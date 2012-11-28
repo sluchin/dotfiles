@@ -25,6 +25,8 @@
                 "~/.emacs.d/navi2ch"
                 "~/.emacs.d/egg"
                 "~/.emacs.d/magit"
+                "~/.emacs.d/mew"
+                "~/.emacs.d/conf"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -241,7 +243,7 @@
 ;; 使用する場合 lisp をロードパスの通ったところにインストールすること
 ;;; インストーラ
 ;; wget http://www.emacswiki.org/emacs/download/auto-install.el
-;; Windowsはwgetが必要なのでとりあえず使わない
+;; Windows は wget が必要なのでとりあえず使わない
 (unless (eq system-type 'windows-nt)
   (when (eval-and-compile (require 'auto-install nil t))
     (auto-install-update-emacswiki-package-name t)
@@ -318,6 +320,40 @@
   (add-hook 'lisp-interaction-mode-hook  'enable-paredit-mode)
   (add-hook 'lisp-mode-hook  'enable-paredit-mode)
   (add-hook 'ielm-mode-hook  'emacs-lisp-mode-hook))
+
+;;; メール
+;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
+(when (locate-library "mew")
+  (autoload 'mew "mew" nil t)
+  (autoload 'mew-send "mew" nil t)
+  (setq read-mail-command 'mew)
+  (autoload 'mew-user-agent-compose "mew" nil t))
+
+(eval-after-load "mew"
+  '(when (eval-when-compile (require 'mew nil t))
+     (setq mail-user-agent 'mew-user-agent)
+     (define-mail-user-agent
+       'mew-user-agent
+       'mew-user-agent-compose
+       'mew-draft-send-message
+       'mew-draft-kill
+       'mew-send-hook)
+
+     ;; メールアカウントの設定
+     ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
+     ;; (setq user-mail-address "email address")
+     ;; (setq user-full-name "user name")
+     ;; (setq mew-mail-domain "domain")
+     ;; (setq mew-imap-user "your IMAP account")
+     ;; (setq mew-imap-server "your IMAP server")
+     ;; (setq mew-smtp-server "your SMTP server")
+     (when (locate-library "mailaccount")
+       (load "mailaccount"))
+     (setq mew-proto "%")
+     (setq mew-use-cached-passwd t)))
+
+;;; 辞書
+
 
 ;;; 自動バイトコンパイル
 ;; M-x install-elisp-from-emacswiki auto-async-byte-compile.el
