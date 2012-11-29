@@ -13,7 +13,7 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
-;;; 起動時間を高速にする
+;;; 起動時間が多少高速になるらしい
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
 ;;; ロードパスの設定
@@ -26,7 +26,7 @@
                 "~/.emacs.d/egg"
                 "~/.emacs.d/magit"
                 "~/.emacs.d/mew"
-                "~/.emacs.d/conf"
+                "~/.emacs.d/conf" 
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -283,7 +283,7 @@
   (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki" t))
 
 ;;; GNU Global
-;; apt-get install global
+;; sudo apt-get install global
 (when (and (executable-find "global") (locate-library "gtags"))
   (autoload 'gtags-mode "gtags" nil t)
   (add-hook 'c-mode-hook 'gtags-mode)
@@ -320,40 +320,6 @@
   (add-hook 'lisp-interaction-mode-hook  'enable-paredit-mode)
   (add-hook 'lisp-mode-hook  'enable-paredit-mode)
   (add-hook 'ielm-mode-hook  'emacs-lisp-mode-hook))
-
-;;; メール
-;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
-(when (locate-library "mew")
-  (autoload 'mew "mew" nil t)
-  (autoload 'mew-send "mew" nil t)
-  (setq read-mail-command 'mew)
-  (autoload 'mew-user-agent-compose "mew" nil t))
-
-(eval-after-load "mew"
-  '(when (eval-when-compile (require 'mew nil t))
-     (setq mail-user-agent 'mew-user-agent)
-     (define-mail-user-agent
-       'mew-user-agent
-       'mew-user-agent-compose
-       'mew-draft-send-message
-       'mew-draft-kill
-       'mew-send-hook)
-
-     ;; メールアカウントの設定
-     ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
-     ;; (setq user-mail-address "email address")
-     ;; (setq user-full-name "user name")
-     ;; (setq mew-mail-domain "domain")
-     ;; (setq mew-imap-user "your IMAP account")
-     ;; (setq mew-imap-server "your IMAP server")
-     ;; (setq mew-smtp-server "your SMTP server")
-     (when (locate-library "mailaccount")
-       (load "mailaccount"))
-     (setq mew-proto "%")
-     (setq mew-use-cached-passwd t)))
-
-;;; 辞書
-
 
 ;;; 自動バイトコンパイル
 ;; M-x install-elisp-from-emacswiki auto-async-byte-compile.el
@@ -428,5 +394,63 @@
 
   ;; find や grep で"grep: NUL: No such file or directory" を回避する
   (setq null-device "/dev/null"))
+
+;;; メール
+;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
+;; sudo apt-get install mew mew-bin
+(when (locate-library "mew")
+  (autoload 'mew "mew" nil t)
+  (autoload 'mew-send "mew" nil t)
+  (setq read-mail-command 'mew)
+  (autoload 'mew-user-agent-compose "mew" nil t))
+
+(eval-after-load "mew"
+  '(when (eval-when-compile (require 'mew nil t))
+     (setq mail-user-agent 'mew-user-agent)
+     (define-mail-user-agent
+       'mew-user-agent
+       'mew-user-agent-compose
+       'mew-draft-send-message
+       'mew-draft-kill
+       'mew-send-hook)
+
+     ;; メールアカウントの設定
+     ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
+     ;; (eval-when-compile (setq load-path (cons "~/.emacs.d/mew" load-path)))
+     ;; (when (eval-when-compile (require 'mew nil t))
+     ;;   ;;; メールアドレス
+     ;;   (setq user-mail-address "Email address")
+     ;;   (setq user-full-name "User name")
+     ;;   (setq mew-mail-domain "Domain name")
+     ;;   ;;; アカウント
+     ;;   (setq mew-imap-user "IMAP account")
+     ;;   (setq mew-imap-server "IMAP server")
+     ;;   (setq mew-smtp-server "SMTP server"))
+     (when (locate-library "mailaccount")
+       (load "mailaccount"))
+     (setq mew-proto "%")
+     (setq mew-use-cached-passwd t)
+     ;;; Gmail
+     (when (string= "gmail.com" mew-mail-domain)
+       (setq mew-imap-auth  t)
+       (setq mew-imap-ssl t)
+       (setq mew-imap-ssl-port "993")
+       (setq mew-smtp-auth t)
+       (setq mew-smtp-ssl t)
+       (setq mew-smtp-ssl-port "465")
+       (setq mew-prog-ssl "/usr/bin/stunnel4")
+       (setq mew-fcc "%Sent") ; 送信メールを保存する
+       (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱"))))
+
+;;; 辞書 (英辞郎の辞書をstardict用に変換したものを使用する)
+;; sudo apt-get install sdcv
+;; M-x install-elisp http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el
+;; M-x install-elisp http://www.emacswiki.org/emacs/download/sdcv.el
+(when (and (executable-find "sdcv") (locate-library "sdcv")
+           (eval-and-compile (require 'sdcv nil t)))
+   (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
+   (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
+   (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
+   (define-key global-map (kbd "C-]") 'sdcv-search-pointer+)) ; ポップアップ
 
 ;;; ここまで拡張 lisp
