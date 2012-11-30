@@ -29,7 +29,9 @@
                 "~/.emacs.d/egg"
                 "~/.emacs.d/magit"
                 "~/.emacs.d/mew"
-                "~/.emacs.d/conf" 
+                "~/.emacs.d/conf"
+                "~/.emacs.d/twittering-mode"
+                "~/.emacs.d/emacs-w3m"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -123,6 +125,7 @@
 ;;; キーバインド
 ;;; ブラウザでURLを開く
 (defun browse-url-at-point ()
+  "get url and open browser"
   (interactive)
   (let ((url-region (bounds-of-thing-at-point 'url)))
     (when url-region
@@ -132,12 +135,14 @@
 
 ;;; 日付挿入
 (defun insert-date ()
+  "insert date"
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
 (define-key global-map (kbd "C-c d") 'insert-date)
 
 ;;; 時間挿入
 (defun insert-time ()
+  "insert time"
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c t") 'insert-time)
@@ -162,7 +167,7 @@
 ;;; 行番号表示
 (when (eval-and-compile (require 'linum nil t)) ; 画面左に行数を表示する
   (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
-  (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号のあとにスペースを入れる
+  (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
 
 ;;; ファイラ(dired)
 (when (eval-and-compile (require 'wdired nil t))
@@ -245,6 +250,7 @@
 
   ;; ソースコードを読みメモする
   (defun org-remember-code-reading ()
+    "When code reading, org-remember mode"
     (interactive)
     (let* ((prefix (org-code-reading-get-prefix (substring (symbol-name major-mode) 0 -5)))
            (org-remember-templates
@@ -254,8 +260,11 @@
 
   ;; GTD
   (defun gtd ()
+    "open my GTD file"
     (interactive)
-    (find-file "~/gtd/progress.org"))
+    (if (file-writable-p "~/gtd/progress.org")
+      (find-file "~/gtd/progress.org")
+      (message "can't open file")))
 
   ;; キーバインド
   (define-key global-map (kbd "C-c l") 'org-store-link)
@@ -479,5 +488,39 @@
    (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
    (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
    (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
+
+;;; twitterクライアント
+;; git clone git://github.com/hayamiz/twittering-mode.git
+(when (locate-library "twittering-mode")
+  (autoload 'twit "twittering-mode" nil t))
+
+(eval-after-load "twittering-mode"
+  '(when (eval-and-compile (require 'twittering-mode nil t))
+     (setq twittering-icon-mode t)
+     (setq twittering-jojo-mode t)
+     (setq twittering-use-master-password t)
+     (setq twittering-status-format
+           "%C{%Y-%m-%d %H:%M:%S} %s > %T // from %f%L%r%R")
+     (setq twittering-update-status-function 'twittering-update-status-from-pop-up-buffer)
+     ;; (setq twittering-username "Twitterアカウント")
+     (defun twittering-mode-hook-func ()
+       (set-face-bold-p 'twittering-username-face t)
+       (set-face-foreground 'twittering-username-face "DeepSkyBlue3")
+       (set-face-foreground 'twittering-uri-face "gray35")
+       (define-key twittering-mode-map (kbd "<") 'my-beginning-of-buffer)
+       (define-key twittering-mode-map (kbd ">") 'my-end-of-buffer)
+       (define-key twittering-mode-map (kbd "F") 'twittering-favorite))
+     (add-hook 'twittering-mode-hook 'twittering-mode-hook-func)))
+
+;;; ブラウザ(w3m)
+;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
+;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
+(when (locate-library "w3m")
+  (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
+  (autoload 'w3m-find-file "w3m" "w3m interface function for local file." t)
+  (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+  (autoload 'w3m-search "w3m-search" "Search QUERY using SEARCH-ENGINE." t)
+  (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
+  (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t))
 
 ;;; ここまで拡張 lisp
