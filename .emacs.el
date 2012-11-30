@@ -6,6 +6,9 @@
 ;;  of 2012-09-22 on akateko, modified by Debian
 ;;  Copyright (C) 2011 Free Software Foundation, Inc.
 
+;;; 設定を読み込まない起動オプション
+;; emacs -q --no-site-file
+
 ;;; ウィンドウのサイズと色は起動オプションで指定する
 ;; /usr/bin/emacs23 -rv -g 100x50-100+0
 
@@ -86,9 +89,6 @@
 ;;; 釣り合いのとれる括弧をハイライトにする
 (show-paren-mode t)
 
-;;; 改行と同時にインデントも行う
-(define-key global-map (kbd "C-m") 'newline-and-indent)
-
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
 
@@ -120,6 +120,7 @@
              (c-add-style "stroustrup-style" stroustrup-style t)
              (c-set-style "stroustrup-style")))
 
+;;; キーバインド
 ;;; ブラウザでURLを開く
 (defun browse-url-at-point ()
   (interactive)
@@ -127,9 +128,22 @@
     (when url-region
       (browse-url (buffer-substring-no-properties (car url-region)
                                                   (cdr url-region))))))
-(define-key global-map (kbd "C-c C-o") 'browse-url-at-point)
+(define-key global-map (kbd "C-c o") 'browse-url-at-point)
 
-;;; キーバインド
+;;; 日付挿入
+(defun insert-date ()
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d")))
+(define-key global-map (kbd "C-c d") 'insert-date)
+
+;;; 時間挿入
+(defun insert-time ()
+  (interactive)
+  (insert (format-time-string "%H:%M:%S")))
+(define-key global-map (kbd "C-c t") 'insert-time)
+
+;;; 改行と同時にインデントも行う
+(define-key global-map (kbd "C-m") 'newline-and-indent)
 ;; find-function のキー割り当て
 ;; C-x F 関数, C-x V 変数, C-x K キー割り当てコマンド
 (find-function-setup-keys)
@@ -141,6 +155,8 @@
 (define-key global-map (kbd "S-DEL") 'clipboard-kill-region)
 ;; クリップボードに貼り付け
 (define-key global-map (kbd "S-<insert>") 'clipboard-yank)
+;; C-\の日本語入力の設定を無効にする
+(define-key global-map "\C-\\" nil)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 ;;; 行番号表示
@@ -169,17 +185,17 @@
   (add-hook 'speedbar-mode-hook
             '(lambda ()
                (speedbar-add-supported-extension '("js" "as" "html" "css" "php"
-                                                   "rst" "howm" "org" "ml" "scala" "*")))))
-;; 行番号を表示しない
-(defadvice linum-on(around my-linum-speedbar-on() activate)
-  (unless (eq major-mode 'speedbar-mode) ad-do-it))
+                                                   "rst" "howm" "org" "ml" "scala" "*"))))
+  ;; 行番号を表示しない
+  (defadvice linum-on(around my-linum-speedbar-on() activate)
+    (unless (eq major-mode 'speedbar-mode) ad-do-it))
 
-(define-key global-map (kbd "<f6>") 'speedbar)
+  (define-key global-map (kbd "<f6>") 'speedbar))
 
 ;;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
-(eval-when-compile (require 'ediff))
-(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(eval-and-compile (require 'ediff)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
 ;;; バッファの切り替えをインクリメンタルにする
 (when (eval-and-compile (require 'iswitchb nil t))
@@ -222,6 +238,11 @@
           ("Bug" ?b "** TODO %?   :bug:\n   %i\n   %a\n   %t" nil "Inbox")
           ("Idea" ?i "** %?\n   %i\n   %a\n   %t" nil "New Ideas")))
 
+  ;; 日付を英語で挿入する
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (set (make-local-variable 'system-time-locale) "C")))
+
   ;; ソースコードを読みメモする
   (defun org-remember-code-reading ()
     (interactive)
@@ -230,6 +251,12 @@
             `(("CodeReading" ?r "** %(identity prefix)%?\n   \n   %a\n   %t"
                ,org-code-reading-file "Memo"))))
       (org-remember)))
+
+  ;; GTD
+  (defun gtd ()
+    (interactive)
+    (find-file "~/gtd/progress.org"))
+
   ;; キーバインド
   (define-key global-map (kbd "C-c l") 'org-store-link)
   (define-key global-map (kbd "C-c a") 'org-agenda)
@@ -298,7 +325,7 @@
 ;;; 日本語入力 (ddskk)
 ;; sudo apt-get install ddskk
 (when (eval-and-compile (require 'skk nil t))
-  (define-key global-map (kbd "C-x C-j") 'skk-mode))
+  (define-key global-map (kbd "C-c j") 'skk-mode))
 
 ;;; 試行錯誤用ファイル
 ;; M-x install-elisp-from-emacswiki open-junk-file.el
@@ -347,7 +374,7 @@
 ;;; git の設定
 ;; git clone git://github.com/byplayer/egg.git
 ;; とりあえず, Windowsでは使わない
-(unless (eq system-type 'windows-nt)
+'(unless (eq system-type 'windows-nt)
   (when (and (executable-find "git") (locate-library "egg"))
     (require 'egg nil t)))
 
@@ -451,6 +478,6 @@
    (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
    (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
    (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
-   (define-key global-map (kbd "C-]") 'sdcv-search-pointer+)) ; ポップアップ
+   (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
 
 ;;; ここまで拡張 lisp
