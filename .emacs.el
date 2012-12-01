@@ -125,7 +125,7 @@
 ;;; キーバインド
 ;;; ブラウザでURLを開く
 (defun browse-url-at-point ()
-  "get url and open browser"
+  "Get url and open browser"
   (interactive)
   (let ((url-region (bounds-of-thing-at-point 'url)))
     (when url-region
@@ -135,14 +135,14 @@
 
 ;;; 日付挿入
 (defun insert-date ()
-  "insert date"
+  "Insert date"
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
 (define-key global-map (kbd "C-c d") 'insert-date)
 
 ;;; 時間挿入
 (defun insert-time ()
-  "insert time"
+  "Insert time"
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c t") 'insert-time)
@@ -162,6 +162,8 @@
 (define-key global-map (kbd "S-<insert>") 'clipboard-yank)
 ;; C-\の日本語入力の設定を無効にする
 (define-key global-map "\C-\\" nil)
+;; 折り返し表示 ON/OFF
+(define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 ;;; 行番号表示
@@ -260,7 +262,7 @@
 
   ;; GTD
   (defun gtd ()
-    "open my GTD file"
+    "Open my GTD file"
     (interactive)
     (if (file-writable-p "~/gtd/progress.org")
       (find-file "~/gtd/progress.org")
@@ -333,8 +335,23 @@
 
 ;;; 日本語入力 (ddskk)
 ;; sudo apt-get install ddskk
+;; 辞書は以下からダウンロードする
+;; http://openlab.ring.gr.jp/skk/wiki/wiki.cgi?page=SKK%BC%AD%BD%F1#p7
+;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
+;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
 (when (eval-and-compile (require 'skk nil t))
-  (define-key global-map (kbd "C-c j") 'skk-mode))
+  (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L")
+  (when (file-directory-p "~/.emacs.d/ddskk")
+    (setq skk-search-prog-list
+          '((skk-search-jisyo-file skk-jisyo 0 t)
+            (skk-search-server skk-aux-large-jisyo 10000)
+            (skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000)
+            (skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2ch" 10000))))
+  ;; skk用のstickyキー設定
+  (setq skk-sticky-key (kbd ":"))
+  ;; インライン候補縦表示
+  (setq skk-show-inline 'vertical)
+  (define-key global-map (kbd "C-;") 'skk-mode))
 
 ;;; 試行錯誤用ファイル
 ;; M-x install-elisp-from-emacswiki open-junk-file.el
