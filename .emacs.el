@@ -472,6 +472,8 @@
      ;; (eval-when-compile (setq load-path (cons "~/.emacs.d/mew" load-path)))
      ;; (when (eval-when-compile (require 'mew nil t))
      ;;   ;;; メールアドレス
+     ;;   (setq mew-name "User name")
+     ;;   (setq mew-user "User login name")
      ;;   (setq user-mail-address "Email address")
      ;;   (setq user-full-name "User name")
      ;;   (setq mew-mail-domain "Domain name")
