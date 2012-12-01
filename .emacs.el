@@ -466,6 +466,14 @@
        (load "mailaccount"))
      (setq mew-proto "%")
      (setq mew-use-cached-passwd t)
+     ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
+     (add-hook 'mew-draft-mode-newdraft-hook
+               (function
+                (lambda ()
+                  (let ((p (point)))
+                    (goto-char (point-max))
+                    (insert-file "~/.signature")
+                    (goto-char p)))))
      ;;; Gmail
      (when (string= "gmail.com" mew-mail-domain)
        (setq mew-imap-auth  t)
