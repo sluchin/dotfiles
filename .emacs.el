@@ -323,17 +323,24 @@
   (define-key global-map (kbd "M-[") 'bm-previous)
   (define-key global-map (kbd "M-]") 'bm-next))
 
-;;; 行番号表示する必要のないモードでは表示しない
- ;; M-x install-elisp-from-emacswiki linum-off.el
- (require 'linum-off nil t)
 
-;;; 2chビューア(navi2ch)
- ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xvfz -
+;;; 変更箇所にジャンプする
+;; M-x install-elisp-from-emacswiki goto-chg.el
+(when (eval-when-compile (require 'goto-chg))
+ (define-key global-map (kbd "<f8>") 'goto-last-change)
+ (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
+
+;;; 行番号表示する必要のないモードでは表示しない
+;; M-x install-elisp-from-emacswiki linum-off.el
+(require 'linum-off nil t)
+
+;;; 2chビューア (navi2ch)
+;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xvfz -
 (when (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs" t))
 
-;;; メモ(howm)
- ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xvfz -
+;;; メモ (howm)
+;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xvfz -
 (when (eval-when-compile (require 'howm nil t))
   (setq howm-menu-lang 'ja)
   ;; デュアルブートで Linux と Windows で共有するための設定をする
@@ -546,7 +553,7 @@
    (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
    (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
 
-;;; twitterクライアント
+;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
 (when (locate-library "twittering-mode")
   (autoload 'twit "twittering-mode" nil t))
