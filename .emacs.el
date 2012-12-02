@@ -31,6 +31,7 @@
                 "~/.emacs.d/conf"
                 "~/.emacs.d/twittering-mode"
                 "~/.emacs.d/emacs-w3m"
+                "~/.emacs.d/bm"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -84,7 +85,7 @@
 ;;; find-fileのデフォルト
 (cd "~/")
 
-;;; 検索時大文字小文字の区別
+;;; 検索時大文字小文字の区別をする
 (setq case-fold-search nil)
 
 ;;; 釣り合いのとれる括弧をハイライトにする
@@ -93,11 +94,15 @@
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
 
-;;; 最近使ったファイルを保存
-(recentf-mode)
-
-;;; クリップボードと同期をとる
+;;; クリップボードとリージョンの同期をとる
 ;; (setq x-select-enable-clipboard t)
+
+;;; 現在位置のファイル・URLを開く
+(ffap-bindings)
+
+;;; ブックマークを変更したら即保存する
+(when (eval-when-compile (require 'bookmark nil t))
+  (setq bookmark-save-flag t))
 
 ;;; タブの設定
 (setq-default tab-width 4)
@@ -291,28 +296,55 @@
 (when (require 'redo+ nil t)
   (define-key global-map (kbd "C-.") 'redo))
 
+;;; 最近使ったファイルを保存
+;; M-x install-elisp-from-emacswiki recentf-ext.el
+;; 以下で最近開いたファイルを一覧表示
+;; M-x recentf-open-files
+(when (eval-when-compile (require 'recentf-ext nil t))
+  (setq recentf-max-saved-items 3000)
+  (setq recentf-exclude '("/TAGS$" "/var/tmp/")))
+
+;;; 使わないバッファを自動的に消す
+(when (require 'tempbuf nil t)
+  (add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
+  (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
+
+;;; カーソル位置印をつけ移動する
+;; git clone git://github.com/joodland/bm.git
+(when (eval-when-compile (require 'bm nil t))
+  (setq-default bm-buffer-persistence nil)
+  (setq bm-restore-repository-on-load t)
+  (add-hook 'find-file-hooks 'bm-buffer-restore)
+  (add-hook 'kill-buffer-hook 'bm-buffer-save)
+  (add-hook 'after-save-hook 'bm-buffer-save)
+  (add-hook 'after-revert-hook 'bm-buffer-restore)
+  (add-hook 'vc-before-checkin-hook 'bm-buffer-save)
+  (define-key global-map (kbd "M-SPC") 'bm-toggle)
+  (define-key global-map (kbd "M-[") 'bm-previous)
+  (define-key global-map (kbd "M-]") 'bm-next))
+
 ;;; 行番号表示する必要のないモードでは表示しない
-;; M-x install-elisp-from-emacswiki linum-off.el
-(require 'linum-off nil t)
+ ;; M-x install-elisp-from-emacswiki linum-off.el
+ (require 'linum-off nil t)
 
 ;;; 2chビューア(navi2ch)
-;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xvfz -
+ ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xvfz -
 (when (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs" t))
 
 ;;; メモ(howm)
-;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xvfz -
+ ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xvfz -
 (when (eval-when-compile (require 'howm nil t))
   (setq howm-menu-lang 'ja)
-  ;; デュアルブートでLinuxとWindowsで共有するための設定をする
+  ;; デュアルブートで Linux と Windows で共有するための設定をする
   (cond ((and (eq system-type 'gnu/linux)
-         (file-directory-p "/dos"))
+              (file-directory-p "/dos"))
          (setq howm-directory "/dos/howm"))
         ((and (eq system-type 'windows-nt)
-         (file-directory-p "e:"))
-          (setq howm-directory "e:/howm"))
+              (file-directory-p "e:"))
+         (setq howm-directory "e:/howm"))
         (t
-          (setq howm-directory "~/howm")))
+         (setq howm-directory "~/howm")))
   ;; 除外するファイル
   (setq howm-excluded-file-regexp
         "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/")
@@ -380,7 +412,7 @@
   (setq auto-async-byte-compile-exclude-files-regexp "/junk/")
   (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
 
-;;; ミニバッファに関数のhelp表示
+;;; ミニバッファに関数の help 表示
 ;; M-x install-elisp-from-emacswiki eldoc-extension.el
 (when (eval-when-compile (require 'eldoc-extension nil t))
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
