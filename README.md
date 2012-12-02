@@ -8,7 +8,9 @@ dotfiles
   - howm 1.4.0  
   - navi2ch 1.8.4  
   - magit  
-  - mew 6.5  
+  - mew 6.5
+  - w3m
+  - twittering-mode
 
 
 
