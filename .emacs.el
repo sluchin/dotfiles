@@ -26,9 +26,8 @@
                 "~/.emacs.d"
                 "~/.emacs.d/howm"
                 "~/.emacs.d/navi2ch"
-                "~/.emacs.d/egg"
+                ;"~/.emacs.d/egg"
                 "~/.emacs.d/magit"
-                "~/.emacs.d/mew"
                 "~/.emacs.d/conf"
                 "~/.emacs.d/twittering-mode"
                 "~/.emacs.d/emacs-w3m"
@@ -39,7 +38,7 @@
 ;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xvfz -
 ;; 目次ファイルに以下を追加 (/usr/share/info/dir)
 ;; * Elisp-ja: (elisp-ja) Emacs Lisp Reference Manual(Japanese).
-;; * Emacs-ja: (emacs-ja) The extensible self-documenting tgext editor(Japanese).
+;; * Emacs-ja: (emacs-ja) The extensible self-documenting text editor(Japanese).
 (when (file-directory-p "~/info")
   (eval-and-compile (require 'info))
   (add-to-list 'Info-directory-list "~/info"))
@@ -445,12 +444,12 @@
               (lambda ()
                 (define-key dired-mode-map "z" 'uenox-dired-winstart))))
 
-  ;; find や grep で"grep: NUL: No such file or directory" を回避する
+  ;; find や grep で "grep: NUL: No such file or directory" を回避する
   (setq null-device "/dev/null"))
 
 ;;; メール
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
-;; sudo apt-get install mew mew-bin
+;; sudo apt-get install mew mew-bin stunnel4
 (when (locate-library "mew")
   (autoload 'mew "mew" nil t)
   (autoload 'mew-send "mew" nil t)
@@ -469,7 +468,6 @@
 
      ;; メールアカウントの設定
      ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
-     ;; (eval-when-compile (setq load-path (cons "~/.emacs.d/mew" load-path)))
      ;; (when (eval-when-compile (require 'mew nil t))
      ;;   ;;; メールアドレス
      ;;   (setq mew-name "User name")
@@ -524,25 +522,16 @@
 (eval-after-load "twittering-mode"
   '(when (eval-and-compile (require 'twittering-mode nil t))
      (setq twittering-icon-mode t)
-     (setq twittering-jojo-mode t)
-     (setq twittering-use-master-password t)
      (setq twittering-status-format
-           "%C{%Y-%m-%d %H:%M:%S} %s > %T // from %f%L%r%R")
+             "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n")
      (setq twittering-update-status-function 'twittering-update-status-from-pop-up-buffer)
-     ;; (setq twittering-username "Twitterアカウント")
-     (defun twittering-mode-hook-func ()
-       (set-face-bold-p 'twittering-username-face t)
-       (set-face-foreground 'twittering-username-face "DeepSkyBlue3")
-       (set-face-foreground 'twittering-uri-face "gray35")
-       (define-key twittering-mode-map (kbd "<") 'my-beginning-of-buffer)
-       (define-key twittering-mode-map (kbd ">") 'my-end-of-buffer)
-       (define-key twittering-mode-map (kbd "F") 'twittering-favorite))
-     (add-hook 'twittering-mode-hook 'twittering-mode-hook-func)))
+     (setq twittering-use-master-password t)))
 
-;;; ブラウザ(w3m)
+;;; ブラウザ (w3m)
+;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
-(when (locate-library "w3m")
+(when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
   (autoload 'w3m-find-file "w3m" "w3m interface function for local file." t)
   (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
