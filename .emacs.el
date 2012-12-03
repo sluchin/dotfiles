@@ -7,10 +7,10 @@
 ;;  Copyright (C) 2011 Free Software Foundation, Inc.
 
 ;;; 設定を読み込まない起動オプション
-;; emacs -q --no-site-file
+;; emacs23 -q --no-site-file
 
 ;;; ウィンドウのサイズと色は起動オプションで指定する
-;; /usr/bin/emacs23 -rv -g 100x50-100+0
+;; emacs23 -rv -g 100x50-100+0
 
 ;;; Windows の場合, 以下の設定をすること
 ;; Cygwin の Base をインストールしパスを通す
@@ -94,6 +94,17 @@
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
 
+;;; ダイアログボックスを使かわないようにする
+(setq use-dialog-box nil)
+(defalias 'message-box 'message)
+
+;;; ログの記録行数を増やす
+(setq message-log-max 100000)
+
+;;; ツールバーとスクロールバーを消す
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
 ;;; クリップボードとリージョンの同期をとる
 ;; (setq x-select-enable-clipboard t)
 
@@ -127,7 +138,7 @@
              (c-set-style "stroustrup-style")))
 
 ;;; キーバインド
-;;; ブラウザでURLを開く
+;;; ブラウザで URL を開く
 (defun browse-url-at-point ()
   "Get url and open browser"
   (interactive)
@@ -175,7 +186,7 @@
   (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
   (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
 
-;;; ファイラ(dired)
+;;; ファイラ (dired)
 (when (eval-and-compile (require 'wdired nil t))
   ;; 編集可能にする
   (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
@@ -234,7 +245,7 @@
 
   ;; org-mode での強調表示を可能にする
   (add-hook 'org-mode-hook 'turn-on-font-lock)
-  ;; 見出しの余分な*を消す
+  ;; 見出しの余分な * を消す
   (setq org-hide-leading-stars t)
   ;; org-remember のディレクトリ
   (setq org-directory "~/memo/")
@@ -323,12 +334,16 @@
   (define-key global-map (kbd "M-[") 'bm-previous)
   (define-key global-map (kbd "M-]") 'bm-next))
 
-
 ;;; 変更箇所にジャンプする
 ;; M-x install-elisp-from-emacswiki goto-chg.el
 (when (eval-when-compile (require 'goto-chg))
  (define-key global-map (kbd "<f8>") 'goto-last-change)
  (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
+
+;;; ファイルを自動保存する
+;; M-x install-elisp http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el
+(when (eval-when-compile (require 'auto-save-buffers))
+  (run-with-idle-timer 2 t 'auto-save-buffers)) ; アイドル 2秒で保存
 
 ;;; 行番号表示する必要のないモードでは表示しない
 ;; M-x install-elisp-from-emacswiki linum-off.el
@@ -385,7 +400,7 @@
             (skk-search-server skk-aux-large-jisyo 10000)
             (skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000)
             (skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2ch" 10000))))
-  ;; skk用のstickyキー設定
+  ;; skk 用の sticky キー設定
   (setq skk-sticky-key (kbd ":"))
   ;; インライン候補縦表示
   (setq skk-show-inline 'vertical)
@@ -543,7 +558,7 @@
        (setq mew-fcc "%Sent") ; 送信メールを保存する
        (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱"))))
 
-;;; 辞書 (英辞郎の辞書をstardict用に変換したものを使用する)
+;;; 辞書 (英辞郎の辞書を stardict 用に変換したものを使用する)
 ;; sudo apt-get install sdcv
 ;; M-x install-elisp http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el
 ;; M-x install-elisp http://www.emacswiki.org/emacs/download/sdcv.el
