@@ -268,9 +268,9 @@
   (defun gtd ()
     "Open my GTD file"
     (interactive)
-    (if (file-writable-p "~/gtd/progress.org")
-      (find-file "~/gtd/progress.org")
-      (message "can't open file")))
+    (if (file-writable-p "~/gtd/plan.org")
+      (find-file "~/gtd/plan.org")
+      (message "Can't open file: ~/gtd/plan.org")))
 
   ;; キーバインド
   (define-key global-map (kbd "C-c l") 'org-store-link)
@@ -523,13 +523,14 @@
      (setq mew-proto "%")
      (setq mew-use-cached-passwd t)
      ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
-     (add-hook 'mew-draft-mode-newdraft-hook
-               (function
-                (lambda ()
-                  (let ((p (point)))
-                    (goto-char (point-max))
-                    (insert-file "~/.signature")
-                    (goto-char p)))))
+     (when (file-readable-p "~/.signature") 
+         (add-hook 'mew-draft-mode-newdraft-hook
+                   (function
+                    (lambda ()
+                      (let ((p (point)))
+                        (goto-char (point-max))
+                        (insert-file "~/.signature")
+                        (goto-char p))))))
      ;;; Gmail
      (when (string= "gmail.com" mew-mail-domain)
        (setq mew-imap-auth  t)
@@ -577,5 +578,7 @@
   (autoload 'w3m-search "w3m-search" "Search QUERY using SEARCH-ENGINE." t)
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t))
-
+(eval-after-load "w3m"
+  '(when (eval-when-compile (require 'w3m nil t))
+     (setq w3m-home-page "http://google.co.jp/")))
 ;;; ここまで拡張 lisp
