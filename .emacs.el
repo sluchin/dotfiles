@@ -26,8 +26,8 @@
                 "~/.emacs.d"
                 "~/.emacs.d/howm"
                 "~/.emacs.d/navi2ch"
-                ;"~/.emacs.d/egg"
-                "~/.emacs.d/magit"
+                "~/.emacs.d/egg"
+                ;; "~/.emacs.d/magit"
                 "~/.emacs.d/conf"
                 "~/.emacs.d/twittering-mode"
                 "~/.emacs.d/emacs-w3m"
@@ -91,10 +91,13 @@
 ;;; 釣り合いのとれる括弧をハイライトにする
 (show-paren-mode t)
 
+;;; リージョンに色をつける
+;; (setq transient-mark-mode t)
+
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
 
-;;; ダイアログボックスを使かわないようにする
+;;; ダイアログボックスを使わないようにする
 (setq use-dialog-box nil)
 (defalias 'message-box 'message)
 
@@ -145,7 +148,7 @@
              (c-set-style "stroustrup-style")))
 
 ;;; キーバインド
-;;; ブラウザで URL を開く
+;; ブラウザで URL を開く
 (defun browse-url-at-point ()
   "Get url and open browser"
   (interactive)
@@ -155,21 +158,21 @@
                                                   (cdr url-region))))))
 (define-key global-map (kbd "C-c o") 'browse-url-at-point)
 
-;;; 日付挿入
+;; 日付挿入
 (defun insert-date ()
   "Insert date"
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
 (define-key global-map (kbd "C-c d") 'insert-date)
 
-;;; 時間挿入
+;; 時間挿入
 (defun insert-time ()
   "Insert time"
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c t") 'insert-time)
 
-;;; 改行と同時にインデントも行う
+;; 改行と同時にインデントも行う
 (define-key global-map (kbd "C-m") 'newline-and-indent)
 ;; find-function のキー割り当て
 ;; C-x F 関数, C-x V 変数, C-x K キー割り当てコマンド
@@ -188,6 +191,7 @@
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
+
 ;;; 行番号表示
 (when (eval-and-compile (require 'linum nil t)) ; 画面左に行数を表示する
   (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
@@ -355,6 +359,10 @@
 ;; (when (eval-when-compile (require 'auto-save-buffers))
 ;;   (run-with-idle-timer 2 t 'auto-save-buffers)) ; アイドル 2秒で保存
 
+;;; Emacs内シェルコマンド履歴保存
+;; M-x install-elisp-from-emacswiki shell-history.el
+(require 'shell-history nil t)
+
 ;;; 行番号表示する必要のないモードでは表示しない
 ;; M-x install-elisp-from-emacswiki linum-off.el
 (require 'linum-off nil t)
@@ -397,7 +405,7 @@
   (add-hook 'c-mode-hook 'gtags-mode)
   (add-hook 'c++-mode-hook 'gtags-mode)
   (add-hook 'java-mode-hook 'gtags-mode)
-  (define-key global-map (kbd "<f3>") 'gtags-find-with-grep))
+  (define-key global-map (kbd "<f5>") 'gtags-find-with-grep))
 
 ;;; grepの色
 ;; M-x install-elisp http://www.bookshelf.jp/elc/color-grep.el
@@ -470,14 +478,14 @@
 ;;; git の設定
 ;; git clone git://github.com/byplayer/egg.git
 ;; とりあえず, Windowsでは使わない
-'(unless (eq system-type 'windows-nt)
+(unless (eq system-type 'windows-nt)
   (when (and (executable-find "git") (locate-library "egg"))
     (require 'egg nil t)))
 
 ;;; git の設定
 ;; git clone git://github.com/jdhuntington/magit.git
 ;; とりあえず, Windowsでは使わない
-(unless (eq system-type 'windows-nt)
+'(unless (eq system-type 'windows-nt)
   (when (and (executable-find "git") (locate-library "magit"))
     (autoload 'magit-status "magit" "Interface for git on Emacs." t)))
 
@@ -590,7 +598,7 @@
 
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
-(when (locate-library "twittering-mode")
+(if (locate-library "twittering-mode")
   (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t))
 
 (eval-after-load "twittering-mode"
@@ -601,7 +609,8 @@
          (setq twittering-status-format
             "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
      (if (boundp 'twittering-update-status-function)
-         (setq twittering-update-status-function 'twittering-update-status-from-pop-up-buffer))
+         (setq twittering-update-status-function
+               'twittering-update-status-from-pop-up-buffer))
      (if (boundp 'twittering-use-master-password)
          (setq twittering-use-master-password t))))
 
@@ -620,5 +629,32 @@
 (eval-after-load "w3m"
   '(if (boundp 'w3m-home-page)
        (setq w3m-home-page "http://google.co.jp/")))
+
+;;; 端末エミュレータ
+;; M-x install-elisp-from-emacswiki multi-term.el
+(when (locate-library "multi-term")
+    (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
+    (autoload 'multi-term-next "multi-term" "Emacs terminal emulator." t))
+
+(eval-after-load "multi-term"
+  '(progn
+     (if (boundp 'multi-term-program)
+         (setq multi-term-program "/bin/zsh"))
+     (if (boundp 'term-unbind-key-list)
+         (setq term-unbind-key-list '("C-x" "C-c" "<ESC>")))
+     (if (boundp 'term-bind-key-alist)
+         (setq term-bind-key-alist
+               '(("C-c C-c" . term-interrupt-subjob)
+                 ("C-m" . term-send-raw)
+                 ("M-f" . term-send-forward-word)
+                 ("M-b" . term-send-backward-word)
+                 ("M-o" . term-send-backspace)
+                 ("M-p" . term-send-up)
+                 ("M-n" . term-send-down)
+                 ("M-M" . term-send-forward-kill-word)
+                 ("M-N" . term-send-backward-kill-word)
+                 ("M-r" . term-send-reverse-search-history)
+                 ("M-," . term-send-input)
+                 ("M-." . comint-dynamic-complete))))))
 
 ;;; ここまで拡張 lisp
