@@ -20,7 +20,7 @@
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
 ;;; ロードパスの設定
-;; lisp の置き場所をここに追加
+;; lisp の置き場所をここで追加
 (setq load-path
       (append '(
                 "~/.emacs.d"
@@ -102,8 +102,9 @@
 (setq message-log-max 100000)
 
 ;;; ツールバーとスクロールバーを消す
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
+(when window-system
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1))
 
 ;;; クリップボードとリージョンの同期をとる
 ;; (setq x-select-enable-clipboard t)
@@ -111,8 +112,14 @@
 ;;; 現在位置のファイル・URLを開く
 (ffap-bindings)
 
+;;; 矩形選択
+;; C-<enter> で矩形選択モード
+(cua-mode t) ; cua-mode を有効にする
+(if (eval-when-compile (require 'cua-base nil t))
+  (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
+
 ;;; ブックマークを変更したら即保存する
-(when (eval-when-compile (require 'bookmark nil t))
+(if (eval-when-compile (require 'bookmark nil t))
   (setq bookmark-save-flag t))
 
 ;;; タブの設定
@@ -186,10 +193,9 @@
   (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
   (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
 
-;;; ファイラ (dired)
-(when (eval-and-compile (require 'wdired nil t))
-  ;; 編集可能にする
-  (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+;;; ファイラ (dired) 編集可能にする
+(if (eval-and-compile (require 'wdired nil t))
+    (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
 
 ;;; 関数のアウトライン表示
 (when (eval-when-compile (require 'speedbar nil t))
@@ -280,7 +286,7 @@
     "Open my GTD file"
     (interactive)
     (if (file-writable-p "~/gtd/plan.org")
-      (find-file "~/gtd/plan.org")
+        (find-file "~/gtd/plan.org")
       (message "Can't open file: ~/gtd/plan.org")))
 
   ;; キーバインド
@@ -294,15 +300,19 @@
 
 ;;; ここから拡張 lisp の設定
 ;; 使用する場合 lisp をロードパスの通ったところにインストールすること
+
 ;;; インストーラ
 ;; wget http://www.emacswiki.org/emacs/download/auto-install.el
-;; Windows は wget が必要なのでとりあえず使わない
-(unless (eq system-type 'windows-nt)
+;; autoloadすると一回目に error になるため使うときは,
+;; M-x require-auto-install を最初に実行するようにする
+(defun require-auto-install ()
+  "Require auto-install"
+  (interactive)
   (when (eval-and-compile (require 'auto-install nil t))
     (auto-install-update-emacswiki-package-name t)
     (auto-install-compatibility-setup)))
 
-;;; リドゥ
+;; リドゥ
 ;; M-x install-elisp-from-emacswiki redo+.el
 (when (require 'redo+ nil t)
   (define-key global-map (kbd "C-.") 'redo))
@@ -342,8 +352,8 @@
 
 ;;; ファイルを自動保存する
 ;; M-x install-elisp http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el
-(when (eval-when-compile (require 'auto-save-buffers))
-  (run-with-idle-timer 2 t 'auto-save-buffers)) ; アイドル 2秒で保存
+;; (when (eval-when-compile (require 'auto-save-buffers))
+;;   (run-with-idle-timer 2 t 'auto-save-buffers)) ; アイドル 2秒で保存
 
 ;;; 行番号表示する必要のないモードでは表示しない
 ;; M-x install-elisp-from-emacswiki linum-off.el
@@ -352,26 +362,33 @@
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xvfz -
 (when (locate-library "navi2ch")
-  (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs" t))
+  (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t))
 
 ;;; メモ (howm)
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xvfz -
-(when (eval-when-compile (require 'howm nil t))
-  (setq howm-menu-lang 'ja)
-  ;; デュアルブートで Linux と Windows で共有するための設定をする
-  (cond ((and (eq system-type 'gnu/linux)
-              (file-directory-p "/dos"))
-         (setq howm-directory "/dos/howm"))
-        ((and (eq system-type 'windows-nt)
-              (file-directory-p "e:"))
-         (setq howm-directory "e:/howm"))
-        (t
-         (setq howm-directory "~/howm")))
-  ;; 除外するファイル
-  (setq howm-excluded-file-regexp
-        "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/")
-  (define-key global-map (kbd "C-c , ,") 'howm-menu)
-  (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki" t))
+(when (locate-library "howm")
+  (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki." t)
+  (define-key global-map (kbd "C-c , ,") 'howm-menu))
+
+(eval-after-load "howm-mode"
+  '(progn
+     (if (boundp 'howm-menu-lang)
+         (setq howm-menu-lang 'ja))
+     (if (boundp 'howm-directory)
+         ;; デュアルブートで Linux と Windows で共有するための設定をする
+         (cond ((and (eq system-type 'gnu/linux)
+                     (file-directory-p "/dos"))
+                (setq howm-directory "/dos/howm"))
+               ((and (eq system-type 'windows-nt)
+                     (file-directory-p "e:"))
+                (setq howm-directory "e:/howm"))
+               (t
+                (setq howm-directory "~/howm"))))
+
+     (if (boundp 'howm-excluded-file-regexp)
+         ;; 除外するファイル
+         (setq howm-excluded-file-regexp
+               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))))
 
 ;;; GNU Global
 ;; sudo apt-get install global
@@ -462,7 +479,7 @@
 ;; とりあえず, Windowsでは使わない
 (unless (eq system-type 'windows-nt)
   (when (and (executable-find "git") (locate-library "magit"))
-    (require 'magit nil t)))
+    (autoload 'magit-status "magit" "Interface for git on Emacs." t)))
 
 ;;; Windows の設定
 (when (eq system-type 'windows-nt)
@@ -505,20 +522,22 @@
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
 ;; sudo apt-get install mew mew-bin stunnel4
 (when (locate-library "mew")
-  (autoload 'mew "mew" nil t)
-  (autoload 'mew-send "mew" nil t)
+  (autoload 'mew "mew" "Mailer on Emacs." t)
+  (autoload 'mew-send "mew" "Send mail." t)
   (setq read-mail-command 'mew)
-  (autoload 'mew-user-agent-compose "mew" nil t))
+  (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t))
 
 (eval-after-load "mew"
-  '(when (eval-when-compile (require 'mew nil t))
-     (setq mail-user-agent 'mew-user-agent)
-     (define-mail-user-agent
-       'mew-user-agent
-       'mew-user-agent-compose
-       'mew-draft-send-message
-       'mew-draft-kill
-       'mew-send-hook)
+  '(progn
+    (if (boundp 'mail-user-agent)
+        (setq mail-user-agent 'mew-user-agent))
+    (if (fboundp 'define-mail-user-agent)
+        (define-mail-user-agent
+          'mew-user-agent
+          'mew-user-agent-compose
+          'mew-draft-send-message
+          'mew-draft-kill
+          'mew-send-hook))
 
      ;; メールアカウントの設定
      ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
@@ -533,12 +552,12 @@
      ;;   (setq mew-imap-user "IMAP account")
      ;;   (setq mew-imap-server "IMAP server")
      ;;   (setq mew-smtp-server "SMTP server"))
-     (when (locate-library "mailaccount")
+     (if (locate-library "mailaccount")
        (load "mailaccount"))
      (setq mew-proto "%")
      (setq mew-use-cached-passwd t)
      ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
-     (when (file-readable-p "~/.signature") 
+     (if (file-readable-p "~/.signature") 
          (add-hook 'mew-draft-mode-newdraft-hook
                    (function
                     (lambda ()
@@ -572,15 +591,19 @@
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
 (when (locate-library "twittering-mode")
-  (autoload 'twit "twittering-mode" nil t))
+  (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t))
 
 (eval-after-load "twittering-mode"
-  '(when (eval-and-compile (require 'twittering-mode nil t))
-     (setq twittering-icon-mode t)
-     (setq twittering-status-format
-             "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n")
-     (setq twittering-update-status-function 'twittering-update-status-from-pop-up-buffer)
-     (setq twittering-use-master-password t)))
+  '(progn
+     (if (boundp 'twittering-icon-mode)
+         (setq twittering-icon-mode t))
+     (if (boundp 'twittering-status-format)
+         (setq twittering-status-format
+            "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
+     (if (boundp 'twittering-update-status-function)
+         (setq twittering-update-status-function 'twittering-update-status-from-pop-up-buffer))
+     (if (boundp 'twittering-use-master-password)
+         (setq twittering-use-master-password t))))
 
 ;;; ブラウザ (w3m)
 ;; sudo apt-get install w3m
@@ -593,7 +616,9 @@
   (autoload 'w3m-search "w3m-search" "Search QUERY using SEARCH-ENGINE." t)
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t))
+
 (eval-after-load "w3m"
-  '(when (eval-when-compile (require 'w3m nil t))
-     (setq w3m-home-page "http://google.co.jp/")))
+  '(if (boundp 'w3m-home-page)
+       (setq w3m-home-page "http://google.co.jp/")))
+
 ;;; ここまで拡張 lisp
