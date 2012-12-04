@@ -26,8 +26,7 @@
                 "~/.emacs.d"
                 "~/.emacs.d/howm"
                 "~/.emacs.d/navi2ch"
-                "~/.emacs.d/egg"
-                ;; "~/.emacs.d/magit"
+                "~/.emacs.d/magit"
                 "~/.emacs.d/conf"
                 "~/.emacs.d/twittering-mode"
                 "~/.emacs.d/emacs-w3m"
@@ -476,16 +475,9 @@
   (umemo-initialize))
 
 ;;; git の設定
-;; git clone git://github.com/byplayer/egg.git
-;; とりあえず, Windowsでは使わない
-(unless (eq system-type 'windows-nt)
-  (when (and (executable-find "git") (locate-library "egg"))
-    (require 'egg nil t)))
-
-;;; git の設定
 ;; git clone git://github.com/jdhuntington/magit.git
-;; とりあえず, Windowsでは使わない
-'(unless (eq system-type 'windows-nt)
+;; とりあえず, Windows では使わない
+(unless (eq system-type 'windows-nt)
   (when (and (executable-find "git") (locate-library "magit"))
     (autoload 'magit-status "magit" "Interface for git on Emacs." t)))
 
