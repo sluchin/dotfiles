@@ -12,6 +12,7 @@ dotfiles
   - emacs-w3m  
   - twittering-mode
   - evernote-mode
+  - gist
 
 
 
