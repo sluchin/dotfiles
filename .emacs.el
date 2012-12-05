@@ -92,7 +92,7 @@
 (show-paren-mode t)
 
 ;;; リージョンに色をつける
-;; (setq transient-mark-mode t)
+(setq transient-mark-mode t)
 
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
@@ -104,10 +104,20 @@
 ;;; ログの記録行数を増やす (デフォルトは 100100)
 (setq message-log-max 1001000)
 
+;;; 履歴を保存する
+(savehist-mode t)
+
+;;; ファイル内のカーソル位置を記録する
+(load "saveplace")
+(setq-default save-place t)
+
+;; ミニバッファを再帰的に呼び出せるようにする
+(setq enable-recursive-minibuffers t)
+
 ;;; ツールバーとスクロールバーを消す
 (when window-system
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1))
+  (tool-bar-mode nil)
+  (scroll-bar-mode nil))
 
 ;;; クリップボードとリージョンの同期をとる
 ;; (setq x-select-enable-clipboard t)
