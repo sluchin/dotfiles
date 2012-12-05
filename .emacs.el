@@ -645,11 +645,11 @@
 ;; sudo gem install -r thrift
 ;; sudo ruby ~/.emacs.d/evernote-mode/ruby/setup.rb
 (when (and (executable-find "ruby") (executable-find "w3m") (locate-library "evernote-mode"))
-  (autoload 'evernote-create-note "evernote-mode" "Interface for Evernote on Emacs." t)
-  (autoload 'evernote-open-note "evernote-mode" "Interface for Evernote on Emacs." t)
-  (autoload 'evernote-write-note "evernote-mode" "Interface for Evernote on Emacs." t)
-  (autoload 'evernote-browser "evernote-mode" "Interface for Evernote on Emacs." t)
-  (autoload 'evernote-post-region "evernote-mode" "Interface for Evernote on Emacs." t)
+  (autoload 'evernote-create-note "evernote-mode" "Create an evernote." t)
+  (autoload 'evernote-open-note "evernote-mode" "Open a note for evernote." t)
+  (autoload 'evernote-write-note "evernote-mode" "Write buffer to an evernote." t)
+  (autoload 'evernote-browser "evernote-mode" "Open an evernote browser." t)
+  (autoload 'evernote-post-region "evernote-mode" "Post the region as an evernote." t)
   ;; 新規ノート作成。タグ、タイトルなどを入力
   (define-key global-map (kbd "C-c e c") 'evernote-create-note)
   ;; タグを選択してノートを開く
