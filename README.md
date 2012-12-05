@@ -8,8 +8,10 @@ dotfiles
   - howm 1.4.0  
   - navi2ch 1.8.4  
   - magit  
-  - w3m  
-  - twittering-mode  
+  - bm  
+  - emacs-w3m  
+  - twittering-mode
+  - evernote-mode
 
 
 
@@ -26,8 +28,8 @@ Quick start
 
   
 
-Authors
--------
+Author
+------
 
 **Tetsuya Higashi**  
 
