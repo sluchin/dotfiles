@@ -119,11 +119,11 @@
 ;; C-<enter> で矩形選択モード
 (cua-mode t) ; cua-mode を有効にする
 (if (eval-when-compile (require 'cua-base nil t))
-  (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
+    (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
 
 ;;; ブックマークを変更したら即保存する
 (if (eval-when-compile (require 'bookmark nil t))
-  (setq bookmark-save-flag t))
+    (setq bookmark-save-flag t))
 
 ;;; タブの設定
 (setq-default tab-width 4)
@@ -226,7 +226,7 @@
 
 ;;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
-(eval-and-compile (require 'ediff)
+(if (eval-and-compile (require 'ediff nil t))
   (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
 ;;; バッファの切り替えをインクリメンタルにする
@@ -358,8 +358,8 @@
 ;;; 変更箇所にジャンプする
 ;; M-x install-elisp-from-emacswiki goto-chg.el
 (when (eval-when-compile (require 'goto-chg))
- (define-key global-map (kbd "<f8>") 'goto-last-change)
- (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
+  (define-key global-map (kbd "<f8>") 'goto-last-change)
+  (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
 
 ;;; ファイルを自動保存する
 ;; M-x install-elisp http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el
@@ -537,15 +537,15 @@
 
 (eval-after-load "mew"
   '(progn
-    (if (boundp 'mail-user-agent)
-        (setq mail-user-agent 'mew-user-agent))
-    (if (fboundp 'define-mail-user-agent)
-        (define-mail-user-agent
-          'mew-user-agent
-          'mew-user-agent-compose
-          'mew-draft-send-message
-          'mew-draft-kill
-          'mew-send-hook))
+     (if (boundp 'mail-user-agent)
+         (setq mail-user-agent 'mew-user-agent))
+     (if (fboundp 'define-mail-user-agent)
+         (define-mail-user-agent
+           'mew-user-agent
+           'mew-user-agent-compose
+           'mew-draft-send-message
+           'mew-draft-kill
+           'mew-send-hook))
 
      ;; メールアカウントの設定
      ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
@@ -561,7 +561,7 @@
      ;;   (setq mew-imap-server "IMAP server")
      ;;   (setq mew-smtp-server "SMTP server"))
      (if (locate-library "mailaccount")
-       (load "mailaccount"))
+         (load "mailaccount"))
      (setq mew-proto "%")
      (setq mew-use-cached-passwd t)
      ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
@@ -591,15 +591,15 @@
 ;; M-x install-elisp http://www.emacswiki.org/emacs/download/sdcv.el
 (when (and (executable-find "sdcv") (locate-library "sdcv")
            (eval-and-compile (require 'sdcv nil t)))
-   (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
-   (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
-   (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
-   (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
+  (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
+  (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
+  (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
+  (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
 
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
 (if (locate-library "twittering-mode")
-  (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t))
+    (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t))
 
 (eval-after-load "twittering-mode"
   '(progn
@@ -607,7 +607,7 @@
          (setq twittering-icon-mode t))
      (if (boundp 'twittering-status-format)
          (setq twittering-status-format
-            "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
+               "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
      (if (boundp 'twittering-update-status-function)
          (setq twittering-update-status-function
                'twittering-update-status-from-pop-up-buffer))
@@ -639,6 +639,7 @@
   (autoload 'evernote-open-note "evernote-mode" "Interface for Evernote on Emacs." t)
   (autoload 'evernote-write-note "evernote-mode" "Interface for Evernote on Emacs." t)
   (autoload 'evernote-browser "evernote-mode" "Interface for Evernote on Emacs." t)
+  (autoload 'evernote-post-region "evernote-mode" "Interface for Evernote on Emacs." t)
   ;; 新規ノート作成。タグ、タイトルなどを入力
   (define-key global-map (kbd "C-c e c") 'evernote-create-note)
   ;; タグを選択してノートを開く
@@ -665,8 +666,8 @@
 ;; zsh を使用するときはこれを使うことにする
 ;; M-x install-elisp-from-emacswiki multi-term.el
 (when (locate-library "multi-term")
-    (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
-    (autoload 'multi-term-next "multi-term" "Emacs terminal emulator." t))
+  (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
+  (autoload 'multi-term-next "multi-term" "Emacs terminal emulator." t))
 
 (eval-after-load "multi-term"
   '(progn
