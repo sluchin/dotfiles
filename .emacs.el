@@ -32,17 +32,28 @@
                 "~/.emacs.d/emacs-w3m"
                 "~/.emacs.d/evernote-mode"
                 "~/.emacs.d/bm"
+                "~/.emacs.d/gist"
+                "~/.emacs.d/elpa"
+                "~/.emacs.d/elpa/archives"
+                "~/.emacs.d/elpa/eieio-1.4"
+                "~/.emacs.d/elpa/gh-0.5.3"
+                "~/.emacs.d/elpa/gist-1.0.2"
+                "~/.emacs.d/elpa/logito-0.1"
+                "~/.emacs.d/elpa/pcache-0.2.3"
+                "~/.emacs.d/elpa/tabulated-list-0"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
 ;;; 日本語の info のバスを設定
 ;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xvfz -
 ;; 目次ファイルに以下を追加 (/usr/share/info/dir)
-;; * Elisp-ja: (elisp-ja) Emacs Lisp Reference Manual(Japanese).
-;; * Emacs-ja: (emacs-ja) The extensible self-documenting text editor(Japanese).
-(when (file-directory-p "~/info")
-  (eval-and-compile (require 'info))
-  (add-to-list 'Info-directory-list "~/info"))
+;; * Elisp-ja: (elisp-ja).    Emacs Lisp Reference Manual(Japanese).
+;; * Emacs-ja: (emacs-ja).    The extensible self-
+(when (file-directory-p "~/.emacs.d/info")
+  (autoload 'info "info" "Enter Info, the documentation browser." t)
+  (eval-after-load "info"
+    '(if (boundp Info-directory-list)
+         (setq Info-directory-list (cons "~/.emacs.d/info" Info-default-directory-list)))))
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
@@ -116,8 +127,8 @@
 
 ;;; ツールバーとスクロールバーを消す
 (when window-system
-  (tool-bar-mode nil)
-  (scroll-bar-mode nil))
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1))
 
 ;;; クリップボードとリージョンの同期をとる
 ;; (setq x-select-enable-clipboard t)
@@ -131,7 +142,10 @@
 (if (eval-when-compile (require 'cua-base nil t))
     (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
 
-;;; ブックマークを変更したら即保存する
+;;; ブックマーク
+;; C-x r m (bookmark-set)
+;; C-x r l (bookmark-bmenu-list)
+;; ブックマークを変更したら即保存する
 (if (eval-when-compile (require 'bookmark nil t))
     (setq bookmark-save-flag t))
 
@@ -299,9 +313,10 @@
   (defun gtd ()
     "Open my GTD file"
     (interactive)
-    (if (file-writable-p "~/gtd/plan.org")
-        (find-file "~/gtd/plan.org")
-      (message "Can't open file: ~/gtd/plan.org")))
+    (let ((dir "~/gtd/plan.org"))
+      (if (file-writable-p dir)
+          (find-file dir)
+      (message (concat "Can't open file: " dir)))))
 
   ;; キーバインド
   (define-key global-map (kbd "C-c l") 'org-store-link)
@@ -327,12 +342,12 @@
     (auto-install-compatibility-setup)))
 
 ;; リドゥ
-;; M-x install-elisp-from-emacswiki redo+.el
+;; (install-elisp-from-emacswiki "redo+.el")
 (when (require 'redo+ nil t)
   (define-key global-map (kbd "C-.") 'redo))
 
 ;;; 最近使ったファイルを保存
-;; M-x install-elisp-from-emacswiki recentf-ext.el
+;; (install-elisp-from-emacswiki "recentf-ext.el")
 ;; 以下で最近開いたファイルを一覧表示
 ;; M-x recentf-open-files
 (when (eval-when-compile (require 'recentf-ext nil t))
@@ -340,7 +355,7 @@
   (setq recentf-exclude '("/TAGS$" "/var/tmp/")))
 
 ;;; 使わないバッファを自動的に消す
-;; M-x install-elisp-from-emacswiki tempbuf.el
+;; (install-elisp-from-emacswiki "tempbuf.el")
 (when (require 'tempbuf nil t)
   (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
@@ -360,33 +375,33 @@
   (define-key global-map (kbd "M-]") 'bm-next))
 
 ;;; カーソル位置を戻す
-;; M-x install-elisp-from-emacswiki point-undo.el
+;; (install-elisp-from-emacswiki "point-undo.el")
 (when (eval-when-compile (require 'point-undo))
   (define-key global-map (kbd "<f7>") 'point-undo)
   (define-key global-map (kbd "S-<f7>") 'point-redo))
 
 ;;; 変更箇所にジャンプする
-;; M-x install-elisp-from-emacswiki goto-chg.el
+;; (install-elisp-from-emacswiki "goto-chg.el")
 (when (eval-when-compile (require 'goto-chg))
   (define-key global-map (kbd "<f8>") 'goto-last-change)
   (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
 
 ;;; ファイルを自動保存する
-;; M-x install-elisp http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el
+;; (install-elisp "http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el")
 ;; (when (eval-when-compile (require 'auto-save-buffers))
 ;;   (run-with-idle-timer 2 t 'auto-save-buffers)) ; アイドル 2秒で保存
 
 ;;; Emacs内シェルコマンド履歴保存
-;; M-x install-elisp-from-emacswiki shell-history.el
+;; (install-elisp-from-emacswiki "shell-history.el")
 (require 'shell-history nil t)
 
 ;;; 行番号表示する必要のないモードでは表示しない
-;; M-x install-elisp-from-emacswiki linum-off.el
+;; (install-elisp-from-emacswiki "linum-off.el")
 (require 'linum-off nil t)
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xvfz -
-(when (locate-library "navi2ch")
+(if (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t))
 
 ;;; メモ (howm)
@@ -425,7 +440,7 @@
   (define-key global-map (kbd "<f5>") 'gtags-find-with-grep))
 
 ;;; grepの色
-;; M-x install-elisp http://www.bookshelf.jp/elc/color-grep.el
+;; (install-elisp "http://www.bookshelf.jp/elc/color-grep.el")
 (eval-and-compile (require 'color-grep nil t))
 
 ;;; 日本語入力 (ddskk)
@@ -449,19 +464,19 @@
   (define-key global-map (kbd "C-;") 'skk-mode))
 
 ;;; 試行錯誤用ファイル
-;; M-x install-elisp-from-emacswiki open-junk-file.el
+;; (install-elisp-from-emacswiki "open-junk-file.el")
 (when (eval-and-compile (require 'open-junk-file nil t))
   ;; C-x C-z で試行錯誤用ファイルを開く
   (define-key global-map (kbd "C-x C-z") 'open-junk-file))
 
 ;;; 式の評価結果を注釈するための設定
-;; M-x install-elisp-from-emacswiki lispxmp.el
+;; (install-elisp-from-emacswiki "lispxmp.el")
 (when (eval-and-compile (require 'lispxmp nil t))
   ;; C-c C-d で注釈
   (define-key emacs-lisp-mode-map (kbd "C-c C-d") 'lispxmp))
 
 ;;; 括弧の対応を保持して編集する設定
-;; M-x install-elisp http://mumble.net/~campbell/emacs/paredit.el
+;; (install-elisp "http://mumble.net/~campbell/emacs/paredit.el")
 ;; scrachバッファでこれが有効になっていると評価できないので注意
 (when (eval-and-compile (require 'paredit nil t))
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
@@ -470,14 +485,14 @@
   (add-hook 'ielm-mode-hook  'emacs-lisp-mode-hook))
 
 ;;; 自動バイトコンパイル
-;; M-x install-elisp-from-emacswiki auto-async-byte-compile.el
+;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
 (when (eval-and-compile (require 'auto-async-byte-compile nil t))
   ;; バイトコンパイルしないファイル
   (setq auto-async-byte-compile-exclude-files-regexp "/junk/")
   (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
 
 ;;; ミニバッファに関数の help 表示
-;; M-x install-elisp-from-emacswiki eldoc-extension.el
+;; (install-elisp-from-emacswiki "eldoc-extension.el")
 (when (eval-when-compile (require 'eldoc-extension nil t))
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
@@ -487,7 +502,7 @@
   (setq eldoc-minor-mode-string ""))
 
 ;;; *Help* にメモを書き込む
-;; M-x install-elisp-from-emacswiki usage-memo.el
+;; (install-elisp-from-emacswiki "usage-memo.el")
 (when (eval-and-compile (require 'usage-memo nil t))
   (setq umemo-base-directory "~/.emacs.d/umemo")
   (umemo-initialize))
@@ -536,6 +551,17 @@
   ;; find や grep で "grep: NUL: No such file or directory" を回避する
   (setq null-device "/dev/null"))
 
+;;; 辞書 (英辞郎の辞書を stardict 用に変換したものを使用する)
+;; sudo apt-get install sdcv
+;; (install-elisp "http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el")
+;; (install-elisp "http://www.emacswiki.org/emacs/download/sdcv.el")
+(when (and (executable-find "sdcv") (locate-library "sdcv")
+           (eval-and-compile (require 'sdcv nil t)))
+  (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
+  (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
+  (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
+  (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
+
 ;;; メール
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
 ;; sudo apt-get install mew mew-bin stunnel4
@@ -583,7 +609,7 @@
                         (goto-char (point-max))
                         (insert-file "~/.signature")
                         (goto-char p))))))
-     ;;; Gmail
+     ;;; Gmail は SSL接続
      (when (string= "gmail.com" mew-mail-domain)
        (setq mew-imap-auth  t)
        (setq mew-imap-ssl t)
@@ -594,17 +620,6 @@
        (setq mew-prog-ssl "/usr/bin/stunnel4")
        (setq mew-fcc "%Sent") ; 送信メールを保存する
        (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱"))))
-
-;;; 辞書 (英辞郎の辞書を stardict 用に変換したものを使用する)
-;; sudo apt-get install sdcv
-;; M-x install-elisp http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el
-;; M-x install-elisp http://www.emacswiki.org/emacs/download/sdcv.el
-(when (and (executable-find "sdcv") (locate-library "sdcv")
-           (eval-and-compile (require 'sdcv nil t)))
-  (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
-  (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
-  (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
-  (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
 
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
@@ -668,13 +683,26 @@
   (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode))
 
 (eval-after-load "evernote-mode"
-  '(progn
-     (if (boundp 'evernote-enml-formatter-command)
-         (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")))))
+  '(if (boundp 'evernote-enml-formatter-command)
+       (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8"))))
+
+;;; Gist
+;; package.el をインストール
+;; Emacs23 (https://gist.github.com/1884169)
+;; (auto-install-from-url "https://raw.github.com/gist/1884092/4542d018c14fb8fb9f2e6b1a69b01abb1ce475bb/package-install.el")
+;; Emacs24 (http://marmalade-repo.org/)
+;; (require 'package)
+;; (package-install gist)
+;; git clone git://github.com/defunkt/gist.el.git
+(when (locate-library "gist")
+  (autoload 'gist-buffer "gist" "Post the current buffer." t)
+  (autoload 'gist-buffer-private "gist" "Post the current buffer as a new private paste." t)
+  (autoload 'gist-region "gist" "Post the current region." t)
+  (autoload 'gist-region-private "gist" "Post the current region as a new private paste." t))
 
 ;;; 端末エミュレータ
 ;; zsh を使用するときはこれを使うことにする
-;; M-x install-elisp-from-emacswiki multi-term.el
+;; (install-elisp-from-emacswiki "multi-term.el")
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
   (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t))
