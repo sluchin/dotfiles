@@ -650,19 +650,19 @@
   (autoload 'evernote-write-note "evernote-mode" "Write buffer to an evernote." t)
   (autoload 'evernote-browser "evernote-mode" "Open an evernote browser." t)
   (autoload 'evernote-post-region "evernote-mode" "Post the region as an evernote." t)
-  ;; 新規ノート作成。タグ、タイトルなどを入力
+  ;; 新規ノート作成
   (define-key global-map (kbd "C-c e c") 'evernote-create-note)
   ;; タグを選択してノートを開く
   (define-key global-map (kbd "C-c e o") 'evernote-open-note)
-  ;; 検索ワードを入力して、Note:と表示されたらTabで一覧が表示される
+  ;; 検索 (Note:と表示されたらTabで一覧が表示される)
   (define-key global-map (kbd "C-c e s") 'evernote-search-notes)
-  ;; evernote-create-searchで保存された検索ワードで検索
+  ;; evernote-create-search で保存された検索ワードで検索
   (define-key global-map (kbd "C-c e S") 'evernote-do-saved-search)
-  ;; 現在のバッファをEvernoteに記録
+  ;; 現在のバッファを Evernote に記録
   (define-key global-map (kbd "C-c e w") 'evernote-write-note)
-  ;; 選択範囲をEvernoteに記録
+  ;; 選択範囲を Evernote に記録
   (define-key global-map (kbd "C-c e p") 'evernote-post-region)
-  ;; Evernote閲覧用ブラウザを起動
+  ;; Evernote 閲覧用ブラウザを起動
   (define-key global-map (kbd "C-c e b") 'evernote-browser)
   ;; 既存のノートに編集を加える
   (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode))
@@ -677,7 +677,7 @@
 ;; M-x install-elisp-from-emacswiki multi-term.el
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
-  (autoload 'multi-term-next "multi-term" "Emacs terminal emulator." t))
+  (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t))
 
 (eval-after-load "multi-term"
   '(progn
