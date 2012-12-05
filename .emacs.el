@@ -30,6 +30,7 @@
                 "~/.emacs.d/conf"
                 "~/.emacs.d/twittering-mode"
                 "~/.emacs.d/emacs-w3m"
+                "~/.emacs.d/evernote-mode"
                 "~/.emacs.d/bm"
                 "~/.emacs.d/auto-install"
                 ) load-path))
@@ -100,8 +101,8 @@
 (setq use-dialog-box nil)
 (defalias 'message-box 'message)
 
-;;; ログの記録行数を増やす
-(setq message-log-max 100000)
+;;; ログの記録行数を増やす (デフォルトは 100100)
+(setq message-log-max 1001000)
 
 ;;; ツールバーとスクロールバーを消す
 (when window-system
@@ -329,8 +330,9 @@
   (setq recentf-exclude '("/TAGS$" "/var/tmp/")))
 
 ;;; 使わないバッファを自動的に消す
+;; M-x install-elisp-from-emacswiki tempbuf.el
 (when (require 'tempbuf nil t)
-  (add-hook 'find-file-hooks 'turn-on-tempbuf-mode)
+  (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
 
 ;;; カーソル位置印をつけ移動する
@@ -346,6 +348,12 @@
   (define-key global-map (kbd "M-SPC") 'bm-toggle)
   (define-key global-map (kbd "M-[") 'bm-previous)
   (define-key global-map (kbd "M-]") 'bm-next))
+
+;;; カーソル位置を戻す
+;; M-x install-elisp-from-emacswiki point-undo.el
+(when (eval-when-compile (require 'point-undo))
+  (define-key global-map (kbd "<f7>") 'point-undo)
+  (define-key global-map (kbd "S-<f7>") 'point-redo))
 
 ;;; 変更箇所にジャンプする
 ;; M-x install-elisp-from-emacswiki goto-chg.el
@@ -622,7 +630,39 @@
   '(if (boundp 'w3m-home-page)
        (setq w3m-home-page "http://google.co.jp/")))
 
+;;; Evernote
+;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
+;; sudo gem install -r thrift
+;; sudo ruby ~/.emacs.d/evernote-mode/ruby/setup.rb
+(when (and (executable-find "ruby") (executable-find "w3m") (locate-library "evernote-mode"))
+  (autoload 'evernote-create-note "evernote-mode" "Interface for Evernote on Emacs." t)
+  (autoload 'evernote-open-note "evernote-mode" "Interface for Evernote on Emacs." t)
+  (autoload 'evernote-write-note "evernote-mode" "Interface for Evernote on Emacs." t)
+  (autoload 'evernote-browser "evernote-mode" "Interface for Evernote on Emacs." t)
+  ;; 新規ノート作成。タグ、タイトルなどを入力
+  (define-key global-map (kbd "C-c e c") 'evernote-create-note)
+  ;; タグを選択してノートを開く
+  (define-key global-map (kbd "C-c e o") 'evernote-open-note)
+  ;; 検索ワードを入力して、Note:と表示されたらTabで一覧が表示される
+  (define-key global-map (kbd "C-c e s") 'evernote-search-notes)
+  ;; evernote-create-searchで保存された検索ワードで検索
+  (define-key global-map (kbd "C-c e S") 'evernote-do-saved-search)
+  ;; 現在のバッファをEvernoteに記録
+  (define-key global-map (kbd "C-c e w") 'evernote-write-note)
+  ;; 選択範囲をEvernoteに記録
+  (define-key global-map (kbd "C-c e p") 'evernote-post-region)
+  ;; Evernote閲覧用ブラウザを起動
+  (define-key global-map (kbd "C-c e b") 'evernote-browser)
+  ;; 既存のノートに編集を加える
+  (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode))
+
+(eval-after-load "evernote-mode"
+  '(progn
+     (if (boundp 'evernote-enml-formatter-command)
+         (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")))))
+
 ;;; 端末エミュレータ
+;; zsh を使用するときはこれを使うことにする
 ;; M-x install-elisp-from-emacswiki multi-term.el
 (when (locate-library "multi-term")
     (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
