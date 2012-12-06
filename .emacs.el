@@ -183,6 +183,18 @@
                                                   (cdr url-region))))))
 (define-key global-map (kbd "C-c o") 'browse-url-at-point)
 
+;; vlc で URL を開く
+(when (executable-find "vlc")
+  (defun vlc-url-at-point ()
+    "Get url and open vlc"
+    (interactive)
+    (let ((url-region (bounds-of-thing-at-point 'url)))
+      (when url-region
+        (start-process "vlc" nil "vlc"
+                       (buffer-substring-no-properties (car url-region)
+                                                       (cdr url-region))))))
+  (define-key global-map (kbd "C-c v") 'vlc-url-at-point))
+
 ;; 日付挿入
 (defun insert-date ()
   "Insert date"
@@ -213,9 +225,11 @@
 ;; クリップボードに貼り付け
 (define-key global-map (kbd "S-<insert>") 'clipboard-yank)
 ;; C-\の日本語入力の設定を無効にする
-(define-key global-map "\C-\\" nil)
+(define-key global-map (kbd "C-\\") nil)
 ;; 折り返し表示 ON/OFF
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
+;; lisp 補完
+(define-key emacs-lisp-mode-map (kbd "C-c C-s") 'lisp-complete-symbol)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
@@ -232,8 +246,9 @@
 (if (eval-and-compile (require 'wdired nil t))
     (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
 ;;; ディレクトリを先に表示する
-(if (eval-when-compile (require 'dired nil t))
-    (setq dired-listing-switches "-AFl --group-directories-first"))
+(unless (eq system-type 'windows-nt)
+  (if (eval-when-compile (require 'dired nil t))
+      (setq dired-listing-switches "-AFl --group-directories-first")))
 ;; w3m で開く
 (when (eval-when-compile (require 'w3m nil t))
   (defun dired-w3m-find-file ()
@@ -242,7 +257,7 @@
     (let ((file (dired-get-filename)))
       (if (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
           (w3m-find-file file))))
-  (define-key dired-mode-map (kbd "C-c b") 'dired-w3m-find-file))
+  (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file))
 
 ;;; 関数のアウトライン表示
 (when (eval-when-compile (require 'speedbar nil t))
@@ -475,12 +490,11 @@
         (dict-2ch "~/.emacs.d/ddskk/SKK-JISYO.2ch"))
     (if (file-readable-p  dict-l)
         (setq skk-large-jisyo dict-l))
-    (if (and (file-readable-p dict-kao) (file-readable-p dict-2ch))
-        (setq skk-search-prog-list
-              '((skk-search-jisyo-file skk-jisyo 0 t)
-                (skk-search-server skk-aux-large-jisyo 10000)
-                (skk-search-jisyo-file dict-kao 10000)
-                (skk-search-jisyo-file dict-2ch 10000)))))
+    (when (and (file-readable-p dict-kao) (file-readable-p dict-2ch))
+      (add-to-list 'skk-search-prog-list '(skk-search-jisyo-file skk-jisyo 0 t) t)
+      (add-to-list 'skk-search-prog-list '(skk-search-jisyo-file dict-kao 10000 t) t)
+      (add-to-list 'skk-search-prog-list '(skk-search-jisyo-file dict-2ch 10000 t) t)))
+
   ;; skk 用の sticky キー設定
   ;; 一般的には `;' だが Paren モードが効かなくなる
   (setq skk-sticky-key (kbd "C-i"))
