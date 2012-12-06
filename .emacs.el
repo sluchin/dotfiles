@@ -16,6 +16,9 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
+;;; バックトレースを有効にする
+(setq debug-on-error t)
+
 ;;; 起動時間が多少高速になるらしい
 (modify-frame-parameters nil '((wait-for-wm . nil)))
 
@@ -221,9 +224,25 @@
   (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
   (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
 
-;;; ファイラ (dired) 編集可能にする
+;;; ファイラ (dired)
+;; 拡張版をつかう
+(if (locate-library "dired-x")
+    (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
+;; 編集可能にする
 (if (eval-and-compile (require 'wdired nil t))
     (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+;;; ディレクトリを先に表示する
+(if (eval-when-compile (require 'dired nil t))
+    (setq dired-listing-switches "-AFl --group-directories-first"))
+;; w3m で開く
+(when (eval-when-compile (require 'w3m nil t))
+  (defun dired-w3m-find-file ()
+    (interactive)
+    (require 'w3m)
+    (let ((file (dired-get-filename)))
+      (if (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
+          (w3m-find-file file))))
+  (define-key dired-mode-map (kbd "C-c b") 'dired-w3m-find-file))
 
 ;;; 関数のアウトライン表示
 (when (eval-when-compile (require 'speedbar nil t))
@@ -607,7 +626,7 @@
        (setq mew-use-cached-passwd t)
 
        ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
-       (if (file-readable-p "~/.signature") 
+       (if (file-readable-p "~/.signature")
            (add-hook 'mew-draft-mode-newdraft-hook
                      (function
                       (lambda ()
