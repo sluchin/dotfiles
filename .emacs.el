@@ -451,18 +451,23 @@
 ;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
 ;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
 (when (eval-and-compile (require 'skk nil t))
-  (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L")
-  (when (file-directory-p "~/.emacs.d/ddskk")
-    (setq skk-search-prog-list
-          '((skk-search-jisyo-file skk-jisyo 0 t)
-            (skk-search-server skk-aux-large-jisyo 10000)
-            (skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000)
-            (skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2ch" 10000))))
+  (let ((dict-l "~/.emacs.d/ddskk/SKK-JISYO.L")
+        (dict-kao "~/.emacs.d/ddskk/SKK-JISYO.KAO")
+        (dict-2ch "~/.emacs.d/ddskk/SKK-JISYO.2ch"))
+    (if (file-readable-p  dict-l)
+        (setq skk-large-jisyo dict-l))
+    (if (and (file-readable-p dict-kao) (file-readable-p dict-2ch))
+        (setq skk-search-prog-list
+              '((skk-search-jisyo-file skk-jisyo 0 t)
+                (skk-search-server skk-aux-large-jisyo 10000)
+                (skk-search-jisyo-file dict-kao 10000)
+                (skk-search-jisyo-file dict-2ch 10000)))))
   ;; skk 用の sticky キー設定
-  (setq skk-sticky-key (kbd ":"))
+  ;; 一般的には `;' だが Paren モードが効かなくなる
+  (setq skk-sticky-key (kbd "C-i"))
   ;; インライン候補縦表示
   (setq skk-show-inline 'vertical)
-  (define-key global-map (kbd "C-;") 'skk-mode))
+  (define-key global-map (kbd "C-\\") 'skk-mode))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
@@ -560,8 +565,8 @@
            (eval-and-compile (require 'sdcv nil t)))
   (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
   (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
-  (define-key global-map (kbd "C-c w") 'sdcv-search-input)   ; バッファに表示
-  (define-key global-map (kbd "C-i") 'sdcv-search-pointer+)) ; ポップアップ
+  (define-key global-map (kbd "C-c w") 'sdcv-search-input)     ; バッファに表示
+  (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)) ; ポップアップ
 
 ;;; メール
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
