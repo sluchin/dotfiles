@@ -80,6 +80,10 @@
          (set-fontset-font nil 'japanese-jisx0208
                            (font-spec :family "Hiragino Mincho Pro")))))
 
+;;; フレームサイズ
+(if window-system
+  (set-frame-size (selected-frame) 100 60))
+
 ;;; 色をつける
 (global-font-lock-mode t)
 
