@@ -32,9 +32,7 @@
                 "~/.emacs.d/emacs-w3m"
                 "~/.emacs.d/evernote-mode"
                 "~/.emacs.d/bm"
-                "~/.emacs.d/gist"
                 "~/.emacs.d/elpa"
-                "~/.emacs.d/elpa/archives"
                 "~/.emacs.d/elpa/eieio-1.4"
                 "~/.emacs.d/elpa/gh-0.5.3"
                 "~/.emacs.d/elpa/gist-1.0.2"
@@ -112,8 +110,8 @@
 (setq use-dialog-box nil)
 (defalias 'message-box 'message)
 
-;;; ログの記録行数を増やす (デフォルトは 100100)
-(setq message-log-max 1001000)
+;;; ログの記録行数を減らす (デフォルトは 100100)
+(setq message-log-max 10010)
 
 ;;; 履歴を保存する
 (savehist-mode t)
@@ -130,8 +128,8 @@
   (tool-bar-mode -1)
   (scroll-bar-mode -1))
 
-;;; クリップボードとリージョンの同期をとる
-;; (setq x-select-enable-clipboard t)
+;;; シンボリックファイルを開く時にいちいち聞かない
+(setq vc-follow-symlinks t)
 
 ;;; 現在位置のファイル・URLを開く
 (ffap-bindings)
@@ -204,6 +202,8 @@
 ;; 改行・タブ・スペースを色づけする
 (define-key global-map (kbd "C-^") 'global-whitespace-mode)
 ;; クリップボードにコピー
+;; クリップボードを使わない場合以下の設定でリージョンと同期をとるとよい
+;; (setq x-select-enable-clipboard t)
 (define-key global-map (kbd "C-<insert>") 'clipboard-kill-ring-save)
 ;; クリップボードに切り取り
 (define-key global-map (kbd "S-DEL") 'clipboard-kill-region)
@@ -408,40 +408,41 @@
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xvfz -
 (when (locate-library "howm")
   (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki." t)
-  (define-key global-map (kbd "C-c , ,") 'howm-menu))
+  (define-key global-map (kbd "C-c , ,") 'howm-menu)
+  (eval-after-load "howm-mode"
+    '(progn
+       (if (boundp 'howm-menu-lang)
+           (setq howm-menu-lang 'ja))
+       (if (boundp 'howm-directory)
+           ;; デュアルブートで Linux と Windows で共有するための設定をする
+           (cond ((and (eq system-type 'gnu/linux)
+                       (file-directory-p "/dos"))
+                  (setq howm-directory "/dos/howm"))
+                 ((and (eq system-type 'windows-nt)
+                       (file-directory-p "e:"))
+                  (setq howm-directory "e:/howm"))
+                 (t
+                  (setq howm-directory "~/howm"))))
 
-(eval-after-load "howm-mode"
-  '(progn
-     (if (boundp 'howm-menu-lang)
-         (setq howm-menu-lang 'ja))
-     (if (boundp 'howm-directory)
-         ;; デュアルブートで Linux と Windows で共有するための設定をする
-         (cond ((and (eq system-type 'gnu/linux)
-                     (file-directory-p "/dos"))
-                (setq howm-directory "/dos/howm"))
-               ((and (eq system-type 'windows-nt)
-                     (file-directory-p "e:"))
-                (setq howm-directory "e:/howm"))
-               (t
-                (setq howm-directory "~/howm"))))
-
-     (if (boundp 'howm-excluded-file-regexp)
-         ;; 除外するファイル
-         (setq howm-excluded-file-regexp
-               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))))
+       (if (boundp 'howm-excluded-file-regexp)
+           ;; 除外するファイル
+           (setq howm-excluded-file-regexp
+                 "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/")))))
 
 ;;; GNU Global
 ;; sudo apt-get install global
 (when (and (executable-find "global") (locate-library "gtags"))
   (autoload 'gtags-mode "gtags" nil t)
-  (add-hook 'c-mode-hook 'gtags-mode)
-  (add-hook 'c++-mode-hook 'gtags-mode)
-  (add-hook 'java-mode-hook 'gtags-mode)
-  (define-key global-map (kbd "<f5>") 'gtags-find-with-grep))
+  (define-key global-map (kbd "<f5>") 'gtags-find-with-grep)
+  (eval-after-load "gtags"
+    '(when (fboundp 'gtags-mode)
+       (add-hook 'c-mode-hook 'gtags-mode)
+       (add-hook 'c++-mode-hook 'gtags-mode)
+       (add-hook 'java-mode-hook 'gtags-mode))))
 
 ;;; grepの色
 ;; (install-elisp "http://www.bookshelf.jp/elc/color-grep.el")
-(eval-and-compile (require 'color-grep nil t))
+(require 'color-grep nil t)
 
 ;;; 日本語入力 (ddskk)
 ;; sudo apt-get install ddskk
@@ -569,75 +570,75 @@
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
   (setq read-mail-command 'mew)
-  (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t))
+  (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
+  (eval-after-load "mew"
+    '(progn
+       (if (boundp 'mail-user-agent)
+           (setq mail-user-agent 'mew-user-agent))
+       (if (fboundp 'define-mail-user-agent)
+           (define-mail-user-agent
+             'mew-user-agent
+             'mew-user-agent-compose
+             'mew-draft-send-message
+             'mew-draft-kill
+             'mew-send-hook))
 
-(eval-after-load "mew"
-  '(progn
-     (if (boundp 'mail-user-agent)
-         (setq mail-user-agent 'mew-user-agent))
-     (if (fboundp 'define-mail-user-agent)
-         (define-mail-user-agent
-           'mew-user-agent
-           'mew-user-agent-compose
-           'mew-draft-send-message
-           'mew-draft-kill
-           'mew-send-hook))
+       ;; メールアカウントの設定
+       ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
+       ;; (when (eval-when-compile (require 'mew nil t))
+       ;;   ;;; メールアドレス
+       ;;   (setq mew-name "User name")
+       ;;   (setq mew-user "User login name")
+       ;;   (setq user-mail-address "Email address")
+       ;;   (setq user-full-name "User name")
+       ;;   (setq mew-mail-domain "Domain name")
+       ;;   ;;; アカウント
+       ;;   (setq mew-imap-user "IMAP account")
+       ;;   (setq mew-imap-server "IMAP server")
+       ;;   (setq mew-smtp-server "SMTP server"))
+       (if (locate-library "mailaccount")
+           (load "mailaccount"))
+       (setq mew-proto "%")
+       (setq mew-use-cached-passwd t)
 
-     ;; メールアカウントの設定
-     ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
-     ;; (when (eval-when-compile (require 'mew nil t))
-     ;;   ;;; メールアドレス
-     ;;   (setq mew-name "User name")
-     ;;   (setq mew-user "User login name")
-     ;;   (setq user-mail-address "Email address")
-     ;;   (setq user-full-name "User name")
-     ;;   (setq mew-mail-domain "Domain name")
-     ;;   ;;; アカウント
-     ;;   (setq mew-imap-user "IMAP account")
-     ;;   (setq mew-imap-server "IMAP server")
-     ;;   (setq mew-smtp-server "SMTP server"))
-     (if (locate-library "mailaccount")
-         (load "mailaccount"))
-     (setq mew-proto "%")
-     (setq mew-use-cached-passwd t)
-     ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
-     (if (file-readable-p "~/.signature") 
-         (add-hook 'mew-draft-mode-newdraft-hook
-                   (function
-                    (lambda ()
-                      (let ((p (point)))
-                        (goto-char (point-max))
-                        (insert-file "~/.signature")
-                        (goto-char p))))))
-     ;;; Gmail は SSL接続
-     (when (string= "gmail.com" mew-mail-domain)
-       (setq mew-imap-auth  t)
-       (setq mew-imap-ssl t)
-       (setq mew-imap-ssl-port "993")
-       (setq mew-smtp-auth t)
-       (setq mew-smtp-ssl t)
-       (setq mew-smtp-ssl-port "465")
-       (setq mew-prog-ssl "/usr/bin/stunnel4")
-       (setq mew-fcc "%Sent") ; 送信メールを保存する
-       (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱"))))
+       ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
+       (if (file-readable-p "~/.signature") 
+           (add-hook 'mew-draft-mode-newdraft-hook
+                     (function
+                      (lambda ()
+                        (let ((p (point)))
+                          (goto-char (point-max))
+                          (insert-file "~/.signature")
+                          (goto-char p))))))
+
+       ;; Gmail は SSL接続
+       (when (string= "gmail.com" mew-mail-domain)
+         (setq mew-imap-auth  t)
+         (setq mew-imap-ssl t)
+         (setq mew-imap-ssl-port "993")
+         (setq mew-smtp-auth t)
+         (setq mew-smtp-ssl t)
+         (setq mew-smtp-ssl-port "465")
+         (setq mew-prog-ssl "/usr/bin/stunnel4")
+         (setq mew-fcc "%Sent") ; 送信メールを保存する
+         (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱")))))
 
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
-(if (locate-library "twittering-mode")
-    (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t))
-
-(eval-after-load "twittering-mode"
-  '(progn
-     (if (boundp 'twittering-icon-mode)
-         (setq twittering-icon-mode t))
-     (if (boundp 'twittering-status-format)
-         (setq twittering-status-format
-               "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
-     (if (boundp 'twittering-update-status-function)
-         (setq twittering-update-status-function
-               'twittering-update-status-from-pop-up-buffer))
-     (if (boundp 'twittering-use-master-password)
-         (setq twittering-use-master-password t))))
+(when (locate-library "twittering-mode")
+  (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t)
+  (eval-after-load "twittering-mode"
+    '(progn
+       (if (boundp 'twittering-icon-mode)
+           (setq twittering-icon-mode t))
+       (if (boundp 'twittering-status-format)
+           (setq twittering-status-format
+                 "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
+       (if (boundp 'twittering-update-status-function)
+           (setq twittering-update-status-function
+                 'twittering-update-status-from-pop-up-buffer))
+       (if (boundp 'twittering-use-master-password)
+           (setq twittering-use-master-password t)))))
 
 ;;; ブラウザ (w3m)
 ;; sudo apt-get install w3m
@@ -649,11 +650,10 @@
   (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
   (autoload 'w3m-search "w3m-search" "Search QUERY using SEARCH-ENGINE." t)
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
-  (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t))
-
-(eval-after-load "w3m"
-  '(if (boundp 'w3m-home-page)
-       (setq w3m-home-page "http://google.co.jp/")))
+  (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
+  (eval-after-load "w3m"
+    '(if (boundp 'w3m-home-page)
+         (setq w3m-home-page "http://google.co.jp/"))))
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
@@ -665,39 +665,28 @@
   (autoload 'evernote-write-note "evernote-mode" "Write buffer to an evernote." t)
   (autoload 'evernote-browser "evernote-mode" "Open an evernote browser." t)
   (autoload 'evernote-post-region "evernote-mode" "Post the region as an evernote." t)
-  ;; 新規ノート作成
-  (define-key global-map (kbd "C-c e c") 'evernote-create-note)
-  ;; タグを選択してノートを開く
-  (define-key global-map (kbd "C-c e o") 'evernote-open-note)
-  ;; 検索 (Note:と表示されたらTabで一覧が表示される)
-  (define-key global-map (kbd "C-c e s") 'evernote-search-notes)
-  ;; evernote-create-search で保存された検索ワードで検索
-  (define-key global-map (kbd "C-c e S") 'evernote-do-saved-search)
-  ;; 現在のバッファを Evernote に記録
-  (define-key global-map (kbd "C-c e w") 'evernote-write-note)
-  ;; 選択範囲を Evernote に記録
-  (define-key global-map (kbd "C-c e p") 'evernote-post-region)
-  ;; Evernote 閲覧用ブラウザを起動
-  (define-key global-map (kbd "C-c e b") 'evernote-browser)
-  ;; 既存のノートに編集を加える
-  (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode))
+  (define-key global-map (kbd "C-c e c") 'evernote-create-note)      ; 新規ノート作成
+  (define-key global-map (kbd "C-c e o") 'evernote-open-note)        ; タグ選択して開く
+  (define-key global-map (kbd "C-c e s") 'evernote-search-notes)     ; 検索
+  (define-key global-map (kbd "C-c e S") 'evernote-do-saved-search)  ; 保存されたワードで検索
+  (define-key global-map (kbd "C-c e w") 'evernote-write-note)       ; 現在バッファを書き込み
+  (define-key global-map (kbd "C-c e p") 'evernote-post-region)      ; 選択範囲を書き込み
+  (define-key global-map (kbd "C-c e b") 'evernote-browser)          ; ブラウザ起動
+  (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode) ; 既存ノートを編集
+  (eval-after-load "evernote-mode"
+    '(if (boundp 'evernote-enml-formatter-command)
+         (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")))))
 
-(eval-after-load "evernote-mode"
-  '(if (boundp 'evernote-enml-formatter-command)
-       (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8"))))
-
-;;; Gist
-;; package.el をインストール
+;;; Gist (https://github.com/defunkt/gist.el)
+;; package-install.el をインストール
 ;; Emacs23 (https://gist.github.com/1884169)
 ;; (auto-install-from-url "https://raw.github.com/gist/1884092/4542d018c14fb8fb9f2e6b1a69b01abb1ce475bb/package-install.el")
-;; Emacs24 (http://marmalade-repo.org/)
-;; (require 'package)
 ;; (package-install gist)
-;; git clone git://github.com/defunkt/gist.el.git
+;; Emacs24 (http://marmalade-repo.org/)
 (when (locate-library "gist")
-  (autoload 'gist-buffer "gist" "Post the current buffer." t)
+  (autoload 'gist-buffer "gist" "Post the current buffer as a new paste." t)
   (autoload 'gist-buffer-private "gist" "Post the current buffer as a new private paste." t)
-  (autoload 'gist-region "gist" "Post the current region." t)
+  (autoload 'gist-region "gist" "Post the current region as a new paste." t)
   (autoload 'gist-region-private "gist" "Post the current region as a new private paste." t))
 
 ;;; 端末エミュレータ
@@ -705,27 +694,26 @@
 ;; (install-elisp-from-emacswiki "multi-term.el")
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
-  (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t))
-
-(eval-after-load "multi-term"
-  '(progn
-     (if (boundp 'multi-term-program)
-         (setq multi-term-program "/bin/zsh"))
-     (if (boundp 'term-unbind-key-list)
-         (setq term-unbind-key-list '("C-x" "C-c" "<ESC>")))
-     (if (boundp 'term-bind-key-alist)
-         (setq term-bind-key-alist
-               '(("C-c C-c" . term-interrupt-subjob)
-                 ("C-m" . term-send-raw)
-                 ("M-f" . term-send-forward-word)
-                 ("M-b" . term-send-backward-word)
-                 ("M-o" . term-send-backspace)
-                 ("M-p" . term-send-up)
-                 ("M-n" . term-send-down)
-                 ("M-M" . term-send-forward-kill-word)
-                 ("M-N" . term-send-backward-kill-word)
-                 ("M-r" . term-send-reverse-search-history)
-                 ("M-," . term-send-input)
-                 ("M-." . comint-dynamic-complete))))))
+  (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t)
+  (eval-after-load "multi-term"
+    '(progn
+       (if (boundp 'multi-term-program)
+           (setq multi-term-program "zsh"))
+       (if (boundp 'term-unbind-key-list)
+           (setq term-unbind-key-list '("C-x" "C-c" "<ESC>")))
+       (if (boundp 'term-bind-key-alist)
+           (setq term-bind-key-alist
+                 '(("C-c C-c" . term-interrupt-subjob)
+                   ("C-m" . term-send-raw)
+                   ("M-f" . term-send-forward-word)
+                   ("M-b" . term-send-backward-word)
+                   ("M-o" . term-send-backspace)
+                   ("M-p" . term-send-up)
+                   ("M-n" . term-send-down)
+                   ("M-M" . term-send-forward-kill-word)
+                   ("M-N" . term-send-backward-kill-word)
+                   ("M-r" . term-send-reverse-search-history)
+                   ("M-," . term-send-input)
+                   ("M-." . comint-dynamic-complete)))))))
 
 ;;; ここまで拡張 lisp
