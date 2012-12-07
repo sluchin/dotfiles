@@ -163,6 +163,9 @@
 ;;; タブをスペースにする
 (setq-default indent-tabs-mode nil)
 
+;;; makefile ではスペースにしない
+(add-hook 'makefile-mode-hook (lambda () (setq indent-tabs-mode t)))
+
 ;;; c言語インデント
 (defconst stroustrup-style
   '((c-basic-offset . 4)
@@ -540,12 +543,12 @@
 
 ;;; 括弧の対応を保持して編集する設定
 ;; (install-elisp "http://mumble.net/~campbell/emacs/paredit.el")
-;; scrachバッファでこれが有効になっていると評価できないので注意
+;; *scrach* バッファでは C-j が効かなくなるため無効にする
 (when (eval-and-compile (require 'paredit nil t))
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook  'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook  'enable-paredit-mode)
-  (add-hook 'ielm-mode-hook  'emacs-lisp-mode-hook))
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook 'emacs-lisp-mode-hook)
+  (add-hook 'lisp-interaction-mode-hook 'disable-paredit-mode))
 
 ;;; 自動バイトコンパイル
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
