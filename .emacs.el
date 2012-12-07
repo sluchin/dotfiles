@@ -9,7 +9,7 @@
 ;;; 設定を読み込まない起動オプション
 ;; emacs23 -q --no-site-file
 
-;;; ウィンドウのサイズと色は起動オプションで指定する
+;;; 通常の起動オプション
 ;; emacs23 -rv -g 100x50-100+0
 
 ;;; Windows の場合, 以下の設定をすること
@@ -85,7 +85,7 @@
 ;; 幅   (frame-width)
 ;; 高さ (frame-height)
 (if window-system
-  (set-frame-size (selected-frame) 100 70))
+  (set-frame-size (selected-frame) 110 70))
 
 ;;; 色をつける
 (global-font-lock-mode t)
@@ -181,13 +181,6 @@
 
 ;;; キーバインド
 ;; ブラウザで URL を開く
-(defun browse-url-at-point ()
-  "Get url and open browser"
-  (interactive)
-  (let ((url-region (bounds-of-thing-at-point 'url)))
-    (when url-region
-      (browse-url (buffer-substring-no-properties (car url-region)
-                                                  (cdr url-region))))))
 (define-key global-map (kbd "C-c o") 'browse-url-at-point)
 
 ;; vlc で URL を開く
@@ -257,7 +250,7 @@
 ;;; ディレクトリを先に表示する
 (unless (eq system-type 'windows-nt)
   (if (eval-when-compile (require 'dired nil t))
-      (setq dired-listing-switches "-AFl --group-directories-first")))
+      (setq dired-listing-switches "-aAFl --group-directories-first")))
 ;; w3m で開く
 (when (eval-when-compile (require 'w3m nil t))
   (defun dired-w3m-find-file ()
@@ -389,14 +382,6 @@
 (when (require 'redo+ nil t)
   (define-key global-map (kbd "C-.") 'redo))
 
-;;; 最近使ったファイルを保存
-;; (install-elisp-from-emacswiki "recentf-ext.el")
-;; 以下で最近開いたファイルを一覧表示
-;; M-x recentf-open-files
-(when (eval-when-compile (require 'recentf-ext nil t))
-  (setq recentf-max-saved-items 3000)
-  (setq recentf-exclude '("/TAGS$" "/var/tmp/")))
-
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
 (when (require 'tempbuf nil t)
@@ -489,6 +474,17 @@
            ;; 除外するファイル
            (setq howm-excluded-file-regexp
                  "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/")))))
+
+;;; 最近使ったファイルを保存
+;; (install-elisp-from-emacswiki "recentf-ext.el")
+;; 以下で最近開いたファイルを一覧表示
+;; M-x recentf-open-files
+(when (eval-when-compile (require 'recentf-ext nil t))
+  (setq recentf-max-saved-items 10000)
+  (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$"))
+  (when (eval-when-compile (require 'howm nil t))
+    (add-to-list 'recentf-exclude howm-directory)
+    (add-to-list 'recentf-exclude ".howm-keys")))
 
 ;;; GNU Global
 ;; sudo apt-get install global
