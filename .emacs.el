@@ -250,10 +250,19 @@
 ;; 編集可能にする
 (if (eval-and-compile (require 'wdired nil t))
     (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
-;;; ディレクトリを先に表示する
+;; ディレクトリを先に表示する
 (unless (eq system-type 'windows-nt)
   (if (eval-when-compile (require 'dired nil t))
       (setq dired-listing-switches "-aAFl --group-directories-first")))
+
+(when (eval-when-compile (require 'dired nil t))
+  ;; ディレクトリを再帰的にコピー可能する
+  (setq dired-recursive-copies 'always)
+  ;; ディレクトリを再帰的に削除可能する
+  (setq dired-recursive-deletes 'always)
+  ;; ゴミ箱に移動する
+  (setq delete-by-moving-to-trash t))
+
 ;; w3m で開く
 (when (eval-when-compile (require 'w3m nil t))
   (defun dired-w3m-find-file ()
