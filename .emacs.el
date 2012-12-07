@@ -42,6 +42,7 @@
                 "~/.emacs.d/elpa/logito-0.1"
                 "~/.emacs.d/elpa/pcache-0.2.3"
                 "~/.emacs.d/elpa/tabulated-list-0"
+                "~/.emacs.d/session/lisp"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -81,8 +82,10 @@
                            (font-spec :family "Hiragino Mincho Pro")))))
 
 ;;; フレームサイズ
+;; 幅   (frame-width)
+;; 高さ (frame-height)
 (if window-system
-  (set-frame-size (selected-frame) 100 60))
+  (set-frame-size (selected-frame) 100 70))
 
 ;;; 色をつける
 (global-font-lock-mode t)
@@ -102,7 +105,7 @@
 (cd "~/")
 
 ;;; 検索時大文字小文字の区別をする
-(setq case-fold-search nil)
+(setq-default case-fold-search nil)
 
 ;;; 釣り合いのとれる括弧をハイライトにする
 (show-paren-mode t)
@@ -234,6 +237,8 @@
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
 ;; lisp 補完
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'lisp-complete-symbol)
+(define-key lisp-interaction-mode-map (kbd "C-c C-s") 'lisp-complete-symbol)
+(define-key lisp-mode-map (kbd "C-c C-s") 'lisp-complete-symbol)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
@@ -414,13 +419,13 @@
 
 ;;; カーソル位置を戻す
 ;; (install-elisp-from-emacswiki "point-undo.el")
-(when (eval-when-compile (require 'point-undo))
+(when (eval-when-compile (require 'point-undo nil t))
   (define-key global-map (kbd "<f7>") 'point-undo)
   (define-key global-map (kbd "S-<f7>") 'point-redo))
 
 ;;; 変更箇所にジャンプする
 ;; (install-elisp-from-emacswiki "goto-chg.el")
-(when (eval-when-compile (require 'goto-chg))
+(when (eval-when-compile (require 'goto-chg nil t))
   (define-key global-map (kbd "<f8>") 'goto-last-change)
   (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
 
@@ -428,6 +433,24 @@
 ;; (install-elisp "http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el")
 ;; (when (eval-when-compile (require 'auto-save-buffers))
 ;;   (run-with-idle-timer 2 t 'auto-save-buffers)) ; アイドル 2秒で保存
+
+;;; セッション保存
+;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/session-2.3a.tar.gz | tar xfz -
+;; ミニバッファ履歴 (tなら無限)
+(setq history-length t)
+;; kill-ringやミニバッファで過去に開いたファイルなどの履歴を保存する
+(when (eval-and-compile (require 'session nil t))
+  (setq session-initialize '(de-saveplace session keys menus places)
+        session-globals-include '((kill-ring 50)
+                                  (session-file-alist 500 t)
+                                  (file-name-history 10000)))
+  (add-hook 'after-init-hook 'session-initialize)
+  ;; 前回閉じたときの位置にカーソルを復帰
+  (setq session-undo-check -1))
+
+;;; minibuf で isearch を使えるようにする
+;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
+(require 'minibuf-isearch nil t)
 
 ;;; Emacs内シェルコマンド履歴保存
 ;; (install-elisp-from-emacswiki "shell-history.el")
@@ -489,15 +512,16 @@
 ;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
 ;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
 (when (eval-and-compile (require 'skk nil t))
-  (let ((dict-l "~/.emacs.d/ddskk/SKK-JISYO.L")
-        (dict-kao "~/.emacs.d/ddskk/SKK-JISYO.KAO")
-        (dict-2ch "~/.emacs.d/ddskk/SKK-JISYO.2ch"))
-    (if (file-readable-p  dict-l)
-        (setq skk-large-jisyo dict-l))
-    (when (and (file-readable-p dict-kao) (file-readable-p dict-2ch))
-      (add-to-list 'skk-search-prog-list '(skk-search-jisyo-file skk-jisyo 0 t) t)
-      (add-to-list 'skk-search-prog-list '(skk-search-jisyo-file dict-kao 10000 t) t)
-      (add-to-list 'skk-search-prog-list '(skk-search-jisyo-file dict-2ch 10000 t) t)))
+  (if (file-readable-p  "~/.emacs.d/ddskk/SKK-JISYO.L")
+      (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
+  (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.KAO")
+             (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH"))
+    (add-to-list 'skk-search-prog-list
+                 '(skk-search-jisyo-file skk-jisyo 0 t) t)
+    (add-to-list 'skk-search-prog-list
+                 '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000 t) t)
+    (add-to-list 'skk-search-prog-list
+                 '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
 
   ;; skk 用の sticky キー設定
   ;; 一般的には `;' だが Paren モードが効かなくなる
@@ -701,7 +725,9 @@
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
 ;; sudo gem install -r thrift
 ;; sudo ruby ~/.emacs.d/evernote-mode/ruby/setup.rb
-(when (and (executable-find "ruby") (executable-find "w3m") (locate-library "evernote-mode"))
+(when (and (executable-find "ruby")
+           (executable-find "w3m")
+           (locate-library "evernote-mode"))
   (autoload 'evernote-create-note "evernote-mode" "Create an evernote." t)
   (autoload 'evernote-open-note "evernote-mode" "Open a note for evernote." t)
   (autoload 'evernote-write-note "evernote-mode" "Write buffer to an evernote." t)
