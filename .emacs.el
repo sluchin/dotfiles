@@ -243,9 +243,10 @@
 ;; 折り返し表示 ON/OFF
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
 ;; lisp 補完
-(define-key emacs-lisp-mode-map (kbd "C-c C-s") 'lisp-complete-symbol)
-(define-key lisp-interaction-mode-map (kbd "C-c C-s") 'lisp-complete-symbol)
-(define-key lisp-mode-map (kbd "C-c C-s") 'lisp-complete-symbol)
+;; M-Tab が標準のキーバインドだが Tab で補完てきるようにする
+(define-key emacs-lisp-mode-map (kbd "C-i") 'lisp-complete-symbol)
+(define-key lisp-interaction-mode-map (kbd "C-i") 'lisp-complete-symbol)
+(define-key lisp-mode-map (kbd "C-i") 'lisp-complete-symbol)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
@@ -260,23 +261,27 @@
   (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
 ;; 編集可能にする
 (when (eval-and-compile (require 'wdired nil t))
-  (add-hook 'dired-mode
-            (lambda ()
-              (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))))
-;; ディレクトリを先に表示する
-(when (eval-when-compile (require 'dired nil t))
-  (if (eq  system-type 'windows-nt)
-      (when (eval-and-compile (require 'ls-lisp nil t))
-        (setq ls-lisp-dirs-first t))
-    (setq dired-listing-switches "-aAFl --group-directories-first")))
+  (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
 
 (when (eval-when-compile (require 'dired nil t))
+  ;; ディレクトリを先に表示する
+  (if (eq  system-type 'windows-nt)
+      ;; Windows の場合
+      (when (eval-and-compile (require 'ls-lisp nil t))
+        (setq ls-lisp-dirs-first t))
+    ;; それ以外
+    (setq dired-listing-switches "-aAFl --group-directories-first"))
   ;; ディレクトリを再帰的にコピー可能する
   (setq dired-recursive-copies 'always)
   ;; ディレクトリを再帰的に削除可能する
   (setq dired-recursive-deletes 'always)
   ;; ゴミ箱に移動する
-  (setq delete-by-moving-to-trash t))
+  (defadvice dired-delete-file (around
+                                activate-move-to-trash
+                                activate
+                                compile)
+    (move-file-to-trash (ad-get-arg 0))
+    ad-do-it))
 
 ;; w3m で開く
 (when (and (executable-find "w3m") (locate-library "w3m"))
