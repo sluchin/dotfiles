@@ -84,7 +84,7 @@
 ;;; フレームサイズ
 ;; 幅   (frame-width)
 ;; 高さ (frame-height)
-(if window-system
+(when window-system
   (set-frame-size (selected-frame) 110 70))
 
 ;;; 色をつける
@@ -141,21 +141,24 @@
 ;;; シンボリックファイルを開く時にいちいち聞かない
 (setq vc-follow-symlinks t)
 
+;;; ビープ音を消す
+(setq visible-bell t)
+
 ;;; 現在位置のファイル・URLを開く
 (ffap-bindings)
 
 ;;; 矩形選択
 ;; C-<enter> で矩形選択モード
 (cua-mode t) ; cua-mode を有効にする
-(if (eval-when-compile (require 'cua-base nil t))
-    (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
+(when (eval-when-compile (require 'cua-base nil t))
+  (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
 
 ;;; ブックマーク
 ;; C-x r m (bookmark-set)
 ;; C-x r l (bookmark-bmenu-list)
 ;; ブックマークを変更したら即保存する
-(if (eval-when-compile (require 'bookmark nil t))
-    (setq bookmark-save-flag t))
+(when (eval-when-compile (require 'bookmark nil t))
+  (setq bookmark-save-flag t))
 
 ;;; タブの設定
 (setq-default tab-width 4)
@@ -184,7 +187,15 @@
 
 ;;; キーバインド
 ;; ブラウザで URL を開く
-(define-key global-map (kbd "C-c o") 'browse-url-at-point)
+;; w3m-mode のときはデフォルト
+(defadvice browse-url-at-point
+  (around change-browse-url-browser-function activate compile)
+  (let ((browse-url-browser-function
+         (if (eq major-mode 'w3m-mode)
+             'browse-url-default-browser
+           'w3m-browse-url)))
+    ad-do-it))
+(define-key global-map (kbd "C-c m") 'browse-url-at-point)
 
 ;; vlc で URL を開く
 (when (executable-find "vlc")
@@ -245,15 +256,19 @@
 
 ;;; ファイラ (dired)
 ;; 拡張版をつかう
-(if (locate-library "dired-x")
-    (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
+(when (locate-library "dired-x")
+  (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
 ;; 編集可能にする
-(if (eval-and-compile (require 'wdired nil t))
-    (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+(when (eval-and-compile (require 'wdired nil t))
+  (add-hook 'dired-mode
+            (lambda ()
+              (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))))
 ;; ディレクトリを先に表示する
-(unless (eq system-type 'windows-nt)
-  (if (eval-when-compile (require 'dired nil t))
-      (setq dired-listing-switches "-aAFl --group-directories-first")))
+(when (eval-when-compile (require 'dired nil t))
+  (if (eq  system-type 'windows-nt)
+      (when (eval-and-compile (require 'ls-lisp nil t))
+        (setq ls-lisp-dirs-first t))
+    (setq dired-listing-switches "-aAFl --group-directories-first")))
 
 (when (eval-when-compile (require 'dired nil t))
   ;; ディレクトリを再帰的にコピー可能する
@@ -264,14 +279,15 @@
   (setq delete-by-moving-to-trash t))
 
 ;; w3m で開く
-(when (eval-when-compile (require 'w3m nil t))
-  (defun dired-w3m-find-file ()
-    (interactive)
-    (require 'w3m)
-    (let ((file (dired-get-filename)))
-      (if (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
-          (w3m-find-file file))))
-  (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file))
+(when (and (executable-find "w3m") (locate-library "w3m"))
+ (when (eval-when-compile (require 'w3m nil t))
+   (defun dired-w3m-find-file ()
+     (interactive)
+     (require 'w3m)
+     (let ((file (dired-get-filename)))
+       (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
+         (w3m-find-file file))))
+   (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
 
 ;;; 関数のアウトライン表示
 (when (eval-when-compile (require 'speedbar nil t))
@@ -288,8 +304,9 @@
   ;; 拡張子の追加
   (add-hook 'speedbar-mode-hook
             '(lambda ()
-               (speedbar-add-supported-extension '("js" "as" "html" "css" "php"
-                                                   "rst" "howm" "org" "ml" "scala" "*"))))
+               (speedbar-add-supported-extension
+                '("js" "as" "html" "css" "php"
+                  "rst" "howm" "org" "ml" "scala" "*"))))
   ;; 行番号を表示しない
   (defadvice linum-on(around my-linum-speedbar-on() activate)
     (unless (eq major-mode 'speedbar-mode) ad-do-it))
@@ -298,7 +315,7 @@
 
 ;;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
-(if (eval-and-compile (require 'ediff nil t))
+(when (eval-and-compile (require 'ediff nil t))
   (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
 ;;; バッファの切り替えをインクリメンタルにする
@@ -364,7 +381,7 @@
     (let ((dir "~/gtd/plan.org"))
       (if (file-writable-p dir)
           (find-file dir)
-      (message (concat "Can't open file: " dir)))))
+        (message (concat "Can't open file: " dir)))))
 
   ;; キーバインド
   (define-key global-map (kbd "C-c l") 'org-store-link)
@@ -458,34 +475,34 @@
 (require 'linum-off nil t)
 
 ;;; 2chビューア (navi2ch)
-;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xvfz -
-(if (locate-library "navi2ch")
+;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
+(when (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t))
 
 ;;; メモ (howm)
-;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xvfz -
+;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xfz -
 (when (locate-library "howm")
   (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki." t)
   (define-key global-map (kbd "C-c , ,") 'howm-menu)
   (eval-after-load "howm-mode"
     '(progn
-       (if (boundp 'howm-menu-lang)
-           (setq howm-menu-lang 'ja))
-       (if (boundp 'howm-directory)
-           ;; デュアルブートで Linux と Windows で共有するための設定をする
-           (cond ((and (eq system-type 'gnu/linux)
-                       (file-directory-p "/dos"))
-                  (setq howm-directory "/dos/howm"))
-                 ((and (eq system-type 'windows-nt)
-                       (file-directory-p "e:"))
-                  (setq howm-directory "e:/howm"))
-                 (t
-                  (setq howm-directory "~/howm"))))
+       (when (boundp 'howm-menu-lang)
+         (setq howm-menu-lang 'ja))
+       (when (boundp 'howm-directory)
+         ;; デュアルブートで Linux と Windows で共有するための設定をする
+         (cond ((and (eq system-type 'gnu/linux)
+                     (file-directory-p "/dos"))
+                (setq howm-directory "/dos/howm"))
+               ((and (eq system-type 'windows-nt)
+                     (file-directory-p "e:"))
+                (setq howm-directory "e:/howm"))
+               (t
+                (setq howm-directory "~/howm"))))
 
-       (if (boundp 'howm-excluded-file-regexp)
-           ;; 除外するファイル
-           (setq howm-excluded-file-regexp
-                 "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/")))))
+       (when (boundp 'howm-excluded-file-regexp)
+         ;; 除外するファイル
+         (setq howm-excluded-file-regexp
+               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/")))))
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
@@ -520,8 +537,8 @@
 ;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
 ;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
 (when (eval-and-compile (require 'skk nil t))
-  (if (file-readable-p  "~/.emacs.d/ddskk/SKK-JISYO.L")
-      (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
+  (when (file-readable-p  "~/.emacs.d/ddskk/SKK-JISYO.L")
+    (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
   (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.KAO")
              (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH"))
     (add-to-list 'skk-search-prog-list
@@ -590,52 +607,53 @@
     (autoload 'magit-status "magit" "Interface for git on Emacs." t)))
 
 ;;; Windows の設定
-(when (eq system-type 'windows-nt)
-  ;; Windows のショートカットをリンクできるようにする
-  ;; http://centaur.maths.qmw.ac.uk/Emacs/files/w32-symlinks.el
-  (when (eval-and-compile (require 'w32-symlinks nil t))
-    (custom-set-variables '(w32-symlinks-handle-shortcuts t))
-    ;; NTEmacs で動かすための設定
-    (defadvice insert-file-contents-literally
-      (before insert-file-contents-literally-before activate)
-      (set-buffer-multibyte nil))
+(eval-and-compile
+  (when (eq system-type 'windows-nt)
+    ;; Windows のショートカットをリンクできるようにする
+    ;; (install-elisp "http://centaur.maths.qmw.ac.uk/Emacs/files/w32-symlinks.el")
+    (when (eval-and-compile
+            (and (require 'ls-lisp nil t) (require 'w32-symlinks nil t)))
+      (custom-set-variables '(w32-symlinks-handle-shortcuts t))
+      ;; NTEmacs で動かすための設定
+      (defadvice insert-file-contents-literally
+        (before insert-file-contents-literally-before activate)
+        (set-buffer-multibyte nil))
 
-    (defadvice minibuffer-complete (before expand-symlinks activate)
-      (let ((file (expand-file-name
-                   (buffer-substring-no-properties
-                    (line-beginning-position) (line-end-position)))))
-        (when (file-symlink-p file)
-          (delete-region (line-beginning-position) (line-end-position))
-          (insert (w32-symlinks-parse-symlink file))))))
+      (defadvice minibuffer-complete (before expand-symlinks activate)
+        (let ((file (expand-file-name
+                     (buffer-substring-no-properties
+                      (line-beginning-position) (line-end-position)))))
+          (when (file-symlink-p file)
+            (delete-region (line-beginning-position) (line-end-position))
+            (insert (w32-symlinks-parse-symlink file))))))
 
-  ;; dired で Windows に関連付けられたアプリを起動する
-  ;; http://www.emacswiki.org/emacs/download/w32-shell-execute.el
-  (when (eval-when-compile (require 'w32-shell-execute nil t))
-    (defun uenox-dired-winstart ()
-      "Type '[uenox-dired-winstart]': win-start the current line's file."
-      (interactive)
-      (if (eq major-mode 'dired-mode)
+    ;; dired で Windows に関連付けられたアプリを起動する
+    ;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/w32-shell-execute.el")
+    (when (eval-and-compile
+            (and (require 'w32-shell-execute nil t) (fboundp 'w32-shell-execute)))
+      (defun uenox-dired-winstart ()
+        "Type '[uenox-dired-winstart]': win-start the current line's file."
+        (interactive)
+        (when (eq major-mode 'dired-mode)
           (let ((fname (dired-get-filename)))
             (w32-shell-execute "open" fname)
             (message "win-started %s" fname))))
-    ;; dired のキー割り当て追加
-    (add-hook 'dired-mode-hook
-              (lambda ()
-                (define-key dired-mode-map "z" 'uenox-dired-winstart))))
+      ;; dired のキー割り当て追加
+      (define-key dired-mode-map "z" 'uenox-dired-winstart))
 
-  ;; find や grep で "grep: NUL: No such file or directory" を回避する
-  (setq null-device "/dev/null"))
+    ;; find や grep で "grep: NUL: No such file or directory" を回避する
+    (setq null-device "/dev/null")))
 
 ;;; 辞書 (英辞郎の辞書を stardict 用に変換したものを使用する)
 ;; sudo apt-get install sdcv
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el")
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/sdcv.el")
-(when (and (executable-find "sdcv") (locate-library "sdcv")
-           (eval-and-compile (require 'sdcv nil t)))
-  (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
-  (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
-  (define-key global-map (kbd "C-c w") 'sdcv-search-input)     ; バッファに表示
-  (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)) ; ポップアップ
+(when (and (executable-find "sdcv") (locate-library "sdcv"))
+  (when (eval-and-compile (require 'sdcv nil t))
+    (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
+    (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
+    (define-key global-map (kbd "C-c w") 'sdcv-search-input)      ; バッファに表示
+    (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+))) ; ポップアップ
 
 ;;; メール
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
@@ -647,15 +665,15 @@
   (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
   (eval-after-load "mew"
     '(progn
-       (if (boundp 'mail-user-agent)
-           (setq mail-user-agent 'mew-user-agent))
-       (if (fboundp 'define-mail-user-agent)
-           (define-mail-user-agent
-             'mew-user-agent
-             'mew-user-agent-compose
-             'mew-draft-send-message
-             'mew-draft-kill
-             'mew-send-hook))
+       (when (boundp 'mail-user-agent)
+         (setq mail-user-agent 'mew-user-agent))
+       (when (fboundp 'define-mail-user-agent)
+         (define-mail-user-agent
+           'mew-user-agent
+           'mew-user-agent-compose
+           'mew-draft-send-message
+           'mew-draft-kill
+           'mew-send-hook))
 
        ;; メールアカウントの設定
        ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
@@ -670,20 +688,20 @@
        ;;   (setq mew-imap-user "IMAP account")
        ;;   (setq mew-imap-server "IMAP server")
        ;;   (setq mew-smtp-server "SMTP server"))
-       (if (locate-library "mailaccount")
-           (load "mailaccount"))
+       (when (locate-library "mailaccount")
+         (load "mailaccount"))
        (setq mew-proto "%")
        (setq mew-use-cached-passwd t)
 
        ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
-       (if (file-readable-p "~/.signature")
-           (add-hook 'mew-draft-mode-newdraft-hook
-                     (function
-                      (lambda ()
-                        (let ((p (point)))
-                          (goto-char (point-max))
-                          (insert-file "~/.signature")
-                          (goto-char p))))))
+       (when (file-readable-p "~/.signature")
+         (add-hook 'mew-draft-mode-newdraft-hook
+                   (function
+                    (lambda ()
+                      (let ((p (point)))
+                        (goto-char (point-max))
+                        (insert-file "~/.signature")
+                        (goto-char p))))))
 
        ;; Gmail は SSL接続
        (when (string= "gmail.com" mew-mail-domain)
@@ -703,16 +721,16 @@
   (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t)
   (eval-after-load "twittering-mode"
     '(progn
-       (if (boundp 'twittering-icon-mode)
-           (setq twittering-icon-mode t))
-       (if (boundp 'twittering-status-format)
-           (setq twittering-status-format
-                 "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
-       (if (boundp 'twittering-update-status-function)
-           (setq twittering-update-status-function
-                 'twittering-update-status-from-pop-up-buffer))
-       (if (boundp 'twittering-use-master-password)
-           (setq twittering-use-master-password t)))))
+       (when (boundp 'twittering-icon-mode)
+         (setq twittering-icon-mode t))
+       (when (boundp 'twittering-status-format)
+         (setq twittering-status-format
+               "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
+       (when (boundp 'twittering-update-status-function)
+         (setq twittering-update-status-function
+               'twittering-update-status-from-pop-up-buffer))
+       (when (boundp 'twittering-use-master-password)
+         (setq twittering-use-master-password t)))))
 
 ;;; ブラウザ (w3m)
 ;; sudo apt-get install w3m
@@ -726,8 +744,8 @@
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
   (eval-after-load "w3m"
-    '(if (boundp 'w3m-home-page)
-         (setq w3m-home-page "http://google.co.jp/"))))
+    '(when (boundp 'w3m-home-page)
+       (setq w3m-home-page "http://google.co.jp/"))))
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
@@ -750,13 +768,13 @@
   (define-key global-map (kbd "C-c e b") 'evernote-browser)          ; ブラウザ起動
   (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode) ; 既存ノートを編集
   (eval-after-load "evernote-mode"
-    '(if (boundp 'evernote-enml-formatter-command)
-         (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")))))
+    '(when (boundp 'evernote-enml-formatter-command)
+       (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")))))
 
 ;;; Gist (https://github.com/defunkt/gist.el)
 ;; package-install.el をインストール
 ;; Emacs23 (https://gist.github.com/1884169)
-;; (auto-install-from-url "https://raw.github.com/gist/1884092/4542d018c14fb8fb9f2e6b1a69b01abb1ce475bb/package-install.el")
+;; (install-elisp "https://raw.github.com/gist/1884092/4542d018c14fb8fb9f2e6b1a69b01abb1ce475bb/package-install.el")
 ;; (package-install gist)
 ;; Emacs24 (http://marmalade-repo.org/)
 (when (locate-library "gist")
@@ -773,23 +791,23 @@
   (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t)
   (eval-after-load "multi-term"
     '(progn
-       (if (boundp 'multi-term-program)
-           (setq multi-term-program "zsh"))
-       (if (boundp 'term-unbind-key-list)
-           (setq term-unbind-key-list '("C-x" "C-c" "<ESC>")))
-       (if (boundp 'term-bind-key-alist)
-           (setq term-bind-key-alist
-                 '(("C-c C-c" . term-interrupt-subjob)
-                   ("C-m" . term-send-raw)
-                   ("M-f" . term-send-forward-word)
-                   ("M-b" . term-send-backward-word)
-                   ("M-o" . term-send-backspace)
-                   ("M-p" . term-send-up)
-                   ("M-n" . term-send-down)
-                   ("M-M" . term-send-forward-kill-word)
-                   ("M-N" . term-send-backward-kill-word)
-                   ("M-r" . term-send-reverse-search-history)
-                   ("M-," . term-send-input)
-                   ("M-." . comint-dynamic-complete)))))))
+       (when (boundp 'multi-term-program)
+         (setq multi-term-program "zsh"))
+       (when (boundp 'term-unbind-key-list)
+         (setq term-unbind-key-list '("C-x" "C-c" "<ESC>")))
+       (when (boundp 'term-bind-key-alist)
+         (setq term-bind-key-alist
+               '(("C-c C-c" . term-interrupt-subjob)
+                 ("C-m" . term-send-raw)
+                 ("M-f" . term-send-forward-word)
+                 ("M-b" . term-send-backward-word)
+                 ("M-o" . term-send-backspace)
+                 ("M-p" . term-send-up)
+                 ("M-n" . term-send-down)
+                 ("M-M" . term-send-forward-kill-word)
+                 ("M-N" . term-send-backward-kill-word)
+                 ("M-r" . term-send-reverse-search-history)
+                 ("M-," . term-send-input)
+                 ("M-." . comint-dynamic-complete)))))))
 
 ;;; ここまで拡張 lisp
