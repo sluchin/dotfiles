@@ -24,6 +24,8 @@
 
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
+;; 全てバイトコンパイルするには以下を評価する
+;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
 (setq load-path
       (append '(
                 "~/.emacs.d"
@@ -43,6 +45,7 @@
                 "~/.emacs.d/elpa/pcache-0.2.3"
                 "~/.emacs.d/elpa/tabulated-list-0"
                 "~/.emacs.d/session/lisp"
+                "~/.emacs.d/term-plus-el"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -108,7 +111,9 @@
 (setq-default case-fold-search nil)
 
 ;;; 釣り合いのとれる括弧をハイライトにする
-(show-paren-mode t)
+(when (eval-and-compile (require 'paren nil t))
+  (setq show-paren-delay 0) ; 初期値は 0.125
+  (show-paren-mode t))      ; 有効化
 
 ;;; リージョンに色をつける
 (setq transient-mark-mode t)
@@ -143,9 +148,6 @@
 
 ;;; ビープ音を消す
 (setq visible-bell t)
-
-;;; 現在位置のファイル・URLを開く
-(ffap-bindings)
 
 ;;; 矩形選択
 ;; C-<enter> で矩形選択モード
@@ -242,6 +244,11 @@
 (define-key global-map (kbd "C-\\") nil)
 ;; 折り返し表示 ON/OFF
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
+;;; 現在位置のファイル・URLを開く
+;; (ffap-bindings)
+(define-key global-map (kbd "C-c C-u") 'find-file-at-point)
+(define-key global-map (kbd "C-c C-d") 'dired-at-point)
+
 ;; lisp 補完
 ;; M-Tab が標準のキーバインドだが Tab で補完てきるようにする
 (define-key emacs-lisp-mode-map (kbd "C-i") 'lisp-complete-symbol)
@@ -420,6 +427,7 @@
 ;; (install-elisp-from-emacswiki "tempbuf.el")
 (when (require 'tempbuf nil t)
   (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
+  (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
 
 ;;; カーソル位置印をつけ移動する
@@ -479,6 +487,14 @@
 ;; (install-elisp-from-emacswiki "linum-off.el")
 (require 'linum-off nil t)
 
+;;; 最近使ったファイルを保存
+;; (install-elisp-from-emacswiki "recentf-ext.el")
+;; 以下で最近開いたファイルを一覧表示
+;; M-x recentf-open-files
+(when (eval-when-compile (require 'recentf-ext nil t))
+  (setq recentf-max-saved-items 10000)
+  (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$")))
+
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
 (when (locate-library "navi2ch")
@@ -507,18 +523,12 @@
        (when (boundp 'howm-excluded-file-regexp)
          ;; 除外するファイル
          (setq howm-excluded-file-regexp
-               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/")))))
-
-;;; 最近使ったファイルを保存
-;; (install-elisp-from-emacswiki "recentf-ext.el")
-;; 以下で最近開いたファイルを一覧表示
-;; M-x recentf-open-files
-(when (eval-when-compile (require 'recentf-ext nil t))
-  (setq recentf-max-saved-items 10000)
-  (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$"))
-  (when (eval-when-compile (require 'howm nil t))
-    (add-to-list 'recentf-exclude howm-directory)
-    (add-to-list 'recentf-exclude ".howm-keys")))
+               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))
+       
+       (when (boundp 'recentf-exclude)
+         ;; 最近使ったファイルから除外する
+         (add-to-list 'recentf-exclude howm-directory)
+         (add-to-list 'recentf-exclude ".howm-keys")))))
 
 ;;; GNU Global
 ;; sudo apt-get install global
@@ -749,8 +759,9 @@
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
   (eval-after-load "w3m"
-    '(when (boundp 'w3m-home-page)
-       (setq w3m-home-page "http://google.co.jp/"))))
+    '(progn
+       (when (boundp 'w3m-home-page)
+         (setq w3m-home-page "http://google.co.jp/")))))
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
@@ -814,5 +825,10 @@
                  ("M-r" . term-send-reverse-search-history)
                  ("M-," . term-send-input)
                  ("M-." . comint-dynamic-complete)))))))
+
+;; term+
+;; M-x term または M-x ansi-term で起動
+(when (locate-library "term+")
+  (require 'term+))
 
 ;;; ここまで拡張 lisp
