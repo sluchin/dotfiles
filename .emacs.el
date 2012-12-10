@@ -427,7 +427,9 @@
 ;; (install-elisp-from-emacswiki "tempbuf.el")
 (when (require 'tempbuf nil t)
   (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
+  (add-hook 'magit-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
+  (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
 
 ;;; カーソル位置印をつけ移動する
