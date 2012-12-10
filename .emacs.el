@@ -57,7 +57,7 @@
 (when (file-directory-p "~/.emacs.d/info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
   (eval-after-load "info"
-    '(if (boundp Info-directory-list)
+    '(if (boundp 'Info-directory-list)
          (setq Info-directory-list (cons "~/.emacs.d/info" Info-default-directory-list)))))
 
 ;;; 初期画面を表示しない
@@ -114,6 +114,9 @@
 (when (eval-and-compile (require 'paren nil t))
   (setq show-paren-delay 0) ; 初期値は 0.125
   (show-paren-mode t))      ; 有効化
+
+;;; キーストロークをエコーエリアに早く表示する
+(setq echo-keystrokes 0.1)
 
 ;;; リージョンに色をつける
 (setq transient-mark-mode t)
@@ -227,23 +230,31 @@
 
 ;; 改行と同時にインデントも行う
 (define-key global-map (kbd "C-m") 'newline-and-indent)
+
 ;; find-function のキー割り当て
 ;; C-x F 関数, C-x V 変数, C-x K キー割り当てコマンド
 (find-function-setup-keys)
+
 ;; 改行・タブ・スペースを色づけする
 (define-key global-map (kbd "C-^") 'global-whitespace-mode)
+
 ;; クリップボードにコピー
 ;; クリップボードを使わない場合以下の設定でリージョンと同期をとるとよい
 ;; (setq x-select-enable-clipboard t)
 (define-key global-map (kbd "C-<insert>") 'clipboard-kill-ring-save)
+
 ;; クリップボードに切り取り
 (define-key global-map (kbd "S-DEL") 'clipboard-kill-region)
+
 ;; クリップボードに貼り付け
 (define-key global-map (kbd "S-<insert>") 'clipboard-yank)
+
 ;; C-\の日本語入力の設定を無効にする
 (define-key global-map (kbd "C-\\") nil)
+
 ;; 折り返し表示 ON/OFF
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
+
 ;;; 現在位置のファイル・URLを開く
 ;; (ffap-bindings)
 (define-key global-map (kbd "C-c C-u") 'find-file-at-point)
@@ -457,11 +468,6 @@
 (when (eval-when-compile (require 'goto-chg nil t))
   (define-key global-map (kbd "<f8>") 'goto-last-change)
   (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
-
-;;; ファイルを自動保存する
-;; (install-elisp "http://homepage3.nifty.com/oatu/emacs/archives/auto-save-buffers.el")
-;; (when (eval-when-compile (require 'auto-save-buffers))
-;;   (run-with-idle-timer 2 t 'auto-save-buffers)) ; アイドル 2秒で保存
 
 ;;; セッション保存
 ;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/session-2.3a.tar.gz | tar xfz -
