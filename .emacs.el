@@ -53,7 +53,7 @@
 ;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xvfz -
 ;; 目次ファイルに以下を追加 (/usr/share/info/dir)
 ;; * Elisp-ja: (elisp-ja).    Emacs Lisp Reference Manual(Japanese).
-;; * Emacs-ja: (emacs-ja).    The extensible self-
+;; * Emacs-ja: (emacs-ja).    The extensible self-documenting text editor(Japanese).
 (when (file-directory-p "~/.emacs.d/info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
   (eval-after-load "info"
