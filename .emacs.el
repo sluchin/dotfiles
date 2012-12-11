@@ -57,7 +57,7 @@
 (when (file-directory-p "~/.emacs.d/info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
   (eval-after-load "info"
-    '(if (boundp 'Info-directory-list)
+    '(when (boundp 'Info-directory-list)
          (setq Info-directory-list (cons "~/.emacs.d/info" Info-default-directory-list)))))
 
 ;;; 初期画面を表示しない
