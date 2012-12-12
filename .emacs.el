@@ -84,6 +84,20 @@
          (set-fontset-font nil 'japanese-jisx0208
                            (font-spec :family "Hiragino Mincho Pro")))))
 
+;; モナーフォントに変更する
+;; モナフォントをインストールしておく
+;; sudo apt-get install fonts-monapo
+(defun font-to-monapo ()
+  "Set monapo font in current buffer"
+  (interactive)
+  (buffer-face-set (font-face-attributes "Monapo")))
+
+;; フォントを元に戻す
+(defun font-back ()
+  "Set default font in current buffer"
+  (interactive)
+  (buffer-face-set (font-face-attributes (frame-parameter nil 'font))))
+
 ;;; フレームサイズ
 ;; 幅   (frame-width)
 ;; 高さ (frame-height)
@@ -506,7 +520,15 @@
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
 (when (locate-library "navi2ch")
-  (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t))
+  (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t)
+  (eval-after-load "navi2ch"
+    '(progn
+       ;; モナフォントをインストールしておく
+       ;; sudo apt-get install fonts-monapo
+       (when (boundp 'navi2ch-mona-enable)
+         (setq navi2ch-mona-enable t))
+       (when (boundp 'navi2ch-article-auto-range)
+         (setq navi2ch-article-auto-range nil)))))
 
 ;;; メモ (howm)
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xfz -
@@ -769,7 +791,11 @@
   (eval-after-load "w3m"
     '(progn
        (when (boundp 'w3m-home-page)
-         (setq w3m-home-page "http://google.co.jp/")))))
+         (setq w3m-home-page "http://google.co.jp/"))
+       (when (boundp 'w3m-use-cookies)
+         (setq w3m-use-cookies t))
+       (when (boundp 'w3m-favicon-cache-expire-wait)
+         (setq w3m-favicon-cache-expire-wait nil)))))
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
