@@ -205,16 +205,14 @@
              (c-set-style "stroustrup-style")))
 
 ;;; キーバインド
-;; ブラウザで URL を開く
-;; w3m-mode のときはデフォルト
-(defadvice browse-url-at-point
-  (around change-browse-url-browser-function activate compile)
-  (let ((browse-url-browser-function
-         (if (eq major-mode 'w3m-mode)
-             'browse-url-default-browser
-           'w3m-browse-url)))
-    ad-do-it))
-(define-key global-map (kbd "C-c m") 'browse-url-at-point)
+;; w3m で URL を開く
+(define-key global-map (kbd "C-c m")
+  (lambda ()
+    "Browse url in w3m"
+    (interactive)
+    (setq browse-url-browser-function 'w3m-browse-url)
+    (browse-url-at-point)
+    (setq browse-url-browser-function 'browse-url-default-browser)))
 
 ;; vlc で URL を開く
 (when (executable-find "vlc")
@@ -421,6 +419,14 @@
         (message (concat "Can't open file: " dir)))))
 
   ;; キーバインド
+  (define-key org-mode-map (kbd "C-c m")
+    (lambda ()
+      "Browse url in w3m"
+      (interactive)
+      (setq browse-url-browser-function 'w3m-browse-url)
+      (org-return)
+      (setq browse-url-browser-function 'browse-url-default-browser)))
+
   (define-key global-map (kbd "C-c l") 'org-store-link)
   (define-key global-map (kbd "C-c a") 'org-agenda)
   (define-key global-map (kbd "C-c r") 'org-remember)
