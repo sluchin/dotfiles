@@ -50,7 +50,7 @@
                 ) load-path))
 
 ;;; 日本語の info のバスを設定
-;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xvfz -
+;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xfz -
 ;; 目次ファイルに以下を追加 (/usr/share/info/dir)
 ;; * Elisp-ja: (elisp-ja).    Emacs Lisp Reference Manual(Japanese).
 ;; * Emacs-ja: (emacs-ja).    The extensible self-documenting text editor(Japanese).
@@ -85,7 +85,7 @@
                            (font-spec :family "Hiragino Mincho Pro")))))
 
 ;; モナーフォントに変更する
-;; モナフォントをインストールしておく
+;; モナーフォントをインストールしておくこと
 ;; sudo apt-get install fonts-monapo
 (defun font-to-monapo ()
   "Set monapo font in current buffer"
@@ -268,9 +268,8 @@
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
 
 ;;; 現在位置のファイル・URLを開く
-;; (ffap-bindings)
-(define-key global-map (kbd "C-c C-u") 'find-file-at-point)
-(define-key global-map (kbd "C-c C-d") 'dired-at-point)
+(define-key global-map (kbd "C-x M-f") 'find-file-at-point)
+(define-key global-map (kbd "C-x M-d") 'dired-at-point)
 
 ;; lisp 補完
 ;; M-Tab が標準のキーバインドだが Tab で補完てきるようにする
@@ -286,18 +285,20 @@
   (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
 
 ;;; ファイラ (dired)
-;; 拡張版をつかう
-(when (locate-library "dired-x")
-  (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
+;; 拡張機能を有効にする
+(eval-and-compile (require 'dired-x nil t))
+(eval-and-compile (require 'ls-lisp nil t))
+
 ;; 編集可能にする
 (when (eval-and-compile (require 'wdired nil t))
   (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
 
-(when (eval-when-compile (require 'dired nil t))
+(when (and (eval-when-compile (require 'dired nil t))
+           (eval-when-compile (require 'dired-aux)))
   ;; ディレクトリを先に表示する
   (if (eq  system-type 'windows-nt)
       ;; Windows の場合
-      (when (eval-and-compile (require 'ls-lisp nil t))
+      (when (eval-when-compile (require 'ls-lisp nil t))
         (setq ls-lisp-dirs-first t))
     ;; それ以外
     (setq dired-listing-switches "-aAFl --group-directories-first"))
@@ -310,19 +311,35 @@
                                 activate-move-to-trash
                                 activate
                                 compile)
-    (move-file-to-trash (ad-get-arg 0))
-    ad-do-it))
-
-;; w3m で開く
-(when (and (executable-find "w3m") (locate-library "w3m"))
- (when (eval-when-compile (require 'w3m nil t))
-   (defun dired-w3m-find-file ()
-     (interactive)
-     (require 'w3m)
-     (let ((file (dired-get-filename)))
-       (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
-         (w3m-find-file file))))
-   (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
+    (move-file-to-trash (ad-get-arg 0)) ad-do-it)
+  ;; libreoffice で開く
+  (when (executable-find "libreoffice")
+    (defun dired-run-libreoffice ()
+      "Open file in libreoffice"
+      (interactive)
+      (let ((file (dired-get-filename)))
+        (when (y-or-n-p (format "Open 'libreoffice' %s " (file-name-nondirectory file)))
+          (dired-run-shell-command (concat "libreoffice " file " &")))))
+    (define-key dired-mode-map (kbd "C-e") 'dired-run-libreoffice))
+  ;; evince で開く
+  (when (executable-find "evince")
+    (defun dired-run-evince ()
+      "Open file in evince"
+      (interactive)
+      (let ((file (dired-get-filename)))
+        (when (y-or-n-p (format "Open 'evince' %s " (file-name-nondirectory file)))
+          (dired-run-shell-command (concat "evince " file " &")))))
+    (define-key dired-mode-map (kbd "C-e") 'dired-run-evince))
+  ;; w3m で開く
+  (when (and (executable-find "w3m") (locate-library "w3m"))
+    (when (eval-when-compile (require 'w3m nil t))
+      (defun dired-w3m-find-file ()
+        "Open file in w3m"
+        (interactive)
+        (let ((file (dired-get-filename)))
+          (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
+            (w3m-find-file file))))
+      (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file))))
 
 ;;; 関数のアウトライン表示
 (when (eval-when-compile (require 'speedbar nil t))
@@ -335,7 +352,7 @@
                                     (unsplittable . t)
                                     (left-fringe . 0)))
   (setq speedbar-hide-button-brackets-flag t)
-  (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy) )
+  (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy))
   ;; 拡張子の追加
   (add-hook 'speedbar-mode-hook
             '(lambda ()
@@ -527,14 +544,58 @@
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
 (when (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t)
+  ;; AAを綺麗に表示する
+  ;; モナーフォントをインストールしておくこと
+  ;; sudo apt-get install fonts-monapo
+  (add-hook 'navi2ch-article-mode-hook
+            (lambda ()
+              (buffer-face-set (font-face-attributes "Monapo"))))
+  ;; C-c 2 で起動
+  (define-key global-map (kbd "C-c 2") 'navi2ch)
   (eval-after-load "navi2ch"
     '(progn
-       ;; モナフォントをインストールしておく
-       ;; sudo apt-get install fonts-monapo
+       ;; モナーフォントを使う
        (when (boundp 'navi2ch-mona-enable)
          (setq navi2ch-mona-enable t))
+       ;; スレッドの表示範囲を絞らない
        (when (boundp 'navi2ch-article-auto-range)
-         (setq navi2ch-article-auto-range nil)))))
+         (setq navi2ch-article-auto-range nil))
+       ;; 終了時に訪ねない
+       (when (boundp 'navi2ch-ask-when-exit)
+         (setq navi2ch-ask-when-exit nil))
+       ;; スレのデフォルト名を使う
+       (when (boundp 'navi2ch-message-user-name)
+         (setq navi2ch-message-user-name ""))
+       ;; あぼーんがあったとき元のファイルは保存しない
+       (when (boundp 'navi2ch-net-save-old-file-when-aborn)
+         (setq navi2ch-net-save-old-file-when-aborn nil))
+       ;; 送信時に訪ねる
+       (when (boundp 'navi2ch-message-ask-before-send)
+         (setq navi2ch-message-ask-before-send t))
+       ;; kill するときに訪ねない
+       (when (boundp 'navi2ch-message-ask-before-kill)
+         (setq navi2ch-message-ask-before-kill nil))
+       ;; バッファは 10 個まで
+       (when (boundp 'navi2ch-article-max-buffers)
+         (setq navi2ch-article-max-buffers 10))
+       ;; navi2ch-article-max-buffers を超えたら古いバッファは消す
+       (when (boundp 'navi2ch-article-auto-expunge)
+         (setq navi2ch-article-auto-expunge t))
+       ;; Board モードのレス数欄にレスの増加数を表示する
+       (when (boundp 'navi2ch-board-insert-subject-with-diff)
+         (setq navi2ch-board-insert-subject-with-diff t))
+       ;; Board モードのレス数欄にレスの未読数を表示する
+       (when (boundp 'navi2ch-board-insert-subject-with-unread)
+         (setq navi2ch-board-insert-subject-with-unread t))
+       ;; 既読スレはすべて表示
+       (when (boundp 'navi2ch-article-exist-message-range)
+         (setq navi2ch-article-exist-message-range '(1 . 1000)))
+       ;; 未読スレもすべて表示
+       (when (boundp 'navi2ch-article-new-message-range)
+         (setq navi2ch-article-new-message-range '(1000 . 1)))
+       ;; 3 ペインモードにする
+       (when (boundp 'navi2ch-list-stay-list-window)
+         (setq navi2ch-list-stay-list-window t)))))
 
 ;;; メモ (howm)
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xfz -
@@ -560,7 +621,6 @@
          ;; 除外するファイル
          (setq howm-excluded-file-regexp
                "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))
-       
        (when (boundp 'recentf-exclude)
          ;; 最近使ったファイルから除外する
          (add-to-list 'recentf-exclude howm-directory)
@@ -588,7 +648,7 @@
 ;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
 ;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
 (when (eval-and-compile (require 'skk nil t))
-  (when (file-readable-p  "~/.emacs.d/ddskk/SKK-JISYO.L")
+  (when (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.L")
     (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
   (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.KAO")
              (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH"))
@@ -747,12 +807,11 @@
        ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
        (when (file-readable-p "~/.signature")
          (add-hook 'mew-draft-mode-newdraft-hook
-                   (function
-                    (lambda ()
-                      (let ((p (point)))
-                        (goto-char (point-max))
-                        (insert-file "~/.signature")
-                        (goto-char p))))))
+                   (lambda ()
+                     (let ((p (point)))
+                       (goto-char (point-max))
+                       (insert-file "~/.signature")
+                       (goto-char p)))))
 
        ;; Gmail は SSL接続
        (when (string= "gmail.com" mew-mail-domain)
@@ -796,12 +855,21 @@
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
   (eval-after-load "w3m"
     '(progn
+       ;; デフォルトで使う検索エンジン
+       (when (boundp 'w3m-search-default-engine)
+         (setq w3m-search-default-engine "google"))
+       ;; ホームページ
        (when (boundp 'w3m-home-page)
          (setq w3m-home-page "http://google.co.jp/"))
+       ;; クッキーを有効にする
        (when (boundp 'w3m-use-cookies)
          (setq w3m-use-cookies t))
+       ;; favicon のキャッシュを消さない 
        (when (boundp 'w3m-favicon-cache-expire-wait)
-         (setq w3m-favicon-cache-expire-wait nil)))))
+         (setq w3m-favicon-cache-expire-wait nil))
+       ;; デフォルトエリア
+       (when (boundp 'w3m-weather-default-area)
+         (setq w3m-weather-default-area "道央・石狩")))))
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
@@ -872,3 +940,4 @@
   (require 'term+))
 
 ;;; ここまで拡張 lisp
+
