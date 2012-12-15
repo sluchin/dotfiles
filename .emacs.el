@@ -286,50 +286,58 @@
 
 ;;; ファイラ (dired)
 ;; 拡張機能を有効にする
-(eval-and-compile (require 'dired-x nil t))
-(eval-and-compile (require 'ls-lisp nil t))
+(add-hook 'dired-load-hook (lambda () (load "dired-x")))
+(add-hook 'dired-load-hook (lambda () (load "ls-lisp")))
+
+;; ゴミ箱に移動する
+(add-hook 'dired-mode-hook
+          (lambda ()
+            (set (make-local-variable 'delete-by-moving-to-trash) t)))
 
 ;; 編集可能にする
 (when (eval-and-compile (require 'wdired nil t))
   (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
 
 (when (and (eval-when-compile (require 'dired nil t))
-           (eval-when-compile (require 'dired-aux)))
+           (eval-when-compile (require 'dired-aux nil t)))
   ;; ディレクトリを先に表示する
-  (if (eq  system-type 'windows-nt)
-      ;; Windows の場合
-      (when (eval-when-compile (require 'ls-lisp nil t))
-        (setq ls-lisp-dirs-first t))
-    ;; それ以外
-    (setq dired-listing-switches "-aAFl --group-directories-first"))
+  (cond ((eq  system-type 'windows-nt)
+          ;; Windows の場合
+          (when (eval-when-compile (require 'ls-lisp nil t))
+            (setq ls-lisp-dirs-first t)))
+        ((eq system-type 'gnu/linux)
+          ;; GNU オプションも使う
+          (setq dired-listing-switches "-alF --time-style=long-iso --group-directories-first"))
+        (t
+          ;; POSIX オプションのみ
+          (setq dired-listing-switches "-alF")))
+
   ;; ディレクトリを再帰的にコピー可能する
   (setq dired-recursive-copies 'always)
   ;; ディレクトリを再帰的に削除可能する
   (setq dired-recursive-deletes 'always)
-  ;; ゴミ箱に移動する
-  (defadvice dired-delete-file (around
-                                activate-move-to-trash
-                                activate
-                                compile)
-    (move-file-to-trash (ad-get-arg 0)) ad-do-it)
+
+  (eval-and-compile
+    (defun dired-run-process (process)
+      "Open file in process"
+      (let ((file (dired-get-filename)))
+        (if (and (file-directory-p file) (not (string= process "vlc")))
+            (message "%s is a directory" (file-name-nondirectory file))
+          (when (y-or-n-p (format "Open '%s' %s " process (file-name-nondirectory file)))
+            (dired-run-shell-command (concat process " " file " &")))))))
+  
   ;; libreoffice で開く
   (when (executable-find "libreoffice")
-    (defun dired-run-libreoffice ()
-      "Open file in libreoffice"
-      (interactive)
-      (let ((file (dired-get-filename)))
-        (when (y-or-n-p (format "Open 'libreoffice' %s " (file-name-nondirectory file)))
-          (dired-run-shell-command (concat "libreoffice " file " &")))))
-    (define-key dired-mode-map (kbd "C-e") 'dired-run-libreoffice))
+    (define-key dired-mode-map (kbd "C-l")
+      (lambda () (interactive) (dired-run-process "libreoffice"))))
   ;; evince で開く
   (when (executable-find "evince")
-    (defun dired-run-evince ()
-      "Open file in evince"
-      (interactive)
-      (let ((file (dired-get-filename)))
-        (when (y-or-n-p (format "Open 'evince' %s " (file-name-nondirectory file)))
-          (dired-run-shell-command (concat "evince " file " &")))))
-    (define-key dired-mode-map (kbd "C-e") 'dired-run-evince))
+    (define-key dired-mode-map (kbd "C-e")
+      (lambda () (interactive) (dired-run-process "evince"))))
+  ;; vlc で開く
+  (when (executable-find "vlc")
+    (define-key dired-mode-map (kbd "C-v")
+      (lambda () (interactive) (dired-run-process "vlc"))))
   ;; w3m で開く
   (when (and (executable-find "w3m") (locate-library "w3m"))
     (when (eval-when-compile (require 'w3m nil t))
@@ -337,8 +345,10 @@
         "Open file in w3m"
         (interactive)
         (let ((file (dired-get-filename)))
-          (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
-            (w3m-find-file file))))
+          (if (not (file-directory-p file))
+              (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
+                (w3m-find-file file))
+            (message "%s is a directory" file))))
       (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file))))
 
 ;;; 関数のアウトライン表示
@@ -722,8 +732,7 @@
   (when (eq system-type 'windows-nt)
     ;; Windows のショートカットをリンクできるようにする
     ;; (install-elisp "http://centaur.maths.qmw.ac.uk/Emacs/files/w32-symlinks.el")
-    (when (eval-and-compile
-            (and (require 'ls-lisp nil t) (require 'w32-symlinks nil t)))
+    (when (and (require 'ls-lisp nil t) (require 'w32-symlinks nil t))
       (custom-set-variables '(w32-symlinks-handle-shortcuts t))
       ;; NTEmacs で動かすための設定
       (defadvice insert-file-contents-literally
@@ -740,8 +749,7 @@
 
     ;; dired で Windows に関連付けられたアプリを起動する
     ;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/w32-shell-execute.el")
-    (when (eval-and-compile
-            (and (require 'w32-shell-execute nil t) (fboundp 'w32-shell-execute)))
+    (when (and (require 'w32-shell-execute nil t) (fboundp 'w32-shell-execute))
       (defun uenox-dired-winstart ()
         "Type '[uenox-dired-winstart]': win-start the current line's file."
         (interactive)
