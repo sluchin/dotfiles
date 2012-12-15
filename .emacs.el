@@ -103,6 +103,24 @@
 ;; 高さ (frame-height)
 (when window-system
   (set-frame-size (selected-frame) 110 70))
+;; フレームサイズを変更する
+(when window-system
+  (defun resize-frame-interactively ()
+    "Resize frame interactively"
+    (interactive)
+    (let (key width height)
+      (catch 'quit
+        (while t
+          (setq width (frame-width) height (frame-height))
+          (message "Resize frame by [npfb] (%dx%d): " width height)
+          (setq key (read-char))
+          (cond
+           ((eq key ?f) (set-frame-width (selected-frame) (1+ width)))
+           ((eq key ?b) (set-frame-width (selected-frame) (1- width)))
+           ((eq key ?n) (set-frame-height (selected-frame) (1+ height)))
+           ((eq key ?p) (set-frame-height (selected-frame) (1- height)))
+           (t (throw 'quit t)))))))
+  (define-key global-map (kbd "<f11>") 'resize-frame-interactively))
 
 ;;; 色をつける
 (global-font-lock-mode t)
@@ -325,7 +343,7 @@
             (message "%s is a directory" (file-name-nondirectory file))
           (when (y-or-n-p (format "Open '%s' %s " process (file-name-nondirectory file)))
             (dired-run-shell-command (concat process " " file " &")))))))
-  
+
   ;; libreoffice で開く
   (when (executable-find "libreoffice")
     (define-key dired-mode-map (kbd "C-l")
@@ -872,7 +890,7 @@
        ;; クッキーを有効にする
        (when (boundp 'w3m-use-cookies)
          (setq w3m-use-cookies t))
-       ;; favicon のキャッシュを消さない 
+       ;; favicon のキャッシュを消さない
        (when (boundp 'w3m-favicon-cache-expire-wait)
          (setq w3m-favicon-cache-expire-wait nil))
        ;; デフォルトエリア
@@ -948,4 +966,3 @@
   (require 'term+))
 
 ;;; ここまで拡張 lisp
-
