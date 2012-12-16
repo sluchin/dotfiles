@@ -102,9 +102,10 @@
 ;; 幅   (frame-width)
 ;; 高さ (frame-height)
 (when window-system
-  (set-frame-size (selected-frame) 110 70))
-;; フレームサイズを変更する
-(when window-system
+  ;; 起動時のフレームサイス
+  (set-frame-size (selected-frame) 110 70)
+
+  ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
     "Resize frame interactively"
     (interactive)
@@ -113,13 +114,13 @@
         (while t
           (setq width (frame-width) height (frame-height))
           (message "Resize frame by [npfb] (%dx%d): " width height)
-          (setq key (read-char))
+          (setq key (read-event))
           (cond
            ((eq key ?f) (set-frame-width (selected-frame) (1+ width)))
            ((eq key ?b) (set-frame-width (selected-frame) (1- width)))
            ((eq key ?n) (set-frame-height (selected-frame) (1+ height)))
            ((eq key ?p) (set-frame-height (selected-frame) (1- height)))
-           (t (throw 'quit t)))))))
+           ((eq key ?q) (throw 'quit t)))))))
   (define-key global-map (kbd "<f11>") 'resize-frame-interactively))
 
 ;;; 色をつける
@@ -388,7 +389,7 @@
                 '("js" "as" "html" "css" "php"
                   "rst" "howm" "org" "ml" "scala" "*"))))
   ;; 行番号を表示しない
-  (defadvice linum-on(around my-linum-speedbar-on() activate)
+  (defadvice linum-on(around linum-off-speedbar activate)
     (unless (eq major-mode 'speedbar-mode) ad-do-it))
 
   (define-key global-map (kbd "<f6>") 'speedbar))
