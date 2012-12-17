@@ -16,6 +16,10 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
+;;; サーバ
+(when (eval-and-compile (require 'server nil t))
+  (unless (server-running-p) (server-start)))
+
 ;;; バックトレースを有効にする
 (setq debug-on-error t)
 
@@ -799,9 +803,9 @@
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
-  (setq read-mail-command 'mew)
   (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
-  (eval-after-load "mew"
+  (setq read-mail-command 'mew)
+ (eval-after-load "mew"
     '(progn
        (when (boundp 'mail-user-agent)
          (setq mail-user-agent 'mew-user-agent))
@@ -813,6 +817,53 @@
            'mew-draft-kill
            'mew-send-hook))
 
+       ;; 起動デモを表示しない
+       (when (boundp 'mew-demo)
+         (setq mew-demo nil))       
+       ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
+       (when (file-readable-p "~/.signature")
+         (add-hook 'mew-draft-mode-newdraft-hook
+                   (lambda ()
+                     (let ((p (point)))
+                       (goto-char (point-max))
+                       (insert-file "~/.signature")
+                       (goto-char p)))))
+       ;; スレッドの親子関係を罫線を使って可視化
+       (when (boundp 'mew-use-fancy-thread)
+         (setq mew-use-fancy-thread t))
+       ;; スレッド間に区切りを表示
+       (when (boundp 'mew-use-thread-separator)
+         (setq mew-use-thread-separator t))
+       ;; レンジを聞かない
+       (when (boundp 'mew-ask-range)
+         (setq mew-ask-range nil))
+       ;; 重複メールには削除マークをつける
+       (when (boundp 'mew-scan-form-mark-delete)
+           (setq mew-scan-form-mark-delete t))
+       ;; PASSの保持
+       (when (boundp 'mew-use-cached-passwd)
+         (setq mew-use-cached-passwd t))
+       (when (boundp 'mew-passwd-timer-unit)
+         (setq mew-passwd-timer-unit 60))
+       (when (boundp 'mew-passwd-lifetime)
+         (setq mew-passwd-lifetime 120))
+       ;; 着信通知
+       ;; 着信した際モードラインに表示される
+       (when (boundp 'mew-use-biff)
+         (setq mew-use-biff t))
+       (when (boundp 'mew-imap-biff)
+         (setq mew-imap-biff t))
+       (when (boundp 'mew-use-biff-bell)
+         (setq mew-use-biff-bell nil))   ; ベルを鳴らさない
+       (when (boundp 'mew-biff-interval)
+         (setq mew-biff-interval 3))     ; 間隔(分)
+       (when (boundp 'mew-auto-get)
+         (setq mew-auto-get t))          ; 起動時取得する
+       ;; IMAPの設定
+       (setq mew-proto "%")
+       ;; 送信メールを保存する
+       (when (boundp 'mew-fcc)
+         (setq mew-fcc "%Sent"))
        ;; メールアカウントの設定
        ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
        ;; (when (eval-when-compile (require 'mew nil t))
@@ -828,29 +879,23 @@
        ;;   (setq mew-smtp-server "SMTP server"))
        (when (locate-library "mailaccount")
          (load "mailaccount"))
-       (setq mew-proto "%")
-       (setq mew-use-cached-passwd t)
-
-       ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
-       (when (file-readable-p "~/.signature")
-         (add-hook 'mew-draft-mode-newdraft-hook
-                   (lambda ()
-                     (let ((p (point)))
-                       (goto-char (point-max))
-                       (insert-file "~/.signature")
-                       (goto-char p)))))
-
        ;; Gmail は SSL接続
        (when (string= "gmail.com" mew-mail-domain)
-         (setq mew-imap-auth  t)
-         (setq mew-imap-ssl t)
+         (when (boundp 'mew-imap-auth)
+           (setq mew-imap-auth  t))
+         (when (boundp 'mew-imap-ssl)
+           (setq mew-imap-ssl t))
          (setq mew-imap-ssl-port "993")
-         (setq mew-smtp-auth t)
-         (setq mew-smtp-ssl t)
-         (setq mew-smtp-ssl-port "465")
-         (setq mew-prog-ssl "/usr/bin/stunnel4")
-         (setq mew-fcc "%Sent") ; 送信メールを保存する
-         (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱")))))
+         (when (boundp 'mew-smtp-auth)
+           (setq mew-smtp-auth t))
+         (when (boundp 'mew-smtp-ssl)
+           (setq mew-smtp-ssl t))
+         (when (boundp 'mew-smtp-ssl-port)
+           (setq mew-smtp-ssl-port "465"))
+         (when (boundp 'mew-prog-ssl)
+           (setq mew-prog-ssl "/usr/bin/stunnel4"))
+         (when (boundp 'mew-imap-trash-folder)
+           (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱"))))))
 
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
