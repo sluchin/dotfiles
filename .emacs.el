@@ -306,6 +306,16 @@
 (when (eval-and-compile (require 'linum nil t)) ; 画面左に行数を表示する
   (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
   (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
+;; 行番号表示する必要のないモードでは表示しない
+(defvar linum-disabled-modes-list
+  '(eshell-mode
+    mew-summary-mode
+    speedbar-mode
+    compilation-mode
+    org-mode
+    dired-mode))
+(defadvice linum-on(around linum-off activate)
+  (unless (or (minibufferp) (member major-mode linum-disabled-modes-list)) ad-do-it))
 
 ;;; ファイラ (dired)
 ;; 拡張機能を有効にする
@@ -392,10 +402,7 @@
                (speedbar-add-supported-extension
                 '("js" "as" "html" "css" "php"
                   "rst" "howm" "org" "ml" "scala" "*"))))
-  ;; 行番号を表示しない
-  (defadvice linum-on(around linum-off-speedbar activate)
-    (unless (eq major-mode 'speedbar-mode) ad-do-it))
-
+  ;; f6 で起動
   (define-key global-map (kbd "<f6>") 'speedbar))
 
 ;;; Ediff Control Panel 専用のフレームを作成しない
@@ -560,10 +567,6 @@
 ;;; Emacs内シェルコマンド履歴保存
 ;; (install-elisp-from-emacswiki "shell-history.el")
 (require 'shell-history nil t)
-
-;;; 行番号表示する必要のないモードでは表示しない
-;; (install-elisp-from-emacswiki "linum-off.el")
-(require 'linum-off nil t)
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
@@ -805,7 +808,7 @@
   (autoload 'mew-send "mew" "Send mail." t)
   (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
- (eval-after-load "mew"
+  (eval-after-load "mew"
     '(progn
        (when (boundp 'mail-user-agent)
          (setq mail-user-agent 'mew-user-agent))
@@ -819,7 +822,7 @@
 
        ;; 起動デモを表示しない
        (when (boundp 'mew-demo)
-         (setq mew-demo nil))       
+         (setq mew-demo nil))
        ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
        (when (file-readable-p "~/.signature")
          (add-hook 'mew-draft-mode-newdraft-hook
@@ -839,7 +842,7 @@
          (setq mew-ask-range nil))
        ;; 重複メールには削除マークをつける
        (when (boundp 'mew-scan-form-mark-delete)
-           (setq mew-scan-form-mark-delete t))
+         (setq mew-scan-form-mark-delete t))
        ;; PASSの保持
        (when (boundp 'mew-use-cached-passwd)
          (setq mew-use-cached-passwd t))
