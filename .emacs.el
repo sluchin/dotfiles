@@ -721,7 +721,6 @@
 (when (eval-and-compile (require 'paredit nil t))
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'ielm-mode-hook 'emacs-lisp-mode-hook)
   (add-hook 'lisp-interaction-mode-hook 'disable-paredit-mode))
 
 ;;; 自動バイトコンパイル
