@@ -314,7 +314,9 @@
     compilation-mode
     org-mode
     dired-mode
-    term-mode))
+    term-mode
+    navi2ch-list-mode
+    navi2ch-board-mode))
 (defadvice linum-on(around linum-off activate)
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list)) ad-do-it))
 
