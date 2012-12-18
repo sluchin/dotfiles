@@ -313,7 +313,8 @@
     speedbar-mode
     compilation-mode
     org-mode
-    dired-mode))
+    dired-mode
+    term-mode))
 (defadvice linum-on(around linum-off activate)
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list)) ad-do-it))
 
