@@ -50,6 +50,7 @@
                 "~/.emacs.d/elpa/tabulated-list-0"
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
+                "~/.emacs.d/plugins/yasnippet"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -103,7 +104,7 @@
   (buffer-face-set (font-face-attributes (frame-parameter nil 'font))))
 
 ;;; フレームサイズ
-;; 幅   (frame-width)
+;; 幅  (frame-width)
 ;; 高さ (frame-height)
 (when window-system
   ;; 起動時のフレームサイス
@@ -161,6 +162,20 @@
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
 
+;;; ツールバーとスクロールバーを消す
+(when window-system
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1))
+
+;;; シンボリックファイルを開く時にいちいち聞かない
+(setq vc-follow-symlinks t)
+
+;;; ビープ音を消す
+(setq visible-bell t)
+
+;;; フラッシュもビープ音も消す
+(setq ring-bell-function 'ignore)
+
 ;;; ダイアログボックスを使わないようにする
 (setq use-dialog-box nil)
 (defalias 'message-box 'message)
@@ -178,17 +193,6 @@
 ;; ミニバッファを再帰的に呼び出せるようにする
 (setq enable-recursive-minibuffers t)
 
-;;; ツールバーとスクロールバーを消す
-(when window-system
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1))
-
-;;; シンボリックファイルを開く時にいちいち聞かない
-(setq vc-follow-symlinks t)
-
-;;; ビープ音を消す
-(setq visible-bell t)
-
 ;;; 矩形選択
 ;; C-<enter> で矩形選択モード
 (cua-mode t) ; cua-mode を有効にする
@@ -201,6 +205,12 @@
 ;; ブックマークを変更したら即保存する
 (when (eval-when-compile (require 'bookmark nil t))
   (setq bookmark-save-flag t))
+
+;;; テンプレート挿入
+(when (eval-when-compile (require 'autoinsert nil t))
+  (setq auto-insert-mode t)
+  (setq auto-insert-directory "~/.emacs.d/auto-insert/")
+  (define-auto-insert "\\.el$" "lisp-template.el"))
 
 ;;; タブの設定
 (setq-default tab-width 4)
@@ -578,6 +588,14 @@
 (when (eval-when-compile (require 'recentf-ext nil t))
   (setq recentf-max-saved-items 10000)
   (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$")))
+
+;;; 略語から定型文を入力する
+;; git clone git://github.com/capitaomorte/yasnippet.git
+;; (install-elisp-from-emacswiki "yasnippet-config.el")
+(when (eval-and-compile (require 'yasnippet nil t))
+  (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                           "~/.emacs.d/plugins/yasnippet/extras/imported"))
+  (yas-global-mode t))
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
