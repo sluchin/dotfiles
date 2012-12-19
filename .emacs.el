@@ -22,7 +22,7 @@
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
-;; f2 でバックトレースをトグルにする
+;; f2 でバックトレースをトグルする
 (define-key global-map (kbd "<f2>")
   (lambda ()
     (interactive)
@@ -223,8 +223,11 @@
 ;;; テンプレート挿入
 (when (eval-and-compile (require 'autoinsert nil t))
   (setq auto-insert-mode t)
-  (setq auto-insert-directory "~/.emacs.d/auto-insert/")
+  (setq auto-insert-directory "~/.emacs.d/autoinsert/")
   (define-auto-insert "\\.el$" "lisp-template.el"))
+
+;;; gzファイルも編集できるようにする
+(auto-compression-mode t)
 
 ;;; タブの設定
 (setq-default tab-width 4)
@@ -429,7 +432,8 @@
 ;;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
 (when (eval-and-compile (require 'ediff nil t))
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  (setq diff-switches '("-u" "-p" "-N")))
 
 ;;; バッファの切り替えをインクリメンタルにする
 (when (eval-and-compile (require 'iswitchb nil t))
@@ -782,7 +786,14 @@
 ;; とりあえず, Windows では使わない
 (unless (eq system-type 'windows-nt)
   (when (and (executable-find "git") (locate-library "magit"))
-    (autoload 'magit-status "magit" "Interface for git on Emacs." t)))
+    (autoload 'magit-status "magit" "Interface for git on Emacs." t)
+    (eval-after-load "magit"
+      '(progn
+         (set-face-attribute 'magit-item-highlight nil
+                             :foreground "#ffffff"
+                             :background "#3f4747")
+         (set-face-foreground 'magit-diff-add "green3")
+         (set-face-foreground 'magit-diff-del "red3")))))
 
 ;;; Windows の設定
 (eval-and-compile
@@ -1080,7 +1091,6 @@ Otherwise return word around point."
 
 ;; term+
 ;; M-x term または M-x ansi-term で起動
-(when (locate-library "term+")
-  (require 'term+))
+(require 'term+ nil t)
 
 ;;; ここまで拡張 lisp
