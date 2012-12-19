@@ -20,8 +20,11 @@
 (when (eval-and-compile (require 'server nil t))
   (unless (server-running-p) (server-start)))
 
-;;; バックトレースを有効にする
-(setq debug-on-error t)
+;;; バックトレースを無効にする
+(setq debug-on-error nil)
+;; f2 でバックトレースを有効にする
+(define-key global-map (kbd "<f2>")
+  (lambda () (interactive) (setq debug-on-error t)))
 
 ;;; 起動時間が多少高速になるらしい
 (modify-frame-parameters nil '((wait-for-wm . nil)))
@@ -194,7 +197,7 @@
 (setq enable-recursive-minibuffers t)
 
 ;;; 矩形選択
-;; C-<enter> で矩形選択モード
+;; <C-enter> で矩形選択モード
 (when (eval-and-compile (require 'cua-base nil t))
   (cua-mode t)                    ; cua-mode を有効にする
   (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
@@ -311,13 +314,13 @@ Otherwise return word around point."
 ;; クリップボードにコピー
 ;; クリップボードを使わない場合以下の設定でリージョンと同期をとるとよい
 ;; (setq x-select-enable-clipboard t)
-(define-key global-map (kbd "C-<insert>") 'clipboard-kill-ring-save)
+(define-key global-map (kbd "<C-insert>") 'clipboard-kill-ring-save)
 
 ;; クリップボードに切り取り
 (define-key global-map (kbd "S-DEL") 'clipboard-kill-region)
 
 ;; クリップボードに貼り付け
-(define-key global-map (kbd "S-<insert>") 'clipboard-yank)
+(define-key global-map (kbd "<S-insert>") 'clipboard-yank)
 
 ;; C-\の日本語入力の設定を無効にする
 (define-key global-map (kbd "C-\\") nil)
@@ -579,13 +582,13 @@ Otherwise return word around point."
 ;; (install-elisp-from-emacswiki "point-undo.el")
 (when (eval-when-compile (require 'point-undo nil t))
   (define-key global-map (kbd "<f7>") 'point-undo)
-  (define-key global-map (kbd "S-<f7>") 'point-redo))
+  (define-key global-map (kbd "<S-f7>") 'point-redo))
 
 ;;; 変更箇所にジャンプする
 ;; (install-elisp-from-emacswiki "goto-chg.el")
 (when (eval-and-compile (require 'goto-chg nil t))
   (define-key global-map (kbd "<f8>") 'goto-last-change)
-  (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
+  (define-key global-map (kbd "<S-f8>") 'goto-last-change-reverse))
 
 ;;; セッション保存
 ;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/session-2.3a.tar.gz | tar xfz -
@@ -979,6 +982,10 @@ Otherwise return word around point."
   (autoload 'w3m-search "w3m-search" "Search QUERY using SEARCH-ENGINE." t)
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
+  (define-key w3m-mode-map (kbd "<left>") 'backward-char)
+  (define-key w3m-mode-map (kbd "<right>") 'forward-char)
+  (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
+  (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-this-url)
   (eval-after-load "w3m"
     '(progn
        ;; デフォルトで使う検索エンジン
