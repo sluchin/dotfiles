@@ -22,9 +22,20 @@
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
-;; f2 でバックトレースを有効にする
+;; f2 でバックトレースをトグルにする
 (define-key global-map (kbd "<f2>")
-  (lambda () (interactive) (setq debug-on-error t)))
+  (lambda ()
+    (interactive)
+    (if debug-on-error
+        (setq debug-on-error nil)
+      (setq debug-on-error t))
+    (message "debug-on-error %s" debug-on-error)))
+
+;;; f3 でロードする
+(define-key emacs-lisp-mode-map (kbd "<f3>")
+  (lambda ()
+    (interactive)
+    (load-file buffer-file-name)))
 
 ;;; 起動時間が多少高速になるらしい
 (modify-frame-parameters nil '((wait-for-wm . nil)))
@@ -241,40 +252,6 @@
              (c-set-style "stroustrup-style")))
 
 ;;; キーバインド
-;; w3m
-(defun w3m-prompt-input ()
-  "Prompt input object for translate."
-  (read-string (format "Search wikipedia (%s): " (or (w3m-region-or-word) ""))
-               nil nil
-               (w3m-region-or-word)))
-
-(defun w3m-region-or-word ()
-  "Return region or word around point.
-If `mark-active' on, return region string.
-Otherwise return word around point."
-  (if mark-active
-      (buffer-substring-no-properties (region-beginning)
-                                      (region-end))
-    (thing-at-point 'word)))
-
-(when (and (executable-find "w3m") (locate-library "w3m")
-           (eval-when-compile (require 'w3m nil t)))
-  ;; URL を開く
-  (defun w3m-url-at-point ()
-    "Browse url in w3m"
-    (interactive)
-    (setq browse-url-browser-function 'w3m-browse-url)
-    (browse-url-at-point)
-    (setq browse-url-browser-function 'browse-url-default-browser))
-  (define-key global-map (kbd "C-c m") 'w3m-url-at-point)
-
-  ;; wikipedia で検索する
-  (defun w3m-search-wikipedia (&optional query)
-    "Search wikipedia in w3m"
-    (interactive)
-    (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input)))))
-  (define-key global-map (kbd "C-c s") 'w3m-search-wikipedia))
-
 ;; vlc で URL を開く
 (when (executable-find "vlc")
   (defun vlc-url-at-point ()
@@ -975,6 +952,21 @@ Otherwise return word around point."
 ;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
+(defun w3m-prompt-input ()
+  "Prompt input object for translate."
+  (read-string (format "Search wikipedia (%s): " (or (w3m-region-or-word) ""))
+               nil nil
+               (w3m-region-or-word)))
+
+(defun w3m-region-or-word ()
+  "Return region or word around point.
+If `mark-active' on, return region string.
+Otherwise return word around point."
+  (if mark-active
+      (buffer-substring-no-properties (region-beginning)
+                                      (region-end))
+    (thing-at-point 'word)))
+
 (when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
   (autoload 'w3m-find-file "w3m" "w3m interface function for local file." t)
@@ -982,10 +974,29 @@ Otherwise return word around point."
   (autoload 'w3m-search "w3m-search" "Search QUERY using SEARCH-ENGINE." t)
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
+
+  ;; キーバインドをカスタマイズ
   (define-key w3m-mode-map (kbd "<left>") 'backward-char)
   (define-key w3m-mode-map (kbd "<right>") 'forward-char)
   (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
   (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-this-url)
+
+  ;; URL を開く
+  (defun w3m-url-at-point ()
+    "Browse url in w3m"
+    (interactive)
+    (setq browse-url-browser-function 'w3m-browse-url)
+    (browse-url-at-point)
+    (setq browse-url-browser-function 'browse-url-default-browser))
+  (define-key global-map (kbd "C-c m") 'w3m-url-at-point)
+
+  ;; ウィキペディアで検索する
+  (defun w3m-search-wikipedia (&optional query)
+    "Search wikipedia in w3m"
+    (interactive)
+    (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input)))))
+  (define-key global-map (kbd "C-c s") 'w3m-search-wikipedia)
+
   (eval-after-load "w3m"
     '(progn
        ;; デフォルトで使う検索エンジン
