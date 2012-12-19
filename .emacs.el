@@ -173,7 +173,7 @@
 ;;; ビープ音を消す
 (setq visible-bell t)
 
-;;; フラッシュもビープ音も消す
+;;; フラッシュを消す
 (setq ring-bell-function 'ignore)
 
 ;;; ダイアログボックスを使わないようにする
@@ -238,14 +238,39 @@
              (c-set-style "stroustrup-style")))
 
 ;;; キーバインド
-;; w3m で URL を開く
-(define-key global-map (kbd "C-c m")
-  (lambda ()
+;; w3m
+(defun w3m-prompt-input ()
+  "Prompt input object for translate."
+  (read-string (format "Search wikipedia (%s): " (or (w3m-region-or-word) ""))
+               nil nil
+               (w3m-region-or-word)))
+
+(defun w3m-region-or-word ()
+  "Return region or word around point.
+If `mark-active' on, return region string.
+Otherwise return word around point."
+  (if mark-active
+      (buffer-substring-no-properties (region-beginning)
+                                      (region-end))
+    (thing-at-point 'word)))
+
+(when (and (executable-find "w3m") (locate-library "w3m")
+           (eval-when-compile (require 'w3m nil t)))
+  ;; URL を開く
+  (defun w3m-url-at-point ()
     "Browse url in w3m"
     (interactive)
     (setq browse-url-browser-function 'w3m-browse-url)
     (browse-url-at-point)
-    (setq browse-url-browser-function 'browse-url-default-browser)))
+    (setq browse-url-browser-function 'browse-url-default-browser))
+  (define-key global-map (kbd "C-c m") 'w3m-url-at-point)
+
+  ;; wikipedia で検索する
+  (defun w3m-search-wikipedia (&optional query)
+    "Search wikipedia in w3m"
+    (interactive)
+    (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input)))))
+  (define-key global-map (kbd "C-c s") 'w3m-search-wikipedia))
 
 ;; vlc で URL を開く
 (when (executable-find "vlc")
@@ -327,7 +352,8 @@
     dired-mode
     term-mode
     navi2ch-list-mode
-    navi2ch-board-mode))
+    navi2ch-board-mode
+    w3m-mode))
 (defadvice linum-on(around linum-off activate)
   (unless (or (minibufferp) (member major-mode linum-disabled-modes-list)) ad-do-it))
 
@@ -344,11 +370,21 @@
 ;; 編集可能にする
 (when (eval-and-compile (require 'wdired nil t))
   (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+(require 'dired-aux nil t)
 
-(when (and (eval-and-compile (require 'dired nil t))
-           (eval-and-compile (require 'dired-aux nil t)))
+;; dired でコマンドを実行する関数定義
+(declare-function dired-run-shell-command "dired-aux" (command))
+(defun dired-run-command (command)
+  "Open file in command"
+  (let ((file (dired-get-filename)))
+    (if (and (file-directory-p file) (not (string= command "vlc")))
+        (message "%s is a directory" (file-name-nondirectory file))
+      (when (y-or-n-p (format "Open '%s' %s " command (file-name-nondirectory file)))
+        (dired-run-shell-command (concat command " " file " &"))))))
+
+(when (eval-and-compile (require 'dired-aux nil t))
   ;; ディレクトリを先に表示する
-  (cond ((eq  system-type 'windows-nt)
+  (cond ((eq system-type 'windows-nt)
           ;; Windows の場合
           (when (eval-and-compile (require 'ls-lisp nil t))
             (setq ls-lisp-dirs-first t)))
@@ -364,27 +400,18 @@
   ;; ディレクトリを再帰的に削除可能する
   (setq dired-recursive-deletes 'always)
 
-  (eval-and-compile
-    (defun dired-run-process (process)
-      "Open file in process"
-      (let ((file (dired-get-filename)))
-        (if (and (file-directory-p file) (not (string= process "vlc")))
-            (message "%s is a directory" (file-name-nondirectory file))
-          (when (y-or-n-p (format "Open '%s' %s " process (file-name-nondirectory file)))
-            (dired-run-shell-command (concat process " " file " &")))))))
-
   ;; libreoffice で開く
   (when (executable-find "libreoffice")
     (define-key dired-mode-map (kbd "C-l")
-      (lambda () (interactive) (dired-run-process "libreoffice"))))
+      (lambda () (interactive) (dired-run-command "libreoffice"))))
   ;; evince で開く
   (when (executable-find "evince")
     (define-key dired-mode-map (kbd "C-e")
-      (lambda () (interactive) (dired-run-process "evince"))))
+      (lambda () (interactive) (dired-run-command "evince"))))
   ;; vlc で開く
   (when (executable-find "vlc")
     (define-key dired-mode-map (kbd "C-v")
-      (lambda () (interactive) (dired-run-process "vlc"))))
+      (lambda () (interactive) (dired-run-command "vlc"))))
   ;; w3m で開く
   (when (and (executable-find "w3m") (locate-library "w3m"))
     (when (eval-when-compile (require 'w3m nil t))
@@ -512,9 +539,9 @@
 ;;; インストーラ
 ;; wget http://www.emacswiki.org/emacs/download/auto-install.el
 ;; autoloadすると一回目に error になるため使うときは,
-;; M-x require-auto-install を最初に実行するようにする
-(defun require-auto-install ()
-  "Require auto-install"
+;; M-x enable-auto-install を最初に実行するようにする
+(defun enable-auto-install ()
+  "Do enable auto-install"
   (interactive)
   (when (eval-and-compile (require 'auto-install nil t))
     (auto-install-update-emacswiki-package-name t)
@@ -592,10 +619,14 @@
 
 ;;; 略語から定型文を入力する
 ;; git clone git://github.com/capitaomorte/yasnippet.git
-(when (eval-and-compile (require 'yasnippet nil t))
-  (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                           "~/.emacs.d/yasnippet/snippets"))
-  (yas-global-mode t))
+;; M-x enable-yasnippet を実行すると使用できる
+(defun enable-yasnippet ()
+  "Do enable yasnippet"
+  (interactive)
+  (when (eval-and-compile (require 'yasnippet nil t))
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                             "~/.emacs.d/yasnippet/snippets"))
+    (yas-global-mode t)))
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
@@ -718,7 +749,7 @@
 
   ;; skk 用の sticky キー設定
   ;; 一般的には `;' だが Paren モードが効かなくなる
-  (setq skk-sticky-key (kbd "C-i"))
+  (setq skk-sticky-key (kbd "TAB"))
   ;; インライン候補縦表示
   (setq skk-show-inline 'vertical)
   (define-key global-map (kbd "C-\\") 'skk-mode))
