@@ -16,30 +16,6 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
-;;; サーバ
-(when (eval-and-compile (require 'server nil t))
-  (unless (server-running-p) (server-start)))
-
-;;; バックトレースを無効にする
-(setq debug-on-error nil)
-;; f2 でバックトレースをトグルする
-(define-key global-map (kbd "<f2>")
-  (lambda ()
-    (interactive)
-    (if debug-on-error
-        (setq debug-on-error nil)
-      (setq debug-on-error t))
-    (message "debug-on-error %s" debug-on-error)))
-
-;;; f3 でロードする
-(define-key emacs-lisp-mode-map (kbd "<f3>")
-  (lambda ()
-    (interactive)
-    (load-file buffer-file-name)))
-
-;;; 起動時間が多少高速になるらしい
-(modify-frame-parameters nil '((wait-for-wm . nil)))
-
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
@@ -121,9 +97,10 @@
 ;; 幅  (frame-width)
 ;; 高さ (frame-height)
 (when window-system
+  ;; 起動時間が多少高速になるらしい
+  (modify-frame-parameters nil '((wait-for-wm . nil)))
   ;; 起動時のフレームサイス
   (set-frame-size (selected-frame) 110 70)
-
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
     "Resize frame interactively"
@@ -155,6 +132,13 @@
 (column-number-mode t)   ; カラム数
 (size-indication-mode t) ; ファイルサイズ
 (which-function-mode t)  ; 関数名
+
+;;; サーバを起動する
+(when (eval-and-compile (require 'server nil t))
+  (unless (server-running-p) (server-start)))
+
+;;; バックトレースを無効にする
+(setq debug-on-error nil)
 
 ;;; find-fileのデフォルト
 (cd "~/")
@@ -255,6 +239,21 @@
              (c-set-style "stroustrup-style")))
 
 ;;; キーバインド
+;; f2 でバックトレースをトグルする
+(define-key global-map (kbd "<f2>")
+  (lambda ()
+    (interactive)
+    (if debug-on-error
+        (setq debug-on-error nil)
+      (setq debug-on-error t))
+    (message "debug-on-error %s" debug-on-error)))
+
+;;; f3 でロードする
+(define-key emacs-lisp-mode-map (kbd "<f3>")
+  (lambda ()
+    (interactive)
+    (load-file buffer-file-name)))
+
 ;; vlc で URL を開く
 (when (executable-find "vlc")
   (defun vlc-url-at-point ()
