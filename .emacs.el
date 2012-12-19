@@ -12,7 +12,7 @@
 ;;; 通常の起動オプション
 ;; emacs23 -rv -g 100x50-100+0
 
-;;; Windows の場合, 以下の設定をすること
+;;; Windows (NTEmacs) の場合, 以下の設定をすること
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
@@ -50,7 +50,7 @@
                 "~/.emacs.d/elpa/tabulated-list-0"
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
-                "~/.emacs.d/plugins/yasnippet"
+                "~/.emacs.d/yasnippet"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -195,19 +195,19 @@
 
 ;;; 矩形選択
 ;; C-<enter> で矩形選択モード
-(cua-mode t) ; cua-mode を有効にする
-(when (eval-when-compile (require 'cua-base nil t))
+(when (eval-and-compile (require 'cua-base nil t))
+  (cua-mode t)                    ; cua-mode を有効にする
   (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
 
 ;;; ブックマーク
 ;; C-x r m (bookmark-set)
 ;; C-x r l (bookmark-bmenu-list)
 ;; ブックマークを変更したら即保存する
-(when (eval-when-compile (require 'bookmark nil t))
+(when (eval-and-compile (require 'bookmark nil t))
   (setq bookmark-save-flag t))
 
 ;;; テンプレート挿入
-(when (eval-when-compile (require 'autoinsert nil t))
+(when (eval-and-compile (require 'autoinsert nil t))
   (setq auto-insert-mode t)
   (setq auto-insert-directory "~/.emacs.d/auto-insert/")
   (define-auto-insert "\\.el$" "lisp-template.el"))
@@ -306,9 +306,10 @@
 
 ;; lisp 補完
 ;; M-Tab が標準のキーバインドだが Tab で補完てきるようにする
-(define-key emacs-lisp-mode-map (kbd "C-i") 'lisp-complete-symbol)
-(define-key lisp-interaction-mode-map (kbd "C-i") 'lisp-complete-symbol)
-(define-key lisp-mode-map (kbd "C-i") 'lisp-complete-symbol)
+(define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
+(define-key lisp-interaction-mode-map (kbd "TAB") 'lisp-complete-symbol)
+(define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
+(define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
@@ -344,12 +345,12 @@
 (when (eval-and-compile (require 'wdired nil t))
   (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
 
-(when (and (eval-when-compile (require 'dired nil t))
-           (eval-when-compile (require 'dired-aux nil t)))
+(when (and (eval-and-compile (require 'dired nil t))
+           (eval-and-compile (require 'dired-aux nil t)))
   ;; ディレクトリを先に表示する
   (cond ((eq  system-type 'windows-nt)
           ;; Windows の場合
-          (when (eval-when-compile (require 'ls-lisp nil t))
+          (when (eval-and-compile (require 'ls-lisp nil t))
             (setq ls-lisp-dirs-first t)))
         ((eq system-type 'gnu/linux)
           ;; GNU オプションも使う
@@ -398,7 +399,7 @@
       (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file))))
 
 ;;; 関数のアウトライン表示
-(when (eval-when-compile (require 'speedbar nil t))
+(when (eval-and-compile (require 'speedbar nil t))
   (setq speedbar-use-images nil)
   (setq speedbar-frame-parameters '((minibuffer)
                                     (width . 50)
@@ -443,9 +444,9 @@
   (concat "[" lang "]"
           "[" (org-code-reading-read-software-name) "]"))
 
-(when (and (eval-when-compile (require 'org nil t))
-           (eval-when-compile (require 'org-remember nil t))
-           (require 'org-install nil t))
+(when (and (eval-and-compile (require 'org nil t))
+           (eval-and-compile (require 'org-remember nil t))
+           (eval-and-compile (require 'org-install nil t)))
 
   ;; org-mode での強調表示を可能にする
   (add-hook 'org-mode-hook 'turn-on-font-lock)
@@ -521,12 +522,12 @@
 
 ;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
-(when (require 'redo+ nil t)
+(when (eval-and-compile (require 'redo+ nil t))
   (define-key global-map (kbd "C-.") 'redo))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
-(when (require 'tempbuf nil t)
+(when (eval-and-compile (require 'tempbuf nil t))
   (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'magit-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
@@ -535,7 +536,7 @@
 
 ;;; カーソル位置印をつけ移動する
 ;; git clone git://github.com/joodland/bm.git
-(when (eval-when-compile (require 'bm nil t))
+(when (eval-and-compile (require 'bm nil t))
   (setq-default bm-buffer-persistence nil)
   (setq bm-restore-repository-on-load t)
   (add-hook 'find-file-hooks 'bm-buffer-restore)
@@ -555,7 +556,7 @@
 
 ;;; 変更箇所にジャンプする
 ;; (install-elisp-from-emacswiki "goto-chg.el")
-(when (eval-when-compile (require 'goto-chg nil t))
+(when (eval-and-compile (require 'goto-chg nil t))
   (define-key global-map (kbd "<f8>") 'goto-last-change)
   (define-key global-map (kbd "S-<f8>") 'goto-last-change-reverse))
 
@@ -585,16 +586,15 @@
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
 ;; 以下で最近開いたファイルを一覧表示
 ;; M-x recentf-open-files
-(when (eval-when-compile (require 'recentf-ext nil t))
+(when (eval-and-compile (require 'recentf-ext nil t))
   (setq recentf-max-saved-items 10000)
   (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$")))
 
 ;;; 略語から定型文を入力する
 ;; git clone git://github.com/capitaomorte/yasnippet.git
-;; (install-elisp-from-emacswiki "yasnippet-config.el")
 (when (eval-and-compile (require 'yasnippet nil t))
   (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                           "~/.emacs.d/plugins/yasnippet/extras/imported"))
+                           "~/.emacs.d/yasnippet/snippets"))
   (yas-global-mode t))
 
 ;;; 2chビューア (navi2ch)
@@ -752,7 +752,7 @@
 
 ;;; ミニバッファに関数の help 表示
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
-(when (eval-when-compile (require 'eldoc-extension nil t))
+(when (eval-and-compile (require 'eldoc-extension nil t))
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
