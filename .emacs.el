@@ -326,19 +326,18 @@
   (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
   (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
 ;; 行番号表示する必要のないモードでは表示しない
-(defvar linum-disabled-modes-list
-  '(eshell-mode
-    mew-summary-mode
-    speedbar-mode
-    compilation-mode
-    org-mode
-    dired-mode
-    term-mode
-    navi2ch-list-mode
-    navi2ch-board-mode
-    w3m-mode))
 (defadvice linum-on(around linum-off activate)
-  (unless (or (minibufferp) (member major-mode linum-disabled-modes-list)) ad-do-it))
+  (unless (or (minibufferp)
+              (member
+               major-mode
+               '(eshell-mode
+                 mew-summary-mode
+                 speedbar-mode
+                 compilation-mode
+                 dired-mode
+                 term-mode
+                 navi2ch-list-mode
+                 navi2ch-board-mode))) ad-do-it))
 
 ;;; ファイラ (dired)
 ;; 拡張機能を有効にする
@@ -540,7 +539,6 @@
 ;; (install-elisp-from-emacswiki "tempbuf.el")
 (when (eval-and-compile (require 'tempbuf nil t))
   (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
-  (add-hook 'magit-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
@@ -789,9 +787,6 @@
     (autoload 'magit-status "magit" "Interface for git on Emacs." t)
     (eval-after-load "magit"
       '(progn
-         (set-face-attribute 'magit-item-highlight nil
-                             :foreground "#ffffff"
-                             :background "#3f4747")
          (set-face-foreground 'magit-diff-add "green3")
          (set-face-foreground 'magit-diff-del "red3")))))
 
