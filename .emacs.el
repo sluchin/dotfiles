@@ -129,7 +129,12 @@
 (line-number-mode t)     ; 行数
 (column-number-mode t)   ; カラム数
 (size-indication-mode t) ; ファイルサイズ
-(which-function-mode t)  ; 関数名
+;; 関数名
+(when (eval-and-compile (require 'which-func nil t))
+  (which-func-mode 1)
+  (setq which-func-modes t))
+(delete (assoc 'which-func-mode mode-line-format) mode-line-format)
+(setq-default header-line-format '(which-func-mode ("" which-func-format)))
 
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
@@ -240,8 +245,10 @@
 ;;; Perl
 ;; (auto-install-from-emacswiki "anything.el")
 ;; (auto-install-from-url "http://github.com/imakado/anything-project/raw/master/anything-project.el")
-;; (auto-install-from-url "http://cvs.savannah.gnu.org/viewvc/*checkout*/emacs/emacs/lisp/progmodes/flymake.el?revision=1.2.4.41")
+;; (auto-install-from-url "http://www.cx4a.org/pub/auto-complete.el")
+;; (auto-install-from-emacswiki "perl-completion.el")
 ;; (auto-install-from-url "http://www.emacswiki.org/emacs/download/perltidy.el")
+;; sudo apt-get install perltidy
 (when (locate-library "cperl-mode")
   (defalias 'perl-mode 'cperl-mode)
   (autoload 'cperl-mode "cperl-mode" "alternate mode for editing Perl programs" t)
@@ -252,23 +259,14 @@
   (add-hook 'cperl-mode-hook
             '(lambda ()
                (progn
-                 (setq indent-tabs-mode nil)
-                 (setq tab-width nil)
-                 (setq cperl-indent-level 4)
-                 (setq cperl-continued-statement-offset 4)
-                 (setq cperl-close-paren-offset -4)
-                 (setq cperl-label-offset -4)
-                 (setq cperl-comment-column 40)
-                 (setq cperl-highlight-variables-indiscriminately t)
-                 (setq cperl-indent-parens-as-block t)
-                 (setq cperl-tab-always-indent t)
-                 (setq cperl-font-lock t)
-                 ;; (auto-install-from-url "http://www.cx4a.org/pub/auto-complete.el")
-                 (require 'auto-complete nil t)
-                 ;; (auto-install-from-emacswiki "perl-completion.el")
-                 (require 'perl-completion nil t)
-                 (add-to-list 'ac-sources 'ac-source-perl-completion)
-                 (perl-completion-mode t)))))
+                 (cperl-set-style "PerlStyle")
+                 (when (and (require 'auto-complete nil t)
+                            (require 'perl-completion nil t))
+                   (add-to-list 'ac-sources 'ac-source-perl-completion)
+                   (perl-completion-mode t))
+                 (when (execute-find "perltidy")
+                   (require 'perltidy nil t))
+                 (flymake-mode t)))))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -601,8 +599,8 @@
 
 ;;; セッション保存
 ;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/session-2.3a.tar.gz | tar xfz -
-;; ミニバッファ履歴 (tなら無限)
-(setq history-length t)
+;; ミニバッファ履歴
+(setq history-length t) ; t の場合無限
 ;; kill-ringやミニバッファで過去に開いたファイルなどの履歴を保存する
 (when (eval-and-compile (require 'session nil t))
   (setq session-initialize '(de-saveplace session keys menus places)
@@ -836,7 +834,7 @@
              (add-to-list 'magit-diff-options "-b"))
            (magit-refresh)
            (message "magit-diff-options %s" magit-diff-options))
-         (define-key magit-status-mode-map (kbd "W") 'magit-toggle-whitespace)))))
+         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace)))))
 
 ;;; Windows の設定
 (eval-and-compile
