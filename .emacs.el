@@ -97,8 +97,6 @@
 ;; 幅  (frame-width)
 ;; 高さ (frame-height)
 (when window-system
-  ;; 起動時間が多少高速になるらしい
-  (modify-frame-parameters nil '((wait-for-wm . nil)))
   ;; 起動時のフレームサイス
   (set-frame-size (selected-frame) 110 70)
   ;; フレームサイズを動的に変更する
@@ -206,9 +204,10 @@
 
 ;;; テンプレート挿入
 (when (eval-and-compile (require 'autoinsert nil t))
-  (setq auto-insert-mode t)
+  (auto-insert-mode t)
   (setq auto-insert-directory "~/.emacs.d/autoinsert/")
-  (define-auto-insert "\\.el$" "lisp-template.el"))
+  (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
+  (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
 
 ;;; gzファイルも編集できるようにする
 (auto-compression-mode t)
@@ -222,7 +221,7 @@
 ;;; makefile ではスペースにしない
 (add-hook 'makefile-mode-hook (lambda () (setq indent-tabs-mode t)))
 
-;;; c言語インデント
+;;; C 言語
 (defconst stroustrup-style
   '((c-basic-offset . 4)
     (c-comment-only-line-offset . 0)
@@ -237,6 +236,39 @@
           '(lambda ()
              (c-add-style "stroustrup-style" stroustrup-style t)
              (c-set-style "stroustrup-style")))
+
+;;; Perl
+;; (auto-install-from-emacswiki "anything.el")
+;; (auto-install-from-url "http://github.com/imakado/anything-project/raw/master/anything-project.el")
+;; (auto-install-from-url "http://cvs.savannah.gnu.org/viewvc/*checkout*/emacs/emacs/lisp/progmodes/flymake.el?revision=1.2.4.41")
+;; (auto-install-from-url "http://www.emacswiki.org/emacs/download/perltidy.el")
+(when (locate-library "cperl-mode")
+  (defalias 'perl-mode 'cperl-mode)
+  (autoload 'cperl-mode "cperl-mode" "alternate mode for editing Perl programs" t)
+  (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\|t\\|cgi\\)\\'" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+  (add-hook 'cperl-mode-hook
+            '(lambda ()
+               (progn
+                 (setq indent-tabs-mode nil)
+                 (setq tab-width nil)
+                 (setq cperl-indent-level 4)
+                 (setq cperl-continued-statement-offset 4)
+                 (setq cperl-close-paren-offset -4)
+                 (setq cperl-label-offset -4)
+                 (setq cperl-comment-column 40)
+                 (setq cperl-highlight-variables-indiscriminately t)
+                 (setq cperl-indent-parens-as-block t)
+                 (setq cperl-tab-always-indent t)
+                 (setq cperl-font-lock t)
+                 ;; (auto-install-from-url "http://www.cx4a.org/pub/auto-complete.el")
+                 (require 'auto-complete nil t)
+                 ;; (auto-install-from-emacswiki "perl-completion.el")
+                 (require 'perl-completion nil t)
+                 (add-to-list 'ac-sources 'ac-source-perl-completion)
+                 (perl-completion-mode t)))))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -985,8 +1017,8 @@
 If `mark-active' on, return region string.
 Otherwise return word around point."
   (if mark-active
-      (buffer-substring-no-properties (region-beginning)
-                                      (region-end))
+      (buffer-substring-no-properties
+       (region-beginning) (region-end))
     (thing-at-point 'word)))
 
 (when (and (executable-find "w3m") (locate-library "w3m"))
@@ -1007,17 +1039,20 @@ Otherwise return word around point."
   (defun w3m-url-at-point ()
     "Browse url in w3m"
     (interactive)
-    (setq browse-url-browser-function 'w3m-browse-url)
-    (browse-url-at-point)
-    (setq browse-url-browser-function 'browse-url-default-browser))
+    (setq browse-url-browser-function 'w3m-browse-url)              ; w3m にする
+    (browse-url-at-point)                                           ; ブラウザで開く
+    (setq browse-url-browser-function 'browse-url-default-browser)) ; デフォルトに戻す
   (define-key global-map (kbd "C-c m") 'w3m-url-at-point)
+
+  ;; グーグルで検索する
+  (define-key global-map (kbd "C-c s") 'w3m-search-new-session)
 
   ;; ウィキペディアで検索する
   (defun w3m-search-wikipedia (&optional query)
-    "Search wikipedia in w3m"
+    "Search at wikipedia in w3m"
     (interactive)
-    (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input)))))
-  (define-key global-map (kbd "C-c s") 'w3m-search-wikipedia)
+    (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input))) t))
+  (define-key global-map (kbd "C-c p") 'w3m-search-wikipedia)
 
   (eval-after-load "w3m"
     '(progn
