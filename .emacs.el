@@ -249,6 +249,7 @@
 ;; (auto-install-from-emacswiki "perl-completion.el")
 ;; (auto-install-from-url "http://www.emacswiki.org/emacs/download/perltidy.el")
 ;; sudo apt-get install perltidy
+;; sudo cpan -i Class::Inspector
 (when (locate-library "cperl-mode")
   (defalias 'perl-mode 'cperl-mode)
   (autoload 'cperl-mode "cperl-mode" "alternate mode for editing Perl programs" t)
@@ -266,7 +267,18 @@
                    (perl-completion-mode t))
                  (when (execute-find "perltidy")
                    (require 'perltidy nil t))
-                 (flymake-mode t)))))
+                 (when (locate-library "flymake")
+                   (flymake-mode t))))))
+(when (locate-library "pod-mode")
+  (autoload 'pod-mode "pod-mode" "alternate mode for editing Perl documents" t)
+  (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
+  (add-hook 'pod-mode-hook
+            '(lambda ()
+               (progn
+                 (font-lock-mode)
+                 (auto-fill-mode t)
+                 (when (locate-library "flyspell")
+                   (flyspell-mode t))))))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
