@@ -351,7 +351,6 @@
 ;; 編集可能にする
 (when (eval-and-compile (require 'wdired nil t))
   (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
-(require 'dired-aux nil t)
 
 ;; dired でコマンドを実行する関数定義
 (declare-function dired-run-shell-command "dired-aux" (command))
@@ -669,9 +668,9 @@
 ;;; メモ (howm)
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xfz -
 (when (locate-library "howm")
-  (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki." t)
-  (define-key global-map (kbd "C-c , ,") 'howm-menu)
-  (eval-after-load "howm-mode"
+  (autoload 'howm-menu "howm" "Hitori Otegaru Wiki Modoki." t)
+  (define-key global-map (kbd "C-c h") 'howm-menu)
+  (eval-after-load "howm"
     '(progn
        (when (boundp 'howm-menu-lang)
          (setq howm-menu-lang 'ja))
@@ -692,8 +691,7 @@
                "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))
        (when (boundp 'recentf-exclude)
          ;; 最近使ったファイルから除外する
-         (add-to-list 'recentf-exclude howm-directory)
-         (add-to-list 'recentf-exclude ".howm-keys")))))
+         (setq recentf-exclude '(howm-directory ".howm-keys"))))))
 
 ;;; GNU Global
 ;; sudo apt-get install global
@@ -779,15 +777,34 @@
   (umemo-initialize))
 
 ;;; git の設定
-;; git clone git://github.com/jdhuntington/magit.git
+;; git clone git://github.com/magit/magit.git
 ;; とりあえず, Windows では使わない
 (unless (eq system-type 'windows-nt)
   (when (and (executable-find "git") (locate-library "magit"))
     (autoload 'magit-status "magit" "Interface for git on Emacs." t)
     (eval-after-load "magit"
       '(progn
-         (set-face-foreground 'magit-diff-add "green3")
-         (set-face-foreground 'magit-diff-del "red3")))))
+         ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
+         (setq magit-diff-refine-hunk 'all)
+         ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
+         (set-face-attribute 'magit-item-highlight nil :inherit nil)
+         ;; 色
+         (set-face-background 'magit-item-highlight "#202020")
+         (set-face-foreground 'magit-diff-add "#40ff40")
+         (set-face-foreground 'magit-diff-del "#ff4040")
+         (set-face-foreground 'magit-diff-file-header "#4040ff")
+         ;; 空白無視をトグルする
+         (defun magit-toggle-whitespace ()
+           (interactive)
+           (if (member "-w" magit-diff-options)
+               (setq magit-diff-options (remove "-w" magit-diff-options))
+             (add-to-list 'magit-diff-options "-w"))
+           (if (member "-b" magit-diff-options)
+               (setq magit-diff-options (remove "-b" magit-diff-options))
+             (add-to-list 'magit-diff-options "-b"))
+           (magit-refresh)
+           (message "magit-diff-options %s" magit-diff-options))
+         (define-key magit-status-mode-map (kbd "W") 'magit-toggle-whitespace)))))
 
 ;;; Windows の設定
 (eval-and-compile
