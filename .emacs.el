@@ -1001,7 +1001,7 @@ Otherwise return word around point."
   (define-key w3m-mode-map (kbd "<left>") 'backward-char)
   (define-key w3m-mode-map (kbd "<right>") 'forward-char)
   (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
-  (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-this-url)
+  (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-next-page)
 
   ;; URL を開く
   (defun w3m-url-at-point ()
