@@ -938,7 +938,7 @@
        ;; 重複メールには削除マークをつける
        (when (boundp 'mew-scan-form-mark-delete)
          (setq mew-scan-form-mark-delete t))
-       ;; PASSの保持
+       ;; パスワードの保持
        (when (boundp 'mew-use-cached-passwd)
          (setq mew-use-cached-passwd t))
        (when (boundp 'mew-passwd-timer-unit)
@@ -957,7 +957,7 @@
          (setq mew-biff-interval 3))     ; 間隔(分)
        (when (boundp 'mew-auto-get)
          (setq mew-auto-get t))          ; 起動時取得する
-       ;; IMAPの設定
+       ;; IMAP の設定
        (setq mew-proto "%")
        ;; 送信メールを保存する
        (when (boundp 'mew-fcc)
