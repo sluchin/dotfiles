@@ -122,19 +122,33 @@
 
 ;;; タイトルバーにフルパス名を表示
 (when window-system
-  (setq frame-title-format "%f"))
+  (when (eval-when-compile (require 'mew nil t))
+    (setq frame-title-format '("%f            "
+                               mew-biff-string))))
 
 ;;; モードラインの表示
-(display-time)           ; 時間
-(line-number-mode t)     ; 行数
-(column-number-mode t)   ; カラム数
-(size-indication-mode t) ; ファイルサイズ
+(display-time)                      ; 時間
+(line-number-mode t)                ; 行数
+(column-number-mode t)              ; カラム数
+(size-indication-mode t)            ; ファイルサイズ
+(when (eval-and-compile (require 'time nil t))
+  (setq display-time-24hr-format t)) ; 24 時間表示
+
 ;; 関数名
 (when (eval-and-compile (require 'which-func nil t))
   (which-func-mode 1)
   (setq which-func-modes t))
 (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
 (setq-default header-line-format '(which-func-mode ("" which-func-format)))
+
+;; 選択範囲の情報表示
+(defun count-lines-and-chars ()
+  (if mark-active
+      (format "[%3d:%4d]"
+              (count-lines (region-beginning) (region-end))
+              (- (region-end) (region-beginning))) ""))
+(add-to-list 'default-mode-line-format
+             '(:eval (count-lines-and-chars)))
 
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
@@ -171,10 +185,8 @@
 ;;; シンボリックファイルを開く時にいちいち聞かない
 (setq vc-follow-symlinks t)
 
-;;; ビープ音を消す
+;;; ビープ音とフラッシュを消す
 (setq visible-bell t)
-
-;;; フラッシュを消す
 (setq ring-bell-function 'ignore)
 
 ;;; ダイアログボックスを使わないようにする
@@ -226,28 +238,36 @@
 ;;; makefile ではスペースにしない
 (add-hook 'makefile-mode-hook (lambda () (setq indent-tabs-mode t)))
 
-;;; C 言語
-(defconst stroustrup-style
-  '((c-basic-offset . 4)
-    (c-comment-only-line-offset . 0)
-    (c-offsets-alist
-     (statement-block-intro . +)
-     (substatement-open . 0)
-     (label . 0)
-     (statement-cont . +)
-     (inline-open . nil))))
+;; 行末の空白を強調表示
+;; (setq-default show-trailing-whitespace t)
+;; (set-face-background 'trailing-whitespace "#b14770")
 
+;;; オートコンプリート
+;; (install-elisp "http://www.cx4a.org/pub/auto-complete.el")
+(when (eval-and-compile (require 'auto-complete nil t))
+  (global-auto-complete-mode t)
+  (setq ac-auto-start 3) ; 3 文字入力から補完される
+  (define-key global-map (kbd "C-;") 'ac-start)
+  (define-key ac-complete-mode-map (kbd "C-;") 'ac-stop)
+  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
+  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+  ;; 動的にトグルする
+  (define-key global-map (kbd "<f4>")
+    (lambda ()
+      (interactive)
+      (if ac-auto-start
+          (setq ac-auto-start nil)
+        (setq ac-auto-start 3))
+      (message "ac-auto-start %s" ac-auto-start))))
+
+;;; C 言語
 (add-hook 'c-mode-common-hook
-          '(lambda ()
-             (c-add-style "stroustrup-style" stroustrup-style t)
-             (c-set-style "stroustrup-style")))
+          '(lambda () (c-set-style "k&r")))
 
 ;;; Perl
-;; (auto-install-from-emacswiki "anything.el")
-;; (auto-install-from-url "http://github.com/imakado/anything-project/raw/master/anything-project.el")
-;; (auto-install-from-url "http://www.cx4a.org/pub/auto-complete.el")
-;; (auto-install-from-emacswiki "perl-completion.el")
-;; (auto-install-from-url "http://www.emacswiki.org/emacs/download/perltidy.el")
+;; (install-elisp-from-emacswiki "anything.el")
+;; (install-elisp-from-emacswiki "perl-completion.el")
+;; (install-elisp "http://www.emacswiki.org/emacs/download/perltidy.el")
 ;; sudo apt-get install perltidy
 ;; sudo cpan -i Class::Inspector
 (when (locate-library "cperl-mode")
@@ -261,14 +281,15 @@
             '(lambda ()
                (progn
                  (cperl-set-style "PerlStyle")
-                 (when (and (require 'auto-complete nil t)
-                            (require 'perl-completion nil t))
+                 (when (and (locate-library "anything") (require 'perl-completion nil t))
                    (add-to-list 'ac-sources 'ac-source-perl-completion)
                    (perl-completion-mode t))
-                 (when (execute-find "perltidy")
+                 (when (executable-find "perltidy")
                    (require 'perltidy nil t))
                  (when (locate-library "flymake")
                    (flymake-mode t))))))
+
+;; Pod
 (when (locate-library "pod-mode")
   (autoload 'pod-mode "pod-mode" "alternate mode for editing Perl documents" t)
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
@@ -746,10 +767,6 @@
        (add-hook 'c++-mode-hook 'gtags-mode)
        (add-hook 'java-mode-hook 'gtags-mode))))
 
-;;; grepの色
-;; (install-elisp "http://www.bookshelf.jp/elc/color-grep.el")
-(require 'color-grep nil t)
-
 ;;; 日本語入力 (ddskk)
 ;; sudo apt-get install ddskk
 ;; 辞書は以下からダウンロードする
@@ -898,6 +915,12 @@
 ;;; メール
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
 ;; sudo apt-get install mew mew-bin stunnel4
+(defun my-mew-biff-bark (n)
+  (if (= n 0)
+      (setq mew-biff-string nil)
+    (if (and mew-use-biff-bell (eq mew-biff-string nil))
+	(beep))
+    (setq mew-biff-string (format "MAIL[%d]" n))))
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
@@ -957,8 +980,11 @@
          (setq mew-biff-interval 3))     ; 間隔(分)
        (when (boundp 'mew-auto-get)
          (setq mew-auto-get t))          ; 起動時取得する
+       (when (boundp 'mew-biff-function)
+         (setq mew-biff-function 'my-mew-biff-bark))
        ;; IMAP の設定
-       (setq mew-proto "%")
+       (when (boundp 'mew-proto)
+         (setq mew-proto "%"))
        ;; 送信メールを保存する
        (when (boundp 'mew-fcc)
          (setq mew-fcc "%Sent"))
