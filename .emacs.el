@@ -915,12 +915,6 @@
 ;;; メール
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
 ;; sudo apt-get install mew mew-bin stunnel4
-(defun my-mew-biff-bark (n)
-  (if (= n 0)
-      (setq mew-biff-string nil)
-    (if (and mew-use-biff-bell (eq mew-biff-string nil))
-	(beep))
-    (setq mew-biff-string (format "MAIL[%d]" n))))
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
@@ -980,8 +974,14 @@
          (setq mew-biff-interval 3))     ; 間隔(分)
        (when (boundp 'mew-auto-get)
          (setq mew-auto-get t))          ; 起動時取得する
-       (when (boundp 'mew-biff-function)
-         (setq mew-biff-function 'my-mew-biff-bark))
+       (when (boundp 'mew-biff-function) ; 関数上書き
+         (setq mew-biff-function
+               '(lambda (n)
+                  (if (= n 0)
+                      (setq mew-biff-string nil)
+                    (if (and mew-use-biff-bell (eq mew-biff-string nil))
+                        (beep))
+                    (setq mew-biff-string (format "MAIL[%d]" n))))))
        ;; IMAP の設定
        (when (boundp 'mew-proto)
          (setq mew-proto "%"))
