@@ -123,30 +123,49 @@
 ;;; タイトルバーにフルパス名を表示
 (when window-system
   (when (eval-when-compile (require 'mew nil t))
-    (setq frame-title-format '("%f            "
+    (setq frame-title-format '("%f    "
                                mew-biff-string))))
 
-;;; モードラインの表示
-(display-time)                      ; 時間
-(line-number-mode t)                ; 行数
-(column-number-mode t)              ; カラム数
-(size-indication-mode t)            ; ファイルサイズ
+;;; モードライン
+;; 色の設定
+(custom-set-faces
+ '(mode-line ((t (:foreground "black" :background "cadet blue" :box nil))))
+ '(mode-line-inactive ((t (:foreground "dim gray" :background "dark gray" :box nil)))))
+
+;; 表示
 (when (eval-and-compile (require 'time nil t))
   (setq display-time-24hr-format t)) ; 24 時間表示
+(display-time)                       ; 時間
+(line-number-mode t)                 ; 行数
+(column-number-mode t)               ; カラム数
+(size-indication-mode t)             ; ファイルサイズ
 
-;; 関数名
+;; 関数名表示
 (when (eval-and-compile (require 'which-func nil t))
-  (which-func-mode 1)
+  (which-func-mode t)
   (setq which-func-modes t))
+(set-face-foreground 'which-func "blue")
+(set-face-background 'which-func "orange")
 (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
 (setq-default header-line-format '(which-func-mode ("" which-func-format)))
 
-;; 選択範囲の情報表示
+;; 関数名表示をトグルする
+(defun toggle-which-func-mode ()
+  (interactive)
+  (which-func-mode)
+  (if which-func-mode
+      (setq-default header-line-format
+                    '(which-func-mode ("" which-func-format)))
+    (setq-default header-line-format nil)))
+(define-key global-map (kbd "<f9>") 'toggle-which-func-mode)
+
+;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
   (if mark-active
-      (format "[%3d:%4d]"
+      (format "[%d lines, %d counts]"
               (count-lines (region-beginning) (region-end))
-              (- (region-end) (region-beginning))) ""))
+              (- (region-end) (region-beginning)))
+    ""))
 (add-to-list 'default-mode-line-format
              '(:eval (count-lines-and-chars)))
 
@@ -202,6 +221,8 @@
 ;;; ファイル内のカーソル位置を記録する
 (load "saveplace")
 (setq-default save-place t)
+;; リンクから開いた場合の対処
+(setq find-file-visit-truename t)
 
 ;; ミニバッファを再帰的に呼び出せるようにする
 (setq enable-recursive-minibuffers t)
@@ -226,7 +247,7 @@
   (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
   (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
 
-;;; gzファイルも編集できるようにする
+;;; gz ファイルも編集できるようにする
 (auto-compression-mode t)
 
 ;;; タブの設定
@@ -239,25 +260,25 @@
 (add-hook 'makefile-mode-hook (lambda () (setq indent-tabs-mode t)))
 
 ;; 行末の空白を強調表示
-;; (setq-default show-trailing-whitespace t)
-;; (set-face-background 'trailing-whitespace "#b14770")
+(setq-default show-trailing-whitespace t)
+(set-face-background 'trailing-whitespace "red")
 
 ;;; オートコンプリート
 ;; (install-elisp "http://www.cx4a.org/pub/auto-complete.el")
 (when (eval-and-compile (require 'auto-complete nil t))
   (global-auto-complete-mode t)
-  (setq ac-auto-start 3) ; 3 文字入力から補完される
+  (setq ac-auto-start nil) ; 補完しない
   (define-key global-map (kbd "C-;") 'ac-start)
   (define-key ac-complete-mode-map (kbd "C-;") 'ac-stop)
   (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
   (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
-  ;; 動的にトグルする
+  ;; オートコンプリートをトグルする
   (define-key global-map (kbd "<f4>")
     (lambda ()
       (interactive)
       (if ac-auto-start
           (setq ac-auto-start nil)
-        (setq ac-auto-start 3))
+        (setq ac-auto-start 3))  ; 3 文字入力から補完される
       (message "ac-auto-start %s" ac-auto-start))))
 
 ;;; C 言語
@@ -594,6 +615,11 @@
 ;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
 (when (eval-and-compile (require 'redo+ nil t))
+  ;; 過去の Undo が Redo されないようにする
+  (setq undo-no-redo t)
+  ;; 大量の Undo に耐えられるようにする
+  (setq undo-limit 600000)
+  (setq undo-strong-limit 900000)
   (define-key global-map (kbd "C-.") 'redo))
 
 ;;; 使わないバッファを自動的に消す
@@ -670,6 +696,12 @@
     (setq yas-snippet-dirs '("~/.emacs.d/snippets"
                              "~/.emacs.d/yasnippet/snippets"))
     (yas-global-mode t)))
+
+;;; タブ
+;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
+(when (eval-and-compile (require 'tabbar nil t))
+  (tabbar-mode -1) ; デフォルト無効
+  (define-key global-map (kbd "<f10>") 'tabbar-mode))
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
@@ -920,6 +952,7 @@
   (autoload 'mew-send "mew" "Send mail." t)
   (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
+  (add-hook 'mew-summary-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (eval-after-load "mew"
     '(progn
        (when (boundp 'mail-user-agent)
@@ -971,17 +1004,40 @@
        (when (boundp 'mew-use-biff-bell)
          (setq mew-use-biff-bell nil))   ; ベルを鳴らさない
        (when (boundp 'mew-biff-interval)
-         (setq mew-biff-interval 3))     ; 間隔(分)
+         (setq mew-biff-interval 1))     ; 間隔(分)
        (when (boundp 'mew-auto-get)
-         (setq mew-auto-get t))          ; 起動時取得する
-       (when (boundp 'mew-biff-function) ; 関数上書き
+         (setq mew-auto-get nil))          ; 起動時取得しない
+       (when (boundp 'mew-biff-function)
+         (defvar mew-mode-line-biff-string "")
+         ;; フォーマットを退避する
+         (defconst mew-mode-line-biff-format default-mode-line-format)
          (setq mew-biff-function
                '(lambda (n)
                   (if (= n 0)
-                      (setq mew-biff-string nil)
-                    (if (and mew-use-biff-bell (eq mew-biff-string nil))
-                        (beep))
-                    (setq mew-biff-string (format "MAIL[%d]" n))))))
+                      (mew-biff-clear)
+                    (if (version< "24.0.0" emacs-version)
+                        (notifications-notify :title "Emacs/Mew"
+                                              :body  (format "You got mail(s): %i" n)
+                                              :timeout 5000))
+                    (setq mew-biff-string (format "Mail(%d)" n))
+                    (setq mew-mode-line-biff-string (format "(%d)" n))
+                    (add-to-list 'default-mode-line-format
+                                 '(:eval (concat
+                                          (propertize
+                                           " "
+                                           'display display-time-mail-icon
+                                           'face
+                                           '(:foreground "white" :background "DeepPink1"))
+                                          (propertize
+                                           mew-mode-line-biff-string
+                                           'face
+                                           '(:foreground "white" :background "DeepPink1")))))))))
+       ;; 関数を上書きする
+       (defun mew-biff-clear ()
+         (when (boundp 'mew-biff-string)
+           (setq mew-biff-string nil))
+         (setq default-mode-line-format mew-mode-line-biff-format))
+
        ;; IMAP の設定
        (when (boundp 'mew-proto)
          (setq mew-proto "%"))
