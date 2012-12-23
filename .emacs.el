@@ -258,68 +258,26 @@
 ;;; makefile ではスペースにしない
 (add-hook 'makefile-mode-hook (lambda () (setq indent-tabs-mode t)))
 
-;; 行末の空白を強調表示
+;;; 行末の空白を強調表示
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "red")
 
-;;; オートコンプリート
-;; (install-elisp "http://www.cx4a.org/pub/auto-complete.el")
-(when (eval-and-compile (require 'auto-complete nil t))
-  (global-auto-complete-mode t)
-  (setq ac-auto-start nil) ; 補完しない
-  (define-key global-map (kbd "C-;") 'ac-start)
-  (define-key ac-complete-mode-map (kbd "C-;") 'ac-stop)
-  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
-  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
-  ;; オートコンプリートをトグルする
-  (define-key global-map (kbd "<f4>")
-    (lambda ()
-      (interactive)
-      (if ac-auto-start
-          (setq ac-auto-start nil)
-        (setq ac-auto-start 3))  ; 3 文字入力から補完される
-      (message "ac-auto-start %s" ac-auto-start))))
-
-;;; C 言語
-(add-hook 'c-mode-common-hook
-          '(lambda () (c-set-style "k&r")))
-
-;;; Perl
-;; (install-elisp-from-emacswiki "anything.el")
-;; (install-elisp-from-emacswiki "perl-completion.el")
-;; (install-elisp "http://www.emacswiki.org/emacs/download/perltidy.el")
-;; sudo apt-get install perltidy
-;; sudo cpan -i Class::Inspector
-(when (locate-library "cperl-mode")
-  (defalias 'perl-mode 'cperl-mode)
-  (autoload 'cperl-mode "cperl-mode" "alternate mode for editing Perl programs" t)
-  (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\|t\\|cgi\\)\\'" . cperl-mode))
-  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
-  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
-  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
-  (add-hook 'cperl-mode-hook
-            '(lambda ()
-               (progn
-                 (cperl-set-style "PerlStyle")
-                 (when (and (locate-library "anything") (require 'perl-completion nil t))
-                   (add-to-list 'ac-sources 'ac-source-perl-completion)
-                   (perl-completion-mode t))
-                 (when (executable-find "perltidy")
-                   (require 'perltidy nil t))
-                 (when (locate-library "flymake")
-                   (flymake-mode t))))))
-
-;; Pod
-(when (locate-library "pod-mode")
-  (autoload 'pod-mode "pod-mode" "alternate mode for editing Perl documents" t)
-  (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
-  (add-hook 'pod-mode-hook
-            '(lambda ()
-               (progn
-                 (font-lock-mode)
-                 (auto-fill-mode t)
-                 (when (locate-library "flyspell")
-                   (flyspell-mode t))))))
+;;; isearch リージョンで検索する
+(defadvice isearch-mode
+  (around isearch-region-mode
+          (forward &optional regexp op-fun recursive-edit word-p)
+          activate)
+  (if (and transient-mark-mode mark-active)
+      (progn
+        (isearch-update-ring
+         (buffer-substring-no-properties (mark) (point)))
+        (deactivate-mark)
+        ad-do-it
+        (if (not forward)
+            (isearch-repeat-backward)
+          (goto-char (mark))
+          (isearch-repeat-forward)))
+    ad-do-it))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -575,10 +533,10 @@
   (defun gtd ()
     "Open my GTD file"
     (interactive)
-    (let ((dir "~/gtd/plan.org"))
-      (if (file-writable-p dir)
-          (find-file dir)
-        (message (concat "Can't open file: " dir)))))
+    (let ((file "~/gtd/plan.org"))
+      (if (file-writable-p file)
+          (find-file file)
+        (message (concat "Can't open file: " file)))))
 
   ;; キーバインド
   (define-key org-mode-map (kbd "C-c m")
@@ -695,6 +653,24 @@
     (setq yas-snippet-dirs '("~/.emacs.d/snippets"
                              "~/.emacs.d/yasnippet/snippets"))
     (yas-global-mode t)))
+
+;;; オートコンプリート
+;; (install-elisp "http://www.cx4a.org/pub/auto-complete.el")
+(when (eval-and-compile (require 'auto-complete nil t))
+  (global-auto-complete-mode t)
+  (setq ac-auto-start nil) ; 補完しない
+  (define-key global-map (kbd "C-;") 'ac-start)
+  (define-key ac-complete-mode-map (kbd "C-;") 'ac-stop)
+  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
+  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+  ;; オートコンプリートをトグルする
+  (define-key global-map (kbd "<f4>")
+    (lambda ()
+      (interactive)
+      (if ac-auto-start
+          (setq ac-auto-start nil)
+        (setq ac-auto-start 3))  ; 3 文字入力から補完される
+      (message "ac-auto-start %s" ac-auto-start))))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
@@ -1020,8 +996,8 @@
                          :timeout 5000))
                     (setq mew-mode-line-biff-icon " ")
                     (setq mew-mode-line-biff-string (format "(%d)" n))))))
-       ;; 関数を上書きする
-       (defun mew-biff-clear ()
+
+       (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
          (setq mew-mode-line-biff-icon nil)
          (setq mew-mode-line-biff-string nil))
 
@@ -1230,3 +1206,48 @@ Otherwise return word around point."
 (require 'term+ nil t)
 
 ;;; ここまで拡張 lisp
+
+;;; ここから言語用設定
+
+;;; C 言語
+(add-hook 'c-mode-common-hook
+          '(lambda () (c-set-style "k&r")))
+
+;;; Perl
+;; (install-elisp-from-emacswiki "anything.el")
+;; (install-elisp-from-emacswiki "perl-completion.el")
+;; (install-elisp "http://www.emacswiki.org/emacs/download/perltidy.el")
+;; sudo apt-get install perltidy
+;; sudo cpan -i Class::Inspector
+(when (locate-library "cperl-mode")
+  (defalias 'perl-mode 'cperl-mode)
+  (autoload 'cperl-mode "cperl-mode" "alternate mode for editing Perl programs" t)
+  (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\|t\\|cgi\\)\\'" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+  (add-hook 'cperl-mode-hook
+            '(lambda ()
+               (progn
+                 (cperl-set-style "PerlStyle")
+                 (when (and (locate-library "anything") (require 'perl-completion nil t))
+                   (add-to-list 'ac-sources 'ac-source-perl-completion)
+                   (perl-completion-mode t))
+                 (when (executable-find "perltidy")
+                   (require 'perltidy nil t))
+                 (when (locate-library "flymake")
+                   (flymake-mode t))))))
+
+;; Pod
+(when (locate-library "pod-mode")
+  (autoload 'pod-mode "pod-mode" "alternate mode for editing Perl documents" t)
+  (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
+  (add-hook 'pod-mode-hook
+            '(lambda ()
+               (progn
+                 (font-lock-mode)
+                 (auto-fill-mode t)
+                 (when (locate-library "flyspell")
+                   (flyspell-mode t))))))
+
+;;; ここまで言語用設定
