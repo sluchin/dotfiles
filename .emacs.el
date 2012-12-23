@@ -123,8 +123,7 @@
 ;;; タイトルバーにフルパス名を表示
 (when window-system
   (when (eval-when-compile (require 'mew nil t))
-    (setq frame-title-format '("%f    "
-                               mew-biff-string))))
+    (setq frame-title-format '("%f"))))
 
 ;;; モードライン
 ;; 色の設定
@@ -999,44 +998,43 @@
        ;; 着信した際モードラインに表示される
        (when (boundp 'mew-use-biff)
          (setq mew-use-biff t))
-       (when (boundp 'mew-imap-biff)
-         (setq mew-imap-biff t))
        (when (boundp 'mew-use-biff-bell)
          (setq mew-use-biff-bell nil))   ; ベルを鳴らさない
        (when (boundp 'mew-biff-interval)
          (setq mew-biff-interval 1))     ; 間隔(分)
        (when (boundp 'mew-auto-get)
-         (setq mew-auto-get nil))          ; 起動時取得しない
+         (setq mew-auto-get nil))        ; 起動時取得しない
+
+       ;; モードラインにアイコンとメールの数を表示する
+       (defvar mew-mode-line-biff-icon nil)
+       (defvar mew-mode-line-biff-string nil)
        (when (boundp 'mew-biff-function)
-         (defvar mew-mode-line-biff-string "")
-         ;; フォーマットを退避する
-         (defconst mew-mode-line-biff-format default-mode-line-format)
          (setq mew-biff-function
                '(lambda (n)
                   (if (= n 0)
                       (mew-biff-clear)
                     (if (version< "24.0.0" emacs-version)
-                        (notifications-notify :title "Emacs/Mew"
-                                              :body  (format "You got mail(s): %i" n)
-                                              :timeout 5000))
-                    (setq mew-biff-string (format "Mail(%d)" n))
-                    (setq mew-mode-line-biff-string (format "(%d)" n))
-                    (add-to-list 'default-mode-line-format
-                                 '(:eval (concat
-                                          (propertize
-                                           " "
-                                           'display display-time-mail-icon
-                                           'face
-                                           '(:foreground "white" :background "DeepPink1"))
-                                          (propertize
-                                           mew-mode-line-biff-string
-                                           'face
-                                           '(:foreground "white" :background "DeepPink1")))))))))
+                        (notifications-notify
+                         :title "Emacs/Mew"
+                         :body  (format "You got mail(s): %i" n)
+                         :timeout 5000))
+                    (setq mew-mode-line-biff-icon " ")
+                    (setq mew-mode-line-biff-string (format "(%d)" n))))))
        ;; 関数を上書きする
        (defun mew-biff-clear ()
-         (when (boundp 'mew-biff-string)
-           (setq mew-biff-string nil))
-         (setq default-mode-line-format mew-mode-line-biff-format))
+         (setq mew-mode-line-biff-icon nil)
+         (setq mew-mode-line-biff-string nil))
+
+       (add-to-list
+        'default-mode-line-format
+        '(:eval (concat
+                 (propertize mew-mode-line-biff-icon
+                             'display display-time-mail-icon
+                             'face
+                             '(:foreground "white" :background "DeepPink1"))
+                 (propertize mew-mode-line-biff-string
+                             'face
+                             '(:foreground "white" :background "DeepPink1")))))
 
        ;; IMAP の設定
        (when (boundp 'mew-proto)
