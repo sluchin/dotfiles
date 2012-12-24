@@ -16,6 +16,9 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
+;;; バックトレースを有効にする
+(setq debug-on-error t)
+
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
@@ -41,6 +44,11 @@
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
                 "~/.emacs.d/yasnippet"
+                "~/.emacs.d/yasnippet-java-mode"
+                "~/.emacs.d/auto-complete"
+                "~/.emacs.d/auto-complete-clang"
+                "~/.emacs.d/ajc-java-complete"
+                "~/.emacs.d/malabar-mode/target/malabar-1.5-SNAPSHOT/lisp"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -117,9 +125,6 @@
            ((eq key ?q) (throw 'quit t)))))))
   (define-key global-map (kbd "<f11>") 'resize-frame-interactively))
 
-;;; 色をつける
-(global-font-lock-mode t)
-
 ;;; タイトルバーにフルパス名を表示
 (when window-system
   (when (eval-when-compile (require 'mew nil t))
@@ -171,9 +176,6 @@
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
   (unless (server-running-p) (server-start)))
-
-;;; バックトレースを無効にする
-(setq debug-on-error nil)
 
 ;;; find-fileのデフォルト
 (cd "~/")
@@ -238,13 +240,6 @@
 ;; ブックマークを変更したら即保存する
 (when (eval-and-compile (require 'bookmark nil t))
   (setq bookmark-save-flag t))
-
-;;; テンプレート挿入
-(when (eval-and-compile (require 'autoinsert nil t))
-  (auto-insert-mode t)
-  (setq auto-insert-directory "~/.emacs.d/autoinsert/")
-  (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
-  (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
 
 ;;; gz ファイルも編集できるようにする
 (auto-compression-mode t)
@@ -340,7 +335,7 @@
 (define-key global-map (kbd "S-DEL") 'clipboard-kill-region)
 
 ;; クリップボードに貼り付け
-(define-key global-map (kbd "<S-insert>") 'clipboard-yank)
+(define-key global-map (kbd "<S-insert>") 'clipboardy-yank)
 
 ;; C-\の日本語入力の設定を無効にする
 (define-key global-map (kbd "C-\\") nil)
@@ -561,7 +556,7 @@
 ;;; インストーラ
 ;; wget http://www.emacswiki.org/emacs/download/auto-install.el
 ;; autoloadすると一回目に error になるため使うときは,
-;; M-x enable-auto-install を最初に実行するようにする
+;; (enable-auto-install) を最初に評価する
 (defun enable-auto-install ()
   "Do enable auto-install"
   (interactive)
@@ -627,11 +622,11 @@
   ;; 前回閉じたときの位置にカーソルを復帰
   (setq session-undo-check -1))
 
-;;; minibuf で isearch を使えるようにする
+;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
 (require 'minibuf-isearch nil t)
 
-;;; Emacs内シェルコマンド履歴保存
+;;; Emacs 内シェルコマンド履歴保存
 ;; (install-elisp-from-emacswiki "shell-history.el")
 (require 'shell-history nil t)
 
@@ -643,40 +638,18 @@
   (setq recentf-max-saved-items 10000)
   (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$")))
 
-;;; 略語から定型文を入力する
-;; git clone git://github.com/capitaomorte/yasnippet.git
-;; M-x enable-yasnippet を実行すると使用できる
-(defun enable-yasnippet ()
-  "Do enable yasnippet"
-  (interactive)
-  (when (eval-and-compile (require 'yasnippet nil t))
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                             "~/.emacs.d/yasnippet/snippets"))
-    (yas-global-mode t)))
-
-;;; オートコンプリート
-;; (install-elisp "http://www.cx4a.org/pub/auto-complete.el")
-(when (eval-and-compile (require 'auto-complete nil t))
-  (global-auto-complete-mode t)
-  (setq ac-auto-start nil) ; 補完しない
-  (define-key global-map (kbd "C-;") 'ac-start)
-  (define-key ac-complete-mode-map (kbd "C-;") 'ac-stop)
-  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
-  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
-  ;; オートコンプリートをトグルする
-  (define-key global-map (kbd "<f4>")
-    (lambda ()
-      (interactive)
-      (if ac-auto-start
-          (setq ac-auto-start nil)
-        (setq ac-auto-start 3))  ; 3 文字入力から補完される
-      (message "ac-auto-start %s" ac-auto-start))))
-
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
 (when (eval-and-compile (require 'tabbar nil t))
   (tabbar-mode -1) ; デフォルト無効
-  (define-key global-map (kbd "<f10>") 'tabbar-mode))
+  (set-face-background 'tabbar-default "cadet blue")
+  (set-face-foreground 'tabbar-unselected "black")
+  (set-face-background 'tabbar-unselected "cadet blue")
+  (set-face-foreground 'tabbar-selected "brack")
+  (set-face-background 'tabbar-selected "blue")
+  (define-key global-map (kbd "<f10>") 'tabbar-mode)
+  (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
+  (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab))
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
@@ -971,7 +944,6 @@
        (when (boundp 'mew-passwd-lifetime)
          (setq mew-passwd-lifetime 120))
        ;; 着信通知
-       ;; 着信した際モードラインに表示される
        (when (boundp 'mew-use-biff)
          (setq mew-use-biff t))
        (when (boundp 'mew-use-biff-bell)
@@ -982,8 +954,8 @@
          (setq mew-auto-get nil))        ; 起動時取得しない
 
        ;; モードラインにアイコンとメールの数を表示する
-       (defvar mew-mode-line-biff-icon nil)
-       (defvar mew-mode-line-biff-string nil)
+       (defvar mew-mode-line-biff-icon "")
+       (defvar mew-mode-line-biff-string "")
        (when (boundp 'mew-biff-function)
          (setq mew-biff-function
                '(lambda (n)
@@ -998,8 +970,8 @@
                     (setq mew-mode-line-biff-string (format "(%d)" n))))))
 
        (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
-         (setq mew-mode-line-biff-icon nil)
-         (setq mew-mode-line-biff-string nil))
+         (setq mew-mode-line-biff-icon "")
+         (setq mew-mode-line-biff-string ""))
 
        (add-to-list
         'default-mode-line-format
@@ -1039,7 +1011,8 @@
            (setq mew-imap-auth  t))
          (when (boundp 'mew-imap-ssl)
            (setq mew-imap-ssl t))
-         (setq mew-imap-ssl-port "993")
+         (when (boundp 'mew-imap-ssl-port)
+           (setq mew-imap-ssl-port "993"))
          (when (boundp 'mew-smtp-auth)
            (setq mew-smtp-auth t))
          (when (boundp 'mew-smtp-ssl)
@@ -1175,6 +1148,9 @@ Otherwise return word around point."
   (autoload 'gist-region-private "gist" "Post the current region as a new private paste." t))
 
 ;;; 端末エミュレータ
+;; eshell では空白を強調表示しない
+(add-hook 'eshell-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+
 ;; zsh を使用するときはこれを使うことにする
 ;; (install-elisp-from-emacswiki "multi-term.el")
 (when (locate-library "multi-term")
@@ -1207,11 +1183,82 @@ Otherwise return word around point."
 
 ;;; ここまで拡張 lisp
 
-;;; ここから言語用設定
+;;; ここから各種言語設定
+
+;;; テンプレート挿入
+(when (eval-and-compile (require 'autoinsert nil t))
+  (auto-insert-mode t)
+  (setq auto-insert-directory "~/.emacs.d/autoinsert/")
+  (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
+  (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
+
+;;; オートコンプリート
+;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
+(when (eval-when-compile (require 'auto-complete-config nil t))
+  (add-to-list 'ac-dictionary-directories
+               "~/.emacs.d/auto-complete/dict")
+  (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat")
+  (ac-config-default)
+  (setq ac-delay 0.0)
+  (setq ac-quick-help-delay 0)
+  (setq ac-auto-show-menu 0.1)
+  (setq ac-candidate-max 50)
+  (setq ac-auto-start nil) ; 自動で補完しない
+  (setq ac-modes
+    (append ac-modes
+      (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode)))
+  (ac-set-trigger-key "C-;")
+  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
+  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+  (define-key ac-complete-mode-map (kbd "C-/") 'ac-stop)
+  ;; オートコンプリートをトグルする
+  (define-key global-map (kbd "<f4>")
+    (lambda (&optional n)
+      (interactive "P")
+      (if (and ac-auto-start (eq n nil))
+          (setq ac-auto-start nil)
+        (if (eq n nil) ; デフォルト
+            (setq ac-auto-start 3)
+         (setq ac-auto-start n)))
+      (message "ac-auto-start %s" ac-auto-start)))
+
+  (ac-config-default))
+
+;;; 略語から定型文を入力する
+;; [new] git clone https://github.com/capitaomorte/yasnippet.git
+;; [old] wget -O- http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2 | tar xfj -
+;; [old] (install-elisp-from-emacswiki "yasnippet-config.el")
+(defun enable-yasnippet ()
+  "Do enable yasnippet"
+  (interactive)
+  (when (eval-and-compile (require 'yasnippet nil t))
+    (yas--initialize)
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                             "~/.emacs.d/yasnippet/snippets"))
+    (mapc 'yas-load-directory yas-snippet-dirs)))
+
+;;; CEDET
+(defun enable-cedet ()
+  "Do enable cedet"
+  (interactive)
+  (when (eval-and-compile (require 'cedet nil t))
+    (global-ede-mode t)))
 
 ;;; C 言語
+;; git clone git://github.com/brianjcj/auto-complete-clang.git
+;; clang -cc1 -x c-header stdafx.h -emit-pch -o stdafx.pch
 (add-hook 'c-mode-common-hook
-          '(lambda () (c-set-style "k&r")))
+          '(lambda ()
+             (c-set-style "k&r")
+             (define-key mode-specific-map "c" 'compile)
+
+             (when (eval-and-compile (require 'auto-complete-clang nil t))
+               (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch")
+               (setq ac-clang-flags '("-w" "-ferror-limit" "1"))
+               (semantic-mode t)
+               (setq ac-sources (append '(ac-source-clang
+                                          ac-source-semantic)
+                                        ac-sources)))))
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
@@ -1221,7 +1268,7 @@ Otherwise return word around point."
 ;; sudo cpan -i Class::Inspector
 (when (locate-library "cperl-mode")
   (defalias 'perl-mode 'cperl-mode)
-  (autoload 'cperl-mode "cperl-mode" "alternate mode for editing Perl programs" t)
+  (autoload 'cperl-mode "cperl-mode" "Alternate mode for editing Perl programs" t)
   (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\|t\\|cgi\\)\\'" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
@@ -1235,19 +1282,97 @@ Otherwise return word around point."
                    (perl-completion-mode t))
                  (when (executable-find "perltidy")
                    (require 'perltidy nil t))
-                 (when (locate-library "flymake")
+                 (when (and (locate-library "flymake") (eq flymake-mode nil))
                    (flymake-mode t))))))
 
 ;; Pod
 (when (locate-library "pod-mode")
-  (autoload 'pod-mode "pod-mode" "alternate mode for editing Perl documents" t)
+  (autoload 'pod-mode "pod-mode" "Alternate mode for editing Perl documents" t)
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
   (add-hook 'pod-mode-hook
             '(lambda ()
                (progn
                  (font-lock-mode)
                  (auto-fill-mode t)
-                 (when (locate-library "flyspell")
+                 (when (and (locate-library "flyspell") (eq flyspell-mode nil))
                    (flyspell-mode t))))))
 
-;;; ここまで言語用設定
+;;; Java [malabar-mode]
+;; git clone git://github.com/espenhw/malabar-mode.git または
+;; git clone https://github.com/buzztaiki/malabar-mode.git
+;; mvn -Dmaven.test.skip=true package
+;; unzip target/malabar-1.5-SNAPSHOT-dist.zip
+;; git clone https://github.com/nekop/yasnippet-java-mode.git
+(defun enable-malabar ()
+  "Do enable malabar-mode"
+  (interactive)
+  (when (eval-and-compile (require 'malabar-mode nil t))
+    (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
+    ;;(semantic-load-enable-minimum-features)
+    (setq malabar-groovy-lib-dir
+          (concat user-emacs-directory
+                  "/malabar-mode/target/malabar-1.5-SNAPSHOT/lib"))
+    ;; 日本語だとコンパイルエラーメッセージが化けるので language を en に設定
+    (setq malabar-groovy-java-options '("-Duser.language=en"))
+    ;; 普段使わないパッケージを import 候補から除外
+    (setq malabar-import-excluded-classes-regexp-list
+          (append
+           '("^java\\.awt\\..*$"
+             "^com\\.sun\\..*$"
+             "^org\\.omg\\..*$")
+           malabar-import-excluded-classes-regexp-list))
+
+    (add-hook 'malabar-mode-hook
+              '(lambda ()
+                 (c-set-style "java")
+                 (setq c-auto-newline t)
+                 (enable-cedet)
+                 (when (eval-and-compile (require 'yasnippet nil t))
+                   (yas--initialize)
+                   (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                                            "~/.emacs.d/yasnippet/snippets"
+                                            "~/.emacs.d/yasnippet-java-mode"))
+                   (mapc 'yas-load-directory yas-snippet-dirs))
+                 (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
+                                                   global-semanticdb-minor-mode
+                                                   global-semantic-idle-summary-mode
+                                                   global-semantic-mru-bookmark-mode))
+                 (semantic-mode 1)
+                 (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
+
+;;; Java [ajc-java-complete]
+;; git clone git://github.com/jixiuf/ajc-java-complete.git
+;; JAVA_HOME="/usr/lib/jvm/java-6-sun"
+;; CLASSPATH=".:$JAVA_HOME/lib"
+;; export JAVA_HOME CLASSPATH
+;; javac Tags.java
+;; java Tags
+;; bunzip2 java_base.tag.bz2
+;; bunzip2 java_base2.tag.bz2
+(defun enable-ajc-java-complete ()
+  "Do enable ajc-java-complete"
+  (interactive)
+  (when (eval-and-compile (require 'yasnippet nil t))
+    (yas--initialize)
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                             "~/.emacs.d/yasnippet/snippets"
+                             "~/.emacs.d/yasnippet-java-mode"))
+    (mapc 'yas-load-directory yas-snippet-dirs))
+
+  (when (eval-and-compile (require 'ajc-java-complete-config nil t))
+    (when (boundp 'ajc-tag-file)
+      (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag"))
+    ;;(add-hook 'java-mode-hook 'ajc-java-complete-mode)
+    (add-hook 'java-mode-hook
+              '(lambda ()
+                 (ajc-java-complete-mode)
+                 (c-set-style "java")
+                 (setq c-auto-newline t)
+                 (setq compile-command
+                       (concat "javac "
+                               (file-name-nondirectory (buffer-file-name))))))))
+
+;;; ここまで各種言語設定
+
+;;; バックトレースを無効にする
+(setq debug-on-error nil)
