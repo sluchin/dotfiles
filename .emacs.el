@@ -561,8 +561,10 @@
   "Do enable auto-install"
   (interactive)
   (when (eval-and-compile (require 'auto-install nil t))
-    (auto-install-update-emacswiki-package-name t)
-    (auto-install-compatibility-setup)))
+    (when (fboundp 'auto-install-update-emacswiki-package-name)
+      (auto-install-update-emacswiki-package-name t))
+    (when (fboundp 'auto-install-compatibility-setup)
+      (auto-install-compatibility-setup))))
 
 ;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
@@ -585,8 +587,10 @@
 ;;; カーソル位置印をつけ移動する
 ;; git clone git://github.com/joodland/bm.git
 (when (eval-and-compile (require 'bm nil t))
-  (setq-default bm-buffer-persistence nil)
-  (setq bm-restore-repository-on-load t)
+  (when (boundp 'bm-buffer-persistence)
+    (setq-default bm-buffer-persistence nil))
+  (when (boundp 'bm-restore-repository-on-load)
+    (setq bm-restore-repository-on-load t))
   (add-hook 'find-file-hooks 'bm-buffer-restore)
   (add-hook 'kill-buffer-hook 'bm-buffer-save)
   (add-hook 'after-save-hook 'bm-buffer-save)
@@ -614,13 +618,16 @@
 (setq history-length t) ; t の場合無限
 ;; kill-ringやミニバッファで過去に開いたファイルなどの履歴を保存する
 (when (eval-and-compile (require 'session nil t))
-  (setq session-initialize '(de-saveplace session keys menus places)
-        session-globals-include '((kill-ring 50)
-                                  (session-file-alist 500 t)
-                                  (file-name-history 10000)))
-  (add-hook 'after-init-hook 'session-initialize)
+  (when (boundp 'session-initialize)
+    (setq session-initialize '(de-saveplace session keys menus places)))
+  (when (boundp 'session-globals-include)
+      (setq session-globals-include '((kill-ring 50)
+                                      (session-file-alist 500 t)
+                                      (file-name-history 10000))))
+    (add-hook 'after-init-hook 'session-initialize)
   ;; 前回閉じたときの位置にカーソルを復帰
-  (setq session-undo-check -1))
+  (when (boundp 'session-undo-check)
+    (setq session-undo-check -1)))
 
 ;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
@@ -635,13 +642,16 @@
 ;; 以下で最近開いたファイルを一覧表示
 ;; M-x recentf-open-files
 (when (eval-and-compile (require 'recentf-ext nil t))
-  (setq recentf-max-saved-items 10000)
-  (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$")))
+  (when (boundp 'recentf-max-saved-items)
+    (setq recentf-max-saved-items 10000))
+  (when (boundp 'recentf-exclude)
+    (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$"))))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
 (when (eval-and-compile (require 'tabbar nil t))
-  (tabbar-mode -1) ; デフォルト無効
+  (when (fboundp 'tabbar-mode)
+    (tabbar-mode -1)) ; デフォルト無効
   (set-face-background 'tabbar-default "cadet blue")
   (set-face-foreground 'tabbar-unselected "black")
   (set-face-background 'tabbar-unselected "cadet blue")
@@ -796,7 +806,8 @@
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
 (when (eval-and-compile (require 'auto-async-byte-compile nil t))
   ;; バイトコンパイルしないファイル
-  (setq auto-async-byte-compile-exclude-files-regexp "/junk/")
+  (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
+    (setq auto-async-byte-compile-exclude-files-regexp "/junk/"))
   (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
 
 ;;; ミニバッファに関数の help 表示
@@ -805,15 +816,19 @@
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-  (setq eldoc-idle-delay 0.2)
+  (when (boundp 'eldoc-idle-delay)
+    (setq eldoc-idle-delay 0.2))
   ;; モードラインに ElDoc と表示しない
-  (setq eldoc-minor-mode-string ""))
+  (when (boundp 'eldoc-minor-mode-string)
+    (setq eldoc-minor-mode-string "")))
 
 ;;; *Help* にメモを書き込む
 ;; (install-elisp-from-emacswiki "usage-memo.el")
 (when (eval-and-compile (require 'usage-memo nil t))
-  (setq umemo-base-directory "~/.emacs.d/umemo")
-  (umemo-initialize))
+  (when (boundp 'umemo-base-directory)
+    (setq umemo-base-directory "~/.emacs.d/umemo"))
+  (when (fboundp 'umemo-initialize)
+    (umemo-initialize)))
 
 ;;; git の設定
 ;; git clone git://github.com/magit/magit.git
@@ -887,8 +902,10 @@
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/sdcv.el")
 (when (and (executable-find "sdcv") (locate-library "sdcv"))
   (when (eval-and-compile (require 'sdcv nil t))
-    (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127"))
-    (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))
+    (when (boundp 'sdcv-dictionary-simple-list)
+      (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
+    (when (boundp 'sdcv-dictionary-complete-list)
+      (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
     (define-key global-map (kbd "C-c w") 'sdcv-search-input)      ; バッファに表示
     (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+))) ; ポップアップ
 
@@ -1068,12 +1085,6 @@ Otherwise return word around point."
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
 
-  ;; キーバインドをカスタマイズ
-  (define-key w3m-mode-map (kbd "<left>") 'backward-char)
-  (define-key w3m-mode-map (kbd "<right>") 'forward-char)
-  (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
-  (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-next-page)
-
   ;; URL を開く
   (defun w3m-url-at-point ()
     "Browse url in w3m"
@@ -1087,11 +1098,12 @@ Otherwise return word around point."
   (define-key global-map (kbd "C-c s") 'w3m-search-new-session)
 
   ;; ウィキペディアで検索する
-  (defun w3m-search-wikipedia (&optional query)
-    "Search at wikipedia in w3m"
-    (interactive)
-    (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input))) t))
-  (define-key global-map (kbd "C-c p") 'w3m-search-wikipedia)
+  (when (fboundp 'w3m-browse-url)
+    (defun w3m-search-wikipedia (&optional query)
+      "Search at wikipedia in w3m"
+      (interactive)
+      (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input))) t))
+    (define-key global-map (kbd "C-c p") 'w3m-search-wikipedia))
 
   (eval-after-load "w3m"
     '(progn
@@ -1109,7 +1121,12 @@ Otherwise return word around point."
          (setq w3m-favicon-cache-expire-wait nil))
        ;; デフォルトエリア
        (when (boundp 'w3m-weather-default-area)
-         (setq w3m-weather-default-area "道央・石狩")))))
+         (setq w3m-weather-default-area "道央・石狩"))
+       ;; キーバインドをカスタマイズ
+       (define-key w3m-mode-map (kbd "<left>") 'backward-char)
+       (define-key w3m-mode-map (kbd "<right>") 'forward-char)
+       (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
+       (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-next-page))))
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
@@ -1194,35 +1211,47 @@ Otherwise return word around point."
 
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
-(when (eval-when-compile (require 'auto-complete-config nil t))
+(when (eval-and-compile (and (require 'auto-complete nil t)
+                             (require 'auto-complete-config nil t)))
   (add-to-list 'ac-dictionary-directories
                "~/.emacs.d/auto-complete/dict")
-  (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat")
-  (ac-config-default)
-  (setq ac-delay 0.0)
-  (setq ac-quick-help-delay 0)
-  (setq ac-auto-show-menu 0.1)
-  (setq ac-candidate-max 50)
-  (setq ac-auto-start nil) ; 自動で補完しない
-  (setq ac-modes
-    (append ac-modes
-      (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode)))
-  (ac-set-trigger-key "C-;")
-  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
-  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
-  (define-key ac-complete-mode-map (kbd "C-/") 'ac-stop)
+  (when (boundp 'ac-comphist-file)
+    (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
+  (when (fboundp 'ac-config-default)
+    (ac-config-default))
+  (when (boundp 'ac-delay)
+    (setq ac-delay 0.1))
+  (when (boundp 'ac-quick-help-delay)
+    (setq ac-quick-help-delay 0.1))
+  (when (boundp 'ac-auto-show-menu)
+    (setq ac-auto-show-menu 0.1))
+  (when (boundp 'ac-candidate-max)
+    (setq ac-candidate-max 50))
+  (when (boundp 'ac-auto-start)
+    (setq ac-auto-start nil)) ; 自動で補完しない
+  (when (boundp 'ac-modes)
+    (setq ac-modes
+          (append ac-modes
+                  (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode))))
+  (when (fboundp 'ac-set-trigger-key)
+    (ac-set-trigger-key "C-;"))
+  (when (boundp 'ac-complete-mode-map)
+    (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
+    (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+    (define-key ac-complete-mode-map (kbd "C-/") 'ac-stop))
   ;; オートコンプリートをトグルする
   (define-key global-map (kbd "<f4>")
-    (lambda (&optional n)
-      (interactive "P")
-      (if (and ac-auto-start (eq n nil))
-          (setq ac-auto-start nil)
-        (if (eq n nil) ; デフォルト
-            (setq ac-auto-start 3)
-         (setq ac-auto-start n)))
-      (message "ac-auto-start %s" ac-auto-start)))
+    '(lambda (&optional n)
+       (interactive "P")
+       (if (and ac-auto-start (eq n nil))
+           (setq ac-auto-start nil)
+         (if (eq n nil) ; デフォルト
+             (setq ac-auto-start 3)
+           (setq ac-auto-start n)))
+       (message "ac-auto-start %s" ac-auto-start)))
 
-  (ac-config-default))
+  (when (fboundp 'ac-config-default)
+    (ac-config-default)))
 
 ;;; 略語から定型文を入力する
 ;; [new] git clone https://github.com/capitaomorte/yasnippet.git
@@ -1232,10 +1261,12 @@ Otherwise return word around point."
   "Do enable yasnippet"
   (interactive)
   (when (eval-and-compile (require 'yasnippet nil t))
-    (yas--initialize)
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                             "~/.emacs.d/yasnippet/snippets"))
-    (mapc 'yas-load-directory yas-snippet-dirs)))
+    (when (fboundp 'yas--initialize)
+      (yas--initialize))
+    (when (boundp 'yas-snippet-dirs)
+      (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                               "~/.emacs.d/yasnippet/snippets"))
+      (mapc 'yas-load-directory yas-snippet-dirs))))
 
 ;;; CEDET
 (defun enable-cedet ()
@@ -1252,13 +1283,17 @@ Otherwise return word around point."
              (c-set-style "k&r")
              (define-key mode-specific-map "c" 'compile)
 
-             (when (eval-and-compile (require 'auto-complete-clang nil t))
-               (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch")
-               (setq ac-clang-flags '("-w" "-ferror-limit" "1"))
+             (when (eval-and-compile (and (require 'auto-complete-clang nil t)
+                                          (require 'auto-complete nil t)))
+               (when (boundp 'ac-clang-prefix-header)
+                 (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
+               (when (boundp 'ac-clang-flags)
+                 (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
                (semantic-mode t)
-               (setq ac-sources (append '(ac-source-clang
-                                          ac-source-semantic)
-                                        ac-sources)))))
+               (when (boundp 'ac-sources)
+                 (setq ac-sources (append '(ac-source-clang
+                                            ac-source-semantic)
+                                          ac-sources))))))
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
@@ -1279,7 +1314,8 @@ Otherwise return word around point."
                  (cperl-set-style "PerlStyle")
                  (when (and (locate-library "anything") (require 'perl-completion nil t))
                    (add-to-list 'ac-sources 'ac-source-perl-completion)
-                   (perl-completion-mode t))
+                   (when (fboundp 'perl-completion-mode)
+                     (perl-completion-mode t)))
                  (when (executable-find "perltidy")
                    (require 'perltidy nil t))
                  (when (and (locate-library "flymake") (eq flymake-mode nil))
@@ -1291,11 +1327,9 @@ Otherwise return word around point."
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
   (add-hook 'pod-mode-hook
             '(lambda ()
-               (progn
-                 (font-lock-mode)
-                 (auto-fill-mode t)
-                 (when (and (locate-library "flyspell") (eq flyspell-mode nil))
-                   (flyspell-mode t))))))
+               (auto-fill-mode t)
+               (when (and (locate-library "flyspell") (eq flyspell-mode nil))
+                 (flyspell-mode t)))))
 
 ;;; Java [malabar-mode]
 ;; git clone git://github.com/espenhw/malabar-mode.git または
@@ -1303,24 +1337,27 @@ Otherwise return word around point."
 ;; mvn -Dmaven.test.skip=true package
 ;; unzip target/malabar-1.5-SNAPSHOT-dist.zip
 ;; git clone https://github.com/nekop/yasnippet-java-mode.git
-(defun enable-malabar ()
-  "Do enable malabar-mode"
-  (interactive)
-  (when (eval-and-compile (require 'malabar-mode nil t))
+(when (eval-and-compile (require 'malabar-mode nil t))
+  (defun enable-malabar ()
+    "Do enable malabar-mode"
+    (interactive)
     (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
     ;;(semantic-load-enable-minimum-features)
-    (setq malabar-groovy-lib-dir
-          (concat user-emacs-directory
-                  "/malabar-mode/target/malabar-1.5-SNAPSHOT/lib"))
+    (when (boundp 'malabar-groovy-lib-dir)
+      (setq malabar-groovy-lib-dir
+            (concat user-emacs-directory
+                    "/malabar-mode/target/malabar-1.5-SNAPSHOT/lib")))
     ;; 日本語だとコンパイルエラーメッセージが化けるので language を en に設定
-    (setq malabar-groovy-java-options '("-Duser.language=en"))
+    (when (boundp 'malabar-groovy-java-options)
+      (setq malabar-groovy-java-options '("-Duser.language=en")))
     ;; 普段使わないパッケージを import 候補から除外
-    (setq malabar-import-excluded-classes-regexp-list
-          (append
-           '("^java\\.awt\\..*$"
-             "^com\\.sun\\..*$"
-             "^org\\.omg\\..*$")
-           malabar-import-excluded-classes-regexp-list))
+    (when (boundp 'malabar-import-excluded-classes-regexp-list)
+      (setq malabar-import-excluded-classes-regexp-list
+            (append
+             '("^java\\.awt\\..*$"
+               "^com\\.sun\\..*$"
+               "^org\\.omg\\..*$")
+             malabar-import-excluded-classes-regexp-list)))
 
     (add-hook 'malabar-mode-hook
               '(lambda ()
@@ -1328,11 +1365,13 @@ Otherwise return word around point."
                  (setq c-auto-newline t)
                  (enable-cedet)
                  (when (eval-and-compile (require 'yasnippet nil t))
-                   (yas--initialize)
-                   (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                                            "~/.emacs.d/yasnippet/snippets"
-                                            "~/.emacs.d/yasnippet-java-mode"))
-                   (mapc 'yas-load-directory yas-snippet-dirs))
+                   (when (fboundp 'yas--initialize)
+                     (yas--initialize))
+                   (when (boundp 'yas-snippet-dirs)
+                     (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                                              "~/.emacs.d/yasnippet/snippets"
+                                              "~/.emacs.d/yasnippet-java-mode"))
+                     (mapc 'yas-load-directory yas-snippet-dirs)))
                  (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
                                                    global-semanticdb-minor-mode
                                                    global-semantic-idle-summary-mode
@@ -1349,20 +1388,24 @@ Otherwise return word around point."
 ;; java Tags
 ;; bunzip2 java_base.tag.bz2
 ;; bunzip2 java_base2.tag.bz2
-(defun enable-ajc-java-complete ()
-  "Do enable ajc-java-complete"
-  (interactive)
-  (when (eval-and-compile (require 'yasnippet nil t))
-    (yas--initialize)
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                             "~/.emacs.d/yasnippet/snippets"
-                             "~/.emacs.d/yasnippet-java-mode"))
-    (mapc 'yas-load-directory yas-snippet-dirs))
+(when (eval-and-compile (and (require 'auto-complete nil t)
+                             (require 'yasnippet nil t)
+                             (fboundp 'ac-define-source)
+                             (require 'ajc-java-complete-config nil t)))
+  (defun enable-ajc-java-complete ()
+    "Do enable ajc-java-complete"
+    (interactive)
+    (when (eval-and-compile (require 'yasnippet nil t))
+      (when (fboundp 'yas--initialize)
+        (yas--initialize))
+      (when (boundp 'yas-snippet-dirs)
+        (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                                 "~/.emacs.d/yasnippet/snippets"
+                                 "~/.emacs.d/yasnippet-java-mode"))
+        (mapc 'yas-load-directory yas-snippet-dirs)))
 
-  (when (eval-and-compile (require 'ajc-java-complete-config nil t))
     (when (boundp 'ajc-tag-file)
       (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag"))
-    ;;(add-hook 'java-mode-hook 'ajc-java-complete-mode)
     (add-hook 'java-mode-hook
               '(lambda ()
                  (ajc-java-complete-mode)
