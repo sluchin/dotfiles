@@ -881,7 +881,7 @@
             (insert (w32-symlinks-parse-symlink file))))))
 
     ;; dired で Windows に関連付けられたアプリを起動する
-    ;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/w32-shell-execute.el")
+    ;; (install-elisp "http://www.emacswiki.org/emacs/download/w32-shell-execute.el")
     (when (and (require 'w32-shell-execute nil t) (fboundp 'w32-shell-execute))
       (defun uenox-dired-winstart ()
         "Type '[uenox-dired-winstart]': win-start the current line's file."
@@ -1331,7 +1331,7 @@ Otherwise return word around point."
                (when (and (locate-library "flyspell") (eq flyspell-mode nil))
                  (flyspell-mode t)))))
 
-;;; Java [malabar-mode]
+;;; Java (malabar-mode)
 ;; git clone git://github.com/espenhw/malabar-mode.git または
 ;; git clone https://github.com/buzztaiki/malabar-mode.git
 ;; mvn -Dmaven.test.skip=true package
@@ -1379,10 +1379,11 @@ Otherwise return word around point."
                  (semantic-mode 1)
                  (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
 
-;;; Java [ajc-java-complete]
+;;; Java (ajc-java-complete)
 ;; git clone git://github.com/jixiuf/ajc-java-complete.git
-;; JAVA_HOME="/usr/lib/jvm/java-6-sun"
-;; CLASSPATH=".:$JAVA_HOME/lib"
+;; (install-elisp "https://github.com/jixiuf/ajc-java-complete/raw/0.2.8/popup.el")
+;; JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
+;; CLASSPATH=.:$JAVAHOME/jre/lib:$JAVAHOME/lib:$JAVA_HOME/lib/tools.jar
 ;; export JAVA_HOME CLASSPATH
 ;; javac Tags.java
 ;; java Tags

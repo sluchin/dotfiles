@@ -16,7 +16,6 @@ dotfiles
   - auto-complete  
   - yasnippet  
   - yasnippet-java-mode  
-  - malabar-mode  
   - ajc-java-complete  
 
 
