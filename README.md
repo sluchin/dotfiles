@@ -10,9 +10,14 @@ dotfiles
   - magit  
   - bm  
   - emacs-w3m  
-  - twittering-mode
-  - evernote-mode
-  - gist
+  - twittering-mode  
+  - evernote-mode  
+  - gist  
+  - auto-complete  
+  - yasnippet  
+  - yasnippet-java-mode  
+  - malabar-mode  
+  - ajc-java-complete  
 
 
 
