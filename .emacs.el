@@ -830,6 +830,11 @@
   (when (fboundp 'umemo-initialize)
     (umemo-initialize)))
 
+;;; プロセスリスト
+;; (install-elisp-from-emacswiki "list-processes+.el")
+(when (locate-library "list-processes+")
+  (autoload 'list-processes+ "list-processes+" "A enhance list processes command." t))
+
 ;;; git の設定
 ;; git clone git://github.com/magit/magit.git
 ;; とりあえず, Windows では使わない
@@ -912,12 +917,17 @@
 ;;; メール
 ;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
 ;; sudo apt-get install mew mew-bin stunnel4
+;; Emacs 23 の場合
+;; (install-elisp-from-emacswiki "notify.el")
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
   (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
   (add-hook 'mew-summary-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+  (add-hook 'mew-message-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+  (when (locate-library "notify")
+    (autoload 'notify "notify" "Notify TITLE, BODY."))
   (eval-after-load "mew"
     '(progn
        (when (boundp 'mail-user-agent)
@@ -973,22 +983,28 @@
        ;; モードラインにアイコンとメールの数を表示する
        (defvar mew-mode-line-biff-icon "")
        (defvar mew-mode-line-biff-string "")
+       (defvar mew-mode-line-biff-quantity 0)
        (when (boundp 'mew-biff-function)
          (setq mew-biff-function
                '(lambda (n)
                   (if (= n 0)
                       (mew-biff-clear)
-                    (if (version< "24.0.0" emacs-version)
-                        (notifications-notify
-                         :title "Emacs/Mew"
-                         :body  (format "You got mail(s): %i" n)
-                         :timeout 5000))
+                    (when (< mew-mode-line-biff-quantity n) ; メール数が増えた場合
+                      (if (version< "24.0.0" emacs-version)
+                          (notifications-notify
+                           :title "Emacs/Mew"
+                           :body  (format "You got mail(s): %i" n)
+                           :timeout 5000)
+                        (when (locate-library "notify")
+                          (notify "Emacs/Mew" (format "You got mail(s): %i" n)))))
                     (setq mew-mode-line-biff-icon " ")
-                    (setq mew-mode-line-biff-string (format "(%d)" n))))))
+                    (setq mew-mode-line-biff-string (format "(%d)" n))
+                    (setq mew-mode-line-biff-quantity n)))))
 
        (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
          (setq mew-mode-line-biff-icon "")
-         (setq mew-mode-line-biff-string ""))
+         (setq mew-mode-line-biff-string "")
+         (setq mew-mode-line-biff-quantity 0))
 
        (add-to-list
         'default-mode-line-format
@@ -1001,7 +1017,7 @@
                              'face
                              '(:foreground "white" :background "DeepPink1")))))
 
-       ;; IMAP の設定
+    ;; IMAP の設定
        (when (boundp 'mew-proto)
          (setq mew-proto "%"))
        ;; 送信メールを保存する
@@ -1331,54 +1347,6 @@ Otherwise return word around point."
                (when (and (locate-library "flyspell") (eq flyspell-mode nil))
                  (flyspell-mode t)))))
 
-;;; Java (malabar-mode)
-;; git clone git://github.com/espenhw/malabar-mode.git または
-;; git clone https://github.com/buzztaiki/malabar-mode.git
-;; mvn -Dmaven.test.skip=true package
-;; unzip target/malabar-1.5-SNAPSHOT-dist.zip
-;; git clone https://github.com/nekop/yasnippet-java-mode.git
-(when (eval-and-compile (require 'malabar-mode nil t))
-  (defun enable-malabar ()
-    "Do enable malabar-mode"
-    (interactive)
-    (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
-    ;;(semantic-load-enable-minimum-features)
-    (when (boundp 'malabar-groovy-lib-dir)
-      (setq malabar-groovy-lib-dir
-            (concat user-emacs-directory
-                    "/malabar-mode/target/malabar-1.5-SNAPSHOT/lib")))
-    ;; 日本語だとコンパイルエラーメッセージが化けるので language を en に設定
-    (when (boundp 'malabar-groovy-java-options)
-      (setq malabar-groovy-java-options '("-Duser.language=en")))
-    ;; 普段使わないパッケージを import 候補から除外
-    (when (boundp 'malabar-import-excluded-classes-regexp-list)
-      (setq malabar-import-excluded-classes-regexp-list
-            (append
-             '("^java\\.awt\\..*$"
-               "^com\\.sun\\..*$"
-               "^org\\.omg\\..*$")
-             malabar-import-excluded-classes-regexp-list)))
-
-    (add-hook 'malabar-mode-hook
-              '(lambda ()
-                 (c-set-style "java")
-                 (setq c-auto-newline t)
-                 (enable-cedet)
-                 (when (eval-and-compile (require 'yasnippet nil t))
-                   (when (fboundp 'yas--initialize)
-                     (yas--initialize))
-                   (when (boundp 'yas-snippet-dirs)
-                     (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                                              "~/.emacs.d/yasnippet/snippets"
-                                              "~/.emacs.d/yasnippet-java-mode"))
-                     (mapc 'yas-load-directory yas-snippet-dirs)))
-                 (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
-                                                   global-semanticdb-minor-mode
-                                                   global-semantic-idle-summary-mode
-                                                   global-semantic-mru-bookmark-mode))
-                 (semantic-mode 1)
-                 (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
-
 ;;; Java (ajc-java-complete)
 ;; git clone git://github.com/jixiuf/ajc-java-complete.git
 ;; (install-elisp "https://github.com/jixiuf/ajc-java-complete/raw/0.2.8/popup.el")
@@ -1405,16 +1373,69 @@ Otherwise return word around point."
                                  "~/.emacs.d/yasnippet-java-mode"))
         (mapc 'yas-load-directory yas-snippet-dirs)))
 
-    (when (boundp 'ajc-tag-file)
-      (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag"))
     (add-hook 'java-mode-hook
               '(lambda ()
-                 (ajc-java-complete-mode)
                  (c-set-style "java")
                  (setq c-auto-newline t)
+                 (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")
+                 (ajc-java-complete-mode)
                  (setq compile-command
                        (concat "javac "
                                (file-name-nondirectory (buffer-file-name))))))))
+
+;;; Java (malabar-mode)
+;; git clone git://github.com/espenhw/malabar-mode.git または
+;; git clone https://github.com/buzztaiki/malabar-mode.git
+;; mvn -Dmaven.test.skip=true package
+;; unzip target/malabar-1.5-SNAPSHOT-dist.zip
+;; git clone https://github.com/nekop/yasnippet-java-mode.git
+(when (eval-and-compile (require 'malabar-mode nil t))
+  (defun enable-malabar-mode ()
+    "Do enable malabar-mode"
+    (interactive)
+    (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
+    ;;(semantic-load-enable-minimum-features)
+    (when (boundp 'malabar-groovy-lib-dir)
+      (setq malabar-groovy-lib-dir
+            (concat user-emacs-directory
+                    "/malabar-mode/target/malabar-1.5-SNAPSHOT/lib")))
+    ;; 日本語だとコンパイルエラーメッセージが化けるので language を en に設定
+    (when (boundp 'malabar-groovy-java-options)
+      (setq malabar-groovy-java-options '("-Duser.language=en")))
+    ;; 普段使わないパッケージを import 候補から除外
+    (when (boundp 'malabar-import-excluded-classes-regexp-list)
+      (setq malabar-import-excluded-classes-regexp-list
+            (append
+             '("^java\\.awt\\..*$"
+               "^com\\.sun\\..*$"
+               "^org\\.omg\\..*$")
+             malabar-import-excluded-classes-regexp-list)))
+    (when (eval-and-compile (require 'yasnippet nil t))
+      (when (fboundp 'yas--initialize)
+        (yas--initialize))
+      (when (boundp 'yas-snippet-dirs)
+        (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                                 "~/.emacs.d/yasnippet/snippets"
+                                 "~/.emacs.d/yasnippet-java-mode"))
+        (mapc 'yas-load-directory yas-snippet-dirs)))
+
+    (add-hook 'malabar-mode-hook
+              '(lambda ()
+                 (c-set-style "java")
+                 (setq c-auto-newline t)
+                 (enable-cedet)
+                 (when (eval-and-compile (and (require 'auto-complete nil t)
+                                              (require 'yasnippet nil t)
+                                              (fboundp 'ac-define-source)
+                                              (require 'ajc-java-complete-config nil t)))
+                   (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")
+                   (ajc-java-complete-mode))
+                 (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
+                                                   global-semanticdb-minor-mode
+                                                   global-semantic-idle-summary-mode
+                                                   global-semantic-mru-bookmark-mode))
+                 (semantic-mode t)
+                 (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
 
 ;;; ここまで各種言語設定
 
