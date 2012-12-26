@@ -48,7 +48,7 @@
                 "~/.emacs.d/auto-complete"
                 "~/.emacs.d/auto-complete-clang"
                 "~/.emacs.d/ajc-java-complete"
-                "~/.emacs.d/malabar-mode/target/malabar-1.5-SNAPSHOT/lisp"
+                "~/.emacs.d/malabar-mode/lisp"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -1347,7 +1347,8 @@ Otherwise return word around point."
                (when (and (locate-library "flyspell") (eq flyspell-mode nil))
                  (flyspell-mode t)))))
 
-;;; Java (ajc-java-complete)
+;;; Java
+;; ajc-java-complete
 ;; git clone git://github.com/jixiuf/ajc-java-complete.git
 ;; (install-elisp "https://github.com/jixiuf/ajc-java-complete/raw/0.2.8/popup.el")
 ;; JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
@@ -1383,7 +1384,7 @@ Otherwise return word around point."
                        (concat "javac "
                                (file-name-nondirectory (buffer-file-name))))))))
 
-;;; Java (malabar-mode)
+;; malabar-mode
 ;; git clone git://github.com/espenhw/malabar-mode.git または
 ;; git clone https://github.com/buzztaiki/malabar-mode.git
 ;; mvn -Dmaven.test.skip=true package
@@ -1396,9 +1397,7 @@ Otherwise return word around point."
     (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
     ;;(semantic-load-enable-minimum-features)
     (when (boundp 'malabar-groovy-lib-dir)
-      (setq malabar-groovy-lib-dir
-            (concat user-emacs-directory
-                    "/malabar-mode/target/malabar-1.5-SNAPSHOT/lib")))
+      (setq malabar-groovy-lib-dir (concat user-emacs-directory "/malabar-mode/lib")))
     ;; 日本語だとコンパイルエラーメッセージが化けるので language を en に設定
     (when (boundp 'malabar-groovy-java-options)
       (setq malabar-groovy-java-options '("-Duser.language=en")))
@@ -1428,8 +1427,10 @@ Otherwise return word around point."
                                               (require 'yasnippet nil t)
                                               (fboundp 'ac-define-source)
                                               (require 'ajc-java-complete-config nil t)))
-                   (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")
-                   (ajc-java-complete-mode))
+                   (when (boundp ajc-tag-file)
+                     (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag"))
+                   (when (fboundp ajc-java-complete-mode)
+                     (ajc-java-complete-mode)))
                  (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
                                                    global-semanticdb-minor-mode
                                                    global-semantic-idle-summary-mode
