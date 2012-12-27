@@ -1427,9 +1427,11 @@ Otherwise return word around point."
                                               (require 'yasnippet nil t)
                                               (fboundp 'ac-define-source)
                                               (require 'ajc-java-complete-config nil t)))
-                   (when (boundp ajc-tag-file)
-                     (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag"))
-                   (when (fboundp ajc-java-complete-mode)
+                   (when (boundp 'ajc-tag-file)
+                     (if (file-readable-p "~/.java_base.tag")
+                         (setq ajc-tag-file ".java_base.tag")
+                       (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+                   (when (fboundp 'ajc-java-complete-mode)
                      (ajc-java-complete-mode)))
                  (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
                                                    global-semanticdb-minor-mode
