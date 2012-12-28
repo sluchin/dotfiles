@@ -2,9 +2,10 @@
 ;;; Emacs 初期化ファイル
 
 ;;; バージョン
+;; 2012-12-28
+;; GNU Emacs 24.2.1 (i686-pc-linux-gnu, GTK+ Version 2.24.10)
+;; 2012-11-27
 ;; GNU Emacs 23.3.1 (i686-pc-linux-gnu, GTK+ Version 2.24.10)
-;;  of 2012-09-22 on akateko, modified by Debian
-;;  Copyright (C) 2011 Free Software Foundation, Inc.
 
 ;;; 設定を読み込まない起動オプション
 ;; emacs23 -q --no-site-file
@@ -23,6 +24,13 @@
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
+(when (eq system-type 'gnu/linux)
+  (setq load-path
+        (append '(
+                  "/usr/share/emacs/site-lisp/mew"
+                  "/usr/share/emacs/site-lisp/global"
+                  "/usr/share/emacs/site-lisp/dictionaries-common"
+                  ) load-path)))
 (setq load-path
       (append '(
                 "~/.emacs.d"
@@ -35,7 +43,6 @@
                 "~/.emacs.d/evernote-mode"
                 "~/.emacs.d/bm"
                 "~/.emacs.d/elpa"
-                "~/.emacs.d/elpa/eieio-1.4"
                 "~/.emacs.d/elpa/gh-0.5.3"
                 "~/.emacs.d/elpa/gist-1.0.2"
                 "~/.emacs.d/elpa/logito-0.1"
@@ -127,8 +134,7 @@
 
 ;;; タイトルバーにフルパス名を表示
 (when window-system
-  (when (eval-when-compile (require 'mew nil t))
-    (setq frame-title-format '("%f"))))
+  (setq frame-title-format '("%f")))
 
 ;;; モードライン
 ;; 色の設定
@@ -146,7 +152,7 @@
 
 ;; 関数名表示
 (when (eval-and-compile (require 'which-func nil t))
-  (which-func-mode t)
+  (which-function-mode t)
   (setq which-func-modes t))
 (set-face-foreground 'which-func "blue")
 (set-face-background 'which-func "orange")
@@ -156,10 +162,10 @@
 ;; 関数名表示をトグルする
 (defun toggle-which-func-mode ()
   (interactive)
-  (which-func-mode)
+  (which-function-mode)
   (if which-func-mode
       (setq-default header-line-format
-                    '(which-func-mode ("" which-func-format)))
+                    '(which-function-mode ("" which-func-format)))
     (setq-default header-line-format nil)))
 (define-key global-map (kbd "<f9>") 'toggle-which-func-mode)
 
@@ -170,8 +176,8 @@
               (count-lines (region-beginning) (region-end))
               (- (region-end) (region-beginning)))
     ""))
-(add-to-list 'default-mode-line-format
-             '(:eval (count-lines-and-chars)))
+(setq-default mode-line-format
+              (cons '(:eval (count-lines-and-chars)) mode-line-format))
 
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
@@ -256,6 +262,8 @@
 ;;; 行末の空白を強調表示
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "red")
+(add-hook 'fundamental-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'calendar-mode-hook (lambda () (setq show-trailing-whitespace nil)))
 
 ;;; isearch リージョンで検索する
 (defadvice isearch-mode
@@ -764,10 +772,12 @@
 ;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
 ;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
 (when (eval-and-compile (require 'skk nil t))
-  (when (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.L")
+  (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.L")
+             (boundp 'skk-large-jisyo))
     (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
   (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.KAO")
-             (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH"))
+             (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH")
+             (boundp 'skk-search-prog-list))
     (add-to-list 'skk-search-prog-list
                  '(skk-search-jisyo-file skk-jisyo 0 t) t)
     (add-to-list 'skk-search-prog-list
@@ -777,9 +787,11 @@
 
   ;; skk 用の sticky キー設定
   ;; 一般的には `;' だが Paren モードが効かなくなる
-  (setq skk-sticky-key (kbd "TAB"))
+  (when (boundp 'skk-sticky-key)
+    (setq skk-sticky-key (kbd "TAB")))
   ;; インライン候補縦表示
-  (setq skk-show-inline 'vertical)
+  (when (boundp 'skk-show-inline)
+    (setq skk-show-inline 'vertical))
   (define-key global-map (kbd "C-\\") 'skk-mode))
 
 ;;; 試行錯誤用ファイル
@@ -833,7 +845,8 @@
 ;;; プロセスリスト
 ;; (install-elisp-from-emacswiki "list-processes+.el")
 (when (locate-library "list-processes+")
-  (autoload 'list-processes+ "list-processes+" "A enhance list processes command." t))
+  (autoload 'list-processes+ "list-processes+" "A enhance list processes command." t)
+  (defalias 'list-proc 'list-processes+))
 
 ;;; git の設定
 ;; git clone git://github.com/magit/magit.git
@@ -926,8 +939,12 @@
   (setq read-mail-command 'mew)
   (add-hook 'mew-summary-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (add-hook 'mew-message-mode-hook (lambda () (setq show-trailing-whitespace nil)))
-  (when (locate-library "notify")
-    (autoload 'notify "notify" "Notify TITLE, BODY."))
+  (add-hook 'mew-virtual-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+  (if (version< "24.0.0" emacs-version)
+      (when (locate-library "notifications")
+        (autoload 'notifications-notify "notifications" "Notify TITLE, BODY."))
+    (when (locate-library "notify")
+      (autoload 'notify "notify" "Notify TITLE, BODY.")))
   (eval-after-load "mew"
     '(progn
        (when (boundp 'mail-user-agent)
@@ -993,10 +1010,10 @@
                       (if (version< "24.0.0" emacs-version)
                           (notifications-notify
                            :title "Emacs/Mew"
-                           :body  (format "You got mail(s): %i" n)
+                           :body  (format "You got mail(s): %d" n)
                            :timeout 5000)
                         (when (locate-library "notify")
-                          (notify "Emacs/Mew" (format "You got mail(s): %i" n)))))
+                          (notify "Emacs/Mew" (format "You got mail(s): %d" n)))))
                     (setq mew-mode-line-biff-icon " ")
                     (setq mew-mode-line-biff-string (format "(%d)" n))
                     (setq mew-mode-line-biff-quantity n)))))
@@ -1006,18 +1023,19 @@
          (setq mew-mode-line-biff-string "")
          (setq mew-mode-line-biff-quantity 0))
 
-       (add-to-list
-        'default-mode-line-format
-        '(:eval (concat
-                 (propertize mew-mode-line-biff-icon
-                             'display display-time-mail-icon
-                             'face
-                             '(:foreground "white" :background "DeepPink1"))
-                 (propertize mew-mode-line-biff-string
-                             'face
-                             '(:foreground "white" :background "DeepPink1")))))
+       (setq-default
+        mode-line-format
+        (cons '(:eval (concat
+                       (propertize mew-mode-line-biff-icon
+                                   'display display-time-mail-icon
+                                   'face
+                                   '(:foreground "white" :background "DeepPink1"))
+                       (propertize mew-mode-line-biff-string
+                                   'face
+                                   '(:foreground "white" :background "DeepPink1"))))
+              mode-line-format))
 
-    ;; IMAP の設定
+       ;; IMAP の設定
        (when (boundp 'mew-proto)
          (setq mew-proto "%"))
        ;; 送信メールを保存する
@@ -1078,7 +1096,7 @@
 ;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
-(defun w3m-prompt-input ()
+(defun w3m-wiki-prompt-input ()
   "Prompt input object for translate."
   (read-string (format "Search wikipedia (%s): " (or (w3m-region-or-word) ""))
                nil nil
@@ -1118,7 +1136,7 @@ Otherwise return word around point."
     (defun w3m-search-wikipedia (&optional query)
       "Search at wikipedia in w3m"
       (interactive)
-      (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-prompt-input))) t))
+      (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-wiki-prompt-input))) t))
     (define-key global-map (kbd "C-c p") 'w3m-search-wikipedia))
 
   (eval-after-load "w3m"
@@ -1216,7 +1234,7 @@ Otherwise return word around point."
 
 ;;; ここまで拡張 lisp
 
-;;; ここから各種言語設定
+;;; ここからプログラミング用設定
 
 ;;; テンプレート挿入
 (when (eval-and-compile (require 'autoinsert nil t))
@@ -1358,13 +1376,13 @@ Otherwise return word around point."
 ;; java Tags
 ;; bunzip2 java_base.tag.bz2
 ;; bunzip2 java_base2.tag.bz2
-(when (eval-and-compile (and (require 'auto-complete nil t)
-                             (require 'yasnippet nil t)
-                             (fboundp 'ac-define-source)
-                             (require 'ajc-java-complete-config nil t)))
-  (defun enable-ajc-java-complete ()
-    "Do enable ajc-java-complete"
-    (interactive)
+(defun enable-ajc-java-complete ()
+  "Do enable ajc-java-complete"
+  (interactive)
+  (when (eval-and-compile (and (require 'auto-complete nil t)
+                               (require 'yasnippet nil t)
+                               (fboundp 'ac-define-source)
+                               (require 'ajc-java-complete-config nil t)))
     (when (eval-and-compile (require 'yasnippet nil t))
       (when (fboundp 'yas--initialize)
         (yas--initialize))
@@ -1378,8 +1396,12 @@ Otherwise return word around point."
               '(lambda ()
                  (c-set-style "java")
                  (setq c-auto-newline t)
-                 (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")
-                 (ajc-java-complete-mode)
+                 (when (boundp 'ajc-tag-file)
+                   (if (file-readable-p "~/.java_base.tag")
+                       (setq ajc-tag-file "~/.java_base.tag")
+                     (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+                 (when (fboundp 'acj-java-complete-mode)
+                   (ajc-java-complete-mode))
                  (setq compile-command
                        (concat "javac "
                                (file-name-nondirectory (buffer-file-name))))))))
@@ -1390,10 +1412,10 @@ Otherwise return word around point."
 ;; mvn -Dmaven.test.skip=true package
 ;; unzip target/malabar-1.5-SNAPSHOT-dist.zip
 ;; git clone https://github.com/nekop/yasnippet-java-mode.git
-(when (eval-and-compile (require 'malabar-mode nil t))
-  (defun enable-malabar-mode ()
-    "Do enable malabar-mode"
-    (interactive)
+(defun enable-malabar-mode ()
+  "Do enable malabar-mode"
+  (interactive)
+  (when (eval-and-compile (require 'malabar-mode nil t))
     (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
     ;;(semantic-load-enable-minimum-features)
     (when (boundp 'malabar-groovy-lib-dir)
@@ -1429,7 +1451,7 @@ Otherwise return word around point."
                                               (require 'ajc-java-complete-config nil t)))
                    (when (boundp 'ajc-tag-file)
                      (if (file-readable-p "~/.java_base.tag")
-                         (setq ajc-tag-file ".java_base.tag")
+                         (setq ajc-tag-file "~/.java_base.tag")
                        (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
                    (when (fboundp 'ajc-java-complete-mode)
                      (ajc-java-complete-mode)))
@@ -1440,7 +1462,7 @@ Otherwise return word around point."
                  (semantic-mode t)
                  (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
 
-;;; ここまで各種言語設定
+;;; ここまでプログラミング用設定
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
