@@ -447,7 +447,42 @@
               (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
                 (w3m-find-file file))
             (message "%s is a directory" file))))
-      (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file))))
+      (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
+  ;; tar.gz で圧縮
+  (when (and (executable-find "tar") (executable-find "gzip"))
+    (defun dired-do-tar-cvzf (arg)
+      "Do tar command"
+      (interactive "P")
+      (let ((files (dired-get-marked-files t current-prefix-arg))
+            (output-filename (let ((string (read-string "Output filename: ")))
+                               ;; 拡張子を入力してなかったら, それを付加する.
+                               (if (or (string-match
+                                        "\\(\\.tar\\.gz\\)\\|\\(\\.tgz\\)$" string)
+                                       (string= "" string))
+                                   string
+                                 (concat string ".tar.gz")))))
+        (or (if (string= "" output-filename)
+                ;; 出力ファイル名が入力されていなかったらエラーとする
+                (progn
+                  (message "Output filename is empty.")
+                  t))
+            (if (string-match "/" output-filename)
+                ;; UNIX ではファイル名に / は使えない
+                (progn
+                  (message "The / cannot be used for the filename with UNIX.")
+                  t))
+            (if (member output-filename (directory-files default-directory))
+                ;; 出力ファイル名と同じ名前のファイルが既にあった場合, 上書きするか問い合わせる
+                (not (y-or-n-p (concat "file "
+                                       output-filename
+                                       " exists. overwrite the file ?"))))
+            (if arg
+                ;; 実際に圧縮をする.
+                (dired-do-shell-command
+                 (concat "tar cvzf " output-filename " *") nil files)
+              (dired-do-shell-command
+               (concat "tar cvzf " output-filename " *") nil files)))))
+    (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-cvzf)))
 
 ;;; 関数のアウトライン表示
 (when (eval-and-compile (require 'speedbar nil t))
