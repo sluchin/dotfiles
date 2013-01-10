@@ -448,41 +448,25 @@
                 (w3m-find-file file))
             (message "%s is a directory" file))))
       (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
-  ;; tar.gz で圧縮
+  ;; tar + gzip で圧縮
   (when (and (executable-find "tar") (executable-find "gzip"))
-    (defun dired-do-tar-cvzf (arg)
-      "Do tar command"
+    (defun dired-do-tar-gzip (arg)
+      "Execute tar and gzip command"
       (interactive "P")
-      (let ((files (dired-get-marked-files t current-prefix-arg))
-            (output-filename (let ((string (read-string "Output filename: ")))
-                               ;; 拡張子を入力してなかったら, それを付加する.
-                               (if (or (string-match
-                                        "\\(\\.tar\\.gz\\)\\|\\(\\.tgz\\)$" string)
-                                       (string= "" string))
-                                   string
-                                 (concat string ".tar.gz")))))
-        (or (if (string= "" output-filename)
-                ;; 出力ファイル名が入力されていなかったらエラーとする
-                (progn
-                  (message "Output filename is empty.")
-                  t))
-            (if (string-match "/" output-filename)
-                ;; UNIX ではファイル名に / は使えない
-                (progn
-                  (message "The / cannot be used for the filename with UNIX.")
-                  t))
-            (if (member output-filename (directory-files default-directory))
-                ;; 出力ファイル名と同じ名前のファイルが既にあった場合, 上書きするか問い合わせる
-                (not (y-or-n-p (concat "file "
-                                       output-filename
-                                       " exists. overwrite the file ?"))))
-            (if arg
-                ;; 実際に圧縮をする.
-                (dired-do-shell-command
-                 (concat "tar cvzf " output-filename " *") nil files)
-              (dired-do-shell-command
-               (concat "tar cvzf " output-filename " *") nil files)))))
-    (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-cvzf)))
+      (let ((files (dired-get-marked-files t current-prefix-arg)))
+        (let ((filename (read-string (concat "Filename(" (car files) ".tar.gz): "))))
+          (when (string= "" filename)
+            (setq filename (concat (car files) ".tar.gz")))
+          (when (not (string-match
+                      "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" filename))
+            (setq filename (concat filename ".tar.gz"))) ; 拡張子追加
+          (or (when (member filename (directory-files default-directory))
+                (not (y-or-n-p
+                      (concat "Overwrite `" filename "'? [Type yn]")))) ; 同名ファイル
+              (when (not (dired-do-shell-command
+                          (concat "tar cfz " filename " *") nil files))
+                (message (concat "Execute tar command to `" filename "'...done")))))))
+    (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
 
 ;;; 関数のアウトライン表示
 (when (eval-and-compile (require 'speedbar nil t))
@@ -1407,10 +1391,8 @@ Otherwise return word around point."
 ;; JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
 ;; CLASSPATH=.:$JAVAHOME/jre/lib:$JAVAHOME/lib:$JAVA_HOME/lib/tools.jar
 ;; export JAVA_HOME CLASSPATH
-;; javac Tags.java
-;; java Tags
+;; javac Tags.java;java Tags または
 ;; bunzip2 java_base.tag.bz2
-;; bunzip2 java_base2.tag.bz2
 (defun enable-ajc-java-complete ()
   "Do enable ajc-java-complete"
   (interactive)
