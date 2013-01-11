@@ -987,6 +987,10 @@
                        (goto-char (point-max))
                        (insert-file "~/.signature")
                        (goto-char p)))))
+       ;; Summary モードの書式変更
+       (when (boundp 'mew-summary-form)
+           (setq mew-summary-form
+                 '(type (5 date) "-" (-4 time) " " (14 from) " " t (30 subj) "|" (0 body))))
        ;; スレッドの親子関係を罫線を使って可視化
        (when (boundp 'mew-use-fancy-thread)
          (setq mew-use-fancy-thread t))
