@@ -56,6 +56,8 @@
                 "~/.emacs.d/auto-complete-clang"
                 "~/.emacs.d/ajc-java-complete"
                 "~/.emacs.d/malabar-mode/lisp"
+                "~/.emacs.d/tomatinho"
+                "~/.emacs.d/pomodoro"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -113,7 +115,10 @@
 ;; 高さ (frame-height)
 (when window-system
   ;; 起動時のフレームサイス
-  (set-frame-size (selected-frame) 110 70)
+  ;; 自宅のデュアルディスプレイの小さい方に合わせるため
+  (if (= (x-display-pixel-height) 900)
+      (set-frame-size (selected-frame) 110 50)
+    (set-frame-size (selected-frame) 110 70))
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
     "Resize frame interactively"
@@ -172,12 +177,13 @@
 ;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
   (if mark-active
-      (format "[%d lines, %d counts]"
+      (format " %dL %dC "
               (count-lines (region-beginning) (region-end))
               (- (region-end) (region-beginning)))
     ""))
-(setq-default mode-line-format
-              (cons '(:eval (count-lines-and-chars)) mode-line-format))
+(unless (member '(:eval (count-lines-and-chars)) mode-line-format)
+  (setq-default mode-line-format
+                (cons '(:eval (count-lines-and-chars)) mode-line-format)))
 
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
@@ -867,6 +873,68 @@
   (autoload 'list-processes+ "list-processes+" "A enhance list processes command." t)
   (defalias 'list-proc 'list-processes+))
 
+;;; ポモドーロ
+;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
+;; (install-elisp "https://raw.github.com/krick/tea-time/master/tea-time.el")
+;; git clone git://github.com/konr/tomatinho.git
+(when (locate-library "pomodoro-technique")
+  (autoload 'pomodoro "pomodoro-technique" "Pomodoro technique timer for emacs.")
+  (eval-after-load "pomodoro-technique"
+    '(progn
+       )))
+
+(when (locate-library "pomodoro")
+  (autoload 'pomodoro:start "pomodoro" "Pomodoro Technique for emacs." t)
+  (eval-after-load "pomodoro"
+    '(progn
+       ;; 作業時間終了後に開くファイル。デフォルトでは "~/.emacs.d/pomodoro.org"
+       (when (boundp 'pomodoro:file)
+         (setq pomodoro:file "~/gtd/pomodoro.org"))
+       ;; 作業時間
+       (when (boundp 'pomodoro:work-time)
+         (setq pomodoro:work-time 25))
+       (when (boundp 'pomodoro:rest-time)
+         (setq pomodoro:rest-time 5))
+       (when (boundp 'pomodoro:long-rest-time)
+         (setq pomodoro:long-rest-time 30)))))
+
+(when (locate-library "tomatinho")
+  (autoload 'tomatinho "tomatinho" "Pomodoro Technique for emacs." t)
+  (eval-after-load "tomatinho"
+    '(progn
+       (when (boundp 'tomatinho-bar-length)
+         (setq tomatinho-bar-length 25))
+       (when (boundp 'tomatinho-pomodoro-length)
+         (setq tomatinho-pomodoro-length 25))           ; 25 分
+       (defvar tomatinho-pomodoro-pause-length 5)       ;  5 分
+       (defvar tomatinho-pomodoro-long-pause-length 20) ; 20 分
+       (defadvice tomatinho-update (after tomatinho-pause-update activate)
+         (let ((type (car tomatinho-current)) (val (cdr tomatinho-current))
+               (l (if (= 0 (mod (+ 1 (length tomatinho-events)) 8)
+                         tomatinho-pomodoro-long-pause-length
+                         tomatinho-pomodoro-pause-length))))
+           (when (and (equal type 'pause) (> val l))
+             (setq tomatinho-events (append tomatinho-events `((pause . ,l))))
+             (setq tomatinho-current '(ok . 0)))))
+       (defun enable-tomatinho-pause ()
+         "Enable tomatinho pause control"
+         (interactive)
+         (ad-enable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
+         (ad-activate 'tomatinho-update))
+       (defun disable-tomatinho-pause ()
+         "Disable tomatinho pause control"
+         (interactive)
+         (ad-disable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
+         (ad-activate 'tomatinho-update)))))
+
+(when (locate-library "tea-time")
+  (autoload 'tea-time "tea-time" "Timer." t)
+  (eval-after-load "tea-time"
+    '(progn
+       (when (and (boundp 'tea-time-sound)
+                  (file-exists-p "~/.emacs.d/tomatinho/tick.wav"))
+             (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav")))))
+
 ;;; git の設定
 ;; git clone git://github.com/magit/magit.git
 ;; とりあえず, Windows では使わない
@@ -876,7 +944,8 @@
     (eval-after-load "magit"
       '(progn
          ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
-         (setq magit-diff-refine-hunk 'all)
+         (when (boundp 'magit-diff-refine-hunk)
+           (setq magit-diff-refine-hunk 'all))
          ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
          (set-face-attribute 'magit-item-highlight nil :inherit nil)
          ;; 色
@@ -1021,14 +1090,27 @@
          (setq mew-auto-get nil))        ; 起動時取得しない
 
        ;; モードラインにアイコンとメールの数を表示する
-       (defvar mew-mode-line-biff-icon "")
-       (defvar mew-mode-line-biff-string "")
+       (defun mew-propertized-biff-icon (fmt)
+         (list (propertize fmt
+                           'display display-time-mail-icon
+                           'face
+                           '(:foreground "white" :background "DeepPink1"))))
+       (defun mew-propertized-biff-string (fmt)
+         (list (propertize fmt
+                           'face
+                           '(:foreground "white" :background "DeepPink1"))))
+       (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
+       (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
        (defvar mew-mode-line-biff-quantity 0)
        (when (boundp 'mew-biff-function)
          (setq mew-biff-function
                '(lambda (n)
                   (if (= n 0)
                       (mew-biff-clear)
+                    (setq mew-mode-line-biff-icon
+                          (mew-propertized-biff-icon " "))
+                    (setq mew-mode-line-biff-string
+                          (mew-propertized-biff-string (format "(%d)" n)))
                     (when (< mew-mode-line-biff-quantity n) ; メール数が増えた場合
                       (if (version< "24.0.0" emacs-version)
                           (notifications-notify
@@ -1036,27 +1118,21 @@
                            :body  (format "You got mail(s): %d" n)
                            :timeout 5000)
                         (when (locate-library "notify")
-                          (notify "Emacs/Mew" (format "You got mail(s): %d" n)))))
-                    (setq mew-mode-line-biff-icon " ")
-                    (setq mew-mode-line-biff-string (format "(%d)" n))
+                          (notify "Emacs/Mew"
+                                  (format "You got mail(s): %d" n)))))
                     (setq mew-mode-line-biff-quantity n)))))
 
        (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
-         (setq mew-mode-line-biff-icon "")
-         (setq mew-mode-line-biff-string "")
+         (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
+         (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
          (setq mew-mode-line-biff-quantity 0))
 
-       (setq-default
-        mode-line-format
-        (cons '(:eval (concat
-                       (propertize mew-mode-line-biff-icon
-                                   'display display-time-mail-icon
-                                   'face
-                                   '(:foreground "white" :background "DeepPink1"))
-                       (propertize mew-mode-line-biff-string
-                                   'face
-                                   '(:foreground "white" :background "DeepPink1"))))
-              mode-line-format))
+       (unless (and (member '(:eval mew-mode-line-biff-icon) mode-line-format)
+                    (member '(:eval mew-mode-line-biff-string) mode-line-format))
+         (setq-default mode-line-format
+                       (cons '(:eval mew-mode-line-biff-string) mode-line-format))
+         (setq-default mode-line-format
+                       (cons '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
        ;; IMAP の設定
        (when (boundp 'mew-proto)
