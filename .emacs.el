@@ -1004,9 +1004,13 @@
 
 ;;; 辞書 (英辞郎の辞書を stardict 用に変換したものを使用する)
 ;; sudo apt-get install sdcv
+;; ~/stardict に辞書を展開
+;; ln -s ~/stardict /usr/share/stardict/dic/eijiro
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el")
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/sdcv.el")
-(when (and (executable-find "sdcv") (locate-library "sdcv"))
+(when (let ((dir  "/usr/share/stardict/dic/eijiro/"))
+        (and (executable-find "sdcv") (locate-library "sdcv")
+             (file-readable-p (concat dir "EIJI127.idx"))))
   (when (eval-and-compile (require 'sdcv nil t))
     (when (boundp 'sdcv-dictionary-simple-list)
       (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
@@ -1016,7 +1020,6 @@
     (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+))) ; ポップアップ
 
 ;;; メール
-;; wget -O- http://www.mew.org/Release/mew-6.5.tar.gz | tar xfz -
 ;; sudo apt-get install mew mew-bin stunnel4
 ;; Emacs 23 の場合
 ;; (install-elisp-from-emacswiki "notify.el")
