@@ -349,7 +349,7 @@
 (define-key global-map (kbd "S-DEL") 'clipboard-kill-region)
 
 ;; クリップボードに貼り付け
-(define-key global-map (kbd "<S-insert>") 'clipboardy-yank)
+(define-key global-map (kbd "<S-insert>") 'clipboard-yank)
 
 ;; C-\の日本語入力の設定を無効にする
 (define-key global-map (kbd "C-\\") nil)
