@@ -1130,10 +1130,10 @@
          (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
          (setq mew-mode-line-biff-quantity 0))
 
-       (unless (and (member '(:eval mew-mode-line-biff-icon) mode-line-format)
-                    (member '(:eval mew-mode-line-biff-string) mode-line-format))
+       (unless (member '(:eval mew-mode-line-biff-string) mode-line-format)
          (setq-default mode-line-format
-                       (cons '(:eval mew-mode-line-biff-string) mode-line-format))
+                       (cons '(:eval mew-mode-line-biff-string) mode-line-format)))
+       (unless (member '(:eval mew-mode-line-biff-icon) mode-line-format)
          (setq-default mode-line-format
                        (cons '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
