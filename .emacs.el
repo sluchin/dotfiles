@@ -217,6 +217,9 @@
 ;;; シンボリックファイルを開く時にいちいち聞かない
 (setq vc-follow-symlinks t)
 
+;;; バッファ自動再読み込み
+(global-auto-revert-mode t)
+
 ;;; ビープ音とフラッシュを消す
 (setq visible-bell t)
 (setq ring-bell-function 'ignore)
