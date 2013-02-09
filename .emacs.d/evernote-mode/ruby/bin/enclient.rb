@@ -426,13 +426,17 @@ module EnClient
 
 
   class AuthCommand < Command
-    attr_accessor :user, :passwd
+    attr_accessor :user, :passwd, :auth_token
 
     def exec_impl
-      Formatter.to_ascii @user, @passwd
+      Formatter.to_ascii @user, @passwd, @auth_token
 
       server_task do
-        sm.authenticate @user, @passwd
+        if @auth_token
+          sm.authenticate_with_token @auth_token
+        else
+          sm.authenticate @user, @passwd
+        end
         LOG.info "Auth successed: auth_token = '#{sm.auth_token}', shared_id = '#{sm.shared_id}'"
         tm.put SyncTask.new(sm, dm, tm)
         server_task true do # defer reply until first sync will be done.
@@ -1172,6 +1176,15 @@ module EnClient
       @user_store = create_user_store
       auth_result = @user_store.authenticate user, passwd, appname, appid
       @auth_token, @shared_id, @expiration = get_session auth_result
+      @note_store = create_note_store @shared_id
+    end
+
+    def authenticate_with_token(token)
+      @user_store = create_user_store
+      user = @user_store.getUser token
+      @auth_token = token
+      @shared_id = user.shardId if user
+      @expiration = 60 * 60 * 24 * 365
       @note_store = create_note_store @shared_id
     end
 

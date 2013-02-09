@@ -1147,20 +1147,17 @@
        (when (boundp 'mew-fcc)
          (setq mew-fcc "%Sent"))
        ;; メールアカウントの設定
-       ;; ~/.emacs.d/conf/mailaccount.el に以下の変数を設定する
-       ;; (when (eval-when-compile (require 'mew nil t))
-       ;;   ;;; メールアドレス
-       ;;   (setq mew-name "User name")
-       ;;   (setq mew-user "User login name")
-       ;;   (setq user-mail-address "Email address")
-       ;;   (setq user-full-name "User name")
-       ;;   (setq mew-mail-domain "Domain name")
-       ;;   ;;; アカウント
-       ;;   (setq mew-imap-user "IMAP account")
-       ;;   (setq mew-imap-server "IMAP server")
-       ;;   (setq mew-smtp-server "SMTP server"))
-       (when (locate-library "mailaccount")
-         (load "mailaccount"))
+       ;; ~/.emacs.d/conf/mail-account.el に以下の変数を設定する
+       ;; (setq mew-name "User name")
+       ;; (setq mew-user "User login name")
+       ;; (setq user-mail-address "Email address")
+       ;; (setq user-full-name "User name")
+       ;; (setq mew-mail-domain "Domain name")
+       ;; (setq mew-imap-user "IMAP account")
+       ;; (setq mew-imap-server "IMAP server")
+       ;; (setq mew-smtp-server "SMTP server")
+       (when (locate-library "mail-account")
+         (load "mail-account"))
        ;; Gmail は SSL接続
        (when (string= "gmail.com" mew-mail-domain)
          (when (boundp 'mew-imap-auth)
@@ -1269,11 +1266,20 @@ Otherwise return word around point."
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
+;; git://github.com/kechako/emacs-evernote-mode-developer-token.git
 ;; sudo gem install -r thrift
-;; sudo ruby ~/.emacs.d/evernote-mode/ruby/setup.rb
+;; cd  ~/.emacs.d/evernote-mode/ruby
+;; sudo ruby setup.rb
 (when (and (executable-find "ruby")
            (executable-find "w3m")
-           (locate-library "evernote-mode"))
+           (locate-library "evernote-mode")
+           (locate-library "evernote-account"))
+  ;; ~/.emacs.d/conf/evernote-account.el に以下の設定をする
+  ;; 以下のURLからデベロッパトークンを取得
+  ;; https://www.evernote.com/api/DeveloperToken.action
+  ;; (setq evernote-username "Username")
+  ;; (setq evernote-developer-token "Developer token")
+  (load "evernote-account")
   (autoload 'evernote-create-note "evernote-mode" "Create an evernote." t)
   (autoload 'evernote-open-note "evernote-mode" "Open a note for evernote." t)
   (autoload 'evernote-write-note "evernote-mode" "Write buffer to an evernote." t)
@@ -1288,8 +1294,9 @@ Otherwise return word around point."
   (define-key global-map (kbd "C-c e b") 'evernote-browser)          ; ブラウザ起動
   (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode) ; 既存ノートを編集
   (eval-after-load "evernote-mode"
-    '(when (boundp 'evernote-enml-formatter-command)
-       (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")))))
+    '(progn
+       (when (boundp 'evernote-enml-formatter-command)
+         (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8"))))))
 
 ;;; Gist (https://github.com/defunkt/gist.el)
 ;; package-install.el をインストール

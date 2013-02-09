@@ -162,6 +162,9 @@
   "*Non-nil means that password cache is enabled.
 It is recommended to encrypt the file with EasyPG.")
 
+(defvar evernote-developer-token nil
+  "*An developer token of your evernote")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Interface for evernote-browsing-mode.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -547,24 +550,26 @@ It is recommended to encrypt the file with EasyPG.")
   "Login"
   (interactive)
   (if (called-interactively-p) (enh-clear-onmem-cache))
-  (unwind-protect
-      (let* ((cache (enh-password-cache-load))
-             (usernames (mapcar #'car cache))
-             (username (or evernote-username
-                           (read-string "Evernote user name:"
-                                        (car usernames) 'usernames)))
-             (cache-passwd (enutil-aget username cache)))
-        (unless (and cache-passwd
-                     (eq (catch 'error 
-                           (progn 
-                             (enh-command-login username cache-passwd)
-                             t))
-                         t))
-          (let* ((passwd (read-passwd "Passwd:")))
-            (enh-command-login username passwd)
-            (setq evernote-username username)
-            (enh-password-cache-save (enutil-aset username cache passwd)))))
-    (enh-password-cache-close)))
+  (if evernote-developer-token
+      (enh-command-login-token evernote-developer-token) 
+    (unwind-protect
+        (let* ((cache (enh-password-cache-load))
+               (usernames (mapcar #'car cache))
+               (username (or evernote-username
+                             (read-string "Evernote user name:"
+                                          (car usernames) 'usernames)))
+               (cache-passwd (enutil-aget username cache)))
+          (unless (and cache-passwd
+                       (eq (catch 'error 
+                             (progn 
+                               (enh-command-login username cache-passwd)
+                               t))
+                           t))
+            (let* ((passwd (read-passwd "Passwd:")))
+              (enh-command-login username passwd)
+              (setq evernote-username username)
+              (enh-password-cache-save (enutil-aset username cache passwd)))))
+      (enh-password-cache-close))))
 
 
 (defun evernote-open-note (&optional ask-notebook)
@@ -1741,6 +1746,14 @@ It is recommended to encrypt the file with EasyPG.")
            (enutil-to-ruby-string "AuthCommand")
            (enutil-to-ruby-string user)
            (enutil-to-ruby-string passwd))))
+
+
+(defun enh-command-login-token (token)
+  "Issue login command"
+  (enh-command-issue
+   (format ":class => %s, :auth_token => %s"
+           (enutil-to-ruby-string "AuthCommand")
+           (enutil-to-ruby-string token))))
 
 
 (defun enh-command-get-notebook-attrs ()
