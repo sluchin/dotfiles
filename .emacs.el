@@ -30,6 +30,7 @@
                   "/usr/share/emacs/site-lisp/mew"
                   "/usr/share/emacs/site-lisp/global"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
+                  "/usr/share/emacs23/site-lisp/ddskk"
                   ) load-path)))
 (setq load-path
       (append '(
@@ -74,6 +75,12 @@
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
+
+;;; 色
+;; reverse video に設定
+(set-face-foreground 'default "white")
+(set-face-background 'default "black")
+(setq frame-background-mode 'dark)
 
 ;;; フォントの設定
 ;; Linux と Windows で変えたほうが見やすい
@@ -1034,11 +1041,13 @@
   (add-hook 'mew-summary-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (add-hook 'mew-message-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (add-hook 'mew-virtual-mode-hook (lambda () (setq show-trailing-whitespace nil)))
-  (if (version< "24.0.0" emacs-version)
-      (when (locate-library "notifications")
-        (autoload 'notifications-notify "notifications" "Notify TITLE, BODY."))
-    (when (locate-library "notify")
-      (autoload 'notify "notify" "Notify TITLE, BODY.")))
+  ;; (if (version< "24.0.0" emacs-version)
+  ;;     (when (locate-library "notifications")
+  ;;       (autoload 'notifications-notify "notifications" "Notify TITLE, BODY."))
+  ;;   (when (locate-library "notify")
+  ;;     (autoload 'notify "notify" "Notify TITLE, BODY.")))
+  ;; bzr trunk の最新をコピー
+  (autoload 'notifications-notify "notifications" "Notify TITLE, BODY.")
   (eval-after-load "mew"
     '(progn
        (when (boundp 'mail-user-agent)
@@ -1091,7 +1100,7 @@
        (when (boundp 'mew-use-biff-bell)
          (setq mew-use-biff-bell nil))   ; ベルを鳴らさない
        (when (boundp 'mew-biff-interval)
-         (setq mew-biff-interval 1))     ; 間隔(分)
+         (setq mew-biff-interval 3))     ; 間隔(分)
        (when (boundp 'mew-auto-get)
          (setq mew-auto-get nil))        ; 起動時取得しない
 
@@ -1118,14 +1127,18 @@
                     (setq mew-mode-line-biff-string
                           (mew-propertized-biff-string (format "(%d)" n)))
                     (when (< mew-mode-line-biff-quantity n) ; メール数が増えた場合
-                      (if (version< "24.0.0" emacs-version)
-                          (notifications-notify
-                           :title "Emacs/Mew"
-                           :body  (format "You got mail(s): %d" n)
-                           :timeout 5000)
-                        (when (locate-library "notify")
-                          (notify "Emacs/Mew"
-                                  (format "You got mail(s): %d" n)))))
+                      ;; (if (version< "24.0.0" emacs-version)
+                      ;;     (notifications-notify
+                      ;;      :title "Emacs/Mew"
+                      ;;      :body  (format "You got mail(s): %d" n)
+                      ;;      :timeout 5000)
+                      ;;   (when (locate-library "notify")
+                      ;;     (notify "Emacs/Mew"
+                      ;;             (format "You got mail(s): %d" n))))
+                      (notifications-notify
+                       :title "Emacs/Mew"
+                       :body  (format "You got mail(s): %d" n)
+                       :timeout 5000))
                     (setq mew-mode-line-biff-quantity n)))))
 
        (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
