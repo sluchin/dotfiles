@@ -124,7 +124,7 @@
   ;; 起動時のフレームサイス
   ;; 自宅のデュアルディスプレイの小さい方に合わせるため
   (if (= (x-display-pixel-height) 900)
-      (set-frame-size (selected-frame) 110 50)
+      (set-frame-size (selected-frame) 110 47)
     (set-frame-size (selected-frame) 110 70))
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
@@ -1032,7 +1032,6 @@
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
 ;; Emacs 23 の場合
-;; (install-elisp-from-emacswiki "notify.el")
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
@@ -1041,12 +1040,7 @@
   (add-hook 'mew-summary-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (add-hook 'mew-message-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (add-hook 'mew-virtual-mode-hook (lambda () (setq show-trailing-whitespace nil)))
-  ;; (if (version< "24.0.0" emacs-version)
-  ;;     (when (locate-library "notifications")
-  ;;       (autoload 'notifications-notify "notifications" "Notify TITLE, BODY."))
-  ;;   (when (locate-library "notify")
-  ;;     (autoload 'notify "notify" "Notify TITLE, BODY.")))
-  ;; bzr trunk の最新をコピー
+  ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY.")
   (eval-after-load "mew"
     '(progn
@@ -1127,14 +1121,6 @@
                     (setq mew-mode-line-biff-string
                           (mew-propertized-biff-string (format "(%d)" n)))
                     (when (< mew-mode-line-biff-quantity n) ; メール数が増えた場合
-                      ;; (if (version< "24.0.0" emacs-version)
-                      ;;     (notifications-notify
-                      ;;      :title "Emacs/Mew"
-                      ;;      :body  (format "You got mail(s): %d" n)
-                      ;;      :timeout 5000)
-                      ;;   (when (locate-library "notify")
-                      ;;     (notify "Emacs/Mew"
-                      ;;             (format "You got mail(s): %d" n))))
                       (notifications-notify
                        :title "Emacs/Mew"
                        :body  (format "You got mail(s): %d" n)
