@@ -278,6 +278,7 @@
 ;;; 行末の空白を強調表示
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "red")
+;; 強調表示しない設定
 (add-hook 'fundamental-mode-hook (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'calendar-mode-hook (lambda () (setq show-trailing-whitespace nil)))
 
@@ -505,7 +506,35 @@
   ;; f6 で起動
   (define-key global-map (kbd "<f6>") 'speedbar))
 
-;;; Ediff Control Panel 専用のフレームを作成しない
+;;; diff-mode
+(when (eval-and-compile (require 'diff nil t))
+  ;; 色
+  (defun diff-mode-setup-faces ()
+    (set-face-attribute 'diff-added nil
+                        :foreground "white"
+                        :background "dark green")
+    (set-face-attribute 'diff-removed nil
+                        :foreground "white"
+                        :background "dark red")
+    (set-face-attribute 'diff-refine-change nil
+                        :foreground nil
+                        :background nil
+                        :weight 'bold
+                        :inverse-video t))
+  (add-hook 'diff-mode-hook 'diff-mode-setup-faces)
+  (add-hook 'diff-mode-hook
+            (lambda ()
+              ;; 色の設定
+              (when (fboundp 'diff-mode-setup-faces)
+                (diff-mode-setup-faces))
+              ;; diff を表示したらすぐに文字単位での強調表示も行う
+              (when (fboundp 'diff-auto-refine-mode)
+                (diff-auto-refine-mode t))
+              ;; 空白の強調表示をしない
+              (when (boundp 'show-trailing-whitespace)
+                (setq show-trailing-whitespace nil)))))
+
+;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
 (when (eval-and-compile (require 'ediff nil t))
   (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -771,7 +800,7 @@
        (when (boundp 'howm-menu-lang)
          (setq howm-menu-lang 'ja))
        (when (boundp 'howm-directory)
-         ;; デュアルブートで Linux と Windows で共有するための設定をする
+         ;; デュアルブートで Linux と Windows で共有するための設定
          (cond ((and (eq system-type 'gnu/linux)
                      (file-directory-p "/dos"))
                 (setq howm-directory "/dos/howm"))
@@ -958,11 +987,9 @@
            (setq magit-diff-refine-hunk 'all))
          ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
          (set-face-attribute 'magit-item-highlight nil :inherit nil)
-         ;; 色
-         (set-face-background 'magit-item-highlight "#202020")
-         (set-face-foreground 'magit-diff-add "#40ff40")
-         (set-face-foreground 'magit-diff-del "#ff4040")
-         (set-face-foreground 'magit-diff-file-header "#4040ff")
+         ;; 色の設定
+         (when (fboundp 'diff-mode-setup-faces)
+           (diff-mode-setup-faces))
          ;; 空白無視をトグルする
          (defun magit-toggle-whitespace ()
            (interactive)
