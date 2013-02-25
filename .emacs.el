@@ -499,29 +499,27 @@
   (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy))
   ;; 拡張子の追加
   (add-hook 'speedbar-mode-hook
-            '(lambda ()
-               (speedbar-add-supported-extension
-                '("js" "as" "html" "css" "php"
-                  "rst" "howm" "org" "ml" "scala" "*"))))
+            (lambda ()
+              (speedbar-add-supported-extension
+               '("js" "as" "html" "css" "php"
+                 "rst" "howm" "org" "ml" "scala" "*"))))
   ;; f6 で起動
   (define-key global-map (kbd "<f6>") 'speedbar))
 
 ;;; diff-mode
+(defun diff-mode-setup-faces ()
+  (set-face-attribute 'diff-added nil
+                      :foreground "white"
+                      :background "dark green")
+  (set-face-attribute 'diff-removed nil
+                      :foreground "white"
+                      :background "dark red")
+  (set-face-attribute 'diff-refine-change nil
+                      :foreground nil
+                      :background nil
+                      :weight 'bold
+                      :inverse-video t))
 (when (eval-and-compile (require 'diff nil t))
-  ;; 色
-  (defun diff-mode-setup-faces ()
-    (set-face-attribute 'diff-added nil
-                        :foreground "white"
-                        :background "dark green")
-    (set-face-attribute 'diff-removed nil
-                        :foreground "white"
-                        :background "dark red")
-    (set-face-attribute 'diff-refine-change nil
-                        :foreground nil
-                        :background nil
-                        :weight 'bold
-                        :inverse-video t))
-  (add-hook 'diff-mode-hook 'diff-mode-setup-faces)
   (add-hook 'diff-mode-hook
             (lambda ()
               ;; 色の設定
@@ -1140,19 +1138,19 @@
        (defvar mew-mode-line-biff-quantity 0)
        (when (boundp 'mew-biff-function)
          (setq mew-biff-function
-               '(lambda (n)
-                  (if (= n 0)
-                      (mew-biff-clear)
-                    (setq mew-mode-line-biff-icon
-                          (mew-propertized-biff-icon " "))
-                    (setq mew-mode-line-biff-string
-                          (mew-propertized-biff-string (format "(%d)" n)))
-                    (when (< mew-mode-line-biff-quantity n) ; メール数が増えた場合
-                      (notifications-notify
-                       :title "Emacs/Mew"
-                       :body  (format "You got mail(s): %d" n)
-                       :timeout 5000))
-                    (setq mew-mode-line-biff-quantity n)))))
+               (lambda (n)
+                 (if (= n 0)
+                     (mew-biff-clear)
+                   (setq mew-mode-line-biff-icon
+                         (mew-propertized-biff-icon " "))
+                   (setq mew-mode-line-biff-string
+                         (mew-propertized-biff-string (format "(%d)" n)))
+                   (when (< mew-mode-line-biff-quantity n) ; メール数が増えた場合
+                     (notifications-notify
+                      :title "Emacs/Mew"
+                      :body  (format "You got mail(s): %d" n)
+                      :timeout 5000))
+                   (setq mew-mode-line-biff-quantity n)))))
 
        (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
          (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
@@ -1413,14 +1411,14 @@ Otherwise return word around point."
     (define-key ac-complete-mode-map (kbd "C-/") 'ac-stop))
   ;; オートコンプリートをトグルする
   (define-key global-map (kbd "<f4>")
-    '(lambda (&optional n)
-       (interactive "P")
-       (if (and ac-auto-start (eq n nil))
-           (setq ac-auto-start nil)
-         (if (eq n nil) ; デフォルト
-             (setq ac-auto-start 3)
-           (setq ac-auto-start n)))
-       (message "ac-auto-start %s" ac-auto-start)))
+    (lambda (&optional n)
+      (interactive "P")
+      (if (and ac-auto-start (eq n nil))
+          (setq ac-auto-start nil)
+        (if (eq n nil) ; デフォルト
+            (setq ac-auto-start 3)
+          (setq ac-auto-start n)))
+      (message "ac-auto-start %s" ac-auto-start)))
 
   (when (fboundp 'ac-config-default)
     (ac-config-default)))
@@ -1451,21 +1449,23 @@ Otherwise return word around point."
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
 ;; clang -cc1 -x c-header stdafx.h -emit-pch -o stdafx.pch
 (add-hook 'c-mode-common-hook
-          '(lambda ()
-             (c-set-style "k&r")
-             (define-key mode-specific-map "c" 'compile)
+          (lambda ()
+            (when (fboundp 'c-set-style)
+              (c-set-style "k&r"))
+            (define-key mode-specific-map "c" 'compile)
 
-             (when (eval-and-compile (and (require 'auto-complete-clang nil t)
-                                          (require 'auto-complete nil t)))
-               (when (boundp 'ac-clang-prefix-header)
-                 (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
-               (when (boundp 'ac-clang-flags)
-                 (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
-               (semantic-mode t)
-               (when (boundp 'ac-sources)
-                 (setq ac-sources (append '(ac-source-clang
-                                            ac-source-semantic)
-                                          ac-sources))))))
+            (when (eval-and-compile (and (require 'auto-complete-clang nil t)
+                                         (require 'auto-complete nil t)))
+              (when (boundp 'ac-clang-prefix-header)
+                (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
+              (when (boundp 'ac-clang-flags)
+                (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
+              (when (fboundp 'semantic-mode)
+                (semantic-mode t))
+              (when (boundp 'ac-sources)
+                (setq ac-sources (append '(ac-source-clang
+                                           ac-source-semantic)
+                                         ac-sources))))))
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
@@ -1481,27 +1481,32 @@ Otherwise return word around point."
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
   (add-hook 'cperl-mode-hook
-            '(lambda ()
-               (progn
-                 (cperl-set-style "PerlStyle")
-                 (when (and (locate-library "anything") (require 'perl-completion nil t))
-                   (add-to-list 'ac-sources 'ac-source-perl-completion)
-                   (when (fboundp 'perl-completion-mode)
-                     (perl-completion-mode t)))
-                 (when (executable-find "perltidy")
-                   (require 'perltidy nil t))
-                 (when (and (locate-library "flymake") (eq flymake-mode nil))
-                   (flymake-mode t))))))
+            (lambda ()
+              (when (fboundp 'cperl-set-style)
+                (cperl-set-style "PerlStyle"))
+              (when (and (locate-library "anything")
+                         (eval-and-compile (require 'perl-completion nil t)))
+                (add-to-list 'ac-sources 'ac-source-perl-completion)
+                (when (fboundp 'perl-completion-mode)
+                  (perl-completion-mode t)))
+              (when (executable-find "perltidy")
+                (require 'perltidy nil t))
+              (when (and (locate-library "flymake")
+                         (eval-and-compile (require 'flymake nil t)))
+                (when (fboundp 'flymake-mode)
+                  (flymake-mode t))))))
 
 ;; Pod
 (when (locate-library "pod-mode")
   (autoload 'pod-mode "pod-mode" "Alternate mode for editing Perl documents" t)
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
   (add-hook 'pod-mode-hook
-            '(lambda ()
-               (auto-fill-mode t)
-               (when (and (locate-library "flyspell") (eq flyspell-mode nil))
-                 (flyspell-mode t)))))
+            (lambda ()
+              (auto-fill-mode t)
+              (when (and (locate-library "flyspell")
+                         (eval-and-compile (require 'flyspell nil t)))
+                (when (fboundp 'flyspell-mode)
+                  (flyspell-mode t))))))
 
 ;;; Java
 ;; ajc-java-complete
@@ -1529,18 +1534,20 @@ Otherwise return word around point."
         (mapc 'yas-load-directory yas-snippet-dirs)))
 
     (add-hook 'java-mode-hook
-              '(lambda ()
-                 (c-set-style "java")
-                 (setq c-auto-newline t)
-                 (when (boundp 'ajc-tag-file)
-                   (if (file-readable-p "~/.java_base.tag")
-                       (setq ajc-tag-file "~/.java_base.tag")
-                     (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
-                 (when (fboundp 'acj-java-complete-mode)
-                   (ajc-java-complete-mode))
-                 (setq compile-command
-                       (concat "javac "
-                               (file-name-nondirectory (buffer-file-name))))))))
+              (lambda ()
+                (when (fboundp 'c-set-style)
+                  (c-set-style "java"))
+                (when (boundp 'c-auto-newline)
+                  (setq c-auto-newline t))
+                (when (boundp 'ajc-tag-file)
+                  (if (file-readable-p "~/.java_base.tag")
+                      (setq ajc-tag-file "~/.java_base.tag")
+                    (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+                (when (fboundp 'acj-java-complete-mode)
+                  (ajc-java-complete-mode))
+                (setq compile-command
+                      (concat "javac "
+                              (file-name-nondirectory (buffer-file-name))))))))
 
 ;; malabar-mode
 ;; git clone git://github.com/espenhw/malabar-mode.git または
@@ -1577,26 +1584,31 @@ Otherwise return word around point."
         (mapc 'yas-load-directory yas-snippet-dirs)))
 
     (add-hook 'malabar-mode-hook
-              '(lambda ()
-                 (c-set-style "java")
-                 (setq c-auto-newline t)
-                 (enable-cedet)
-                 (when (eval-and-compile (and (require 'auto-complete nil t)
-                                              (require 'yasnippet nil t)
-                                              (fboundp 'ac-define-source)
-                                              (require 'ajc-java-complete-config nil t)))
-                   (when (boundp 'ajc-tag-file)
-                     (if (file-readable-p "~/.java_base.tag")
-                         (setq ajc-tag-file "~/.java_base.tag")
-                       (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
-                   (when (fboundp 'ajc-java-complete-mode)
-                     (ajc-java-complete-mode)))
-                 (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
-                                                   global-semanticdb-minor-mode
-                                                   global-semantic-idle-summary-mode
-                                                   global-semantic-mru-bookmark-mode))
-                 (semantic-mode t)
-                 (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
+              (lambda ()
+                (when (fboundp 'c-set-style)
+                  (c-set-style "java"))
+                (when (boundp 'c-auto-newline)
+                  (setq c-auto-newline t))
+                (when (fboundp 'enable-cedet)
+                  (enable-cedet))
+                (when (eval-and-compile (and (require 'auto-complete nil t)
+                                             (require 'yasnippet nil t)
+                                             (fboundp 'ac-define-source)
+                                             (require 'ajc-java-complete-config nil t)))
+                  (when (boundp 'ajc-tag-file)
+                    (if (file-readable-p "~/.java_base.tag")
+                        (setq ajc-tag-file "~/.java_base.tag")
+                      (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+                  (when (fboundp 'ajc-java-complete-mode)
+                    (ajc-java-complete-mode)))
+                (when (boundp 'semantic-default-submodes)
+                  (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
+                                                    global-semanticdb-minor-mode
+                                                    global-semantic-idle-summary-mode
+                                                    global-semantic-mru-bookmark-mode)))
+                (when (fboundp 'semantic-mode)
+                  (semantic-mode t))
+                (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
 
 ;;; ここまでプログラミング用設定
 
