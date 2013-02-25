@@ -1292,7 +1292,7 @@ Otherwise return word around point."
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
 ;; git://github.com/kechako/emacs-evernote-mode-developer-token.git
 ;; sudo gem install -r thrift
-;; cd  ~/.emacs.d/evernote-mode/ruby
+;; cd ~/.emacs.d/evernote-mode/ruby
 ;; sudo ruby setup.rb
 (when (and (executable-find "ruby")
            (executable-find "w3m")
@@ -1502,7 +1502,8 @@ Otherwise return word around point."
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
   (add-hook 'pod-mode-hook
             (lambda ()
-              (auto-fill-mode t)
+              (when (fboundp 'auto-fill-mode)
+                (auto-fill-mode t))
               (when (and (locate-library "flyspell")
                          (eval-and-compile (require 'flyspell nil t)))
                 (when (fboundp 'flyspell-mode)
