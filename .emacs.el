@@ -654,19 +654,30 @@
   (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
 
-;;; カーソル位置印をつけ移動する
+;;; カーソル位置に印をつけ移動する
 ;; git clone git://github.com/joodland/bm.git
 (when (eval-and-compile (require 'bm nil t))
+  ;; マークのセーブ
   (when (boundp 'bm-buffer-persistence)
-    (setq-default bm-buffer-persistence nil))
+    (setq-default bm-buffer-persistence t))
+  ;; セーブファイル名の設定
+  (when (boundp 'bm-repository-file)
+    (setq bm-repository-file "~/.emacs.d/.bm-repository"))
+  ;; 起動時に設定のロード
   (when (boundp 'bm-restore-repository-on-load)
     (setq bm-restore-repository-on-load t))
+  (add-hook 'after-init-hook 'bm-repository-load)
   (add-hook 'find-file-hooks 'bm-buffer-restore)
-  (add-hook 'kill-buffer-hook 'bm-buffer-save)
-  (add-hook 'after-save-hook 'bm-buffer-save)
   (add-hook 'after-revert-hook 'bm-buffer-restore)
+  ;; 設定ファイルのセーブ
+  (add-hook 'kill-buffer-hook 'bm-buffer-save)
+  (add-hook 'auto-save-hook 'bm-buffer-save)
+  (add-hook 'after-save-hook 'bm-buffer-save)
   (add-hook 'vc-before-checkin-hook 'bm-buffer-save)
-  (define-key global-map (kbd "M-SPC") 'bm-toggle)
+  (add-hook 'kill-emacs-hook (lambda nil
+                               (bm-buffer-save-all)
+                               (bm-repository-save)))
+  (define-key global-map (kbd "M-\\") 'bm-toggle)
   (define-key global-map (kbd "M-[") 'bm-previous)
   (define-key global-map (kbd "M-]") 'bm-next))
 
@@ -1222,12 +1233,6 @@
 ;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
-(defun w3m-wiki-prompt-input ()
-  "Prompt input object for translate."
-  (read-string (format "Search wikipedia (%s): " (or (w3m-region-or-word) ""))
-               nil nil
-               (w3m-region-or-word)))
-
 (defun w3m-region-or-word ()
   "Return region or word around point.
 If `mark-active' on, return region string.
@@ -1236,6 +1241,12 @@ Otherwise return word around point."
       (buffer-substring-no-properties
        (region-beginning) (region-end))
     (thing-at-point 'word)))
+
+(defun w3m-wiki-prompt-input ()
+  "Prompt input object for translate."
+  (read-string (format "Search wikipedia (%s): " (or (w3m-region-or-word) ""))
+               nil nil
+               (w3m-region-or-word)))
 
 (when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
