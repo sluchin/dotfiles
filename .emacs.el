@@ -122,8 +122,8 @@
 ;; 高さ (frame-height)
 (when window-system
   ;; 起動時のフレームサイス
-  ;; 自宅のデュアルディスプレイの小さい方に合わせるため
   (if (= (x-display-pixel-height) 900)
+      ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
       (set-frame-size (selected-frame) 110 47)
     (set-frame-size (selected-frame) 110 70))
   ;; フレームサイズを動的に変更する
@@ -495,38 +495,31 @@
   ;; フレームサイズ
   (when (eval-when-compile (require 'speedbar nil t))
     (defun speedbar-frame-adjust ()
-      (set-frame-size (selected-frame) 35 40))
+      (if (= (x-display-pixel-height) 900)
+          ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
+          (set-frame-size (selected-frame) 30 30)
+        (set-frame-size (selected-frame) 30 45)))
     (add-hook 'speedbar-after-create-hook 'speedbar-frame-adjust)
     (setq speedbar-after-create-hook '(speedbar-frame-adjust)))
-  ;; f6 でフォーカス移す
+  ;; フォーカスを移す
+  (define-key global-map (kbd "M-`") 'speedbar-get-focus)
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
   (eval-after-load "speedbar"
     '(progn
        (setq speedbar-use-images nil)
        (setq speedbar-hide-button-brackets-flag t)
        (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy))
-
        (custom-set-variables '(speedbar-frame-parameters
                                '((minibuffer . nil)
-                                 (width . 50)
+                                 (width . 30)
                                  (border-width . 0)
                                  (menu-bar-lines . 0)
                                  (tool-bar-lines . 0)
                                  (unsplittable . t)
                                  (left-fringe . 0))))
-       (dolist (face (list 'speedbar-file-face
-                           'speedbar-directory-face
-                           'speedbar-tag-face
-                           'speedbar-selected-face
-                           'speedbar-highlight-face
-                           'speedbar-button-face))
-         (if (eq system-type 'window-nt)
-             (set-face-attribute face nil :family "Lucida Console" :height 80)
-           (set-face-attribute face nil :family "Monospace" :height 80)))
-
        ;; 拡張子の追加
        (speedbar-add-supported-extension
-        '("js" "as" "html" "css" "php"
+        '("txt" "js" "as" "html" "css" "php"
           "rst" "howm" "org" "ml" "scala" "*"))
 
        ;; "a" で無視ファイル表示/非表示のトグル
@@ -553,22 +546,20 @@
                       :background nil
                       :weight 'bold
                       :inverse-video t))
-(when (eval-and-compile (require 'diff nil t))
+(when (eval-when-compile (require 'diff nil t))
   (add-hook 'diff-mode-hook
             (lambda ()
               ;; 色の設定
-              (when (fboundp 'diff-mode-setup-faces)
-                (diff-mode-setup-faces))
+              (diff-mode-setup-faces)
               ;; diff を表示したらすぐに文字単位での強調表示も行う
               (when (fboundp 'diff-auto-refine-mode)
                 (diff-auto-refine-mode t))
               ;; 空白の強調表示をしない
-              (when (boundp 'show-trailing-whitespace)
-                (setq show-trailing-whitespace nil)))))
+              (setq show-trailing-whitespace nil))))
 
 ;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
-(when (eval-and-compile (require 'ediff nil t))
+(when (eval-when-compile (require 'ediff nil t))
   (setq ediff-window-setup-function 'ediff-setup-windows-plain)
   (setq diff-switches '("-u" "-p" "-N")))
 
