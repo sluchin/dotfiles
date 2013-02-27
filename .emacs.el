@@ -486,25 +486,59 @@
     (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
 
 ;;; 関数のアウトライン表示
-(when (eval-and-compile (require 'speedbar nil t))
-  (setq speedbar-use-images nil)
-  (setq speedbar-frame-parameters '((minibuffer)
-                                    (width . 50)
-                                    (border-width . 0)
-                                    (menu-bar-lines . 0)
-                                    (tool-bar-lines . 0)
-                                    (unsplittable . t)
-                                    (left-fringe . 0)))
-  (setq speedbar-hide-button-brackets-flag t)
-  (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy))
-  ;; 拡張子の追加
+(when (and (window-system) (locate-library "speedbar"))
+  ;; フォントをデフォルトにする
   (add-hook 'speedbar-mode-hook
             (lambda ()
-              (speedbar-add-supported-extension
-               '("js" "as" "html" "css" "php"
-                 "rst" "howm" "org" "ml" "scala" "*"))))
-  ;; f6 で起動
-  (define-key global-map (kbd "<f6>") 'speedbar))
+              (buffer-face-set
+               (font-face-attributes (frame-parameter nil 'font)))))
+  ;; フレームサイズ
+  (when (eval-when-compile (require 'speedbar nil t))
+    (defun speedbar-frame-adjust ()
+      (set-frame-size (selected-frame) 35 40))
+    (add-hook 'speedbar-after-create-hook 'speedbar-frame-adjust)
+    (setq speedbar-after-create-hook '(speedbar-frame-adjust)))
+  ;; f6 でフォーカス移す
+  (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
+  (eval-after-load "speedbar"
+    '(progn
+       (setq speedbar-use-images nil)
+       (setq speedbar-hide-button-brackets-flag t)
+       (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy))
+
+       (custom-set-variables '(speedbar-frame-parameters
+                               '((minibuffer . nil)
+                                 (width . 50)
+                                 (border-width . 0)
+                                 (menu-bar-lines . 0)
+                                 (tool-bar-lines . 0)
+                                 (unsplittable . t)
+                                 (left-fringe . 0))))
+       (dolist (face (list 'speedbar-file-face
+                           'speedbar-directory-face
+                           'speedbar-tag-face
+                           'speedbar-selected-face
+                           'speedbar-highlight-face
+                           'speedbar-button-face))
+         (if (eq system-type 'window-nt)
+             (set-face-attribute face nil :family "Lucida Console" :height 80)
+           (set-face-attribute face nil :family "Monospace" :height 80)))
+
+       ;; 拡張子の追加
+       (speedbar-add-supported-extension
+        '("js" "as" "html" "css" "php"
+          "rst" "howm" "org" "ml" "scala" "*"))
+
+       ;; "a" で無視ファイル表示/非表示のトグル
+       (define-key speedbar-file-key-map "a" 'speedbar-toggle-show-all-files)
+       ;; ← や → でもディレクトリを開閉 (デフォルト: "=" "+" "-")
+       (define-key speedbar-file-key-map [right] 'speedbar-expand-line)
+       (define-key speedbar-file-key-map (kbd "C-f") 'speedbar-expand-line)
+       (define-key speedbar-file-key-map [left] 'speedbar-contract-line)
+       (define-key speedbar-file-key-map (kbd "C-b") 'speedbar-contract-line)
+       ;; BS でも上位ディレクトリへ (デフォルト: "U")
+       (define-key speedbar-file-key-map [backspace] 'speedbar-up-directory)
+       (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory))))
 
 ;;; diff-mode
 (defun diff-mode-setup-faces ()
