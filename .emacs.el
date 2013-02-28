@@ -505,21 +505,26 @@
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
   (eval-after-load "speedbar"
     '(progn
-       (setq speedbar-use-images nil)
-       (setq speedbar-hide-button-brackets-flag t)
-       (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy))
-       (custom-set-variables '(speedbar-frame-parameters
-                               '((minibuffer . nil)
-                                 (width . 30)
-                                 (border-width . 0)
-                                 (menu-bar-lines . 0)
-                                 (tool-bar-lines . 0)
-                                 (unsplittable . t)
-                                 (left-fringe . 0))))
+       (when (boundp 'speedbar-use-images)
+         (setq speedbar-use-images nil))
+       (when (boundp 'speedbar-hide-button-brackets-flag)
+         (setq speedbar-hide-button-brackets-flag t))
+       (when (boundp 'speedbar-tag-hierarchy-method)
+         (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy)))
+       (when (boundp 'speedbar-frame-parameters)
+         (custom-set-variables '(speedbar-frame-parameters
+                                 '((minibuffer . nil)
+                                   (width . 30)
+                                   (border-width . 0)
+                                   (menu-bar-lines . 0)
+                                   (tool-bar-lines . 0)
+                                   (unsplittable . t)
+                                   (left-fringe . 0)))))
        ;; 拡張子の追加
-       (speedbar-add-supported-extension
-        '("js" "as" "html" "css" "php"
-          "rst" "howm" "org" "ml" "scala" "*"))
+       (when (fboundp 'speedbar-add-supported-extension)
+         (speedbar-add-supported-extension
+          '("js" "as" "html" "css" "php"
+            "rst" "howm" "org" "ml" "scala" "*")))
 
        ;; "a" で無視ファイル表示/非表示のトグル
        (define-key speedbar-file-key-map "a" 'speedbar-toggle-show-all-files)
