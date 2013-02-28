@@ -494,13 +494,12 @@
                (font-face-attributes (frame-parameter nil 'font)))))
   ;; フレームサイズ
   (when (eval-when-compile (require 'speedbar nil t))
-    (defun speedbar-frame-adjust ()
-      (if (= (x-display-pixel-height) 900)
-          ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-          (set-frame-size (selected-frame) 30 30)
-        (set-frame-size (selected-frame) 30 45)))
-    (add-hook 'speedbar-after-create-hook 'speedbar-frame-adjust)
-    (setq speedbar-after-create-hook '(speedbar-frame-adjust)))
+    (setq speedbar-after-create-hook
+          '(lambda ()
+             (if (= (x-display-pixel-height) 900)
+                 ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
+                 (set-frame-size (selected-frame) 30 30)
+               (set-frame-size (selected-frame) 30 45)))))
   ;; フォーカスを移す
   (define-key global-map (kbd "M-`") 'speedbar-get-focus)
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
@@ -519,18 +518,18 @@
                                  (left-fringe . 0))))
        ;; 拡張子の追加
        (speedbar-add-supported-extension
-        '("txt" "js" "as" "html" "css" "php"
+        '("js" "as" "html" "css" "php"
           "rst" "howm" "org" "ml" "scala" "*"))
 
        ;; "a" で無視ファイル表示/非表示のトグル
        (define-key speedbar-file-key-map "a" 'speedbar-toggle-show-all-files)
        ;; ← や → でもディレクトリを開閉 (デフォルト: "=" "+" "-")
-       (define-key speedbar-file-key-map [right] 'speedbar-expand-line)
+       (define-key speedbar-file-key-map (kbd "<right>") 'speedbar-expand-line)
        (define-key speedbar-file-key-map (kbd "C-f") 'speedbar-expand-line)
-       (define-key speedbar-file-key-map [left] 'speedbar-contract-line)
+       (define-key speedbar-file-key-map (kbd "<left>") 'speedbar-contract-line)
        (define-key speedbar-file-key-map (kbd "C-b") 'speedbar-contract-line)
        ;; BS でも上位ディレクトリへ (デフォルト: "U")
-       (define-key speedbar-file-key-map [backspace] 'speedbar-up-directory)
+       (define-key speedbar-file-key-map (kbd "<backspace>") 'speedbar-up-directory)
        (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory))))
 
 ;;; diff-mode
@@ -708,7 +707,7 @@
 
 ;;; カーソル位置を戻す
 ;; (install-elisp-from-emacswiki "point-undo.el")
-(when (eval-when-compile (require 'point-undo nil t))
+(when (eval-and-compile (require 'point-undo nil t))
   (define-key global-map (kbd "<f7>") 'point-undo)
   (define-key global-map (kbd "<S-f7>") 'point-redo))
 
@@ -884,7 +883,7 @@
                  '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
 
   ;; skk 用の sticky キー設定
-  ;; 一般的には `;' だが Paren モードが効かなくなる
+  ;; 一般的には `;' だが Paren モードが効かなくなるため TAB にする
   (when (boundp 'skk-sticky-key)
     (setq skk-sticky-key (kbd "TAB")))
   ;; インライン候補縦表示
