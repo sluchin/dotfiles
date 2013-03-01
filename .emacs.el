@@ -492,7 +492,8 @@
   (add-hook 'speedbar-mode-hook
             (lambda ()
               (buffer-face-set
-               (font-face-attributes (frame-parameter nil 'font)))))
+               (font-face-attributes (frame-parameter nil 'font)))
+              (setq header-line-format nil)))
   ;; フレームサイズ
   (when (eval-when-compile (require 'speedbar nil t))
     (setq speedbar-after-create-hook
