@@ -121,7 +121,7 @@
 ;; 幅  (frame-width)
 ;; 高さ (frame-height)
 (when window-system
-  ;; 起動時のフレームサイス
+  ;; 起動時のフレームサイズ
   (if (= (x-display-pixel-height) 900)
       ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
       (set-frame-size (selected-frame) 110 47)
@@ -164,8 +164,7 @@
 
 ;; 関数名表示
 (when (eval-and-compile (require 'which-func nil t))
-  (which-function-mode t)
-  (setq which-func-modes t))
+  (which-function-mode 1))
 (set-face-foreground 'which-func "blue")
 (set-face-background 'which-func "orange")
 (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
@@ -174,8 +173,10 @@
 ;; 関数名表示をトグルする
 (defun toggle-which-func-mode ()
   (interactive)
-  (which-function-mode)
-  (if which-func-mode
+  (if which-function-mode
+      (which-function-mode -1)
+    (which-function-mode 1))
+  (if which-function-mode
       (setq-default header-line-format
                     '(which-function-mode ("" which-func-format)))
     (setq-default header-line-format nil)))
