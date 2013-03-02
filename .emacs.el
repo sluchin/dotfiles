@@ -322,8 +322,6 @@
 (define-key isearch-mode-map "\C-k" 'isearch-edit-string)
 ;; quail/KKC が勝手に起動して終了しないので終了する
 (define-key global-map '[non-convert] 'kkc-cancel)
-;; quail/KKC 起動キーを無効化
-(define-key global-map (kbd "C-\\") 'nil)
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
