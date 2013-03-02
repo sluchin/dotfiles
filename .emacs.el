@@ -418,6 +418,9 @@
 (define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
 (define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
 
+;; エコー領域をクリアする
+(define-key global-map (kbd "C-c C-g") (lambda () (interactive) (message nil)))
+
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
 ;;; 行番号表示
