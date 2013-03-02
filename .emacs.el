@@ -83,8 +83,8 @@
 (setq frame-background-mode 'dark)
 
 ;;; フォントの設定
-;; Linux と Windows で変えたほうが見やすい
-;; Osaka フォントなど見やすいがカラムがずれるのでやめた
+;; Linux と Windows で変える
+;; Osaka フォントなど見やすいがカラムがずれる
 ;; 使えるフォントを調べるには以下を評価する
 ;; (prin1 (font-family-list))
 (when window-system
@@ -124,7 +124,7 @@
   ;; 起動時のフレームサイズ
   (if (= (x-display-pixel-height) 900)
       ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-      (set-frame-size (selected-frame) 110 47)
+      (set-frame-size (selected-frame) 110 54)
     (set-frame-size (selected-frame) 110 70))
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
@@ -144,43 +144,55 @@
            ((eq key ?q) (throw 'quit t)))))))
   (define-key global-map (kbd "<f11>") 'resize-frame-interactively))
 
-;;; タイトルバーにフルパス名を表示
+;;; タイトルバーにパス名またはバッファ名を表示
 (when window-system
-  (setq frame-title-format '("%f")))
+  (setq frame-title-format
+        '(:eval (if (buffer-file-name)
+                    (abbreviate-file-name (buffer-file-name))
+                  "%b")))
+  (setq icon-title-format "%b"))
 
-;;; モードライン
-;; 色の設定
+;;; モードラインの色設定
+;; 使える色を調べるには以下を評価する
+;; (list-colors-display)
 (custom-set-faces
- '(mode-line ((t (:foreground "black" :background "cadet blue" :box nil))))
- '(mode-line-inactive ((t (:foreground "dim gray" :background "dark gray" :box nil)))))
+ '(mode-line ((t (:foreground "gray5" :background "RoyalBlue1" :box nil))))
+ '(mode-line-inactive ((t (:foreground "gray55" :background "RoyalBlue4" :box nil)))))
 
 ;; 表示
-(when (eval-and-compile (require 'time nil t))
-  (setq display-time-24hr-format t)) ; 24 時間表示
-(display-time)                       ; 時間
-(line-number-mode t)                 ; 行数
-(column-number-mode t)               ; カラム数
-(size-indication-mode t)             ; ファイルサイズ
+(when (eval-when-compile (require 'time nil t))
+  (when (boundp 'display-time-24hr-format)
+    (setq display-time-24hr-format t))) ; 24 時間表示
+(display-time)                          ; 時間
+(line-number-mode t)                    ; 行数
+(column-number-mode t)                  ; カラム数
+(size-indication-mode t)                ; ファイルサイズ
 
 ;; 関数名表示
-(when (eval-and-compile (require 'which-func nil t))
-  (which-function-mode 1))
-(set-face-foreground 'which-func "blue")
-(set-face-background 'which-func "orange")
-(delete (assoc 'which-func-mode mode-line-format) mode-line-format)
-(setq-default header-line-format '(which-func-mode ("" which-func-format)))
-
-;; 関数名表示をトグルする
-(defun toggle-which-func-mode ()
-  (interactive)
-  (if which-function-mode
-      (which-function-mode -1)
-    (which-function-mode 1))
-  (if which-function-mode
-      (setq-default header-line-format
-                    '(which-function-mode ("" which-func-format)))
-    (setq-default header-line-format nil)))
-(define-key global-map (kbd "<f9>") 'toggle-which-func-mode)
+(when (eval-when-compile (require 'which-func nil t))
+  ;; ヘッダに表示
+  (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
+  (setq-default header-line-format '(which-func-mode ("" which-func-format)))
+  (when (fboundp 'which-function-mode)
+    (which-function-mode 1) ; デフォルト表示
+    ;; f9 で関数名表示をトグルする
+    (defun toggle-which-func-mode ()
+      (interactive)
+      (if which-function-mode
+          (which-function-mode -1)
+        (which-function-mode 1))
+      (if which-function-mode
+          (setq-default header-line-format
+                        '(which-function-mode ("" which-func-format)))
+        (setq-default header-line-format nil)))
+    (define-key global-map (kbd "<f9>") 'toggle-which-func-mode))
+  ;; 色
+  ;; face を調べるには以下を評価する
+  ;; (list-faces-display)
+  (set-face-foreground 'which-func "chocolate1")
+  (set-face-bold-p 'which-func t)
+  (set-face-foreground 'header-line "chocolate1")
+  (set-face-background 'header-line "gray30"))
 
 ;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
@@ -194,8 +206,9 @@
                 (cons '(:eval (count-lines-and-chars)) mode-line-format)))
 
 ;;; サーバを起動する
-(when (eval-and-compile (require 'server nil t))
-  (unless (server-running-p) (server-start)))
+(when (eval-when-compile (require 'server nil t))
+  (when (fboundp 'server-start)
+    (unless (server-running-p) (server-start))))
 
 ;;; find-fileのデフォルト
 (cd "~/")
@@ -204,9 +217,11 @@
 (setq-default case-fold-search nil)
 
 ;;; 釣り合いのとれる括弧をハイライトにする
-(when (eval-and-compile (require 'paren nil t))
-  (setq show-paren-delay 0) ; 初期値は 0.125
-  (show-paren-mode t))      ; 有効化
+(when (eval-when-compile (require 'paren nil t))
+  (when (boundp 'show-paren-delay)
+    (setq show-paren-delay 0)) ; 初期値は 0.125
+  (when (fboundp 'show-paren-mode)
+    (show-paren-mode t)))      ; 有効化
 
 ;;; キーストロークをエコーエリアに早く表示する
 (setq echo-keystrokes 0.1)
@@ -253,16 +268,19 @@
 
 ;;; 矩形選択
 ;; <C-enter> で矩形選択モード
-(when (eval-and-compile (require 'cua-base nil t))
-  (cua-mode t)                    ; cua-mode を有効にする
-  (setq cua-enable-cua-keys nil)) ; キーバインドを無効化
+(when (eval-when-compile (require 'cua-base nil t))
+  (when (fboundp 'cua-mode)
+    (cua-mode t))                    ; cua-mode を有効にする
+  (when (boundp 'cua-enable-cua-keys)
+    (setq cua-enable-cua-keys nil))) ; キーバインドを無効化
 
 ;;; ブックマーク
 ;; C-x r m (bookmark-set)
 ;; C-x r l (bookmark-bmenu-list)
 ;; ブックマークを変更したら即保存する
-(when (eval-and-compile (require 'bookmark nil t))
-  (setq bookmark-save-flag t))
+(when (eval-when-compile (require 'bookmark nil t))
+  (when (boundp 'bookmark-save-flag)
+    (setq bookmark-save-flag t)))
 
 ;;; gz ファイルも編集できるようにする
 (auto-compression-mode t)
@@ -374,7 +392,7 @@
 (define-key global-map (kbd "C-x M-d") 'dired-at-point)
 
 ;; lisp 補完
-;; M-Tab が標準のキーバインドだが Tab で補完てきるようにする
+;; Tab で補完 (デフォルト: M-Tab)
 (define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
 (define-key lisp-interaction-mode-map (kbd "TAB") 'lisp-complete-symbol)
 (define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
@@ -411,80 +429,89 @@
             (set (make-local-variable 'delete-by-moving-to-trash) t)))
 
 ;; 編集可能にする
-(when (eval-and-compile (require 'wdired nil t))
-  (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+(when (locate-library "wdired")
+  (autoload 'wdired-change-to-wdired-mode "wdired")
+  (eval-after-load "dired"
+    '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
 
-;; dired でコマンドを実行する関数定義
-(declare-function dired-run-shell-command "dired-aux" (command))
-(defun dired-run-command (command)
-  "Open file in command"
-  (let ((file (dired-get-filename)))
-    (if (and (file-directory-p file) (not (string= command "vlc")))
-        (message "%s is a directory" (file-name-nondirectory file))
-      (when (y-or-n-p (format "Open '%s' %s " command (file-name-nondirectory file)))
-        (dired-run-shell-command (concat command " " file " &"))))))
+(when (eval-when-compile (and (require 'dired nil t)
+                              (require 'dired-aux nil t)))
+  (declare-function dired-run-shell-command "dired-aux" (command))
 
-(when (eval-and-compile (require 'dired-aux nil t))
-  ;; ディレクトリを先に表示する
-  (cond ((eq system-type 'windows-nt)
-          ;; Windows の場合
-          (when (eval-and-compile (require 'ls-lisp nil t))
-            (setq ls-lisp-dirs-first t)))
-        ((eq system-type 'gnu/linux)
-          ;; GNU オプションも使う
-          (setq dired-listing-switches "-alF --time-style=long-iso --group-directories-first"))
-        (t
-          ;; POSIX オプションのみ
-          (setq dired-listing-switches "-alF")))
+  (when (and (fboundp 'dired-run-shell-command)
+             (fboundp 'dired-get-filename)
+             (fboundp 'dired-do-shell-command))
 
-  ;; ディレクトリを再帰的にコピー可能する
-  (setq dired-recursive-copies 'always)
-  ;; ディレクトリを再帰的に削除可能する
-  (setq dired-recursive-deletes 'always)
+    ;; dired でコマンドを実行する関数定義
+    (defun dired-run-command (command)
+      "Open file in command"
+      (let ((file (dired-get-filename)))
+        (if (and (file-directory-p file) (not (string= command "vlc")))
+            (message "%s is a directory" (file-name-nondirectory file))
+          (when (y-or-n-p (format "Open '%s' %s " command (file-name-nondirectory file)))
+            (dired-run-shell-command (concat command " " file " &"))))))
 
-  ;; libreoffice で開く
-  (when (executable-find "libreoffice")
-    (define-key dired-mode-map (kbd "C-l")
-      (lambda () (interactive) (dired-run-command "libreoffice"))))
-  ;; evince で開く
-  (when (executable-find "evince")
-    (define-key dired-mode-map (kbd "C-e")
-      (lambda () (interactive) (dired-run-command "evince"))))
-  ;; vlc で開く
-  (when (executable-find "vlc")
-    (define-key dired-mode-map (kbd "C-v")
-      (lambda () (interactive) (dired-run-command "vlc"))))
-  ;; w3m で開く
-  (when (and (executable-find "w3m") (locate-library "w3m"))
-    (when (eval-when-compile (require 'w3m nil t))
-      (defun dired-w3m-find-file ()
-        "Open file in w3m"
-        (interactive)
-        (let ((file (dired-get-filename)))
-          (if (not (file-directory-p file))
-              (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
-                (w3m-find-file file))
-            (message "%s is a directory" file))))
-      (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
-  ;; tar + gzip で圧縮
-  (when (and (executable-find "tar") (executable-find "gzip"))
-    (defun dired-do-tar-gzip (arg)
-      "Execute tar and gzip command"
-      (interactive "P")
-      (let ((files (dired-get-marked-files t current-prefix-arg)))
-        (let ((filename (read-string (concat "Filename(" (car files) ".tar.gz): "))))
-          (when (string= "" filename)
-            (setq filename (concat (car files) ".tar.gz")))
-          (when (not (string-match
-                      "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" filename))
-            (setq filename (concat filename ".tar.gz"))) ; 拡張子追加
-          (or (when (member filename (directory-files default-directory))
-                (not (y-or-n-p
-                      (concat "Overwrite `" filename "'? [Type yn]")))) ; 同名ファイル
-              (when (not (dired-do-shell-command
-                          (concat "tar cfz " filename " *") nil files))
-                (message (concat "Execute tar command to `" filename "'...done")))))))
-    (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
+    ;; ディレクトリを先に表示する
+    (cond ((eq system-type 'windows-nt)
+           ;; Windows の場合
+           (when (eval-and-compile (require 'ls-lisp nil t))
+             (setq ls-lisp-dirs-first t)))
+          ((eq system-type 'gnu/linux)
+           ;; GNU オプションも使う
+           (setq dired-listing-switches "-alF --time-style=long-iso --group-directories-first"))
+          (t
+           ;; POSIX オプションのみ
+           (setq dired-listing-switches "-alF")))
+
+    ;; ディレクトリを再帰的にコピー可能する
+    (setq dired-recursive-copies 'always)
+    ;; ディレクトリを再帰的に削除可能する
+    (setq dired-recursive-deletes 'always)
+
+    (when (fboundp 'dired-run-command)
+      ;; libreoffice で開く
+      (when (executable-find "libreoffice")
+        (define-key dired-mode-map (kbd "C-l")
+          (lambda () (interactive) (dired-run-command "libreoffice"))))
+      ;; evince で開く
+      (when (executable-find "evince")
+        (define-key dired-mode-map (kbd "C-e")
+          (lambda () (interactive) (dired-run-command "evince"))))
+      ;; vlc で開く
+      (when (executable-find "vlc")
+        (define-key dired-mode-map (kbd "C-v")
+          (lambda () (interactive) (dired-run-command "vlc")))))
+    ;; w3m で開く
+    (when (and (executable-find "w3m") (locate-library "w3m"))
+      (when (eval-when-compile (require 'w3m nil t))
+        (defun dired-w3m-find-file ()
+          "Open file in w3m"
+          (interactive)
+          (let ((file (dired-get-filename)))
+            (if (not (file-directory-p file))
+                (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
+                  (w3m-find-file file))
+              (message "%s is a directory" file))))
+        (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
+    ;; tar + gzip で圧縮
+    (when (and (executable-find "tar") (executable-find "gzip"))
+      (defun dired-do-tar-gzip (arg)
+        "Execute tar and gzip command"
+        (interactive "P")
+        (let ((files (dired-get-marked-files t current-prefix-arg)))
+          (let ((filename (read-string (concat "Filename(" (car files) ".tar.gz): "))))
+            (when (string= "" filename)
+              (setq filename (concat (car files) ".tar.gz")))
+            (when (not (string-match
+                        "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" filename))
+              (setq filename (concat filename ".tar.gz"))) ; 拡張子追加
+            (or (when (member filename (directory-files default-directory))
+                  (not (y-or-n-p
+                        (concat "Overwrite `" filename "'? [Type yn]")))) ; 同名ファイル
+                (when (not (dired-do-shell-command
+                            (concat "tar cfz " filename " *") nil files))
+                  (message (concat "Execute tar command to `" filename "'...done"))))))
+        (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))))
 
 ;;; 関数のアウトライン表示
 (when (and (window-system) (locate-library "speedbar"))
@@ -500,7 +527,7 @@
           '(lambda ()
              (if (= (x-display-pixel-height) 900)
                  ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-                 (set-frame-size (selected-frame) 30 30)
+                 (set-frame-size (selected-frame) 30 35)
                (set-frame-size (selected-frame) 30 45)))))
   ;; フォーカスを移す
   (define-key global-map (kbd "M-`") 'speedbar-get-focus)
@@ -527,6 +554,9 @@
          (speedbar-add-supported-extension
           '("js" "as" "html" "css" "php"
             "rst" "howm" "org" "ml" "scala" "*")))
+       ;; 隠しファイルの表示
+       (when (boundp 'speedbar-directory-unshown-regexp)
+         (setq speedbar-directory-unshown-regexp "^\\'"))
 
        ;; "a" で無視ファイル表示/非表示のトグル
        (define-key speedbar-file-key-map "a" 'speedbar-toggle-show-all-files)
@@ -566,15 +596,21 @@
 ;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
 (when (eval-when-compile (require 'ediff nil t))
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-  (setq diff-switches '("-u" "-p" "-N")))
+  (when (boundp 'ediff-window-setup-function)
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+  (when (boundp 'diff-switches)
+    (setq diff-switches '("-u" "-p" "-N"))))
 
 ;;; バッファの切り替えをインクリメンタルにする
-(when (eval-and-compile (require 'iswitchb nil t))
-  (iswitchb-mode t)
-  (setq read-buffer-function 'iswitchb-read-buffer)
-  (setq iswitchb-regexp nil)
-  (setq iswitchb-prompt-newbuffer nil))
+(when (eval-when-compile (require 'iswitchb nil t))
+  (when (fboundp 'iswitchb-mode)
+    (iswitchb-mode t))
+  (when (boundp 'read-buffer-function)
+    (setq read-buffer-function 'iswitchb-read-buffer))
+  (when (boundp 'iswitchb-regexp)
+    (setq iswitchb-regexp nil))
+  (when (boundp 'iswitchb-prompt-newbuffer)
+    (setq iswitchb-prompt-newbuffer nil)))
 
 ;;; 文書作成 (org-mode)
 (defvar org-code-reading-software-name nil)
@@ -589,26 +625,33 @@
   (concat "[" lang "]"
           "[" (org-code-reading-read-software-name) "]"))
 
-(when (and (eval-and-compile (require 'org nil t))
-           (eval-and-compile (require 'org-remember nil t))
-           (eval-and-compile (require 'org-install nil t)))
+(when (and (eval-when-compile (require 'org nil t))
+           (eval-when-compile (require 'org-remember nil t))
+           (eval-when-compile (require 'org-install nil t)))
 
   ;; org-mode での強調表示を可能にする
   (add-hook 'org-mode-hook 'turn-on-font-lock)
   ;; 見出しの余分な * を消す
-  (setq org-hide-leading-stars t)
+  (when (boundp 'org-hide-leading-stars)
+    (setq org-hide-leading-stars t))
   ;; org-remember のディレクトリ
-  (setq org-directory "~/memo/")
+  (when (boundp 'org-directory)
+    (setq org-directory "~/memo/"))
   ;; org-remember のファイル名
-  (setq org-default-notes-file (concat org-directory "agenda.org"))
-  (setq org-startup-truncated nil)
-  (setq org-return-follows-link t)
+  (when (boundp 'org-default-notes-file)
+    (setq org-default-notes-file (concat org-directory "agenda.org")))
+  (when (boundp 'org-startup-truncated)
+    (setq org-startup-truncated nil))
+  (when (boundp 'org-return-follows-link)
+    (setq org-return-follows-link t))
   (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (org-remember-insinuate)
-  (setq org-remember-templates
-        '(("Todo" ?t "** TODO %?\n   %i\n   %a\n   %t" nil "Inbox")
-          ("Bug" ?b "** TODO %?   :bug:\n   %i\n   %a\n   %t" nil "Inbox")
-          ("Idea" ?i "** %?\n   %i\n   %a\n   %t" nil "New Ideas")))
+  (when (fboundp 'org-remember-insinuate)
+    (org-remember-insinuate))
+  (when (boundp 'org-remember-templates)
+    (setq org-remember-templates
+          '(("Todo" ?t "** TODO %?\n   %i\n   %a\n   %t" nil "Inbox")
+            ("Bug" ?b "** TODO %?   :bug:\n   %i\n   %a\n   %t" nil "Inbox")
+            ("Idea" ?i "** %?\n   %i\n   %a\n   %t" nil "New Ideas"))))
 
   ;; 日付を英語で挿入する
   (add-hook 'org-mode-hook
@@ -950,7 +993,7 @@
 ;; (install-elisp-from-emacswiki "list-processes+.el")
 (when (locate-library "list-processes+")
   (autoload 'list-processes+ "list-processes+" "A enhance list processes command." t)
-  (defalias 'list-proc 'list-processes+))
+  (defalias 'ps 'list-processes+))
 
 ;;; ポモドーロ
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
@@ -1170,11 +1213,11 @@
          (list (propertize fmt
                            'display display-time-mail-icon
                            'face
-                           '(:foreground "white" :background "DeepPink1"))))
+                           '(:foreground "white" :background "red1"))))
        (defun mew-propertized-biff-string (fmt)
          (list (propertize fmt
                            'face
-                           '(:foreground "white" :background "DeepPink1"))))
+                           '(:foreground "white" :background "red1"))))
        (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
        (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
        (defvar mew-mode-line-biff-quantity 0)
