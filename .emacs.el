@@ -159,6 +159,10 @@
  '(mode-line ((t (:foreground "gray5" :background "RoyalBlue1" :box nil))))
  '(mode-line-inactive ((t (:foreground "gray55" :background "RoyalBlue4" :box nil)))))
 
+;;; ヘッダラインの色設定
+(set-face-foreground 'header-line "chocolate1")
+(set-face-background 'header-line "gray30")
+
 ;; 表示
 (when (eval-when-compile (require 'time nil t))
   (when (boundp 'display-time-24hr-format)
@@ -190,9 +194,7 @@
   ;; face を調べるには以下を評価する
   ;; (list-faces-display)
   (set-face-foreground 'which-func "chocolate1")
-  (set-face-bold-p 'which-func t)
-  (set-face-foreground 'header-line "chocolate1")
-  (set-face-background 'header-line "gray30"))
+  (set-face-bold-p 'which-func t))
 
 ;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
