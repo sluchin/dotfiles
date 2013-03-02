@@ -160,6 +160,8 @@
  '(mode-line-inactive ((t (:foreground "gray55" :background "RoyalBlue4" :box nil)))))
 
 ;;; ヘッダラインの色設定
+;; face を調べるには以下を評価する
+;; (list-faces-display)
 (set-face-foreground 'header-line "chocolate1")
 (set-face-background 'header-line "gray30")
 
@@ -174,11 +176,11 @@
 
 ;; 関数名表示
 (when (eval-when-compile (require 'which-func nil t))
-  ;; ヘッダに表示
+  ;; ヘッダに表示する
   (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
   (setq-default header-line-format '(which-func-mode ("" which-func-format)))
   (when (fboundp 'which-function-mode)
-    (which-function-mode 1) ; デフォルト表示
+    (which-function-mode 1) ; デフォルトで表示
     ;; f9 で関数名表示をトグルする
     (defun toggle-which-func-mode ()
       (interactive)
@@ -191,8 +193,6 @@
         (setq-default header-line-format nil)))
     (define-key global-map (kbd "<f9>") 'toggle-which-func-mode))
   ;; 色
-  ;; face を調べるには以下を評価する
-  ;; (list-faces-display)
   (set-face-foreground 'which-func "chocolate1")
   (set-face-bold-p 'which-func t))
 
@@ -269,10 +269,8 @@
 (setq enable-recursive-minibuffers t)
 
 ;;; 矩形選択
-;; <C-enter> で矩形選択モード
+;; M-x cua-mode <C-enter> で矩形選択モード
 (when (eval-when-compile (require 'cua-base nil t))
-  (when (fboundp 'cua-mode)
-    (cua-mode t))                    ; cua-mode を有効にする
   (when (boundp 'cua-enable-cua-keys)
     (setq cua-enable-cua-keys nil))) ; キーバインドを無効化
 
@@ -284,7 +282,7 @@
   (when (boundp 'bookmark-save-flag)
     (setq bookmark-save-flag t)))
 
-;;; gz ファイルも編集できるようにする
+;;; gzip ファイルも編集できるようにする
 (auto-compression-mode t)
 
 ;;; タブの設定
@@ -303,7 +301,8 @@
 (add-hook 'fundamental-mode-hook (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'calendar-mode-hook (lambda () (setq show-trailing-whitespace nil)))
 
-;;; isearch リージョンで検索する
+;;; isearch
+;; リージョンで検索する
 (defadvice isearch-mode
   (around isearch-region-mode
           (forward &optional regexp op-fun recursive-edit word-p)
@@ -319,6 +318,12 @@
           (goto-char (mark))
           (isearch-repeat-forward)))
     ad-do-it))
+;; i-search に入ったとき C-k すれば日本語が通る
+(define-key isearch-mode-map "\C-k" 'isearch-edit-string)
+;; quail/KKC が勝手に起動して終了しないので終了する
+(define-key global-map '[non-convert] 'kkc-cancel)
+;; quail/KKC 起動キーを無効化
+(define-key global-map (kbd "C-\\") 'nil)
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -333,6 +338,7 @@
 ;;; f3 でロードする
 (define-key emacs-lisp-mode-map (kbd "<f3>")
   (lambda ()
+    "Load the current buffer"
     (interactive)
     (load-file buffer-file-name)))
 
