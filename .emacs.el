@@ -440,15 +440,6 @@
                  navi2ch-board-mode))) ad-do-it))
 
 ;;; ファイラ (dired)
-;; 拡張機能を有効にする
-(add-hook 'dired-load-hook (lambda () (load "dired-x")))
-(add-hook 'dired-load-hook (lambda () (load "ls-lisp")))
-
-;; ゴミ箱に移動する
-(add-hook 'dired-mode-hook
-          (lambda ()
-            (set (make-local-variable 'delete-by-moving-to-trash) t)))
-
 ;; 編集可能にする
 (when (locate-library "wdired")
   (autoload 'wdired-change-to-wdired-mode "wdired")
@@ -457,6 +448,16 @@
 
 (when (eval-when-compile (and (require 'dired nil t)
                               (require 'dired-aux nil t)))
+  ;; 拡張機能を有効にする
+  (add-hook 'dired-load-hook (lambda () (load "dired-x")))
+  (add-hook 'dired-load-hook (lambda () (load "ls-lisp")))
+
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (setq header-line-format nil)          ; ヘッダを表示しない
+              (set (make-local-variable
+                    'delete-by-moving-to-trash) t))) ; ゴミ箱に移動する
+
   (declare-function dired-run-shell-command "dired-aux" (command))
 
   (when (and (fboundp 'dired-run-shell-command)
@@ -1172,6 +1173,7 @@
   (autoload 'mew-send "mew" "Send mail." t)
   (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
+  ;; 空白を強調表示しない
   (add-hook 'mew-summary-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (add-hook 'mew-message-mode-hook (lambda () (setq show-trailing-whitespace nil)))
   (add-hook 'mew-virtual-mode-hook (lambda () (setq show-trailing-whitespace nil)))
@@ -1445,8 +1447,11 @@ Otherwise return word around point."
   (autoload 'gist-region-private "gist" "Post the current region as a new private paste." t))
 
 ;;; 端末エミュレータ
-;; eshell では空白を強調表示しない
-(add-hook 'eshell-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+;; eshell
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (setq header-line-format nil)         ; ヘッダ表示しない
+            (setq show-trailing-whitespace nil))) ; 空白を強調表示しない
 
 ;; zsh を使用するときはこれを使うことにする
 ;; (install-elisp-from-emacswiki "multi-term.el")
