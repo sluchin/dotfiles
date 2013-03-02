@@ -335,12 +335,24 @@
       (setq debug-on-error t))
     (message "debug-on-error %s" debug-on-error)))
 
-;;; f3 でロードする
+;; f3 でロードする
 (define-key emacs-lisp-mode-map (kbd "<f3>")
   (lambda ()
     "Load the current buffer"
     (interactive)
     (load-file buffer-file-name)))
+
+;; firefox で URL を開く
+(when (executable-find "firefox")
+  (defun firefox-url-at-point ()
+    "Get url and open firefox"
+    (interactive)
+    (let ((url-region (bounds-of-thing-at-point 'url)))
+      (when url-region
+        (start-process "firefox" nil "firefox"
+                       (buffer-substring-no-properties (car url-region)
+                                                       (cdr url-region))))))
+  (define-key global-map (kbd "C-c f") 'firefox-url-at-point))
 
 ;; vlc で URL を開く
 (when (executable-find "vlc")
@@ -477,6 +489,10 @@
     (setq dired-recursive-deletes 'always)
 
     (when (fboundp 'dired-run-command)
+      ;; firefox で開く
+      (when (executable-find "firefox")
+        (define-key dired-mode-map (kbd "C-f")
+          (lambda () (interactive) (dired-run-command "firefox"))))
       ;; libreoffice で開く
       (when (executable-find "libreoffice")
         (define-key dired-mode-map (kbd "C-l")
