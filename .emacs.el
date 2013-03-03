@@ -319,7 +319,7 @@
           (isearch-repeat-forward)))
     ad-do-it))
 ;; i-search に入ったとき C-k すれば日本語が通る
-(define-key isearch-mode-map "\C-k" 'isearch-edit-string)
+(define-key isearch-mode-map (kbd "C-k") 'isearch-edit-string)
 ;; quail/KKC が勝手に起動して終了しないので終了する
 (define-key global-map '[non-convert] 'kkc-cancel)
 
@@ -340,8 +340,31 @@
     (interactive)
     (load-file buffer-file-name)))
 
-;; firefox で URL を開く
+(defun browse-prompt-input ()
+  "Prompt input object for translate."
+  (read-string (format "Search (%s): " (or (browse-region-or-word) ""))
+               nil nil
+               (browse-region-or-word)))
+(defun browse-region-or-word ()
+  "Return region or word around point.
+If `mark-active' on, return region string.
+Otherwise return word around point."
+  (if mark-active
+      (buffer-substring-no-properties (region-beginning)
+                                      (region-end))
+    (thing-at-point 'word)))
+
 (when (executable-find "firefox")
+  ;; firefox で google 検索
+  (defun google-search (&optional query)
+    "Search google in browse"
+    (interactive)
+    (browse-url (concat "https://www.google.co.jp/search?q="
+                        (or query (browse-prompt-input))
+                        "&ie=utf-8&oe=utf-8&hl=ja")))
+  (define-key global-map (kbd "C-c f") 'google-search)
+
+  ;; firefox で URL を開く
   (defun firefox-url-at-point ()
     "Get url and open firefox"
     (interactive)
@@ -350,7 +373,7 @@
         (start-process "firefox" nil "firefox"
                        (buffer-substring-no-properties (car url-region)
                                                        (cdr url-region))))))
-  (define-key global-map (kbd "C-c f") 'firefox-url-at-point))
+  (define-key global-map (kbd "C-c u") 'firefox-url-at-point))
 
 ;; vlc で URL を開く
 (when (executable-find "vlc")
@@ -1151,7 +1174,7 @@
 ;;; 辞書 (英辞郎の辞書を stardict 用に変換したものを使用する)
 ;; sudo apt-get install sdcv
 ;; ~/stardict に辞書を展開
-;; ln -s ~/stardict /usr/share/stardict/dic/eijiro
+;; sudo ln -s ~/stardict /usr/share/stardict/dic/eijiro
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el")
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/sdcv.el")
 (when (let ((dir  "/usr/share/stardict/dic/eijiro/"))
