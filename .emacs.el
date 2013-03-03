@@ -759,15 +759,26 @@ Otherwise return word around point."
     (when (fboundp 'auto-install-compatibility-setup)
       (auto-install-compatibility-setup))))
 
-;; リドゥ
+;;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
+;; C-? でリドゥ C-/ でアンドゥ
 (when (eval-and-compile (require 'redo+ nil t))
   ;; 過去の Undo が Redo されないようにする
   (setq undo-no-redo t)
   ;; 大量の Undo に耐えられるようにする
   (setq undo-limit 600000)
-  (setq undo-strong-limit 900000)
-  (define-key global-map (kbd "C-.") 'redo))
+  (setq undo-strong-limit 900000))
+
+;; アンドゥ木構造
+;; (install-elisp "http://www.dr-qubit.org/undo-tree/undo-tree.el")
+;; C-x u で木構造表示
+(when (eval-and-compile (require 'undo-tree nil t))
+  (global-undo-tree-mode))
+
+;; アンドゥ履歴
+;; (install-elisp "http://cx4a.org/pub/undohist.el")
+(when (eval-and-compile (require 'undohist nil t))
+  (undohist-initialize))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
