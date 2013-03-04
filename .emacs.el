@@ -318,8 +318,9 @@
 ;; 日本語で検索できる
 (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
 (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
-(when (boundp 'skk-isearch-start-mode)
-  (setq skk-isearch-start-mode 'latin))
+(eval-after-load "skk-isearch-mode"
+  '(when (boundp 'skk-isearch-start-mode)
+     (setq skk-isearch-start-mode 'latin)))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -607,12 +608,12 @@ Otherwise return word around point."
 
        ;; "a" で無視ファイル表示/非表示のトグル
        (define-key speedbar-file-key-map "a" 'speedbar-toggle-show-all-files)
-       ;; ← や → でもディレクトリを開閉 (デフォルト: "=" "+" "-")
+       ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
        (define-key speedbar-file-key-map (kbd "<right>") 'speedbar-expand-line)
        (define-key speedbar-file-key-map (kbd "C-f") 'speedbar-expand-line)
        (define-key speedbar-file-key-map (kbd "<left>") 'speedbar-contract-line)
        (define-key speedbar-file-key-map (kbd "C-b") 'speedbar-contract-line)
-       ;; BS でも上位ディレクトリへ (デフォルト: "U")
+       ;; BS でも上位ディレクトリへ (デフォルト: `U')
        (define-key speedbar-file-key-map (kbd "<backspace>") 'speedbar-up-directory)
        (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory))))
 
@@ -976,28 +977,30 @@ Otherwise return word around point."
 ;; http://openlab.ring.gr.jp/skk/wiki/wiki.cgi?page=SKK%BC%AD%BD%F1#p7
 ;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
 ;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
-(when (eval-and-compile (require 'skk nil t))
-  (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.L")
-             (boundp 'skk-large-jisyo))
-    (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
-  (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.KAO")
-             (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH")
-             (boundp 'skk-search-prog-list))
-    (add-to-list 'skk-search-prog-list
-                 '(skk-search-jisyo-file skk-jisyo 0 t) t)
-    (add-to-list 'skk-search-prog-list
-                 '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000 t) t)
-    (add-to-list 'skk-search-prog-list
-                 '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
-
-  ;; skk 用の sticky キー設定
-  ;; 一般的には `;' だが Paren モードが効かなくなるため TAB にする
-  (when (boundp 'skk-sticky-key)
-    (setq skk-sticky-key (kbd "TAB")))
-  ;; インライン候補縦表示
-  (when (boundp 'skk-show-inline)
-    (setq skk-show-inline 'vertical))
-  (define-key global-map (kbd "C-\\") 'skk-mode))
+(when (locate-library "skk")
+  (autoload 'skk-mode "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
+  (define-key global-map (kbd "C-\\") 'skk-mode)
+  (eval-after-load "skk"
+    '(progn
+       (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.L")
+                  (boundp 'skk-large-jisyo))
+         (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
+       (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.KAO")
+                  (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH")
+                  (boundp 'skk-search-prog-list))
+         (add-to-list 'skk-search-prog-list
+                      '(skk-search-jisyo-file skk-jisyo 0 t) t)
+         (add-to-list 'skk-search-prog-list
+                      '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000 t) t)
+         (add-to-list 'skk-search-prog-list
+                      '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
+       ;; skk 用の sticky キー設定
+       ;; 一般的には `;' だが Paren モードが効かなくなるため TAB にする
+       (when (boundp 'skk-sticky-key)
+         (setq skk-sticky-key (kbd "TAB")))
+       ;; インライン候補縦表示
+       (when (boundp 'skk-show-inline)
+         (setq skk-show-inline 'vertical)))))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
