@@ -1206,10 +1206,24 @@ Otherwise return word around point."
   (autoload 'mew-send "mew" "Send mail." t)
   (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
-  ;; 空白を強調表示しない
-  (add-hook 'mew-summary-mode-hook (lambda () (setq show-trailing-whitespace nil)))
-  (add-hook 'mew-message-mode-hook (lambda () (setq show-trailing-whitespace nil)))
-  (add-hook 'mew-virtual-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+  ;; ヘッダ・空白を強調表示しない
+  (add-hook 'mew-summary-mode-hook
+            (lambda ()
+              (setq header-line-format nil)
+              (setq show-trailing-whitespace nil)))
+  (add-hook 'mew-message-mode-hook
+            (lambda ()
+              (setq header-line-format nil)
+              (setq show-trailing-whitespace nil)))
+  (add-hook 'mew-virtual-mode-hook
+            (lambda ()
+              (setq header-line-format nil)
+              (setq show-trailing-whitespace nil)))
+  (add-hook 'mew-draft-mode-hook
+            (lambda ()
+              (setq header-line-format nil)
+              (setq show-trailing-whitespace nil)))
+
   ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY.")
   (eval-after-load "mew"
