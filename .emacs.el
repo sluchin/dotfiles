@@ -286,13 +286,10 @@
 (auto-compression-mode t)
 
 ;;; タブの設定
-(setq-default tab-width 4)
-
-;;; タブをスペースにする
-(setq-default indent-tabs-mode nil)
-
-;;; makefile ではスペースにしない
-(add-hook 'makefile-mode-hook (lambda () (setq indent-tabs-mode t)))
+(setq-default tab-width 4)          ; 4 スペース
+(setq-default indent-tabs-mode nil) ; タブをスペースにする
+(add-hook 'makefile-mode-hook       ; makefile ではスペースにしない
+          (lambda () (setq indent-tabs-mode t)))
 
 ;;; 行末の空白を強調表示
 (setq-default show-trailing-whitespace t)
@@ -318,10 +315,11 @@
           (goto-char (mark))
           (isearch-repeat-forward)))
     ad-do-it))
-;; i-search に入ったとき C-k すれば日本語が通る
-(define-key isearch-mode-map (kbd "C-k") 'isearch-edit-string)
-;; quail/KKC が勝手に起動して終了しないので終了する
-(define-key global-map '[non-convert] 'kkc-cancel)
+;; 日本語で検索できる
+(add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
+(add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
+(when (boundp 'skk-isearch-start-mode)
+  (setq skk-isearch-start-mode 'latin))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -1119,32 +1117,30 @@ Otherwise return word around point."
 
 ;;; git の設定
 ;; git clone git://github.com/magit/magit.git
-;; とりあえず, Windows では使わない
-(unless (eq system-type 'windows-nt)
-  (when (and (executable-find "git") (locate-library "magit"))
-    (autoload 'magit-status "magit" "Interface for git on Emacs." t)
-    (eval-after-load "magit"
-      '(progn
-         ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
-         (when (boundp 'magit-diff-refine-hunk)
-           (setq magit-diff-refine-hunk 'all))
-         ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
-         (set-face-attribute 'magit-item-highlight nil :inherit nil)
-         ;; 色の設定
-         (when (fboundp 'diff-mode-setup-faces)
-           (diff-mode-setup-faces))
-         ;; 空白無視をトグルする
-         (defun magit-toggle-whitespace ()
-           (interactive)
-           (if (member "-w" magit-diff-options)
-               (setq magit-diff-options (remove "-w" magit-diff-options))
-             (add-to-list 'magit-diff-options "-w"))
-           (if (member "-b" magit-diff-options)
-               (setq magit-diff-options (remove "-b" magit-diff-options))
-             (add-to-list 'magit-diff-options "-b"))
-           (magit-refresh)
-           (message "magit-diff-options %s" magit-diff-options))
-         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace)))))
+(when (and (executable-find "git") (locate-library "magit"))
+  (autoload 'magit-status "magit" "Interface for git on Emacs." t)
+  (eval-after-load "magit"
+    '(progn
+       ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
+       (when (boundp 'magit-diff-refine-hunk)
+         (setq magit-diff-refine-hunk 'all))
+       ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
+       (set-face-attribute 'magit-item-highlight nil :inherit nil)
+       ;; 色の設定
+       (when (fboundp 'diff-mode-setup-faces)
+         (diff-mode-setup-faces)) ; diff-mode で定義済み
+       ;; 空白無視をトグルする
+       (defun magit-toggle-whitespace ()
+         (interactive)
+         (if (member "-w" magit-diff-options)
+             (setq magit-diff-options (remove "-w" magit-diff-options))
+           (add-to-list 'magit-diff-options "-w"))
+         (if (member "-b" magit-diff-options)
+             (setq magit-diff-options (remove "-b" magit-diff-options))
+           (add-to-list 'magit-diff-options "-b"))
+         (magit-refresh)
+         (message "magit-diff-options %s" magit-diff-options))
+       (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))))
 
 ;;; Windows の設定
 (eval-and-compile
@@ -1567,10 +1563,7 @@ Otherwise return word around point."
         (if (eq n nil) ; デフォルト
             (setq ac-auto-start 3)
           (setq ac-auto-start n)))
-      (message "ac-auto-start %s" ac-auto-start)))
-
-  (when (fboundp 'ac-config-default)
-    (ac-config-default)))
+      (message "ac-auto-start %s" ac-auto-start))))
 
 ;;; 略語から定型文を入力する
 ;; [new] git clone https://github.com/capitaomorte/yasnippet.git
