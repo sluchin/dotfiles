@@ -315,11 +315,11 @@
           (goto-char (mark))
           (isearch-repeat-forward)))
     ad-do-it))
-;; 日本語で検索できる
-(add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
-(add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
-(eval-after-load "skk-isearch-mode"
-  '(when (boundp 'skk-isearch-start-mode)
+;; 日本語で検索するための設定
+(when (eval-and-compile (require 'skk-isearch nil t))
+  (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
+  (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
+  (when (boundp 'skk-isearch-start-mode)
      (setq skk-isearch-start-mode 'latin)))
 
 ;;; キーバインド
