@@ -31,6 +31,7 @@
                   "/usr/share/emacs/site-lisp/global"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
                   "/usr/share/emacs23/site-lisp/ddskk"
+                  "/usr/share/emacs23/site-lisp/migemo"
                   ) load-path)))
 (setq load-path
       (append '(
@@ -315,12 +316,36 @@
           (goto-char (mark))
           (isearch-repeat-forward)))
     ad-do-it))
+;; migemo
+;; sudo apt-get install migemo cmigemo
+;; git clone git://github.com/koron/cmigemo.git
+;; ./configure; make gcc;
+;; cd dict; make utf-8
+;; cd ..; sudo make gcc-install
+(when (and (executable-find "cmigemo")
+           (locate-library "migemo"))
+  (when (boundp 'migemo-command)
+    (setq migemo-command "cmigemo"))                    ; コマンド
+  (when (boundp 'migemo-options)
+    (setq migemo-options '("-q" "--emacs")))            ; オプション
+  (when (boundp 'migemo-dictionary)
+    (setq migemo-dictionary
+          "/usr/local/share/migemo/utf-8/migemo-dict")) ; パス指定
+  (when (boundp 'migemo-user-dictionary)
+    (setq migemo-user-dictionary nil))
+  (when (boundp 'migemo-regex-dictionary)
+    (setq migemo-regex-dictionary nil))
+  (when (boundp 'migemo-coding-system)
+  (setq migemo-coding-system 'utf-8-unix))
+  (load-library "migemo")
+  (when (fboundp 'migemo-init)
+    (migemo-init)))
 ;; 日本語で検索するための設定
 (when (eval-and-compile (require 'skk-isearch nil t))
   (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
   (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
   (when (boundp 'skk-isearch-start-mode)
-     (setq skk-isearch-start-mode 'latin)))
+     (setq skk-isearch-start-mode 'latin))) ; 起動時アスキーモード
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -460,6 +485,15 @@ Otherwise return word around point."
                  term-mode
                  navi2ch-list-mode
                  navi2ch-board-mode))) ad-do-it))
+
+;;; ファイル名をユニークにする
+(when (eval-and-compile (require 'uniquify nil t))
+  ;; filename<dir> 形式のバッファ名にする
+  (when (boundp 'uniquify-buffer-name-style)
+    (setq uniquify-buffer-name-style 'post-forward-angle-brackets)))
+  ;; * で囲まれたバッファ名は対象外にする
+  (when (boundp 'uniquify-ignore-buffers-re)
+    (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;;; ファイラ (dired)
 ;; 編集可能にする
@@ -644,15 +678,17 @@ Otherwise return word around point."
 ;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
 (when (eval-when-compile (require 'ediff nil t))
+  ;; ediff 関連のバッファをひとつにまとめる
   (when (boundp 'ediff-window-setup-function)
     (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+  ;; diff オプション
   (when (boundp 'diff-switches)
     (setq diff-switches '("-u" "-p" "-N"))))
 
 ;;; バッファの切り替えをインクリメンタルにする
 (when (eval-when-compile (require 'iswitchb nil t))
   (when (fboundp 'iswitchb-mode)
-    (iswitchb-mode t))
+    (iswitchb-mode t)) ; iswitchb モードをオン
   (when (boundp 'read-buffer-function)
     (setq read-buffer-function 'iswitchb-read-buffer))
   (when (boundp 'iswitchb-regexp)
@@ -1021,10 +1057,7 @@ Otherwise return word around point."
        (when (boundp 'skk-dcomp-multiple-activate)
          (setq skk-dcomp-multiple-activate t))        ; 動的補完の複数候補表示
        (when (boundp 'skk-dcomp-multiple-rows)
-         (setq skk-dcomp-multiple-rows 10))	          ; 動的補完の候補表示件数
-       ;; 動的補完時に次の補完へ
-       (define-key skk-j-mode-map (kbd "C-n") 'skk-comp-wrapper)
-       (define-key skk-j-mode-map (kbd "C-p") 'skk-abbrev-comma))))
+         (setq skk-dcomp-multiple-rows 10)))))        ; 動的補完の候補表示件数
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
