@@ -977,6 +977,9 @@ Otherwise return word around point."
 ;; http://openlab.ring.gr.jp/skk/wiki/wiki.cgi?page=SKK%BC%AD%BD%F1#p7
 ;; http://kddoing.ddo.jp/user/skk/SKK-JISYO.KAO.unannotated
 ;; http://omaemona.sourceforge.net/packages/Canna/SKK-JISYO.2ch
+;; q 「かなモード」,「カナモード」間をトグルする.
+;; l 「かなモード」または「カナモード」から「アスキーモード」へ.
+;; L 「かなモード」または「カナモード」から「全英モード」へ.
 (when (locate-library "skk")
   (autoload 'skk-mode "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
   (define-key global-map (kbd "C-\\") 'skk-mode)
@@ -994,13 +997,34 @@ Otherwise return word around point."
                       '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000 t) t)
          (add-to-list 'skk-search-prog-list
                       '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
-       ;; skk 用の sticky キー設定
        ;; 一般的には `;' だが Paren モードが効かなくなるため TAB にする
        (when (boundp 'skk-sticky-key)
-         (setq skk-sticky-key (kbd "TAB")))
-       ;; インライン候補縦表示
+         (setq skk-sticky-key (kbd "TAB")))           ; sticky キー設定
        (when (boundp 'skk-show-inline)
-         (setq skk-show-inline 'vertical)))))
+         (setq skk-show-inline 'vertical))            ; インライン候補縦表示
+       (when (boundp 'skk-egg-like-newline)
+         (setq skk-egg-like-newline t))               ; Enter で確定
+       (when (boundp 'skk-auto-insert-paren)
+         (setq skk-auto-insert-paren))                ; 閉括弧を自動補完
+       (when (boundp 'skk-show-tooltip)
+         (setq skk-show-tooltip t))                   ; tips 描画
+       (when (boundp 'skk-show-annotation)
+         (setq skk-show-annotation t))                ; 注釈を表示
+       (when (boundp 'skk-annotation-show-wikipedia-url)
+         (setq skk-annotation-show-wikipedia-url t))  ; Wikipedia 注釈 (C-o でブラウザを開く)
+       (when (boundp 'skk-use-look)
+         (setq skk-use-look t))                       ; 英語補完 (/ で略語展開モード)
+       (when (boundp 'skk-henkan-strict-okuri-precedence)
+         (setq skk-henkan-strict-okuri-precedence t)) ; 送り仮名
+       (when (boundp skk-dcomp-activate)
+         (setq skk-dcomp-activate t))                 ; 動的に補完
+       (when (boundp 'skk-dcomp-multiple-activate)
+         (setq skk-dcomp-multiple-activate t))        ; 動的補完の複数候補表示
+       (when (boundp 'skk-dcomp-multiple-rows)
+         (setq skk-dcomp-multiple-rows 10))	          ; 動的補完の候補表示件数
+       ;; 動的補完時に次の補完へ
+       (define-key skk-j-mode-map (kbd "C-n") 'skk-comp-wrapper)
+       (define-key skk-j-mode-map (kbd "C-p") 'skk-abbrev-comma))))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
