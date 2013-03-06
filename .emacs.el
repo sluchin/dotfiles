@@ -483,7 +483,8 @@ Otherwise return word around point."
                  dired-mode
                  term-mode
                  navi2ch-list-mode
-                 navi2ch-board-mode))) ad-do-it))
+                 navi2ch-board-mode
+                 twittering-mode))) ad-do-it))
 
 ;;; ファイル名をユニークにする
 (when (eval-and-compile (require 'uniquify nil t))
