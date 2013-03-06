@@ -318,27 +318,23 @@
     ad-do-it))
 ;; migemo
 ;; sudo apt-get install migemo cmigemo
-;; git clone git://github.com/koron/cmigemo.git
-;; ./configure; make gcc;
-;; cd dict; make utf-8
-;; cd ..; sudo make gcc-install
+;; C-e でトグル
 (when (and (executable-find "cmigemo")
            (locate-library "migemo"))
-  (when (boundp 'migemo-command)
-    (setq migemo-command "cmigemo"))                    ; コマンド
-  (when (boundp 'migemo-options)
-    (setq migemo-options '("-q" "--emacs")))            ; オプション
-  (when (boundp 'migemo-dictionary)
-    (setq migemo-dictionary
-          "/usr/local/share/migemo/utf-8/migemo-dict")) ; パス指定
-  (when (boundp 'migemo-user-dictionary)
+  (when (boundp 'migemo-command)          ; コマンド
+    (setq migemo-command "cmigemo"))
+  (when (boundp 'migemo-options)          ; オプション
+    (setq migemo-options '("-q" "--emacs")))
+  (when (boundp 'migemo-dictionary)       ; パス指定
+    (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict"))
+  (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
     (setq migemo-user-dictionary nil))
-  (when (boundp 'migemo-regex-dictionary)
+  (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
     (setq migemo-regex-dictionary nil))
-  (when (boundp 'migemo-coding-system)
+  (when (boundp 'migemo-coding-system)    ; utf-8
   (setq migemo-coding-system 'utf-8-unix))
-  (load-library "migemo")
-  (when (fboundp 'migemo-init)
+  (load-library "migemo")                 ; ロード
+  (when (fboundp 'migemo-init)            ; 初期化
     (migemo-init)))
 ;; 日本語で検索するための設定
 (when (eval-and-compile (require 'skk-isearch nil t))
@@ -346,6 +342,9 @@
   (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
   (when (boundp 'skk-isearch-start-mode)
      (setq skk-isearch-start-mode 'latin))) ; 起動時アスキーモード
+;; ファイル名に拡張
+;(ido-mode t)       ; コマンドが ido のものに置き変わる
+;(ido-everywhere t) ; バッファ名ファイル名全て
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -616,12 +615,13 @@ Otherwise return word around point."
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
   (eval-after-load "speedbar"
     '(progn
-       (when (boundp 'speedbar-use-images)
+       (when (boundp 'speedbar-use-images)                ; イメージ表示しない
          (setq speedbar-use-images nil))
-       (when (boundp 'speedbar-hide-button-brackets-flag)
+       (when (boundp 'speedbar-hide-button-brackets-flag) ; ブラケット表示を隠す
          (setq speedbar-hide-button-brackets-flag t))
-       (when (boundp 'speedbar-tag-hierarchy-method)
+       (when (boundp 'speedbar-tag-hierarchy-method)      ; Tags グループ化
          (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy)))
+       ;; フレーム設定
        (when (boundp 'speedbar-frame-parameters)
          (custom-set-variables '(speedbar-frame-parameters
                                  '((minibuffer . nil)
@@ -640,6 +640,7 @@ Otherwise return word around point."
        (when (boundp 'speedbar-directory-unshown-regexp)
          (setq speedbar-directory-unshown-regexp "^\\'"))
 
+       ;; キーバインドのカスタマイズ
        ;; "a" で無視ファイル表示/非表示のトグル
        (define-key speedbar-file-key-map "a" 'speedbar-toggle-show-all-files)
        ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
@@ -687,12 +688,16 @@ Otherwise return word around point."
 
 ;;; バッファの切り替えをインクリメンタルにする
 (when (eval-when-compile (require 'iswitchb nil t))
+  ;; iswitchb モードをオン
   (when (fboundp 'iswitchb-mode)
-    (iswitchb-mode t)) ; iswitchb モードをオン
+    (iswitchb-mode t))
+  ;; バッファ名の読み取り方を指定
   (when (boundp 'read-buffer-function)
     (setq read-buffer-function 'iswitchb-read-buffer))
+  ;; 部分文字列の代わりに正規表現を使う場合は t に設定する
   (when (boundp 'iswitchb-regexp)
     (setq iswitchb-regexp nil))
+  ;; 新しいバッファを作成するときいちいち聞いてこない
   (when (boundp 'iswitchb-prompt-newbuffer)
     (setq iswitchb-prompt-newbuffer nil)))
 
@@ -713,25 +718,23 @@ Otherwise return word around point."
            (eval-when-compile (require 'org-remember nil t))
            (eval-when-compile (require 'org-install nil t)))
 
+  ;; 自動で org-mode にする
+  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
   ;; org-mode での強調表示を可能にする
   (add-hook 'org-mode-hook 'turn-on-font-lock)
-  ;; 見出しの余分な * を消す
-  (when (boundp 'org-hide-leading-stars)
+  (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
     (setq org-hide-leading-stars t))
-  ;; org-remember のディレクトリ
-  (when (boundp 'org-directory)
+  (when (boundp 'org-directory)           ; org-remember のディレクトリ
     (setq org-directory "~/memo/"))
-  ;; org-remember のファイル名
-  (when (boundp 'org-default-notes-file)
+  (when (boundp 'org-default-notes-file)  ; org-remember のファイル名
     (setq org-default-notes-file (concat org-directory "agenda.org")))
-  (when (boundp 'org-startup-truncated)
+  (when (boundp 'org-startup-truncated)   ; 行の折り返し
     (setq org-startup-truncated nil))
-  (when (boundp 'org-return-follows-link)
+  (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
     (setq org-return-follows-link t))
-  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (when (fboundp 'org-remember-insinuate)
+  (when (fboundp 'org-remember-insinuate) ; org-remember の初期化
     (org-remember-insinuate))
-  (when (boundp 'org-remember-templates)
+  (when (boundp 'org-remember-templates)  ; テンプレート
     (setq org-remember-templates
           '(("Todo" ?t "** TODO %?\n   %i\n   %a\n   %t" nil "Inbox")
             ("Bug" ?b "** TODO %?   :bug:\n   %i\n   %a\n   %t" nil "Inbox")
@@ -789,8 +792,10 @@ Otherwise return word around point."
   "Do enable auto-install"
   (interactive)
   (when (eval-and-compile (require 'auto-install nil t))
+    ;; 起動時に EmacsWiki のページ名を補完候補に加える
     (when (fboundp 'auto-install-update-emacswiki-package-name)
       (auto-install-update-emacswiki-package-name t))
+    ;; install-elisp.el 互換モードにする
     (when (fboundp 'auto-install-compatibility-setup)
       (auto-install-compatibility-setup))))
 
@@ -846,6 +851,7 @@ Otherwise return word around point."
   (add-hook 'kill-emacs-hook (lambda nil
                                (bm-buffer-save-all)
                                (bm-repository-save)))
+  ;; キーバインド
   (define-key global-map (kbd "M-\\") 'bm-toggle)
   (define-key global-map (kbd "M-[") 'bm-previous)
   (define-key global-map (kbd "M-]") 'bm-next))
@@ -864,16 +870,19 @@ Otherwise return word around point."
 
 ;;; セッション保存
 ;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/session-2.3a.tar.gz | tar xfz -
-;; ミニバッファ履歴
-(setq history-length t) ; t の場合無限
 ;; kill-ringやミニバッファで過去に開いたファイルなどの履歴を保存する
 (when (eval-and-compile (require 'session nil t))
+  ;; セッション初期化
   (when (boundp 'session-initialize)
     (setq session-initialize '(de-saveplace session keys menus places)))
+  ;; ミニバッファ履歴
+  (when (boundp 'history-length)
+    (setq history-length t)) ; t の場合無限
+  ;; 保存件数をカスタマイズ
   (when (boundp 'session-globals-include)
-      (setq session-globals-include '((kill-ring 50)
-                                      (session-file-alist 500 t)
-                                      (file-name-history 10000))))
+      (setq session-globals-include '((kill-ring 50)               ; kill-ring の保存件数
+                                      (session-file-alist 500 t)   ; カーソル位置保存件数
+                                      (file-name-history 10000)))) ; ファイル履歴
     (add-hook 'after-init-hook 'session-initialize)
   ;; 前回閉じたときの位置にカーソルを復帰
   (when (boundp 'session-undo-check)
@@ -892,9 +901,9 @@ Otherwise return word around point."
 ;; 以下で最近開いたファイルを一覧表示
 ;; M-x recentf-open-files
 (when (eval-and-compile (require 'recentf-ext nil t))
-  (when (boundp 'recentf-max-saved-items)
+  (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
     (setq recentf-max-saved-items 10000))
-  (when (boundp 'recentf-exclude)
+  (when (boundp 'recentf-exclude)         ; 除外するファイル
     (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$"))))
 
 ;;; タブ
@@ -902,11 +911,13 @@ Otherwise return word around point."
 (when (eval-and-compile (require 'tabbar nil t))
   (when (fboundp 'tabbar-mode)
     (tabbar-mode -1)) ; デフォルト無効
+  ;; 色の設定
   (set-face-background 'tabbar-default "cadet blue")
   (set-face-foreground 'tabbar-unselected "black")
   (set-face-background 'tabbar-unselected "cadet blue")
   (set-face-foreground 'tabbar-selected "brack")
   (set-face-background 'tabbar-selected "blue")
+  ;; キーバインド
   (define-key global-map (kbd "<f10>") 'tabbar-mode)
   (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
   (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab))
@@ -975,10 +986,11 @@ Otherwise return word around point."
   (define-key global-map (kbd "C-c h") 'howm-menu)
   (eval-after-load "howm"
     '(progn
+       ;; メニュー言語
        (when (boundp 'howm-menu-lang)
          (setq howm-menu-lang 'ja))
+       ;; デュアルブートで Linux と Windows で共有するための設定
        (when (boundp 'howm-directory)
-         ;; デュアルブートで Linux と Windows で共有するための設定
          (cond ((and (eq system-type 'gnu/linux)
                      (file-directory-p "/dos"))
                 (setq howm-directory "/dos/howm"))
@@ -987,13 +999,12 @@ Otherwise return word around point."
                 (setq howm-directory "e:/howm"))
                (t
                 (setq howm-directory "~/howm"))))
-
+       ;; 除外するファイル
        (when (boundp 'howm-excluded-file-regexp)
-         ;; 除外するファイル
          (setq howm-excluded-file-regexp
                "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))
+       ;; 最近使ったファイルから除外する
        (when (boundp 'recentf-exclude)
-         ;; 最近使ったファイルから除外する
          (setq recentf-exclude '(howm-directory ".howm-keys"))))))
 
 ;;; GNU Global
@@ -1033,31 +1044,31 @@ Otherwise return word around point."
                       '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000 t) t)
          (add-to-list 'skk-search-prog-list
                       '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
-       ;; 一般的には `;' だが Paren モードが効かなくなるため TAB にする
-       (when (boundp 'skk-sticky-key)
-         (setq skk-sticky-key (kbd "TAB")))           ; sticky キー設定
-       (when (boundp 'skk-show-inline)
-         (setq skk-show-inline 'vertical))            ; インライン候補縦表示
-       (when (boundp 'skk-egg-like-newline)
-         (setq skk-egg-like-newline t))               ; Enter で確定
-       (when (boundp 'skk-auto-insert-paren)
-         (setq skk-auto-insert-paren))                ; 閉括弧を自動補完
-       (when (boundp 'skk-show-tooltip)
-         (setq skk-show-tooltip t))                   ; tips 描画
-       (when (boundp 'skk-show-annotation)
-         (setq skk-show-annotation t))                ; 注釈を表示
-       (when (boundp 'skk-annotation-show-wikipedia-url)
-         (setq skk-annotation-show-wikipedia-url t))  ; Wikipedia 注釈 (C-o でブラウザを開く)
-       (when (boundp 'skk-use-look)
-         (setq skk-use-look t))                       ; 英語補完 (/ で略語展開モード)
-       (when (boundp 'skk-henkan-strict-okuri-precedence)
-         (setq skk-henkan-strict-okuri-precedence t)) ; 送り仮名
-       (when (boundp skk-dcomp-activate)
-         (setq skk-dcomp-activate t))                 ; 動的に補完
-       (when (boundp 'skk-dcomp-multiple-activate)
-         (setq skk-dcomp-multiple-activate t))        ; 動的補完の複数候補表示
-       (when (boundp 'skk-dcomp-multiple-rows)
-         (setq skk-dcomp-multiple-rows 10)))))        ; 動的補完の候補表示件数
+       ;;  `;' だと Paren モードで効かなくなるため `:' にする
+       (when (boundp 'skk-sticky-key)                     ; sticky キー設定
+         (setq skk-sticky-key ":"))
+       (when (boundp 'skk-show-inline)                    ; インライン候補縦表示
+         (setq skk-show-inline 'vertical))
+       (when (boundp 'skk-egg-like-newline)               ; Enter で確定
+         (setq skk-egg-like-newline t))
+       (when (boundp 'skk-auto-insert-paren)              ; 閉括弧を自動補完
+         (setq skk-auto-insert-paren))
+       (when (boundp 'skk-show-tooltip)                   ; tips 描画
+         (setq skk-show-tooltip t))
+       (when (boundp 'skk-show-annotation)                ; 注釈を表示
+         (setq skk-show-annotation t))
+       (when (boundp 'skk-annotation-show-wikipedia-url)  ; Wikipedia 注釈 (C-o でブラウザを開く)
+         (setq skk-annotation-show-wikipedia-url t))
+       (when (boundp 'skk-use-look)                       ; 英語補完 (/ で略語展開モード)
+         (setq skk-use-look t))
+       (when (boundp 'skk-henkan-strict-okuri-precedence) ; 送り仮名
+         (setq skk-henkan-strict-okuri-precedence t))
+       (when (boundp skk-dcomp-activate)                  ; 動的に補完
+         (setq skk-dcomp-activate t))
+       (when (boundp 'skk-dcomp-multiple-activate)        ; 動的補完の複数候補表示
+         (setq skk-dcomp-multiple-activate t))
+       (when (boundp 'skk-dcomp-multiple-rows)            ; 動的補完の候補表示件数
+         (setq skk-dcomp-multiple-rows 10)))))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
@@ -1093,7 +1104,7 @@ Otherwise return word around point."
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-  (when (boundp 'eldoc-idle-delay)
+  (when (boundp 'eldoc-idle-delay) ; 待ち時間
     (setq eldoc-idle-delay 0.2))
   ;; モードラインに ElDoc と表示しない
   (when (boundp 'eldoc-minor-mode-string)
@@ -1102,9 +1113,9 @@ Otherwise return word around point."
 ;;; *Help* にメモを書き込む
 ;; (install-elisp-from-emacswiki "usage-memo.el")
 (when (eval-and-compile (require 'usage-memo nil t))
-  (when (boundp 'umemo-base-directory)
+  (when (boundp 'umemo-base-directory) ; ディレクトリ
     (setq umemo-base-directory "~/.emacs.d/umemo"))
-  (when (fboundp 'umemo-initialize)
+  (when (fboundp 'umemo-initialize)    ; 初期化
     (umemo-initialize)))
 
 ;;; プロセスリスト
@@ -1113,7 +1124,7 @@ Otherwise return word around point."
   (autoload 'list-processes+ "list-processes+" "A enhance list processes command." t)
   (defalias 'ps 'list-processes+))
 
-;;; ポモドーロ
+;;; ポモドーロタイマ
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
 ;; (install-elisp "https://raw.github.com/krick/tea-time/master/tea-time.el")
 ;; git clone git://github.com/konr/tomatinho.git
@@ -1131,11 +1142,11 @@ Otherwise return word around point."
        (when (boundp 'pomodoro:file)
          (setq pomodoro:file "~/gtd/pomodoro.org"))
        ;; 作業時間
-       (when (boundp 'pomodoro:work-time)
+       (when (boundp 'pomodoro:work-time)      ; 仕事
          (setq pomodoro:work-time 25))
-       (when (boundp 'pomodoro:rest-time)
+       (when (boundp 'pomodoro:rest-time)      ; 休憩
          (setq pomodoro:rest-time 5))
-       (when (boundp 'pomodoro:long-rest-time)
+       (when (boundp 'pomodoro:long-rest-time) ; 長い休憩
          (setq pomodoro:long-rest-time 30)))))
 
 (when (locate-library "tomatinho")
@@ -1144,10 +1155,10 @@ Otherwise return word around point."
     '(progn
        (when (boundp 'tomatinho-bar-length)
          (setq tomatinho-bar-length 25))
-       (when (boundp 'tomatinho-pomodoro-length)
-         (setq tomatinho-pomodoro-length 25))           ; 25 分
-       (defvar tomatinho-pomodoro-pause-length 5)       ;  5 分
-       (defvar tomatinho-pomodoro-long-pause-length 20) ; 20 分
+       (when (boundp 'tomatinho-pomodoro-length)        ; 仕事
+         (setq tomatinho-pomodoro-length 25))
+       (defvar tomatinho-pomodoro-pause-length 5)       ; 休憩
+       (defvar tomatinho-pomodoro-long-pause-length 20) ; 長い休憩
        (defadvice tomatinho-update (after tomatinho-pause-update activate)
          (let ((type (car tomatinho-current)) (val (cdr tomatinho-current))
                (l (if (= 0 (mod (+ 1 (length tomatinho-events)) 8)
@@ -1167,10 +1178,12 @@ Otherwise return word around point."
          (ad-disable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
          (ad-activate 'tomatinho-update)))))
 
+;;; タイマー
 (when (locate-library "tea-time")
   (autoload 'tea-time "tea-time" "Timer." t)
   (eval-after-load "tea-time"
     '(progn
+       ;; サウンドファイルのパス
        (when (and (boundp 'tea-time-sound)
                   (file-exists-p "~/.emacs.d/tomatinho/tick.wav"))
              (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav")))))
@@ -1285,6 +1298,7 @@ Otherwise return word around point."
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY.")
   (eval-after-load "mew"
     '(progn
+       ;; 初期設定
        (when (boundp 'mail-user-agent)
          (setq mail-user-agent 'mew-user-agent))
        (when (fboundp 'define-mail-user-agent)
@@ -1295,49 +1309,41 @@ Otherwise return word around point."
            'mew-draft-kill
            'mew-send-hook))
 
-       ;; 起動デモを表示しない
-       (when (boundp 'mew-demo)
+       (when (boundp 'mew-demo)                  ; 起動デモを表示しない
          (setq mew-demo nil))
-       ;;署名の自動挿入（ホームディレクトリに.signatureを作っておく）
-       (when (file-readable-p "~/.signature")
+       ;; ホームディレクトリに .signature を作っておく
+       (when (file-readable-p "~/.signature")    ; 署名の自動挿入
          (add-hook 'mew-draft-mode-newdraft-hook
                    (lambda ()
                      (let ((p (point)))
                        (goto-char (point-max))
                        (insert-file "~/.signature")
                        (goto-char p)))))
-       ;; Summary モードの書式変更
-       (when (boundp 'mew-summary-form)
+       (when (boundp 'mew-summary-form)          ; Summary モードの書式変更
            (setq mew-summary-form
                  '(type (5 date) "-" (-4 time) " " (14 from) " " t (30 subj) "|" (0 body))))
-       ;; スレッドの親子関係を罫線を使って可視化
-       (when (boundp 'mew-use-fancy-thread)
+       (when (boundp 'mew-use-fancy-thread)      ; スレッドの親子関係を罫線を使って可視化
          (setq mew-use-fancy-thread t))
-       ;; スレッド間に区切りを表示
-       (when (boundp 'mew-use-thread-separator)
+       (when (boundp 'mew-use-thread-separator)  ; スレッド間に区切りを表示
          (setq mew-use-thread-separator t))
-       ;; レンジを聞かない
-       (when (boundp 'mew-ask-range)
+       (when (boundp 'mew-ask-range)             ; レンジを聞かない
          (setq mew-ask-range nil))
-       ;; 重複メールには削除マークをつける
-       (when (boundp 'mew-scan-form-mark-delete)
+       (when (boundp 'mew-scan-form-mark-delete) ; 重複メールには削除マークをつける
          (setq mew-scan-form-mark-delete t))
-       ;; パスワードの保持
-       (when (boundp 'mew-use-cached-passwd)
+       (when (boundp 'mew-use-cached-passwd)     ; パスワードの保持
          (setq mew-use-cached-passwd t))
-       (when (boundp 'mew-passwd-timer-unit)
+       (when (boundp 'mew-passwd-timer-unit)     ; lifetime の単位
          (setq mew-passwd-timer-unit 60))
-       (when (boundp 'mew-passwd-lifetime)
+       (when (boundp 'mew-passwd-lifetime)       ; 120 hours
          (setq mew-passwd-lifetime 120))
-       ;; 着信通知
-       (when (boundp 'mew-use-biff)
+       (when (boundp 'mew-use-biff)              ; 着信通知
          (setq mew-use-biff t))
-       (when (boundp 'mew-use-biff-bell)
-         (setq mew-use-biff-bell nil))   ; ベルを鳴らさない
-       (when (boundp 'mew-biff-interval)
-         (setq mew-biff-interval 3))     ; 間隔(分)
-       (when (boundp 'mew-auto-get)
-         (setq mew-auto-get nil))        ; 起動時取得しない
+       (when (boundp 'mew-use-biff-bell)         ; ベルを鳴らさない
+         (setq mew-use-biff-bell nil))
+       (when (boundp 'mew-biff-interval)         ; 間隔(分)
+         (setq mew-biff-interval 3))
+       (when (boundp 'mew-auto-get)              ; 起動時取得しない
+         (setq mew-auto-get nil))
 
        ;; モードラインにアイコンとメールの数を表示する
        (defun mew-propertized-biff-icon (fmt)
@@ -1353,6 +1359,7 @@ Otherwise return word around point."
        (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
        (defvar mew-mode-line-biff-quantity 0)
        (when (boundp 'mew-biff-function)
+         ;; mew-biff-interval の間隔で呼ばれる関数
          (setq mew-biff-function
                (lambda (n)
                  (if (= n 0)
@@ -1361,18 +1368,20 @@ Otherwise return word around point."
                          (mew-propertized-biff-icon " "))
                    (setq mew-mode-line-biff-string
                          (mew-propertized-biff-string (format "(%d)" n)))
-                   (when (< mew-mode-line-biff-quantity n) ; メール数が増えた場合
+                   ;; メール数が増えた場合, D-Bus 経由で通知
+                   (when (< mew-mode-line-biff-quantity n)
                      (notifications-notify
                       :title "Emacs/Mew"
                       :body  (format "You got mail(s): %d" n)
                       :timeout 5000))
                    (setq mew-mode-line-biff-quantity n)))))
-
+       ;; 着信後呼ばれる関数
        (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
          (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
          (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
          (setq mew-mode-line-biff-quantity 0))
 
+       ;; モードラインのフォーマット
        (unless (member '(:eval mew-mode-line-biff-string) mode-line-format)
          (setq-default mode-line-format
                        (cons '(:eval mew-mode-line-biff-string) mode-line-format)))
@@ -1380,11 +1389,9 @@ Otherwise return word around point."
          (setq-default mode-line-format
                        (cons '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
-       ;; IMAP の設定
-       (when (boundp 'mew-proto)
+       (when (boundp 'mew-proto)             ; IMAP の設定
          (setq mew-proto "%"))
-       ;; 送信メールを保存する
-       (when (boundp 'mew-fcc)
+       (when (boundp 'mew-fcc)               ; 送信メールを保存する
          (setq mew-fcc "%Sent"))
        ;; メールアカウントの設定
        ;; ~/.emacs.d/conf/mail-account.el に以下の変数を設定する
@@ -1396,9 +1403,9 @@ Otherwise return word around point."
        ;; (setq mew-imap-user "IMAP account")
        ;; (setq mew-imap-server "IMAP server")
        ;; (setq mew-smtp-server "SMTP server")
-       (when (locate-library "mail-account")
+       (when (locate-library "mail-account") ; アカウント設定
          (load "mail-account"))
-       ;; Gmail は SSL接続
+       ;; SSL 接続の設定
        (when (string= "gmail.com" mew-mail-domain)
          (when (boundp 'mew-imap-auth)
            (setq mew-imap-auth  t))
@@ -1419,20 +1426,39 @@ Otherwise return word around point."
 
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
+;; sudo apt-get install libxpm-dev
+;; (eval 'image-types)
 (when (locate-library "twittering-mode")
   (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t)
+  (add-hook 'twittering-mode-hook
+            (lambda ()
+              (setq header-line-format nil)
+              (setq show-trailing-whitespace nil)))
   (eval-after-load "twittering-mode"
     '(progn
-       (when (boundp 'twittering-icon-mode)
+       (when (boundp 'twittering-auth-method)                   ; OAuth を使わない
+         (setq twittering-auth-method 'xauth))
+       ;; ~/.emacs.d/conf/twitter-account.el に以下の変数を設定する
+       ;; (setq twittering-username "User name")
+       ;; (setq twittering-password "Password")
+       (when (locate-library "twitter-account")                 ; アカウント
+         (load "twitter-account"))
+       (when (boundp 'twittering-icon-mode)                     ; ユーザアイコンを表示
          (setq twittering-icon-mode t))
-       (when (boundp 'twittering-status-format)
+       (when (boundp 'twittering-convert-fix-size)              ; アイコンサイズ
+         (setq twittering-convert-fix-size 32))
+       (when (boundp 'twittering-display-remaining)             ; モードラインに API の残数を表示する
+         (setq twittering-display-remaining t))
+       (when (boundp 'twittering-status-format)                 ; フォーマット指定
          (setq twittering-status-format
                "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
-       (when (boundp 'twittering-update-status-function)
+       (when (boundp 'twittering-update-status-function)        ; バッファラインにステータスを表示
          (setq twittering-update-status-function
                'twittering-update-status-from-pop-up-buffer))
-       (when (boundp 'twittering-use-master-password)
-         (setq twittering-use-master-password t)))))
+       (when (boundp 'twittering-number-of-tweets-on-retrieval) ; ツイート取得数
+         (setq twittering-number-of-tweets-on-retrieval 50))
+       (when (boundp 'twittering-timer-interval)                ; 更新の頻度 (秒)
+         (setq twittering-timer-interval 60)))))
 
 ;;; ブラウザ (w3m)
 ;; sudo apt-get install w3m
@@ -1483,20 +1509,15 @@ Otherwise return word around point."
 
   (eval-after-load "w3m"
     '(progn
-       ;; デフォルトで使う検索エンジン
-       (when (boundp 'w3m-search-default-engine)
+       (when (boundp 'w3m-search-default-engine)     ; デフォルトで使う検索エンジン
          (setq w3m-search-default-engine "google"))
-       ;; ホームページ
-       (when (boundp 'w3m-home-page)
+       (when (boundp 'w3m-home-page)                 ; ホームページ
          (setq w3m-home-page "http://google.co.jp/"))
-       ;; クッキーを有効にする
-       (when (boundp 'w3m-use-cookies)
+       (when (boundp 'w3m-use-cookies)               ; クッキーを有効にする
          (setq w3m-use-cookies t))
-       ;; favicon のキャッシュを消さない
-       (when (boundp 'w3m-favicon-cache-expire-wait)
+       (when (boundp 'w3m-favicon-cache-expire-wait) ; favicon のキャッシュを消さない
          (setq w3m-favicon-cache-expire-wait nil))
-       ;; デフォルトエリア
-       (when (boundp 'w3m-weather-default-area)
+       (when (boundp 'w3m-weather-default-area)      ; デフォルトエリア
          (setq w3m-weather-default-area "道央・石狩"))
        ;; キーバインドをカスタマイズ
        (define-key w3m-mode-map (kbd "<left>") 'backward-char)
@@ -1564,11 +1585,11 @@ Otherwise return word around point."
   (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t)
   (eval-after-load "multi-term"
     '(progn
-       (when (boundp 'multi-term-program)
+       (when (boundp 'multi-term-program)   ; zsh を使う
          (setq multi-term-program "zsh"))
-       (when (boundp 'term-unbind-key-list)
+       (when (boundp 'term-unbind-key-list) ; バインドしないキーリスト
          (setq term-unbind-key-list '("C-x" "C-c" "<ESC>")))
-       (when (boundp 'term-bind-key-alist)
+       (when (boundp 'term-bind-key-alist)  ; バインドするキーリスト
          (setq term-bind-key-alist
                '(("C-c C-c" . term-interrupt-subjob)
                  ("C-m" . term-send-raw)
@@ -1604,30 +1625,30 @@ Otherwise return word around point."
                              (require 'auto-complete-config nil t)))
   (add-to-list 'ac-dictionary-directories
                "~/.emacs.d/auto-complete/dict")
-  (when (boundp 'ac-comphist-file)
+  (when (boundp 'ac-comphist-file)     ; ソースファイル
     (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
-  (when (fboundp 'ac-config-default)
+  (when (fboundp 'ac-config-default)   ; デフォルト設定にする
     (ac-config-default))
-  (when (boundp 'ac-delay)
+  (when (boundp 'ac-delay)             ; 待ち時間
     (setq ac-delay 0.1))
-  (when (boundp 'ac-quick-help-delay)
+  (when (boundp 'ac-quick-help-delay)  ; クイックヘルプ表示時間
     (setq ac-quick-help-delay 0.1))
-  (when (boundp 'ac-auto-show-menu)
+  (when (boundp 'ac-auto-show-menu)    ; 補完メニュー表示時間
     (setq ac-auto-show-menu 0.1))
-  (when (boundp 'ac-candidate-max)
+  (when (boundp 'ac-candidate-max)     ; 候補の最大数
     (setq ac-candidate-max 50))
-  (when (boundp 'ac-auto-start)
-    (setq ac-auto-start nil)) ; 自動で補完しない
-  (when (boundp 'ac-modes)
+  (when (boundp 'ac-auto-start)        ; 自動で補完しない
+    (setq ac-auto-start nil))
+  (when (boundp 'ac-modes)             ; 補完対象モード
     (setq ac-modes
           (append ac-modes
                   (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode))))
-  (when (fboundp 'ac-set-trigger-key)
+  (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
     (ac-set-trigger-key "C-;"))
-  (when (boundp 'ac-complete-mode-map)
-    (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
-    (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
-    (define-key ac-complete-mode-map (kbd "C-/") 'ac-stop))
+  ;; キーバインド
+  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
+  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+  (define-key ac-complete-mode-map (kbd "C-/") 'ac-stop)
   ;; オートコンプリートをトグルする
   (define-key global-map (kbd "<f4>")
     (lambda (&optional n)
@@ -1647,9 +1668,9 @@ Otherwise return word around point."
   "Do enable yasnippet"
   (interactive)
   (when (eval-and-compile (require 'yasnippet nil t))
-    (when (fboundp 'yas--initialize)
+    (when (fboundp 'yas--initialize) ; 初期化
       (yas--initialize))
-    (when (boundp 'yas-snippet-dirs)
+    (when (boundp 'yas-snippet-dirs) ; スニペットディクトリ
       (setq yas-snippet-dirs '("~/.emacs.d/snippets"
                                "~/.emacs.d/yasnippet/snippets"))
       (mapc 'yas-load-directory yas-snippet-dirs))))
