@@ -1390,9 +1390,23 @@ Otherwise return word around point."
          (setq-default mode-line-format
                        (cons '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
-       (when (boundp 'mew-proto)             ; IMAP の設定
+       ;; リージョンで refile する
+       (defadvice mew-summary-auto-refile (around
+                                           mew-summary-auto-refile-region
+                                           activate)
+         "Refile on the region."
+         (mew-summary-mark-escape) ; マークを退避する
+         (when (mew-mark-active-p)
+           (let ((mew-region (mew-summary-get-region)))
+             (mew-summary-mark-all-region (car mew-region) (cdr mew-region))))
+         ad-do-it
+         (mew-summary-mark-review))
+
+       ;; IMAP の設定
+       (when (boundp 'mew-proto)
          (setq mew-proto "%"))
-       (when (boundp 'mew-fcc)               ; 送信メールを保存する
+       ;; 送信メールを保存する
+       (when (boundp 'mew-fcc)
          (setq mew-fcc "%Sent"))
        ;; メールアカウントの設定
        ;; ~/.emacs.d/conf/mail-account.el に以下の変数を設定する
@@ -1404,7 +1418,7 @@ Otherwise return word around point."
        ;; (setq mew-imap-user "IMAP account")
        ;; (setq mew-imap-server "IMAP server")
        ;; (setq mew-smtp-server "SMTP server")
-       (when (locate-library "mail-account") ; アカウント設定
+       (when (locate-library "mail-account")
          (load "mail-account"))
        ;; SSL 接続の設定
        (when (string= "gmail.com" mew-mail-domain)
