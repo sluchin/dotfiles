@@ -72,7 +72,8 @@
   (autoload 'info "info" "Enter Info, the documentation browser." t)
   (eval-after-load "info"
     '(when (boundp 'Info-directory-list)
-         (setq Info-directory-list (cons "~/.emacs.d/info" Info-default-directory-list)))))
+         (setq Info-directory-list (cons "~/.emacs.d/info"
+                                         Info-default-directory-list)))))
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
@@ -158,7 +159,8 @@
 ;; (list-colors-display)
 (custom-set-faces
  '(mode-line ((t (:foreground "gray5" :background "RoyalBlue1" :box nil))))
- '(mode-line-inactive ((t (:foreground "gray55" :background "RoyalBlue4" :box nil)))))
+ '(mode-line-inactive
+   ((t (:foreground "gray55" :background "RoyalBlue4" :box nil)))))
 
 ;;; ヘッダラインの色設定
 ;; face を調べるには以下を評価する
@@ -320,12 +322,12 @@
 ;; sudo apt-get install migemo cmigemo
 ;; C-e でトグル
 (when (and (executable-find "cmigemo")
-           (locate-library "migemo"))
+           (require 'migemo nil t))
   (when (boundp 'migemo-command)          ; コマンド
     (setq migemo-command "cmigemo"))
   (when (boundp 'migemo-options)          ; オプション
     (setq migemo-options '("-q" "--emacs")))
-  (when (boundp 'migemo-dictionary)       ; パス指定
+  (when (boundp 'migemo-dictionary)       ; 辞書のパス指定
     (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict"))
   (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
     (setq migemo-user-dictionary nil))
@@ -333,7 +335,6 @@
     (setq migemo-regex-dictionary nil))
   (when (boundp 'migemo-coding-system)    ; utf-8
   (setq migemo-coding-system 'utf-8-unix))
-  (load-library "migemo")                 ; ロード
   (when (fboundp 'migemo-init)            ; 初期化
     (migemo-init)))
 ;; 日本語で検索するための設定
@@ -468,9 +469,12 @@ Otherwise return word around point."
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
 ;;; 行番号表示
-(when (eval-and-compile (require 'linum nil t)) ; 画面左に行数を表示する
-  (global-linum-mode t)                         ; デフォルトで linum-mode を有効にする
-  (setq linum-format "%5d"))                    ; 5桁分の領域を確保して行番号を表示
+;; 画面左に行数を表示する
+(when (eval-and-compile (require 'linum nil t))
+  ;; デフォルトで linum-mode を有効にする
+  (global-linum-mode t)
+  ;; 5桁分の領域を確保して行番号を表示
+  (setq linum-format "%5d"))
 ;; 行番号表示する必要のないモードでは表示しない
 (defadvice linum-on(around linum-off activate)
   (unless (or (minibufferp)
@@ -526,7 +530,8 @@ Otherwise return word around point."
       (let ((file (dired-get-filename)))
         (if (and (file-directory-p file) (not (string= command "vlc")))
             (message "%s is a directory" (file-name-nondirectory file))
-          (when (y-or-n-p (format "Open '%s' %s " command (file-name-nondirectory file)))
+          (when (y-or-n-p (format "Open '%s' %s "
+                                  command (file-name-nondirectory file)))
             (dired-run-shell-command (concat command " " file " &"))))))
 
     ;; ディレクトリを先に表示する
@@ -536,7 +541,8 @@ Otherwise return word around point."
              (setq ls-lisp-dirs-first t)))
           ((eq system-type 'gnu/linux)
            ;; GNU オプションも使う
-           (setq dired-listing-switches "-alF --time-style=long-iso --group-directories-first"))
+           (setq dired-listing-switches
+                 "-alF --time-style=long-iso --group-directories-first"))
           (t
            ;; POSIX オプションのみ
            (setq dired-listing-switches "-alF")))
@@ -571,7 +577,8 @@ Otherwise return word around point."
           (interactive)
           (let ((file (dired-get-filename)))
             (if (not (file-directory-p file))
-                (when (y-or-n-p (format "Open 'w3m' %s " (file-name-nondirectory file)))
+                (when (y-or-n-p (format "Open 'w3m' %s "
+                                        (file-name-nondirectory file)))
                   (w3m-find-file file))
               (message "%s is a directory" file))))
         (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
@@ -581,18 +588,20 @@ Otherwise return word around point."
         "Execute tar and gzip command"
         (interactive "P")
         (let ((files (dired-get-marked-files t current-prefix-arg)))
-          (let ((filename (read-string (concat "Filename(" (car files) ".tar.gz): "))))
+          (let ((filename (read-string
+                           (concat "Filename(" (car files) ".tar.gz): "))))
             (when (string= "" filename)
               (setq filename (concat (car files) ".tar.gz")))
             (when (not (string-match
                         "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" filename))
               (setq filename (concat filename ".tar.gz"))) ; 拡張子追加
             (or (when (member filename (directory-files default-directory))
-                  (not (y-or-n-p
-                        (concat "Overwrite `" filename "'? [Type yn]")))) ; 同名ファイル
+                  (not (y-or-n-p ; 同名ファイル
+                        (concat "Overwrite `" filename "'? [Type yn]"))))
                 (when (not (dired-do-shell-command
                             (concat "tar cfz " filename " *") nil files))
-                  (message (concat "Execute tar command to `" filename "'...done"))))))
+                  (message (concat
+                            "Execute tar command to `" filename "'...done"))))))
         (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))))
 
 ;;; 関数のアウトライン表示
@@ -621,7 +630,8 @@ Otherwise return word around point."
        (when (boundp 'speedbar-hide-button-brackets-flag) ; ブラケット表示を隠す
          (setq speedbar-hide-button-brackets-flag t))
        (when (boundp 'speedbar-tag-hierarchy-method)      ; Tags グループ化
-         (setq speedbar-tag-hierarchy-method '(speedbar-simple-group-tag-hierarchy)))
+         (setq speedbar-tag-hierarchy-method
+               '(speedbar-simple-group-tag-hierarchy)))
        ;; フレーム設定
        (when (boundp 'speedbar-frame-parameters)
          (custom-set-variables '(speedbar-frame-parameters
@@ -650,7 +660,8 @@ Otherwise return word around point."
        (define-key speedbar-file-key-map (kbd "<left>") 'speedbar-contract-line)
        (define-key speedbar-file-key-map (kbd "C-b") 'speedbar-contract-line)
        ;; BS でも上位ディレクトリへ (デフォルト: `U')
-       (define-key speedbar-file-key-map (kbd "<backspace>") 'speedbar-up-directory)
+       (define-key speedbar-file-key-map
+         (kbd "<backspace>") 'speedbar-up-directory)
        (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory))))
 
 ;;; diff-mode
@@ -870,7 +881,8 @@ Otherwise return word around point."
   (define-key global-map (kbd "<S-f8>") 'goto-last-change-reverse))
 
 ;;; セッション保存
-;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/session-2.3a.tar.gz | tar xfz -
+;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/
+;; session-2.3a.tar.gz | tar xfz -
 ;; kill-ringやミニバッファで過去に開いたファイルなどの履歴を保存する
 (when (eval-and-compile (require 'session nil t))
   ;; セッション初期化
@@ -924,7 +936,8 @@ Otherwise return word around point."
   (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab))
 
 ;;; 2chビューア (navi2ch)
-;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/navi2ch-1.8.4.tar.gz/download | tar xfz -
+;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/
+;; navi2ch-1.8.4.tar.gz/download | tar xfz -
 (when (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t)
   ;; AAを綺麗に表示する
@@ -1003,7 +1016,8 @@ Otherwise return word around point."
        ;; 除外するファイル
        (when (boundp 'howm-excluded-file-regexp)
          (setq howm-excluded-file-regexp
-               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))
+               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|
+                0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))
        ;; 最近使ったファイルから除外する
        (when (boundp 'recentf-exclude)
          (setq recentf-exclude '(howm-directory ".howm-keys"))))))
@@ -1046,29 +1060,41 @@ Otherwise return word around point."
          (add-to-list 'skk-search-prog-list
                       '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
        ;;  `;' だと Paren モードで効かなくなるため `:' にする
-       (when (boundp 'skk-sticky-key)                     ; sticky キー設定
+       ;; sticky キー設定
+       (when (boundp 'skk-sticky-key)
          (setq skk-sticky-key ":"))
-       (when (boundp 'skk-show-inline)                    ; インライン候補縦表示
+       ;; インライン候補縦表示
+       (when (boundp 'skk-show-inline)
          (setq skk-show-inline 'vertical))
-       (when (boundp 'skk-egg-like-newline)               ; Enter で確定
+       ;; Enter で確定
+       (when (boundp 'skk-egg-like-newline)
          (setq skk-egg-like-newline t))
-       (when (boundp 'skk-auto-insert-paren)              ; 閉括弧を自動補完
+       ;; 閉括弧を自動補完
+       (when (boundp 'skk-auto-insert-paren)
          (setq skk-auto-insert-paren))
-       (when (boundp 'skk-show-tooltip)                   ; tips 描画
+       ;; tips 描画
+       (when (boundp 'skk-show-tooltip)
          (setq skk-show-tooltip t))
-       (when (boundp 'skk-show-annotation)                ; 注釈を表示
+       ;; 注釈を表示
+       (when (boundp 'skk-show-annotation)
          (setq skk-show-annotation t))
-       (when (boundp 'skk-annotation-show-wikipedia-url)  ; Wikipedia 注釈 (C-o でブラウザを開く)
+       ;; Wikipedia 注釈 (C-o でブラウザを開く)
+       (when (boundp 'skk-annotation-show-wikipedia-url)
          (setq skk-annotation-show-wikipedia-url t))
-       (when (boundp 'skk-use-look)                       ; 英語補完 (/ で略語展開モード)
+       ;; 英語補完 (/ で略語展開モード)
+       (when (boundp 'skk-use-look)
          (setq skk-use-look t))
-       (when (boundp 'skk-henkan-strict-okuri-precedence) ; 送り仮名
+       ;; 送り仮名
+       (when (boundp 'skk-henkan-strict-okuri-precedence)
          (setq skk-henkan-strict-okuri-precedence t))
-       (when (boundp skk-dcomp-activate)                  ; 動的に補完
+       ;; 動的に補完
+       (when (boundp skk-dcomp-activate)
          (setq skk-dcomp-activate t))
-       (when (boundp 'skk-dcomp-multiple-activate)        ; 動的補完の複数候補表示
+       ;; 動的補完の複数候補表示
+       (when (boundp 'skk-dcomp-multiple-activate)
          (setq skk-dcomp-multiple-activate t))
-       (when (boundp 'skk-dcomp-multiple-rows)            ; 動的補完の候補表示件数
+       ;; 動的補完の候補表示件数
+       (when (boundp 'skk-dcomp-multiple-rows)
          (setq skk-dcomp-multiple-rows 10)))))
 
 ;;; 試行錯誤用ファイル
@@ -1122,7 +1148,8 @@ Otherwise return word around point."
 ;;; プロセスリスト
 ;; (install-elisp-from-emacswiki "list-processes+.el")
 (when (locate-library "list-processes+")
-  (autoload 'list-processes+ "list-processes+" "A enhance list processes command." t)
+  (autoload 'list-processes+
+    "list-processes+" "A enhance list processes command." t)
   (defalias 'ps 'list-processes+))
 
 ;;; ポモドーロタイマ
@@ -1130,7 +1157,8 @@ Otherwise return word around point."
 ;; (install-elisp "https://raw.github.com/krick/tea-time/master/tea-time.el")
 ;; git clone git://github.com/konr/tomatinho.git
 (when (locate-library "pomodoro-technique")
-  (autoload 'pomodoro "pomodoro-technique" "Pomodoro technique timer for emacs.")
+  (autoload 'pomodoro
+    "pomodoro-technique" "Pomodoro technique timer for emacs.")
   (eval-after-load "pomodoro-technique"
     '(progn
        )))
@@ -1238,7 +1266,8 @@ Otherwise return word around point."
 
     ;; dired で Windows に関連付けられたアプリを起動する
     ;; (install-elisp "http://www.emacswiki.org/emacs/download/w32-shell-execute.el")
-    (when (and (require 'w32-shell-execute nil t) (fboundp 'w32-shell-execute))
+    (when (and (require 'w32-shell-execute nil t)
+               (fboundp 'w32-shell-execute))
       (defun uenox-dired-winstart ()
         "Type '[uenox-dired-winstart]': win-start the current line's file."
         (interactive)
@@ -1265,17 +1294,20 @@ Otherwise return word around point."
     (when (boundp 'sdcv-dictionary-simple-list)
       (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
     (when (boundp 'sdcv-dictionary-complete-list)
-      (setq sdcv-dictionary-complete-list '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
-    (define-key global-map (kbd "C-c w") 'sdcv-search-input)      ; バッファに表示
-    (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+))) ; ポップアップ
+      (setq sdcv-dictionary-complete-list
+            '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
+    ;; バッファに表示
+    (define-key global-map (kbd "C-c w") 'sdcv-search-input)
+    ;; ポップアップ
+    (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)))
 
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
-;; Emacs 23 の場合
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
-  (autoload 'mew-user-agent-compose "mew" "Set up message composition draft with Mew." t)
+  (autoload 'mew-user-agent-compose
+    "mew" "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
   ;; ヘッダ・空白を強調表示しない
   (add-hook 'mew-summary-mode-hook
@@ -1310,26 +1342,30 @@ Otherwise return word around point."
            'mew-draft-kill
            'mew-send-hook))
 
-       (when (boundp 'mew-demo)                  ; 起動デモを表示しない
+       ;; 起動デモを表示しない
+       (when (boundp 'mew-demo)
          (setq mew-demo nil))
+       ;; 署名の自動挿入
        ;; ホームディレクトリに .signature を作っておく
-       (when (file-readable-p "~/.signature")    ; 署名の自動挿入
+       (when (file-readable-p "~/.signature")
          (add-hook 'mew-draft-mode-newdraft-hook
                    (lambda ()
                      (let ((p (point)))
                        (goto-char (point-max))
                        (insert-file "~/.signature")
                        (goto-char p)))))
-       (when (boundp 'mew-summary-form)          ; Summary モードの書式変更
+       ;; Summary モードの書式変更
+       (when (boundp 'mew-summary-form)
            (setq mew-summary-form
-                 '(type (5 date) "-" (-4 time) " " (14 from) " " t (30 subj) "|" (0 body))))
-       (when (boundp 'mew-use-fancy-thread)      ; スレッドの親子関係を罫線を使って可視化
+                 '(type (5 date) "-" (-4 time) " "
+                        (14 from) " " t (30 subj) "|" (0 body))))
+       (when (boundp 'mew-use-fancy-thread)      ; スレッドの親子関係を可視化
          (setq mew-use-fancy-thread t))
        (when (boundp 'mew-use-thread-separator)  ; スレッド間に区切りを表示
          (setq mew-use-thread-separator t))
        (when (boundp 'mew-ask-range)             ; レンジを聞かない
          (setq mew-ask-range nil))
-       (when (boundp 'mew-scan-form-mark-delete) ; 重複メールには削除マークをつける
+       (when (boundp 'mew-scan-form-mark-delete) ; 重複メールに削除マーク
          (setq mew-scan-form-mark-delete t))
        (when (boundp 'mew-use-cached-passwd)     ; パスワードの保持
          (setq mew-use-cached-passwd t))
@@ -1385,22 +1421,57 @@ Otherwise return word around point."
        ;; モードラインのフォーマット
        (unless (member '(:eval mew-mode-line-biff-string) mode-line-format)
          (setq-default mode-line-format
-                       (cons '(:eval mew-mode-line-biff-string) mode-line-format)))
+                       (cons
+                        '(:eval mew-mode-line-biff-string) mode-line-format)))
        (unless (member '(:eval mew-mode-line-biff-icon) mode-line-format)
          (setq-default mode-line-format
-                       (cons '(:eval mew-mode-line-biff-icon) mode-line-format)))
+                       (cons
+                        '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
-       ;; リージョンで refile する
-       (defadvice mew-summary-auto-refile (around
-                                           mew-summary-auto-refile-region
-                                           activate)
-         "Refile on the region."
-         (mew-summary-mark-escape) ; マークを退避する
-         (when (mew-mark-active-p)
-           (let ((mew-region (mew-summary-get-region)))
-             (mew-summary-mark-all-region (car mew-region) (cdr mew-region))))
-         ad-do-it
-         (mew-summary-mark-review))
+       ;; カーソルから最後までを refile する
+       (defun mew-summary-auto-refile-from-cursor (&optional
+                                                   mew-mark-review-only)
+         "Refile each message in the folder automatically from cursor."
+         (interactive "P")
+         (mew-summary-refilable
+          (mew-decode-syntax-delete)
+          (let ((mew-use-highlight-x-face nil)
+                (lines (mew-sinfo-get-ttl-line))
+                (case-fold-search nil)
+                (line 1) (mark nil) msg)
+            (cond
+             (mew-mark-review-only
+              (setq msg (format "Refile all messages marked with '%c'? "
+                                mew-mark-review)))
+             (mew-refile-auto-refile-skip-any-mark
+              (setq msg "Refile all non-marked messages? "))
+             (t
+              (setq msg "Refile messages including marked with weak marks?")))
+            (if (and mew-refile-auto-refile-confirm (not (y-or-n-p msg)))
+                (message "Not refiled")
+              (message "Auto refiling...")
+              (save-window-excursion
+                (while (re-search-forward mew-regex-sumsyn-valid nil t)
+                  (setq mark (mew-summary-get-mark))
+                  (if mew-mark-review-only
+                      (and mark
+                           (char-equal mark mew-mark-review)
+                           (mew-summary-refile-body nil t 'no-msg))
+                    (or (and mark
+                             (or mew-refile-auto-refile-skip-any-mark
+                                 (>= (mew-markdb-level mark)
+                                     (mew-markdb-level mew-mark-refile))))
+                        (mew-summary-refile-body nil t 'no-msg)))
+                  (if (= (% (/ (* 100 line) lines) 10) 0)
+                      (message "Auto refiling...%s%%" (/ (* 100 line) lines)))
+                  (setq line (1+ line))
+                  (forward-line)))
+              (message "Auto refiling...done")))))
+       ;; 全ファイルの refile を C-M-o に変更する
+       (define-key mew-summary-mode-map (kbd "C-M-o") 'mew-summary-auto-refile)
+       ;; カーソルから最後までの refile を M-o に割り当てる
+       (define-key mew-summary-mode-map (kbd "M-o")
+         'mew-summary-auto-refile-from-cursor)
 
        ;; IMAP の設定
        (when (boundp 'mew-proto)
@@ -1408,6 +1479,7 @@ Otherwise return word around point."
        ;; 送信メールを保存する
        (when (boundp 'mew-fcc)
          (setq mew-fcc "%Sent"))
+
        ;; メールアカウントの設定
        ;; ~/.emacs.d/conf/mail-account.el に以下の変数を設定する
        ;; (setq mew-name "User name")
@@ -1419,7 +1491,8 @@ Otherwise return word around point."
        ;; (setq mew-imap-server "IMAP server")
        ;; (setq mew-smtp-server "SMTP server")
        (when (locate-library "mail-account")
-         (load "mail-account"))
+         (load "mail-account")) ; ファイルからロードする
+
        ;; SSL 接続の設定
        (when (string= "gmail.com" mew-mail-domain)
          (when (boundp 'mew-imap-auth)
@@ -1451,28 +1524,39 @@ Otherwise return word around point."
               (setq show-trailing-whitespace nil)))
   (eval-after-load "twittering-mode"
     '(progn
-       (when (boundp 'twittering-auth-method)                   ; OAuth を使わない
+       ;; OAuth を使わない
+       (when (boundp 'twittering-auth-method)
          (setq twittering-auth-method 'xauth))
+
+       ;; アカウント
        ;; ~/.emacs.d/conf/twitter-account.el に以下の変数を設定する
        ;; (setq twittering-username "User name")
        ;; (setq twittering-password "Password")
-       (when (locate-library "twitter-account")                 ; アカウント
+       (when (locate-library "twitter-account")
          (load "twitter-account"))
-       (when (boundp 'twittering-icon-mode)                     ; ユーザアイコンを表示
+
+       ;; ユーザアイコンを表示
+       (when (boundp 'twittering-icon-mode)
          (setq twittering-icon-mode t))
-       (when (boundp 'twittering-convert-fix-size)              ; アイコンサイズ
+       ;; アイコンサイズ
+       (when (boundp 'twittering-convert-fix-size)
          (setq twittering-convert-fix-size 32))
-       (when (boundp 'twittering-display-remaining)             ; モードラインに API の残数を表示する
+       ;; モードラインに API の残数を表示する
+       (when (boundp 'twittering-display-remaining)
          (setq twittering-display-remaining t))
-       (when (boundp 'twittering-status-format)                 ; フォーマット指定
+       ;; フォーマット指定
+       (when (boundp 'twittering-status-format)
          (setq twittering-status-format
                "%C{%Y-%m-%d %H:%M:%S} %@\n%i %s <%S> from %f%L\n %t\n\n"))
-       (when (boundp 'twittering-update-status-function)        ; バッファラインにステータスを表示
+       ;; バッファラインにステータスを表示
+       (when (boundp 'twittering-update-status-function)
          (setq twittering-update-status-function
                'twittering-update-status-from-pop-up-buffer))
-       (when (boundp 'twittering-number-of-tweets-on-retrieval) ; ツイート取得数
+       ;; ツイート取得数
+       (when (boundp 'twittering-number-of-tweets-on-retrieval)
          (setq twittering-number-of-tweets-on-retrieval 50))
-       (when (boundp 'twittering-timer-interval)                ; 更新の頻度 (秒)
+       ;; 更新の頻度 (秒)
+       (when (boundp 'twittering-timer-interval)
          (setq twittering-timer-interval 60)))))
 
 ;;; ブラウザ (w3m)
@@ -1506,9 +1590,12 @@ Otherwise return word around point."
   (defun w3m-url-at-point ()
     "Browse url in w3m"
     (interactive)
-    (setq browse-url-browser-function 'w3m-browse-url)              ; w3m にする
-    (browse-url-at-point)                                           ; ブラウザで開く
-    (setq browse-url-browser-function 'browse-url-default-browser)) ; デフォルトに戻す
+    ;; デフォルトを w3m にする
+    (setq browse-url-browser-function 'w3m-browse-url)
+    ;; ブラウザで開く
+    (browse-url-at-point)
+    ;; デフォルトに戻す
+    (setq browse-url-browser-function 'browse-url-default-browser))
   (define-key global-map (kbd "C-c m") 'w3m-url-at-point)
 
   ;; グーグルで検索する
@@ -1519,20 +1606,26 @@ Otherwise return word around point."
     (defun w3m-search-wikipedia (&optional query)
       "Search at wikipedia in w3m"
       (interactive)
-      (w3m-browse-url (concat "ja.wikipedia.org/wiki/" (or query (w3m-wiki-prompt-input))) t))
+      (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
+                              (or query (w3m-wiki-prompt-input))) t))
     (define-key global-map (kbd "C-c p") 'w3m-search-wikipedia))
 
   (eval-after-load "w3m"
     '(progn
-       (when (boundp 'w3m-search-default-engine)     ; デフォルトで使う検索エンジン
+       ;; デフォルトで使う検索エンジン
+       (when (boundp 'w3m-search-default-engine)
          (setq w3m-search-default-engine "google"))
-       (when (boundp 'w3m-home-page)                 ; ホームページ
+       ;; ホームページ
+       (when (boundp 'w3m-home-page)
          (setq w3m-home-page "http://google.co.jp/"))
-       (when (boundp 'w3m-use-cookies)               ; クッキーを有効にする
+       ;; クッキーを有効にする
+       (when (boundp 'w3m-use-cookies)
          (setq w3m-use-cookies t))
-       (when (boundp 'w3m-favicon-cache-expire-wait) ; favicon のキャッシュを消さない
+       ;; favicon のキャッシュを消さない
+       (when (boundp 'w3m-favicon-cache-expire-wait)
          (setq w3m-favicon-cache-expire-wait nil))
-       (when (boundp 'w3m-weather-default-area)      ; デフォルトエリア
+       ;; デフォルトエリア
+       (when (boundp 'w3m-weather-default-area)
          (setq w3m-weather-default-area "道央・石狩"))
        ;; キーバインドをカスタマイズ
        (define-key w3m-mode-map (kbd "<left>") 'backward-char)
@@ -1550,29 +1643,46 @@ Otherwise return word around point."
            (executable-find "w3m")
            (locate-library "evernote-mode")
            (locate-library "evernote-account"))
+  ;; アカウント
   ;; ~/.emacs.d/conf/evernote-account.el に以下の設定をする
   ;; 以下のURLからデベロッパトークンを取得
   ;; https://www.evernote.com/api/DeveloperToken.action
   ;; (setq evernote-username "Username")
   ;; (setq evernote-developer-token "Developer token")
   (load "evernote-account")
-  (autoload 'evernote-create-note "evernote-mode" "Create an evernote." t)
-  (autoload 'evernote-open-note "evernote-mode" "Open a note for evernote." t)
-  (autoload 'evernote-write-note "evernote-mode" "Write buffer to an evernote." t)
-  (autoload 'evernote-browser "evernote-mode" "Open an evernote browser." t)
-  (autoload 'evernote-post-region "evernote-mode" "Post the region as an evernote." t)
-  (define-key global-map (kbd "C-c e c") 'evernote-create-note)      ; 新規ノート作成
-  (define-key global-map (kbd "C-c e o") 'evernote-open-note)        ; タグ選択して開く
-  (define-key global-map (kbd "C-c e s") 'evernote-search-notes)     ; 検索
-  (define-key global-map (kbd "C-c e S") 'evernote-do-saved-search)  ; 保存されたワードで検索
-  (define-key global-map (kbd "C-c e w") 'evernote-write-note)       ; 現在バッファを書き込み
-  (define-key global-map (kbd "C-c e p") 'evernote-post-region)      ; 選択範囲を書き込み
-  (define-key global-map (kbd "C-c e b") 'evernote-browser)          ; ブラウザ起動
-  (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode) ; 既存ノートを編集
+
+  (autoload 'evernote-create-note
+    "evernote-mode" "Create an evernote." t)
+  (autoload 'evernote-open-note
+    "evernote-mode" "Open a note for evernote." t)
+  (autoload 'evernote-write-note
+    "evernote-mode" "Write buffer to an evernote." t)
+  (autoload 'evernote-browser
+    "evernote-mode" "Open an evernote browser." t)
+  (autoload 'evernote-post-region
+    "evernote-mode" "Post the region as an evernote." t)
+  ;; キーバインド
+  ;; 新規ノート作成
+  (define-key global-map (kbd "C-c e c") 'evernote-create-note)
+  ;; タグ選択して開く
+  (define-key global-map (kbd "C-c e o") 'evernote-open-note)
+  ;; 検索
+  (define-key global-map (kbd "C-c e s") 'evernote-search-notes)
+  ;; 保存されたワードで検索
+  (define-key global-map (kbd "C-c e S") 'evernote-do-saved-search)
+  ;; 現在バッファを書き込み
+  (define-key global-map (kbd "C-c e w") 'evernote-write-note)
+  ;; 選択範囲を書き込み
+  (define-key global-map (kbd "C-c e p") 'evernote-post-region)
+  ;; ブラウザ起動
+  (define-key global-map (kbd "C-c e b") 'evernote-browser)
+  ;; 既存ノートを編集
+  (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode)
   (eval-after-load "evernote-mode"
     '(progn
        (when (boundp 'evernote-enml-formatter-command)
-         (setq evernote-enml-formatter-command '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8"))))))
+         (setq evernote-enml-formatter-command
+               '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8"))))))
 
 ;;; Gist (https://github.com/defunkt/gist.el)
 ;; package-install.el をインストール
@@ -1581,10 +1691,14 @@ Otherwise return word around point."
 ;; (package-install gist)
 ;; Emacs24 (http://marmalade-repo.org/)
 (when (locate-library "gist")
-  (autoload 'gist-buffer "gist" "Post the current buffer as a new paste." t)
-  (autoload 'gist-buffer-private "gist" "Post the current buffer as a new private paste." t)
-  (autoload 'gist-region "gist" "Post the current region as a new paste." t)
-  (autoload 'gist-region-private "gist" "Post the current region as a new private paste." t))
+  (autoload 'gist-buffer
+    "gist" "Post the current buffer as a new paste." t)
+  (autoload 'gist-buffer-private
+    "gist" "Post the current buffer as a new private paste." t)
+  (autoload 'gist-region "gist"
+    "Post the current region as a new paste." t)
+  (autoload 'gist-region-private
+    "gist" "Post the current region as a new private paste." t))
 
 ;;; 端末エミュレータ
 ;; eshell
@@ -1727,8 +1841,10 @@ Otherwise return word around point."
 ;; sudo cpan -i Class::Inspector
 (when (locate-library "cperl-mode")
   (defalias 'perl-mode 'cperl-mode)
-  (autoload 'cperl-mode "cperl-mode" "Alternate mode for editing Perl programs" t)
-  (add-to-list 'auto-mode-alist '("\\.\\([pP][Llm]\\|al\\|t\\|cgi\\)\\'" . cperl-mode))
+  (autoload 'cperl-mode
+    "cperl-mode" "Alternate mode for editing Perl programs" t)
+  (add-to-list 'auto-mode-alist
+               '("\\.\\([pP][Llm]\\|al\\|t\\|cgi\\)\\'" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
@@ -1750,7 +1866,8 @@ Otherwise return word around point."
 
 ;; Pod
 (when (locate-library "pod-mode")
-  (autoload 'pod-mode "pod-mode" "Alternate mode for editing Perl documents" t)
+  (autoload 'pod-mode
+    "pod-mode" "Alternate mode for editing Perl documents" t)
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
   (add-hook 'pod-mode-hook
             (lambda ()
