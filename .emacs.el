@@ -1042,45 +1042,88 @@ Otherwise return word around point."
 ;; q 「かなモード」,「カナモード」間をトグルする.
 ;; l 「かなモード」または「カナモード」から「アスキーモード」へ.
 ;; L 「かなモード」または「カナモード」から「全英モード」へ.
+;; 辞書をマージする
+;; sudo apt-get install skktools
+(defun sync-skkdic ()
+  (interactive)
+  (let ((ibus-jisyo "~/.skk-ibus-jisyo"))
+    (when (and (boundp 'skk-jisyo)
+               (file-writable-p ibus-jisyo)
+               (file-writable-p skk-jisyo))
+      ;; バックアップ
+      (copy-file skk-jisyo (make-backup-file-name (expand-file-name skk-jisyo)) t)
+      (let ((tmp " *skk*") ; テンポラリバッファ
+            (coding-system-for-write 'euc-jp))
+        ;; マージするコマンド実行
+        (call-process "skkdic-expr" nil tmp nil
+                                 (expand-file-name skk-jisyo)
+                                 (expand-file-name ibus-jisyo))
+        ;; ファイルにコピー
+        (switch-to-buffer tmp)
+        (write-region (point-min) (point-max) skk-jisyo)
+        (kill-buffer tmp)))))
+
 (when (locate-library "skk")
   (autoload 'skk-mode "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
   (define-key global-map (kbd "C-\\") 'skk-mode)
   (eval-after-load "skk"
     '(progn
-       (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.L")
-                  (boundp 'skk-large-jisyo))
-         (setq skk-large-jisyo "~/.emacs.d/ddskk/SKK-JISYO.L"))
-       (when (and (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.KAO")
-                  (file-readable-p "~/.emacs.d/ddskk/SKK-JISYO.2CH")
-                  (boundp 'skk-search-prog-list))
-         (add-to-list 'skk-search-prog-list
-                      '(skk-search-jisyo-file skk-jisyo 0 t) t)
-         (add-to-list 'skk-search-prog-list
-                      '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.KAO" 10000 t) t)
-         (add-to-list 'skk-search-prog-list
-                      '(skk-search-jisyo-file "~/.emacs.d/ddskk/SKK-JISYO.2CH" 10000 t) t))
-       ;;  `;' だと Paren モードで効かなくなるため `:' にする
+       ;; 辞書の登録
+       (let ((personal "~/Dropbox/skk/.skk-jisyo")        ; 個人辞書
+             (large "~/.emacs.d/ddskk/SKK-JISYO.L")       ; 基本辞書
+             (assoc "~/.emacs.d/ddskk/SKK-JISYO.assoc")   ; 連想辞書
+             (jinmei "~/.emacs.d/ddskk/SKK-JISYO.jinmei") ; 人名
+             (book "~/.emacs.d/ddskk/SKK-JISYO.book")     ; 本
+             (2ch "~/.emacs.d/ddskk/SKK-JISYO.2ch")       ; 2ch
+             (kao0 "~/.emacs.d/ddskk/SKK-JISYO.KAO0")     ; 顔文字 0
+             (kao1 "~/.emacs.d/ddskk/SKK-JISYO.KAO1")     ; 顔文字 1
+             (kao2 "~/.emacs.d/ddskk/SKK-JISYO.KAO2"))    ; 顔文字 2
+         (when (boundp 'skk-jisyo)
+           (when (and (file-readable-p personal)
+                      (file-writable-p personal)) ; 個人辞書
+             (setq skk-jisyo personal)))
+         (when (boundp 'skk-large-jisyo)
+           (when (file-readable-p large)          ; 基本辞書
+             (setq skk-large-jisyo large)))
+         (when (boundp 'skk-search-prog-list)
+           (when (file-readable-p assoc)          ; 連想辞書
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file assoc 10000 t) t))
+           (when (file-readable-p jinmei)         ; 人名
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file jinmei 10000 t) t))
+           (when (file-readable-p book)           ; 本
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file book 10000 t) t))
+           (when (file-readable-p 2ch)            ; 2ch
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file 2ch 10000 t) t))
+           (when (file-readable-p kao0)           ; 顔文字 0
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file kao0 10000 t) t))
+           (when (file-readable-p kao1)           ; 顔文字 1
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file kao1 10000 t) t))
+           (when (file-readable-p kao2)           ; 顔文字 2
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file kao2 10000 t) t))))
+
        ;; sticky キー設定
+       ;;  `;' だと Paren モードで効かなくなるため `:' にする
        (when (boundp 'skk-sticky-key)
          (setq skk-sticky-key ":"))
-       ;; インライン候補縦表示
-       (when (boundp 'skk-show-inline)
-         (setq skk-show-inline 'vertical))
        ;; Enter で確定
        (when (boundp 'skk-egg-like-newline)
          (setq skk-egg-like-newline t))
        ;; 閉括弧を自動補完
        (when (boundp 'skk-auto-insert-paren)
          (setq skk-auto-insert-paren))
-       ;; tips 描画
-       (when (boundp 'skk-show-tooltip)
-         (setq skk-show-tooltip t))
+       ;; 変換候補の表示位置 (C-f でミニバッファとトグル)
+       (when (boundp 'skk-show-candidates-always-pop-to-buffer)
+         (setq skk-show-candidates-always-pop-to-buffer t))
        ;; 注釈を表示
        (when (boundp 'skk-show-annotation)
          (setq skk-show-annotation t))
-       ;; Wikipedia 注釈 (C-o でブラウザを開く)
-       (when (boundp 'skk-annotation-show-wikipedia-url)
-         (setq skk-annotation-show-wikipedia-url t))
        ;; 英語補完 (/ で略語展開モード)
        (when (boundp 'skk-use-look)
          (setq skk-use-look t))
@@ -1088,14 +1131,29 @@ Otherwise return word around point."
        (when (boundp 'skk-henkan-strict-okuri-precedence)
          (setq skk-henkan-strict-okuri-precedence t))
        ;; 動的に補完
-       (when (boundp skk-dcomp-activate)
+       (when (boundp 'skk-dcomp-activate)
          (setq skk-dcomp-activate t))
        ;; 動的補完の複数候補表示
        (when (boundp 'skk-dcomp-multiple-activate)
          (setq skk-dcomp-multiple-activate t))
        ;; 動的補完の候補表示件数
        (when (boundp 'skk-dcomp-multiple-rows)
-         (setq skk-dcomp-multiple-rows 10)))))
+         (setq skk-dcomp-multiple-rows 10))
+       ;; ローマ字 prefix をみて補完する
+       (when (boundp 'skk-comp-use-prefix)
+         (setq skk-comp-use-prefix t))
+       ;; 補完時にサイクルする
+       (when (boundp 'skk-comp-circulate)
+         (setq skk-comp-circulate t))
+       ;; 半角カタカナ候補も変換候補にする
+       (when (boundp 'skk-search-katakana)
+         (setq skk-search-katakana 'jisx0201-kana))
+       ;; サ行の送りプレフィックスに限定して送りあり変換する
+       (when (boundp 'skk-search-sagyo-henkaku)
+         (setq skk-search-sagyo-henkaku t))
+       ;; 辞書登録のとき、余計な送り仮名を送らないようにする
+       (when (boundp 'skk-check-okurigana-on-touroku)
+         (setq skk-check-okurigana-on-touroku 'auto)))))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
@@ -1429,49 +1487,11 @@ Otherwise return word around point."
                         '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
        ;; カーソルから最後までを refile する
-       (defun mew-summary-auto-refile-from-cursor (&optional
-                                                   mew-mark-review-only)
-         "Refile each message in the folder automatically from cursor."
-         (interactive "P")
-         (mew-summary-refilable
-          (mew-decode-syntax-delete)
-          (let ((mew-use-highlight-x-face nil)
-                (lines (mew-sinfo-get-ttl-line))
-                (case-fold-search nil)
-                (line 1) (mark nil) msg)
-            (cond
-             (mew-mark-review-only
-              (setq msg (format "Refile all messages marked with '%c'? "
-                                mew-mark-review)))
-             (mew-refile-auto-refile-skip-any-mark
-              (setq msg "Refile all non-marked messages? "))
-             (t
-              (setq msg "Refile messages including marked with weak marks?")))
-            (if (and mew-refile-auto-refile-confirm (not (y-or-n-p msg)))
-                (message "Not refiled")
-              (message "Auto refiling...")
-              (save-window-excursion
-                (while (re-search-forward mew-regex-sumsyn-valid nil t)
-                  (setq mark (mew-summary-get-mark))
-                  (if mew-mark-review-only
-                      (and mark
-                           (char-equal mark mew-mark-review)
-                           (mew-summary-refile-body nil t 'no-msg))
-                    (or (and mark
-                             (or mew-refile-auto-refile-skip-any-mark
-                                 (>= (mew-markdb-level mark)
-                                     (mew-markdb-level mew-mark-refile))))
-                        (mew-summary-refile-body nil t 'no-msg)))
-                  (if (= (% (/ (* 100 line) lines) 10) 0)
-                      (message "Auto refiling...%s%%" (/ (* 100 line) lines)))
-                  (setq line (1+ line))
-                  (forward-line)))
-              (message "Auto refiling...done")))))
-       ;; 全ファイルの refile を C-M-o に変更する
-       (define-key mew-summary-mode-map (kbd "C-M-o") 'mew-summary-auto-refile)
-       ;; カーソルから最後までの refile を M-o に割り当てる
-       (define-key mew-summary-mode-map (kbd "M-o")
-         'mew-summary-auto-refile-from-cursor)
+       (defadvice mew-summary-auto-refile
+         (around mew-summary-auto-refile-from-cursor activate)
+         (narrow-to-region (point) (point-max))
+         ad-do-it
+         (widen))
 
        ;; IMAP の設定
        (when (boundp 'mew-proto)
