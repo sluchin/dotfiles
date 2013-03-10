@@ -425,6 +425,23 @@ Otherwise return word around point."
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c t") 'insert-time)
 
+;; エンコード
+;; diff や ediff を開くとき必要
+;; euc-jp
+(defun set-euc-jp ()
+  "Set euc-jp"
+  (interactive)
+  (set-language-environment "Japanese")
+  (set-default-coding-systems 'euc-jp)
+  (set-terminal-coding-system 'euc-jp))
+;; utf-8
+(defun set-utf-8 ()
+  "Set utf-8"
+  (interactive)
+  (set-language-environment "Japanese")
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8))
+
 ;; 改行と同時にインデントも行う
 (define-key global-map (kbd "C-m") 'newline-and-indent)
 
@@ -1046,22 +1063,49 @@ Otherwise return word around point."
 ;; sudo apt-get install skktools
 (defun sync-skkdic ()
   (interactive)
-  (let ((ibus-jisyo "~/.skk-ibus-jisyo"))
-    (when (and (boundp 'skk-jisyo)
-               (file-writable-p ibus-jisyo)
-               (file-writable-p skk-jisyo))
-      ;; バックアップ
-      (copy-file skk-jisyo (make-backup-file-name (expand-file-name skk-jisyo)) t)
-      (let ((tmp " *skk*") ; テンポラリバッファ
-            (coding-system-for-write 'euc-jp))
-        ;; マージするコマンド実行
-        (call-process "skkdic-expr" nil tmp nil
-                                 (expand-file-name skk-jisyo)
-                                 (expand-file-name ibus-jisyo))
-        ;; ファイルにコピー
-        (switch-to-buffer tmp)
-        (write-region (point-min) (point-max) skk-jisyo)
-        (kill-buffer tmp)))))
+  (let ((ibus-skk-jisyo "~/.skk-ibus-jisyo")
+        (share-skk-jisyo "~/Dropbox/skk/.skk-jisyo")
+        (home-skk-jisyo "~/.skk-jisyo"))
+    (if (executable-find "skkdic-expr")
+        (when (and (boundp 'skk-jisyo)
+                   (file-readable-p skk-jisyo)
+                   (file-writable-p skk-jisyo))
+          ;; バックアップ
+          (copy-file skk-jisyo (make-backup-file-name (expand-file-name skk-jisyo)) t)
+          (let ((tmp "*skk*")                      ; テンポラリバッファ
+                (coding-system-for-read 'euc-jp)   ; euc-jp に変更
+                (coding-system-for-write 'euc-jp))
+            ;; マージするコマンド実行
+            (if (and (file-readable-p home-skk-jisyo)
+                     (file-readable-p ibus-skk-jisyo))
+                (progn
+                  (expand-file-name skk-jisyo)
+                  (call-process "skkdic-expr" nil tmp nil
+                                (expand-file-name home-skk-jisyo)
+                                (expand-file-name ibus-skk-jisyo)
+                                (expand-file-name skk-jisyo)))
+              (when (file-readable-p home-skk-jisyo)
+                (expand-file-name skk-jisyo)
+                (call-process "skkdic-expr" nil tmp nil
+                              (expand-file-name home-skk-jisyo)
+                              (expand-file-name skk-jisyo)))
+              (when (file-readable-p ibus-skk-jisyo)
+                (expand-file-name skk-jisyo)
+                (call-process "skkdic-expr" nil tmp nil
+                              (expand-file-name ibus-skk-jisyo)
+                              (expand-file-name skk-jisyo))))
+            ;; バッファ切替
+            (switch-to-buffer tmp)
+            (goto-char (point-min))
+            ;; ヘッダ入力
+            (insert ";; -*- mode: skk-jisyo-edit; coding: euc-jp -*-\n")
+            (insert ";; okuri-ari entries.\n")
+            (insert ";; okuri-nasi entries.\n")
+            ;; ファイルにコピー
+            (write-region (point-min) (point-max) skk-jisyo)
+            ;;バッファ削除
+            (kill-buffer tmp)))
+      (message "not found skkdic-expr"))))
 
 (when (locate-library "skk")
   (autoload 'skk-mode "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
@@ -1127,9 +1171,6 @@ Otherwise return word around point."
        ;; 英語補完 (/ で略語展開モード)
        (when (boundp 'skk-use-look)
          (setq skk-use-look t))
-       ;; 送り仮名
-       (when (boundp 'skk-henkan-strict-okuri-precedence)
-         (setq skk-henkan-strict-okuri-precedence t))
        ;; 動的に補完
        (when (boundp 'skk-dcomp-activate)
          (setq skk-dcomp-activate t))
@@ -1148,12 +1189,15 @@ Otherwise return word around point."
        ;; 半角カタカナ候補も変換候補にする
        (when (boundp 'skk-search-katakana)
          (setq skk-search-katakana 'jisx0201-kana))
+       ;; 送り仮名
+       (when (boundp 'skk-henkan-strict-okuri-precedence)
+         (setq skk-henkan-strict-okuri-precedence t))
        ;; サ行の送りプレフィックスに限定して送りあり変換する
        (when (boundp 'skk-search-sagyo-henkaku)
          (setq skk-search-sagyo-henkaku t))
        ;; 辞書登録のとき、余計な送り仮名を送らないようにする
        (when (boundp 'skk-check-okurigana-on-touroku)
-         (setq skk-check-okurigana-on-touroku 'auto)))))
+         (setq skk-check-okurigana-on-touroku nil)))))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
