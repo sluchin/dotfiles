@@ -1109,7 +1109,7 @@ Otherwise return word around point."
 
 (when (locate-library "skk")
   (autoload 'skk-mode
-    "skk" "Dare devil SKK (Simple Kana to Kanji conversion program)")
+    "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
   (define-key global-map (kbd "C-\\") 'skk-mode)
   (eval-after-load "skk"
     '(progn
@@ -1192,7 +1192,7 @@ Otherwise return word around point."
           (lambda (date-information format gengo and-time)
             (skk-default-current-date
              date-information "%s-%s-%s(%s)%s:%s" 0 nil 0 0 0 0))))
-       ;; キー変更
+       ;; ユーザ追加設定用の変数
        (when (boundp 'skk-rom-kana-rule-list)
          (setq skk-rom-kana-rule-list
                (append skk-rom-kana-rule-list
@@ -1200,9 +1200,9 @@ Otherwise return word around point."
                          ("z1" nil "１") ("z2" nil "２") ("z3" nil "３")
                          ("z4" nil "４") ("z5" nil "５") ("z6" nil "６")
                          ("z7" nil "７") ("z8" nil "８") ("z9" nil "９")
-                         ("zh" nil "←") ("zj" nil "↓") ("zj" nil "↓")
-                         ("zk" nil "↑") ("zl" nil "→")
-                         ("z~" nil "～") ("z@" nil skk-today)))))
+                         ("zh" nil "←") ("zj" nil "↓") ("zk" nil "↑")
+                         ("zl" nil "→") ("z~" nil "～")
+                         ("z@" nil skk-today)))))
 
        ;; sticky キー設定
        ;; `;' だと Paren モードで効かなくなるため `:' にする
