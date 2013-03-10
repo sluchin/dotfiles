@@ -1108,20 +1108,29 @@ Otherwise return word around point."
       (message "not found skkdic-expr"))))
 
 (when (locate-library "skk")
-  (autoload 'skk-mode "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
+  (autoload 'skk-mode
+    "skk" "Dare devil SKK (Simple Kana to Kanji conversion program)")
   (define-key global-map (kbd "C-\\") 'skk-mode)
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
-       (let ((personal "~/Dropbox/skk/.skk-jisyo")        ; 個人辞書
-             (large "~/.emacs.d/ddskk/SKK-JISYO.L")       ; 基本辞書
-             (assoc "~/.emacs.d/ddskk/SKK-JISYO.assoc")   ; 連想辞書
-             (jinmei "~/.emacs.d/ddskk/SKK-JISYO.jinmei") ; 人名
-             (book "~/.emacs.d/ddskk/SKK-JISYO.book")     ; 本
-             (2ch "~/.emacs.d/ddskk/SKK-JISYO.2ch")       ; 2ch
-             (kao0 "~/.emacs.d/ddskk/SKK-JISYO.KAO0")     ; 顔文字 0
-             (kao1 "~/.emacs.d/ddskk/SKK-JISYO.KAO1")     ; 顔文字 1
-             (kao2 "~/.emacs.d/ddskk/SKK-JISYO.KAO2"))    ; 顔文字 2
+       (let ((personal "~/Dropbox/skk/.skk-jisyo")               ; 個人辞書
+             (large "~/.emacs.d/ddskk/SKK-JISYO.L")              ; 基本辞書
+             (assoc "~/.emacs.d/ddskk/SKK-JISYO.assoc")          ; 連想辞書
+             (edict "~/.emacs.d/ddskk/SKK-JISYO.edict")          ; 英和辞典
+             (book "~/.emacs.d/ddskk/SKK-JISYO.book")            ; 本
+             (law "~/.emacs.d/ddskk/SKK-JISYO.law")              ; 法律
+             (pron "~/.emacs.d/ddskk/SKK-JISYO.propernoun")      ; 企業など
+             (jinmei "~/.emacs.d/ddskk/SKK-JISYO.jinmei")        ; 人名
+             (geo "~/.emacs.d/ddskk/SKK-JISYO.geo")              ; 地名辞典
+             (sta "~/.emacs.d/ddskk/SKK-JISYO.station")          ; 駅
+             (2ch "~/.emacs.d/ddskk/SKK-JISYO.2ch")              ; 2ch
+             (kao0 "~/.emacs.d/ddskk/SKK-JISYO.KAO0")            ; 顔文字 0
+             (kao1 "~/.emacs.d/ddskk/SKK-JISYO.KAO1")            ; 顔文字 1
+             (kao2 "~/.emacs.d/ddskk/SKK-JISYO.KAO2")            ; 顔文字 2
+             (kao3 "~/.emacs.d/ddskk/SKK-JISYO.KAO3")            ; 顔文字 3
+             (zip "~/.emacs.d/ddskk/SKK-JISYO.zipcode")          ; 郵便番号
+             (zipo "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode")) ; 郵便番号会社
          (when (boundp 'skk-jisyo)
            (when (and (file-readable-p personal)
                       (file-writable-p personal)) ; 個人辞書
@@ -1133,12 +1142,27 @@ Otherwise return word around point."
            (when (file-readable-p assoc)          ; 連想辞書
              (add-to-list 'skk-search-prog-list
                           (list 'skk-search-jisyo-file assoc 10000 t) t))
-           (when (file-readable-p jinmei)         ; 人名
+           (when (file-readable-p edict)          ; 英和辞書
              (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file jinmei 10000 t) t))
+                          (list 'skk-search-jisyo-file edict 10000 t) t))
            (when (file-readable-p book)           ; 本
              (add-to-list 'skk-search-prog-list
                           (list 'skk-search-jisyo-file book 10000 t) t))
+           (when (file-readable-p law)            ; 法律
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file law 10000 t) t))
+           (when (file-readable-p pron)           ; 企業など
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file pron 10000 t) t))
+           (when (file-readable-p jinmei)         ; 人名
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file jinmei 10000 t) t))
+           (when (file-readable-p geo)            ; 地名辞典
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file geo 10000 t) t))
+           (when (file-readable-p sta)            ; 駅
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file sta 10000 t) t))
            (when (file-readable-p 2ch)            ; 2ch
              (add-to-list 'skk-search-prog-list
                           (list 'skk-search-jisyo-file 2ch 10000 t) t))
@@ -1150,10 +1174,38 @@ Otherwise return word around point."
                           (list 'skk-search-jisyo-file kao1 10000 t) t))
            (when (file-readable-p kao2)           ; 顔文字 2
              (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file kao2 10000 t) t))))
+                          (list 'skk-search-jisyo-file kao2 10000 t) t))
+           (when (file-readable-p kao3)           ; 顔文字 3
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file kao3 10000 t) t))
+           (when (file-readable-p zip)            ; 郵便番号
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file zip 10000 t) t))
+           (when (file-readable-p zipo)           ; 郵便番号会社
+             (add-to-list 'skk-search-prog-list
+                          (list 'skk-search-jisyo-file zipo 10000 t) t))))
+
+       ;; トゥデイ
+       (when (and (fboundp 'skk-current-date)
+                  (fboundp 'skk-default-current-date))
+         (skk-current-date
+          (lambda (date-information format gengo and-time)
+            (skk-default-current-date
+             date-information "%s-%s-%s(%s)%s:%s" 0 nil 0 0 0 0))))
+       ;; キー変更
+       (when (boundp 'skk-rom-kana-rule-list)
+         (setq skk-rom-kana-rule-list
+               (append skk-rom-kana-rule-list
+                       '(("@" nil "@") ("zz" nil "＠") ("z0" nil "０")
+                         ("z1" nil "１") ("z2" nil "２") ("z3" nil "３")
+                         ("z4" nil "４") ("z5" nil "５") ("z6" nil "６")
+                         ("z7" nil "７") ("z8" nil "８") ("z9" nil "９")
+                         ("zh" nil "←") ("zj" nil "↓") ("zj" nil "↓")
+                         ("zk" nil "↑") ("zl" nil "→")
+                         ("z~" nil "～") ("z@" nil skk-today)))))
 
        ;; sticky キー設定
-       ;;  `;' だと Paren モードで効かなくなるため `:' にする
+       ;; `;' だと Paren モードで効かなくなるため `:' にする
        (when (boundp 'skk-sticky-key)
          (setq skk-sticky-key ":"))
        ;; Enter で確定
@@ -1168,9 +1220,15 @@ Otherwise return word around point."
        ;; 注釈を表示
        (when (boundp 'skk-show-annotation)
          (setq skk-show-annotation t))
+       ;; wikipedia 無効
+       (when (boundp 'skk-annotation-wikipedia-retrieved)
+         (setq skk-annotation-wikipedia-retrieved nil))
        ;; 英語補完 (/ で略語展開モード)
        (when (boundp 'skk-use-look)
          (setq skk-use-look t))
+       ;; 英語再帰的に補完
+       (when (boundp 'skk-look-recursive-search)
+         (setq skk-look-recursive-search t))
        ;; 動的に補完
        (when (boundp 'skk-dcomp-activate)
          (setq skk-dcomp-activate t))
@@ -1740,7 +1798,7 @@ Otherwise return word around point."
   (define-key global-map (kbd "C-c e p") 'evernote-post-region)
   ;; ブラウザ起動
   (define-key global-map (kbd "C-c e b") 'evernote-browser)
-  ;; 既存ノートを編集
+  ;; 既存ノートを編集 (デフォルト： C-x C-q)
   (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode)
   (eval-after-load "evernote-mode"
     '(progn
