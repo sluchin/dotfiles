@@ -1119,76 +1119,38 @@ Otherwise return word around point."
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
-       (let ((personal "~/Dropbox/skk/.skk-jisyo")               ; 個人辞書
-             (large "~/.emacs.d/ddskk/SKK-JISYO.L")              ; 基本辞書
-             (assoc "~/.emacs.d/ddskk/SKK-JISYO.assoc")          ; 連想辞書
-             (edict "~/.emacs.d/ddskk/SKK-JISYO.edict")          ; 英和辞典
-             (book "~/.emacs.d/ddskk/SKK-JISYO.book")            ; 本
-             (law "~/.emacs.d/ddskk/SKK-JISYO.law")              ; 法律
-             (pron "~/.emacs.d/ddskk/SKK-JISYO.propernoun")      ; 企業など
-             (jinmei "~/.emacs.d/ddskk/SKK-JISYO.jinmei")        ; 人名
-             (geo "~/.emacs.d/ddskk/SKK-JISYO.geo")              ; 地名辞典
-             (sta "~/.emacs.d/ddskk/SKK-JISYO.station")          ; 駅
-             (2ch "~/.emacs.d/ddskk/SKK-JISYO.2ch")              ; 2ch
-             (kao0 "~/.emacs.d/ddskk/SKK-JISYO.KAO0")            ; 顔文字 0
-             (kao1 "~/.emacs.d/ddskk/SKK-JISYO.KAO1")            ; 顔文字 1
-             (kao2 "~/.emacs.d/ddskk/SKK-JISYO.KAO2")            ; 顔文字 2
-             (kao3 "~/.emacs.d/ddskk/SKK-JISYO.KAO3")            ; 顔文字 3
-             (zip "~/.emacs.d/ddskk/SKK-JISYO.zipcode")          ; 郵便番号
-             (zipo "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode")) ; 郵便番号会社
+       (let ((personal "~/Dropbox/skk/.skk-jisyo")           ; 個人辞書
+             (large "~/.emacs.d/ddskk/SKK-JISYO.L")          ; 基本辞書
+             (lst '( "~/.emacs.d/ddskk/SKK-JISYO.assoc"      ; 連想辞書
+                     "~/.emacs.d/ddskk/SKK-JISYO.edict"      ; 英和辞典
+                     "~/.emacs.d/ddskk/SKK-JISYO.book"       ; 本
+                     "~/.emacs.d/ddskk/SKK-JISYO.law"        ; 法律
+                     "~/.emacs.d/ddskk/SKK-JISYO.propernoun" ; 企業など
+                     "~/.emacs.d/ddskk/SKK-JISYO.jinmei"     ; 人名
+                     "~/.emacs.d/ddskk/SKK-JISYO.geo"        ; 地名辞典
+                     "~/.emacs.d/ddskk/SKK-JISYO.station"    ; 駅
+                     "~/.emacs.d/ddskk/SKK-JISYO.2ch"        ; 2ch
+                     "~/.emacs.d/ddskk/SKK-JISYO.KAO0"       ; 顔文字 0
+                     "~/.emacs.d/ddskk/SKK-JISYO.KAO1"       ; 顔文字 1
+                     "~/.emacs.d/ddskk/SKK-JISYO.KAO2"       ; 顔文字 2
+                     "~/.emacs.d/ddskk/SKK-JISYO.KAO3"       ; 顔文字 3
+                     "~/.emacs.d/ddskk/SKK-JISYO.zipcode"    ; 郵便番号
+             "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode")))  ; 郵便番号会社
+         ;; 個人辞書
          (when (boundp 'skk-jisyo)
            (when (and (file-readable-p personal)
-                      (file-writable-p personal)) ; 個人辞書
+                      (file-writable-p personal))
              (setq skk-jisyo personal)))
+         ;; 基本辞書
          (when (boundp 'skk-large-jisyo)
-           (when (file-readable-p large)          ; 基本辞書
+           (when (file-readable-p large)
              (setq skk-large-jisyo large)))
+         ;; その他
          (when (boundp 'skk-search-prog-list)
-           (when (file-readable-p assoc)          ; 連想辞書
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file assoc 10000 t) t))
-           (when (file-readable-p edict)          ; 英和辞書
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file edict 10000 t) t))
-           (when (file-readable-p book)           ; 本
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file book 10000 t) t))
-           (when (file-readable-p law)            ; 法律
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file law 10000 t) t))
-           (when (file-readable-p pron)           ; 企業など
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file pron 10000 t) t))
-           (when (file-readable-p jinmei)         ; 人名
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file jinmei 10000 t) t))
-           (when (file-readable-p geo)            ; 地名辞典
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file geo 10000 t) t))
-           (when (file-readable-p sta)            ; 駅
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file sta 10000 t) t))
-           (when (file-readable-p 2ch)            ; 2ch
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file 2ch 10000 t) t))
-           (when (file-readable-p kao0)           ; 顔文字 0
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file kao0 10000 t) t))
-           (when (file-readable-p kao1)           ; 顔文字 1
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file kao1 10000 t) t))
-           (when (file-readable-p kao2)           ; 顔文字 2
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file kao2 10000 t) t))
-           (when (file-readable-p kao3)           ; 顔文字 3
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file kao3 10000 t) t))
-           (when (file-readable-p zip)            ; 郵便番号
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file zip 10000 t) t))
-           (when (file-readable-p zipo)           ; 郵便番号会社
-             (add-to-list 'skk-search-prog-list
-                          (list 'skk-search-jisyo-file zipo 10000 t) t))))
+           (dolist (jisyo lst)
+             (when (file-readable-p jisyo)
+               (add-to-list 'skk-search-prog-list
+                            (list 'skk-search-jisyo-file jisyo 10000 t) t)))))
 
        ;; トゥデイ
        (when (and (fboundp 'skk-current-date)
