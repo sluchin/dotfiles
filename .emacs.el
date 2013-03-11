@@ -1059,6 +1059,8 @@ Otherwise return word around point."
 ;; q 「かなモード」,「カナモード」間をトグルする.
 ;; l 「かなモード」または「カナモード」から「アスキーモード」へ.
 ;; L 「かなモード」または「カナモード」から「全英モード」へ.
+;; 見出し語をバッファに表示するには以下を評価する
+;; (shell-command "cat ~/.emacs.d/ddskk/SKK-JISYO.KAO0 | awk '{print $1}'")
 ;; 辞書をマージする
 ;; sudo apt-get install skktools
 (defun sync-skkdic ()
@@ -1066,12 +1068,14 @@ Otherwise return word around point."
   (let ((ibus-skk-jisyo "~/.skk-ibus-jisyo")
         (share-skk-jisyo "~/Dropbox/skk/.skk-jisyo")
         (home-skk-jisyo "~/.skk-jisyo"))
-    (if (executable-find "skkdic-expr")
+    (if (and (executable-find "skkdic-expr")
+             (executable-find "skkdic-sort"))
         (when (and (boundp 'skk-jisyo)
                    (file-readable-p skk-jisyo)
                    (file-writable-p skk-jisyo))
           ;; バックアップ
-          (copy-file skk-jisyo (make-backup-file-name (expand-file-name skk-jisyo)) t)
+          (copy-file skk-jisyo
+                     (make-backup-file-name (expand-file-name skk-jisyo)) t)
           (let ((tmp "*skk*")                      ; テンポラリバッファ
                 (coding-system-for-read 'euc-jp)   ; euc-jp に変更
                 (coding-system-for-write 'euc-jp))
@@ -1096,16 +1100,17 @@ Otherwise return word around point."
                               (expand-file-name skk-jisyo))))
             ;; バッファ切替
             (switch-to-buffer tmp)
-            (goto-char (point-min))
+            ;; ソートする
+            (shell-command-on-region (point-min) (point-max)
+                                     "skkdic-sort" tmp t nil nil)
             ;; ヘッダ入力
+            (goto-char (point-min))
             (insert ";; -*- mode: skk-jisyo-edit; coding: euc-jp -*-\n")
-            (insert ";; okuri-ari entries.\n")
-            (insert ";; okuri-nasi entries.\n")
             ;; ファイルにコピー
             (write-region (point-min) (point-max) skk-jisyo)
             ;;バッファ削除
             (kill-buffer tmp)))
-      (message "not found skkdic-expr"))))
+      (message "skkdic-tools not found"))))
 
 (when (locate-library "skk")
   (autoload 'skk-mode
