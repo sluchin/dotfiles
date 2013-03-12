@@ -1061,6 +1061,7 @@ Otherwise return word around point."
 ;; L 「かなモード」または「カナモード」から「全英モード」へ.
 ;; 見出し語をバッファに表示するには以下を評価する
 ;; (shell-command "cat ~/.emacs.d/ddskk/SKK-JISYO.KAO0 | awk '{print $1}'")
+
 ;; 辞書をマージする
 ;; sudo apt-get install skktools
 (defun sync-skkdic ()
@@ -1112,6 +1113,20 @@ Otherwise return word around point."
             (kill-buffer tmp)))
       (message "skkdic-tools not found"))))
 
+;; 見出し語をバッファに表示する
+(defun display-direction-word ()
+  (interactive)
+  (let ((fn (read-file-name "filename: " "~/.emacs.d/ddskk/"))
+        (coding-system-for-read 'euc-jp))
+    (message "%s" fn)
+    (with-temp-buffer
+      (insert-file-contents fn nil)
+      (with-output-to-temp-buffer "*direction*"
+        (while (re-search-forward "^\\(.+?\\)[ |\t]" nil t)
+          (princ (concat (replace-regexp-in-string
+                          "[ ]+$" "" (match-string 0)) "\n")))))))
+
+;; skk の設定
 (when (locate-library "skk")
   (autoload 'skk-mode
     "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
@@ -1119,23 +1134,23 @@ Otherwise return word around point."
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
-       (let ((personal "~/Dropbox/skk/.skk-jisyo")           ; 個人辞書
-             (large "~/.emacs.d/ddskk/SKK-JISYO.L")          ; 基本辞書
-             (lst '( "~/.emacs.d/ddskk/SKK-JISYO.assoc"      ; 連想辞書
-                     "~/.emacs.d/ddskk/SKK-JISYO.edict"      ; 英和辞典
-                     "~/.emacs.d/ddskk/SKK-JISYO.book"       ; 本
-                     "~/.emacs.d/ddskk/SKK-JISYO.law"        ; 法律
-                     "~/.emacs.d/ddskk/SKK-JISYO.propernoun" ; 企業など
-                     "~/.emacs.d/ddskk/SKK-JISYO.jinmei"     ; 人名
-                     "~/.emacs.d/ddskk/SKK-JISYO.geo"        ; 地名辞典
-                     "~/.emacs.d/ddskk/SKK-JISYO.station"    ; 駅
-                     "~/.emacs.d/ddskk/SKK-JISYO.2ch"        ; 2ch
-                     "~/.emacs.d/ddskk/SKK-JISYO.KAO0"       ; 顔文字 0
-                     "~/.emacs.d/ddskk/SKK-JISYO.KAO1"       ; 顔文字 1
-                     "~/.emacs.d/ddskk/SKK-JISYO.KAO2"       ; 顔文字 2
-                     "~/.emacs.d/ddskk/SKK-JISYO.KAO3"       ; 顔文字 3
-                     "~/.emacs.d/ddskk/SKK-JISYO.zipcode"    ; 郵便番号
-             "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode")))  ; 郵便番号会社
+       (let ((personal "~/Dropbox/skk/.skk-jisyo")                 ; 個人辞書
+             (large "~/.emacs.d/ddskk/SKK-JISYO.L")                ; 基本辞書
+             (lst '("~/.emacs.d/ddskk/SKK-JISYO.assoc"             ; 連想辞書
+                    "~/.emacs.d/ddskk/SKK-JISYO.edict"             ; 英和辞典
+                    "~/.emacs.d/ddskk/SKK-JISYO.book"              ; 本
+                    "~/.emacs.d/ddskk/SKK-JISYO.law"               ; 法律
+                    "~/.emacs.d/ddskk/SKK-JISYO.propernoun"        ; 企業など
+                    "~/.emacs.d/ddskk/SKK-JISYO.jinmei"            ; 人名
+                    "~/.emacs.d/ddskk/SKK-JISYO.geo"               ; 地名辞典
+                    "~/.emacs.d/ddskk/SKK-JISYO.station"           ; 駅
+                    "~/.emacs.d/ddskk/SKK-JISYO.2ch"               ; 2ch用語
+                    "~/.emacs.d/ddskk/SKK-JISYO.KAO0"              ; 顔文字 0
+                    "~/.emacs.d/ddskk/SKK-JISYO.KAO1"              ; 顔文字 1
+                    "~/.emacs.d/ddskk/SKK-JISYO.KAO2"              ; 顔文字 2
+                    "~/.emacs.d/ddskk/SKK-JISYO.KAO3"              ; 顔文字 3
+                    "~/.emacs.d/ddskk/SKK-JISYO.zipcode"           ; 郵便番号
+                    "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode"))) ; 会社
          ;; 個人辞書
          (when (boundp 'skk-jisyo)
            (when (and (file-readable-p personal)
@@ -1167,15 +1182,22 @@ Otherwise return word around point."
                          ("z1" nil "１") ("z2" nil "２") ("z3" nil "３")
                          ("z4" nil "４") ("z5" nil "５") ("z6" nil "６")
                          ("z7" nil "７") ("z8" nil "８") ("z9" nil "９")
-                         ("zh" nil "←") ("zj" nil "↓") ("zk" nil "↑")
-                         ("zl" nil "→") ("z~" nil "～")
+                         ("zb" nil "←") ("zn" nil "↓") ("zp" nil "↑")
+                         ("zf" nil "→") ("z~" nil "～")
                          ("z@" nil skk-today)))))
 
        ;; sticky キー設定
-       ;; `;' だと Paren モードで効かなくなるため `:' にする
        (when (boundp 'skk-sticky-key)
-         (setq skk-sticky-key ":"))
-       ;; Enter で確定
+         (setq skk-sticky-key ";"))
+       ;; Paren モードで `;' が効かなくなるので無効にする
+       (defadvice skk-mode (around disable-paredit-around activate)
+         "Disable paredit-mode on skk-mode"
+         ad-do-it
+         (if skk-mode
+             (disable-paredit-mode)
+           (enable-paredit-mode)))
+
+       ;; Enter で確定 (デフォルト: C-j)
        (when (boundp 'skk-egg-like-newline)
          (setq skk-egg-like-newline t))
        ;; 閉括弧を自動補完
