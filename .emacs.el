@@ -1122,9 +1122,8 @@ Otherwise return word around point."
     (with-temp-buffer
       (insert-file-contents fn nil)
       (with-output-to-temp-buffer "*direction*"
-        (while (re-search-forward "^\\(.+?\\)[ |\t]" nil t)
-          (princ (concat (replace-regexp-in-string
-                          "[ ]+$" "" (match-string 0)) "\n")))))))
+        (while (re-search-forward "^\\(.+?\\)\\([ |\t]\\)" nil t)
+          (princ (concat (match-string 1) "\n")))))))
 
 ;; skk の設定
 (when (locate-library "skk")
