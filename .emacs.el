@@ -78,6 +78,25 @@
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
 
+;;; 各種文字コード設定
+;; http://nijino.homelinux.net/emacs/cp5022x.el
+(when (locate-library "cp5022x")
+  (require 'cp5022x nil t))
+(set-default-coding-systems 'utf-8-emacs)
+(setq default-file-name-coding-system 'utf-8-emacs)
+;; charset と coding-system の優先度設定
+(set-charset-priority 'ascii
+                      'japanese-jisx0208
+                      'latin-jisx0201
+                      'katakana-jisx0201
+                      'iso-8859-1
+                      'cp1252
+                      'unicode)
+(set-coding-system-priority 'utf-8
+                            'euc-jp
+                            'iso-2022-jp
+                            'cp932)
+
 ;;; 色
 ;; reverse video に設定
 (set-face-foreground 'default "white")
@@ -364,6 +383,7 @@
     (interactive)
     (load-file buffer-file-name)))
 
+;; リージョンからブラウザを開く関数
 (defun browse-prompt-input ()
   "Prompt input object for translate."
   (read-string (format "Search (%s): " (or (browse-region-or-word) ""))
@@ -378,8 +398,9 @@ Otherwise return word around point."
                                       (region-end))
     (thing-at-point 'word)))
 
+;; firefox で開く
 (when (executable-find "firefox")
-  ;; firefox で google 検索
+  ;; google 検索
   (defun google-search (&optional query)
     "Search google in browse"
     (interactive)
@@ -388,7 +409,7 @@ Otherwise return word around point."
                         "&ie=utf-8&oe=utf-8&hl=ja")))
   (define-key global-map (kbd "C-c f") 'google-search)
 
-  ;; firefox で URL を開く
+  ;; URL を開く
   (defun firefox-url-at-point ()
     "Get url and open firefox"
     (interactive)
@@ -425,22 +446,19 @@ Otherwise return word around point."
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c t") 'insert-time)
 
-;; エンコード
-;; diff や ediff を開くとき必要
-;; euc-jp
-(defun set-euc-jp ()
-  "Set euc-jp"
-  (interactive)
-  (set-language-environment "Japanese")
-  (set-default-coding-systems 'euc-jp)
-  (set-terminal-coding-system 'euc-jp))
-;; utf-8
-(defun set-utf-8 ()
-  "Set utf-8"
-  (interactive)
-  (set-language-environment "Japanese")
-  (set-default-coding-systems 'utf-8)
-  (set-terminal-coding-system 'utf-8))
+;; C-; で略語展開
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-file-name-partially
+        try-complete-file-name
+        try-expand-all-abbrevs
+        try-expand-list
+        try-expand-line
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol))
+(define-key global-map (kbd "C-;") 'hippie-expand)
 
 ;; 改行と同時にインデントも行う
 (define-key global-map (kbd "C-m") 'newline-and-indent)
@@ -488,24 +506,24 @@ Otherwise return word around point."
 ;;; 行番号表示
 ;; 画面左に行数を表示する
 (when (eval-and-compile (require 'linum nil t))
+  ;; 5桁分の領域を確保して行番号を表示
+  (setq linum-format "%5d")
   ;; デフォルトで linum-mode を有効にする
   (global-linum-mode t)
-  ;; 5桁分の領域を確保して行番号を表示
-  (setq linum-format "%5d"))
-;; 行番号表示する必要のないモードでは表示しない
-(defadvice linum-on(around linum-off activate)
-  (unless (or (minibufferp)
-              (member
-               major-mode
-               '(eshell-mode
-                 mew-summary-mode
-                 speedbar-mode
-                 compilation-mode
-                 dired-mode
-                 term-mode
-                 navi2ch-list-mode
-                 navi2ch-board-mode
-                 twittering-mode))) ad-do-it))
+  ;; 行番号表示する必要のないモードでは表示しない
+  (defadvice linum-on(around linum-off activate)
+    (unless (or (minibufferp)
+                (member
+                 major-mode
+                 '(eshell-mode
+                   mew-summary-mode
+                   speedbar-mode
+                   compilation-mode
+                   dired-mode
+                   term-mode
+                   navi2ch-list-mode
+                   navi2ch-board-mode
+                   twittering-mode))) ad-do-it)))
 
 ;;; ファイル名をユニークにする
 (when (eval-and-compile (require 'uniquify nil t))
@@ -1084,18 +1102,15 @@ Otherwise return word around point."
             (if (and (file-readable-p home-skk-jisyo)
                      (file-readable-p ibus-skk-jisyo))
                 (progn
-                  (expand-file-name skk-jisyo)
                   (call-process "skkdic-expr" nil tmp nil
                                 (expand-file-name home-skk-jisyo)
                                 (expand-file-name ibus-skk-jisyo)
                                 (expand-file-name skk-jisyo)))
               (when (file-readable-p home-skk-jisyo)
-                (expand-file-name skk-jisyo)
                 (call-process "skkdic-expr" nil tmp nil
                               (expand-file-name home-skk-jisyo)
                               (expand-file-name skk-jisyo)))
               (when (file-readable-p ibus-skk-jisyo)
-                (expand-file-name skk-jisyo)
                 (call-process "skkdic-expr" nil tmp nil
                               (expand-file-name ibus-skk-jisyo)
                               (expand-file-name skk-jisyo))))
@@ -1121,7 +1136,7 @@ Otherwise return word around point."
     (message "%s" fn)
     (with-temp-buffer
       (insert-file-contents fn nil)
-      (with-output-to-temp-buffer "*direction*"
+      (with-output-to-temp-buffer (concat "*" (file-name-nondirectory fn) "*")
         (while (re-search-forward "^\\(.+?\\)\\([ |\t]\\)" nil t)
           (princ (concat (match-string 1) "\n")))))))
 
@@ -1182,7 +1197,7 @@ Otherwise return word around point."
                          ("z4" nil "４") ("z5" nil "５") ("z6" nil "６")
                          ("z7" nil "７") ("z8" nil "８") ("z9" nil "９")
                          ("zb" nil "←") ("zn" nil "↓") ("zp" nil "↑")
-                         ("zf" nil "→") ("z~" nil "～")
+                         ("zf" nil "→") ("z~" nil "～") ("z/" nil "・")
                          ("z@" nil skk-today)))))
 
        ;; sticky キー設定
