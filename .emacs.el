@@ -1196,8 +1196,9 @@ Otherwise return word around point."
                          ("z1" nil "１") ("z2" nil "２") ("z3" nil "３")
                          ("z4" nil "４") ("z5" nil "５") ("z6" nil "６")
                          ("z7" nil "７") ("z8" nil "８") ("z9" nil "９")
-                         ("zb" nil "←") ("zn" nil "↓") ("zp" nil "↑")
-                         ("zf" nil "→") ("z~" nil "～") ("z/" nil "・")
+                         ("zh" nil "←") ("zj" nil "↓") ("zk" nil "↑")
+                         ("zl" nil "→") ("z~" nil "～") ("z/" nil "・")
+                         ("z[" nil "『") ("z]" nil "』")
                          ("z@" nil skk-today)))))
 
        ;; sticky キー設定
@@ -1218,7 +1219,7 @@ Otherwise return word around point."
          (setq skk-egg-like-newline t))
        ;; 閉括弧を自動補完
        (when (boundp 'skk-auto-insert-paren)
-         (setq skk-auto-insert-paren))
+         (setq skk-auto-insert-paren t))
        ;; 変換候補の表示位置 (C-f でミニバッファとトグル)
        (when (boundp 'skk-show-candidates-always-pop-to-buffer)
          (setq skk-show-candidates-always-pop-to-buffer t))
