@@ -516,11 +516,11 @@ Otherwise return word around point."
                 (member
                  major-mode
                  '(eshell-mode
+                   term-mode
+                   dired-mode
                    mew-summary-mode
                    speedbar-mode
                    compilation-mode
-                   dired-mode
-                   term-mode
                    navi2ch-list-mode
                    navi2ch-board-mode
                    twittering-mode))) ad-do-it)))
@@ -1101,11 +1101,10 @@ Otherwise return word around point."
             ;; マージするコマンド実行
             (if (and (file-readable-p home-skk-jisyo)
                      (file-readable-p ibus-skk-jisyo))
-                (progn
-                  (call-process "skkdic-expr" nil tmp nil
-                                (expand-file-name home-skk-jisyo)
-                                (expand-file-name ibus-skk-jisyo)
-                                (expand-file-name skk-jisyo)))
+                (call-process "skkdic-expr" nil tmp nil
+                              (expand-file-name home-skk-jisyo)
+                              (expand-file-name ibus-skk-jisyo)
+                              (expand-file-name skk-jisyo))
               (when (file-readable-p home-skk-jisyo)
                 (call-process "skkdic-expr" nil tmp nil
                               (expand-file-name home-skk-jisyo)
@@ -1159,10 +1158,10 @@ Otherwise return word around point."
                     "~/.emacs.d/ddskk/SKK-JISYO.geo"               ; 地名辞典
                     "~/.emacs.d/ddskk/SKK-JISYO.station"           ; 駅
                     "~/.emacs.d/ddskk/SKK-JISYO.2ch"               ; 2ch用語
-                    "~/.emacs.d/ddskk/SKK-JISYO.KAO0"              ; 顔文字 0
-                    "~/.emacs.d/ddskk/SKK-JISYO.KAO1"              ; 顔文字 1
-                    "~/.emacs.d/ddskk/SKK-JISYO.KAO2"              ; 顔文字 2
-                    "~/.emacs.d/ddskk/SKK-JISYO.KAO3"              ; 顔文字 3
+                    "~/.emacs.d/ddskk/SKK-JISYO.emojio"            ; エモジオ
+                    "~/.emacs.d/ddskk/SKK-JISYO.kao0"              ; 顔文字 0
+                    "~/.emacs.d/ddskk/SKK-JISYO.kao1"              ; 顔文字 1
+                    "~/.emacs.d/ddskk/SKK-JISYO.kao2"              ; 顔文字 2
                     "~/.emacs.d/ddskk/SKK-JISYO.zipcode"           ; 郵便番号
                     "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode"))) ; 会社
          ;; 個人辞書
@@ -1200,6 +1199,13 @@ Otherwise return word around point."
                          ("zl" nil "→") ("z~" nil "～") ("z/" nil "・")
                          ("z[" nil "『") ("z]" nil "』")
                          ("z@" nil skk-today)))))
+       ;; 空白を強調表示しない
+       (defadvice skk-mode (around disable-whitespace activate)
+         "Disable whitespase on skk-mode"
+         ad-do-it
+         (if skk-mode
+             (setq-default show-trailing-whitespace nil)
+           (setq-default show-trailing-whitespace t)))
 
        ;; sticky キー設定
        (when (boundp 'skk-sticky-key)
@@ -1207,7 +1213,7 @@ Otherwise return word around point."
        ;; `;' が効かなくなるので paredit モードを無効にする
        (when (locate-library "paredit")
          (eval-after-load "paredit"
-           (defadvice skk-mode (around disable-paredit-around activate)
+           (defadvice skk-mode (around disable-paredit activate)
              "Disable paredit-mode on skk-mode"
              ad-do-it
              (if skk-mode
