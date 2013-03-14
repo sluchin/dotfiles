@@ -1209,15 +1209,17 @@ Otherwise return word around point."
        ;; sticky キー設定
        (when (boundp 'skk-sticky-key)
          (setq skk-sticky-key ";")
-         ;; paredit モードで sticky キーを優先させる
+         ;; paredit モードで sticky キーを使用する
          (when (locate-library "paredit")
            (eval-after-load "paredit"
              (defadvice skk-mode (after disable-paredit activate)
                "Disable paredit-mode on skk-mode"
-               (if (and skk-mode paredit-mode)
+               (when paredit-mode
+                 (if skk-mode
+                     (define-key paredit-mode-map
+                       skk-sticky-key 'skk-sticky-set-henkan-point)
                    (define-key paredit-mode-map
-                     skk-sticky-key 'skk-sticky-set-henkan-point)
-                 (paredit-define-keys))))))
+                     skk-sticky-key 'paredit-semicolon)))))))
 
        ;; Enter で確定 (デフォルト: C-j)
        (when (boundp 'skk-egg-like-newline)
