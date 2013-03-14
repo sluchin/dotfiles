@@ -1209,16 +1209,16 @@ Otherwise return word around point."
 
        ;; sticky キー設定
        (when (boundp 'skk-sticky-key)
-         (setq skk-sticky-key ";"))
-       ;; `;' が効かなくなるので paredit モードを無効にする
-       (when (locate-library "paredit")
-         (eval-after-load "paredit"
-           (defadvice skk-mode (around disable-paredit activate)
-             "Disable paredit-mode on skk-mode"
-             ad-do-it
-             (if skk-mode
-                 (disable-paredit-mode)
-               (enable-paredit-mode)))))
+         (setq skk-sticky-key ";")
+         ;; `;' が効かなくなるので paredit モードを無効にする
+         (when (locate-library "paredit")
+           (eval-after-load "paredit"
+             (defadvice skk-mode (around disable-paredit activate)
+               "Disable paredit-mode on skk-mode"
+               ad-do-it
+               (if skk-mode
+                   (disable-paredit-mode)
+                 (enable-paredit-mode))))))
 
        ;; Enter で確定 (デフォルト: C-j)
        (when (boundp 'skk-egg-like-newline)
