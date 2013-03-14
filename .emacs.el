@@ -1136,7 +1136,7 @@ Otherwise return word around point."
     (with-temp-buffer
       (insert-file-contents fn nil)
       (with-output-to-temp-buffer (concat "*" (file-name-nondirectory fn) "*")
-        (while (re-search-forward "^\\(.+?\\)\\([ |\t]\\)" nil t)
+        (while (re-search-forward "^\\([^;]+?\\)\\([ |\t]\\)" nil t)
           (princ (concat (match-string 1) "\n")))))))
 
 ;; skk の設定
@@ -1201,7 +1201,7 @@ Otherwise return word around point."
                          ("z@" nil skk-today)))))
        ;; 空白を強調表示しない
        (defadvice skk-mode (around disable-whitespace activate)
-         "Disable whitespase on skk-mode"
+         "Highlight whitespase on skk-mode"
          ad-do-it
          (if skk-mode
              (setq-default show-trailing-whitespace nil)
