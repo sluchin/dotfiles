@@ -1200,9 +1200,8 @@ Otherwise return word around point."
                          ("z[" nil "『") ("z]" nil "』")
                          ("z@" nil skk-today)))))
        ;; 空白を強調表示しない
-       (defadvice skk-mode (around disable-whitespace activate)
+       (defadvice skk-mode (after disable-whitespace activate)
          "Highlight whitespase on skk-mode"
-         ad-do-it
          (if skk-mode
              (setq-default show-trailing-whitespace nil)
            (setq-default show-trailing-whitespace t)))
@@ -1210,15 +1209,15 @@ Otherwise return word around point."
        ;; sticky キー設定
        (when (boundp 'skk-sticky-key)
          (setq skk-sticky-key ";")
-         ;; `;' が効かなくなるので paredit モードを無効にする
+         ;; paredit モードで sticky キーを優先させる
          (when (locate-library "paredit")
            (eval-after-load "paredit"
-             (defadvice skk-mode (around disable-paredit activate)
+             (defadvice skk-mode (after disable-paredit activate)
                "Disable paredit-mode on skk-mode"
-               ad-do-it
-               (if skk-mode
-                   (disable-paredit-mode)
-                 (enable-paredit-mode))))))
+               (if (and skk-mode paredit-mode)
+                   (define-key paredit-mode-map
+                     skk-sticky-key 'skk-sticky-set-henkan-point)
+                 (paredit-define-keys))))))
 
        ;; Enter で確定 (デフォルト: C-j)
        (when (boundp 'skk-egg-like-newline)
