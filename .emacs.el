@@ -1270,7 +1270,10 @@ Otherwise return word around point."
          (setq skk-search-sagyo-henkaku t))
        ;; 辞書登録のとき、余計な送り仮名を送らないようにする
        (when (boundp 'skk-check-okurigana-on-touroku)
-         (setq skk-check-okurigana-on-touroku nil)))))
+         (setq skk-check-okurigana-on-touroku nil))
+       ;; C-q で半角カナに変換
+       (when (boundp 'skk-use-jisx0201-input-method)
+         (setq skk-use-jisx0201-input-method t)))))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
