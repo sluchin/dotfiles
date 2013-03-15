@@ -1132,12 +1132,15 @@ Otherwise return word around point."
   (interactive)
   (let ((fn (read-file-name "filename: " "~/.emacs.d/ddskk/"))
         (coding-system-for-read 'euc-jp))
-    (message "%s" fn)
-    (with-temp-buffer
-      (insert-file-contents fn nil)
-      (with-output-to-temp-buffer (concat "*" (file-name-nondirectory fn) "*")
-        (while (re-search-forward "^\\([^;]+?\\)\\([ |\t]\\)" nil t)
-          (princ (concat (match-string 1) "\n")))))))
+    (if (file-readable-p fn)
+        (progn
+          (message "%s" fn)
+          (with-temp-buffer
+            (insert-file-contents fn nil)
+            (with-output-to-temp-buffer (concat "*" (file-name-nondirectory fn) "*")
+              (while (re-search-forward "^\\([^;]+?\\)\\([ |\t]\\)" nil t)
+                (princ (concat (match-string 1) "\n"))))))
+      (message "can not open %s" fn))))
 
 ;; skk の設定
 (when (locate-library "skk")
@@ -1210,7 +1213,8 @@ Otherwise return word around point."
              (setq-default show-trailing-whitespace nil)
            (setq-default show-trailing-whitespace t))
          ;; paredit モードで sticky キーを使用する
-         (when (and (string= skk-sticky-key ";")
+         (when (and (boundp 'skk-sticky-key)
+                    (string= skk-sticky-key ";")
                     (boundp 'paredit-mode)
                     paredit-mode)
            (if skk-mode
