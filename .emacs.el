@@ -1210,7 +1210,7 @@ Otherwise return word around point."
              (setq-default show-trailing-whitespace nil)
            (setq-default show-trailing-whitespace t))
          ;; paredit モードで sticky キーを使用する
-         (when (and (stringp skk-sticky-key)
+         (when (and (string= skk-sticky-key ";")
                     (boundp 'paredit-mode)
                     paredit-mode)
            (if skk-mode
