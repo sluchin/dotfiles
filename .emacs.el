@@ -460,6 +460,13 @@ Otherwise return word around point."
         try-complete-lisp-symbol))
 (define-key global-map (kbd "C-;") 'hippie-expand)
 
+;; lisp 補完
+;; Tab で補完 (デフォルト: M-Tab)
+(define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
+(define-key lisp-interaction-mode-map (kbd "TAB") 'lisp-complete-symbol)
+(define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
+(define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
+
 ;; 改行と同時にインデントも行う
 (define-key global-map (kbd "C-m") 'newline-and-indent)
 
@@ -490,13 +497,6 @@ Otherwise return word around point."
 ;;; 現在位置のファイル・URLを開く
 (define-key global-map (kbd "C-x M-f") 'find-file-at-point)
 (define-key global-map (kbd "C-x M-d") 'dired-at-point)
-
-;; lisp 補完
-;; Tab で補完 (デフォルト: M-Tab)
-(define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
-(define-key lisp-interaction-mode-map (kbd "TAB") 'lisp-complete-symbol)
-(define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
-(define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
 
 ;; エコー領域をクリアする
 (define-key global-map (kbd "C-c C-g") (lambda () (interactive) (message nil)))
@@ -1199,27 +1199,25 @@ Otherwise return word around point."
                          ("zl" nil "→") ("z~" nil "～") ("z/" nil "・")
                          ("z[" nil "『") ("z]" nil "』")
                          ("z@" nil skk-today)))))
-       ;; 空白を強調表示しない
-       (defadvice skk-mode (after disable-whitespace activate)
-         "Highlight whitespase on skk-mode"
-         (if skk-mode
-             (setq-default show-trailing-whitespace nil)
-           (setq-default show-trailing-whitespace t)))
 
        ;; sticky キー設定
        (when (boundp 'skk-sticky-key)
-         (setq skk-sticky-key ";")
+         (setq skk-sticky-key ";"))
+
+       (defadvice skk-mode (after after-skk-mode activate)
+         ;; 空白を強調表示しない
+         (if skk-mode
+             (setq-default show-trailing-whitespace nil)
+           (setq-default show-trailing-whitespace t))
          ;; paredit モードで sticky キーを使用する
-         (when (locate-library "paredit")
-           (eval-after-load "paredit"
-             (defadvice skk-mode (after disable-paredit activate)
-               "Disable paredit-mode on skk-mode"
-               (when paredit-mode
-                 (if skk-mode
-                     (define-key paredit-mode-map
-                       skk-sticky-key 'skk-sticky-set-henkan-point)
-                   (define-key paredit-mode-map
-                     skk-sticky-key 'paredit-semicolon)))))))
+         (when (and (stringp skk-sticky-key)
+                    (boundp 'paredit-mode)
+                    paredit-mode)
+           (if skk-mode
+               (define-key paredit-mode-map
+                 skk-sticky-key 'skk-sticky-set-henkan-point)
+             (define-key paredit-mode-map
+               skk-sticky-key 'paredit-semicolon))))
 
        ;; Enter で確定 (デフォルト: C-j)
        (when (boundp 'skk-egg-like-newline)
@@ -1889,31 +1887,33 @@ Otherwise return word around point."
                              (require 'auto-complete-config nil t)))
   (add-to-list 'ac-dictionary-directories
                "~/.emacs.d/auto-complete/dict")
-  (when (boundp 'ac-comphist-file)     ; ソースファイル
+  (when (boundp 'ac-comphist-file)    ; ソースファイル
     (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
-  (when (fboundp 'ac-config-default)   ; デフォルト設定にする
+  (when (fboundp 'ac-config-default)  ; デフォルト設定にする
     (ac-config-default))
-  (when (boundp 'ac-delay)             ; 待ち時間
-    (setq ac-delay 0.1))
-  (when (boundp 'ac-quick-help-delay)  ; クイックヘルプ表示時間
+  (when (boundp 'ac-delay)            ; 待ち時間
+    (setq ac-delay 0))
+  (when (boundp 'ac-quick-help-delay) ; クイックヘルプ表示時間
     (setq ac-quick-help-delay 0.1))
-  (when (boundp 'ac-auto-show-menu)    ; 補完メニュー表示時間
+  (when (boundp 'ac-auto-show-menu)   ; 補完メニュー表示時間
     (setq ac-auto-show-menu 0.1))
-  (when (boundp 'ac-candidate-max)     ; 候補の最大数
+  (when (boundp 'ac-candidate-max)    ; 候補の最大数
     (setq ac-candidate-max 50))
-  (when (boundp 'ac-auto-start)        ; 自動で補完しない
+  (when (boundp 'ac-auto-start)       ; 自動で補完しない
     (setq ac-auto-start nil))
-  (when (boundp 'ac-modes)             ; 補完対象モード
+  (when (boundp 'ac-modes)            ; 補完対象モード
     (setq ac-modes
           (append ac-modes
                   (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode))))
-  (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
-    (ac-set-trigger-key "C-;"))
+
   ;; キーバインド
+  (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
+    (ac-set-trigger-key "M-n"))
+  (define-key ac-complete-mode-map (kbd "M-p") 'ac-stop)
   (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
   (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
-  (define-key ac-complete-mode-map (kbd "C-/") 'ac-stop)
-  ;; オートコンプリートをトグルする
+
+   ;; オートコンプリートをトグルする
   (define-key global-map (kbd "<f4>")
     (lambda (&optional n)
       (interactive "P")
