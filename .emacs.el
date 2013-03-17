@@ -1332,7 +1332,6 @@ Otherwise return word around point."
 
 ;;; ポモドーロタイマ
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
-;; (install-elisp "https://raw.github.com/krick/tea-time/master/tea-time.el")
 ;; git clone git://github.com/konr/tomatinho.git
 (when (locate-library "pomodoro-technique")
   (autoload 'pomodoro
@@ -1386,6 +1385,7 @@ Otherwise return word around point."
          (ad-activate 'tomatinho-update)))))
 
 ;;; タイマー
+;; (install-elisp "https://raw.github.com/krick/tea-time/master/tea-time.el")
 (when (locate-library "tea-time")
   (autoload 'tea-time "tea-time" "Timer." t)
   (eval-after-load "tea-time"
