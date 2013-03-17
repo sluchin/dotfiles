@@ -853,8 +853,8 @@ Otherwise return word around point."
   ;; 過去の Undo が Redo されないようにする
   (setq undo-no-redo t)
   ;; 大量の Undo に耐えられるようにする
-  (setq undo-limit 600000)
-  (setq undo-strong-limit 900000))
+  (setq undo-limit 6000000)
+  (setq undo-strong-limit 9000000))
 
 ;; アンドゥ木構造
 ;; (install-elisp "http://www.dr-qubit.org/undo-tree/undo-tree.el")
