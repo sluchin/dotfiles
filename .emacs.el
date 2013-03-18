@@ -1268,7 +1268,7 @@ Otherwise return word around point."
        ;; サ行の送りプレフィックスに限定して送りあり変換する
        (when (boundp 'skk-search-sagyo-henkaku)
          (setq skk-search-sagyo-henkaku t))
-       ;; 辞書登録のとき、余計な送り仮名を送らないようにする
+       ;; 辞書登録のとき, 余計な送り仮名を送らないようにする
        (when (boundp 'skk-check-okurigana-on-touroku)
          (setq skk-check-okurigana-on-touroku nil))
        ;; C-q で半角カナに変換
