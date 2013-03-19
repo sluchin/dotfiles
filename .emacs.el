@@ -1606,12 +1606,14 @@ Otherwise return word around point."
                        (cons
                         '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
-       ;; カーソルから最後までを refile する
+       ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
          (around mew-summary-auto-refile-from-cursor activate)
-         (narrow-to-region (point) (point-max))
-         ad-do-it
-         (widen))
+         (save-excursion
+           (save-window-excursion
+             (narrow-to-region (point) (point-max))
+             ad-do-it
+             (widen))))
 
        ;; IMAP の設定
        (when (boundp 'mew-proto)
