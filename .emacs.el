@@ -374,6 +374,7 @@
 ;; f2 でバックトレースをトグルする
 (define-key global-map (kbd "<f2>")
   (lambda ()
+    "Toggle debug-on-error"
     (interactive)
     (if debug-on-error
         (setq debug-on-error nil)
