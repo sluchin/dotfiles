@@ -493,7 +493,7 @@ Otherwise return word around point."
 ;; 折り返し表示 ON/OFF
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
 
-;;; 現在位置のファイル・URLを開く
+;; 現在位置のファイル・URLを開く
 (define-key global-map (kbd "C-x M-f") 'find-file-at-point)
 (define-key global-map (kbd "C-x M-d") 'dired-at-point)
 
