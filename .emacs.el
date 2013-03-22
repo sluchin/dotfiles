@@ -834,8 +834,8 @@ Otherwise return word around point."
 ;; (cua-mode)
 ;; <C-enter> で矩形選択モード
 (eval-after-load "cua-base"
-  ;; キーバインドを無効化
   '(progn
+     ;; キーバインドを無効化
      (when (boundp 'cua-enable-cua-keys)
        (setq cua-enable-cua-keys nil))))
 
@@ -965,12 +965,13 @@ Otherwise return word around point."
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
 ;; 以下で最近開いたファイルを一覧表示
-;; M-x recentf-open-files
+;; (recentf-open-files)
 (when (eval-and-compile (require 'recentf-ext nil t))
   (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
     (setq recentf-max-saved-items 10000))
   (when (boundp 'recentf-exclude)         ; 除外するファイル
-    (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$"))))
+    (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$")))
+  (define-key global-map (kbd "C-c C-c") 'recentf-open-files))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
