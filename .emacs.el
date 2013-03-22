@@ -245,7 +245,10 @@
   (when (boundp 'show-paren-delay)
     (setq show-paren-delay 0)) ; 初期値は 0.125
   (when (fboundp 'show-paren-mode)
-    (show-paren-mode t)))      ; 有効化
+    (show-paren-mode t))       ; 有効化
+  ;; ウィンドウ内に収まらないときだけ括弧内も光らせる
+  (when (boundp 'show-paren-style)
+    (setq show-paren-style 'mixed)))
 
 ;;; キーストロークをエコーエリアに早く表示する
 (setq echo-keystrokes 0.1)
@@ -281,14 +284,14 @@
 ;;; 履歴を保存する
 (savehist-mode t)
 
-;;; ファイル内のカーソル位置を記録する
-(load "saveplace")
-(setq-default save-place t)
-;; リンクから開いた場合の対処
+;;; シンボリックリンクを実名にする
 (setq find-file-visit-truename t)
 
-;; ミニバッファを再帰的に呼び出せるようにする
+;;; ミニバッファを再帰的に呼び出せるようにする
 (setq enable-recursive-minibuffers t)
+
+;;; eval した結果を全部表示
+(setq eval-expression-print-length nil)
 
 ;;; 矩形選択
 ;; M-x cua-mode <C-enter> で矩形選択モード
@@ -337,34 +340,35 @@
           (goto-char (mark))
           (isearch-repeat-forward)))
     ad-do-it))
-;; migemo
+
+;;; migemo
 ;; sudo apt-get install migemo cmigemo
 ;; C-e でトグル
-(when (and (executable-find "cmigemo")
-           (require 'migemo nil t))
-  (when (boundp 'migemo-command)          ; コマンド
-    (setq migemo-command "cmigemo"))
-  (when (boundp 'migemo-options)          ; オプション
-    (setq migemo-options '("-q" "--emacs")))
-  (when (boundp 'migemo-dictionary)       ; 辞書のパス指定
-    (setq migemo-dictionary "/usr/local/share/migemo/utf-8/migemo-dict"))
-  (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
-    (setq migemo-user-dictionary nil))
-  (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
-    (setq migemo-regex-dictionary nil))
-  (when (boundp 'migemo-coding-system)    ; utf-8
-  (setq migemo-coding-system 'utf-8-unix))
-  (when (fboundp 'migemo-init)            ; 初期化
-    (migemo-init)))
-;; 日本語で検索するための設定
+(when (eq system-type 'gnu/linux)
+  (when (and (executable-find "cmigemo")
+             (require 'migemo nil t))
+    (when (boundp 'migemo-command)          ; コマンド
+      (setq migemo-command "cmigemo"))
+    (when (boundp 'migemo-options)          ; オプション
+      (setq migemo-options '("-q" "--emacs")))
+    (when (boundp 'migemo-dictionary)       ; 辞書のパス指定
+      (setq migemo-dictionary "/usr/share/migemo/migemo-dict"))
+    (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
+      (setq migemo-user-dictionary nil))
+    (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
+      (setq migemo-regex-dictionary nil))
+    (when (boundp 'migemo-coding-system)    ; euc-jp
+      (setq migemo-coding-system 'euc-jp))
+    (when (fboundp 'migemo-init)            ; 初期化
+      (migemo-init))))
+
+;;; 日本語で検索するための設定
 (when (eval-and-compile (require 'skk-isearch nil t))
   (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
   (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
+  ;; 起動時アスキーモード
   (when (boundp 'skk-isearch-start-mode)
-     (setq skk-isearch-start-mode 'latin))) ; 起動時アスキーモード
-;; ファイル名に拡張
-;(ido-mode t)       ; コマンドが ido のものに置き変わる
-;(ido-everywhere t) ; バッファ名ファイル名全て
+     (setq skk-isearch-start-mode 'latin)))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -825,6 +829,11 @@ Otherwise return word around point."
   (define-key global-map (kbd "C-c r") 'org-remember)
   (define-key global-map (kbd "C-c c") 'org-remember-code-reading)
   (define-key global-map (kbd "C-c b") 'org-iswitchb))
+
+;;; ファイル内のカーソル位置を記録する
+(when (eval-and-compile (require 'saveplace nil t))
+  (when (boundp 'save-place)
+    (setq-default save-place t)))
 
 ;;; ここまで標準 lisp
 
