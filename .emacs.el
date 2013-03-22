@@ -293,12 +293,6 @@
 ;;; eval した結果を全部表示
 (setq eval-expression-print-length nil)
 
-;;; 矩形選択
-;; M-x cua-mode <C-enter> で矩形選択モード
-(when (eval-when-compile (require 'cua-base nil t))
-  (when (boundp 'cua-enable-cua-keys)
-    (setq cua-enable-cua-keys nil))) ; キーバインドを無効化
-
 ;;; ブックマーク
 ;; C-x r m (bookmark-set)
 ;; C-x r l (bookmark-bmenu-list)
@@ -836,6 +830,15 @@ Otherwise return word around point."
   (when (boundp 'save-place)
     (setq-default save-place t)))
 
+;;; 矩形選択
+;; (cua-mode)
+;; <C-enter> で矩形選択モード
+(eval-after-load "cua-base"
+  ;; キーバインドを無効化
+  '(progn
+     (when (boundp 'cua-enable-cua-keys)
+       (setq cua-enable-cua-keys nil))))
+
 ;;; ここまで標準 lisp
 
 ;;; ここから拡張 lisp の設定
@@ -861,21 +864,26 @@ Otherwise return word around point."
 ;; C-? でリドゥ C-/ でアンドゥ
 (when (eval-and-compile (require 'redo+ nil t))
   ;; 過去の Undo が Redo されないようにする
-  (setq undo-no-redo t)
+  (when (boundp 'undo-no-redo)
+    (setq undo-no-redo t))
   ;; 大量の Undo に耐えられるようにする
-  (setq undo-limit 6000000)
-  (setq undo-strong-limit 9000000))
+  (when (boundp 'undo-limit)
+    (setq undo-limit 6000000))
+  (when (boundp 'undo-strong-limit)
+    (setq undo-strong-limit 9000000)))
 
 ;; アンドゥ木構造
 ;; (install-elisp "http://www.dr-qubit.org/undo-tree/undo-tree.el")
 ;; C-x u で木構造表示
 (when (eval-and-compile (require 'undo-tree nil t))
-  (global-undo-tree-mode))
+  (when (fboundp 'global-undo-tree-mode)
+    (global-undo-tree-mode)))
 
 ;; アンドゥ履歴
 ;; (install-elisp "http://cx4a.org/pub/undohist.el")
 (when (eval-and-compile (require 'undohist nil t))
-  (undohist-initialize))
+  (when (fboundp 'undohist-initialize)
+    (undohist-initialize)))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
