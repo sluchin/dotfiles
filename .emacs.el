@@ -346,26 +346,29 @@
        ;; migemo
        ;; sudo apt-get install migemo cmigemo
        ;; C-e でトグル
-       (when (eq system-type 'gnu/linux)
-         (when (and (executable-find "cmigemo")
-                    (eval-and-compile (require 'migemo nil t)))
-           (when (boundp 'migemo-command)          ; コマンド
-             (setq migemo-command "cmigemo"))
-           (when (boundp 'migemo-options)          ; オプション
-             (setq migemo-options '("-q" "--emacs")))
-           ;; 辞書のパス指定
-           (let ((mdict "/usr/share/migemo/migemo-dict"))
-             (when (and (boundp 'migemo-dictionary)
-                        (file-readable-p mdict))
-               (setq migemo-dictionary mdict)))
-           (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
-             (setq migemo-user-dictionary nil))
-           (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
-             (setq migemo-regex-dictionary nil))
-           (when (boundp 'migemo-coding-system)    ; euc-jp
-             (setq migemo-coding-system 'euc-jp))
-           (when (fboundp 'migemo-init)            ; 初期化
-             (migemo-init))))
+       (when (and (executable-find "cmigemo")
+                  (locate-library "migemo"))
+         (autoload 'migemo-init "migemo"
+           "Japanese incremental search through dynamic pattern expansion." t)
+         (add-hook 'isearch-mode-hook 'migemo-init)
+         (eval-after-load "migemo"
+           '(progn
+              (when (boundp 'migemo-command)          ; コマンド
+                (setq migemo-command "cmigemo"))
+              (when (boundp 'migemo-options)          ; オプション
+                (setq migemo-options '("-q" "--emacs")))
+              ;; 辞書のパス指定
+              (when (eq system-type 'gnu/linux)
+                (let ((mdict "/usr/share/migemo/migemo-dict"))
+                  (when (and (boundp 'migemo-dictionary)
+                             (file-readable-p mdict))
+                    (setq migemo-dictionary mdict))))
+              (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
+                (setq migemo-user-dictionary nil))
+              (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
+                (setq migemo-regex-dictionary nil))
+              (when (boundp 'migemo-coding-system)    ; euc-jp
+                (setq migemo-coding-system 'euc-jp)))))
        ;; 日本語で検索するための設定
        (when (locate-library "skk-isearch")
          (autoload 'skk-isearch-mode-setup "skk-isearch"
