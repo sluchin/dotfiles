@@ -369,8 +369,6 @@
       ;; 起動時アスキーモード
       (when (boundp 'skk-isearch-start-mode)
         (setq skk-isearch-start-mode 'latin))
-      (when (boundp 'skk-isearch-mode-enable)
-        (setq skk-isearch-mode-enable 'always))
       ;; 変換でエラーを捕捉しないよう変更
       (defadvice skk-isearch-wrapper
         (around skk-isearch-wrapper-nil (&rest arg) activate compile)
