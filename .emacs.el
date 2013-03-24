@@ -1,5 +1,7 @@
-;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
-;;; Emacs 初期化ファイル
+;;; .emacs.el --- Emacs initialize file
+;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
+;; Copyright (C) 2013
+;; Author: Tetsuya Higashi
 
 ;;; バージョン
 ;; 2012-12-28
@@ -7,13 +9,13 @@
 ;; 2012-11-27
 ;; GNU Emacs 23.3.1 (i686-pc-linux-gnu, GTK+ Version 2.24.10)
 
-;;; 設定を読み込まない起動オプション
+;;; 起動オプション
+;; 設定を読み込まない起動オプション
 ;; emacs23 -q --no-site-file
+;; 通常の起動オプション
+;; emacs23 -g 100x50-100+0
 
-;;; 通常の起動オプション
-;; emacs23 -rv -g 100x50-100+0
-
-;;; Windows (NTEmacs) の場合, 以下の設定をすること
+;;; NTEmacs 設定
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
@@ -297,9 +299,11 @@
 ;; C-x r m (bookmark-set)
 ;; C-x r l (bookmark-bmenu-list)
 ;; ブックマークを変更したら即保存する
-(when (eval-when-compile (require 'bookmark nil t))
-  (when (boundp 'bookmark-save-flag)
-    (setq bookmark-save-flag t)))
+(when (locate-library "bookmark")
+  (eval-after-load "bookmark"
+    '(progn
+       (when (boundp 'bookmark-save-flag)
+         (setq bookmark-save-flag t)))))
 
 ;;; gzip ファイルも編集できるようにする
 (auto-compression-mode t)
@@ -314,68 +318,74 @@
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "red")
 ;; 強調表示しない設定
-(add-hook 'fundamental-mode-hook (lambda () (setq show-trailing-whitespace nil)))
-(add-hook 'calendar-mode-hook (lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'fundamental-mode-hook
+          (lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'calendar-mode-hook
+          (lambda () (setq show-trailing-whitespace nil)))
 
-;;; isearch
-;; リージョンで検索する
-(defadvice isearch-mode
-  (around isearch-region-mode
-          (forward &optional regexp op-fun recursive-edit word-p)
-          activate compile)
-  (if (and transient-mark-mode mark-active)
-      (progn
-        (isearch-update-ring
-         (buffer-substring-no-properties (mark) (point)))
-        (deactivate-mark)
-        ad-do-it
-        (if (not forward)
-            (isearch-repeat-backward)
-          (goto-char (mark))
-          (isearch-repeat-forward)))
-    ad-do-it))
-
-;;; migemo
-;; sudo apt-get install migemo cmigemo
-;; C-e でトグル
-(when (eq system-type 'gnu/linux)
-  (when (and (executable-find "cmigemo")
-             (eval-and-compile (require 'migemo nil t)))
-    (when (boundp 'migemo-command)          ; コマンド
-      (setq migemo-command "cmigemo"))
-    (when (boundp 'migemo-options)          ; オプション
-      (setq migemo-options '("-q" "--emacs")))
-    (when (boundp 'migemo-dictionary)       ; 辞書のパス指定
-      (setq migemo-dictionary "/usr/share/migemo/migemo-dict"))
-    (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
-      (setq migemo-user-dictionary nil))
-    (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
-      (setq migemo-regex-dictionary nil))
-    (when (boundp 'migemo-coding-system)    ; euc-jp
-      (setq migemo-coding-system 'euc-jp))
-    (when (fboundp 'migemo-init)            ; 初期化
-      (migemo-init))))
-
-;;; 日本語で検索するための設定
-(when (locate-library "skk-isearch")
-  (autoload 'skk-isearch-mode-setup
-    "skk-isearch" "Hook function called when skk isearch begin." t)
-  (autoload 'skk-isearch-mode-cleanup
-    "skk-isearch" "Hook function called when skk isearch is done." t)
-  (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
-  (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
-  (eval-after-load "skk-isearch"
+;;; 検索 (isearch)
+(when (locate-library "isearch")
+  (eval-after-load "isearch"
     '(progn
-      ;; 起動時アスキーモード
-      (when (boundp 'skk-isearch-start-mode)
-        (setq skk-isearch-start-mode 'latin))
-      ;; 変換でエラーを捕捉しないよう変更
-      (defadvice skk-isearch-wrapper
-        (around skk-isearch-wrapper-nil (&rest arg) activate compile)
-        (if (null (car arg))
-            (let ((skk-dcomp-multiple-activate nil))
-              (ignore-errors ad-do-it))
-          ad-do-it)))))
+       ;; リージョンで検索する
+       (defadvice isearch-mode
+         (around isearch-region-mode
+                 (forward &optional regexp op-fun recursive-edit word-p)
+                 activate compile)
+         (if (and transient-mark-mode mark-active)
+             (progn
+               (isearch-update-ring
+                (buffer-substring-no-properties (mark) (point)))
+               (deactivate-mark)
+               ad-do-it
+               (if (not forward)
+                   (isearch-repeat-backward)
+                 (goto-char (mark))
+                 (isearch-repeat-forward)))
+           ad-do-it))
+       ;; migemo
+       ;; sudo apt-get install migemo cmigemo
+       ;; C-e でトグル
+       (when (eq system-type 'gnu/linux)
+         (when (and (executable-find "cmigemo")
+                    (eval-and-compile (require 'migemo nil t)))
+           (when (boundp 'migemo-command)          ; コマンド
+             (setq migemo-command "cmigemo"))
+           (when (boundp 'migemo-options)          ; オプション
+             (setq migemo-options '("-q" "--emacs")))
+           ;; 辞書のパス指定
+           (let ((mdict "/usr/share/migemo/migemo-dict"))
+             (when (and (boundp 'migemo-dictionary)
+                        (file-readable-p mdict))
+               (setq migemo-dictionary mdict)))
+           (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
+             (setq migemo-user-dictionary nil))
+           (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
+             (setq migemo-regex-dictionary nil))
+           (when (boundp 'migemo-coding-system)    ; euc-jp
+             (setq migemo-coding-system 'euc-jp))
+           (when (fboundp 'migemo-init)            ; 初期化
+             (migemo-init))))
+       ;; 日本語で検索するための設定
+       (when (locate-library "skk-isearch")
+         (autoload 'skk-isearch-mode-setup "skk-isearch"
+           "Hook function called when skk isearch begin." t)
+         (autoload 'skk-isearch-mode-cleanup "skk-isearch"
+           "Hook function called when skk isearch is done." t)
+         (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
+         (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
+         (eval-after-load "skk-isearch"
+           '(progn
+              ;; 起動時アスキーモード
+              (when (boundp 'skk-isearch-start-mode)
+                (setq skk-isearch-start-mode 'latin))
+              ;; 変換でエラーを捕捉しない
+              (defadvice skk-isearch-wrapper
+                (around skk-isearch-wrapper-nil (&rest arg) activate compile)
+                (if (null (car arg))
+                    (let ((skk-dcomp-multiple-activate nil))
+                      (ignore-errors ad-do-it))
+                  ad-do-it))))))))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -490,17 +500,15 @@ Otherwise return word around point."
 (define-key global-map (kbd "C-^") 'global-whitespace-mode)
 
 ;; クリップボードにコピー
-;; クリップボードを使わない場合以下の設定でリージョンと同期をとるとよい
-;; (setq x-select-enable-clipboard t)
 (define-key global-map (kbd "<C-insert>") 'clipboard-kill-ring-save)
 
 ;; クリップボードに切り取り
 (define-key global-map (kbd "S-DEL") 'clipboard-kill-region)
 
-;; クリップボードに貼り付け
+;; クリップボードから貼り付け
 (define-key global-map (kbd "<S-insert>") 'clipboard-yank)
 
-;; C-\の日本語入力の設定を無効にする
+;; C-\ の日本語入力の設定を無効にする
 (define-key global-map (kbd "C-\\") nil)
 
 ;; 折り返し表示 ON/OFF
@@ -859,8 +867,8 @@ Otherwise return word around point."
 
 ;;; インストーラ
 ;; wget http://www.emacswiki.org/emacs/download/auto-install.el
-;; autoloadすると一回目に error になるため使うときは,
-;; (enable-auto-install) を最初に評価する
+;; autoloadすると一回目に error になるため使うときは, 以下を評価する
+;; (enable-auto-install)
 (defun enable-auto-install ()
   "Do enable auto-install"
   (interactive)
@@ -988,19 +996,20 @@ Otherwise return word around point."
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
-(when (eval-and-compile (require 'tabbar nil t))
-  (when (fboundp 'tabbar-mode)
-    (tabbar-mode -1)) ; デフォルト無効
-  ;; 色の設定
-  (set-face-background 'tabbar-default "cadet blue")
-  (set-face-foreground 'tabbar-unselected "black")
-  (set-face-background 'tabbar-unselected "cadet blue")
-  (set-face-foreground 'tabbar-selected "brack")
-  (set-face-background 'tabbar-selected "blue")
+(when (locate-library "tabbar")
+  (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line" t)
   ;; キーバインド
   (define-key global-map (kbd "<f10>") 'tabbar-mode)
   (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
-  (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab))
+  (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab)
+  (eval-after-load "tabbar"
+    '(progn
+       ;; 色の設定
+       (set-face-background 'tabbar-default "cadet blue")
+       (set-face-foreground 'tabbar-unselected "black")
+       (set-face-background 'tabbar-unselected "cadet blue")
+       (set-face-foreground 'tabbar-selected "brack")
+       (set-face-background 'tabbar-selected "blue"))))
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/
