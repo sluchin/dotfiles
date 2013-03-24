@@ -372,7 +372,7 @@
       ;; 変換でエラーを捕捉しないよう変更
       (defadvice skk-isearch-wrapper
         (around skk-isearch-wrapper-nil (&rest arg) activate compile)
-        (if (and (null (car arg)))
+        (if (null (car arg))
             (let ((skk-dcomp-multiple-activate nil))
               (ignore-errors ad-do-it))
           ad-do-it)))))
