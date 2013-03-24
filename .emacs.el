@@ -79,7 +79,7 @@
 (setq inhibit-startup-screen t)
 
 ;;; 各種文字コード設定
-;; http://nijino.homelinux.net/emacs/cp5022x.el
+;; (install-elisp http://nijino.homelinux.net/emacs/cp5022x.el)
 (when (locate-library "cp5022x")
   (require 'cp5022x nil t))
 (set-default-coding-systems 'utf-8-emacs)
@@ -322,7 +322,7 @@
 (defadvice isearch-mode
   (around isearch-region-mode
           (forward &optional regexp op-fun recursive-edit word-p)
-          activate)
+          activate compile)
   (if (and transient-mark-mode mark-active)
       (progn
         (isearch-update-ring
@@ -340,7 +340,7 @@
 ;; C-e でトグル
 (when (eq system-type 'gnu/linux)
   (when (and (executable-find "cmigemo")
-             (require 'migemo nil t))
+             (eval-and-compile (require 'migemo nil t)))
     (when (boundp 'migemo-command)          ; コマンド
       (setq migemo-command "cmigemo"))
     (when (boundp 'migemo-options)          ; オプション
@@ -357,12 +357,27 @@
       (migemo-init))))
 
 ;;; 日本語で検索するための設定
-(when (eval-and-compile (require 'skk-isearch nil t))
+(when (locate-library "skk-isearch")
+  (autoload 'skk-isearch-mode-setup
+    "skk-isearch" "Hook function called when skk isearch begin." t)
+  (autoload 'skk-isearch-mode-cleanup
+    "skk-isearch" "Hook function called when skk isearch is done." t)
   (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
   (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
-  ;; 起動時アスキーモード
-  (when (boundp 'skk-isearch-start-mode)
-     (setq skk-isearch-start-mode 'latin)))
+  (eval-after-load "skk-isearch"
+    '(progn
+      ;; 起動時アスキーモード
+      (when (boundp 'skk-isearch-start-mode)
+        (setq skk-isearch-start-mode 'latin))
+      (when (boundp 'skk-isearch-mode-enable)
+        (setq skk-isearch-mode-enable 'always))
+      ;; 変換でエラーを捕捉しないよう変更
+      (defadvice skk-isearch-wrapper
+        (around skk-isearch-wrapper-nil (&rest arg) activate compile)
+        (if (and (null (car arg)))
+            (let ((skk-dcomp-multiple-activate nil))
+              (ignore-errors ad-do-it))
+          ad-do-it)))))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -510,7 +525,7 @@ Otherwise return word around point."
   ;; デフォルトで linum-mode を有効にする
   (global-linum-mode t)
   ;; 行番号表示する必要のないモードでは表示しない
-  (defadvice linum-on(around linum-off activate)
+  (defadvice linum-on (around linum-off activate compile)
     (unless (or (minibufferp)
                 (member
                  major-mode
@@ -1226,7 +1241,7 @@ Otherwise return word around point."
        (when (boundp 'skk-sticky-key)
          (setq skk-sticky-key ";"))
 
-       (defadvice skk-mode (after after-skk-mode activate)
+       (defadvice skk-mode (after after-skk-mode activate compile)
          ;; 空白を強調表示しない
          (if skk-mode
              (setq-default show-trailing-whitespace nil)
@@ -1384,7 +1399,7 @@ Otherwise return word around point."
          (setq tomatinho-pomodoro-length 25))
        (defvar tomatinho-pomodoro-pause-length 5)       ; 休憩
        (defvar tomatinho-pomodoro-long-pause-length 20) ; 長い休憩
-       (defadvice tomatinho-update (after tomatinho-pause-update activate)
+       (defadvice tomatinho-update (after tomatinho-pause-update activate compile)
          (let ((type (car tomatinho-current)) (val (cdr tomatinho-current))
                (l (if (= 0 (mod (+ 1 (length tomatinho-events)) 8)
                          tomatinho-pomodoro-long-pause-length
@@ -1450,10 +1465,10 @@ Otherwise return word around point."
       (custom-set-variables '(w32-symlinks-handle-shortcuts t))
       ;; NTEmacs で動かすための設定
       (defadvice insert-file-contents-literally
-        (before insert-file-contents-literally-before activate)
+        (before insert-file-contents-literally-before activate compile)
         (set-buffer-multibyte nil))
 
-      (defadvice minibuffer-complete (before expand-symlinks activate)
+      (defadvice minibuffer-complete (before expand-symlinks activate compile)
         (let ((file (expand-file-name
                      (buffer-substring-no-properties
                       (line-beginning-position) (line-end-position)))))
@@ -1610,7 +1625,7 @@ Otherwise return word around point."
                       :timeout 5000))
                    (setq mew-mode-line-biff-quantity n)))))
        ;; 着信後呼ばれる関数
-       (defadvice mew-biff-clear (after mew-biff-clear-icon activate)
+       (defadvice mew-biff-clear (after mew-biff-clear-icon activate compile)
          (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
          (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
          (setq mew-mode-line-biff-quantity 0))
@@ -1627,7 +1642,7 @@ Otherwise return word around point."
 
        ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
-         (around mew-summary-auto-refile-from-cursor activate)
+         (around mew-summary-auto-refile-from-cursor activate compile)
          (save-excursion
            (save-window-excursion
              (narrow-to-region (point) (point-max))
