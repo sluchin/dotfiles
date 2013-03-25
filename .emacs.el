@@ -560,7 +560,8 @@ Otherwise return word around point."
 ;;; ファイラ (dired)
 ;; 編集可能にする
 (when (locate-library "wdired")
-  (autoload 'wdired-change-to-wdired-mode "wdired")
+  (autoload 'wdired-change-to-wdired-mode "wdired"
+    "Rename files editing their names in dired buffers." t)
   (eval-after-load "dired"
     '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
 
@@ -771,6 +772,27 @@ Otherwise return word around point."
   (when (boundp 'iswitchb-prompt-newbuffer)
     (setq iswitchb-prompt-newbuffer nil)))
 
+;;; 優先度の高いディレクトリから探索
+(defun find-directory (dir)
+  "Find directory"
+  (let (basedir (sharedir "Dropbox"))
+    (cond ((eq system-type 'windows-nt)
+           (setq basedir "e:"))
+          (t
+           (setq basedir "/dos")))
+    (let ((lst (list (concat basedir "/" sharedir "/" dir)
+                     (concat "~/" sharedir "/" dir)
+                     (concat basedir "/" dir)
+                     (concat "~/" dir))))
+      (dolist (d lst)
+        (when (file-directory-p d)
+          (throw 'find d)))
+      (let ((defaultdir (car (last lst))))
+        (if (file-exists-p defaultdir)
+            (message "file already exists: %s" defaultdir)
+          (make-directory defaultdir)
+          (throw 'find defaultdir))))))
+
 ;;; 文書作成 (org-mode)
 (defvar org-code-reading-software-name nil)
 (defvar org-code-reading-file "code-reading.org")
@@ -795,9 +817,11 @@ Otherwise return word around point."
   (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
     (setq org-hide-leading-stars t))
   (when (boundp 'org-directory)           ; org-remember のディレクトリ
-    (setq org-directory "~/memo/"))
+    (setq org-directory (catch 'find (find-directory "org"))))
+  (message "org-directory: %s" org-directory)
   (when (boundp 'org-default-notes-file)  ; org-remember のファイル名
     (setq org-default-notes-file (concat org-directory "agenda.org")))
+  (message "org-default-notes-file: %s" org-default-notes-file)
   (when (boundp 'org-startup-truncated)   ; 行の折り返し
     (setq org-startup-truncated nil))
   (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
@@ -822,7 +846,8 @@ Otherwise return word around point."
     (let* ((prefix (org-code-reading-get-prefix (substring (symbol-name major-mode) 0 -5)))
            (org-remember-templates
             `(("CodeReading" ?r "** %(identity prefix)%?\n   \n   %a\n   %t"
-               ,org-code-reading-file "Memo"))))
+               ,org-code-reading-file (catch 'find (find-directory "code"))))))
+      (message "org-code-reading-file: %s" org-code-reading-file)
       (org-remember)))
 
   ;; GTD
@@ -892,16 +917,18 @@ Otherwise return word around point."
     (setq undo-no-redo t))
   ;; 大量の Undo に耐えられるようにする
   (when (boundp 'undo-limit)
-    (setq undo-limit 6000000))
+    (setq undo-limit 600000))
   (when (boundp 'undo-strong-limit)
-    (setq undo-strong-limit 9000000)))
+    (setq undo-strong-limit 900000)))
 
 ;; アンドゥ木構造
 ;; (install-elisp "http://www.dr-qubit.org/undo-tree/undo-tree.el")
 ;; C-x u で木構造表示
-(when (eval-and-compile (require 'undo-tree nil t))
-  (when (fboundp 'global-undo-tree-mode)
-    (global-undo-tree-mode)))
+;; バージョン 23 では動かない
+(when (>= emacs-major-version 24)
+  (when (eval-and-compile (require 'undo-tree nil t))
+    (when (fboundp 'global-undo-tree-mode)
+      (global-undo-tree-mode))))
 
 ;; アンドゥ履歴
 ;; (install-elisp "http://cx4a.org/pub/undohist.el")
@@ -911,7 +938,9 @@ Otherwise return word around point."
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
-(when (eval-and-compile (require 'tempbuf nil t))
+(when (locate-library "tempbuf")
+  (autoload 'turn-on-tempbuf-mode "tempbuf"
+    "Kill unused buffers in the background." t)
   (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
   (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
@@ -919,64 +948,84 @@ Otherwise return word around point."
 
 ;;; カーソル位置に印をつけ移動する
 ;; git clone git://github.com/joodland/bm.git
-(when (eval-and-compile (require 'bm nil t))
-  ;; マークのセーブ
-  (when (boundp 'bm-buffer-persistence)
-    (setq-default bm-buffer-persistence t))
-  ;; セーブファイル名の設定
-  (when (boundp 'bm-repository-file)
-    (setq bm-repository-file "~/.emacs.d/.bm-repository"))
-  ;; 起動時に設定のロード
-  (when (boundp 'bm-restore-repository-on-load)
-    (setq bm-restore-repository-on-load t))
+(when (locate-library "bm")
+  (autoload 'bm-repository-load "bm" "Load the repository." t)
+  (autoload 'bm-buffer-restore "bm"
+    "Restore bookmarks saved in the repository for the current buffer." t)
+  (autoload 'bm-toggle "bm" "Toggle bookmark at point." t)
+  (autoload 'bm-previous "bm" "Goto previous bookmark." t)
+  (autoload 'bm-next "bm" "Goto next bookmark." t)
   (add-hook 'after-init-hook 'bm-repository-load)
   (add-hook 'find-file-hooks 'bm-buffer-restore)
   (add-hook 'after-revert-hook 'bm-buffer-restore)
-  ;; 設定ファイルのセーブ
-  (add-hook 'kill-buffer-hook 'bm-buffer-save)
-  (add-hook 'auto-save-hook 'bm-buffer-save)
-  (add-hook 'after-save-hook 'bm-buffer-save)
-  (add-hook 'vc-before-checkin-hook 'bm-buffer-save)
-  (add-hook 'kill-emacs-hook (lambda nil
-                               (bm-buffer-save-all)
-                               (bm-repository-save)))
   ;; キーバインド
   (define-key global-map (kbd "M-\\") 'bm-toggle)
   (define-key global-map (kbd "M-[") 'bm-previous)
-  (define-key global-map (kbd "M-]") 'bm-next))
+  (define-key global-map (kbd "M-]") 'bm-next)
+  (eval-after-load "bm"
+    '(progn
+       ;; マークのセーブ
+       (when (boundp 'bm-buffer-persistence)
+         (setq-default bm-buffer-persistence t))
+       ;; セーブファイル
+       (when (boundp 'bm-repository-file)
+         (setq bm-repository-file "~/.emacs.d/.bm-repository"))
+       ;; 起動時に設定のロード
+       (when (boundp 'bm-restore-repository-on-load)
+         (setq bm-restore-repository-on-load t))
+       ;; 設定ファイルのセーブ
+       (add-hook 'kill-buffer-hook 'bm-buffer-save)
+       (add-hook 'auto-save-hook 'bm-buffer-save)
+       (add-hook 'after-save-hook 'bm-buffer-save)
+       (add-hook 'vc-before-checkin-hook 'bm-buffer-save)
+       (add-hook 'kill-emacs-hook (lambda nil
+                                    (bm-buffer-save-all)
+                                    (bm-repository-save))))))
 
 ;;; カーソル位置を戻す
 ;; (install-elisp-from-emacswiki "point-undo.el")
-(when (eval-and-compile (require 'point-undo nil t))
+(when (locate-library "point-undo")
+  (autoload 'point-undo "point-undo" "Undo point." t)
+  (autoload 'point-redo "point-redo" "Redo point." t)
   (define-key global-map (kbd "<f7>") 'point-undo)
   (define-key global-map (kbd "<S-f7>") 'point-redo))
 
 ;;; 変更箇所にジャンプする
 ;; (install-elisp-from-emacswiki "goto-chg.el")
-(when (eval-and-compile (require 'goto-chg nil t))
+(when (locate-library "goto-chg")
+  (autoload 'goto-last-change "goto-chg" "Goto last change." t)
+  (autoload 'goto-last-change-reverse "goto-chg" "Goto last change reverse." t)
   (define-key global-map (kbd "<f8>") 'goto-last-change)
   (define-key global-map (kbd "<S-f8>") 'goto-last-change-reverse))
 
 ;;; セッション保存
 ;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/
 ;; session-2.3a.tar.gz | tar xfz -
-;; kill-ringやミニバッファで過去に開いたファイルなどの履歴を保存する
-(when (eval-and-compile (require 'session nil t))
-  ;; セッション初期化
-  (when (boundp 'session-initialize)
-    (setq session-initialize '(de-saveplace session keys menus places)))
-  ;; ミニバッファ履歴
-  (when (boundp 'history-length)
-    (setq history-length t)) ; t の場合無限
-  ;; 保存件数をカスタマイズ
-  (when (boundp 'session-globals-include)
-      (setq session-globals-include '((kill-ring 50)               ; kill-ring の保存件数
-                                      (session-file-alist 500 t)   ; カーソル位置保存件数
-                                      (file-name-history 10000)))) ; ファイル履歴
-    (add-hook 'after-init-hook 'session-initialize)
-  ;; 前回閉じたときの位置にカーソルを復帰
-  (when (boundp 'session-undo-check)
-    (setq session-undo-check -1)))
+(when (locate-library "session")
+  (autoload 'session-jump-to-last-change "session"
+    "Rename files editing their names in dired buffers" t)
+  (autoload 'session-initialize "session"
+    "Initialize package session and read previous session file." t)
+  (add-hook 'after-init-hook 'session-initialize)
+  (eval-after-load "cus-load"
+    '(progn
+       (custom-add-load 'data 'session)
+       (custom-add-load 'session 'session)
+       ;; セッション初期化
+       (when (boundp 'session-initialize)
+         (setq session-initialize '(de-saveplace session keys menus places)))
+       ;; ミニバッファ履歴
+       (when (boundp 'history-length)
+         (setq history-length t)) ; t の場合無限
+       ;; 保存件数をカスタマイズ
+       (when (boundp 'session-globals-include)
+         ;; キルリング, カーソル位置, ファイル履歴
+         (setq session-globals-include '((kill-ring 50)
+                                         (session-file-alist 500 t)
+                                         (file-name-history 10000))))
+       ;; 前回閉じたときの位置にカーソルを復帰
+       (when (boundp 'session-undo-check)
+         (setq session-undo-check -1)))))
 
 ;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
@@ -988,19 +1037,20 @@ Otherwise return word around point."
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
-;; 以下で最近開いたファイルを一覧表示
-;; (recentf-open-files)
-(when (eval-and-compile (require 'recentf-ext nil t))
-  (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
-    (setq recentf-max-saved-items 10000))
-  (when (boundp 'recentf-exclude)         ; 除外するファイル
-    (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$")))
-  (define-key global-map (kbd "C-c C-c") 'recentf-open-files))
+(when (locate-library "recentf-ext")
+  (autoload 'recentf-open-files "recentf-ext" "Recentf extensions." t)
+  (define-key global-map (kbd "C-c C-c") 'recentf-open-files)
+  (eval-after-load "recentf-ext"
+    '(progn
+       (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
+         (setq recentf-max-saved-items 10000))
+       (when (boundp 'recentf-exclude)         ; 除外するファイル
+         (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$"))))))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
 (when (locate-library "tabbar")
-  (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line" t)
+  (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
   ;; キーバインド
   (define-key global-map (kbd "<f10>") 'tabbar-mode)
   (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
@@ -1084,14 +1134,8 @@ Otherwise return word around point."
          (setq howm-menu-lang 'ja))
        ;; デュアルブートで Linux と Windows で共有するための設定
        (when (boundp 'howm-directory)
-         (cond ((and (eq system-type 'gnu/linux)
-                     (file-directory-p "/dos"))
-                (setq howm-directory "/dos/howm"))
-               ((and (eq system-type 'windows-nt)
-                     (file-directory-p "e:"))
-                (setq howm-directory "e:/howm"))
-               (t
-                (setq howm-directory "~/howm"))))
+         (setq howm-directory (catch 'find (find-directory "howm"))))
+       (message "howm-directory: %s" howm-directory)
        ;; 除外するファイル
        (when (boundp 'howm-excluded-file-regexp)
          (setq howm-excluded-file-regexp
@@ -1103,14 +1147,14 @@ Otherwise return word around point."
 
 ;;; GNU Global
 ;; sudo apt-get install global
-(when (and (executable-find "global") (locate-library "gtags"))
-  (autoload 'gtags-mode "gtags" nil t)
-  (define-key global-map (kbd "<f5>") 'gtags-find-with-grep)
-  (eval-after-load "gtags"
-    '(when (fboundp 'gtags-mode)
-       (add-hook 'c-mode-hook 'gtags-mode)
-       (add-hook 'c++-mode-hook 'gtags-mode)
-       (add-hook 'java-mode-hook 'gtags-mode))))
+(when (and (executable-find "global")
+           (locate-library "gtags"))
+  (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
+  (autoload 'gtags-find-with-grep "gtags" "Gtags facility for Emacs." t)
+  (add-hook 'c-mode-hook 'gtags-mode)
+  (add-hook 'c++-mode-hook 'gtags-mode)
+  (add-hook 'java-mode-hook 'gtags-mode)
+  (define-key global-map (kbd "<f5>") 'gtags-find-with-grep))
 
 ;;; 日本語入力 (ddskk)
 ;; sudo apt-get install ddskk
@@ -1127,6 +1171,7 @@ Otherwise return word around point."
 ;; 辞書をマージする
 ;; sudo apt-get install skktools
 (defun sync-skkdic ()
+  "Sync skkdic"
   (interactive)
   (let ((ibus-skk-jisyo "~/.skk-ibus-jisyo")
         (share-skk-jisyo "~/Dropbox/skk/.skk-jisyo")
@@ -1173,6 +1218,7 @@ Otherwise return word around point."
 
 ;; 見出し語をバッファに表示する
 (defun display-direction-word ()
+  "Display direction word"
   (interactive)
   (let ((fn (read-file-name "filename: " "~/.emacs.d/ddskk/"))
         (coding-system-for-read 'euc-jp))
@@ -1189,7 +1235,7 @@ Otherwise return word around point."
 ;; skk の設定
 (when (locate-library "skk")
   (autoload 'skk-mode
-    "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)")
+    "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)." t)
   (define-key global-map (kbd "C-\\") 'skk-mode)
   (eval-after-load "skk"
     '(progn
@@ -1321,51 +1367,71 @@ Otherwise return word around point."
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
-(when (eval-and-compile (require 'open-junk-file nil t))
+(when (locate-library "open-junk-file")
+  (autoload 'open-junk-file "open-junk-file"
+    "Open a junk (memo) file to try-and-error." t)
   ;; C-x C-z で試行錯誤用ファイルを開く
   (define-key global-map (kbd "C-x C-z") 'open-junk-file))
 
 ;;; 式の評価結果を注釈するための設定
 ;; (install-elisp-from-emacswiki "lispxmp.el")
-(when (eval-and-compile (require 'lispxmp nil t))
+(when (locate-library "lispxmp")
+  (autoload 'lispxmp "lispxmp" "Automagic emacs lisp code annotation." t)
   ;; C-c C-d で注釈
   (define-key emacs-lisp-mode-map (kbd "C-c C-d") 'lispxmp))
 
 ;;; 括弧の対応を保持して編集する設定
 ;; (install-elisp "http://mumble.net/~campbell/emacs/paredit.el")
 ;; *scrach* バッファでは C-j が効かなくなるため無効にする
-(when (eval-and-compile (require 'paredit nil t))
+(when (locate-library "paredit")
+  (autoload 'enable-paredit-mode "paredit"
+    "Turn on pseudo-structural editing of Lisp code." t)
+  (autoload 'disable-paredit-mode "paredit"
+    "Turn off pseudo-structural editing of Lisp code." t)
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-interaction-mode-hook 'disable-paredit-mode))
 
 ;;; 自動バイトコンパイル
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
-(when (eval-and-compile (require 'auto-async-byte-compile nil t))
-  ;; バイトコンパイルしないファイル
-  (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
-    (setq auto-async-byte-compile-exclude-files-regexp "/junk/"))
-  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode))
+(when (locate-library "auto-async-byte-compile")
+  (autoload 'enable-auto-async-byte-compile-mode "auto-async-byte-compile"
+    "Automatically byte-compile when saved." t)
+  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
+  (eval-after-load "auto-async-byte-compile"
+    '(progn
+       ;; バイトコンパイルしないファイル
+       (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
+         (setq auto-async-byte-compile-exclude-files-regexp "/junk/")))))
 
 ;;; ミニバッファに関数の help 表示
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
-(when (eval-and-compile (require 'eldoc-extension nil t))
+(when (locate-library "eldoc-extension")
+  (autoload 'turn-on-eldoc-mode "eldoc-extension"
+    "Some extension for eldoc." t)
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-  (when (boundp 'eldoc-idle-delay) ; 待ち時間
-    (setq eldoc-idle-delay 0.2))
-  ;; モードラインに ElDoc と表示しない
-  (when (boundp 'eldoc-minor-mode-string)
-    (setq eldoc-minor-mode-string "")))
+  (eval-after-load "eldoc-extension"
+    '(progn
+       ;; 待ち時間
+       (when (boundp 'eldoc-idle-delay)
+         (setq eldoc-idle-delay 0.2))
+       ;; モードラインに ElDoc と表示しない
+       (when (boundp 'eldoc-minor-mode-string)
+         (setq eldoc-minor-mode-string "")))))
 
 ;;; *Help* にメモを書き込む
 ;; (install-elisp-from-emacswiki "usage-memo.el")
-(when (eval-and-compile (require 'usage-memo nil t))
-  (when (boundp 'umemo-base-directory) ; ディレクトリ
-    (setq umemo-base-directory "~/.emacs.d/umemo"))
-  (when (fboundp 'umemo-initialize)    ; 初期化
-    (umemo-initialize)))
+(when (locate-library "usage-memo")
+  (autoload 'umemo-initialize "usage-memo"
+    "Integration of Emacs help system and memo." t)
+  (add-hook 'help-mode-hook 'umemo-initialize)
+  (eval-after-load "usage-memo"
+    '(progn
+       ;; ディレクトリ
+       (when (boundp 'umemo-base-directory)
+         (setq umemo-base-directory (catch 'find (find-directory "umemo")))))))
 
 ;;; プロセスリスト
 ;; (install-elisp-from-emacswiki "list-processes+.el")
@@ -1512,16 +1578,19 @@ Otherwise return word around point."
 (when (let ((dir  "/usr/share/stardict/dic/eijiro/"))
         (and (executable-find "sdcv") (locate-library "sdcv")
              (file-readable-p (concat dir "EIJI127.idx"))))
-  (when (eval-and-compile (require 'sdcv nil t))
-    (when (boundp 'sdcv-dictionary-simple-list)
-      (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
-    (when (boundp 'sdcv-dictionary-complete-list)
-      (setq sdcv-dictionary-complete-list
-            '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
-    ;; バッファに表示
-    (define-key global-map (kbd "C-c w") 'sdcv-search-input)
-    ;; ポップアップ
-    (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)))
+  (autoload 'sdcv-search-input "sdcv" "Translate current input word." t)
+  (autoload 'sdcv-search-pointer+ "sdcv" "Translate current point word." t)
+  ;; バッファに表示
+  (define-key global-map (kbd "C-c w") 'sdcv-search-input)
+  ;; ポップアップ
+  (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)
+  (eval-after-load "sdcv"
+    '(progn
+       (when (boundp 'sdcv-dictionary-simple-list)
+         (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
+       (when (boundp 'sdcv-dictionary-complete-list)
+         (setq sdcv-dictionary-complete-list
+               '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))))))
 
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
@@ -1550,7 +1619,7 @@ Otherwise return word around point."
               (setq show-trailing-whitespace nil)))
 
   ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
-  (autoload 'notifications-notify "notifications" "Notify TITLE, BODY.")
+  (autoload 'notifications-notify "notifications" "Notify TITLE, BODY." t)
   (eval-after-load "mew"
     '(progn
        ;; 初期設定
@@ -1825,6 +1894,8 @@ Otherwise return word around point."
 ;; sudo gem install -r thrift
 ;; cd ~/.emacs.d/evernote-mode/ruby
 ;; sudo ruby setup.rb
+;; C-x C-q  既存ノートを編集
+;; M-x evernote-change-edit-mode  TEXT または XHTML に変更
 (when (and (executable-find "ruby")
            (executable-find "w3m")
            (locate-library "evernote-mode")
@@ -1841,12 +1912,16 @@ Otherwise return word around point."
     "evernote-mode" "Create an evernote." t)
   (autoload 'evernote-open-note
     "evernote-mode" "Open a note for evernote." t)
+  (autoload 'evernote-search-notes
+    "evernote-mode" "Search notes with query and open a note among them." t)
+  (autoload 'evernote-do-saved-search
+    "evernote-mode" "Do a saved search and open a note." t)
   (autoload 'evernote-write-note
     "evernote-mode" "Write buffer to an evernote." t)
-  (autoload 'evernote-browser
-    "evernote-mode" "Open an evernote browser." t)
   (autoload 'evernote-post-region
     "evernote-mode" "Post the region as an evernote." t)
+  (autoload 'evernote-browser
+    "evernote-mode" "Open an evernote browser." t)
   ;; キーバインド
   ;; 新規ノート作成
   (define-key global-map (kbd "C-c e c") 'evernote-create-note)
@@ -1862,8 +1937,6 @@ Otherwise return word around point."
   (define-key global-map (kbd "C-c e p") 'evernote-post-region)
   ;; ブラウザ起動
   (define-key global-map (kbd "C-c e b") 'evernote-browser)
-  ;; 既存ノートを編集 (デフォルト： C-x C-q)
-  (define-key global-map (kbd "C-c e e") 'evernote-change-edit-mode)
   (eval-after-load "evernote-mode"
     '(progn
        (when (boundp 'evernote-enml-formatter-command)
@@ -2030,7 +2103,7 @@ Otherwise return word around point."
 (when (locate-library "cperl-mode")
   (defalias 'perl-mode 'cperl-mode)
   (autoload 'cperl-mode
-    "cperl-mode" "Alternate mode for editing Perl programs" t)
+    "cperl-mode" "Alternate mode for editing Perl programs." t)
   (add-to-list 'auto-mode-alist
                '("\\.\\([pP][Llm]\\|al\\|t\\|cgi\\)\\'" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
@@ -2055,7 +2128,7 @@ Otherwise return word around point."
 ;; Pod
 (when (locate-library "pod-mode")
   (autoload 'pod-mode
-    "pod-mode" "Alternate mode for editing Perl documents" t)
+    "pod-mode" "Alternate mode for editing Perl documents." t)
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
   (add-hook 'pod-mode-hook
             (lambda ()
