@@ -1053,8 +1053,6 @@ Otherwise return word around point."
   (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
   ;; キーバインド
   (define-key global-map (kbd "<f10>") 'tabbar-mode)
-  (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
-  (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab)
   (eval-after-load "tabbar"
     '(progn
        ;; 色の設定
@@ -1062,7 +1060,9 @@ Otherwise return word around point."
        (set-face-foreground 'tabbar-unselected "black")
        (set-face-background 'tabbar-unselected "cadet blue")
        (set-face-foreground 'tabbar-selected "brack")
-       (set-face-background 'tabbar-selected "blue"))))
+       (set-face-background 'tabbar-selected "blue")
+       (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
+       (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab))))
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/
