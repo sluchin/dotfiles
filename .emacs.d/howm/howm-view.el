@@ -1,7 +1,7 @@
 ;;; howm-view.el --- Wiki-like note-taking tool
 ;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
 ;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-view.el,v 1.245 2011-12-31 15:07:29 hira Exp $
+;;; $Id: howm-view.el,v 1.246 2012-09-13 10:48:06 hira Exp $
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 (defvar howm-view-summary-format
   (let* ((path (format-time-string howm-file-name-format))
          (width (length (file-name-nondirectory path))))
-    (concat "%-" (format "%s" width) "s " howm-view-summary-sep " ")))
+    (concat "%-" (format "%s" (1+ width)) "s" howm-view-summary-sep " ")))
 (defvar howm-view-header-format
   "\n==========================>>> %s\n"
   "Format string of header for howm-view-contents.
@@ -144,7 +144,8 @@
 (defvar howm-view-font-lock-silent t
   "Inhibit font-lock-verbose if non-nil.")
 (howm-defvar-risky howm-view-summary-font-lock-keywords
-  '(("^[^ \t\r\n]+ +" . howm-view-name-face)
+  `((,(concat "\\(^[^ \t\r\n].*\\)" (regexp-quote howm-view-summary-sep))
+     1 howm-view-name-face)
     ("^ +" . howm-view-empty-face)))
 (howm-defvar-risky howm-view-contents-font-lock-keywords nil)
 

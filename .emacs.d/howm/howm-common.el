@@ -1,7 +1,7 @@
 ;;; howm-common.el --- Wiki-like note-taking tool
 ;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
 ;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-common.el,v 1.88 2011-12-31 15:07:29 hira Exp $
+;;; $Id: howm-common.el,v 1.89 2012-12-27 03:20:12 hira Exp $
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -271,6 +271,8 @@ If PASS-RET-THROUGH is non-nil, RET is unread and nil is returned.
 
 (defun howm-get-buffer-for-file (file &optional buffer-name)
   "Get buffer for FILE, and rename buffer if BUFFER-NAME is given."
+  ;; This may cause "File XXX no longer exists!" message if the file
+  ;; is deleted and the corresponding buffer still exists.
   (let ((buf (find-file-noselect file)))
     (when buffer-name
       (with-current-buffer buf
