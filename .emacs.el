@@ -1036,17 +1036,14 @@
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
-(when (locate-library "recentf-ext")
-  (autoload 'recentf-open-files "recentf-ext" "Recentf extensions." t)
-  (define-key global-map (kbd "C-c C-c") 'recentf-open-files)
-  (eval-after-load "recentf-ext"
-    '(progn
-       (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
-         (setq recentf-max-saved-items 10000))
-       (when (boundp 'recentf-exclude)         ; 除外するファイル
-         (setq recentf-exclude
-               '("/TAGS$" "/var/tmp/" "/tmp/"
-                 "~$" "/$" "/howm/" ".howm-keys"))))))
+(when (eval-and-compile (require 'recentf-ext nil t))
+  (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
+    (setq recentf-max-saved-items 10000))
+  (when (boundp 'recentf-exclude)         ; 除外するファイル
+    (setq recentf-exclude
+          '("/TAGS$" "/var/tmp/" "/tmp/"
+            "~$" "/$" "/howm/" ".howm-keys")))
+  (define-key global-map (kbd "C-c C-c") 'recentf-open-files))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
