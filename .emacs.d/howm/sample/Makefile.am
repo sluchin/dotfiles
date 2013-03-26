@@ -1,4 +1,4 @@
-EXTRA_DIST = search.txt top.txt .howm-keys \
+EXTRA_DIST = search.txt top.txt \
 	dot.emacs bug-report.txt
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status

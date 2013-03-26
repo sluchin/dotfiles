@@ -1,7 +1,7 @@
 =begin
 
 = howm (一人お手軽 Wiki もどき)
-$Id: README.ja.rd,v 1.331 2012-08-16 09:52:07 hira Exp $
+$Id: README.ja.rd,v 1.334 2012-12-27 03:20:12 hira Exp $
 
 Emacs で断片的なメモをどんどんとるための環境です.
 分類機能はあえてつけません.
@@ -922,6 +922,13 @@ Emacs で断片的なメモをどんどんとるための環境です.
 === 更新記録
 
 thx > patch・改良案・指摘をくださった皆様
+
+* リリース版 howm-1.4.1 [2012-12-27]
+    * ~/.howm-keys が無かったら, 全メモをスキャンして再生成
+      ((<thx|URL:http://sourceforge.jp/projects/howm/lists/archive/eng/2012/000099.html>))
+      > Albert-san (areiner at tph.tuwien.ac.at)
+    * fix: *.txt と *.howm が混在しても一覧モードの表示がずれないように
+      ((<thx|URL:http://toro.2ch.net/test/read.cgi/unix/1141892764/940>))
 
 * リリース版 howm-1.4.0 [2012-08-16]
   * Note
