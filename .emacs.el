@@ -779,22 +779,23 @@
            (setq basedir "e:"))
           (t
            (setq basedir "/dos")))
-    (let ((lst (list (concat basedir "/" sharedir "/" dir)
-                     (concat "~/" sharedir "/" dir)
-                     (concat basedir "/" dir)
-                     (concat "~/" dir))))
+    (let ((lst (list (concat (file-name-as-directory basedir)
+                             (file-name-as-directory sharedir) dir)
+                     (concat (file-name-as-directory "~")
+                             (file-name-as-directory sharedir) dir)
+                     (concat (file-name-as-directory basedir) dir)
+                     (concat (file-name-as-directory "~") dir))))
       ;; ディレクトリ探索
       (dolist (d lst)
         (when (file-directory-p d)
           (throw 'find d)))
-      ;; ディレクトリない場合作成する
+      ;; ディレクトリがない場合ホーム下に作成する
       (let ((defaultdir (car (last lst))))
-        (if (file-exists-p defaultdir)
-            (message "file already exists: %s" defaultdir)
-          (make-directory defaultdir)
-          (throw 'find defaultdir))))))
+        (condition-case error (make-directory defaultdir)
+          (error (message "%s" error)))
+        (throw 'find defaultdir)))))
 
-;;; 文書作成 (org-mode)
+;;; 文書作成 (org-mode)a
 (defvar org-code-reading-software-name nil)
 (defvar org-code-reading-file "code-reading.org")
 (defun org-code-reading-read-software-name ()
@@ -1059,7 +1060,7 @@
        (set-face-background 'tabbar-default "cadet blue")
        (set-face-foreground 'tabbar-unselected "black")
        (set-face-background 'tabbar-unselected "cadet blue")
-       (set-face-foreground 'tabbar-selected "brack")
+       (set-face-foreground 'tabbar-selected "black")
        (set-face-background 'tabbar-selected "blue")
        ;; グループを使わない
        (when (boundp 'tabbar-buffer-groups-function)
@@ -1079,10 +1080,10 @@
                           (cond
                            ;; カレントバッファは表示する
                            ((eq (current-buffer) b) b)
-                           ;; *scratch* バッファは表示する
-                           ((equal "*scratch*" (buffer-name b)) b)
                            ;; *Messages* バッファは表示する
                            ((equal "*Messages*" (buffer-name b)) b)
+                           ;; *scratch* バッファは表示する
+                           ((equal "*scratch*" (buffer-name b)) b)
                            ;; それ以外の * で始まるバッファは非表示
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
                            ;; スペースで始まるバッファは非表示
@@ -1181,7 +1182,8 @@
 ;; sudo apt-get install global
 (when (and (executable-find "global")
            (locate-library "gtags"))
-  (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
+  (autoload 'gtags-mode "gtags"
+    "Gtags facility for Emacs." t)
   (autoload 'gtags-find-with-grep "gtags"
     "Input pattern, search with grep(1) and move to the locations." t)
   (add-hook 'c-mode-hook 'gtags-mode)
@@ -1273,7 +1275,7 @@
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
-       (let ((personal "~/Dropbox/skk/.skk-jisyo")                 ; 個人辞書
+       (let ((personal (catch 'find (find-directory "skk")))       ; 個人辞書
              (large "~/.emacs.d/ddskk/SKK-JISYO.L")                ; 基本辞書
              (lst '("~/.emacs.d/ddskk/SKK-JISYO.assoc"             ; 連想辞書
                     "~/.emacs.d/ddskk/SKK-JISYO.edict"             ; 英和辞典
@@ -1294,7 +1296,8 @@
          (when (boundp 'skk-jisyo)
            (when (and (file-readable-p personal)
                       (file-writable-p personal))
-             (setq skk-jisyo personal)))
+             (setq skk-jisyo personal)
+             (message "skk-jisyo: %s" skk-jisyo)))
          ;; 基本辞書
          (when (boundp 'skk-large-jisyo)
            (when (file-readable-p large)
