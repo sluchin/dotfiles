@@ -1275,7 +1275,10 @@
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
-       (let ((personal (catch 'find (find-directory "skk")))       ; 個人辞書
+       (let ((personal
+              (concat (file-name-as-directory
+                       (catch 'find (find-directory "skk")))
+                       ".skk-jisyo"))                              ; 個人辞書
              (large "~/.emacs.d/ddskk/SKK-JISYO.L")                ; 基本辞書
              (lst '("~/.emacs.d/ddskk/SKK-JISYO.assoc"             ; 連想辞書
                     "~/.emacs.d/ddskk/SKK-JISYO.edict"             ; 英和辞典
