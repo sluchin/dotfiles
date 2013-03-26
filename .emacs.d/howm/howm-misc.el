@@ -1,7 +1,7 @@
 ;;; howm-misc.el --- Wiki-like note-taking tool
 ;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
 ;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-misc.el,v 1.94 2012-02-18 12:03:31 hira Exp $
+;;; $Id: howm-misc.el,v 1.95 2012-09-23 10:44:24 hira Exp $
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -39,7 +39,10 @@
         (insert howm-menu-top "\n"))
       (set-buffer-modified-p t)
       (save-buffer)
-      (kill-buffer nil)))
+      (kill-buffer nil)
+      (message "Generating %s ..." howm-keyword-file)
+      (howm-keyword-add-items (howm-all-items))
+      (message "Done.")))
   howm-keyword-file)
 
 (add-hook 'howm-view-open-hook 'howm-set-mode)
