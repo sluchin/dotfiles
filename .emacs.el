@@ -86,7 +86,7 @@
   (require 'cp5022x nil t))
 (set-default-coding-systems 'utf-8-emacs)
 (setq default-file-name-coding-system 'utf-8-emacs)
-;; charset と coding-system の優先度設定
+;; charset の優先度設定
 (set-charset-priority 'ascii
                       'japanese-jisx0208
                       'latin-jisx0201
@@ -94,6 +94,7 @@
                       'iso-8859-1
                       'cp1252
                       'unicode)
+;; coding-system の優先度設定
 (set-coding-system-priority 'utf-8
                             'euc-jp
                             'iso-2022-jp
@@ -130,13 +131,13 @@
 ;; モナーフォントをインストールしておくこと
 ;; sudo apt-get install fonts-monapo
 (defun font-to-monapo ()
-  "Set monapo font in current buffer"
+  "Set monapo font in current buffer."
   (interactive)
   (buffer-face-set (font-face-attributes "Monapo")))
 
 ;; フォントを元に戻す
 (defun font-back ()
-  "Set default font in current buffer"
+  "Set default font in current buffer."
   (interactive)
   (buffer-face-set (font-face-attributes (frame-parameter nil 'font))))
 
@@ -151,7 +152,7 @@
     (set-frame-size (selected-frame) 110 70))
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
-    "Resize frame interactively"
+    "Resize frame interactively."
     (interactive)
     (let (key width height)
       (catch 'quit
@@ -385,16 +386,16 @@
               ;; 変換でエラーを捕捉しない
               (defadvice skk-isearch-wrapper
                 (around skk-isearch-wrapper-nil (&rest arg) activate compile)
-                (if (null (car arg))
+                (if (null (car arg))            ; (nul) の場合
                     (let ((skk-dcomp-multiple-activate nil))
-                      (ignore-errors ad-do-it))
+                      (ignore-errors ad-do-it)) ; エラーを無視する
                   ad-do-it))))))))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
 (define-key global-map (kbd "<f2>")
   (lambda ()
-    "Toggle debug-on-error"
+    "Toggle debug-on-error."
     (interactive)
     (if debug-on-error
         (setq debug-on-error nil)
@@ -404,7 +405,7 @@
 ;; f3 でロードする
 (define-key emacs-lisp-mode-map (kbd "<f3>")
   (lambda ()
-    "Load the current buffer"
+    "Load the current buffer."
     (interactive)
     (load-file buffer-file-name)))
 
@@ -415,9 +416,7 @@
                nil nil
                (browse-region-or-word)))
 (defun browse-region-or-word ()
-  "Return region or word around point.
-If `mark-active' on, return region string.
-Otherwise return word around point."
+  "Return region or word around point."
   (if mark-active
       (buffer-substring-no-properties (region-beginning)
                                       (region-end))
@@ -427,7 +426,7 @@ Otherwise return word around point."
 (when (executable-find "firefox")
   ;; google 検索
   (defun google-search (&optional query)
-    "Search google in browse"
+    "Search google in browse."
     (interactive)
     (browse-url (concat "https://www.google.co.jp/search?q="
                         (or query (browse-prompt-input))
@@ -436,7 +435,7 @@ Otherwise return word around point."
 
   ;; URL を開く
   (defun firefox-url-at-point ()
-    "Get url and open firefox"
+    "Get url and open firefox."
     (interactive)
     (let ((url-region (bounds-of-thing-at-point 'url)))
       (when url-region
@@ -448,7 +447,7 @@ Otherwise return word around point."
 ;; vlc で URL を開く
 (when (executable-find "vlc")
   (defun vlc-url-at-point ()
-    "Get url and open vlc"
+    "Get url and open vlc."
     (interactive)
     (let ((url-region (bounds-of-thing-at-point 'url)))
       (when url-region
@@ -459,14 +458,14 @@ Otherwise return word around point."
 
 ;; 日付挿入
 (defun insert-date ()
-  "Insert date"
+  "Insert date."
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
 (define-key global-map (kbd "C-c d") 'insert-date)
 
 ;; 時間挿入
 (defun insert-time ()
-  "Insert time"
+  "Insert time."
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c t") 'insert-time)
@@ -573,7 +572,6 @@ Otherwise return word around point."
 
   (add-hook 'dired-mode-hook
             (lambda ()
-              (setq header-line-format nil)          ; ヘッダを表示しない
               (set (make-local-variable
                     'delete-by-moving-to-trash) t))) ; ゴミ箱に移動する
 
@@ -585,7 +583,7 @@ Otherwise return word around point."
 
     ;; dired でコマンドを実行する関数定義
     (defun dired-run-command (command)
-      "Open file in command"
+      "Open file in command."
       (let ((file (dired-get-filename)))
         (if (and (file-directory-p file) (not (string= command "vlc")))
             (message "%s is a directory" (file-name-nondirectory file))
@@ -632,7 +630,7 @@ Otherwise return word around point."
     (when (and (executable-find "w3m") (locate-library "w3m"))
       (when (eval-when-compile (require 'w3m nil t))
         (defun dired-w3m-find-file ()
-          "Open file in w3m"
+          "Open file in w3m."
           (interactive)
           (let ((file (dired-get-filename)))
             (if (not (file-directory-p file))
@@ -644,7 +642,7 @@ Otherwise return word around point."
     ;; tar + gzip で圧縮
     (when (and (executable-find "tar") (executable-find "gzip"))
       (defun dired-do-tar-gzip (arg)
-        "Execute tar and gzip command"
+        "Execute tar and gzip command."
         (interactive "P")
         (let ((files (dired-get-marked-files t current-prefix-arg)))
           (let ((filename (read-string
@@ -774,8 +772,9 @@ Otherwise return word around point."
 
 ;;; 優先度の高いディレクトリから探索
 (defun find-directory (dir)
-  "Find directory"
+  "Find shared directory."
   (let (basedir (sharedir "Dropbox"))
+    ;; Windows, Linux デュアルブートで共有
     (cond ((eq system-type 'windows-nt)
            (setq basedir "e:"))
           (t
@@ -784,9 +783,11 @@ Otherwise return word around point."
                      (concat "~/" sharedir "/" dir)
                      (concat basedir "/" dir)
                      (concat "~/" dir))))
+      ;; ディレクトリ探索
       (dolist (d lst)
         (when (file-directory-p d)
           (throw 'find d)))
+      ;; ディレクトリない場合作成する
       (let ((defaultdir (car (last lst))))
         (if (file-exists-p defaultdir)
             (message "file already exists: %s" defaultdir)
@@ -817,11 +818,11 @@ Otherwise return word around point."
   (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
     (setq org-hide-leading-stars t))
   (when (boundp 'org-directory)           ; org-remember のディレクトリ
-    (setq org-directory (catch 'find (find-directory "org"))))
-  (message "org-directory: %s" org-directory)
+    (setq org-directory (catch 'find (find-directory "org")))
+    (message "org-directory: %s" org-directory))
   (when (boundp 'org-default-notes-file)  ; org-remember のファイル名
-    (setq org-default-notes-file (concat org-directory "agenda.org")))
-  (message "org-default-notes-file: %s" org-default-notes-file)
+    (setq org-default-notes-file (concat org-directory "agenda.org"))
+    (message "org-default-notes-file: %s" org-default-notes-file))
   (when (boundp 'org-startup-truncated)   ; 行の折り返し
     (setq org-startup-truncated nil))
   (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
@@ -841,7 +842,7 @@ Otherwise return word around point."
 
   ;; ソースコードを読みメモする
   (defun org-remember-code-reading ()
-    "When code reading, org-remember mode"
+    "When code reading, org-remember mode."
     (interactive)
     (let* ((prefix (org-code-reading-get-prefix (substring (symbol-name major-mode) 0 -5)))
            (org-remember-templates
@@ -852,7 +853,7 @@ Otherwise return word around point."
 
   ;; GTD
   (defun gtd ()
-    "Open my GTD file"
+    "Open my GTD file."
     (interactive)
     (let ((file "~/gtd/plan.org"))
       (if (file-writable-p file)
@@ -862,7 +863,7 @@ Otherwise return word around point."
   ;; キーバインド
   (define-key org-mode-map (kbd "C-c m")
     (lambda ()
-      "Browse url in w3m"
+      "Browse url in w3m."
       (interactive)
       (setq browse-url-browser-function 'w3m-browse-url)
       (org-return)
@@ -880,7 +881,7 @@ Otherwise return word around point."
     (setq-default save-place t)))
 
 ;;; 矩形選択
-;; (cua-mode)
+;; M-x cua-mode
 ;; <C-enter> で矩形選択モード
 (eval-after-load "cua-base"
   '(progn
@@ -898,7 +899,7 @@ Otherwise return word around point."
 ;; autoloadすると一回目に error になるため使うときは, 以下を評価する
 ;; (enable-auto-install)
 (defun enable-auto-install ()
-  "Do enable auto-install"
+  "Do enable auto-install."
   (interactive)
   (when (eval-and-compile (require 'auto-install nil t))
     ;; 起動時に EmacsWiki のページ名を補完候補に加える
@@ -919,7 +920,8 @@ Otherwise return word around point."
   (when (boundp 'undo-limit)
     (setq undo-limit 600000))
   (when (boundp 'undo-strong-limit)
-    (setq undo-strong-limit 900000)))
+    (setq undo-strong-limit 900000))
+  (define-key global-map (kbd "C-?") 'redo))
 
 ;; アンドゥ木構造
 ;; (install-elisp "http://www.dr-qubit.org/undo-tree/undo-tree.el")
@@ -984,17 +986,13 @@ Otherwise return word around point."
 
 ;;; カーソル位置を戻す
 ;; (install-elisp-from-emacswiki "point-undo.el")
-(when (locate-library "point-undo")
-  (autoload 'point-undo "point-undo" "Undo point." t)
-  (autoload 'point-redo "point-redo" "Redo point." t)
+(when (eval-and-compile (require 'point-undo nil t))
   (define-key global-map (kbd "<f7>") 'point-undo)
   (define-key global-map (kbd "<S-f7>") 'point-redo))
 
 ;;; 変更箇所にジャンプする
 ;; (install-elisp-from-emacswiki "goto-chg.el")
-(when (locate-library "goto-chg")
-  (autoload 'goto-last-change "goto-chg" "Goto last change." t)
-  (autoload 'goto-last-change-reverse "goto-chg" "Goto last change reverse." t)
+(when (eval-and-compile (require 'goto-chg nil t))
   (define-key global-map (kbd "<f8>") 'goto-last-change)
   (define-key global-map (kbd "<S-f8>") 'goto-last-change-reverse))
 
@@ -1003,7 +1001,7 @@ Otherwise return word around point."
 ;; session-2.3a.tar.gz | tar xfz -
 (when (locate-library "session")
   (autoload 'session-jump-to-last-change "session"
-    "Rename files editing their names in dired buffers" t)
+    "Rename files editing their names in dired buffers." t)
   (autoload 'session-initialize "session"
     "Initialize package session and read previous session file." t)
   (add-hook 'after-init-hook 'session-initialize)
@@ -1045,7 +1043,9 @@ Otherwise return word around point."
        (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
          (setq recentf-max-saved-items 10000))
        (when (boundp 'recentf-exclude)         ; 除外するファイル
-         (setq recentf-exclude '("/TAGS$" "/var/tmp/" "/tmp/" "~$" "/$"))))))
+         (setq recentf-exclude
+               '("/TAGS$" "/var/tmp/" "/tmp/"
+                 "~$" "/$" "/howm/" ".howm-keys"))))))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
@@ -1061,6 +1061,35 @@ Otherwise return word around point."
        (set-face-background 'tabbar-unselected "cadet blue")
        (set-face-foreground 'tabbar-selected "brack")
        (set-face-background 'tabbar-selected "blue")
+       ;; グループを使わない
+       (when (boundp 'tabbar-buffer-groups-function)
+         (setq tabbar-buffer-groups-function nil))
+       ;; タブがはみ出たときスクロールさせる
+       (when (boundp 'tabbar-auto-scroll-flag)
+         (setq tabbar-auto-scroll-flag t))
+       ;; タブホームボタン非表示
+       (when (boundp 'tabbar-buffer-home-button)
+         (setq tabbar-buffer-home-button (quote (("") ""))))
+       ;; バッファ非表示
+       (setq tabbar-buffer-list-function
+             (lambda ()
+               (delq nil
+                     (mapcar
+                      #'(lambda (b)
+                          (cond
+                           ;; カレントバッファは表示する
+                           ((eq (current-buffer) b) b)
+                           ;; *scratch* バッファは表示する
+                           ((equal "*scratch*" (buffer-name b)) b)
+                           ;; *Messages* バッファは表示する
+                           ((equal "*Messages*" (buffer-name b)) b)
+                           ;; それ以外の * で始まるバッファは非表示
+                           ((char-equal ?* (aref (buffer-name b) 0)) nil)
+                           ;; スペースで始まるバッファは非表示
+                           ((char-equal ?\x20 (aref (buffer-name b) 0)) nil)
+                           ;; それ以外は表示
+                           (t b)))
+                      (buffer-list)))))
        (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
        (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab))))
 
@@ -1123,34 +1152,38 @@ Otherwise return word around point."
          (setq navi2ch-list-stay-list-window t)))))
 
 ;;; メモ (howm)
-;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.0.tar.gz | tar xfz -
+;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.1.tar.gz | tar xfz -
 (when (locate-library "howm")
-  (autoload 'howm-menu "howm" "Hitori Otegaru Wiki Modoki." t)
-  (define-key global-map (kbd "C-c h") 'howm-menu)
-  (eval-after-load "howm"
+  (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki." t)
+  (define-key global-map (kbd "C-c , ,") 'howm-menu)
+  (eval-after-load "howm-mode"
     '(progn
        ;; メニュー言語
        (when (boundp 'howm-menu-lang)
          (setq howm-menu-lang 'ja))
-       ;; デュアルブートで Linux と Windows で共有するための設定
+       ;; ディレクトリ設定
        (when (boundp 'howm-directory)
          (setq howm-directory (catch 'find (find-directory "howm"))))
        (message "howm-directory: %s" howm-directory)
+       ;; save 時にメニューを自動更新
+       (when (boundp 'howm-menu-refresh-after-save)
+         (setq howm-menu-refresh-after-save t))
+       ;; タイトルを表示
+       (when (boundp 'howm-list-title)
+         (setq howm-list-title t))
        ;; 除外するファイル
        (when (boundp 'howm-excluded-file-regexp)
          (setq howm-excluded-file-regexp
-               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|
-                0+-0+-0+\\)\\)\\|[~#]$\\|\\.bak$\\|/CVS/"))
-       ;; 最近使ったファイルから除外する
-       (when (boundp 'recentf-exclude)
-         (setq recentf-exclude '(howm-directory ".howm-keys"))))))
+               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0000-00-00-0+\\)\\)\\|
+                [~#]$\\|\\.bak$\\|/CVS/")))))
 
 ;;; GNU Global
 ;; sudo apt-get install global
 (when (and (executable-find "global")
            (locate-library "gtags"))
   (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
-  (autoload 'gtags-find-with-grep "gtags" "Gtags facility for Emacs." t)
+  (autoload 'gtags-find-with-grep "gtags"
+    "Input pattern, search with grep(1) and move to the locations." t)
   (add-hook 'c-mode-hook 'gtags-mode)
   (add-hook 'c++-mode-hook 'gtags-mode)
   (add-hook 'java-mode-hook 'gtags-mode)
@@ -1218,7 +1251,7 @@ Otherwise return word around point."
 
 ;; 見出し語をバッファに表示する
 (defun display-direction-word ()
-  "Display direction word"
+  "Display direction word."
   (interactive)
   (let ((fn (read-file-name "filename: " "~/.emacs.d/ddskk/"))
         (coding-system-for-read 'euc-jp))
@@ -1376,7 +1409,7 @@ Otherwise return word around point."
 ;;; 式の評価結果を注釈するための設定
 ;; (install-elisp-from-emacswiki "lispxmp.el")
 (when (locate-library "lispxmp")
-  (autoload 'lispxmp "lispxmp" "Automagic emacs lisp code annotation." t)
+  (autoload 'lispxmp "lispxmp" "Automatic emacs lisp code annotation." t)
   ;; C-c C-d で注釈
   (define-key emacs-lisp-mode-map (kbd "C-c C-d") 'lispxmp))
 
@@ -1395,7 +1428,8 @@ Otherwise return word around point."
 ;;; 自動バイトコンパイル
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
 (when (locate-library "auto-async-byte-compile")
-  (autoload 'enable-auto-async-byte-compile-mode "auto-async-byte-compile"
+  (autoload 'enable-auto-async-byte-compile-mode
+    "auto-async-byte-compile"
     "Automatically byte-compile when saved." t)
   (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
   (eval-after-load "auto-async-byte-compile"
@@ -1407,7 +1441,8 @@ Otherwise return word around point."
 ;;; ミニバッファに関数の help 表示
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
 (when (locate-library "eldoc-extension")
-  (autoload 'turn-on-eldoc-mode "eldoc-extension"
+  (autoload 'turn-on-eldoc-mode
+    "eldoc-extension"
     "Some extension for eldoc." t)
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
@@ -1431,7 +1466,8 @@ Otherwise return word around point."
     '(progn
        ;; ディレクトリ
        (when (boundp 'umemo-base-directory)
-         (setq umemo-base-directory (catch 'find (find-directory "umemo")))))))
+         (setq umemo-base-directory (catch 'find (find-directory "umemo")))
+         (message "umemo-base-directory: %s" umemo-base-directory)))))
 
 ;;; プロセスリスト
 ;; (install-elisp-from-emacswiki "list-processes+.el")
@@ -1445,7 +1481,7 @@ Otherwise return word around point."
 ;; git clone git://github.com/konr/tomatinho.git
 (when (locate-library "pomodoro-technique")
   (autoload 'pomodoro
-    "pomodoro-technique" "Pomodoro technique timer for emacs.")
+    "pomodoro-technique" "Pomodoro technique timer for emacs." t)
   (eval-after-load "pomodoro-technique"
     '(progn
        )))
@@ -1484,12 +1520,12 @@ Otherwise return word around point."
              (setq tomatinho-events (append tomatinho-events `((pause . ,l))))
              (setq tomatinho-current '(ok . 0)))))
        (defun enable-tomatinho-pause ()
-         "Enable tomatinho pause control"
+         "Enable tomatinho pause control."
          (interactive)
          (ad-enable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
          (ad-activate 'tomatinho-update))
        (defun disable-tomatinho-pause ()
-         "Disable tomatinho pause control"
+         "Disable tomatinho pause control."
          (interactive)
          (ad-disable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
          (ad-activate 'tomatinho-update)))))
@@ -1603,7 +1639,6 @@ Otherwise return word around point."
   ;; ヘッダ・空白を強調表示しない
   (add-hook 'mew-summary-mode-hook
             (lambda ()
-              (setq header-line-format nil)
               (setq show-trailing-whitespace nil)))
   (add-hook 'mew-message-mode-hook
             (lambda ()
@@ -1859,7 +1894,7 @@ Otherwise return word around point."
   ;; ウィキペディアで検索する
   (when (fboundp 'w3m-browse-url)
     (defun w3m-search-wikipedia (&optional query)
-      "Search at wikipedia in w3m"
+      "Search at wikipedia in w3m."
       (interactive)
       (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
                               (or query (w3m-wiki-prompt-input))) t))
@@ -2055,7 +2090,7 @@ Otherwise return word around point."
 ;; [old] wget -O- http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2 | tar xfj -
 ;; [old] (install-elisp-from-emacswiki "yasnippet-config.el")
 (defun enable-yasnippet ()
-  "Do enable yasnippet"
+  "Do enable yasnippet."
   (interactive)
   (when (eval-and-compile (require 'yasnippet nil t))
     (when (fboundp 'yas--initialize) ; 初期化
@@ -2067,7 +2102,7 @@ Otherwise return word around point."
 
 ;;; CEDET
 (defun enable-cedet ()
-  "Do enable cedet"
+  "Do enable cedet."
   (interactive)
   (when (eval-and-compile (require 'cedet nil t))
     (global-ede-mode t)))
@@ -2149,7 +2184,7 @@ Otherwise return word around point."
 ;; javac Tags.java;java Tags または
 ;; bunzip2 java_base.tag.bz2
 (defun enable-ajc-java-complete ()
-  "Do enable ajc-java-complete"
+  "Do enable ajc-java-complete."
   (interactive)
   (when (eval-and-compile (and (require 'auto-complete nil t)
                                (require 'yasnippet nil t)
@@ -2187,7 +2222,7 @@ Otherwise return word around point."
 ;; unzip target/malabar-1.5-SNAPSHOT-dist.zip
 ;; git clone https://github.com/nekop/yasnippet-java-mode.git
 (defun enable-malabar-mode ()
-  "Do enable malabar-mode"
+  "Do enable malabar-mode."
   (interactive)
   (when (eval-and-compile (require 'malabar-mode nil t))
     (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
