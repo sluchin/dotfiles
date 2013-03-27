@@ -411,24 +411,24 @@
 ;; firefox で開く
 (when (executable-find "firefox")
   ;; グーグル検索
-  (defun fox-google-search ()
+  (defun firefox-google-search ()
     "Search google in firefox."
     (interactive)
     (browse-url (concat "https://www.google.co.jp/search?q="
                         (let ((region (region-or-word)))
                           (read-string "google search: " region nil region))
                         "&ie=utf-8&oe=utf-8&hl=ja")))
-  (define-key global-map (kbd "C-c f s") 'fox-google-search)
+  (define-key global-map (kbd "C-c f s") 'firefox-google-search)
 
   ;; ウィキペディア検索
-  (defun fox-wikipedia-search ()
+  (defun firefox-wikipedia-search ()
     "Search wikipedia in firefox."
     (interactive)
     (browse-url (concat "https://ja.wikipedia.org/wiki/"
                         (let ((region (region-or-word)))
                           (read-string "wikipedia search: "
                                        region nil region)))))
-  (define-key global-map (kbd "C-c f w") 'fox-wikipedia-search)
+  (define-key global-map (kbd "C-c f w") 'firefox-wikipedia-search)
 
   ;; URL を開く
   (defun firefox-url-at-point ()
