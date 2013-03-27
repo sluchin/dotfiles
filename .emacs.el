@@ -332,11 +332,10 @@
          (before isearch-region-mode
                  (forward &optional regexp op-fun recursive-edit word-p)
                  activate compile)
-           (if (and transient-mark-mode mark-active)
-               (progn
-                 (isearch-update-ring
-                  (buffer-substring-no-properties (mark) (point))))
-             (isearch-update-ring (thing-at-point 'word))))
+         (if (and transient-mark-mode mark-active)
+             (isearch-update-ring
+              (buffer-substring-no-properties (mark) (point)))
+           (isearch-update-ring (thing-at-point 'word))))
        ;; migemo
        ;; sudo apt-get install migemo cmigemo
        ;; C-e でトグル
@@ -404,6 +403,7 @@
 
 ;; リージョンまたはワードを返却するマクロ
 (defmacro region-or-word ()
+  "Return region or word"
   (if mark-active
       (buffer-substring-no-properties (region-beginning) (region-end))
     (thing-at-point 'word)))
@@ -554,15 +554,27 @@
     (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;;; ファイラ (dired)
-;; 編集可能にする
-(when (locate-library "wdired")
-  (autoload 'wdired-change-to-wdired-mode "wdired"
-    "Rename files editing their names in dired buffers." t)
-  (eval-after-load "dired"
-    '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
+;; dired でコマンドを実行する関数定義
+(defun dired-run-command (command)
+  "Open file in command."
+  (when (and (fboundp 'dired-run-shell-command)
+             (fboundp 'dired-get-filename))
+    (let ((file (dired-get-filename)))
+      (if (and (file-directory-p file) (not (string= command "vlc")))
+          (message "%s is a directory" (file-name-nondirectory file))
+        (when (y-or-n-p (format "Open '%s' %s "
+                                command (file-name-nondirectory file)))
+          (dired-run-shell-command (concat command " " file " &")))))))
 
 (when (eval-when-compile (and (require 'dired nil t)
                               (require 'dired-aux nil t)))
+  ;; 編集可能にする
+  (when (locate-library "wdired")
+    (autoload 'wdired-change-to-wdired-mode "wdired"
+      "Rename files editing their names in dired buffers." t)
+    (eval-after-load "dired"
+      '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
+
   ;; 拡張機能を有効にする
   (add-hook 'dired-load-hook (lambda () (load "dired-x")))
   (add-hook 'dired-load-hook (lambda () (load "ls-lisp")))
@@ -574,89 +586,76 @@
 
   (declare-function dired-run-shell-command "dired-aux" (command))
 
-  (when (and (fboundp 'dired-run-shell-command)
-             (fboundp 'dired-get-filename)
+  ;; ディレクトリを先に表示する
+  (cond ((eq system-type 'windows-nt)
+         ;; Windows の場合
+         (when (eval-and-compile (require 'ls-lisp nil t))
+           (setq ls-lisp-dirs-first t)))
+        ((eq system-type 'gnu/linux)
+         ;; GNU オプションも使う
+         (setq dired-listing-switches
+               "-alF --time-style=long-iso --group-directories-first"))
+        (t
+         ;; POSIX オプションのみ
+         (setq dired-listing-switches "-alF")))
+
+  ;; ディレクトリを再帰的にコピー可能する
+  (setq dired-recursive-copies 'always)
+  ;; ディレクトリを再帰的に削除可能する
+  (setq dired-recursive-deletes 'always)
+
+  ;; firefox で開く
+  (when (executable-find "firefox")
+    (define-key dired-mode-map (kbd "C-f")
+      (lambda () (interactive) (dired-run-command "firefox"))))
+  ;; libreoffice で開く
+  (when (executable-find "libreoffice")
+    (define-key dired-mode-map (kbd "C-l")
+      (lambda () (interactive) (dired-run-command "libreoffice"))))
+  ;; evince で開く
+  (when (executable-find "evince")
+    (define-key dired-mode-map (kbd "C-e")
+      (lambda () (interactive) (dired-run-command "evince"))))
+  ;; vlc で開く
+  (when (executable-find "vlc")
+    (define-key dired-mode-map (kbd "C-v")
+      (lambda () (interactive) (dired-run-command "vlc"))))
+  ;; w3m で開く
+  (when (and (executable-find "w3m") (locate-library "w3m"))
+    (when (eval-when-compile (require 'w3m nil t))
+      (defun dired-w3m-find-file ()
+        "Open file in w3m."
+        (interactive)
+        (let ((file (dired-get-filename)))
+          (if (not (file-directory-p file))
+              (when (y-or-n-p (format "Open 'w3m' %s "
+                                      (file-name-nondirectory file)))
+                (w3m-find-file file))
+            (message "%s is a directory" file))))
+      (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
+
+  ;; tar + gzip で圧縮
+  (when (and (executable-find "tar") (executable-find "gzip")
              (fboundp 'dired-do-shell-command))
-
-    ;; dired でコマンドを実行する関数定義
-    (defun dired-run-command (command)
-      "Open file in command."
-      (let ((file (dired-get-filename)))
-        (if (and (file-directory-p file) (not (string= command "vlc")))
-            (message "%s is a directory" (file-name-nondirectory file))
-          (when (y-or-n-p (format "Open '%s' %s "
-                                  command (file-name-nondirectory file)))
-            (dired-run-shell-command (concat command " " file " &"))))))
-
-    ;; ディレクトリを先に表示する
-    (cond ((eq system-type 'windows-nt)
-           ;; Windows の場合
-           (when (eval-and-compile (require 'ls-lisp nil t))
-             (setq ls-lisp-dirs-first t)))
-          ((eq system-type 'gnu/linux)
-           ;; GNU オプションも使う
-           (setq dired-listing-switches
-                 "-alF --time-style=long-iso --group-directories-first"))
-          (t
-           ;; POSIX オプションのみ
-           (setq dired-listing-switches "-alF")))
-
-    ;; ディレクトリを再帰的にコピー可能する
-    (setq dired-recursive-copies 'always)
-    ;; ディレクトリを再帰的に削除可能する
-    (setq dired-recursive-deletes 'always)
-
-    (when (fboundp 'dired-run-command)
-      ;; firefox で開く
-      (when (executable-find "firefox")
-        (define-key dired-mode-map (kbd "C-f")
-          (lambda () (interactive) (dired-run-command "firefox"))))
-      ;; libreoffice で開く
-      (when (executable-find "libreoffice")
-        (define-key dired-mode-map (kbd "C-l")
-          (lambda () (interactive) (dired-run-command "libreoffice"))))
-      ;; evince で開く
-      (when (executable-find "evince")
-        (define-key dired-mode-map (kbd "C-e")
-          (lambda () (interactive) (dired-run-command "evince"))))
-      ;; vlc で開く
-      (when (executable-find "vlc")
-        (define-key dired-mode-map (kbd "C-v")
-          (lambda () (interactive) (dired-run-command "vlc")))))
-    ;; w3m で開く
-    (when (and (executable-find "w3m") (locate-library "w3m"))
-      (when (eval-when-compile (require 'w3m nil t))
-        (defun dired-w3m-find-file ()
-          "Open file in w3m."
-          (interactive)
-          (let ((file (dired-get-filename)))
-            (if (not (file-directory-p file))
-                (when (y-or-n-p (format "Open 'w3m' %s "
-                                        (file-name-nondirectory file)))
-                  (w3m-find-file file))
-              (message "%s is a directory" file))))
-        (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
-    ;; tar + gzip で圧縮
-    (when (and (executable-find "tar") (executable-find "gzip"))
-      (defun dired-do-tar-gzip (arg)
-        "Execute tar and gzip command."
-        (interactive "P")
-        (let ((files (dired-get-marked-files t current-prefix-arg)))
-          (let ((filename (read-string
-                           (concat "Filename(" (car files) ".tar.gz): "))))
-            (when (string= "" filename)
-              (setq filename (concat (car files) ".tar.gz")))
-            (when (not (string-match
-                        "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" filename))
-              (setq filename (concat filename ".tar.gz"))) ; 拡張子追加
-            (or (when (member filename (directory-files default-directory))
-                  (not (y-or-n-p ; 同名ファイル
-                        (concat "Overwrite `" filename "'? [Type yn]"))))
-                (when (not (dired-do-shell-command
-                            (concat "tar cfz " filename " *") nil files))
-                  (message (concat
-                            "Execute tar command to `" filename "'...done"))))))
-        (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))))
+    (defun dired-do-tar-gzip (arg)
+      "Execute tar and gzip command."
+      (interactive "P")
+      (let ((files (dired-get-marked-files t current-prefix-arg)))
+        (let ((filename (read-string
+                         (concat "Filename(" (car files) ".tar.gz): "))))
+          (when (string= "" filename)
+            (setq filename (concat (car files) ".tar.gz")))
+          (when (not (string-match
+                      "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" filename))
+            (setq filename (concat filename ".tar.gz"))) ; 拡張子追加
+          (or (when (member filename (directory-files default-directory))
+                (not (y-or-n-p ; 同名ファイル
+                      (concat "Overwrite `" filename "'? [Type yn]"))))
+              (when (not (dired-do-shell-command
+                          (concat "tar cfz " filename " *") nil files))
+                (message (concat
+                          "Execute tar command to `" filename "'...done"))))))
+      (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))))
 
 ;;; 関数のアウトライン表示
 (when (and (window-system) (locate-library "speedbar"))
@@ -768,29 +767,30 @@
     (setq iswitchb-prompt-newbuffer nil)))
 
 ;;; 優先度の高いディレクトリから探索
-(defun find-directory (dir)
+(defun find-directory (base)
   "Find shared directory."
-  (let (basedir (sharedir "Dropbox"))
+  (let (parent (sharedir "Dropbox"))
     ;; Windows, Linux デュアルブートで共有
     (cond ((eq system-type 'windows-nt)
-           (setq basedir "e:"))
+           (setq parent "e:"))
           (t
-           (setq basedir "/dos")))
-    (let ((lst (list (concat (file-name-as-directory basedir)
-                             (file-name-as-directory sharedir) dir)
+           (setq parent "/dos")))
+    (let ((lst (list (concat (file-name-as-directory parent)
+                             (file-name-as-directory sharedir) base)
                      (concat (file-name-as-directory "~")
-                             (file-name-as-directory sharedir) dir)
-                     (concat (file-name-as-directory basedir) dir)
-                     (concat (file-name-as-directory "~") dir))))
+                             (file-name-as-directory sharedir) base)
+                     (concat (file-name-as-directory parent) base)
+                     (concat (file-name-as-directory "~") base))))
       ;; ディレクトリ探索
-      (dolist (d lst)
-        (when (file-directory-p d)
-          (throw 'find d)))
+      (dolist (dir lst)
+        (when (file-directory-p dir)
+          (throw 'find dir)))
       ;; ディレクトリがない場合ホーム下に作成する
-      (let ((defaultdir (car (last lst))))
-        (condition-case error (make-directory defaultdir)
-          (error (message "%s" error)))
-        (throw 'find defaultdir)))))
+      (let ((default (car (last lst))))
+        (condition-case err
+            (make-directory default)
+          (error (message "%s" err)))
+        (throw 'find default)))))
 
 ;;; 文書作成 (org-mode)a
 (defvar org-code-reading-software-name nil)
