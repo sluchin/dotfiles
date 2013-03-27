@@ -333,8 +333,10 @@
                  (forward &optional regexp op-fun recursive-edit word-p)
                  activate compile)
          (if (and transient-mark-mode mark-active)
-             (isearch-update-ring
-              (buffer-substring-no-properties (mark) (point)))
+             (progn
+               (isearch-update-ring
+                (buffer-substring-no-properties (mark) (point)))
+               (deactivate-mark))
            (isearch-update-ring (thing-at-point 'word))))
        ;; migemo
        ;; sudo apt-get install migemo cmigemo
