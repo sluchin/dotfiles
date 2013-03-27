@@ -1,5 +1,6 @@
+;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 ;;; .emacs.el --- Emacs initialize file
-;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
+
 ;; Copyright (C) 2013
 ;; Author: Tetsuya Higashi
 
@@ -82,8 +83,7 @@
 
 ;;; 各種文字コード設定
 ;; (install-elisp http://nijino.homelinux.net/emacs/cp5022x.el)
-(when (locate-library "cp5022x")
-  (require 'cp5022x nil t))
+(eval-and-compile (require 'cp5022x nil t))
 (set-default-coding-systems 'utf-8-emacs)
 (setq default-file-name-coding-system 'utf-8-emacs)
 ;; charset の優先度設定
@@ -204,9 +204,11 @@
   ;; ヘッダに表示する
   (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
   (setq-default header-line-format '(which-func-mode ("" which-func-format)))
-  (when (fboundp 'which-function-mode)
-    (which-function-mode 1) ; デフォルトで表示
-    ;; f9 で関数名表示をトグルする
+  ;; 色
+  (set-face-foreground 'which-func "chocolate1")
+  (set-face-bold-p 'which-func t)
+  ;; M-1 で関数名表示をトグルする
+  (when (fboundp ' which-function-mode)
     (defun toggle-which-func-mode ()
       (interactive)
       (if which-function-mode
@@ -215,11 +217,8 @@
       (if which-function-mode
           (setq-default header-line-format
                         '(which-function-mode ("" which-func-format)))
-        (setq-default header-line-format nil)))
-    (define-key global-map (kbd "<f9>") 'toggle-which-func-mode))
-  ;; 色
-  (set-face-foreground 'which-func "chocolate1")
-  (set-face-bold-p 'which-func t))
+        (setq-default header-line-format "")))
+    (define-key global-map (kbd "M-1") 'toggle-which-func-mode)))
 
 ;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
@@ -296,6 +295,9 @@
 ;;; eval した結果を全部表示
 (setq eval-expression-print-length nil)
 
+;;; gzip ファイルも編集できるようにする
+(auto-compression-mode t)
+
 ;;; ブックマーク
 ;; C-x r m (bookmark-set)
 ;; C-x r l (bookmark-bmenu-list)
@@ -306,9 +308,6 @@
        (when (boundp 'bookmark-save-flag)
          (setq bookmark-save-flag t)))))
 
-;;; gzip ファイルも編集できるようにする
-(auto-compression-mode t)
-
 ;;; タブの設定
 (setq-default tab-width 4)          ; 4 スペース
 (setq-default indent-tabs-mode nil) ; タブをスペースにする
@@ -318,7 +317,7 @@
 ;;; 行末の空白を強調表示
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "red")
-;; 強調表示しない設定
+;; 空白強調表示の必要のないモードはしない
 (add-hook 'fundamental-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'calendar-mode-hook
@@ -333,17 +332,13 @@
          (around isearch-region-mode
                  (forward &optional regexp op-fun recursive-edit word-p)
                  activate compile)
-         (if (and transient-mark-mode mark-active)
-             (progn
-               (isearch-update-ring
-                (buffer-substring-no-properties (mark) (point)))
-               (deactivate-mark)
-               ad-do-it
-               (if (not forward)
-                   (isearch-repeat-backward)
-                 (goto-char (mark))
-                 (isearch-repeat-forward)))
-           ad-do-it))
+           (if (and transient-mark-mode mark-active)
+               (progn
+                 (isearch-update-ring
+                  (buffer-substring-no-properties (mark) (point)))
+                 (deactivate-mark))
+             (isearch-update-ring (thing-at-point 'word)))
+           ad-do-it)
        ;; migemo
        ;; sudo apt-get install migemo cmigemo
        ;; C-e でトグル
@@ -409,40 +404,44 @@
     (interactive)
     (load-file buffer-file-name)))
 
-;; リージョンからブラウザを開く関数
-(defun browse-prompt-input ()
-  "Prompt input object for translate."
-  (read-string (format "Search (%s): " (or (browse-region-or-word) ""))
-               nil nil
-               (browse-region-or-word)))
-(defun browse-region-or-word ()
-  "Return region or word around point."
+;; リージョンまたはワードを返却するマクロ
+(defmacro region-or-word ()
   (if mark-active
-      (buffer-substring-no-properties (region-beginning)
-                                      (region-end))
+      (buffer-substring-no-properties (region-beginning) (region-end))
     (thing-at-point 'word)))
 
 ;; firefox で開く
 (when (executable-find "firefox")
-  ;; google 検索
-  (defun google-search (&optional query)
-    "Search google in browse."
+  ;; グーグル検索
+  (defun fox-google-search ()
+    "Search google in firefox."
     (interactive)
     (browse-url (concat "https://www.google.co.jp/search?q="
-                        (or query (browse-prompt-input))
+                        (let ((region (region-or-word)))
+                          (read-string "google search: " region nil region))
                         "&ie=utf-8&oe=utf-8&hl=ja")))
-  (define-key global-map (kbd "C-c f") 'google-search)
+  (define-key global-map (kbd "C-c f s") 'fox-google-search)
+
+  ;; ウィキベディア検索
+  (defun fox-wikipedia-search ()
+    "Search wikipedia in firefox."
+    (interactive)
+    (browse-url (concat "https://ja.wikipedia.org/wiki/"
+                        (let ((region (region-or-word)))
+                          (read-string "wikipedia search: "
+                                       region nil region)))))
+  (define-key global-map (kbd "C-c f w") 'fox-wikipedia-search)
 
   ;; URL を開く
   (defun firefox-url-at-point ()
-    "Get url and open firefox."
+    "Browse url in firefox."
     (interactive)
     (let ((url-region (bounds-of-thing-at-point 'url)))
       (when url-region
         (start-process "firefox" nil "firefox"
                        (buffer-substring-no-properties (car url-region)
                                                        (cdr url-region))))))
-  (define-key global-map (kbd "C-c u") 'firefox-url-at-point))
+  (define-key global-map (kbd "C-c f u") 'firefox-url-at-point))
 
 ;; vlc で URL を開く
 (when (executable-find "vlc")
@@ -1049,15 +1048,15 @@
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
 (when (locate-library "tabbar")
   (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
-  ;; キーバインド
-  (define-key global-map (kbd "<f10>") 'tabbar-mode)
+  ;; M-2 でタブ表示
+  (define-key global-map (kbd "M-2") 'tabbar-mode)
   (eval-after-load "tabbar"
     '(progn
        ;; 色の設定
        (set-face-background 'tabbar-default "cadet blue")
        (set-face-foreground 'tabbar-unselected "black")
        (set-face-background 'tabbar-unselected "cadet blue")
-       (set-face-foreground 'tabbar-selected "black")
+       (set-face-foreground 'tabbar-selected "white")
        (set-face-background 'tabbar-selected "blue")
        ;; グループを使わない
        (when (boundp 'tabbar-buffer-groups-function)
@@ -1075,11 +1074,11 @@
                      (mapcar
                       #'(lambda (b)
                           (cond
-                           ;; カレントバッファは表示する
+                           ;; カレントバッファは表示
                            ((eq (current-buffer) b) b)
-                           ;; *Messages* バッファは表示する
+                           ;; *Messages* バッファは表示
                            ((equal "*Messages*" (buffer-name b)) b)
-                           ;; *scratch* バッファは表示する
+                           ;; *scratch* バッファは表示
                            ((equal "*scratch*" (buffer-name b)) b)
                            ;; それ以外の * で始まるバッファは非表示
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
@@ -1445,8 +1444,7 @@
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
 (when (locate-library "eldoc-extension")
   (autoload 'turn-on-eldoc-mode
-    "eldoc-extension"
-    "Some extension for eldoc." t)
+    "eldoc-extension" "Some extension for eldoc." t)
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
@@ -1454,10 +1452,13 @@
     '(progn
        ;; 待ち時間
        (when (boundp 'eldoc-idle-delay)
-         (setq eldoc-idle-delay 0.2))
+         (setq eldoc-idle-delay 0.1))
        ;; モードラインに ElDoc と表示しない
        (when (boundp 'eldoc-minor-mode-string)
-         (setq eldoc-minor-mode-string "")))))
+         (setq eldoc-minor-mode-string ""))
+       ;; 折り返して表示
+       (when (boundp 'eldoc-echo-area-use-multiline-p)
+         (setq eldoc-echo-area-use-multiline-p t)))))
 
 ;;; *Help* にメモを書き込む
 ;; (install-elisp-from-emacswiki "usage-memo.el")
@@ -1856,21 +1857,6 @@
 ;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
-(defun w3m-region-or-word ()
-  "Return region or word around point.
-If `mark-active' on, return region string.
-Otherwise return word around point."
-  (if mark-active
-      (buffer-substring-no-properties
-       (region-beginning) (region-end))
-    (thing-at-point 'word)))
-
-(defun w3m-wiki-prompt-input ()
-  "Prompt input object for translate."
-  (read-string (format "Search wikipedia (%s): " (or (w3m-region-or-word) ""))
-               nil nil
-               (w3m-region-or-word)))
-
 (when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
   (autoload 'w3m-find-file "w3m" "w3m interface function for local file." t)
@@ -1879,9 +1865,22 @@ Otherwise return word around point."
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
 
+  ;; グーグルで検索する
+  (define-key global-map (kbd "C-c m s") 'w3m-search-new-session)
+
+  ;; ウィキペディアで検索する
+  (when (fboundp 'w3m-browse-url)
+    (defun w3m-search-wikipedia ()
+      "Search at wikipedia in w3m."
+      (interactive)
+      (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
+                              (let ((region (region-or-word)))
+                                (read-string "wikipedia search: " region nil region)))))
+    (define-key global-map (kbd "C-c m w") 'w3m-search-wikipedia))
+
   ;; URL を開く
   (defun w3m-url-at-point ()
-    "Browse url in w3m"
+    "Browse url in w3m."
     (interactive)
     ;; デフォルトを w3m にする
     (setq browse-url-browser-function 'w3m-browse-url)
@@ -1889,19 +1888,7 @@ Otherwise return word around point."
     (browse-url-at-point)
     ;; デフォルトに戻す
     (setq browse-url-browser-function 'browse-url-default-browser))
-  (define-key global-map (kbd "C-c m") 'w3m-url-at-point)
-
-  ;; グーグルで検索する
-  (define-key global-map (kbd "C-c s") 'w3m-search-new-session)
-
-  ;; ウィキペディアで検索する
-  (when (fboundp 'w3m-browse-url)
-    (defun w3m-search-wikipedia (&optional query)
-      "Search at wikipedia in w3m."
-      (interactive)
-      (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
-                              (or query (w3m-wiki-prompt-input))) t))
-    (define-key global-map (kbd "C-c p") 'w3m-search-wikipedia))
+  (define-key global-map (kbd "C-c m u") 'w3m-url-at-point)
 
   (eval-after-load "w3m"
     '(progn
