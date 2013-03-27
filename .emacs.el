@@ -329,16 +329,14 @@
     '(progn
        ;; リージョンで検索する
        (defadvice isearch-mode
-         (around isearch-region-mode
+         (before isearch-region-mode
                  (forward &optional regexp op-fun recursive-edit word-p)
                  activate compile)
            (if (and transient-mark-mode mark-active)
                (progn
                  (isearch-update-ring
-                  (buffer-substring-no-properties (mark) (point)))
-                 (deactivate-mark))
-             (isearch-update-ring (thing-at-point 'word)))
-           ad-do-it)
+                  (buffer-substring-no-properties (mark) (point))))
+             (isearch-update-ring (thing-at-point 'word))))
        ;; migemo
        ;; sudo apt-get install migemo cmigemo
        ;; C-e でトグル
