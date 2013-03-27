@@ -654,8 +654,8 @@
               (when (not (dired-do-shell-command
                           (concat "tar cfz " filename " *") nil files))
                 (message (concat
-                          "Execute tar command to `" filename "'...done"))))))
-      (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))))
+                          "Execute tar command to `" filename "'...done")))))))
+    (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
 
 ;;; 関数のアウトライン表示
 (when (and (window-system) (locate-library "speedbar"))
