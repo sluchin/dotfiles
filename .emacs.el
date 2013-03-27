@@ -420,7 +420,7 @@
                         "&ie=utf-8&oe=utf-8&hl=ja")))
   (define-key global-map (kbd "C-c f s") 'fox-google-search)
 
-  ;; ウィキベディア検索
+  ;; ウィキペディア検索
   (defun fox-wikipedia-search ()
     "Search wikipedia in firefox."
     (interactive)
