@@ -342,7 +342,8 @@
          (if (and transient-mark-mode mark-active)
              (progn
                (isearch-update-ring
-                (buffer-substring-no-properties (mark) (point))))
+                (buffer-substring-no-properties (mark) (point)))
+               (deactivate-mark))
            (let ((word (thing-at-point 'word)))
              (when word
                (isearch-update-ring word)))))
@@ -661,10 +662,12 @@
             (or (when (member tarfile (directory-files default-directory))
                   (not (y-or-n-p ; 同名ファイル
                         (concat "Overwrite `" tarfile "'? [Type yn]"))))
-                (unless (dired-do-shell-command
-                         (concat "tar cfz " tarfile " *") nil files)
-                  (message (concat
-                            "Execute tar command to `" tarfile "'...done"))))))))
+                (condition-case err
+                    (dired-do-shell-command
+                     (concat "tar cfz " tarfile " *") nil files)
+                  (error (message "%s" err))))
+            (message (concat
+                      "Execute tar command to `" tarfile "'...done"))))))
     (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
 
 ;;; 関数のアウトライン表示
@@ -1338,7 +1341,7 @@
                          ("z7" nil "７") ("z8" nil "８") ("z9" nil "９")
                          ("zh" nil "←") ("zj" nil "↓") ("zk" nil "↑")
                          ("zl" nil "→") ("z~" nil "～") ("z/" nil "・")
-                         ("z[" nil "『") ("z]" nil "』")
+                         ("z[" nil "『") ("z]" nil "』") ("z " nil "　")
                          ("z@" nil skk-today)))))
 
        ;; sticky キー設定
