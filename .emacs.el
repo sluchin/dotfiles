@@ -343,10 +343,7 @@
              (progn
                (isearch-update-ring
                 (buffer-substring-no-properties (mark) (point)))
-               (deactivate-mark))
-           (let ((word (thing-at-point 'word)))
-             (when word
-               (isearch-update-ring word)))))
+               (deactivate-mark))))
        ;; migemo
        ;; sudo apt-get install migemo cmigemo
        ;; C-e でトグル
@@ -1364,6 +1361,17 @@
              (define-key paredit-mode-map
                skk-sticky-key 'paredit-semicolon))))
 
+       ;; 動的補完の候補表示件数を変更
+       (define-key skk-j-mode-map (kbd "M-;")
+         (lambda (&optional n)
+           (interactive "P")
+           (if (and skk-dcomp-multiple-rows (eq n nil))
+               (setq skk-dcomp-multiple-rows 1)
+             (if (eq n nil) ; デフォルト
+                 (setq skk-dcomp-multiple-rows 5)
+               (setq skk-dcomp-multiple-rows n)))
+           (message "skk-dcomp-multiple-rows %s" skk-dcomp-multiple-rows)))
+
        ;; Enter で確定 (デフォルト: C-j)
        (when (boundp 'skk-egg-like-newline)
          (setq skk-egg-like-newline t))
@@ -1393,7 +1401,7 @@
          (setq skk-dcomp-multiple-activate t))
        ;; 動的補完の候補表示件数
        (when (boundp 'skk-dcomp-multiple-rows)
-         (setq skk-dcomp-multiple-rows 10))
+         (setq skk-dcomp-multiple-rows 5))
        ;; ローマ字 prefix をみて補完する
        (when (boundp 'skk-comp-use-prefix)
          (setq skk-comp-use-prefix t))
