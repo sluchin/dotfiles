@@ -33,9 +33,16 @@
                   "/usr/share/emacs/site-lisp/mew"
                   "/usr/share/emacs/site-lisp/global"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
-                  "/usr/share/emacs23/site-lisp/ddskk"
-                  "/usr/share/emacs23/site-lisp/migemo"
-                  ) load-path)))
+                  "/usr/share/emacs/site-lisp/ddskk"
+                  "/usr/share/emacs/site-lisp/migemo"
+                  ) load-path))
+  ;; バージョン 24
+  (unless (= emacs-major-version 23)
+    (setq load-path
+          (append '(
+                    "/usr/share/emacs23/site-lisp/ddskk"
+                    "/usr/share/emacs23/site-lisp/migemo"
+                    ) load-path))))
 (setq load-path
       (append '(
                 "~/.emacs.d"
@@ -335,9 +342,10 @@
          (if (and transient-mark-mode mark-active)
              (progn
                (isearch-update-ring
-                (buffer-substring-no-properties (mark) (point)))
-               (deactivate-mark))
-           (isearch-update-ring (thing-at-point 'word))))
+                (buffer-substring-no-properties (mark) (point))))
+           (let ((word (thing-at-point 'word)))
+             (when word
+               (isearch-update-ring word)))))
        ;; migemo
        ;; sudo apt-get install migemo cmigemo
        ;; C-e でトグル
@@ -623,40 +631,40 @@
     (define-key dired-mode-map (kbd "C-v")
       (lambda () (interactive) (dired-run-command "vlc"))))
   ;; w3m で開く
-  (when (and (executable-find "w3m") (locate-library "w3m"))
-    (when (eval-when-compile (require 'w3m nil t))
-      (defun dired-w3m-find-file ()
-        "Open file in w3m."
-        (interactive)
-        (let ((file (dired-get-filename)))
-          (if (not (file-directory-p file))
-              (when (y-or-n-p (format "Open 'w3m' %s "
-                                      (file-name-nondirectory file)))
-                (w3m-find-file file))
-            (message "%s is a directory" file))))
-      (define-key dired-mode-map (kbd "C-b") 'dired-w3m-find-file)))
+  (when (and (executable-find "w3m") (locate-library "w3m")
+             (eval-when-compile (require 'w3m nil t)))
+    (defun dired-w3m-find-file ()
+      "Open file in w3m."
+      (interactive)
+      (let ((file (dired-get-filename)))
+        (if (not (file-directory-p file))
+            (when (y-or-n-p (format "Open 'w3m' %s "
+                                    (file-name-nondirectory file)))
+              (w3m-find-file file))
+          (message "%s is a directory" file))))
+    (define-key dired-mode-map (kbd "C-m") 'dired-w3m-find-file))
 
   ;; tar + gzip で圧縮
   (when (and (executable-find "tar") (executable-find "gzip")
+             (fboundp 'dired-get-marked-files)
+             (boundp 'current-prefix-arg)
              (fboundp 'dired-do-shell-command))
     (defun dired-do-tar-gzip (arg)
       "Execute tar and gzip command."
       (interactive "P")
       (let ((files (dired-get-marked-files t current-prefix-arg)))
-        (let ((filename (read-string
-                         (concat "Filename(" (car files) ".tar.gz): "))))
-          (when (string= "" filename)
-            (setq filename (concat (car files) ".tar.gz")))
-          (when (not (string-match
-                      "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" filename))
-            (setq filename (concat filename ".tar.gz"))) ; 拡張子追加
-          (or (when (member filename (directory-files default-directory))
-                (not (y-or-n-p ; 同名ファイル
-                      (concat "Overwrite `" filename "'? [Type yn]"))))
-              (when (not (dired-do-shell-command
-                          (concat "tar cfz " filename " *") nil files))
-                (message (concat
-                          "Execute tar command to `" filename "'...done")))))))
+        (let ((default (concat (car files) ".tar.gz")))
+          (let ((tarfile (read-string "Filename: " default nil default)))
+            (unless (string-match
+                     "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
+              (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
+            (or (when (member tarfile (directory-files default-directory))
+                  (not (y-or-n-p ; 同名ファイル
+                        (concat "Overwrite `" tarfile "'? [Type yn]"))))
+                (unless (dired-do-shell-command
+                         (concat "tar cfz " tarfile " *") nil files)
+                  (message (concat
+                            "Execute tar command to `" tarfile "'...done"))))))))
     (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
 
 ;;; 関数のアウトライン表示
@@ -794,7 +802,7 @@
           (error (message "%s" err)))
         (throw 'find default)))))
 
-;;; 文書作成 (org-mode)a
+;;; 文書作成 (org-mode)
 (defvar org-code-reading-software-name nil)
 (defvar org-code-reading-file "code-reading.org")
 (defun org-code-reading-read-software-name ()
@@ -821,7 +829,8 @@
     (setq org-directory (catch 'find (find-directory "org")))
     (message "org-directory: %s" org-directory))
   (when (boundp 'org-default-notes-file)  ; org-remember のファイル名
-    (setq org-default-notes-file (concat org-directory "agenda.org"))
+    (setq org-default-notes-file
+          (concat (file-name-as-directory org-directory) "agenda.org"))
     (message "org-default-notes-file: %s" org-default-notes-file))
   (when (boundp 'org-startup-truncated)   ; 行の折り返し
     (setq org-startup-truncated nil))
@@ -1077,9 +1086,13 @@
                            ;; カレントバッファは表示
                            ((eq (current-buffer) b) b)
                            ;; *Messages* バッファは表示
-                           ((equal "*Messages*" (buffer-name b)) b)
+                           ((string= "*Messages*" (buffer-name b)) b)
                            ;; *scratch* バッファは表示
-                           ((equal "*scratch*" (buffer-name b)) b)
+                           ((string= "*scratch*" (buffer-name b)) b)
+                           ;; multi-term のバッファは表示
+                           ((string-match "*terminal.*" (buffer-name b)) b)
+                           ;; eshell または shell は表示
+                           ((string-match "*[e]?shell.*" (buffer-name b)) b)
                            ;; それ以外の * で始まるバッファは非表示
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
                            ;; スペースで始まるバッファは非表示
@@ -1988,7 +2001,10 @@
 ;; eshell
 (add-hook 'eshell-mode-hook
           (lambda ()
-            (setq header-line-format nil)         ; ヘッダ表示しない
+            (setq show-trailing-whitespace nil))) ; 空白を強調表示しない
+;; shell
+(add-hook 'shell-mode-hook
+          (lambda ()
             (setq show-trailing-whitespace nil))) ; 空白を強調表示しない
 
 ;; zsh を使用するときはこれを使うことにする
