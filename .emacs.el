@@ -1,7 +1,7 @@
 ;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 ;;; .emacs.el --- Emacs initialize file
 
-;; Copyright (C) 2013
+;; Copyright (C) 2012 2013
 ;; Author: Tetsuya Higashi
 
 ;;; バージョン
@@ -262,9 +262,6 @@
 ;;; キーストロークをエコーエリアに早く表示する
 (setq echo-keystrokes 0.1)
 
-;;; リージョンに色をつける
-(setq transient-mark-mode t)
-
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
 
@@ -339,7 +336,7 @@
          (before isearch-region-mode
                  (forward &optional regexp op-fun recursive-edit word-p)
                  activate compile)
-         (if (and transient-mark-mode mark-active)
+         (if mark-active
              (progn
                (isearch-update-ring
                 (buffer-substring-no-properties (mark) (point)))
@@ -390,6 +387,53 @@
                     (let ((skk-dcomp-multiple-activate nil))
                       (ignore-errors ad-do-it)) ; エラーを無視する
                   ad-do-it))))))))
+
+;;; マークの設定
+;; C-g でリージョン強調表示解除
+;; C-x C-x でマークとポイントを移動
+;; C-x C-@ グローバル
+
+;; mark-ring を増やす (デフォルト: 16)
+(setq global-mark-ring-max 256)
+(setq mark-ring-max 256)
+
+;; リージョン強調表示
+(setq transient-mark-mode t)
+
+;; 連続してマークを辿る C-u C-@ C-@ ...
+;; (デフォルト: C-u C-@ C-u C-@ ...)
+(setq set-mark-command-repeat-pop t)
+
+;; C-d または Delete でリージョンを削除できるようにする
+(delete-selection-mode t)
+
+;; C-@ マークコマンド
+(defadvice set-mark-command
+  (after print-mark-ring (arg) activate compile)
+  (message "%s - %s" (point) mark-ring))
+
+;; 現在ポイントのマークを削除
+(defun delete-mark-ring ()
+  "Delete mark at current point."
+  (interactive)
+  (let (lst (curpos (make-marker)))
+    (set-marker curpos (point) (current-buffer))
+    (dolist (m mark-ring)
+      ;; 一致しない場合, リストに追加
+      (unless (equal m curpos)
+        (setq lst (append lst (list m)))))
+    (setq mark-ring lst))
+  (message "%s - %s" (point) mark-ring))
+
+;; mark-ring を全削除
+(defun mark-ring-clear ()
+  "All clear mark-ring."
+  (interactive)
+  (setq mark-ring nil)
+  (message "mark-ring: %s" mark-ring))
+
+;; ポイントを表示
+(defun print-point () (interactive) (message "%s" (point)))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
