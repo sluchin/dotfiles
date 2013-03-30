@@ -1831,41 +1831,42 @@
          (list (propertize fmt
                            'face
                            '(:foreground "white" :background "red1"))))
-       (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
-       (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
-       (defvar mew-mode-line-biff-quantity 0)
-       (when (boundp 'mew-biff-function)
-         ;; mew-biff-interval の間隔で呼ばれる関数
-         (setq mew-biff-function
-               (lambda (n)
-                 (if (= n 0)
-                     (mew-biff-clear)
-                   (setq mew-mode-line-biff-icon
-                         (mew-propertized-biff-icon " "))
-                   (setq mew-mode-line-biff-string
-                         (mew-propertized-biff-string (format "(%d)" n)))
-                   ;; メール数が増えた場合, D-Bus 経由で通知
-                   (when (< mew-mode-line-biff-quantity n)
-                     (notifications-notify
-                      :title "Emacs/Mew"
-                      :body  (format "You got mail(s): %d" n)
-                      :timeout 5000))
-                   (setq mew-mode-line-biff-quantity n)))))
-       ;; 着信後呼ばれる関数
-       (defadvice mew-biff-clear (after mew-biff-clear-icon activate compile)
-         (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
-         (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
-         (setq mew-mode-line-biff-quantity 0))
 
-       ;; モードラインのフォーマット
-       (let ((mew-string '(:eval mew-mode-line-biff-string))
-             (mew-icon '(:eval mew-mode-line-biff-icon)))
+       (let* ((mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
+              (mew-mode-line-biff-string (mew-propertized-biff-string ""))
+              (mew-mode-line-biff-quantity 0))
+         (when (boundp 'mew-biff-function)
+           ;; mew-biff-interval の間隔で呼ばれる関数
+           (setq mew-biff-function
+                 (lambda (n)
+                   (if (= n 0)
+                       (mew-biff-clear)
+                     (setq mew-mode-line-biff-icon
+                           (mew-propertized-biff-icon " "))
+                     (setq mew-mode-line-biff-string
+                           (mew-propertized-biff-string (format "(%d)" n)))
+                     ;; メール数が増えた場合, D-Bus 経由で通知
+                     (when (< mew-mode-line-biff-quantity n)
+                       (notifications-notify
+                        :title "Emacs/Mew"
+                        :body  (format "You got mail(s): %d" n)
+                        :timeout 5000))
+                     (setq mew-mode-line-biff-quantity n)))))
+         ;; 着信後呼ばれる関数
+         (defadvice mew-biff-clear (after mew-biff-clear-icon activate compile)
+           (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
+           (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
+           (setq mew-mode-line-biff-quantity 0))
+
+         ;; モードラインのフォーマット
+         (let ((mew-string '(:eval mew-mode-line-biff-string))
+               (mew-icon '(:eval mew-mode-line-biff-icon)))
            (unless (member mew-string mode-line-format)
              (setq-default mode-line-format
                            (cons mew-string mode-line-format)))
            (unless (member mew-icon mode-line-format)
              (setq-default mode-line-format
-                           (cons mew-icon mode-line-format))))
+                           (cons mew-icon mode-line-format)))))
 
        ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
