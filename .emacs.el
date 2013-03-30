@@ -1,7 +1,7 @@
 ;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 ;;; .emacs.el --- Emacs initialize file
 
-;; Copyright (C) 2013
+;; Copyright (C) 2012 2013
 ;; Author: Tetsuya Higashi
 
 ;;; バージョン
@@ -183,32 +183,16 @@
                   "%b")))
   (setq icon-title-format "%b"))
 
-;;; モードラインの色設定
-;; 使える色を調べるには以下を評価する
-;; (list-colors-display)
-(custom-set-faces
- '(mode-line ((t (:foreground "gray5" :background "RoyalBlue1" :box nil))))
- '(mode-line-inactive
-   ((t (:foreground "gray55" :background "RoyalBlue4" :box nil)))))
-
 ;;; ヘッダラインの色設定
 ;; face を調べるには以下を評価する
 ;; (list-faces-display)
+;; 使える色を調べるには以下を評価する
+;; (list-colors-display)
 (set-face-foreground 'header-line "chocolate1")
 (set-face-background 'header-line "gray30")
 
-;; 表示
-(when (eval-when-compile (require 'time nil t))
-  (when (boundp 'display-time-24hr-format)
-    (setq display-time-24hr-format t))) ; 24 時間表示
-(display-time)                          ; 時間
-(line-number-mode t)                    ; 行数
-(column-number-mode t)                  ; カラム数
-(size-indication-mode t)                ; ファイルサイズ
-
-;; 関数名表示
+;; ヘッダラインに関数名表示
 (when (eval-when-compile (require 'which-func nil t))
-  ;; ヘッダに表示する
   (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
   (setq-default header-line-format '(which-func-mode ("" which-func-format)))
   ;; 色
@@ -227,10 +211,67 @@
         (setq-default header-line-format "")))
     (define-key global-map (kbd "M-1") 'toggle-which-func-mode)))
 
+;;; モードライン色
+(custom-set-faces
+ ;; アクティブ時
+ '(mode-line ((t (:foreground "white" :background "blue" :box nil))))
+ ;; 非アクティブ時
+ '(mode-line-inactive ((t (:foreground "white" :background "gray15" :box nil)))))
+
+;;; モードライン表示
+(when (eval-when-compile (require 'time nil t))
+  (when (boundp 'display-time-day-and-date) ; 日時表示
+    (setq display-time-day-and-date t))
+  (when (boundp 'display-time-24hr-format)  ; 24 時間表示
+    (setq display-time-24hr-format t))
+  (when (boundp 'display-time-string-forms) ; 日時フォーマット
+    (setq display-time-string-forms
+          '((format
+             "%s/%s(%s) %s:%s "
+             month day dayname 24-hours minutes)))))
+(display-time)                              ; 時間
+(line-number-mode t)                        ; 行数
+(column-number-mode t)                      ; カラム数
+(size-indication-mode t)                    ; ファイルサイズ
+;; 総行数表示
+(setcar (cdr mode-line-position)
+        '(:eval (format " %%I(L%d)" (count-lines (point-max) (point-min)))))
+;; ポイント表示
+(unless (member '(:eval (format "%d" (point))) mode-line-position)
+  (setq mode-line-position
+        (append mode-line-position
+                (list '(:eval (format "%d" (point)))))))
+
+;; モード名を短縮して表示
+(add-hook
+  'after-change-major-mode-hook
+  (lambda ()
+    (let ((modes
+           '((auto-complete-mode . " α")
+             (yas/minor-mode . " υ")
+             (paredit-mode . " π")
+             (undo-tree-mode . " Ut")
+             (eldoc-mode . "")
+             (abbrev-mode . "")
+             (lisp-interaction-mode . "λ")
+             (hi-lock-mode . "")
+             (python-mode . "Py")
+             (emacs-lisp-mode . "El")
+             (nxhtml-mode . "nx"))))
+      (dolist (cleaner modes)
+        (let* ((mode (car cleaner))
+               (short (cdr cleaner))
+               (default (cdr (assq mode minor-mode-alist))))
+          (when default
+            (setcar default short))
+          ;; メジャーモード
+          (when (eq mode major-mode)
+            (setq mode-name short)))))))
+
 ;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
   (if mark-active
-      (format " %dL %dC "
+      (format " L%d C%d "
               (count-lines (region-beginning) (region-end))
               (- (region-end) (region-beginning)))
     ""))
@@ -261,9 +302,6 @@
 
 ;;; キーストロークをエコーエリアに早く表示する
 (setq echo-keystrokes 0.1)
-
-;;; リージョンに色をつける
-(setq transient-mark-mode t)
 
 ;;; 画像ファイルを表示する
 (auto-image-file-mode t)
@@ -339,7 +377,7 @@
          (before isearch-region-mode
                  (forward &optional regexp op-fun recursive-edit word-p)
                  activate compile)
-         (if (and transient-mark-mode mark-active)
+         (if mark-active
              (progn
                (isearch-update-ring
                 (buffer-substring-no-properties (mark) (point)))
@@ -390,6 +428,52 @@
                     (let ((skk-dcomp-multiple-activate nil))
                       (ignore-errors ad-do-it)) ; エラーを無視する
                   ad-do-it))))))))
+
+;;; マークの設定
+;; C-g でリージョン強調表示解除
+;; C-x C-x でマークとポイントを移動
+;; C-x C-@ グローバル
+
+;; mark-ring を増やす (デフォルト: 16)
+(setq global-mark-ring-max 256)
+(setq mark-ring-max 256)
+
+;; リージョン強調表示
+(setq transient-mark-mode t)
+
+;; 連続してマークを辿る C-u C-@ C-@ ...
+;; (デフォルト: C-u C-@ C-u C-@ ...)
+(setq set-mark-command-repeat-pop t)
+
+;; C-d または Delete でリージョンを削除できるようにする
+(delete-selection-mode t)
+
+;; C-@ マークコマンド
+(defadvice set-mark-command
+  (after print-mark-ring (arg) activate compile)
+  (message "%s - %s" (point) mark-ring))
+
+;; 現在ポイントのマークを削除
+(defun delete-mark-ring ()
+  "Delete mark at current point."
+  (interactive)
+  (let (lst (curpos (make-marker)))
+    (set-marker curpos (point) (current-buffer))
+    (dolist (m mark-ring)
+      ;; 一致しない場合, リストに追加
+      (if (equal m curpos)
+          (message "deleted mark: %s" m)
+        (setq lst (append lst (list m)))))
+    (setq mark-ring lst))
+  (message "%s - %s" (point) mark-ring))
+(define-key global-map (kbd "C-2") 'delete-mark-ring)
+
+;; mark-ring を全削除
+(defun clear-mark-ring ()
+  "All clear mark-ring."
+  (interactive)
+  (setq mark-ring nil)
+  (message "mark-ring: %s" mark-ring))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -640,7 +724,7 @@
                                     (file-name-nondirectory file)))
               (w3m-find-file file))
           (message "%s is a directory" file))))
-    (define-key dired-mode-map (kbd "C-m") 'dired-w3m-find-file))
+    (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
 
   ;; tar + gzip で圧縮
   (when (and (executable-find "tar") (executable-find "gzip")
@@ -1164,9 +1248,9 @@
 ;;; メモ (howm)
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.1.tar.gz | tar xfz -
 (when (locate-library "howm")
-  (autoload 'howm-menu "howm-mode" "Hitori Otegaru Wiki Modoki." t)
+  (autoload 'howm-menu "howm" "Hitori Otegaru Wiki Modoki." t)
   (define-key global-map (kbd "C-c , ,") 'howm-menu)
-  (eval-after-load "howm-mode"
+  (eval-after-load "howm"
     '(progn
        ;; メニュー言語
        (when (boundp 'howm-menu-lang)
@@ -1775,12 +1859,10 @@
        ;; モードラインのフォーマット
        (unless (member '(:eval mew-mode-line-biff-string) mode-line-format)
          (setq-default mode-line-format
-                       (cons
-                        '(:eval mew-mode-line-biff-string) mode-line-format)))
+                       (cons '(:eval mew-mode-line-biff-string) mode-line-format)))
        (unless (member '(:eval mew-mode-line-biff-icon) mode-line-format)
          (setq-default mode-line-format
-                       (cons
-                        '(:eval mew-mode-line-biff-icon) mode-line-format)))
+                       (cons '(:eval mew-mode-line-biff-icon) mode-line-format)))
 
        ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
@@ -1890,7 +1972,7 @@
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
 
   ;; グーグルで検索する
-  (define-key global-map (kbd "C-c m s") 'w3m-search-new-session)
+  (define-key global-map (kbd "C-c 3 s") 'w3m-search-new-session)
 
   ;; ウィキペディアで検索する
   (when (fboundp 'w3m-browse-url)
@@ -1900,7 +1982,7 @@
       (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
                               (let ((region (region-or-word)))
                                 (read-string "wikipedia search: " region nil region)))))
-    (define-key global-map (kbd "C-c m w") 'w3m-search-wikipedia))
+    (define-key global-map (kbd "C-c 3 w") 'w3m-search-wikipedia))
 
   ;; URL を開く
   (defun w3m-url-at-point ()
@@ -1912,7 +1994,7 @@
     (browse-url-at-point)
     ;; デフォルトに戻す
     (setq browse-url-browser-function 'browse-url-default-browser))
-  (define-key global-map (kbd "C-c m u") 'w3m-url-at-point)
+  (define-key global-map (kbd "C-c 3 u") 'w3m-url-at-point)
 
   (eval-after-load "w3m"
     '(progn
@@ -2297,3 +2379,4 @@
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
+
