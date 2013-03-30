@@ -229,44 +229,44 @@
           '((format
              "%s/%s(%s) %s:%s "
              month day dayname 24-hours minutes)))))
-(display-time)                              ; 時間
-(line-number-mode t)                        ; 行数
-(column-number-mode t)                      ; カラム数
-(size-indication-mode t)                    ; ファイルサイズ
-;; 総行数表示
-(setcar (cdr mode-line-position)
-        '(:eval (format " %%I/L%d" (count-lines (point-max) (point-min)))))
-;; ポイント表示
-(unless (member '(:eval (format "%d" (point))) mode-line-position)
-  (setq mode-line-position
-        (append mode-line-position
-                (list '(:eval (format "%d" (point)))))))
+(display-time)             ; 時間
+(line-number-mode t)       ; 行数
+(column-number-mode t)     ; カラム数
+(size-indication-mode t)   ; ファイルサイズ
+;; カスタマイズ
+;; 割合 バイト数/総行数 [行数:カラム数:カーソル位置]
+(setq mode-line-position
+        '(:eval (format "%%p %%I/L%d [%%l:%%c:%d]"
+                        (count-lines (point-max) (point-min))
+                        (point))))
 
 ;; モード名を短縮して表示
 (add-hook
-  'after-change-major-mode-hook
-  (lambda ()
-    (let ((modes
-           '((auto-complete-mode . " α")
-             (yas/minor-mode . " υ")
-             (paredit-mode . " π")
-             (undo-tree-mode . "")
-             (eldoc-mode . "")
-             (abbrev-mode . "")
-             (lisp-interaction-mode . "λ")
-             (hi-lock-mode . "")
-             (python-mode . "Py")
-             (emacs-lisp-mode . "El")
-             (nxhtml-mode . "nx"))))
-      (dolist (cleaner modes)
-        (let* ((mode (car cleaner))
-               (short (cdr cleaner))
-               (default (cdr (assq mode minor-mode-alist))))
-          (when default
-            (setcar default short))
-          ;; メジャーモード
-          (when (eq mode major-mode)
-            (setq mode-name short)))))))
+ 'after-change-major-mode-hook
+ (lambda ()
+   (let ((modes
+          ;; マイナーモード
+          '((auto-complete-mode . " α")
+            (yas/minor-mode . " υ")
+            (paredit-mode . " π")
+            (undo-tree-mode . "")
+            (eldoc-mode . "")
+            (abbrev-mode . "")
+            ;; メジャーモード
+            (lisp-interaction-mode . "λ")
+            (hi-lock-mode . "")
+            (python-mode . "Py")
+            (emacs-lisp-mode . "El")
+            (nxhtml-mode . "nx"))))
+     (dolist (cleaner modes)
+       (let* ((mode (car cleaner))
+              (short (cdr cleaner))
+              (default (cdr (assq mode minor-mode-alist))))
+         (when default
+           (setcar default short))
+         ;; メジャーモード
+         (when (eq mode major-mode)
+           (setq mode-name short)))))))
 
 ;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
@@ -275,9 +275,10 @@
               (count-lines (region-beginning) (region-end))
               (- (region-end) (region-beginning)))
     ""))
-(unless (member '(:eval (count-lines-and-chars)) mode-line-format)
-  (setq-default mode-line-format
-                (cons '(:eval (count-lines-and-chars)) mode-line-format)))
+(let ((lines-chars '(:eval (count-lines-and-chars))))
+  (unless (member lines-chars mode-line-format)
+    (setq-default mode-line-format
+                  (cons lines-chars mode-line-format))))
 
 ;;; サーバを起動する
 (when (eval-when-compile (require 'server nil t))
@@ -1146,9 +1147,9 @@
   (eval-after-load "tabbar"
     '(progn
        ;; 色の設定
-       (set-face-background 'tabbar-default "cadet blue")
+       (set-face-background 'tabbar-default "gray20")
        (set-face-foreground 'tabbar-unselected "black")
-       (set-face-background 'tabbar-unselected "cadet blue")
+       (set-face-background 'tabbar-unselected "gray60")
        (set-face-foreground 'tabbar-selected "white")
        (set-face-background 'tabbar-selected "blue")
        ;; グループを使わない
@@ -1857,12 +1858,14 @@
          (setq mew-mode-line-biff-quantity 0))
 
        ;; モードラインのフォーマット
-       (unless (member '(:eval mew-mode-line-biff-string) mode-line-format)
-         (setq-default mode-line-format
-                       (cons '(:eval mew-mode-line-biff-string) mode-line-format)))
-       (unless (member '(:eval mew-mode-line-biff-icon) mode-line-format)
-         (setq-default mode-line-format
-                       (cons '(:eval mew-mode-line-biff-icon) mode-line-format)))
+       (let ((mew-string '(:eval mew-mode-line-biff-string))
+             (mew-icon '(:eval mew-mode-line-biff-icon)))
+           (unless (member mew-string mode-line-format)
+             (setq-default mode-line-format
+                           (cons mew-string mode-line-format)))
+           (unless (member mew-icon mode-line-format)
+             (setq-default mode-line-format
+                           (cons mew-icon mode-line-format))))
 
        ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
