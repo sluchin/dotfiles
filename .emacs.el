@@ -214,9 +214,9 @@
 ;;; モードライン色
 (custom-set-faces
  ;; アクティブ時
- '(mode-line ((t (:foreground "white" :background "blue" :box nil))))
+ '(mode-line ((t (:foreground "white" :background "gray15" :box nil))))
  ;; 非アクティブ時
- '(mode-line-inactive ((t (:foreground "white" :background "gray15" :box nil)))))
+ '(mode-line-inactive ((t (:foreground "white" :background "gray30" :box nil)))))
 
 ;;; モードライン表示
 (when (eval-when-compile (require 'time nil t))
@@ -235,7 +235,7 @@
 (size-indication-mode t)                    ; ファイルサイズ
 ;; 総行数表示
 (setcar (cdr mode-line-position)
-        '(:eval (format " %%I(L%d)" (count-lines (point-max) (point-min)))))
+        '(:eval (format " %%I/L%d" (count-lines (point-max) (point-min)))))
 ;; ポイント表示
 (unless (member '(:eval (format "%d" (point))) mode-line-position)
   (setq mode-line-position
@@ -250,7 +250,7 @@
            '((auto-complete-mode . " α")
              (yas/minor-mode . " υ")
              (paredit-mode . " π")
-             (undo-tree-mode . " Ut")
+             (undo-tree-mode . "")
              (eldoc-mode . "")
              (abbrev-mode . "")
              (lisp-interaction-mode . "λ")
