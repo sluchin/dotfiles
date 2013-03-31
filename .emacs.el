@@ -901,86 +901,114 @@
         (throw 'find default)))))
 
 ;;; 文書作成 (org-mode)
-(defvar org-code-reading-software-name nil)
-(defvar org-code-reading-file "code-reading.org")
-(defun org-code-reading-read-software-name ()
-  (set (make-local-variable 'org-code-reading-software-name)
-       (read-string "Code Reading Software: "
-                    (or org-code-reading-software-name
-                        (file-name-nondirectory
-                         (buffer-file-name))))))
-(defun org-code-reading-get-prefix (lang)
-  (concat "[" lang "]"
-          "[" (org-code-reading-read-software-name) "]"))
+;; リファレンス (find-file "~/.emacs.d/org/reference.org")
 
-(when (and (eval-when-compile (require 'org nil t))
-           (eval-when-compile (require 'org-remember nil t))
-           (eval-when-compile (require 'org-install nil t)))
+;; 仕事用 GTD ファイルを開く
+(defun gtd ()
+  "Open my GTD file for work."
+  (interactive)
+  (let ((file (concat (file-name-as-directory
+                       (catch 'find (find-directory "org")))
+                      "work.org")))
+    (message "gtd file for work: %s" file)
+    (if (file-exists-p file)
+        (if (and (file-readable-p file)
+                 (file-writable-p file))
+            (find-file file)
+          (message (concat "Can't open file: " file)))
+      (when (file-exists-p (file-name-directory file))
+        (find-file file)))))
 
+;; 自宅用 GTD ファイルを開く
+(defun gtd-home ()
+  "Open my GTD file for home."
+  (interactive)
+  (let ((file (concat (file-name-as-directory
+                       (catch 'find (find-directory "org")))
+                      "home.org")))
+    (message "gtd file for home: %s" file)
+    (if (file-exists-p file)
+        (if (and (file-readable-p file)
+                 (file-writable-p file))
+            (find-file file)
+          (message (concat "Can't open file: " file)))
+      (when (file-exists-p (file-name-directory file))
+        (find-file file)))))
+
+;; org-mode 設定
+(when (and (locate-library "org")
+           (locate-library "org-agenda")
+           (locate-library "org-remember"))
   ;; 自動で org-mode にする
   (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  ;; org-mode での強調表示を可能にする
-  (add-hook 'org-mode-hook 'turn-on-font-lock)
-  (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
-    (setq org-hide-leading-stars t))
-  (when (boundp 'org-directory)           ; org-remember のディレクトリ
-    (setq org-directory (catch 'find (find-directory "org")))
-    (message "org-directory: %s" org-directory))
-  (when (boundp 'org-default-notes-file)  ; org-remember のファイル名
-    (setq org-default-notes-file
-          (concat (file-name-as-directory org-directory) "agenda.org"))
-    (message "org-default-notes-file: %s" org-default-notes-file))
-  (when (boundp 'org-startup-truncated)   ; 行の折り返し
-    (setq org-startup-truncated nil))
-  (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
-    (setq org-return-follows-link t))
-  (when (fboundp 'org-remember-insinuate) ; org-remember の初期化
-    (org-remember-insinuate))
-  (when (boundp 'org-remember-templates)  ; テンプレート
-    (setq org-remember-templates
-          '(("Todo" ?t "** TODO %?\n   %i\n   %a\n   %t" nil "Inbox")
-            ("Bug" ?b "** TODO %?   :bug:\n   %i\n   %a\n   %t" nil "Inbox")
-            ("Idea" ?i "** %?\n   %i\n   %a\n   %t" nil "New Ideas"))))
-
-  ;; 日付を英語で挿入する
   (add-hook 'org-mode-hook
             (lambda ()
-              (set (make-local-variable 'system-time-locale) "C")))
-
-  ;; ソースコードを読みメモする
-  (defun org-remember-code-reading ()
-    "When code reading, org-remember mode."
-    (interactive)
-    (let* ((prefix (org-code-reading-get-prefix (substring (symbol-name major-mode) 0 -5)))
-           (org-remember-templates
-            `(("CodeReading" ?r "** %(identity prefix)%?\n   \n   %a\n   %t"
-               ,org-code-reading-file (catch 'find (find-directory "code"))))))
-      (message "org-code-reading-file: %s" org-code-reading-file)
-      (org-remember)))
-
-  ;; GTD
-  (defun gtd ()
-    "Open my GTD file."
-    (interactive)
-    (let ((file "~/gtd/plan.org"))
-      (if (file-writable-p file)
-          (find-file file)
-        (message (concat "Can't open file: " file)))))
-
-  ;; キーバインド
-  (define-key org-mode-map (kbd "C-c m")
-    (lambda ()
-      "Browse url in w3m."
-      (interactive)
-      (setq browse-url-browser-function 'w3m-browse-url)
-      (org-return)
-      (setq browse-url-browser-function 'browse-url-default-browser)))
-
+              ;; 日付を英語で挿入する
+              (set (make-local-variable 'system-time-locale) "C")
+              ;; org-mode での強調表示を可能にする
+              (turn-on-font-lock)))
+  (autoload 'org-sotre-link "org"
+    "Store an org-link to the current location." t)
+  (autoload 'org-agenda "org-agenda"
+    "Dynamic task and appointment lists for Org" t)
+  (autoload 'org-remember "org-remember"
+    "Fast note taking in Org-mode" t)
+  (autoload 'org-remember-code-reading
+    "org-remember" "Fast note taking in Org-mode for code reading" t)
+  (autoload 'org-iswitchb "org" "Switch between Org buffers." t)
   (define-key global-map (kbd "C-c l") 'org-store-link)
   (define-key global-map (kbd "C-c a") 'org-agenda)
   (define-key global-map (kbd "C-c r") 'org-remember)
   (define-key global-map (kbd "C-c c") 'org-remember-code-reading)
-  (define-key global-map (kbd "C-c b") 'org-iswitchb))
+  (define-key global-map (kbd "C-c b") 'org-iswitchb)
+  (eval-after-load "org"
+    '(progn
+      ;; org-mode
+      (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
+        (setq org-hide-leading-stars t))
+      (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
+        (setq org-return-follows-link t))
+      (when (boundp 'org-startup-truncated)   ; 行の折り返し
+        (setq org-startup-truncated nil))
+
+      ;; org-remember
+      (when (boundp 'org-directory)           ; ディレクトリ
+        (setq org-directory (catch 'find (find-directory "org")))
+        (message "org-directory: %s" org-directory))
+      (when (boundp 'org-default-notes-file)  ; ファイル名
+        (setq org-default-notes-file
+              (concat (file-name-as-directory org-directory) "agenda.org"))
+        (message "org-default-notes-file: %s" org-default-notes-file))
+      (when (boundp 'org-remember-templates)  ; テンプレート
+        (setq org-remember-templates
+              '(("Todo" ?t "** TODO%?\n%i\n   %a\n   %t" nil "Inbox")
+                ("Bug" ?b "** TODO%?   :bug:\n%i\n   %a\n   %t" nil "Inbox")
+                ("Idea" ?i "**%?\n%i\n   %a\n   %t" nil "New Ideas"))))
+      (when (fboundp 'org-remember-insinuate) ; 初期化
+        (org-remember-insinuate))
+
+      ;; org-agenda
+      (when (boundp 'org-agenda-files)        ; 対象ファイル
+        (setq org-agenda-files (list org-directory)))
+
+      ;; ソースコードを読みメモする
+      (when (and (boundp 'org-directory)
+                 (boundp 'org-default-notes-file)
+                 (boundp 'org-remember-templates))
+        (defun org-remember-code-reading ()
+          "When code reading, org-remember mode."
+          (interactive)
+          (let* ((org-directory (catch 'find (find-directory "code")))
+                 (org-default-notes-file
+                  (concat (file-name-as-directory org-directory)
+                          "code-reading.org"))
+                 (prefix
+                  (concat "[" (substring (symbol-name major-mode) 0 -5) "]"))
+                 (org-remember-templates
+                  `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t"
+                     org-directory "Memo"))))
+            (message "org-remember-code-reading: %s" org-default-notes-file)
+            (org-remember)))))))
 
 ;;; ファイル内のカーソル位置を記録する
 (when (eval-and-compile (require 'saveplace nil t))
