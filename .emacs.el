@@ -179,15 +179,15 @@
 (when window-system
   (setq frame-title-format
         '(:eval (if (buffer-file-name)
+                    ;; ファイル名を表示
                     (abbreviate-file-name (buffer-file-name))
+                  ;; バッファ名を表示
                   "%b")))
   (setq icon-title-format "%b"))
 
 ;;; ヘッダラインの色設定
-;; face を調べるには以下を評価する
-;; (list-faces-display)
-;; 使える色を調べるには以下を評価する
-;; (list-colors-display)
+;; face  (list-faces-display)
+;; color (list-colors-display)
 (set-face-foreground 'header-line "chocolate1")
 (set-face-background 'header-line "gray30")
 
@@ -300,6 +300,20 @@
   ;; ウィンドウ内に収まらないときだけ括弧内も光らせる
   (when (boundp 'show-paren-style)
     (setq show-paren-style 'mixed)))
+
+;;; 括弧へジャンプ (デフォルト: C-M-n C-M-p)
+(define-key global-map (kbd "C-x %")
+  (lambda (&optional arg)
+    "Go to the matching parenthesis if on parenthesis."
+    (interactive "p")
+    (setq arg (or arg 1))
+    (cond ((and (not (bobp))
+                (char-equal ?\x29 (char-syntax (char-before))))
+           (backward-list arg))
+          ((and (not (eobp))
+                (char-equal ?\x28 (char-syntax (char-after))))
+           (forward-list arg))
+          (t (self-insert-command arg)))))
 
 ;;; キーストロークをエコーエリアに早く表示する
 (setq echo-keystrokes 0.1)
@@ -1424,7 +1438,17 @@
                          ("zh" nil "←") ("zj" nil "↓") ("zk" nil "↑")
                          ("zl" nil "→") ("z~" nil "～") ("z/" nil "・")
                          ("z[" nil "『") ("z]" nil "』") ("z " nil "　")
+                         ("z." nil "。") ("z," nil "、") ("zt2" nil "‥")
+                         ("zt3" nil "…")
                          ("z@" nil skk-today)))))
+       ;; 句読点を変更する
+       (when (boundp 'skk-kutouten-type)
+         (setq-default skk-kutouten-type '(".". ","))
+         (defun skk-default-kutouten ()
+           "Change default kutouten."
+           (interactive)
+           (setq skk-kutouten-type '(".". ","))
+           (message "skk-kutouten-type: %s" skk-kutouten-type)))
 
        ;; sticky キー設定
        (when (boundp 'skk-sticky-key)
@@ -1831,10 +1855,9 @@
          (list (propertize fmt
                            'face
                            '(:foreground "white" :background "red1"))))
-
-       (let* ((mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
-              (mew-mode-line-biff-string (mew-propertized-biff-string ""))
-              (mew-mode-line-biff-quantity 0))
+       (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
+       (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
+       (let* ((mew-mode-line-biff-quantity 0))
          (when (boundp 'mew-biff-function)
            ;; mew-biff-interval の間隔で呼ばれる関数
            (setq mew-biff-function
