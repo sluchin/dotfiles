@@ -285,9 +285,6 @@
   (when (fboundp 'server-start)
     (unless (server-running-p) (server-start))))
 
-;;; find-fileのデフォルト
-(cd "~/")
-
 ;;; 検索時大文字小文字の区別をする
 (setq-default case-fold-search nil)
 
@@ -353,7 +350,9 @@
 (setq enable-recursive-minibuffers t)
 
 ;;; eval した結果を全部表示
+;; (デフォルト: length=4 level=12)
 (setq eval-expression-print-length nil)
+(setq eval-expression-print-level nil)
 
 ;;; gzip ファイルも編集できるようにする
 (auto-compression-mode t)
