@@ -671,121 +671,125 @@
         (when (y-or-n-p (format "Open '%s' %s "
                                 command (file-name-nondirectory file)))
           (dired-run-shell-command (concat command " " file " &")))))))
-
-(when (eval-when-compile (and (require 'dired nil t)
-                              (require 'dired-aux nil t)))
-  ;; 編集可能にする
-  (when (locate-library "wdired")
-    (autoload 'wdired-change-to-wdired-mode "wdired"
-      "Rename files editing their names in dired buffers." t)
-    (eval-after-load "dired"
-      '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
-
+;; dired 設定
+(when (locate-library "dired")
+  (autoload 'dired "dired"
+    "\"Edit\" directory DIRNAME--delete, rename, print, etc." t)
   ;; 拡張機能を有効にする
   (add-hook 'dired-load-hook (lambda () (load "dired-x")))
   (add-hook 'dired-load-hook (lambda () (load "ls-lisp")))
-
+  ;; ゴミ箱に移動する
   (add-hook 'dired-mode-hook
             (lambda ()
               (set (make-local-variable
-                    'delete-by-moving-to-trash) t))) ; ゴミ箱に移動する
+                    'delete-by-moving-to-trash) t)))
+  (eval-after-load "dired"
+    '(progn
+      ;; 編集可能にする
+      (when (locate-library "wdired")
+        (autoload 'wdired-change-to-wdired-mode "wdired"
+          "Rename files editing their names in dired buffers." t)
+        (eval-after-load "dired"
+          '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
 
-  (declare-function dired-run-shell-command "dired-aux" (command))
+      (declare-function dired-run-shell-command "dired-aux" (command))
 
-  ;; ディレクトリを先に表示する
-  (cond ((eq system-type 'windows-nt)
-         ;; Windows の場合
-         (when (eval-and-compile (require 'ls-lisp nil t))
-           (setq ls-lisp-dirs-first t)))
-        ((eq system-type 'gnu/linux)
-         ;; GNU オプションも使う
-         (setq dired-listing-switches
-               "-alF --time-style=long-iso --group-directories-first"))
-        (t
-         ;; POSIX オプションのみ
-         (setq dired-listing-switches "-alF")))
+      ;; ディレクトリを先に表示する
+      (cond ((eq system-type 'windows-nt)
+             ;; Windows の場合
+             (when (eval-and-compile (require 'ls-lisp nil t))
+               (setq ls-lisp-dirs-first t)))
+            ((eq system-type 'gnu/linux)
+             ;; GNU オプションも使う
+             (setq dired-listing-switches
+                   "-alF --time-style=long-iso --group-directories-first"))
+            (t
+             ;; POSIX オプションのみ
+             (setq dired-listing-switches "-alF")))
 
-  ;; ディレクトリを再帰的にコピー可能する
-  (setq dired-recursive-copies 'always)
-  ;; ディレクトリを再帰的に削除可能する
-  (setq dired-recursive-deletes 'always)
+      ;; ディレクトリを再帰的にコピー可能する
+      (setq dired-recursive-copies 'always)
+      ;; ディレクトリを再帰的に削除可能する
+      (setq dired-recursive-deletes 'always)
 
-  ;; firefox で開く
-  (when (executable-find "firefox")
-    (define-key dired-mode-map (kbd "C-f")
-      (lambda () (interactive) (dired-run-command "firefox"))))
-  ;; libreoffice で開く
-  (when (executable-find "libreoffice")
-    (define-key dired-mode-map (kbd "C-l")
-      (lambda () (interactive) (dired-run-command "libreoffice"))))
-  ;; evince で開く
-  (when (executable-find "evince")
-    (define-key dired-mode-map (kbd "C-e")
-      (lambda () (interactive) (dired-run-command "evince"))))
-  ;; vlc で開く
-  (when (executable-find "vlc")
-    (define-key dired-mode-map (kbd "C-v")
-      (lambda () (interactive) (dired-run-command "vlc"))))
-  ;; w3m で開く
-  (when (and (executable-find "w3m") (locate-library "w3m")
-             (eval-when-compile (require 'w3m nil t)))
-    (defun dired-w3m-find-file ()
-      "Open file in w3m."
-      (interactive)
-      (let ((file (dired-get-filename)))
-        (if (not (file-directory-p file))
-            (when (y-or-n-p (format "Open 'w3m' %s "
-                                    (file-name-nondirectory file)))
-              (w3m-find-file file))
-          (message "%s is a directory" file))))
-    (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
+      ;; firefox で開く
+      (when (executable-find "firefox")
+        (define-key dired-mode-map (kbd "C-f")
+          (lambda () (interactive) (dired-run-command "firefox"))))
+      ;; libreoffice で開く
+      (when (executable-find "libreoffice")
+        (define-key dired-mode-map (kbd "C-l")
+          (lambda () (interactive) (dired-run-command "libreoffice"))))
+      ;; evince で開く
+      (when (executable-find "evince")
+        (define-key dired-mode-map (kbd "C-e")
+          (lambda () (interactive) (dired-run-command "evince"))))
+      ;; vlc で開く
+      (when (executable-find "vlc")
+        (define-key dired-mode-map (kbd "C-v")
+          (lambda () (interactive) (dired-run-command "vlc"))))
+      ;; w3m で開く
+      (when (and (executable-find "w3m") (locate-library "w3m")
+                 (eval-when-compile (require 'w3m nil t)))
+        (defun dired-w3m-find-file ()
+          "Open file in w3m."
+          (interactive)
+          (let ((file (dired-get-filename)))
+            (if (not (file-directory-p file))
+                (when (y-or-n-p (format "Open 'w3m' %s "
+                                        (file-name-nondirectory file)))
+                  (w3m-find-file file))
+              (message "%s is a directory" file))))
+        (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
 
-  ;; tar + gzip で圧縮
-  (when (and (executable-find "tar") (executable-find "gzip")
-             (fboundp 'dired-get-marked-files)
-             (boundp 'current-prefix-arg)
-             (fboundp 'dired-do-shell-command))
-    (defun dired-do-tar-gzip (arg)
-      "Execute tar and gzip command."
-      (interactive "P")
-      (let ((files (dired-get-marked-files t current-prefix-arg)))
-        (let ((default (concat (car files) ".tar.gz")))
-          (let ((tarfile (read-string "Filename: " default nil default)))
-            (unless (string-match
-                     "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
-              (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
-            (or (when (member tarfile (directory-files default-directory))
-                  (not (y-or-n-p ; 同名ファイル
-                        (concat "Overwrite `" tarfile "'? [Type yn]"))))
-                (condition-case err
-                    (dired-do-shell-command
-                     (concat "tar cfz " tarfile " *") nil files)
-                  (error (message "%s" err))))
-            (message (concat
-                      "Execute tar command to `" tarfile "'...done"))))))
-    (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
+      ;; tar + gzip で圧縮
+      (when (and (executable-find "tar") (executable-find "gzip")
+                 (fboundp 'dired-get-marked-files)
+                 (boundp 'current-prefix-arg)
+                 (fboundp 'dired-do-shell-command))
+        (defun dired-do-tar-gzip (arg)
+          "Execute tar and gzip command."
+          (interactive "P")
+          (let ((files (dired-get-marked-files t current-prefix-arg)))
+            (let ((default (concat (car files) ".tar.gz")))
+              (let ((tarfile (read-string "Filename: " default nil default)))
+                (unless (string-match
+                         "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
+                  (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
+                (or (when (member tarfile (directory-files default-directory))
+                      (not (y-or-n-p ; 同名ファイル
+                            (concat "Overwrite `" tarfile "'? [Type yn]"))))
+                    (condition-case err
+                        (dired-do-shell-command
+                         (concat "tar cfz " tarfile " *") nil files)
+                      (error (message "%s" err))))
+                (message (concat
+                          "Execute tar command to `" tarfile "'...done"))))))
+        (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))))
 
 ;;; 関数のアウトライン表示
 (when (and (window-system) (locate-library "speedbar"))
+  (autoload 'speedbar-get-focus "speedbar"
+    "Change frame focus to or from the speedbar frame." t)
   ;; フォントをデフォルトにする
   (add-hook 'speedbar-mode-hook
             (lambda ()
               (buffer-face-set
                (font-face-attributes (frame-parameter nil 'font)))
               (setq header-line-format nil)))
-  ;; フレームサイズ
-  (when (eval-when-compile (require 'speedbar nil t))
-    (setq speedbar-after-create-hook
-          '(lambda ()
-             (if (= (x-display-pixel-height) 900)
-                 ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-                 (set-frame-size (selected-frame) 30 35)
-               (set-frame-size (selected-frame) 30 45)))))
   ;; フォーカスを移す
   (define-key global-map (kbd "M-`") 'speedbar-get-focus)
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
   (eval-after-load "speedbar"
     '(progn
+       ;; フレームサイズ
+       (when (boundp 'speedbar-after-create-hook)
+         (setq speedbar-after-create-hook
+               '(lambda ()
+                  (if (= (x-display-pixel-height) 900)
+                      ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
+                      (set-frame-size (selected-frame) 30 35)
+                    (set-frame-size (selected-frame) 30 45)))))
        (when (boundp 'speedbar-use-images)                ; イメージ表示しない
          (setq speedbar-use-images nil))
        (when (boundp 'speedbar-hide-button-brackets-flag) ; ブラケット表示を隠す
@@ -902,7 +906,6 @@
 
 ;;; 文書作成 (org-mode)
 ;; リファレンス (find-file "~/.emacs.d/org/reference.org")
-
 ;; 仕事用 GTD ファイルを開く
 (defun gtd ()
   "Open my GTD file for work."
