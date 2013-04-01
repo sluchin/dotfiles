@@ -73,6 +73,7 @@
                 "~/.emacs.d/malabar-mode/lisp"
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
+                "~/.emacs.d/gtags"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -1912,7 +1913,7 @@
          (setq mew-use-biff t))
        (when (boundp 'mew-use-biff-bell)         ; ベルを鳴らさない
          (setq mew-use-biff-bell nil))
-       (when (boundp 'mew-biff-interval)         ; 間隔(分)
+       (when (boundp 'mew-biff-interval)         ; 間隔 (分)
          (setq mew-biff-interval 3))
        (when (boundp 'mew-auto-get)              ; 起動時取得しない
          (setq mew-auto-get nil))
@@ -1942,10 +1943,12 @@
                            (mew-propertized-biff-string (format "(%d)" n)))
                      ;; メール数が増えた場合, D-Bus 経由で通知
                      (when (< mew-mode-line-biff-quantity n)
+                       (message "mew biff: < %d %d" mew-mode-line-biff-quantity n)
                        (notifications-notify
                         :title "Emacs/Mew"
                         :body  (format "You got mail(s): %d" n)
                         :timeout 5000))
+
                      (setq mew-mode-line-biff-quantity n)))))
          ;; 着信後呼ばれる関数
          (defadvice mew-biff-clear (after mew-biff-clear-icon activate compile)
@@ -2239,10 +2242,15 @@
 ;;; ここからプログラミング用設定
 
 ;;; GNU Global
-;; sudo apt-get install global
+;; wget http://tamacom.com/global/global-6.2.8.tar.gz
 (when (and (executable-find "global")
            (locate-library "gtags"))
   (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
+  (add-hook 'gtags-select-mode-hook
+            (lambda ()
+              ;; 強調表示
+              (when (fboundp 'hl-line-mode)
+                (hl-line-mode 1))))
   (add-hook 'c-mode-common-hook
             (lambda ()
               (when (fboundp 'gtags-mode)
@@ -2270,22 +2278,44 @@
               (when (boundp 'gtags-libpath)
                 (setq gtags-libpath
                       (concat " /usr/lib/perl/5.14" ":" " /usr/lib/perl5")))))
+
   (eval-after-load "gtags"
     '(progn
+       ;; ローカルバッファ変数にパスを設定
        (defvar gtags-libpath nil "Library directory of language.")
        (make-variable-buffer-local 'gtags-libpath)
-
+       ;; 環境変数の設定
        (defadvice gtags-goto-tag
          (before setenv-gtags-libpath activate)
          (setenv "GTAGSLIBPATH" gtags-libpath))
-
-       (define-key gtags-mode-map (kbd "M-t") 'gtags-find-tag)       ; 関数定義
-       (define-key gtags-mode-map (kbd "M-r") 'gtags-find-rtag)      ; 関数参照
-       (define-key gtags-mode-map (kbd "M-s") 'gtags-find-symbol)    ; 定義元
-       (define-key gtags-mode-map (kbd "M-p") 'gtags-find-pattern)   ; パターン
-       (define-key gtags-mode-map (kbd "M-f") 'gtags-find-file)      ; ファイル
-       (define-key gtags-mode-map (kbd "C-t") 'gtags-pop-stack)      ; 戻る
-       (define-key gtags-mode-map (kbd "C-f") 'gtags-find-with-grep) ; grep
+       ;; パスの表示形式
+       (when (boundp 'gtags-path-style)
+         (setq gtags-path-style 'absolute))
+       ;; ポップ時バッファ削除
+       (when (boundp 'gtags-pop-delete)
+         (setq gtags-pop-delete t))
+       ;; 選択バッファを一段階のみ有効
+       (when (boundp 'gtags-select-buffer-single)
+         (setq gtags-select-buffer-single t))
+       ;; キーバインド
+       ;; 定義タグ検索
+       (define-key gtags-mode-map (kbd "C-c g d") 'gtags-find-tag)
+       ;; 参照タグ検索
+       (define-key gtags-mode-map (kbd "C-c g r") 'gtags-find-rtag)
+       ;; 変数の定義元と参照元の一覧表示
+       (define-key gtags-mode-map (kbd "C-c g s") 'gtags-find-symbol)
+       ;; grep 検索
+       (define-key gtags-mode-map (kbd "C-c g g") 'gtags-find-with-grep)
+       ;; POSIX 正規表現検索
+       (define-key gtags-mode-map (kbd "C-c g p") 'gtags-find-pattern)
+       ;; パス名検索
+       (define-key gtags-mode-map (kbd "C-c g P") 'gtags-find-file)
+       ;; ファイルの定義タグ検索
+       (define-key gtags-mode-map (kbd "C-c g f") 'gtags-parse-file)
+       ;; コンテキスト検索
+       (define-key gtags-mode-map (kbd "C-]") 'gtags-find-tag-from-here)
+       ;; タグスタックをポップ
+       (define-key gtags-mode-map (kbd "C-t") 'gtags-pop-stack)
        (message "Loading %s (gtags)...done" this-file-name))))
 
 ;;; テンプレート挿入
@@ -2319,7 +2349,8 @@
     (setq ac-modes
           (append ac-modes
                   (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode))))
-
+  (when (boundp 'ac-source)           ; Global を使う
+    (setq-default ac-sources '(ac-source-gtags)))
   ;; キーバインド
   (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
     (ac-set-trigger-key "M-n"))
