@@ -270,6 +270,7 @@
           '((auto-complete-mode . " α")
             (yas/minor-mode . " υ")
             (paredit-mode . " π")
+            (gtags-mode . " ν")
             (undo-tree-mode . "")
             (eldoc-mode . "")
             (abbrev-mode . "")
@@ -1338,7 +1339,7 @@
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.1.tar.gz | tar xfz -
 (when (locate-library "howm")
   (autoload 'howm-menu "howm" "Hitori Otegaru Wiki Modoki." t)
-  (define-key global-map (kbd "C-c , ,") 'howm-menu)
+  (define-key global-map (kbd "C-c h") 'howm-menu)
   (eval-after-load "howm"
     '(progn
        ;; メニュー言語
@@ -1360,19 +1361,6 @@
                "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0000-00-00-0+\\)\\)\\|
                 [~#]$\\|\\.bak$\\|/CVS/"))
        (message "Loading %s (howm)...done" this-file-name))))
-
-;;; GNU Global
-;; sudo apt-get install global
-(when (and (executable-find "global")
-           (locate-library "gtags"))
-  (autoload 'gtags-mode "gtags"
-    "Gtags facility for Emacs." t)
-  (autoload 'gtags-find-with-grep "gtags"
-    "Input pattern, search with grep(1) and move to the locations." t)
-  (add-hook 'c-mode-hook 'gtags-mode)
-  (add-hook 'c++-mode-hook 'gtags-mode)
-  (add-hook 'java-mode-hook 'gtags-mode)
-  (define-key global-map (kbd "<f5>") 'gtags-find-with-grep))
 
 ;;; 日本語入力 (ddskk)
 ;; sudo apt-get install ddskk
@@ -2249,6 +2237,56 @@
 ;;; ここまで拡張 lisp
 
 ;;; ここからプログラミング用設定
+
+;;; GNU Global
+;; sudo apt-get install global
+(when (and (executable-find "global")
+           (locate-library "gtags"))
+  (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (fboundp 'gtags-mode)
+                (gtags-mode 1))
+              (when (boundp 'gtags-libpath)
+                (setq gtags-libpath "/usr/include"))))
+  (add-hook 'java-mode-hook
+            (lambda () (when (fboundp 'gtags-mode) (gtags-mode 1))))
+  (add-hook 'ruby-mode-hook
+            (lambda ()
+              (when (fboundp 'gtags-mode)
+                (gtags-mode 1))
+              (when (boundp 'gtags-libpath)
+                (setq gtags-libpath "/usr/lib/ruby/1.8"))))
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (when (fboundp 'gtags-mode)
+                (gtags-mode 1))
+              (when (boundp 'gtags-libpath)
+                (setq gtags-libpath " /usr/lib/python2.7"))))
+  (add-hook 'perl-mode-hook
+            (lambda ()
+              (when (fboundp 'gtags-mode)
+                (gtags-mode 1))
+              (when (boundp 'gtags-libpath)
+                (setq gtags-libpath
+                      (concat " /usr/lib/perl/5.14" ":" " /usr/lib/perl5")))))
+  (eval-after-load "gtags"
+    '(progn
+       (defvar gtags-libpath nil "Library directory of language.")
+       (make-variable-buffer-local 'gtags-libpath)
+
+       (defadvice gtags-goto-tag
+         (before setenv-gtags-libpath activate)
+         (setenv "GTAGSLIBPATH" gtags-libpath))
+
+       (define-key gtags-mode-map (kbd "M-t") 'gtags-find-tag)       ; 関数定義
+       (define-key gtags-mode-map (kbd "M-r") 'gtags-find-rtag)      ; 関数参照
+       (define-key gtags-mode-map (kbd "M-s") 'gtags-find-symbol)    ; 定義元
+       (define-key gtags-mode-map (kbd "M-p") 'gtags-find-pattern)   ; パターン
+       (define-key gtags-mode-map (kbd "M-f") 'gtags-find-file)      ; ファイル
+       (define-key gtags-mode-map (kbd "C-t") 'gtags-pop-stack)      ; 戻る
+       (define-key gtags-mode-map (kbd "C-f") 'gtags-find-with-grep) ; grep
+       (message "Loading %s (gtags)...done" this-file-name))))
 
 ;;; テンプレート挿入
 (when (eval-and-compile (require 'autoinsert nil t))
