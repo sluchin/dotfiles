@@ -1363,7 +1363,7 @@
        (when (boundp 'howm-excluded-file-regexp)
          (setq howm-excluded-file-regexp
                "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0000-00-00-0+\\)\\)\\|
-                [~#]$\\|\\.bak$\\|/CVS/"))
+                [~#]$\\|\\.bak$\\|/CVS/\\|~$"))
        (message "Loading %s (howm)...done" this-file-name))))
 
 ;;; 日本語入力 (ddskk)
