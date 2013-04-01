@@ -1222,7 +1222,7 @@
     (setq recentf-exclude
           '("/TAGS$" "/var/tmp/" "/tmp/"
             "~$" "/$" "/howm/" ".howm-keys")))
-  (define-key global-map (kbd "C-c C-c") 'recentf-open-files))
+  (define-key global-map (kbd "C-c C-f") 'recentf-open-files))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
@@ -1261,11 +1261,14 @@
                            ;; *scratch* バッファは表示
                            ((string= "*scratch*" (buffer-name b)) b)
                            ;; multi-term のバッファは表示
-                           ((string-match "*terminal.*" (buffer-name b)) b)
+                           ((string-match "\*terminal.*" (buffer-name b)) b)
                            ;; eshell または shell は表示
-                           ((string-match "*[e]?shell.*" (buffer-name b)) b)
+                           ((string-match "\*[e]?shell.*" (buffer-name b)) b)
                            ;; info は表示
                            ((string= "*info*" (buffer-name b)) b)
+                           ;; GTAGS は表示
+                           ((string-match
+                             "\*GTAGS SELECT\*.*" (buffer-name b)) b)
                            ;; それ以外の * で始まるバッファは非表示
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
                            ;; スペースで始まるバッファは非表示
