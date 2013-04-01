@@ -20,6 +20,9 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
+;; ファイル名
+(defvar this-file-name load-file-name)
+
 ;;; バックトレースを有効にする
 (setq debug-on-error t)
 
@@ -75,15 +78,33 @@
 
 ;;; 日本語の info のバスを設定
 ;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xfz -
-;; 目次ファイルに以下を追加 (/usr/share/info/dir)
+;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
 ;; * Elisp-ja: (elisp-ja).    Emacs Lisp Reference Manual(Japanese).
 ;; * Emacs-ja: (emacs-ja).    The extensible self-documenting text editor(Japanese).
 (when (file-directory-p "~/.emacs.d/info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
   (eval-after-load "info"
-    '(when (boundp 'Info-directory-list)
+    '(progn
+       (when (boundp 'Info-directory-list)
          (setq Info-directory-list (cons "~/.emacs.d/info"
-                                         Info-default-directory-list)))))
+                                         Info-default-directory-list)))
+       (message "Loading %s (info)...done" this-file-name))))
+
+(defun emacs-info (&optional node)
+  "Read documentation for Emacs in the info system."
+  (interactive) (info (format "(emacs)%s" (or node ""))))
+
+(defun emacs-ja-info (&optional node)
+  "Read documentation for Emacs-ja in the info system."
+  (interactive) (info (format "(emacs-ja)%s" (or node ""))))
+
+(defun elisp-info (&optional node)
+  "Read documentation for Elisp in the info system."
+  (interactive) (info (format "(elisp)%s" (or node ""))))
+
+(defun elisp-ja-info (&optional node)
+  "Read documentation for Elisp-ja in the info system."
+  (interactive) (info (format "(elisp-ja)%s" (or node ""))))
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
@@ -365,7 +386,8 @@
   (eval-after-load "bookmark"
     '(progn
        (when (boundp 'bookmark-save-flag)
-         (setq bookmark-save-flag t)))))
+         (setq bookmark-save-flag t))
+       (message "Loading %s (bookmark)...done" this-file-name))))
 
 ;;; タブの設定
 (setq-default tab-width 4)          ; 4 スペース
@@ -441,7 +463,8 @@
                 (if (null (car arg))            ; (nil) の場合
                     (let ((skk-dcomp-multiple-activate nil))
                       (ignore-errors ad-do-it)) ; エラーを無視する
-                  ad-do-it))))))))
+                  ad-do-it)))))
+       (message "Loading %s (isearch)...done" this-file-name))))
 
 ;;; マークの設定
 ;; C-g でリージョン強調表示解除
@@ -685,46 +708,46 @@
                     'delete-by-moving-to-trash) t)))
   (eval-after-load "dired"
     '(progn
-      ;; 編集可能にする
-      (when (locate-library "wdired")
-        (autoload 'wdired-change-to-wdired-mode "wdired"
-          "Rename files editing their names in dired buffers." t)
-        (eval-after-load "dired"
-          '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
+       ;; 編集可能にする
+       (when (locate-library "wdired")
+         (autoload 'wdired-change-to-wdired-mode "wdired"
+           "Rename files editing their names in dired buffers." t)
+         (eval-after-load "dired"
+           '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
 
-      (declare-function dired-run-shell-command "dired-aux" (command))
+       (declare-function dired-run-shell-command "dired-aux" (command))
 
-      ;; ディレクトリを先に表示する
-      (cond ((eq system-type 'windows-nt)
-             ;; Windows の場合
-             (when (eval-and-compile (require 'ls-lisp nil t))
-               (setq ls-lisp-dirs-first t)))
-            ((eq system-type 'gnu/linux)
-             ;; GNU オプションも使う
-             (setq dired-listing-switches
-                   "-alF --time-style=long-iso --group-directories-first"))
-            (t
-             ;; POSIX オプションのみ
-             (setq dired-listing-switches "-alF")))
+       ;; ディレクトリを先に表示する
+       (cond ((eq system-type 'windows-nt)
+              ;; Windows の場合
+              (when (eval-and-compile (require 'ls-lisp nil t))
+                (setq ls-lisp-dirs-first t)))
+             ((eq system-type 'gnu/linux)
+              ;; GNU オプションも使う
+              (setq dired-listing-switches
+                    "-alF --time-style=long-iso --group-directories-first"))
+             (t
+              ;; POSIX オプションのみ
+              (setq dired-listing-switches "-alF")))
 
-      ;; ディレクトリを再帰的にコピー可能する
-      (setq dired-recursive-copies 'always)
-      ;; ディレクトリを再帰的に削除可能する
-      (setq dired-recursive-deletes 'always)
+       ;; ディレクトリを再帰的にコピー可能する
+       (setq dired-recursive-copies 'always)
+       ;; ディレクトリを再帰的に削除可能する
+       (setq dired-recursive-deletes 'always)
 
-      ;; firefox で開く
-      (when (executable-find "firefox")
-        (define-key dired-mode-map (kbd "C-f")
-          (lambda () (interactive) (dired-run-command "firefox"))))
-      ;; libreoffice で開く
-      (when (executable-find "libreoffice")
-        (define-key dired-mode-map (kbd "C-l")
-          (lambda () (interactive) (dired-run-command "libreoffice"))))
-      ;; evince で開く
-      (when (executable-find "evince")
-        (define-key dired-mode-map (kbd "C-e")
-          (lambda () (interactive) (dired-run-command "evince"))))
-      ;; vlc で開く
+       ;; firefox で開く
+       (when (executable-find "firefox")
+         (define-key dired-mode-map (kbd "C-f")
+           (lambda () (interactive) (dired-run-command "firefox"))))
+       ;; libreoffice で開く
+       (when (executable-find "libreoffice")
+         (define-key dired-mode-map (kbd "C-l")
+           (lambda () (interactive) (dired-run-command "libreoffice"))))
+       ;; evince で開く
+       (when (executable-find "evince")
+         (define-key dired-mode-map (kbd "C-e")
+           (lambda () (interactive) (dired-run-command "evince"))))
+       ;; vlc で開く
       (when (executable-find "vlc")
         (define-key dired-mode-map (kbd "C-v")
           (lambda () (interactive) (dired-run-command "vlc"))))
@@ -764,8 +787,9 @@
                          (concat "tar cfz " tarfile " *") nil files)
                       (error (message "%s" err))))
                 (message (concat
-                          "Execute tar command to `" tarfile "'...done"))))))
-        (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))))
+                          "Execute tar command to `" tarfile "'...done" this-file-name))))))
+        (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))
+      (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
 (when (and (window-system) (locate-library "speedbar"))
@@ -827,7 +851,8 @@
        ;; BS でも上位ディレクトリへ (デフォルト: `U')
        (define-key speedbar-file-key-map
          (kbd "<backspace>") 'speedbar-up-directory)
-       (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory))))
+       (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory)
+       (message "Loading %s (speedbar)...done" this-file-name))))
 
 ;;; diff-mode
 (defun diff-mode-setup-faces ()
@@ -905,7 +930,18 @@
         (throw 'find default)))))
 
 ;;; 文書作成 (org-mode)
-;; リファレンス (find-file "~/.emacs.d/org/reference.org")
+;; Org-mode Reference Card
+(defun org-ref ()
+  "Read reference for Org-mode."
+  (interactive) (find-file "~/.emacs.d/org/reference-card.org"))
+
+;; Org-mode 日本語 info
+;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
+;; * Org Mode Ja: (org-ja).    Outline-based notes management and organizer (Japanese).
+(defun org-ja-info (&optional node)
+  "Read documentation for Org-mode(japanese) in the info system."
+  (interactive) (info (format "(org-ja)%s" (or node ""))))
+
 ;; 仕事用 GTD ファイルを開く
 (defun gtd ()
   "Open my GTD file for work."
@@ -966,52 +1002,53 @@
   (define-key global-map (kbd "C-c b") 'org-iswitchb)
   (eval-after-load "org"
     '(progn
-      ;; org-mode
-      (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
-        (setq org-hide-leading-stars t))
-      (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
-        (setq org-return-follows-link t))
-      (when (boundp 'org-startup-truncated)   ; 行の折り返し
-        (setq org-startup-truncated nil))
+       ;; org-mode
+       (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
+         (setq org-hide-leading-stars t))
+       (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
+         (setq org-return-follows-link t))
+       (when (boundp 'org-startup-truncated)   ; 行の折り返し
+         (setq org-startup-truncated nil))
 
-      ;; org-remember
-      (when (boundp 'org-directory)           ; ディレクトリ
-        (setq org-directory (catch 'find (find-directory "org")))
-        (message "org-directory: %s" org-directory))
-      (when (boundp 'org-default-notes-file)  ; ファイル名
-        (setq org-default-notes-file
-              (concat (file-name-as-directory org-directory) "agenda.org"))
-        (message "org-default-notes-file: %s" org-default-notes-file))
-      (when (boundp 'org-remember-templates)  ; テンプレート
-        (setq org-remember-templates
-              '(("Todo" ?t "** TODO%?\n%i\n   %a\n   %t" nil "Inbox")
-                ("Bug" ?b "** TODO%?   :bug:\n%i\n   %a\n   %t" nil "Inbox")
-                ("Idea" ?i "**%?\n%i\n   %a\n   %t" nil "New Ideas"))))
-      (when (fboundp 'org-remember-insinuate) ; 初期化
-        (org-remember-insinuate))
+       ;; org-remember
+       (when (boundp 'org-directory)           ; ディレクトリ
+         (setq org-directory (catch 'find (find-directory "org")))
+         (message "org-directory: %s" org-directory))
+       (when (boundp 'org-default-notes-file)  ; ファイル名
+         (setq org-default-notes-file
+               (concat (file-name-as-directory org-directory) "agenda.org"))
+         (message "org-default-notes-file: %s" org-default-notes-file))
+       (when (boundp 'org-remember-templates)  ; テンプレート
+         (setq org-remember-templates
+               '(("Todo" ?t "** TODO%?\n%i\n   %a\n   %t" nil "Inbox")
+                 ("Bug" ?b "** TODO%?   :bug:\n%i\n   %a\n   %t" nil "Inbox")
+                 ("Idea" ?i "**%?\n%i\n   %a\n   %t" nil "New Ideas"))))
+       (when (fboundp 'org-remember-insinuate) ; 初期化
+         (org-remember-insinuate))
 
-      ;; org-agenda
-      (when (boundp 'org-agenda-files)        ; 対象ファイル
-        (setq org-agenda-files (list org-directory)))
+       ;; org-agenda
+       (when (boundp 'org-agenda-files)        ; 対象ファイル
+         (setq org-agenda-files (list org-directory)))
 
-      ;; ソースコードを読みメモする
-      (when (and (boundp 'org-directory)
-                 (boundp 'org-default-notes-file)
-                 (boundp 'org-remember-templates))
-        (defun org-remember-code-reading ()
-          "When code reading, org-remember mode."
-          (interactive)
-          (let* ((org-directory (catch 'find (find-directory "code")))
-                 (org-default-notes-file
-                  (concat (file-name-as-directory org-directory)
-                          "code-reading.org"))
-                 (prefix
-                  (concat "[" (substring (symbol-name major-mode) 0 -5) "]"))
-                 (org-remember-templates
-                  `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t"
-                     org-directory "Memo"))))
-            (message "org-remember-code-reading: %s" org-default-notes-file)
-            (org-remember)))))))
+       ;; ソースコードを読みメモする
+       (when (and (boundp 'org-directory)
+                  (boundp 'org-default-notes-file)
+                  (boundp 'org-remember-templates))
+         (defun org-remember-code-reading ()
+           "When code reading, org-remember mode."
+           (interactive)
+           (let* ((org-directory (catch 'find (find-directory "code")))
+                  (org-default-notes-file
+                   (concat (file-name-as-directory org-directory)
+                           "code-reading.org"))
+                  (prefix
+                   (concat "[" (substring (symbol-name major-mode) 0 -5) "]"))
+                  (org-remember-templates
+                   `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t"
+                      org-directory "Memo"))))
+             (message "org-remember-code-reading: %s" org-default-notes-file)
+             (org-remember))))
+       (message "Loading %s (org)...done" this-file-name))))
 
 ;;; ファイル内のカーソル位置を記録する
 (when (eval-and-compile (require 'saveplace nil t))
@@ -1025,7 +1062,8 @@
   '(progn
      ;; キーバインドを無効化
      (when (boundp 'cua-enable-cua-keys)
-       (setq cua-enable-cua-keys nil))))
+       (setq cua-enable-cua-keys nil))
+     (message "Loading %s (cua-base)...done" this-file-name)))
 
 ;;; ここまで標準 lisp
 
@@ -1120,7 +1158,8 @@
        (add-hook 'vc-before-checkin-hook 'bm-buffer-save)
        (add-hook 'kill-emacs-hook (lambda nil
                                     (bm-buffer-save-all)
-                                    (bm-repository-save))))))
+                                    (bm-repository-save)))
+       (message "Loading %s (bm)...done" this-file-name))))
 
 ;;; カーソル位置を戻す
 ;; (install-elisp-from-emacswiki "point-undo.el")
@@ -1161,7 +1200,8 @@
                                          (file-name-history 10000))))
        ;; 前回閉じたときの位置にカーソルを復帰
        (when (boundp 'session-undo-check)
-         (setq session-undo-check -1)))))
+         (setq session-undo-check -1))
+       (message "Loading %s (session)...done" this-file-name))))
 
 ;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
@@ -1222,6 +1262,8 @@
                            ((string-match "*terminal.*" (buffer-name b)) b)
                            ;; eshell または shell は表示
                            ((string-match "*[e]?shell.*" (buffer-name b)) b)
+                           ;; info は表示
+                           ((string= "*info*" (buffer-name b)) b)
                            ;; それ以外の * で始まるバッファは非表示
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
                            ;; スペースで始まるバッファは非表示
@@ -1230,7 +1272,8 @@
                            (t b)))
                       (buffer-list)))))
        (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
-       (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab))))
+       (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab)
+       (message "Loading %s (tabbar)...done" this-file-name))))
 
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/
@@ -1288,7 +1331,8 @@
          (setq navi2ch-article-new-message-range '(1000 . 1)))
        ;; 3 ペインモードにする
        (when (boundp 'navi2ch-list-stay-list-window)
-         (setq navi2ch-list-stay-list-window t)))))
+         (setq navi2ch-list-stay-list-window t))
+       (message "Loading %s (navi2ch)...done" this-file-name))))
 
 ;;; メモ (howm)
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.1.tar.gz | tar xfz -
@@ -1314,7 +1358,8 @@
        (when (boundp 'howm-excluded-file-regexp)
          (setq howm-excluded-file-regexp
                "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0000-00-00-0+\\)\\)\\|
-                [~#]$\\|\\.bak$\\|/CVS/")))))
+                [~#]$\\|\\.bak$\\|/CVS/"))
+       (message "Loading %s (howm)...done" this-file-name))))
 
 ;;; GNU Global
 ;; sudo apt-get install global
@@ -1561,7 +1606,8 @@
          (setq skk-check-okurigana-on-touroku nil))
        ;; C-q で半角カナに変換
        (when (boundp 'skk-use-jisx0201-input-method)
-         (setq skk-use-jisx0201-input-method t)))))
+         (setq skk-use-jisx0201-input-method t))
+       (message "Loading %s (ddskk)...done" this-file-name))))
 
 ;;; 試行錯誤用ファイル
 ;; (install-elisp-from-emacswiki "open-junk-file.el")
@@ -1601,7 +1647,8 @@
     '(progn
        ;; バイトコンパイルしないファイル
        (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
-         (setq auto-async-byte-compile-exclude-files-regexp "/junk/")))))
+         (setq auto-async-byte-compile-exclude-files-regexp "/junk/"))
+       (message "Loading %s (auto-async-byte-compile)...done" this-file-name))))
 
 ;;; ミニバッファに関数の help 表示
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
@@ -1616,12 +1663,13 @@
        ;; 待ち時間
        (when (boundp 'eldoc-idle-delay)
          (setq eldoc-idle-delay 0.1))
-       ;; モードラインに ElDoc と表示しない
+       ;; モードラインに表示しない
        (when (boundp 'eldoc-minor-mode-string)
          (setq eldoc-minor-mode-string ""))
        ;; 折り返して表示
        (when (boundp 'eldoc-echo-area-use-multiline-p)
-         (setq eldoc-echo-area-use-multiline-p t)))))
+         (setq eldoc-echo-area-use-multiline-p t))
+       (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
 ;;; *Help* にメモを書き込む
 ;; (install-elisp-from-emacswiki "usage-memo.el")
@@ -1634,7 +1682,8 @@
        ;; ディレクトリ
        (when (boundp 'umemo-base-directory)
          (setq umemo-base-directory (catch 'find (find-directory "umemo")))
-         (message "umemo-base-directory: %s" umemo-base-directory)))))
+         (message "umemo-base-directory: %s" umemo-base-directory))
+       (message "Loading %s (usage-memo)...done" this-file-name))))
 
 ;;; プロセスリスト
 ;; (install-elisp-from-emacswiki "list-processes+.el")
@@ -1651,7 +1700,7 @@
     "pomodoro-technique" "Pomodoro technique timer for emacs." t)
   (eval-after-load "pomodoro-technique"
     '(progn
-       )))
+       (message "Loading %s (pomodoro-technique)...done" this-file-name))))
 
 (when (locate-library "pomodoro")
   (autoload 'pomodoro:start "pomodoro" "Pomodoro Technique for emacs." t)
@@ -1666,7 +1715,8 @@
        (when (boundp 'pomodoro:rest-time)      ; 休憩
          (setq pomodoro:rest-time 5))
        (when (boundp 'pomodoro:long-rest-time) ; 長い休憩
-         (setq pomodoro:long-rest-time 30)))))
+         (setq pomodoro:long-rest-time 30))
+       (message "Loading %s (pomodoro)...done" this-file-name))))
 
 (when (locate-library "tomatinho")
   (autoload 'tomatinho "tomatinho" "Pomodoro Technique for emacs." t)
@@ -1695,7 +1745,8 @@
          "Disable tomatinho pause control."
          (interactive)
          (ad-disable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
-         (ad-activate 'tomatinho-update)))))
+         (ad-activate 'tomatinho-update))
+       (message "Loading %s (tomatinho)...done" this-file-name))))
 
 ;;; タイマー
 ;; (install-elisp "https://raw.github.com/krick/tea-time/master/tea-time.el")
@@ -1706,7 +1757,8 @@
        ;; サウンドファイルのパス
        (when (and (boundp 'tea-time-sound)
                   (file-exists-p "~/.emacs.d/tomatinho/tick.wav"))
-             (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav")))))
+             (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav"))
+       (message "Loading %s (tea-time)...done" this-file-name))))
 
 ;;; git の設定
 ;; git clone git://github.com/magit/magit.git
@@ -1733,7 +1785,8 @@
            (add-to-list 'magit-diff-options "-b"))
          (magit-refresh)
          (message "magit-diff-options %s" magit-diff-options))
-       (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))))
+       (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace)
+       (message "Loading %s (magit)...done" this-file-name))))
 
 ;;; Windows の設定
 (eval-and-compile
@@ -1793,7 +1846,8 @@
          (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
        (when (boundp 'sdcv-dictionary-complete-list)
          (setq sdcv-dictionary-complete-list
-               '("EIJI127" "WAEI127" "REIJI127" "RYAKU127"))))))
+               '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
+       (message "Loading %s (sdcv)...done" this-file-name))))
 
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
@@ -1967,7 +2021,8 @@
          (when (boundp 'mew-prog-ssl)
            (setq mew-prog-ssl "/usr/bin/stunnel4"))
          (when (boundp 'mew-imap-trash-folder)
-           (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱"))))))
+           (setq mew-imap-trash-folder "%[Gmail]/ゴミ箱")))
+       (message "Loading %s (mew)...done" this-file-name))))
 
 ;;; twitter クライアント
 ;; git clone git://github.com/hayamiz/twittering-mode.git
@@ -2014,7 +2069,8 @@
          (setq twittering-number-of-tweets-on-retrieval 50))
        ;; 更新の頻度 (秒)
        (when (boundp 'twittering-timer-interval)
-         (setq twittering-timer-interval 60)))))
+         (setq twittering-timer-interval 60))
+       (message "Loading %s (twitter-mode)...done" this-file-name))))
 
 ;;; ブラウザ (w3m)
 ;; sudo apt-get install w3m
@@ -2074,7 +2130,8 @@
        (define-key w3m-mode-map (kbd "<left>") 'backward-char)
        (define-key w3m-mode-map (kbd "<right>") 'forward-char)
        (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
-       (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-next-page))))
+       (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-next-page)
+       (message "Loading %s (w3m)...done" this-file-name))))
 
 ;;; Evernote
 ;; wget http://emacs-evernote-mode.googlecode.com/files/evernote-mode-0_41.zip
@@ -2129,7 +2186,8 @@
     '(progn
        (when (boundp 'evernote-enml-formatter-command)
          (setq evernote-enml-formatter-command
-               '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8"))))))
+               '("w3m" "-dump" "-I" "UTF8" "-O" "UTF8")))
+       (message "Loading %s (evernote-mode)...done" this-file-name))))
 
 ;;; Gist (https://github.com/defunkt/gist.el)
 ;; package-install.el をインストール
@@ -2181,7 +2239,8 @@
                  ("M-N" . term-send-backward-kill-word)
                  ("M-r" . term-send-reverse-search-history)
                  ("M-," . term-send-input)
-                 ("M-." . comint-dynamic-complete)))))))
+                 ("M-." . comint-dynamic-complete))))
+       (message "Loading %s (multi-term)...done" this-file-name))))
 
 ;; term+
 ;; M-x term または M-x ansi-term で起動
