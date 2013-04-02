@@ -34,10 +34,10 @@
   (setq load-path
         (append '(
                   "/usr/share/emacs/site-lisp/mew"
-                  "/usr/share/emacs/site-lisp/global"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
                   "/usr/share/emacs/site-lisp/ddskk"
                   "/usr/share/emacs/site-lisp/migemo"
+                  "/usr/local/share/gtags"
                   ) load-path))
   ;; バージョン 24
   (unless (= emacs-major-version 23)
@@ -73,7 +73,6 @@
                 "~/.emacs.d/malabar-mode/lisp"
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
-                "~/.emacs.d/gtags"
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
@@ -255,7 +254,7 @@
 (line-number-mode t)       ; 行数
 (column-number-mode t)     ; カラム数
 (size-indication-mode t)   ; ファイルサイズ
-;; カスタマイズ
+;; モードライン表示をカスタマイズ
 ;; 割合 バイト数/総行数 [行数:カラム数:カーソル位置]
 (setq mode-line-position
         '(:eval (format "%%p %%I/L%d [%%l:%%c:%d]"
@@ -589,14 +588,14 @@
   "Insert date."
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
-(define-key global-map (kbd "C-c d") 'insert-date)
+(define-key global-map (kbd "C-c i d") 'insert-date)
 
 ;; 時間挿入
 (defun insert-time ()
   "Insert time."
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
-(define-key global-map (kbd "C-c t") 'insert-time)
+(define-key global-map (kbd "C-c i t") 'insert-time)
 
 ;; C-; で略語展開
 (setq hippie-expand-try-functions-list
@@ -714,7 +713,7 @@
        (when (locate-library "wdired")
          (autoload 'wdired-change-to-wdired-mode "wdired"
            "Rename files editing their names in dired buffers." t)
-         (eval-after-load "dired"
+         (eval-after-load "wdired"
            '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
 
        (declare-function dired-run-shell-command "dired-aux" (command))
@@ -754,17 +753,19 @@
         (define-key dired-mode-map (kbd "C-v")
           (lambda () (interactive) (dired-run-command "vlc"))))
       ;; w3m で開く
-      (when (and (executable-find "w3m") (locate-library "w3m")
-                 (eval-when-compile (require 'w3m nil t)))
+      (when (and (executable-find "w3m") (locate-library "w3m"))
+        (autoload 'w3m-find-file "w3m" "Function used to open FILE" t)
         (defun dired-w3m-find-file ()
           "Open file in w3m."
           (interactive)
-          (let ((file (dired-get-filename)))
-            (if (not (file-directory-p file))
-                (when (y-or-n-p (format "Open 'w3m' %s "
-                                        (file-name-nondirectory file)))
-                  (w3m-find-file file))
-              (message "%s is a directory" file))))
+          (when (and (fboundp 'dired-get-filename)
+                     (fboundp 'w3m-find-file))
+            (let ((file (dired-get-filename)))
+              (if (not (file-directory-p file))
+                  (when (y-or-n-p (format "Open 'w3m' %s "
+                                          (file-name-nondirectory file)))
+                    (w3m-find-file file))
+                (message "%s is a directory" file)))))
         (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
 
       ;; tar + gzip で圧縮
@@ -997,11 +998,11 @@
   (autoload 'org-remember-code-reading
     "org-remember" "Fast note taking in Org-mode for code reading" t)
   (autoload 'org-iswitchb "org" "Switch between Org buffers." t)
-  (define-key global-map (kbd "C-c l") 'org-store-link)
-  (define-key global-map (kbd "C-c a") 'org-agenda)
-  (define-key global-map (kbd "C-c r") 'org-remember)
-  (define-key global-map (kbd "C-c c") 'org-remember-code-reading)
-  (define-key global-map (kbd "C-c b") 'org-iswitchb)
+  (define-key global-map (kbd "C-c o l") 'org-store-link)
+  (define-key global-map (kbd "C-c o a") 'org-agenda)
+  (define-key global-map (kbd "C-c o r") 'org-remember)
+  (define-key global-map (kbd "C-c o c") 'org-remember-code-reading)
+  (define-key global-map (kbd "C-c o b") 'org-iswitchb)
   (eval-after-load "org"
     '(progn
        ;; org-mode
@@ -1260,7 +1261,7 @@
                            ((string= "*Messages*" (buffer-name b)) b)
                            ;; *scratch* バッファは表示
                            ((string= "*scratch*" (buffer-name b)) b)
-                           ;; multi-term のバッファは表示
+                           ;; multi-term バッファは表示
                            ((string-match "\*terminal.*" (buffer-name b)) b)
                            ;; eshell または shell は表示
                            ((string-match "\*[e]?shell.*" (buffer-name b)) b)
@@ -1273,6 +1274,8 @@
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
                            ;; スペースで始まるバッファは非表示
                            ((char-equal ?\x20 (aref (buffer-name b) 0)) nil)
+                           ;; .bash_history は非表示
+                           ((string= ".bash_history" (buffer-name b)) nil)
                            ;; それ以外は表示
                            (t b)))
                       (buffer-list)))))
@@ -1641,27 +1644,6 @@
        (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
          (setq auto-async-byte-compile-exclude-files-regexp "/junk/"))
        (message "Loading %s (auto-async-byte-compile)...done" this-file-name))))
-
-;;; ミニバッファに関数の help 表示
-;; (install-elisp-from-emacswiki "eldoc-extension.el")
-(when (locate-library "eldoc-extension")
-  (autoload 'turn-on-eldoc-mode
-    "eldoc-extension" "Some extension for eldoc." t)
-  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-  (eval-after-load "eldoc-extension"
-    '(progn
-       ;; 待ち時間
-       (when (boundp 'eldoc-idle-delay)
-         (setq eldoc-idle-delay 0.1))
-       ;; モードラインに表示しない
-       (when (boundp 'eldoc-minor-mode-string)
-         (setq eldoc-minor-mode-string ""))
-       ;; 折り返して表示
-       (when (boundp 'eldoc-echo-area-use-multiline-p)
-         (setq eldoc-echo-area-use-multiline-p t))
-       (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
 ;;; *Help* にメモを書き込む
 ;; (install-elisp-from-emacswiki "usage-memo.el")
@@ -2254,26 +2236,31 @@
               ;; 強調表示
               (when (fboundp 'hl-line-mode)
                 (hl-line-mode 1))))
+  ;; C言語
   (add-hook 'c-mode-common-hook
             (lambda ()
               (when (fboundp 'gtags-mode)
                 (gtags-mode 1))
               (when (boundp 'gtags-libpath)
                 (setq gtags-libpath "/usr/include"))))
+  ;; Java
   (add-hook 'java-mode-hook
             (lambda () (when (fboundp 'gtags-mode) (gtags-mode 1))))
+  ;; Ruby
   (add-hook 'ruby-mode-hook
             (lambda ()
               (when (fboundp 'gtags-mode)
                 (gtags-mode 1))
               (when (boundp 'gtags-libpath)
                 (setq gtags-libpath "/usr/lib/ruby/1.8"))))
+  ;; Python
   (add-hook 'python-mode-hook
             (lambda ()
               (when (fboundp 'gtags-mode)
                 (gtags-mode 1))
               (when (boundp 'gtags-libpath)
                 (setq gtags-libpath " /usr/lib/python2.7"))))
+  ;; Perl
   (add-hook 'perl-mode-hook
             (lambda ()
               (when (fboundp 'gtags-mode)
@@ -2281,7 +2268,6 @@
               (when (boundp 'gtags-libpath)
                 (setq gtags-libpath
                       (concat " /usr/lib/perl/5.14" ":" " /usr/lib/perl5")))))
-
   (eval-after-load "gtags"
     '(progn
        ;; ローカルバッファ変数にパスを設定
@@ -2320,6 +2306,25 @@
        ;; タグスタックをポップ
        (define-key gtags-mode-map (kbd "C-t") 'gtags-pop-stack)
        (message "Loading %s (gtags)...done" this-file-name))))
+
+;;; Emacs Lisp
+;; ミニバッファに関数の help 表示
+;; (install-elisp-from-emacswiki "eldoc-extension.el")
+(when (locate-library "eldoc-extension")
+  (autoload 'turn-on-eldoc-mode
+    "eldoc-extension" "Some extension for eldoc." t)
+  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+  (eval-after-load "eldoc-extension"
+    '(progn
+       ;; 待ち時間
+       (when (boundp 'eldoc-idle-delay)
+         (setq eldoc-idle-delay 0.1))
+       ;; 折り返して表示
+       (when (boundp 'eldoc-echo-area-use-multiline-p)
+         (setq eldoc-echo-area-use-multiline-p t))
+       (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
 ;;; テンプレート挿入
 (when (eval-and-compile (require 'autoinsert nil t))
@@ -2415,6 +2420,25 @@
                 (setq ac-sources (append '(ac-source-clang
                                            ac-source-semantic)
                                          ac-sources))))))
+;; c-eldoc
+;; (install-elisp-from-emacswiki "c-eldoc.el")
+(when (locate-library "c-eldoc")
+  (add-hook 'c-mode-hook (lambda ()
+                           (when (eval-and-compile (require 'c-eldoc nil t))
+                             (c-turn-on-eldoc-mode))))
+  (eval-after-load "c-eldoc"
+    '(progn
+       ;; 待ち時間
+       (when (boundp 'eldoc-idle-delay)
+         (setq eldoc-idle-delay 0.1))
+       ;; 折り返して表示
+       (when (boundp 'eldoc-echo-area-use-multiline-p)
+         (setq eldoc-echo-area-use-multiline-p t))
+       ;; インクルードパス
+       (when (boundp 'c-eldoc-includes)
+         (setq c-eldoc-includes
+               "-I./ -I../ -I/usr/include `pkg-config gtk+-2.0 --cflags`"))
+       (message "Loading %s (c-eldoc)...done" this-file-name))))
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
