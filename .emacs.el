@@ -679,9 +679,9 @@
   ;; filename<dir> 形式のバッファ名にする
   (when (boundp 'uniquify-buffer-name-style)
     (setq uniquify-buffer-name-style 'post-forward-angle-brackets)))
-  ;; * で囲まれたバッファ名は対象外にする
-  (when (boundp 'uniquify-ignore-buffers-re)
-    (setq uniquify-ignore-buffers-re "*[^*]+*"))
+;; * で囲まれたバッファ名は対象外にする
+(when (boundp 'uniquify-ignore-buffers-re)
+  (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;;; ファイラ (dired)
 ;; dired でコマンドを実行する関数定義
@@ -716,8 +716,6 @@
          (eval-after-load "wdired"
            '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
 
-       (declare-function dired-run-shell-command "dired-aux" (command))
-
        ;; ディレクトリを先に表示する
        (cond ((eq system-type 'windows-nt)
               ;; Windows の場合
@@ -749,50 +747,50 @@
          (define-key dired-mode-map (kbd "C-e")
            (lambda () (interactive) (dired-run-command "evince"))))
        ;; vlc で開く
-      (when (executable-find "vlc")
-        (define-key dired-mode-map (kbd "C-v")
-          (lambda () (interactive) (dired-run-command "vlc"))))
-      ;; w3m で開く
-      (when (and (executable-find "w3m") (locate-library "w3m"))
-        (autoload 'w3m-find-file "w3m" "Function used to open FILE" t)
-        (defun dired-w3m-find-file ()
-          "Open file in w3m."
-          (interactive)
-          (when (and (fboundp 'dired-get-filename)
-                     (fboundp 'w3m-find-file))
-            (let ((file (dired-get-filename)))
-              (if (not (file-directory-p file))
-                  (when (y-or-n-p (format "Open 'w3m' %s "
-                                          (file-name-nondirectory file)))
-                    (w3m-find-file file))
-                (message "%s is a directory" file)))))
-        (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
+       (when (executable-find "vlc")
+         (define-key dired-mode-map (kbd "C-v")
+           (lambda () (interactive) (dired-run-command "vlc"))))
+       ;; w3m で開く
+       (when (and (executable-find "w3m") (locate-library "w3m"))
+         (autoload 'w3m-find-file "w3m" "Function used to open FILE" t)
+         (defun dired-w3m-find-file ()
+           "Open file in w3m."
+           (interactive)
+           (when (and (fboundp 'dired-get-filename)
+                      (fboundp 'w3m-find-file))
+             (let ((file (dired-get-filename)))
+               (if (not (file-directory-p file))
+                   (when (y-or-n-p (format "Open 'w3m' %s "
+                                           (file-name-nondirectory file)))
+                     (w3m-find-file file))
+                 (message "%s is a directory" file)))))
+         (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
 
-      ;; tar + gzip で圧縮
-      (when (and (executable-find "tar") (executable-find "gzip")
-                 (fboundp 'dired-get-marked-files)
-                 (boundp 'current-prefix-arg)
-                 (fboundp 'dired-do-shell-command))
-        (defun dired-do-tar-gzip (arg)
-          "Execute tar and gzip command."
-          (interactive "P")
-          (let ((files (dired-get-marked-files t current-prefix-arg)))
-            (let ((default (concat (car files) ".tar.gz")))
-              (let ((tarfile (read-string "Filename: " default nil default)))
-                (unless (string-match
-                         "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
-                  (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
-                (or (when (member tarfile (directory-files default-directory))
-                      (not (y-or-n-p ; 同名ファイル
-                            (concat "Overwrite `" tarfile "'? [Type yn]"))))
-                    (condition-case err
-                        (dired-do-shell-command
-                         (concat "tar cfz " tarfile " *") nil files)
-                      (error (message "%s" err))))
-                (message (concat
-                          "Execute tar command to `" tarfile "'...done" this-file-name))))))
-        (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))
-      (message "Loading %s (dired)...done" this-file-name))))
+       ;; tar + gzip で圧縮
+       (when (and (executable-find "tar") (executable-find "gzip")
+                  (fboundp 'dired-get-marked-files)
+                  (boundp 'current-prefix-arg)
+                  (fboundp 'dired-do-shell-command))
+         (defun dired-do-tar-gzip (arg)
+           "Execute tar and gzip command."
+           (interactive "P")
+           (let ((files (dired-get-marked-files t current-prefix-arg)))
+             (let ((default (concat (car files) ".tar.gz")))
+               (let ((tarfile (read-string "Filename: " default nil default)))
+                 (unless (string-match
+                          "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
+                   (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
+                 (or (when (member tarfile (directory-files default-directory))
+                       (not (y-or-n-p ; 同名ファイル
+                             (concat "Overwrite `" tarfile "'? [Type yn]"))))
+                     (condition-case err
+                         (dired-do-shell-command
+                          (concat "tar cfz " tarfile " *") nil files)
+                       (error (message "%s" err))))
+                 (message (concat
+                           "Execute tar command to `" tarfile "'...done" this-file-name))))))
+         (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))
+       (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
 (when (and (window-system) (locate-library "speedbar"))
