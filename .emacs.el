@@ -407,65 +407,64 @@
 
 ;;; 検索 (isearch)
 (when (locate-library "isearch")
-  (eval-after-load "isearch"
+  ;; リージョンで検索する
+  (defadvice isearch-mode
+    (before isearch-region-mode
+            (forward &optional regexp op-fun recursive-edit word-p)
+            activate compile)
+    (if mark-active
+        (progn
+          (isearch-update-ring
+           (buffer-substring-no-properties (mark) (point)))
+          (deactivate-mark)))))
+;; migemo
+;; sudo apt-get install migemo cmigemo
+;; C-e でトグル
+(when (and (executable-find "cmigemo")
+           (locate-library "migemo"))
+  (autoload 'migemo-init "migemo"
+    "Japanese incremental search through dynamic pattern expansion." t)
+  (add-hook 'isearch-mode-hook 'migemo-init)
+  (eval-after-load "migemo"
     '(progn
-       ;; リージョンで検索する
-       (defadvice isearch-mode
-         (before isearch-region-mode
-                 (forward &optional regexp op-fun recursive-edit word-p)
-                 activate compile)
-         (if mark-active
-             (progn
-               (isearch-update-ring
-                (buffer-substring-no-properties (mark) (point)))
-               (deactivate-mark))))
-       ;; migemo
-       ;; sudo apt-get install migemo cmigemo
-       ;; C-e でトグル
-       (when (and (executable-find "cmigemo")
-                  (locate-library "migemo"))
-         (autoload 'migemo-init "migemo"
-           "Japanese incremental search through dynamic pattern expansion." t)
-         (add-hook 'isearch-mode-hook 'migemo-init)
-         (eval-after-load "migemo"
-           '(progn
-              (when (boundp 'migemo-command)          ; コマンド
-                (setq migemo-command "cmigemo"))
-              (when (boundp 'migemo-options)          ; オプション
-                (setq migemo-options '("-q" "--emacs")))
-              ;; 辞書のパス指定
-              (when (eq system-type 'gnu/linux)
-                (let ((mdict "/usr/share/migemo/migemo-dict"))
-                  (when (and (boundp 'migemo-dictionary)
-                             (file-readable-p mdict))
-                    (setq migemo-dictionary mdict))))
-              (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
-                (setq migemo-user-dictionary nil))
-              (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
-                (setq migemo-regex-dictionary nil))
-              (when (boundp 'migemo-coding-system)    ; euc-jp
-                (setq migemo-coding-system 'euc-jp)))))
-       ;; 日本語で検索するための設定
-       (when (locate-library "skk-isearch")
-         (autoload 'skk-isearch-mode-setup "skk-isearch"
-           "Hook function called when skk isearch begin." t)
-         (autoload 'skk-isearch-mode-cleanup "skk-isearch"
-           "Hook function called when skk isearch is done." t)
-         (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
-         (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
-         (eval-after-load "skk-isearch"
-           '(progn
-              ;; 起動時アスキーモード
-              (when (boundp 'skk-isearch-start-mode)
-                (setq skk-isearch-start-mode 'latin))
-              ;; 変換でエラーを捕捉しない
-              (defadvice skk-isearch-wrapper
-                (around skk-isearch-wrapper-nil (&rest arg) activate compile)
-                (if (null (car arg))            ; (nil) の場合
-                    (let ((skk-dcomp-multiple-activate nil))
-                      (ignore-errors ad-do-it)) ; エラーを無視する
-                  ad-do-it)))))
-       (message "Loading %s (isearch)...done" this-file-name))))
+       (when (boundp 'migemo-command)          ; コマンド
+         (setq migemo-command "cmigemo"))
+       (when (boundp 'migemo-options)          ; オプション
+         (setq migemo-options '("-q" "--emacs")))
+       ;; 辞書のパス指定
+       (when (eq system-type 'gnu/linux)
+         (let ((mdict "/usr/share/migemo/migemo-dict"))
+           (when (and (boundp 'migemo-dictionary)
+                      (file-readable-p mdict))
+             (setq migemo-dictionary mdict))))
+       (when (boundp 'migemo-user-dictionary)  ; ユーザ辞書を使わない
+         (setq migemo-user-dictionary nil))
+       (when (boundp 'migemo-regex-dictionary) ; 正規表現辞書を使わない
+         (setq migemo-regex-dictionary nil))
+       (when (boundp 'migemo-coding-system)    ; euc-jp
+         (setq migemo-coding-system 'euc-jp))
+       (message "Loading %s (migemo)...done" this-file-name))))
+;; 日本語で検索するための設定
+(when (locate-library "skk-isearch")
+  (autoload 'skk-isearch-mode-setup "skk-isearch"
+    "Hook function called when skk isearch begin." t)
+  (autoload 'skk-isearch-mode-cleanup "skk-isearch"
+    "Hook function called when skk isearch is done." t)
+  (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
+  (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
+  (eval-after-load "skk-isearch"
+    '(progn
+       ;; 起動時アスキーモード
+       (when (boundp 'skk-isearch-start-mode)
+         (setq skk-isearch-start-mode 'latin))
+       ;; 変換でエラーを捕捉しない
+       (defadvice skk-isearch-wrapper
+         (around skk-isearch-wrapper-nil (&rest arg) activate compile)
+         (if (null (car arg))            ; (nil) の場合
+             (let ((skk-dcomp-multiple-activate nil))
+               (ignore-errors ad-do-it)) ; エラーを無視する
+           ad-do-it))
+       (message "Loading %s (skk-isearch)...done" this-file-name))))
 
 ;;; マークの設定
 ;; C-g でリージョン強調表示解除
@@ -588,14 +587,14 @@
   "Insert date."
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
-(define-key global-map (kbd "C-c i d") 'insert-date)
+(define-key global-map (kbd "C-c d d") 'insert-date)
 
 ;; 時間挿入
 (defun insert-time ()
   "Insert time."
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
-(define-key global-map (kbd "C-c i t") 'insert-time)
+(define-key global-map (kbd "C-c d t") 'insert-time)
 
 ;; C-; で略語展開
 (setq hippie-expand-try-functions-list
@@ -1206,7 +1205,10 @@
 
 ;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
-(require 'minibuf-isearch nil t)
+(when (locate-library "minibuf-isearch")
+  (add-hook 'minibuffer-setup-hook
+            (lambda ()
+              (require 'minibuf-isearch nil t))))
 
 ;;; Emacs 内シェルコマンド履歴保存
 ;; (install-elisp-from-emacswiki "shell-history.el")
@@ -1926,7 +1928,6 @@
                            (mew-propertized-biff-string (format "(%d)" n)))
                      ;; メール数が増えた場合, D-Bus 経由で通知
                      (when (< mew-mode-line-biff-quantity n)
-                       (message "mew biff: < %d %d" mew-mode-line-biff-quantity n)
                        (notifications-notify
                         :title "Emacs/Mew"
                         :body  (format "You got mail(s): %d" n)
@@ -2174,8 +2175,8 @@
     "gist" "Post the current buffer as a new paste." t)
   (autoload 'gist-buffer-private
     "gist" "Post the current buffer as a new private paste." t)
-  (autoload 'gist-region "gist"
-    "Post the current region as a new paste." t)
+  (autoload 'gist-region
+    "gist" "Post the current region as a new paste." t)
   (autoload 'gist-region-private
     "gist" "Post the current region as a new private paste." t))
 
@@ -2218,7 +2219,11 @@
 
 ;; term+
 ;; M-x term または M-x ansi-term で起動
-(require 'term+ nil t)
+(when (locate-library "term+")
+  (add-hook 'term-mode-hook
+            (lambda ()
+              (require 'term+ nil t)
+              (message "Loading %s...done" (locate-library "term+")))))
 
 ;;; ここまで拡張 lisp
 
