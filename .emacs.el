@@ -1251,25 +1251,25 @@
        ;; バッファ非表示
        (setq tabbar-buffer-list-function
              (lambda ()
-               (delq nil
-                     (mapcar
-                      #'(lambda (b)
+               (let ((messages "\\(Messages\\)")
+                     (scratch "\\(scratch\\)")
+                     (gtags "\\(GTAGS\\)")
+                     (woman "\\(woman\\)")
+                     (man "\\(man\\)")
+                     (term "\\(terminal\\)")
+                     (shell "\\([e]?shell\\)"))
+                 (delq nil
+                       (mapcar
+                        (lambda (b)
                           (cond
                            ;; カレントバッファは表示
                            ((eq (current-buffer) b) b)
-                           ;; *Messages* バッファは表示
-                           ((string= "*Messages*" (buffer-name b)) b)
-                           ;; *scratch* バッファは表示
-                           ((string= "*scratch*" (buffer-name b)) b)
-                           ;; multi-term バッファは表示
-                           ((string-match "\*terminal.*" (buffer-name b)) b)
-                           ;; eshell または shell は表示
-                           ((string-match "\*[e]?shell.*" (buffer-name b)) b)
-                           ;; info は表示
-                           ((string= "*info*" (buffer-name b)) b)
-                           ;; GTAGS は表示
+                           ;; * で始まる表示するバッファ
                            ((string-match
-                             "\*GTAGS SELECT\*.*" (buffer-name b)) b)
+                             (concat "\\*" messages "\\|" scratch "\\|"
+                                     gtags "\\|" woman "\\|" man "\\|"
+                                     term "\\|" shell
+                                     ".*") (buffer-name b)) b)
                            ;; それ以外の * で始まるバッファは非表示
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
                            ;; スペースで始まるバッファは非表示
@@ -1278,7 +1278,7 @@
                            ((string= ".bash_history" (buffer-name b)) nil)
                            ;; それ以外は表示
                            (t b)))
-                      (buffer-list)))))
+                        (buffer-list))))))
        (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
        (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab)
        (message "Loading %s (tabbar)...done" this-file-name))))
@@ -2236,50 +2236,41 @@
   (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
   (add-hook 'gtags-select-mode-hook
             (lambda ()
-              ;; 強調表示
-              (when (fboundp 'hl-line-mode)
+              (when (fboundp 'hl-line-mode)        ; 強調表示
                 (hl-line-mode 1))))
-  ;; C言語
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (when (fboundp 'gtags-mode)
-                (gtags-mode 1))
-              (when (boundp 'gtags-libpath)
-                (setq gtags-libpath "/usr/include"))))
-  ;; Java
-  (add-hook 'java-mode-hook
-            (lambda () (when (fboundp 'gtags-mode) (gtags-mode 1))))
-  ;; Ruby
-  (add-hook 'ruby-mode-hook
-            (lambda ()
-              (when (fboundp 'gtags-mode)
-                (gtags-mode 1))
-              (when (boundp 'gtags-libpath)
-                (setq gtags-libpath "/usr/lib/ruby/1.8"))))
-  ;; Python
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (when (fboundp 'gtags-mode)
-                (gtags-mode 1))
-              (when (boundp 'gtags-libpath)
-                (setq gtags-libpath " /usr/lib/python2.7"))))
-  ;; Perl
-  (add-hook 'perl-mode-hook
-            (lambda ()
-              (when (fboundp 'gtags-mode)
-                (gtags-mode 1))
-              (when (boundp 'gtags-libpath)
-                (setq gtags-libpath
-                      (concat " /usr/lib/perl/5.14" ":" " /usr/lib/perl5")))))
+  (let ((hook (lambda ()
+                (when (fboundp 'gtags-mode)        ; gtags-mode
+                  (gtags-mode 1))
+                (when (fboundp 'set-gtags-libpath) ; パス設定
+                  (set-gtags-libpath)))))
+    (add-hook 'c-mode-common-hook hook) ; C, C++
+    (add-hook 'java-mode-hook hook))    ; Java
   (eval-after-load "gtags"
     '(progn
-       ;; ローカルバッファ変数にパスを設定
+       ;; ローカルバッファ変数
        (defvar gtags-libpath nil "Library directory of language.")
        (make-variable-buffer-local 'gtags-libpath)
+       ;; ローカルバッファ変数にパスを設定する関数定義
+       (defun set-gtags-libpath ()
+         (let (path-string
+               (dirs (cond
+                      ((eq major-mode 'c-mode)
+                       '("/usr/src/linux-source-3.2.0"
+                         "/usr/include"))
+                      ((eq major-mode 'c++-mode)
+                       '("/usr/include")))))
+           (dolist (dir dirs)
+             (if (file-readable-p (concat (file-name-as-directory dir) "GTAGS"))
+                 (setq path-string (concat path-string dir ":"))
+               (message "GTAGS does't exist: %s" dir)))
+           (if (and (boundp 'gtags-libpath) path-string)
+               (setq gtags-libpath (substring path-string 0 -1)))
+           (message "gtags-libpath: %s" gtags-libpath)))
        ;; 環境変数の設定
        (defadvice gtags-goto-tag
          (before setenv-gtags-libpath activate)
-         (setenv "GTAGSLIBPATH" gtags-libpath))
+         (setenv "GTAGSLIBPATH" gtags-libpath)
+         (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
        ;; パスの表示形式
        (when (boundp 'gtags-path-style)
          (setq gtags-path-style 'absolute))
@@ -2294,7 +2285,7 @@
        (define-key gtags-mode-map (kbd "C-c g d") 'gtags-find-tag)
        ;; 参照タグ検索
        (define-key gtags-mode-map (kbd "C-c g r") 'gtags-find-rtag)
-       ;; 変数の定義元と参照元の一覧表示
+       ;; シンボル一覧表示
        (define-key gtags-mode-map (kbd "C-c g s") 'gtags-find-symbol)
        ;; grep 検索
        (define-key gtags-mode-map (kbd "C-c g g") 'gtags-find-with-grep)
@@ -2308,7 +2299,77 @@
        (define-key gtags-mode-map (kbd "C-]") 'gtags-find-tag-from-here)
        ;; タグスタックをポップ
        (define-key gtags-mode-map (kbd "C-t") 'gtags-pop-stack)
+       ;; 一覧表示のキーバインド
+       (define-key gtags-select-mode-map "p" 'previous-line)
+       (define-key gtags-select-mode-map "n" 'next-line)
+       (define-key gtags-select-mode-map "q" 'gtags-pop-stack)
        (message "Loading %s (gtags)...done" this-file-name))))
+
+;;; オートコンプリート
+;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
+;; 有効 (auto-complete-mode 1)
+;; 無効 (auto-complete-mode -1)
+(when (locate-library "auto-complete")
+  (autoload 'auto-complete-mode "auto-complete"
+    "Auto Completion for GNU Emacs." t)
+  (eval-after-load "auto-complete"
+    '(progn
+       (when (boundp 'ac-dictionary-directories)
+         (add-to-list 'ac-dictionary-directories
+                      "~/.emacs.d/auto-complete/dict"))
+       (when (boundp 'ac-comphist-file)    ; ソースファイル
+         (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
+       (when (fboundp 'ac-config-default)  ; デフォルト設定にする
+         (ac-config-default))
+       (when (boundp 'ac-delay)            ; 待ち時間
+         (setq ac-delay 0))
+       (when (boundp 'ac-quick-help-delay) ; クイックヘルプ表示時間
+         (setq ac-quick-help-delay 0.1))
+       (when (boundp 'ac-auto-show-menu)   ; 補完メニュー表示時間
+         (setq ac-auto-show-menu 0.1))
+       (when (boundp 'ac-candidate-max)    ; 候補の最大数
+         (setq ac-candidate-max 50))
+       (when (boundp 'ac-auto-start)       ; 自動で補完しない
+         (setq ac-auto-start nil))
+       (when (boundp 'ac-modes)            ; 補完対象モード
+         (setq ac-modes
+               (append ac-modes
+                       (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode))))
+       ;; キーバインド
+       (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
+         (ac-set-trigger-key "M-n"))
+       (define-key ac-complete-mode-map (kbd "M-p") 'ac-stop)
+       (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
+       (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+
+       ;; オートコンプリートをトグルする
+       (define-key global-map (kbd "<f4>")
+         (lambda (&optional n)
+           (interactive "P")
+           (if (and ac-auto-start (eq n nil))
+               (setq ac-auto-start nil)
+             (if (eq n nil) ; デフォルト
+                 (setq ac-auto-start 3)
+               (setq ac-auto-start n)))
+           (message "ac-auto-start %s" ac-auto-start))))))
+
+;;; 略語から定型文を入力する
+;; [new] git clone https://github.com/capitaomorte/yasnippet.git
+;; [old] wget -O- http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2 | tar xfj -
+;; [old] (install-elisp-from-emacswiki "yasnippet-config.el")
+;; 有効 (yas/minor-mode 1)
+;; 無効 (yas/minor-mode -1)
+(when (locate-library "yasnippet")
+  (autoload 'yas/minor-mode "yasnippet"
+    "Yet another snippet extension for Emacs." t)
+  (eval-after-load "yasnippet"
+    '(progn
+       (when (fboundp 'yas--initialize) ; 初期化
+         (yas--initialize))
+       (when (boundp 'yas-snippet-dirs) ; スニペットディクトリ
+         (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                                  "~/.emacs.d/yasnippet/snippets"))
+         (mapc 'yas-load-directory yas-snippet-dirs)))))
 
 ;;; Emacs Lisp
 ;; ミニバッファに関数の help 表示
@@ -2336,72 +2397,6 @@
   (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
   (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
 
-;;; オートコンプリート
-;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
-(when (eval-and-compile (and (require 'auto-complete nil t)
-                             (require 'auto-complete-config nil t)))
-  (add-to-list 'ac-dictionary-directories
-               "~/.emacs.d/auto-complete/dict")
-  (when (boundp 'ac-comphist-file)    ; ソースファイル
-    (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
-  (when (fboundp 'ac-config-default)  ; デフォルト設定にする
-    (ac-config-default))
-  (when (boundp 'ac-delay)            ; 待ち時間
-    (setq ac-delay 0))
-  (when (boundp 'ac-quick-help-delay) ; クイックヘルプ表示時間
-    (setq ac-quick-help-delay 0.1))
-  (when (boundp 'ac-auto-show-menu)   ; 補完メニュー表示時間
-    (setq ac-auto-show-menu 0.1))
-  (when (boundp 'ac-candidate-max)    ; 候補の最大数
-    (setq ac-candidate-max 50))
-  (when (boundp 'ac-auto-start)       ; 自動で補完しない
-    (setq ac-auto-start nil))
-  (when (boundp 'ac-modes)            ; 補完対象モード
-    (setq ac-modes
-          (append ac-modes
-                  (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode))))
-  (when (boundp 'ac-source)           ; Global を使う
-    (setq-default ac-sources '(ac-source-gtags)))
-  ;; キーバインド
-  (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
-    (ac-set-trigger-key "M-n"))
-  (define-key ac-complete-mode-map (kbd "M-p") 'ac-stop)
-  (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
-  (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
-
-   ;; オートコンプリートをトグルする
-  (define-key global-map (kbd "<f4>")
-    (lambda (&optional n)
-      (interactive "P")
-      (if (and ac-auto-start (eq n nil))
-          (setq ac-auto-start nil)
-        (if (eq n nil) ; デフォルト
-            (setq ac-auto-start 3)
-          (setq ac-auto-start n)))
-      (message "ac-auto-start %s" ac-auto-start))))
-
-;;; 略語から定型文を入力する
-;; [new] git clone https://github.com/capitaomorte/yasnippet.git
-;; [old] wget -O- http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2 | tar xfj -
-;; [old] (install-elisp-from-emacswiki "yasnippet-config.el")
-(defun enable-yasnippet ()
-  "Do enable yasnippet."
-  (interactive)
-  (when (eval-and-compile (require 'yasnippet nil t))
-    (when (fboundp 'yas--initialize) ; 初期化
-      (yas--initialize))
-    (when (boundp 'yas-snippet-dirs) ; スニペットディクトリ
-      (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                               "~/.emacs.d/yasnippet/snippets"))
-      (mapc 'yas-load-directory yas-snippet-dirs))))
-
-;;; CEDET
-(defun enable-cedet ()
-  "Do enable cedet."
-  (interactive)
-  (when (eval-and-compile (require 'cedet nil t))
-    (global-ede-mode t)))
-
 ;;; C 言語
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
 ;; clang -cc1 -x c-header stdafx.h -emit-pch -o stdafx.pch
@@ -2421,14 +2416,17 @@
                 (semantic-mode t))
               (when (boundp 'ac-sources)
                 (setq ac-sources (append '(ac-source-clang
-                                           ac-source-semantic)
+                                           ac-source-semantic
+                                           ac-source-gtags)
                                          ac-sources))))))
 ;; c-eldoc
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
 (when (locate-library "c-eldoc")
-  (add-hook 'c-mode-hook (lambda ()
-                           (when (eval-and-compile (require 'c-eldoc nil t))
-                             (c-turn-on-eldoc-mode))))
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (require 'c-eldoc nil t)
+              (when (fboundp 'c-turn-on-eldoc-mode)
+                (c-turn-on-eldoc-mode))))
   (eval-after-load "c-eldoc"
     '(progn
        ;; 待ち時間
@@ -2442,6 +2440,18 @@
          (setq c-eldoc-includes
                "-I./ -I../ -I/usr/include `pkg-config gtk+-2.0 --cflags`"))
        (message "Loading %s (c-eldoc)...done" this-file-name))))
+;; CEDET
+(when (locate-library "cedet")
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (require 'cedet nil t)
+              (when (fboundp 'global-ede-mode)
+                (global-ede-mode 1))
+              (when (fboundp 'semantic-load-enable-code-helpers)
+                (semantic-load-enable-code-helpers))
+              (when (fboundp 'global-srecode-minor-mode)
+                (global-srecode-minor-mode 1))
+              (message "Loading %s (cedet)...done" this-file-name))))
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
