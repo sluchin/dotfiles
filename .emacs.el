@@ -262,33 +262,33 @@
                         (point))))
 
 ;; モード名を短縮して表示
-(add-hook
- 'after-change-major-mode-hook
- (lambda ()
-   (let ((modes
-          ;; マイナーモード
-          '((auto-complete-mode . " α")
-            (yas/minor-mode . " υ")
-            (paredit-mode . " π")
-            (gtags-mode . " ν")
-            (undo-tree-mode . "")
-            (eldoc-mode . "")
-            (abbrev-mode . "")
-            ;; メジャーモード
-            (lisp-interaction-mode . "λ")
-            (hi-lock-mode . "")
-            (python-mode . "Py")
-            (emacs-lisp-mode . "El")
-            (nxhtml-mode . "nx"))))
-     (dolist (cleaner modes)
-       (let* ((mode (car cleaner))
-              (short (cdr cleaner))
-              (default (cdr (assq mode minor-mode-alist))))
-         (when default
-           (setcar default short))
-         ;; メジャーモード
-         (when (eq mode major-mode)
-           (setq mode-name short)))))))
+(defun display-short-mode-name ()
+  (let ((modes
+         ;; マイナーモード
+         '((auto-complete-mode . " α")
+           (yas/minor-mode . " υ")
+           (paredit-mode . " π")
+           (gtags-mode . " ν")
+           (undo-tree-mode . "")
+           (eldoc-mode . "")
+           (abbrev-mode . "")
+           ;; メジャーモード
+           (lisp-interaction-mode . "λ")
+           (emacs-lisp-mode . "ε")
+           (ruby-mode . "в")
+           (python-mode . "φ")
+           (cperl-mode . "ψ")
+           (nxhtml-mode . "nx"))))
+    (dolist (cleaner modes)
+      (let* ((mode (car cleaner))
+             (short (cdr cleaner))
+             (default (cdr (assq mode minor-mode-alist))))
+        (when default
+          (setcar default short))
+        ;; メジャーモード
+        (when (eq mode major-mode)
+          (setq mode-name short))))))
+(add-hook 'after-change-major-mode-hook 'display-short-mode-name)
 
 ;; 選択範囲の行数文字数を表示
 (defun count-lines-and-chars ()
@@ -2307,11 +2307,26 @@
 
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
-;; 有効 (auto-complete-mode 1)
-;; 無効 (auto-complete-mode -1)
 (when (locate-library "auto-complete")
-  (autoload 'auto-complete-mode "auto-complete"
-    "Auto Completion for GNU Emacs." t)
+  ;; F4 で オートコンプリートをトグルする
+  (defun toggle-auto-complete-mode (&optional n)
+    "Toggle auto-complete-mode."
+    (interactive "P")
+    (require 'auto-complete nil t)
+    (when (and (fboundp 'auto-complete-mode)
+               (boundp 'auto-complete-mode)
+               (boundp 'ac-auto-start))
+      ;; auto-complete-mode をトグルする
+      (if auto-complete-mode
+          (auto-complete-mode -1)
+        (auto-complete-mode 1)
+        (let* ((default (cdr (assq 'auto-complete-mode minor-mode-alist))))
+          (setcar default " α")))
+      ;; ac-auto-start の設定
+      (when (not (eq n nil))
+        (setq ac-auto-start n)
+        (message "ac-auto-start %s" ac-auto-start))))
+  (define-key global-map (kbd "<f4>") 'toggle-auto-complete-mode)
   (eval-after-load "auto-complete"
     '(progn
        (when (boundp 'ac-dictionary-directories)
@@ -2329,8 +2344,8 @@
          (setq ac-auto-show-menu 0.1))
        (when (boundp 'ac-candidate-max)    ; 候補の最大数
          (setq ac-candidate-max 50))
-       (when (boundp 'ac-auto-start)       ; 自動で補完しない
-         (setq ac-auto-start nil))
+       (when (boundp 'ac-auto-start)       ; 3 文字目から補完する
+         (setq ac-auto-start 3))
        (when (boundp 'ac-modes)            ; 補完対象モード
          (setq ac-modes
                (append ac-modes
@@ -2341,27 +2356,33 @@
        (define-key ac-complete-mode-map (kbd "M-p") 'ac-stop)
        (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
        (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+       (message "Loading %s (auto-complete)...done" this-file-name))))
 
-       ;; オートコンプリートをトグルする
-       (define-key global-map (kbd "<f4>")
-         (lambda (&optional n)
-           (interactive "P")
-           (if (and ac-auto-start (eq n nil))
-               (setq ac-auto-start nil)
-             (if (eq n nil) ; デフォルト
-                 (setq ac-auto-start 3)
-               (setq ac-auto-start n)))
-           (message "ac-auto-start %s" ac-auto-start))))))
+;;; テンプレート挿入
+(when (eval-and-compile (require 'autoinsert nil t))
+  (auto-insert-mode t)
+  (setq auto-insert-directory "~/.emacs.d/autoinsert/")
+  (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
+  (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
 
 ;;; 略語から定型文を入力する
 ;; [new] git clone https://github.com/capitaomorte/yasnippet.git
 ;; [old] wget -O- http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2 | tar xfj -
 ;; [old] (install-elisp-from-emacswiki "yasnippet-config.el")
-;; 有効 (yas/minor-mode 1)
-;; 無効 (yas/minor-mode -1)
 (when (locate-library "yasnippet")
-  (autoload 'yas/minor-mode "yasnippet"
-    "Yet another snippet extension for Emacs." t)
+  ;; F5 で yasnippet をトグルする
+  (defun toggle-yas/minor-mode ()
+    "Toggle yas/minor-mode"
+    (interactive)
+    (require 'yasnippet nil t)
+    (when (and (fboundp 'yas/minor-mode)
+               (boundp 'yas/minor-mode))
+      (if yas/minor-mode
+          (yas/minor-mode -1)
+        (yas/minor-mode 1)
+        (let* ((default (cdr (assq 'yas/minor-mode minor-mode-alist))))
+          (setcar default " υ")))))
+  (define-key global-map (kbd "<f5>") 'toggle-yas/minor-mode)
   (eval-after-load "yasnippet"
     '(progn
        (when (fboundp 'yas--initialize) ; 初期化
@@ -2369,10 +2390,11 @@
        (when (boundp 'yas-snippet-dirs) ; スニペットディクトリ
          (setq yas-snippet-dirs '("~/.emacs.d/snippets"
                                   "~/.emacs.d/yasnippet/snippets"))
-         (mapc 'yas-load-directory yas-snippet-dirs)))))
+         (mapc 'yas-load-directory yas-snippet-dirs)
+         (message "Loading %s (yasnippet)...done" this-file-name)))))
 
 ;;; Emacs Lisp
-;; ミニバッファに関数の help 表示
+;; ミニバッファにヘルプ表示
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
 (when (locate-library "eldoc-extension")
   (autoload 'turn-on-eldoc-mode
@@ -2390,13 +2412,6 @@
          (setq eldoc-echo-area-use-multiline-p t))
        (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
-;;; テンプレート挿入
-(when (eval-and-compile (require 'autoinsert nil t))
-  (auto-insert-mode t)
-  (setq auto-insert-directory "~/.emacs.d/autoinsert/")
-  (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
-  (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
-
 ;;; C 言語
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
 ;; clang -cc1 -x c-header stdafx.h -emit-pch -o stdafx.pch
@@ -2405,21 +2420,20 @@
             (when (fboundp 'c-set-style)
               (c-set-style "k&r"))
             (define-key mode-specific-map "c" 'compile)
-
-            (when (eval-and-compile (and (require 'auto-complete-clang nil t)
-                                         (require 'auto-complete nil t)))
-              (when (boundp 'ac-clang-prefix-header)
-                (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
-              (when (boundp 'ac-clang-flags)
-                (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
-              (when (fboundp 'semantic-mode)
-                (semantic-mode t))
-              (when (boundp 'ac-sources)
-                (setq ac-sources (append '(ac-source-clang
-                                           ac-source-semantic
-                                           ac-source-gtags)
-                                         ac-sources))))))
-;; c-eldoc
+            (require 'auto-complete-clang nil t)
+            (require 'auto-complete nil t)
+            (when (boundp 'ac-clang-prefix-header)
+              (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
+            (when (boundp 'ac-clang-flags)
+              (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
+            (when (fboundp 'semantic-mode)
+              (semantic-mode t))
+            (when (boundp 'ac-sources)
+              (setq ac-sources (append '(ac-source-clang
+                                         ac-source-semantic
+                                         ac-source-gtags)
+                                       ac-sources)))))
+;; ミニバッファにプロトタイプ表示
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
 (when (locate-library "c-eldoc")
   (add-hook 'c-mode-common-hook
@@ -2442,16 +2456,17 @@
        (message "Loading %s (c-eldoc)...done" this-file-name))))
 ;; CEDET
 (when (locate-library "cedet")
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (require 'cedet nil t)
-              (when (fboundp 'global-ede-mode)
-                (global-ede-mode 1))
-              (when (fboundp 'semantic-load-enable-code-helpers)
-                (semantic-load-enable-code-helpers))
-              (when (fboundp 'global-srecode-minor-mode)
-                (global-srecode-minor-mode 1))
-              (message "Loading %s (cedet)...done" this-file-name))))
+  (let ((hook (lambda ()
+                (require 'cedet nil t)
+                (when (fboundp 'global-ede-mode)
+                  (global-ede-mode 1))
+                (when (fboundp 'semantic-load-enable-code-helpers)
+                  (semantic-load-enable-code-helpers))
+                (when (fboundp 'global-srecode-minor-mode)
+                  (global-srecode-minor-mode 1))
+                (message "Loading %s (cedet)...done" this-file-name))))
+    (add-hook 'c-mode-common-hook 'hook) ; C, C++
+    (add-hook 'java-mode-hook hook)))    ; Java
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
@@ -2472,17 +2487,17 @@
             (lambda ()
               (when (fboundp 'cperl-set-style)
                 (cperl-set-style "PerlStyle"))
-              (when (and (locate-library "anything")
-                         (eval-and-compile (require 'perl-completion nil t)))
-                (add-to-list 'ac-sources 'ac-source-perl-completion)
+              (when (locate-library "anything")
+                (require 'perl-completion nil t)
+                (when (boundp 'ac-sources)
+                  (add-to-list 'ac-sources 'ac-source-perl-completion))
                 (when (fboundp 'perl-completion-mode)
                   (perl-completion-mode t)))
               (when (executable-find "perltidy")
                 (require 'perltidy nil t))
-              (when (and (locate-library "flymake")
-                         (eval-and-compile (require 'flymake nil t)))
-                (when (fboundp 'flymake-mode)
-                  (flymake-mode t))))))
+              (require 'flymake nil t)
+              (when (fboundp 'flymake-mode)
+                (flymake-mode t)))))
 
 ;; Pod
 (when (locate-library "pod-mode")
@@ -2493,10 +2508,9 @@
             (lambda ()
               (when (fboundp 'auto-fill-mode)
                 (auto-fill-mode t))
-              (when (and (locate-library "flyspell")
-                         (eval-and-compile (require 'flyspell nil t)))
-                (when (fboundp 'flyspell-mode)
-                  (flyspell-mode t))))))
+              (require 'flyspell nil t)
+              (when (fboundp 'flyspell-mode)
+                (flyspell-mode t)))))
 
 ;;; Java
 ;; ajc-java-complete
@@ -2510,34 +2524,33 @@
 (defun enable-ajc-java-complete ()
   "Do enable ajc-java-complete."
   (interactive)
-  (when (eval-and-compile (and (require 'auto-complete nil t)
-                               (require 'yasnippet nil t)
-                               (fboundp 'ac-define-source)
-                               (require 'ajc-java-complete-config nil t)))
-    (when (eval-and-compile (require 'yasnippet nil t))
-      (when (fboundp 'yas--initialize)
-        (yas--initialize))
-      (when (boundp 'yas-snippet-dirs)
-        (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                                 "~/.emacs.d/yasnippet/snippets"
-                                 "~/.emacs.d/yasnippet-java-mode"))
-        (mapc 'yas-load-directory yas-snippet-dirs)))
+  (require 'auto-complete nil t)
+  (require 'ajc-java-complete-config nil t)
+  (require 'yasnippet nil t)
+  (when (fboundp 'yas--initialize)
+    (yas--initialize))
+  (when (boundp 'yas-snippet-dirs)
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                             "~/.emacs.d/yasnippet/snippets"
+                             "~/.emacs.d/yasnippet-java-mode"))
+    (when (boundp 'yas-load-directory)
+      (mapc 'yas-load-directory yas-snippet-dirs)))
 
-    (add-hook 'java-mode-hook
-              (lambda ()
-                (when (fboundp 'c-set-style)
-                  (c-set-style "java"))
-                (when (boundp 'c-auto-newline)
-                  (setq c-auto-newline t))
-                (when (boundp 'ajc-tag-file)
-                  (if (file-readable-p "~/.java_base.tag")
-                      (setq ajc-tag-file "~/.java_base.tag")
-                    (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
-                (when (fboundp 'acj-java-complete-mode)
-                  (ajc-java-complete-mode))
-                (setq compile-command
-                      (concat "javac "
-                              (file-name-nondirectory (buffer-file-name))))))))
+  (add-hook 'java-mode-hook
+            (lambda ()
+              (when (fboundp 'c-set-style)
+                (c-set-style "java"))
+              (when (boundp 'c-auto-newline)
+                (setq c-auto-newline t))
+              (when (boundp 'ajc-tag-file)
+                (if (file-readable-p "~/.java_base.tag")
+                    (setq ajc-tag-file "~/.java_base.tag")
+                  (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+              (when (fboundp 'ajc-java-complete-mode)
+                (ajc-java-complete-mode))
+              (setq compile-command
+                    (concat "javac "
+                            (file-name-nondirectory (buffer-file-name)))))))
 
 ;; malabar-mode
 ;; git clone git://github.com/espenhw/malabar-mode.git または
@@ -2548,57 +2561,55 @@
 (defun enable-malabar-mode ()
   "Do enable malabar-mode."
   (interactive)
-  (when (eval-and-compile (require 'malabar-mode nil t))
-    (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
-    ;;(semantic-load-enable-minimum-features)
-    (when (boundp 'malabar-groovy-lib-dir)
-      (setq malabar-groovy-lib-dir (concat user-emacs-directory "/malabar-mode/lib")))
-    ;; 日本語だとコンパイルエラーメッセージが化けるので language を en に設定
-    (when (boundp 'malabar-groovy-java-options)
-      (setq malabar-groovy-java-options '("-Duser.language=en")))
-    ;; 普段使わないパッケージを import 候補から除外
-    (when (boundp 'malabar-import-excluded-classes-regexp-list)
-      (setq malabar-import-excluded-classes-regexp-list
-            (append
-             '("^java\\.awt\\..*$"
-               "^com\\.sun\\..*$"
-               "^org\\.omg\\..*$")
-             malabar-import-excluded-classes-regexp-list)))
-    (when (eval-and-compile (require 'yasnippet nil t))
-      (when (fboundp 'yas--initialize)
-        (yas--initialize))
-      (when (boundp 'yas-snippet-dirs)
-        (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                                 "~/.emacs.d/yasnippet/snippets"
-                                 "~/.emacs.d/yasnippet-java-mode"))
-        (mapc 'yas-load-directory yas-snippet-dirs)))
+  (require 'malabar-mode nil t)
+  (add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
+  ;;(semantic-load-enable-minimum-features)
+  (when (boundp 'malabar-groovy-lib-dir)
+    (setq malabar-groovy-lib-dir (concat user-emacs-directory "/malabar-mode/lib")))
+  ;; 日本語だとコンパイルエラーメッセージが化けるので language を en に設定
+  (when (boundp 'malabar-groovy-java-options)
+    (setq malabar-groovy-java-options '("-Duser.language=en")))
+  ;; 普段使わないパッケージを import 候補から除外
+  (when (boundp 'malabar-import-excluded-classes-regexp-list)
+    (setq malabar-import-excluded-classes-regexp-list
+          (append
+           '("^java\\.awt\\..*$"
+             "^com\\.sun\\..*$"
+             "^org\\.omg\\..*$")
+           malabar-import-excluded-classes-regexp-list)))
+  (require 'yasnippet nil t)
+  (when (fboundp 'yas--initialize)
+    (yas--initialize))
+  (when (boundp 'yas-snippet-dirs)
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
+                             "~/.emacs.d/yasnippet/snippets"
+                             "~/.emacs.d/yasnippet-java-mode"))
+    (when (boundp 'yas-load-directory)
+      (mapc 'yas-load-directory yas-snippet-dirs)))
 
-    (add-hook 'malabar-mode-hook
-              (lambda ()
-                (when (fboundp 'c-set-style)
-                  (c-set-style "java"))
-                (when (boundp 'c-auto-newline)
-                  (setq c-auto-newline t))
-                (when (fboundp 'enable-cedet)
-                  (enable-cedet))
-                (when (eval-and-compile (and (require 'auto-complete nil t)
-                                             (require 'yasnippet nil t)
-                                             (fboundp 'ac-define-source)
-                                             (require 'ajc-java-complete-config nil t)))
-                  (when (boundp 'ajc-tag-file)
-                    (if (file-readable-p "~/.java_base.tag")
-                        (setq ajc-tag-file "~/.java_base.tag")
-                      (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
-                  (when (fboundp 'ajc-java-complete-mode)
-                    (ajc-java-complete-mode)))
-                (when (boundp 'semantic-default-submodes)
-                  (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
-                                                    global-semanticdb-minor-mode
-                                                    global-semantic-idle-summary-mode
-                                                    global-semantic-mru-bookmark-mode)))
-                (when (fboundp 'semantic-mode)
-                  (semantic-mode t))
-                (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))))
+  (add-hook 'malabar-mode-hook
+            (lambda ()
+              (when (fboundp 'c-set-style)
+                (c-set-style "java"))
+              (when (boundp 'c-auto-newline)
+                (setq c-auto-newline t))
+              (require 'auto-complete nil t)
+              (require 'yasnippet nil t)
+              (require 'ajc-java-complete-config nil t)
+              (when (boundp 'ajc-tag-file)
+                (if (file-readable-p "~/.java_base.tag")
+                    (setq ajc-tag-file "~/.java_base.tag")
+                  (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+              (when (fboundp 'ajc-java-complete-mode)
+                (ajc-java-complete-mode))
+              (when (boundp 'semantic-default-submodes)
+                (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
+                                                  global-semanticdb-minor-mode
+                                                  global-semantic-idle-summary-mode
+                                                  global-semantic-mru-bookmark-mode)))
+              (when (fboundp 'semantic-mode)
+                (semantic-mode t))
+              (add-hook 'after-save-hook 'malabar-compile-file-silently nil t))))
 
 ;;; ここまでプログラミング用設定
 
