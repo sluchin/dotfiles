@@ -405,6 +405,8 @@
           (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'calendar-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'compilation-mode-hook
+          (lambda () (setq show-trailing-whitespace nil)))
 
 ;;; 検索 (isearch)
 (when (locate-library "isearch")
@@ -425,7 +427,7 @@
            (locate-library "migemo"))
   (autoload 'migemo-init "migemo"
     "Japanese incremental search through dynamic pattern expansion." t)
-  (add-hook 'isearch-mode-hook #'migemo-init)
+  (add-hook 'isearch-mode-hook 'migemo-init)
   (eval-after-load "migemo"
     '(progn
        (when (boundp 'migemo-command)          ; コマンド
@@ -451,8 +453,8 @@
     "Hook function called when skk isearch begin." t)
   (autoload 'skk-isearch-mode-cleanup "skk-isearch"
     "Hook function called when skk isearch is done." t)
-  (add-hook 'isearch-mode-hook #'skk-isearch-mode-setup)
-  (add-hook 'isearch-mode-end-hook #'skk-isearch-mode-cleanup)
+  (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
+  (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
   (eval-after-load "skk-isearch"
     '(progn
        ;; 起動時アスキーモード
@@ -767,28 +769,29 @@
          (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
 
        ;; tar + gzip で圧縮
-       (when (and (executable-find "tar") (executable-find "gzip")
-                  (fboundp 'dired-get-marked-files)
-                  (boundp 'current-prefix-arg)
-                  (fboundp 'dired-do-shell-command))
+       (when (and (executable-find "tar")
+                  (executable-find "gzip"))
          (defun dired-do-tar-gzip (arg)
            "Execute tar and gzip command."
            (interactive "P")
-           (let ((files (dired-get-marked-files t current-prefix-arg)))
-             (let ((default (concat (car files) ".tar.gz")))
-               (let ((tarfile (read-string "Filename: " default nil default)))
-                 (unless (string-match
-                          "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
-                   (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
-                 (or (when (member tarfile (directory-files default-directory))
-                       (not (y-or-n-p ; 同名ファイル
-                             (concat "Overwrite `" tarfile "'? [Type yn]"))))
-                     (condition-case err
-                         (dired-do-shell-command
-                          (concat "tar cfz " tarfile " *") nil files)
-                       (error (message "%s" err))))
-                 (message (concat
-                           "Execute tar command to `" tarfile "'...done" this-file-name))))))
+           (when (and (fboundp 'dired-get-marked-files)
+                      (boundp 'current-prefix-arg)
+                      (fboundp 'dired-do-shell-command))
+             (let ((files (dired-get-marked-files t current-prefix-arg)))
+               (let ((default (concat (car files) ".tar.gz")))
+                 (let ((tarfile (read-string "Filename: " default nil default)))
+                   (unless (string-match
+                            "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
+                     (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
+                   (or (when (member tarfile (directory-files default-directory))
+                         (not (y-or-n-p ; 同名ファイル
+                               (concat "Overwrite `" tarfile "'? [Type yn]"))))
+                       (condition-case err
+                           (dired-do-shell-command
+                            (concat "tar cfz " tarfile " *") nil files)
+                         (error (message "%s" err))))
+                   (message (concat
+                             "Execute tar command to `" tarfile "'...done" this-file-name)))))))
          (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))
        (message "Loading %s (dired)...done" this-file-name))))
 
@@ -1120,10 +1123,10 @@
 (when (locate-library "tempbuf")
   (autoload 'turn-on-tempbuf-mode "tempbuf"
     "Kill unused buffers in the background." t)
-  (add-hook 'evernote-mode-hook #'turn-on-tempbuf-mode)
-  (add-hook 'sdcv-mode-hook #'turn-on-tempbuf-mode)
-  (add-hook 'help-mode-hook #'turn-on-tempbuf-mode)
-  (add-hook 'dired-mode-hook #'turn-on-tempbuf-mode))
+  (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
+  (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
+  (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
+  (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
 
 ;;; カーソル位置に印をつけ移動する
 ;; git clone git://github.com/joodland/bm.git
@@ -1134,9 +1137,9 @@
   (autoload 'bm-toggle "bm" "Toggle bookmark at point." t)
   (autoload 'bm-previous "bm" "Goto previous bookmark." t)
   (autoload 'bm-next "bm" "Goto next bookmark." t)
-  (add-hook 'after-init-hook #'bm-repository-load)
-  (add-hook 'find-file-hooks #'bm-buffer-restore)
-  (add-hook 'after-revert-hook #'bm-buffer-restore)
+  (add-hook 'after-init-hook 'bm-repository-load)
+  (add-hook 'find-file-hooks 'bm-buffer-restore)
+  (add-hook 'after-revert-hook 'bm-buffer-restore)
   ;; キーバインド
   (define-key global-map (kbd "M-\\") 'bm-toggle)
   (define-key global-map (kbd "M-[") 'bm-previous)
@@ -1153,10 +1156,10 @@
        (when (boundp 'bm-restore-repository-on-load)
          (setq bm-restore-repository-on-load t))
        ;; 設定ファイルのセーブ
-       (add-hook 'kill-buffer-hook #'bm-buffer-save)
-       (add-hook 'auto-save-hook #'bm-buffer-save)
-       (add-hook 'after-save-hook #'bm-buffer-save)
-       (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
+       (add-hook 'kill-buffer-hook 'bm-buffer-save)
+       (add-hook 'auto-save-hook 'bm-buffer-save)
+       (add-hook 'after-save-hook 'bm-buffer-save)
+       (add-hook 'vc-before-checkin-hook 'bm-buffer-save)
        (add-hook 'kill-emacs-hook (lambda nil
                                     (bm-buffer-save-all)
                                     (bm-repository-save)))
@@ -1182,7 +1185,7 @@
     "Rename files editing their names in dired buffers." t)
   (autoload 'session-initialize "session"
     "Initialize package session and read previous session file." t)
-  (add-hook 'after-init-hook #'session-initialize)
+  (add-hook 'after-init-hook 'session-initialize)
   (eval-after-load "cus-load"
     '(progn
        (custom-add-load 'data 'session)
@@ -1210,10 +1213,6 @@
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (require 'minibuf-isearch nil t))))
-
-;;; Emacs 内シェルコマンド履歴保存
-;; (install-elisp-from-emacswiki "shell-history.el")
-(require 'shell-history nil t)
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
@@ -1253,12 +1252,12 @@
        (setq tabbar-buffer-list-function
              (lambda ()
                (let ((messages "\\(Messages\\)")
-                     (scratch "\\(scratch\\)")
-                     (gtags "\\(GTAGS\\)")
-                     (woman "\\(woman\\)")
-                     (man "\\(man\\)")
-                     (term "\\(terminal\\)")
-                     (shell "\\([e]?shell\\)"))
+                     (scratch  "\\(scratch\\)")
+                     (gtags    "\\(GTAGS\\)")
+                     (woman    "\\(woman\\)")
+                     (man      "\\(man\\)")
+                     (term     "\\(terminal\\)")
+                     (shell    "\\([e]?shell\\)"))
                  (delq nil
                        (mapcar
                         (lambda (b)
@@ -1628,9 +1627,9 @@
     "Turn on pseudo-structural editing of Lisp code." t)
   (autoload 'disable-paredit-mode "paredit"
     "Turn off pseudo-structural editing of Lisp code." t)
-  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook #'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook #'disable-paredit-mode))
+  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook 'disable-paredit-mode))
 
 ;;; 自動バイトコンパイル
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
@@ -1638,7 +1637,7 @@
   (autoload 'enable-auto-async-byte-compile-mode
     "auto-async-byte-compile"
     "Automatically byte-compile when saved." t)
-  (add-hook 'emacs-lisp-mode-hook #'enable-auto-async-byte-compile-mode)
+  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
   (eval-after-load "auto-async-byte-compile"
     '(progn
        ;; バイトコンパイルしないファイル
@@ -1651,7 +1650,7 @@
 (when (locate-library "usage-memo")
   (autoload 'umemo-initialize "usage-memo"
     "Integration of Emacs help system and memo." t)
-  (add-hook 'help-mode-hook #'umemo-initialize)
+  (add-hook 'help-mode-hook 'umemo-initialize)
   (eval-after-load "usage-memo"
     '(progn
        ;; ディレクトリ
@@ -2515,7 +2514,7 @@
                   (global-srecode-minor-mode 1))
                 (message "Loading %s (cedet)...done" this-file-name))))
     (add-hook 'c-mode-common-hook hook) ; C, C++
-    (add-hook 'java-mode-hook hook)))    ; Java
+    (add-hook 'java-mode-hook hook)))   ; Java
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
