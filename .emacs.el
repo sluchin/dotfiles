@@ -2437,7 +2437,7 @@
              (require 'psgml nil t)))
   (autoload 'sgml-mode "psgml" "Major mode to edit SGML files." t)
   (autoload 'xml-mode "psgml" "Major mode to edit XML files." t)
-
+  ;; 拡張子のリスト
   (setq auto-mode-alist
         (append
          '(("\\.\\(html\\|xml\\|sgml\\)$" . xml-mode)
