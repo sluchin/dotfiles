@@ -71,6 +71,7 @@
                 "~/.emacs.d/auto-complete-clang"
                 "~/.emacs.d/ajc-java-complete"
                 "~/.emacs.d/malabar-mode/lisp"
+                "~/.emacs.d/psgml"
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
                 "~/.emacs.d/auto-install"
@@ -424,7 +425,7 @@
            (locate-library "migemo"))
   (autoload 'migemo-init "migemo"
     "Japanese incremental search through dynamic pattern expansion." t)
-  (add-hook 'isearch-mode-hook 'migemo-init)
+  (add-hook 'isearch-mode-hook #'migemo-init)
   (eval-after-load "migemo"
     '(progn
        (when (boundp 'migemo-command)          ; コマンド
@@ -450,8 +451,8 @@
     "Hook function called when skk isearch begin." t)
   (autoload 'skk-isearch-mode-cleanup "skk-isearch"
     "Hook function called when skk isearch is done." t)
-  (add-hook 'isearch-mode-hook 'skk-isearch-mode-setup)
-  (add-hook 'isearch-mode-end-hook 'skk-isearch-mode-cleanup)
+  (add-hook 'isearch-mode-hook #'skk-isearch-mode-setup)
+  (add-hook 'isearch-mode-end-hook #'skk-isearch-mode-cleanup)
   (eval-after-load "skk-isearch"
     '(progn
        ;; 起動時アスキーモード
@@ -1119,10 +1120,10 @@
 (when (locate-library "tempbuf")
   (autoload 'turn-on-tempbuf-mode "tempbuf"
     "Kill unused buffers in the background." t)
-  (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
-  (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
-  (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
-  (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
+  (add-hook 'evernote-mode-hook #'turn-on-tempbuf-mode)
+  (add-hook 'sdcv-mode-hook #'turn-on-tempbuf-mode)
+  (add-hook 'help-mode-hook #'turn-on-tempbuf-mode)
+  (add-hook 'dired-mode-hook #'turn-on-tempbuf-mode))
 
 ;;; カーソル位置に印をつけ移動する
 ;; git clone git://github.com/joodland/bm.git
@@ -1133,9 +1134,9 @@
   (autoload 'bm-toggle "bm" "Toggle bookmark at point." t)
   (autoload 'bm-previous "bm" "Goto previous bookmark." t)
   (autoload 'bm-next "bm" "Goto next bookmark." t)
-  (add-hook 'after-init-hook 'bm-repository-load)
-  (add-hook 'find-file-hooks 'bm-buffer-restore)
-  (add-hook 'after-revert-hook 'bm-buffer-restore)
+  (add-hook 'after-init-hook #'bm-repository-load)
+  (add-hook 'find-file-hooks #'bm-buffer-restore)
+  (add-hook 'after-revert-hook #'bm-buffer-restore)
   ;; キーバインド
   (define-key global-map (kbd "M-\\") 'bm-toggle)
   (define-key global-map (kbd "M-[") 'bm-previous)
@@ -1152,10 +1153,10 @@
        (when (boundp 'bm-restore-repository-on-load)
          (setq bm-restore-repository-on-load t))
        ;; 設定ファイルのセーブ
-       (add-hook 'kill-buffer-hook 'bm-buffer-save)
-       (add-hook 'auto-save-hook 'bm-buffer-save)
-       (add-hook 'after-save-hook 'bm-buffer-save)
-       (add-hook 'vc-before-checkin-hook 'bm-buffer-save)
+       (add-hook 'kill-buffer-hook #'bm-buffer-save)
+       (add-hook 'auto-save-hook #'bm-buffer-save)
+       (add-hook 'after-save-hook #'bm-buffer-save)
+       (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
        (add-hook 'kill-emacs-hook (lambda nil
                                     (bm-buffer-save-all)
                                     (bm-repository-save)))
@@ -1181,7 +1182,7 @@
     "Rename files editing their names in dired buffers." t)
   (autoload 'session-initialize "session"
     "Initialize package session and read previous session file." t)
-  (add-hook 'after-init-hook 'session-initialize)
+  (add-hook 'after-init-hook #'session-initialize)
   (eval-after-load "cus-load"
     '(progn
        (custom-add-load 'data 'session)
@@ -1627,9 +1628,9 @@
     "Turn on pseudo-structural editing of Lisp code." t)
   (autoload 'disable-paredit-mode "paredit"
     "Turn off pseudo-structural editing of Lisp code." t)
-  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook 'disable-paredit-mode))
+  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'disable-paredit-mode))
 
 ;;; 自動バイトコンパイル
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
@@ -1637,7 +1638,7 @@
   (autoload 'enable-auto-async-byte-compile-mode
     "auto-async-byte-compile"
     "Automatically byte-compile when saved." t)
-  (add-hook 'emacs-lisp-mode-hook 'enable-auto-async-byte-compile-mode)
+  (add-hook 'emacs-lisp-mode-hook #'enable-auto-async-byte-compile-mode)
   (eval-after-load "auto-async-byte-compile"
     '(progn
        ;; バイトコンパイルしないファイル
@@ -1650,7 +1651,7 @@
 (when (locate-library "usage-memo")
   (autoload 'umemo-initialize "usage-memo"
     "Integration of Emacs help system and memo." t)
-  (add-hook 'help-mode-hook 'umemo-initialize)
+  (add-hook 'help-mode-hook #'umemo-initialize)
   (eval-after-load "usage-memo"
     '(progn
        ;; ディレクトリ
@@ -2182,13 +2183,15 @@
 
 ;;; 端末エミュレータ
 ;; eshell
+;; 空白を強調表示しない
 (add-hook 'eshell-mode-hook
           (lambda ()
-            (setq show-trailing-whitespace nil))) ; 空白を強調表示しない
+            (setq show-trailing-whitespace nil)))
 ;; shell
+;; 空白を強調表示しない
 (add-hook 'shell-mode-hook
           (lambda ()
-            (setq show-trailing-whitespace nil))) ; 空白を強調表示しない
+            (setq show-trailing-whitespace nil)))
 
 ;; zsh を使用するときはこれを使うことにする
 ;; (install-elisp-from-emacswiki "multi-term.el")
@@ -2349,7 +2352,8 @@
        (when (boundp 'ac-modes)            ; 補完対象モード
          (setq ac-modes
                (append ac-modes
-                       (list 'malabar-mode 'php-mode 'javascript-mode 'css-mode))))
+                       (list 'malabar-mode 'php-mode
+                             'javascript-mode 'css-mode))))
        ;; キーバインド
        (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
          (ac-set-trigger-key "M-n"))
@@ -2359,11 +2363,22 @@
        (message "Loading %s (auto-complete)...done" this-file-name))))
 
 ;;; テンプレート挿入
-(when (eval-and-compile (require 'autoinsert nil t))
-  (auto-insert-mode t)
-  (setq auto-insert-directory "~/.emacs.d/autoinsert/")
-  (add-to-list 'auto-insert-alist '("\\.el" . "lisp-template.el"))
-  (add-to-list 'auto-insert-alist '("\\.pl" . "perl-template.pl")))
+(when (locate-library "autoinsert")
+  (autoload 'auto-insert "autoinsert"
+    "Automatic mode-dependent insertion of text into new files" t)
+  (add-hook 'find-file-not-found-hooks 'auto-insert)
+  (eval-after-load "autoinsert"
+    '(progn
+       (when (boundp 'auto-insert-directory)
+         (setq auto-insert-directory "~/.emacs.d/autoinsert/"))
+       (when (boundp 'auto-insert-alist)
+         (setq auto-insert-alist
+               (append '(("\\.el" . "lisp-template.el")
+                         ("\\.pl" . "perl-template.pl")
+                         ("\\.xml" . "xml-template.xml")
+                         ("\\.xhtml\\([.]?\\w+\\)*" . "xml-template.xml"))
+                       auto-insert-alist)))
+       (message "Loading %s (autoinsert)...done" this-file-name))))
 
 ;;; 略語から定型文を入力する
 ;; [new] git clone https://github.com/capitaomorte/yasnippet.git
@@ -2411,6 +2426,40 @@
        (when (boundp 'eldoc-echo-area-use-multiline-p)
          (setq eldoc-echo-area-use-multiline-p t))
        (message "Loading %s (eldoc-extension)...done" this-file-name))))
+
+;;; Psgml モード
+;; C-c C-p  DTD の Parse
+;; C-c C-o  文章の Parse
+;; C-c C-e  element の挿入
+;; C-c /    終了タグを挿入
+(when (eval-and-compile
+        (and (require 'nxml-mode nil t)
+             (require 'psgml nil t)))
+  (autoload 'sgml-mode "psgml" "Major mode to edit SGML files." t)
+  (autoload 'xml-mode "psgml" "Major mode to edit XML files." t)
+
+  (setq auto-mode-alist
+        (append
+         '(("\\.\\(html\\|xml\\|sgml\\)$" . xml-mode)
+           ("\\.xhtml\\([.]?\\w+\\)*$" . xml-mode))
+         auto-mode-alist))
+  ;; DTD の自動読み込み
+  (when (boundp 'sgml-auto-activate-dtd)
+    (setq sgml-auto-activate-dtd t))
+  ;; 色の設定
+  (when (boundp 'sgml-set-face)
+    (setq sgml-set-face t))
+  (when (boundp 'sgml-markup-faces)
+    (setq sgml-markup-faces
+          '((start-tag . font-lock-keyword-face)
+            (end-tag . font-lock-keyword-face)
+            (comment . font-lock-comment-face)
+            (pi . font-lock-constant-face)
+            (sgml . font-lock-type-face)
+            (doctype . bold)
+            (entity . italic)
+            (shortref . font-lock-reference-face))))
+  (message "Loading %s (psgml)...done" this-file-name))
 
 ;;; C 言語
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
@@ -2465,7 +2514,7 @@
                 (when (fboundp 'global-srecode-minor-mode)
                   (global-srecode-minor-mode 1))
                 (message "Loading %s (cedet)...done" this-file-name))))
-    (add-hook 'c-mode-common-hook 'hook) ; C, C++
+    (add-hook 'c-mode-common-hook hook) ; C, C++
     (add-hook 'java-mode-hook hook)))    ; Java
 
 ;;; Perl
