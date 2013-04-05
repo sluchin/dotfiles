@@ -1125,7 +1125,7 @@
        (when (fboundp 'auto-install-compatibility-setup)
          (auto-install-compatibility-setup)))))
 
-;;; 単語選択
+;;; 単語選択 (デフォルト: M-@)
 ;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/thing-opt.el")
 (when (eval-and-compile (require 'thing-opt nil t))
   (when (fboundp 'define-thing-commands)
