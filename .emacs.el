@@ -1131,8 +1131,9 @@
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
   (define-key global-map (kbd "C-2") 'mark-word*)   ; 単語選択
-  (define-key global-map (kbd "C-3") 'mark-up-list) ; リスト選択
-  (define-key global-map (kbd "C-4") 'mark-string)) ; 文字列選択
+  (define-key global-map (kbd "C-3") 'mark-symbol)  ; シンボル
+  (define-key global-map (kbd "C-4") 'mark-up-list) ; リスト選択
+  (define-key global-map (kbd "C-5") 'mark-string)) ; 文字列選択
 
 ;;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
