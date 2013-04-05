@@ -281,7 +281,6 @@
            (python-mode           . "φ")
            (cperl-mode            . "ψ")
            (xml-mode              . "χ"))))
-           (nxhtml-mode           . "nx"))))
     (dolist (cleaner modes)
       (let* ((mode (car cleaner))
              (short (cdr cleaner))
@@ -797,7 +796,8 @@
                             (concat "tar cfz " tarfile " *") nil files)
                          (error (message "%s" err))))
                    (message (concat
-                             "Execute tar command to `" tarfile "'...done" this-file-name)))))))
+                             "Execute tar command to `"
+                             tarfile "'...done" this-file-name)))))))
          (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))
        (message "Loading %s (dired)...done" this-file-name))))
 
@@ -1223,6 +1223,10 @@
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (require 'minibuf-isearch nil t))))
+
+;;; Emacs 内シェルコマンド履歴保存
+;; (install-elisp-from-emacswiki "shell-history.el")
+(require 'shell-history nil t)
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
@@ -2522,6 +2526,7 @@
                                          ac-source-semantic
                                          ac-source-gtags)
                                        ac-sources)))))
+
 ;; ミニバッファにプロトタイプ表示
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
 (when (locate-library "c-eldoc")
@@ -2529,31 +2534,32 @@
     "Helpful description of the arguments to C functions." t)
   (add-hook 'c-mode-common-hook 'c-turn-on-eldoc-mode)
 
-(eval-after-load "c-eldoc"
-  '(progn
-     ;; 関数が見つからないメッセージ抑制
-     (defadvice c-eldoc-print-current-symbol-info
-       (around c-eldoc-print-current-symbol-info-noerror activate compile)
-       (flet ((message (format-string &rest args)
-                       (eval `(format ,format-string ,@args))))
-         ad-do-it))
-     ;; 待ち時間
-     (when (boundp 'eldoc-idle-delay)
-       (setq eldoc-idle-delay 0.1))
-     ;; 折り返して表示
-     (when (boundp 'eldoc-echo-area-use-multiline-p)
-       (setq eldoc-echo-area-use-multiline-p t))
-     ;; インクルードパス
-     (when (boundp 'c-eldoc-includes)
-       (setq c-eldoc-includes "") ; 初期化
-       (let ((includes (list "-I./ -I../ "
-                             "-I/usr/src/linux-source-3.2.0/include/ "
-                             "-I/usr/include/ "
-                             "`pkg-config gtk+-2.0 --cflags`")))
-         (dolist (include includes)
-           (setq c-eldoc-includes
-                 (concat c-eldoc-includes include)))))
-     (message "Loading %s (c-eldoc)...done" this-file-name))))
+  (eval-after-load "c-eldoc"
+    '(progn
+       ;; 関数が見つからないメッセージ抑制
+       (defadvice c-eldoc-print-current-symbol-info
+         (around c-eldoc-print-current-symbol-info-noerror activate compile)
+         (flet ((message (format-string &rest args)
+                         (eval `(format ,format-string ,@args))))
+           ad-do-it))
+       ;; 待ち時間
+       (when (boundp 'eldoc-idle-delay)
+         (setq eldoc-idle-delay 0.1))
+       ;; 折り返して表示
+       (when (boundp 'eldoc-echo-area-use-multiline-p)
+         (setq eldoc-echo-area-use-multiline-p t))
+       ;; インクルードパス
+       (when (boundp 'c-eldoc-includes)
+         (setq c-eldoc-includes "") ; 初期化
+         (let ((includes (list "-I./ -I../ "
+                               "-I/usr/src/linux-source-3.2.0/include/ "
+                               "-I/usr/include/ "
+                               "`pkg-config gtk+-2.0 --cflags`")))
+           (dolist (include includes)
+             (setq c-eldoc-includes
+                   (concat c-eldoc-includes include)))))
+       (message "Loading %s (c-eldoc)...done" this-file-name))))
+
 ;; CEDET
 (when (locate-library "cedet")
   (let ((hook (lambda ()
