@@ -421,6 +421,7 @@
           (isearch-update-ring
            (buffer-substring-no-properties (mark) (point)))
           (deactivate-mark)))))
+
 ;; migemo
 ;; sudo apt-get install migemo cmigemo
 ;; C-e でトグル
@@ -449,6 +450,7 @@
        (when (boundp 'migemo-coding-system)    ; euc-jp
          (setq migemo-coding-system 'euc-jp))
        (message "Loading %s (migemo)...done" this-file-name))))
+
 ;; 日本語で検索するための設定
 (when (locate-library "skk-isearch")
   (autoload 'skk-isearch-mode-setup "skk-isearch"
@@ -488,9 +490,6 @@
 ;; (デフォルト: C-u C-@ C-u C-@ ...)
 (setq set-mark-command-repeat-pop t)
 
-;; C-d または Delete でリージョンを削除できるようにする
-(delete-selection-mode t)
-
 ;; C-@ マークコマンド
 (defadvice set-mark-command
   (after print-mark-ring (arg) activate compile)
@@ -509,7 +508,7 @@
         (setq lst (append lst (list m)))))
     (setq mark-ring lst))
   (message "%s - %s" (point) mark-ring))
-(define-key global-map (kbd "C-2") 'delete-mark-ring)
+(define-key global-map (kbd "C-1") 'delete-mark-ring)
 
 ;; mark-ring を全削除
 (defun clear-mark-ring ()
@@ -530,11 +529,12 @@
     (message "debug-on-error %s" debug-on-error)))
 
 ;; f3 でロードする
-(define-key emacs-lisp-mode-map (kbd "<f3>")
-  (lambda ()
-    "Load the current buffer."
-    (interactive)
-    (load-file buffer-file-name)))
+(when (boundp 'emacs-lisp-mode-map)
+  (define-key emacs-lisp-mode-map (kbd "<f3>")
+    (lambda ()
+      "Load the current buffer."
+      (interactive)
+      (load-file buffer-file-name))))
 
 ;; リージョンまたはワードを返却するマクロ
 (defmacro region-or-word ()
@@ -618,10 +618,14 @@
 
 ;; lisp 補完
 ;; Tab で補完 (デフォルト: M-Tab)
-(define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
-(define-key lisp-interaction-mode-map (kbd "TAB") 'lisp-complete-symbol)
-(define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol)
-(define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol)
+(when (boundp 'emacs-lisp-mode-map)
+  (define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol))
+(when (boundp 'lisp-interaction-mode-map)
+  (define-key lisp-interaction-mode-map (kbd "TAB") 'lisp-complete-symbol))
+(when (boundp 'lisp-mode-map)
+  (define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol))
+(when (boundp 'read-expression-map)
+  (define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol))
 
 ;; 改行と同時にインデントも行う
 (define-key global-map (kbd "C-m") 'newline-and-indent)
@@ -654,6 +658,12 @@
 
 ;; エコー領域をクリアする
 (define-key global-map (kbd "C-c C-g") (lambda () (interactive) (message nil)))
+
+;; C-q をプリフィックスキー化
+(define-key global-map (kbd "C-q") (make-sparse-keymap))
+
+;; 制御文字の挿入（デフォルト: C-q）
+(define-key global-map (kbd "C-q C-q") 'quoted-insert)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
@@ -721,7 +731,9 @@
            "Rename files editing their names in dired buffers." t)
 
          (eval-after-load "wdired"
-           '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
+           '(progn
+              (when (boundp 'dired-mode-map)
+                (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))))
 
        ;; ディレクトリを先に表示する
        (cond ((eq system-type 'windows-nt)
@@ -742,19 +754,23 @@
        (setq dired-recursive-deletes 'always)
 
        ;; firefox で開く
-       (when (executable-find "firefox")
+       (when (and (executable-find "firefox")
+                  (boundp 'dired-mode-map))
          (define-key dired-mode-map (kbd "C-f")
            (lambda () (interactive) (dired-run-command "firefox"))))
        ;; libreoffice で開く
-       (when (executable-find "libreoffice")
+       (when (and (executable-find "libreoffice")
+                  (boundp 'dired-mode-map))
          (define-key dired-mode-map (kbd "C-l")
            (lambda () (interactive) (dired-run-command "libreoffice"))))
        ;; evince で開く
-       (when (executable-find "evince")
+       (when (and (executable-find "evince")
+                  (boundp 'dired-mode-map))
          (define-key dired-mode-map (kbd "C-e")
            (lambda () (interactive) (dired-run-command "evince"))))
        ;; vlc で開く
-       (when (executable-find "vlc")
+       (when (and (executable-find "vlc")
+                  (boundp 'dired-mode-map))
          (define-key dired-mode-map (kbd "C-v")
            (lambda () (interactive) (dired-run-command "vlc"))))
        ;; w3m で開く
@@ -771,7 +787,8 @@
                                            (file-name-nondirectory file)))
                      (w3m-find-file file))
                  (message "%s is a directory" file)))))
-         (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file))
+         (when (boundp 'dired-mode-map)
+           (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file)))
 
        ;; tar + gzip で圧縮
        (when (and (executable-find "tar")
@@ -798,7 +815,8 @@
                    (message (concat
                              "Execute tar command to `"
                              tarfile "'...done" this-file-name)))))))
-         (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip))
+         (when (boundp 'dired-mode-map)
+           (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
@@ -1032,9 +1050,16 @@
          (message "org-default-notes-file: %s" org-default-notes-file))
        (when (boundp 'org-remember-templates)  ; テンプレート
          (setq org-remember-templates
-               '(("Todo" ?t "** TODO%?\n%i\n   %a\n   %t" nil "Inbox")
-                 ("Bug" ?b "** TODO%?   :bug:\n%i\n   %a\n   %t" nil "Inbox")
-                 ("Idea" ?i "**%?\n%i\n   %a\n   %t" nil "New Ideas"))))
+               '(("Todo"  ?t
+                  "** TODO%?\n%i\n   %a\n   %t\n" nil "Inbox")
+                 ("Bug"   ?b
+                  "** TODO%?   :bug:\n%i\n   %a\n   %t\n" nil "Inbox")
+                 ("Idea"  ?i
+                  "**%?\n%i\n   %a\n   %t\n" nil "New Ideas")
+                 ("Emacs" ?e
+                  "**%?\n%i\n   %a\n   %t\n" nil "Emacs")
+                 ("Memo"  ?m
+                  "**%?\n%i\n   %a\n   %t\n" nil "Memo"))))
        (when (fboundp 'org-remember-insinuate) ; 初期化
          (org-remember-insinuate))
 
@@ -1056,7 +1081,7 @@
                   (prefix
                    (concat "[" (substring (symbol-name major-mode) 0 -5) "]"))
                   (org-remember-templates
-                   `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t"
+                   `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t\n"
                       org-directory "Memo"))))
              (message "org-remember-code-reading: %s" org-default-notes-file)
              (org-remember))))
@@ -1083,19 +1108,31 @@
 ;; 使用する場合 lisp をロードパスの通ったところにインストールすること
 
 ;;; インストーラ
-;; wget http://www.emacswiki.org/emacs/download/auto-install.el
-;; autoloadすると一回目に error になるため使うときは, 以下を評価する
-;; (enable-auto-install)
-(defun enable-auto-install ()
-  "Do enable auto-install."
-  (interactive)
-  (when (eval-and-compile (require 'auto-install nil t))
-    ;; 起動時に EmacsWiki のページ名を補完候補に加える
-    (when (fboundp 'auto-install-update-emacswiki-package-name)
-      (auto-install-update-emacswiki-package-name t))
-    ;; install-elisp.el 互換モードにする
-    (when (fboundp 'auto-install-compatibility-setup)
-      (auto-install-compatibility-setup))))
+;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/auto-install.el")
+(when (locate-library "auto-install")
+  (autoload 'auto-install "auto-install"
+    "Auto install elisp file." t)
+  (autoload 'install-elisp "auto-install"
+    "Install an elisp file from a given url." t)
+  (autoload 'install-elisp-from-emacswiki "auto-install"
+    "Install an elisp file from EmacsWiki.org." t)
+  (eval-after-load "auto-install"
+    '(progn
+       ;; 起動時に EmacsWiki のページ名を補完候補に加える
+       (when (fboundp 'auto-install-update-emacswiki-package-name)
+         (auto-install-update-emacswiki-package-name t))
+       ;; install-elisp.el 互換モードにする
+       (when (fboundp 'auto-install-compatibility-setup)
+         (auto-install-compatibility-setup)))))
+
+;;; 単語選択
+;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/thing-opt.el")
+(when (eval-and-compile (require 'thing-opt nil t))
+  (when (fboundp 'define-thing-commands)
+    (define-thing-commands))
+  (define-key global-map (kbd "C-2") 'mark-word*)   ; 単語選択
+  (define-key global-map (kbd "C-3") 'mark-up-list) ; リスト選択
+  (define-key global-map (kbd "C-4") 'mark-string)) ; 文字列選択
 
 ;;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
@@ -1223,10 +1260,6 @@
   (add-hook 'minibuffer-setup-hook
             (lambda ()
               (require 'minibuf-isearch nil t))))
-
-;;; Emacs 内シェルコマンド履歴保存
-;; (install-elisp-from-emacswiki "shell-history.el")
-(require 'shell-history nil t)
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
@@ -1551,6 +1584,7 @@
          (when (and (boundp 'skk-sticky-key)
                     (string= skk-sticky-key ";")
                     (boundp 'paredit-mode)
+                    (boundp 'paredit-mode-map)
                     paredit-mode)
            (if skk-mode
                (define-key paredit-mode-map
@@ -1559,15 +1593,16 @@
                skk-sticky-key 'paredit-semicolon))))
 
        ;; 動的補完の候補表示件数を変更
-       (define-key skk-j-mode-map (kbd "M-;")
-         (lambda (&optional n)
-           (interactive "P")
-           (if (and skk-dcomp-multiple-rows (eq n nil))
-               (setq skk-dcomp-multiple-rows 1)
-             (if (eq n nil) ; デフォルト
-                 (setq skk-dcomp-multiple-rows 5)
-               (setq skk-dcomp-multiple-rows n)))
-           (message "skk-dcomp-multiple-rows %s" skk-dcomp-multiple-rows)))
+       (when (boundp 'skk-j-mode-map)
+         (define-key skk-j-mode-map (kbd "M-;")
+           (lambda (&optional n)
+             (interactive "P")
+             (if (and skk-dcomp-multiple-rows (eq n nil))
+                 (setq skk-dcomp-multiple-rows 1)
+               (if (eq n nil) ; デフォルト
+                   (setq skk-dcomp-multiple-rows 5)
+                 (setq skk-dcomp-multiple-rows n)))
+             (message "skk-dcomp-multiple-rows %s" skk-dcomp-multiple-rows))))
 
        ;; Enter で確定 (デフォルト: C-j)
        (when (boundp 'skk-egg-like-newline)
@@ -1635,7 +1670,8 @@
 (when (locate-library "lispxmp")
   (autoload 'lispxmp "lispxmp" "Automatic emacs lisp code annotation." t)
   ;; C-c C-d で注釈
-  (define-key emacs-lisp-mode-map (kbd "C-c C-d") 'lispxmp))
+  (when (boundp 'emacs-lisp-mode-map)
+    (define-key emacs-lisp-mode-map (kbd "C-c C-d") 'lispxmp)))
 
 ;;; 括弧の対応を保持して編集する設定
 ;; (install-elisp "http://mumble.net/~campbell/emacs/paredit.el")
@@ -1784,7 +1820,8 @@
            (add-to-list 'magit-diff-options "-b"))
          (magit-refresh)
          (message "magit-diff-options %s" magit-diff-options))
-       (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace)
+       (when (boundp 'magit-mode-map)
+         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))
        (message "Loading %s (magit)...done" this-file-name))))
 
 ;;; Windows の設定
@@ -1814,12 +1851,14 @@
       (defun uenox-dired-winstart ()
         "Type '[uenox-dired-winstart]': win-start the current line's file."
         (interactive)
-        (when (eq major-mode 'dired-mode)
+        (when (and (fboundp 'dired-get-filename)
+                   (eq major-mode 'dired-mode))
           (let ((fname (dired-get-filename)))
             (w32-shell-execute "open" fname)
             (message "win-started %s" fname))))
       ;; dired のキー割り当て追加
-      (define-key dired-mode-map "z" 'uenox-dired-winstart))
+      (when (boundp 'dired-mode-map)
+        (define-key dired-mode-map "z" 'uenox-dired-winstart)))
 
     ;; find や grep で "grep: NUL: No such file or directory" を回避する
     (setq null-device "/dev/null")))
@@ -2119,10 +2158,12 @@
     (interactive)
     (when (fboundp 'w3m-browse-url)
       (let ((dir "/usr/share/doc/stl-manual/html"))
-        (w3m-browse-url
-         (concat "file://"
-                 (file-name-as-directory (expand-file-name dir))
-                 "index.html")))))
+        (if (file-exists-p dir)
+            (w3m-browse-url
+             (concat "file://"
+                     (file-name-as-directory (expand-file-name dir))
+                     "index.html"))
+          (message "Directory does not exist: %s" dir)))))
 
   (eval-after-load "w3m"
     '(progn
@@ -2142,10 +2183,11 @@
        (when (boundp 'w3m-weather-default-area)
          (setq w3m-weather-default-area "道央・石狩"))
        ;; キーバインドをカスタマイズ
-       (define-key w3m-mode-map (kbd "<left>") 'backward-char)
-       (define-key w3m-mode-map (kbd "<right>") 'forward-char)
-       (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
-       (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-next-page)
+       (when (boundp 'w3m-mode-map)
+         (define-key w3m-mode-map (kbd "<left>") 'backward-char)
+         (define-key w3m-mode-map (kbd "<right>") 'forward-char)
+         (define-key w3m-mode-map (kbd "<M-left>") 'w3m-view-previous-page)
+         (define-key w3m-mode-map (kbd "<M-right>") 'w3m-view-next-page))
        (message "Loading %s (w3m)...done" this-file-name))))
 
 ;;; Evernote
@@ -2233,7 +2275,8 @@
           (lambda ()
             (setq show-trailing-whitespace nil)))
 
-;; zsh を使用するときはこれを使うことにする
+;; multi-term
+;; zsh に設定
 ;; (install-elisp-from-emacswiki "multi-term.el")
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
@@ -2324,28 +2367,30 @@
        (when (boundp 'gtags-select-buffer-single)
          (setq gtags-select-buffer-single t))
        ;; キーバインド
-       ;; 定義タグ検索
-       (define-key gtags-mode-map (kbd "C-c g d") 'gtags-find-tag)
-       ;; 参照タグ検索
-       (define-key gtags-mode-map (kbd "C-c g r") 'gtags-find-rtag)
-       ;; シンボル一覧表示
-       (define-key gtags-mode-map (kbd "C-c g s") 'gtags-find-symbol)
-       ;; grep 検索
-       (define-key gtags-mode-map (kbd "C-c g g") 'gtags-find-with-grep)
-       ;; POSIX 正規表現検索
-       (define-key gtags-mode-map (kbd "C-c g p") 'gtags-find-pattern)
-       ;; パス名検索
-       (define-key gtags-mode-map (kbd "C-c g P") 'gtags-find-file)
-       ;; ファイルの定義タグ検索
-       (define-key gtags-mode-map (kbd "C-c g f") 'gtags-parse-file)
-       ;; コンテキスト検索
-       (define-key gtags-mode-map (kbd "C-]") 'gtags-find-tag-from-here)
-       ;; タグスタックをポップ
-       (define-key gtags-mode-map (kbd "C-t") 'gtags-pop-stack)
+       (when (boundp 'gtags-mode-map)
+         ;; 定義タグ検索
+         (define-key gtags-mode-map (kbd "C-c g d") 'gtags-find-tag)
+         ;; 参照タグ検索
+         (define-key gtags-mode-map (kbd "C-c g r") 'gtags-find-rtag)
+         ;; シンボル一覧表示
+         (define-key gtags-mode-map (kbd "C-c g s") 'gtags-find-symbol)
+         ;; grep 検索
+         (define-key gtags-mode-map (kbd "C-c g g") 'gtags-find-with-grep)
+         ;; POSIX 正規表現検索
+         (define-key gtags-mode-map (kbd "C-c g p") 'gtags-find-pattern)
+         ;; パス名検索
+         (define-key gtags-mode-map (kbd "C-c g P") 'gtags-find-file)
+         ;; ファイルの定義タグ検索
+         (define-key gtags-mode-map (kbd "C-c g f") 'gtags-parse-file)
+         ;; コンテキスト検索
+         (define-key gtags-mode-map (kbd "C-]") 'gtags-find-tag-from-here)
+         ;; タグスタックをポップ
+         (define-key gtags-mode-map (kbd "C-t") 'gtags-pop-stack))
        ;; 一覧表示のキーバインド
-       (define-key gtags-select-mode-map "p" 'previous-line)
-       (define-key gtags-select-mode-map "n" 'next-line)
-       (define-key gtags-select-mode-map "q" 'gtags-pop-stack)
+       (when (boundp 'gtags-select-mode-map)
+         (define-key gtags-select-mode-map "p" 'previous-line)
+         (define-key gtags-select-mode-map "n" 'next-line)
+         (define-key gtags-select-mode-map "q" 'gtags-pop-stack))
        (message "Loading %s (gtags)...done" this-file-name))))
 
 ;;; オートコンプリート
@@ -2398,9 +2443,10 @@
        ;; キーバインド
        (when (fboundp 'ac-set-trigger-key)  ; 起動キーの設定
          (ac-set-trigger-key "M-n"))
-       (define-key ac-complete-mode-map (kbd "M-p") 'ac-stop)
-       (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
-       (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
+       (when (boundp 'ac-complete-mode-map)
+         (define-key ac-complete-mode-map (kbd "M-p") 'ac-stop)
+         (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
+         (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous))
        (message "Loading %s (auto-complete)...done" this-file-name))))
 
 ;;; テンプレート挿入
