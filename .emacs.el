@@ -84,6 +84,7 @@
 ;; * Emacs-ja: (emacs-ja).    The extensible self-documenting text editor(Japanese).
 (when (file-directory-p "~/.emacs.d/info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
+
   (eval-after-load "info"
     '(progn
        (when (boundp 'Info-directory-list)
@@ -266,20 +267,20 @@
 (defun display-short-mode-name ()
   (let ((modes
          ;; マイナーモード
-         '((auto-complete-mode . " α")
-           (yas/minor-mode . " υ")
-           (paredit-mode . " π")
-           (gtags-mode . " ν")
-           (undo-tree-mode . "")
-           (eldoc-mode . "")
-           (abbrev-mode . "")
+         '((auto-complete-mode    . " α")
+           (yas/minor-mode        . " υ")
+           (paredit-mode          . " π")
+           (gtags-mode            . " ν")
+           (undo-tree-mode        . "")
+           (eldoc-mode            . "")
+           (abbrev-mode           . "")
            ;; メジャーモード
            (lisp-interaction-mode . "λ")
-           (emacs-lisp-mode . "ε")
-           (ruby-mode . "в")
-           (python-mode . "φ")
-           (cperl-mode . "ψ")
-           (nxhtml-mode . "nx"))))
+           (emacs-lisp-mode       . "ε")
+           (ruby-mode             . "в")
+           (python-mode           . "φ")
+           (cperl-mode            . "ψ")
+           (xml-mode              . "χ"))))
     (dolist (cleaner modes)
       (let* ((mode (car cleaner))
              (short (cdr cleaner))
@@ -426,6 +427,7 @@
   (autoload 'migemo-init "migemo"
     "Japanese incremental search through dynamic pattern expansion." t)
   (add-hook 'isearch-mode-hook #'migemo-init)
+
   (eval-after-load "migemo"
     '(progn
        (when (boundp 'migemo-command)          ; コマンド
@@ -453,6 +455,7 @@
     "Hook function called when skk isearch is done." t)
   (add-hook 'isearch-mode-hook #'skk-isearch-mode-setup)
   (add-hook 'isearch-mode-end-hook #'skk-isearch-mode-cleanup)
+
   (eval-after-load "skk-isearch"
     '(progn
        ;; 起動時アスキーモード
@@ -707,12 +710,14 @@
             (lambda ()
               (set (make-local-variable
                     'delete-by-moving-to-trash) t)))
+
   (eval-after-load "dired"
     '(progn
        ;; 編集可能にする
        (when (locate-library "wdired")
          (autoload 'wdired-change-to-wdired-mode "wdired"
            "Rename files editing their names in dired buffers." t)
+
          (eval-after-load "wdired"
            '(define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))
 
@@ -805,6 +810,7 @@
   ;; フォーカスを移す
   (define-key global-map (kbd "M-`") 'speedbar-get-focus)
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
+
   (eval-after-load "speedbar"
     '(progn
        ;; フレームサイズ
@@ -1001,6 +1007,7 @@
   (define-key global-map (kbd "C-c o r") 'org-remember)
   (define-key global-map (kbd "C-c o c") 'org-remember-code-reading)
   (define-key global-map (kbd "C-c o b") 'org-iswitchb)
+
   (eval-after-load "org"
     '(progn
        ;; org-mode
@@ -1141,6 +1148,7 @@
   (define-key global-map (kbd "M-\\") 'bm-toggle)
   (define-key global-map (kbd "M-[") 'bm-previous)
   (define-key global-map (kbd "M-]") 'bm-next)
+
   (eval-after-load "bm"
     '(progn
        ;; マークのセーブ
@@ -1183,6 +1191,7 @@
   (autoload 'session-initialize "session"
     "Initialize package session and read previous session file." t)
   (add-hook 'after-init-hook #'session-initialize)
+
   (eval-after-load "cus-load"
     '(progn
        (custom-add-load 'data 'session)
@@ -1223,7 +1232,7 @@
   (when (boundp 'recentf-exclude)         ; 除外するファイル
     (setq recentf-exclude
           '("/TAGS$" "/var/tmp/" "/tmp/"
-            "~$" "/$" "/howm/" ".howm-keys")))
+            "~$" "/$" "/howm/" ".howm-keys" ".emacs.d/bookmarks")))
   (define-key global-map (kbd "C-c C-f") 'recentf-open-files))
 
 ;;; タブ
@@ -1232,6 +1241,7 @@
   (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
   ;; M-2 でタブ表示
   (define-key global-map (kbd "M-2") 'tabbar-mode)
+
   (eval-after-load "tabbar"
     '(progn
        ;; 色の設定
@@ -1253,12 +1263,12 @@
        (setq tabbar-buffer-list-function
              (lambda ()
                (let ((messages "\\(Messages\\)")
-                     (scratch "\\(scratch\\)")
-                     (gtags "\\(GTAGS\\)")
-                     (woman "\\(woman\\)")
-                     (man "\\(man\\)")
-                     (term "\\(terminal\\)")
-                     (shell "\\([e]?shell\\)"))
+                     (scratch  "\\(scratch\\)")
+                     (gtags    "\\(GTAGS\\)")
+                     (woman    "\\(woman\\)")
+                     (man      "\\(man\\)")
+                     (term     "\\(terminal\\)")
+                     (shell    "\\([e]?shell\\)"))
                  (delq nil
                        (mapcar
                         (lambda (b)
@@ -1297,6 +1307,7 @@
               (buffer-face-set (font-face-attributes "Monapo"))))
   ;; C-c 2 で起動
   (define-key global-map (kbd "C-c 2") 'navi2ch)
+
   (eval-after-load "navi2ch"
     '(progn
        ;; モナーフォントを使う
@@ -1348,6 +1359,7 @@
 (when (locate-library "howm")
   (autoload 'howm-menu "howm" "Hitori Otegaru Wiki Modoki." t)
   (define-key global-map (kbd "C-c h") 'howm-menu)
+
   (eval-after-load "howm"
     '(progn
        ;; メニュー言語
@@ -1451,6 +1463,7 @@
   (autoload 'skk-mode
     "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)." t)
   (define-key global-map (kbd "C-\\") 'skk-mode)
+
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
@@ -1639,6 +1652,7 @@
     "auto-async-byte-compile"
     "Automatically byte-compile when saved." t)
   (add-hook 'emacs-lisp-mode-hook #'enable-auto-async-byte-compile-mode)
+
   (eval-after-load "auto-async-byte-compile"
     '(progn
        ;; バイトコンパイルしないファイル
@@ -1652,6 +1666,7 @@
   (autoload 'umemo-initialize "usage-memo"
     "Integration of Emacs help system and memo." t)
   (add-hook 'help-mode-hook #'umemo-initialize)
+
   (eval-after-load "usage-memo"
     '(progn
        ;; ディレクトリ
@@ -1673,12 +1688,14 @@
 (when (locate-library "pomodoro-technique")
   (autoload 'pomodoro
     "pomodoro-technique" "Pomodoro technique timer for emacs." t)
+
   (eval-after-load "pomodoro-technique"
     '(progn
        (message "Loading %s (pomodoro-technique)...done" this-file-name))))
 
 (when (locate-library "pomodoro")
   (autoload 'pomodoro:start "pomodoro" "Pomodoro Technique for emacs." t)
+
   (eval-after-load "pomodoro"
     '(progn
        ;; 作業時間終了後に開くファイル。デフォルトでは "~/.emacs.d/pomodoro.org"
@@ -1695,6 +1712,7 @@
 
 (when (locate-library "tomatinho")
   (autoload 'tomatinho "tomatinho" "Pomodoro Technique for emacs." t)
+
   (eval-after-load "tomatinho"
     '(progn
        (when (boundp 'tomatinho-bar-length)
@@ -1727,6 +1745,7 @@
 ;; (install-elisp "https://raw.github.com/krick/tea-time/master/tea-time.el")
 (when (locate-library "tea-time")
   (autoload 'tea-time "tea-time" "Timer." t)
+
   (eval-after-load "tea-time"
     '(progn
        ;; サウンドファイルのパス
@@ -1739,6 +1758,7 @@
 ;; git clone git://github.com/magit/magit.git
 (when (and (executable-find "git") (locate-library "magit"))
   (autoload 'magit-status "magit" "Interface for git on Emacs." t)
+
   (eval-after-load "magit"
     '(progn
        ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
@@ -1815,6 +1835,7 @@
   (define-key global-map (kbd "C-c w") 'sdcv-search-input)
   ;; ポップアップ
   (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)
+
   (eval-after-load "sdcv"
     '(progn
        (when (boundp 'sdcv-dictionary-simple-list)
@@ -1851,6 +1872,7 @@
 
   ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY." t)
+
   (eval-after-load "mew"
     '(progn
        ;; 初期設定
@@ -2010,6 +2032,7 @@
             (lambda ()
               (setq header-line-format nil)
               (setq show-trailing-whitespace nil)))
+
   (eval-after-load "twittering-mode"
     '(progn
        ;; OAuth を使わない
@@ -2064,10 +2087,10 @@
   (define-key global-map (kbd "C-c 3 s") 'w3m-search-new-session)
 
   ;; ウィキペディアで検索する
-  (when (fboundp 'w3m-browse-url)
-    (defun w3m-search-wikipedia ()
-      "Search at wikipedia in w3m."
-      (interactive)
+  (defun w3m-search-wikipedia ()
+    "Search at wikipedia in w3m."
+    (interactive)
+    (when (fboundp 'w3m-browse-url)
       (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
                               (let ((region (region-or-word)))
                                 (read-string "wikipedia search: " region nil region)))))
@@ -2084,6 +2107,18 @@
     ;; デフォルトに戻す
     (setq browse-url-browser-function 'browse-url-default-browser))
   (define-key global-map (kbd "C-c 3 u") 'w3m-url-at-point)
+
+  ;; stl-manual を閲覧する
+  ;; sudo apt-get install stl-manual
+  (defun stl-manual ()
+    "Browse stl-manual."
+    (interactive)
+    (when (fboundp 'w3m-browse-url)
+      (let ((dir "/usr/share/doc/stl-manual/html"))
+        (w3m-browse-url
+         (concat "file://"
+                 (file-name-as-directory (expand-file-name dir))
+                 "index.html")))))
 
   (eval-after-load "w3m"
     '(progn
@@ -2158,6 +2193,7 @@
   (define-key global-map (kbd "C-c e p") 'evernote-post-region)
   ;; ブラウザ起動
   (define-key global-map (kbd "C-c e b") 'evernote-browser)
+
   (eval-after-load "evernote-mode"
     '(progn
        (when (boundp 'evernote-enml-formatter-command)
@@ -2198,6 +2234,7 @@
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
   (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t)
+
   (eval-after-load "multi-term"
     '(progn
        (when (boundp 'multi-term-program)   ; zsh を使う
@@ -2224,9 +2261,7 @@
 ;; M-x term または M-x ansi-term で起動
 (when (locate-library "term+")
   (add-hook 'term-mode-hook
-            (lambda ()
-              (require 'term+ nil t)
-              (message "Loading %s...done" (locate-library "term+")))))
+            (lambda () (require 'term+ nil t))))
 
 ;;; ここまで拡張 lisp
 
@@ -2248,6 +2283,7 @@
                   (set-gtags-libpath)))))
     (add-hook 'c-mode-common-hook hook) ; C, C++
     (add-hook 'java-mode-hook hook))    ; Java
+
   (eval-after-load "gtags"
     '(progn
        ;; ローカルバッファ変数
@@ -2271,7 +2307,7 @@
            (message "gtags-libpath: %s" gtags-libpath)))
        ;; 環境変数の設定
        (defadvice gtags-goto-tag
-         (before setenv-gtags-libpath activate)
+         (before setenv-gtags-libpath activate compile)
          (setenv "GTAGSLIBPATH" gtags-libpath)
          (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
        ;; パスの表示形式
@@ -2330,6 +2366,7 @@
         (setq ac-auto-start n)
         (message "ac-auto-start %s" ac-auto-start))))
   (define-key global-map (kbd "<f4>") 'toggle-auto-complete-mode)
+
   (eval-after-load "auto-complete"
     '(progn
        (when (boundp 'ac-dictionary-directories)
@@ -2367,6 +2404,7 @@
   (autoload 'auto-insert "autoinsert"
     "Automatic mode-dependent insertion of text into new files" t)
   (add-hook 'find-file-not-found-hooks 'auto-insert)
+
   (eval-after-load "autoinsert"
     '(progn
        (when (boundp 'auto-insert-directory)
@@ -2398,6 +2436,7 @@
         (let* ((default (cdr (assq 'yas/minor-mode minor-mode-alist))))
           (setcar default " υ")))))
   (define-key global-map (kbd "<f5>") 'toggle-yas/minor-mode)
+
   (eval-after-load "yasnippet"
     '(progn
        (when (fboundp 'yas--initialize) ; 初期化
@@ -2412,11 +2451,12 @@
 ;; ミニバッファにヘルプ表示
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
 (when (locate-library "eldoc-extension")
-  (autoload 'turn-on-eldoc-mode
-    "eldoc-extension" "Some extension for eldoc." t)
+  (autoload 'turn-on-eldoc-mode "eldoc-extension"
+    "Some extension for eldoc." t)
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+
   (eval-after-load "eldoc-extension"
     '(progn
        ;; 待ち時間
@@ -2485,24 +2525,35 @@
 ;; ミニバッファにプロトタイプ表示
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
 (when (locate-library "c-eldoc")
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (require 'c-eldoc nil t)
-              (when (fboundp 'c-turn-on-eldoc-mode)
-                (c-turn-on-eldoc-mode))))
-  (eval-after-load "c-eldoc"
-    '(progn
-       ;; 待ち時間
-       (when (boundp 'eldoc-idle-delay)
-         (setq eldoc-idle-delay 0.1))
-       ;; 折り返して表示
-       (when (boundp 'eldoc-echo-area-use-multiline-p)
-         (setq eldoc-echo-area-use-multiline-p t))
-       ;; インクルードパス
-       (when (boundp 'c-eldoc-includes)
-         (setq c-eldoc-includes
-               "-I./ -I../ -I/usr/include `pkg-config gtk+-2.0 --cflags`"))
-       (message "Loading %s (c-eldoc)...done" this-file-name))))
+  (autoload 'c-turn-on-eldoc-mode "c-eldoc"
+    "Helpful description of the arguments to C functions." t)
+  (add-hook 'c-mode-common-hook 'c-turn-on-eldoc-mode)
+
+(eval-after-load "c-eldoc"
+  '(progn
+     ;; 関数が見つからないメッセージ抑制
+     (defadvice c-eldoc-print-current-symbol-info
+       (around c-eldoc-print-current-symbol-info-noerror activate compile)
+       (flet ((message (format-string &rest args)
+                       (eval `(format ,format-string ,@args))))
+         ad-do-it))
+     ;; 待ち時間
+     (when (boundp 'eldoc-idle-delay)
+       (setq eldoc-idle-delay 0.1))
+     ;; 折り返して表示
+     (when (boundp 'eldoc-echo-area-use-multiline-p)
+       (setq eldoc-echo-area-use-multiline-p t))
+     ;; インクルードパス
+     (when (boundp 'c-eldoc-includes)
+       (setq c-eldoc-includes "") ; 初期化
+       (let ((includes (list "-I./ -I../ "
+                             "-I/usr/src/linux-source-3.2.0/include/ "
+                             "-I/usr/include/ "
+                             "`pkg-config gtk+-2.0 --cflags`")))
+         (dolist (include includes)
+           (setq c-eldoc-includes
+                 (concat c-eldoc-includes include)))))
+     (message "Loading %s (c-eldoc)...done" this-file-name))))
 ;; CEDET
 (when (locate-library "cedet")
   (let ((hook (lambda ()
@@ -2515,7 +2566,7 @@
                   (global-srecode-minor-mode 1))
                 (message "Loading %s (cedet)...done" this-file-name))))
     (add-hook 'c-mode-common-hook hook) ; C, C++
-    (add-hook 'java-mode-hook hook)))    ; Java
+    (add-hook 'java-mode-hook hook)))   ; Java
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
