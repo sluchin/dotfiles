@@ -2550,13 +2550,12 @@
 
 ;;; nXml モード
 (when (locate-library "nxml")
-  (add-hook 'nxml-mode-hook
-            (lambda ()
-              (setq indent-tabs-mode t)
-              (setq tab-width 4)))
+  ;; 拡張子のリスト
   (setq auto-mode-alist
-        (append '(("\\.\\(html\\|xhtml\\|shtml\\|tpl\\)\\'" . nxml-mode))
-                auto-mode-alist))
+        (append
+         '(("\\.\\(html\\|xml\\|shtml\\|sgml\\|xspf\\)$" . nxml-mode)
+           ("\\.xhtml\\([.]?\\w+\\)*$" . nxml-mode))
+         auto-mode-alist))
 
   (eval-after-load "nxml"
     '(progn
