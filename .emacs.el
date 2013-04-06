@@ -267,19 +267,17 @@
 (size-indication-mode t)   ; ファイルサイズ
 
 ;; 時間フォーマット
-(when (locate-library "time")
-  (eval-after-load "time"
-    '(progn
-       (when (boundp 'display-time-day-and-date) ; 日時表示
-         (setq display-time-day-and-date t))
-       (when (boundp 'display-time-24hr-format)  ; 24 時間表示
-         (setq display-time-24hr-format t))
-       (when (boundp 'display-time-string-forms) ; 日時フォーマット
-         (setq display-time-string-forms
-               '((format
-                  "%s/%s(%s) %s:%s "
-                  month day dayname 24-hours minutes))))
-       (message "Loading %s (time)...done" this-file-name))))
+(when (eval-and-compile (require 'time nil t))
+  (when (boundp 'display-time-day-and-date) ; 日時表示
+    (setq display-time-day-and-date t))
+  (when (boundp 'display-time-24hr-format)  ; 24 時間表示
+    (setq display-time-24hr-format t))
+  (when (boundp 'display-time-string-forms) ; 日時フォーマット
+    (setq display-time-string-forms
+          '((format
+             "%s/%s(%s) %s:%s "
+             month day dayname 24-hours minutes))))
+  (message "Loading %s (time)...done" this-file-name))
 
 ;; 割合 バイト数/総行数 [行数:カラム数:カーソル位置]
 (setq mode-line-position
