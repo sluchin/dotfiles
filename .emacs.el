@@ -20,11 +20,31 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 
-;; ファイル名
-(defvar this-file-name load-file-name)
-
 ;;; バックトレースを有効にする
 (setq debug-on-error t)
+
+;;; require 時間を計測する
+(defvar benchmark-alist nil)
+(defadvice require
+  (around require-benchmark
+          (feature &optional filename noerror)
+          activate compile)
+  (let* ((before (time-to-seconds (current-time)))
+         (result ad-do-it)
+         (after (time-to-seconds (current-time)))
+         (time (* (- after before) 1000)))
+    (unless (assq result benchmark-alist)
+      (add-to-list 'benchmark-alist (cons result time)))))
+
+;; 表示
+(defun print-benchmark ()
+  "Print benchmark."
+  (interactive)
+  (dolist (alist (reverse benchmark-alist))
+    (message "%s: %.6f msec" (car alist) (cdr alist))))
+
+;;; ファイル名を保持
+(defvar this-file-name load-file-name)
 
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
@@ -71,7 +91,6 @@
                 "~/.emacs.d/auto-complete-clang"
                 "~/.emacs.d/ajc-java-complete"
                 "~/.emacs.d/malabar-mode/lisp"
-                "~/.emacs.d/psgml"
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
                 "~/.emacs.d/auto-install"
@@ -271,7 +290,6 @@
            (yas/minor-mode        . " υ")
            (paredit-mode          . " π")
            (gtags-mode            . " ν")
-           (undo-tree-mode        . "")
            (eldoc-mode            . "")
            (abbrev-mode           . "")
            ;; メジャーモード
@@ -280,7 +298,7 @@
            (ruby-mode             . "в")
            (python-mode           . "φ")
            (cperl-mode            . "ψ")
-           (xml-mode              . "χ"))))
+           (nxml-mode             . "χ"))))
     (dolist (cleaner modes)
       (let* ((mode (car cleaner))
              (short (cdr cleaner))
@@ -799,22 +817,22 @@
            (when (and (fboundp 'dired-get-marked-files)
                       (boundp 'current-prefix-arg)
                       (fboundp 'dired-do-shell-command))
-             (let ((files (dired-get-marked-files t current-prefix-arg)))
-               (let ((default (concat (car files) ".tar.gz")))
-                 (let ((tarfile (read-string "Filename: " default nil default)))
-                   (unless (string-match
-                            "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
-                     (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
-                   (or (when (member tarfile (directory-files default-directory))
-                         (not (y-or-n-p ; 同名ファイル
-                               (concat "Overwrite `" tarfile "'? [Type yn]"))))
-                       (condition-case err
-                           (dired-do-shell-command
-                            (concat "tar cfz " tarfile " *") nil files)
-                         (error (message "%s" err))))
-                   (message (concat
-                             "Execute tar command to `"
-                             tarfile "'...done" this-file-name)))))))
+             (let* ((files (dired-get-marked-files t current-prefix-arg))
+                    (default (concat (car files) ".tar.gz"))
+                    (tarfile (read-string "Filename: " default nil default)))
+               (unless (string-match
+                        "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
+                 (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
+               (or (when (member tarfile (directory-files default-directory))
+                     (not (y-or-n-p ; 同名ファイル
+                           (concat "Overwrite `" tarfile "'? [Type yn]"))))
+                   (condition-case err
+                       (dired-do-shell-command
+                        (concat "tar cfz " tarfile " *") nil files)
+                     (error (message "%s" err))))
+               (message (concat
+                         "Execute tar command to `"
+                         tarfile "'...done" this-file-name)))))
          (when (boundp 'dired-mode-map)
            (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
        (message "Loading %s (dired)...done" this-file-name))))
@@ -883,7 +901,8 @@
        (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory)
        (message "Loading %s (speedbar)...done" this-file-name))))
 
-;;; diff-mode
+;;; 差分表示 (diff-mode)
+;; 色設定
 (defun diff-mode-setup-faces ()
   (set-face-attribute 'diff-added nil
                       :foreground "white"
@@ -896,26 +915,41 @@
                       :background nil
                       :weight 'bold
                       :inverse-video t))
-(when (eval-when-compile (require 'diff nil t))
+
+;; diff-mode
+(when (locate-library "diff")
+  (autoload 'diff "diff" "run diff" t)
   (add-hook 'diff-mode-hook
             (lambda ()
-              ;; 色の設定
-              (diff-mode-setup-faces)
+              ;; 空白の強調表示をしない
+              (setq show-trailing-whitespace nil)
               ;; diff を表示したらすぐに文字単位での強調表示も行う
               (when (fboundp 'diff-auto-refine-mode)
-                (diff-auto-refine-mode t))
-              ;; 空白の強調表示をしない
-              (setq show-trailing-whitespace nil))))
+                (diff-auto-refine-mode t))))
+
+  (eval-after-load "diff"
+    '(progn
+       ;; 色の設定
+       (when (and (eval-when-compile (require 'diff-mode nil t))
+                  (fboundp 'diff-mode-setup-faces))
+         (diff-mode-setup-faces))
+       (message "Loading %s (diff)...done" this-file-name))))
 
 ;; Ediff Control Panel 専用のフレームを作成しない
 ;; Windows の場合, 環境変数 CYGWIN に "nodosfilewarning" を設定する
-(when (eval-when-compile (require 'ediff nil t))
-  ;; ediff 関連のバッファをひとつにまとめる
-  (when (boundp 'ediff-window-setup-function)
-    (setq ediff-window-setup-function 'ediff-setup-windows-plain))
-  ;; diff オプション
-  (when (boundp 'diff-switches)
-    (setq diff-switches '("-u" "-p" "-N"))))
+(when (locate-library "ediff")
+  (autoload 'ediff "ediff"
+    "A comprehensive visual interface to diff & patch." t)
+
+  (eval-after-load "ediff"
+    '(progn
+       ;; ediff 関連のバッファをひとつにまとめる
+       (when (boundp 'ediff-window-setup-function)
+         (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+       ;; diff オプション
+       (when (boundp 'diff-switches)
+         (setq diff-switches '("-u" "-p" "-N")))
+       (message "Loading %s (ediff)...done" this-file-name))))
 
 ;;; バッファの切り替えをインクリメンタルにする
 (when (eval-when-compile (require 'iswitchb nil t))
@@ -1149,15 +1183,6 @@
     (setq undo-strong-limit 900000))
   (define-key global-map (kbd "C-?") 'redo))
 
-;; アンドゥ木構造
-;; (install-elisp "http://www.dr-qubit.org/undo-tree/undo-tree.el")
-;; C-x u で木構造表示
-;; バージョン 23 では動かない
-(when (>= emacs-major-version 24)
-  (when (eval-and-compile (require 'undo-tree nil t))
-    (when (fboundp 'global-undo-tree-mode)
-      (global-undo-tree-mode))))
-
 ;; アンドゥ履歴
 ;; (install-elisp "http://cx4a.org/pub/undohist.el")
 (when (eval-and-compile (require 'undohist nil t))
@@ -1300,7 +1325,8 @@
        ;; バッファ非表示
        (setq tabbar-buffer-list-function
              (lambda ()
-               (let ((messages "\\(Messages\\)")
+               (let ((case-fold-search nil)
+                     (messages "\\(Messages\\)")
                      (scratch  "\\(scratch\\)")
                      (gtags    "\\(GTAGS\\)")
                      (woman    "\\(woman\\)")
@@ -1808,7 +1834,8 @@
        ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
        (set-face-attribute 'magit-item-highlight nil :inherit nil)
        ;; 色の設定
-       (when (fboundp 'diff-mode-setup-faces)
+       (when (and (eval-when-compile (require 'diff-mode nil t))
+                  (fboundp 'diff-mode-setup-faces))
          (diff-mode-setup-faces)) ; diff-mode で定義済み
        ;; 空白無視をトグルする
        (defun magit-toggle-whitespace ()
@@ -2518,11 +2545,40 @@
          (setq eldoc-echo-area-use-multiline-p t))
        (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
-;;; Psgml モード
-;; C-c C-p  DTD の Parse
-;; C-c C-o  文章の Parse
-;; C-c C-e  element の挿入
-;; C-c /    終了タグを挿入
+;;; nXml モード
+(when (locate-library "nxml")
+  (add-hook 'nxml-mode-hook
+            (lambda ()
+              (setq indent-tabs-mode t)
+              (setq tab-width 4)))
+  (setq auto-mode-alist
+        (append '(("\\.\\(html\\|xhtml\\|shtml\\|tpl\\)\\'" . nxml-mode))
+                auto-mode-alist))
+
+  (eval-after-load "nxml"
+    '(progn
+       ;; スラッシュの入力で終了タグを自動補完
+       (when (boundp 'nxml-slash-auto-complete-flag)
+         (setq nxml-slash-auto-complete-flag t))
+       ;; タグのインデント幅
+       (when (boundp 'nxml-child-indent)
+         (setq nxml-child-indent 2))
+       ;; 属性のインデント幅
+       (when (boundp 'nxml-attribute-indent)
+         (setq nxml-attribute-indent 4))
+       ;; M-Tab で補完
+       (when (boundp 'nxml-bind-meta-tab-to-complete-flag)
+         (setq nxml-bind-meta-tab-to-complete-flag t))
+       ;; </ の入力で閉じタグを補完する
+       (when (boundp 'nxml-slash-auto-complete-flag)
+         (setq nxml-slash-auto-complete-flag t))
+       ;; C-M-k で下位を含む要素全体をkillする
+       (when (boundp 'nxml-sexp-element-flag)
+         (setq nxml-sexp-element-flag t))
+       ;; グリフは非表示
+       (when (boundp 'nxml-char-ref-display-glyph-flag)
+         (setq nxml-char-ref-display-glyph-flag nil)))))
+
 (when (eval-and-compile
         (and (require 'nxml-mode nil t)
              (require 'psgml nil t)))
