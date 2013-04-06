@@ -2548,7 +2548,7 @@
          (setq eldoc-echo-area-use-multiline-p t))
        (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
-;;; nXml モード
+;;; nXML モード
 (when (locate-library "nxml")
   ;; 拡張子のリスト
   (setq auto-mode-alist
@@ -2579,36 +2579,8 @@
          (setq nxml-sexp-element-flag t))
        ;; グリフは非表示
        (when (boundp 'nxml-char-ref-display-glyph-flag)
-         (setq nxml-char-ref-display-glyph-flag nil)))))
-
-(when (eval-and-compile
-        (and (require 'nxml-mode nil t)
-             (require 'psgml nil t)))
-  (autoload 'sgml-mode "psgml" "Major mode to edit SGML files." t)
-  (autoload 'xml-mode "psgml" "Major mode to edit XML files." t)
-  ;; 拡張子のリスト
-  (setq auto-mode-alist
-        (append
-         '(("\\.\\(html\\|xml\\|sgml\\)$" . xml-mode)
-           ("\\.xhtml\\([.]?\\w+\\)*$" . xml-mode))
-         auto-mode-alist))
-  ;; DTD の自動読み込み
-  (when (boundp 'sgml-auto-activate-dtd)
-    (setq sgml-auto-activate-dtd t))
-  ;; 色の設定
-  (when (boundp 'sgml-set-face)
-    (setq sgml-set-face t))
-  (when (boundp 'sgml-markup-faces)
-    (setq sgml-markup-faces
-          '((start-tag . font-lock-keyword-face)
-            (end-tag . font-lock-keyword-face)
-            (comment . font-lock-comment-face)
-            (pi . font-lock-constant-face)
-            (sgml . font-lock-type-face)
-            (doctype . bold)
-            (entity . italic)
-            (shortref . font-lock-reference-face))))
-  (message "Loading %s (psgml)...done" this-file-name))
+         (setq nxml-char-ref-display-glyph-flag nil))
+       (message "Loading %s (nxml)...done" this-file-name))))
 
 ;;; C 言語
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
