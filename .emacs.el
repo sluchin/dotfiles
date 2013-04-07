@@ -1171,7 +1171,7 @@
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
   (define-key global-map (kbd "C-c C-w") 'mark-word*)   ; 単語選択
-  (define-key global-map (kbd "C-1") 'mark-symbol)  ; シンボル
+  (define-key global-map (kbd "C-1") 'mark-symbol)      ; シンボル
   (define-key global-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
   (define-key global-map (kbd "C-c C-s") 'mark-string)) ; 文字列選択
 
