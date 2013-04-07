@@ -261,23 +261,23 @@
  '(mode-line-inactive ((t (:foreground "white" :background "gray30" :box nil)))))
 
 ;;; モードライン表示カスタマイズ
-(display-time)             ; 時間
-(line-number-mode t)       ; 行数
-(column-number-mode t)     ; カラム数
-(size-indication-mode t)   ; ファイルサイズ
-
-;; 時間フォーマット
-(when (eval-and-compile (require 'time nil t))
-  (when (boundp 'display-time-day-and-date) ; 日時表示
-    (setq display-time-day-and-date t))
-  (when (boundp 'display-time-24hr-format)  ; 24 時間表示
-    (setq display-time-24hr-format t))
-  (when (boundp 'display-time-string-forms) ; 日時フォーマット
-    (setq display-time-string-forms
-          '((format
-             "%s/%s(%s) %s:%s "
-             month day dayname 24-hours minutes))))
-  (message "Loading %s (time)...done" this-file-name))
+(when (fboundp 'display-time)             ; 時間
+  (display-time))
+(when (fboundp 'line-number-mode)         ; 行数
+  (line-number-mode 1))
+(when (fboundp 'column-number-mode)       ; カラム数
+  (column-number-mode 1))
+(when (fboundp 'size-indication-mode)     ; ファイルサイズ
+  (size-indication-mode 1))
+(when (boundp 'display-time-day-and-date) ; 日時表示
+  (setq display-time-day-and-date t))
+(when (boundp 'display-time-24hr-format)  ; 24 時間表示
+  (setq display-time-24hr-format t))
+(when (boundp 'display-time-string-forms) ; 日時フォーマット
+  (setq display-time-string-forms
+        '((format
+           "%s/%s(%s) %s:%s "
+           month day dayname 24-hours minutes))))
 
 ;; 割合 バイト数/総行数 [行数:カラム数:カーソル位置]
 (setq mode-line-position
