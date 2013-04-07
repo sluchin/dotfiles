@@ -249,11 +249,7 @@
       (interactive)
       (if which-function-mode
           (which-function-mode -1)
-        (which-function-mode 1))
-      (if which-function-mode
-          (setq-default header-line-format
-                        '(which-function-mode ("" which-func-format)))
-        (setq-default header-line-format "")))
+        (which-function-mode 1)))
     (define-key global-map (kbd "M-1") 'toggle-which-func-mode)))
 
 ;;; モードライン色
@@ -1937,22 +1933,13 @@
   (autoload 'mew-user-agent-compose
     "mew" "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
-  ;; ヘッダ・空白を強調表示しない
-  (add-hook 'mew-summary-mode-hook
-            (lambda ()
-              (setq show-trailing-whitespace nil)))
-  (add-hook 'mew-message-mode-hook
-            (lambda ()
-              (setq header-line-format nil)
-              (setq show-trailing-whitespace nil)))
-  (add-hook 'mew-virtual-mode-hook
-            (lambda ()
-              (setq header-line-format nil)
-              (setq show-trailing-whitespace nil)))
-  (add-hook 'mew-draft-mode-hook
-            (lambda ()
-              (setq header-line-format nil)
-              (setq show-trailing-whitespace nil)))
+  ;; 空白を強調表示しない
+  (let ((hook (lambda ()
+                (setq show-trailing-whitespace nil))))
+    (add-hook 'mew-summary-mode-hook hook)
+    (add-hook 'mew-message-mode-hook hook)
+    (add-hook 'mew-virtual-mode-hook hook)
+    (add-hook 'mew-draft-mode-hook hook))
 
   ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY." t)
@@ -2114,7 +2101,6 @@
   (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t)
   (add-hook 'twittering-mode-hook
             (lambda ()
-              (setq header-line-format nil)
               (setq show-trailing-whitespace nil)))
 
   (eval-after-load "twittering-mode"
