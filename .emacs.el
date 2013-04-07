@@ -47,7 +47,7 @@
     (message "%-18s %.6f msec" "all" all)))
 
 ;;; ファイル名を保持
-(defvar this-file-name load-file-name)
+(defconst this-file-name load-file-name)
 
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
