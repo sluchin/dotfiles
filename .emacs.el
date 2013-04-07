@@ -1930,16 +1930,20 @@
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
-  (autoload 'mew-user-agent-compose
-    "mew" "Set up message composition draft with Mew." t)
+  (autoload 'mew-user-agent-compose "mew"
+    "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
-  ;; 空白を強調表示しない
+  ;; 空白強調表示をしない
   (let ((hook (lambda ()
                 (setq show-trailing-whitespace nil))))
     (add-hook 'mew-summary-mode-hook hook)
-    (add-hook 'mew-message-mode-hook hook)
-    (add-hook 'mew-virtual-mode-hook hook)
     (add-hook 'mew-draft-mode-hook hook))
+  ;; ヘッダ表示と空白強調表示をしない
+  (let ((hook (lambda ()
+                (setq header-line-format nil)
+                (setq show-trailing-whitespace nil))))
+    (add-hook 'mew-message-mode-hook hook)
+    (add-hook 'mew-virtual-mode-hook hook))
 
   ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY." t)
