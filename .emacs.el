@@ -114,18 +114,22 @@
                                          Info-default-directory-list)))
        (message "Loading %s (info)...done" this-file-name))))
 
+;; Emacs info
 (defun emacs-info (&optional node)
   "Read documentation for Emacs in the info system."
   (interactive) (info (format "(emacs)%s" (or node ""))))
 
+;; Emacs info 日本語
 (defun emacs-ja-info (&optional node)
   "Read documentation for Emacs-ja in the info system."
   (interactive) (info (format "(emacs-ja)%s" (or node ""))))
 
+;; Emacs Lisp info
 (defun elisp-info (&optional node)
   "Read documentation for Elisp in the info system."
   (interactive) (info (format "(elisp)%s" (or node ""))))
 
+;; Emacs Lisp info 日本語
 (defun elisp-ja-info (&optional node)
   "Read documentation for Elisp-ja in the info system."
   (interactive) (info (format "(elisp-ja)%s" (or node ""))))
@@ -255,9 +259,11 @@
 ;;; モードライン色
 (custom-set-faces
  ;; アクティブ時
- '(mode-line ((t (:foreground "white" :background "gray15" :box nil))))
+ '(mode-line
+   ((t (:foreground "white" :background "gray15" :box nil))))
  ;; 非アクティブ時
- '(mode-line-inactive ((t (:foreground "white" :background "gray30" :box nil)))))
+ '(mode-line-inactive
+   ((t (:foreground "white" :background "gray30" :box nil)))))
 
 ;;; モードライン表示カスタマイズ
 (when (fboundp 'display-time)             ; 時間
@@ -840,7 +846,8 @@
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
-(when (and (window-system) (locate-library "speedbar"))
+(when (and (window-system)
+           (locate-library "speedbar"))
   (autoload 'speedbar-get-focus "speedbar"
     "Change frame focus to or from the speedbar frame." t)
   ;; フォントをデフォルトにする
@@ -890,8 +897,8 @@
          (setq speedbar-directory-unshown-regexp "^\\'"))
 
        ;; キーバインドのカスタマイズ
-       ;; "a" で無視ファイル表示/非表示のトグル
-       (define-key speedbar-file-key-map "a" 'speedbar-toggle-show-all-files)
+       ;; "a" で無視ファイル表示・非表示のトグル
+       (define-key speedbar-file-key-map (kbd "a") 'speedbar-toggle-show-all-files)
        ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
        (define-key speedbar-file-key-map (kbd "<right>") 'speedbar-expand-line)
        (define-key speedbar-file-key-map (kbd "C-f") 'speedbar-expand-line)
@@ -1284,10 +1291,7 @@
 
 ;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
-(when (locate-library "minibuf-isearch")
-  (add-hook 'minibuffer-setup-hook
-            (lambda ()
-              (require 'minibuf-isearch nil t))))
+(eval-and-compile (require 'minibuf-isearch nil t))
 
 ;;; 最近使ったファイルを保存
 ;; (install-elisp-from-emacswiki "recentf-ext.el")
@@ -2101,7 +2105,8 @@
 ;; git clone git://github.com/hayamiz/twittering-mode.git
 ;; sudo apt-get install libxpm-dev
 ;; (eval 'image-types)
-(when (locate-library "twittering-mode")
+(when (and (executable-find "curl")
+           (locate-library "twittering-mode"))
   (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t)
   (add-hook 'twittering-mode-hook
             (lambda ()
