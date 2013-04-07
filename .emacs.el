@@ -40,8 +40,11 @@
 (defun print-benchmark ()
   "Print benchmark."
   (interactive)
-  (dolist (alist (reverse benchmark-alist))
-    (message "%s: %.6f msec" (car alist) (cdr alist))))
+  (let ((all 0))
+    (dolist (alist (reverse benchmark-alist))
+      (setq all (+ all (cdr alist)))
+      (message "%-18s %.6f msec" (car alist) (cdr alist)))
+    (message "%-18s %.6f msec" "all" all)))
 
 ;;; ファイル名を保持
 (defvar this-file-name load-file-name)
@@ -338,7 +341,7 @@
   (when (boundp 'show-paren-delay)
     (setq show-paren-delay 0)) ; 初期値は 0.125
   (when (fboundp 'show-paren-mode)
-    (show-paren-mode t))       ; 有効化
+    (show-paren-mode 1))       ; 有効化
   ;; ウィンドウ内に収まらないときだけ括弧内も光らせる
   (when (boundp 'show-paren-style)
     (setq show-paren-style 'mixed)))
@@ -361,7 +364,7 @@
 (setq echo-keystrokes 0.1)
 
 ;;; 画像ファイルを表示する
-(auto-image-file-mode t)
+(auto-image-file-mode 1)
 
 ;;; ツールバーとスクロールバーを消す
 (when window-system
@@ -372,7 +375,7 @@
 (setq vc-follow-symlinks t)
 
 ;;; バッファ自動再読み込み
-(global-auto-revert-mode t)
+(global-auto-revert-mode 1)
 
 ;;; ビープ音とフラッシュを消す
 (setq visible-bell t)
@@ -386,7 +389,7 @@
 (setq message-log-max 10010)
 
 ;;; 履歴を保存する
-(savehist-mode t)
+(savehist-mode 1)
 
 ;;; シンボリックリンクを実名にする
 (setq find-file-visit-truename t)
@@ -400,7 +403,7 @@
 (setq eval-expression-print-level nil)
 
 ;;; gzip ファイルも編集できるようにする
-(auto-compression-mode t)
+(auto-compression-mode 1)
 
 ;;; ブックマーク
 ;; C-x r m (bookmark-set)
@@ -529,7 +532,7 @@
         (setq lst (append lst (list m)))))
     (setq mark-ring lst))
   (message "%s - %s" (point) mark-ring))
-(define-key global-map (kbd "C-1") 'delete-mark-ring)
+(define-key global-map (kbd "C-2") 'delete-mark-ring)
 
 ;; mark-ring を全削除
 (defun clear-mark-ring ()
@@ -671,7 +674,7 @@
 (define-key global-map (kbd "C-\\") nil)
 
 ;; 折り返し表示 ON/OFF
-(define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
+(define-key global-map (kbd "C-c l") 'toggle-truncate-lines)
 
 ;; 現在位置のファイル・URLを開く
 (define-key global-map (kbd "C-x M-f") 'find-file-at-point)
@@ -694,7 +697,7 @@
   ;; 5桁分の領域を確保して行番号を表示
   (setq linum-format "%5d")
   ;; デフォルトで linum-mode を有効にする
-  (global-linum-mode t)
+  (global-linum-mode 1)
   ;; 行番号表示する必要のないモードでは表示しない
   (defadvice linum-on (around linum-off activate compile)
     (unless (or (minibufferp)
@@ -928,7 +931,7 @@
               (setq show-trailing-whitespace nil)
               ;; diff を表示したらすぐに文字単位での強調表示も行う
               (when (fboundp 'diff-auto-refine-mode)
-                (diff-auto-refine-mode t))))
+                (diff-auto-refine-mode 1))))
 
   (eval-after-load "diff"
     '(progn
@@ -955,10 +958,10 @@
        (message "Loading %s (ediff)...done" this-file-name))))
 
 ;;; バッファの切り替えをインクリメンタルにする
-(when (eval-when-compile (require 'iswitchb nil t))
-  ;; iswitchb モードをオン
+(when (eval-and-compile (require 'iswitchb nil t))
+  ;; iswitchb モードを有効にする
   (when (fboundp 'iswitchb-mode)
-    (iswitchb-mode t))
+    (iswitchb-mode 1))
   ;; バッファ名の読み取り方を指定
   (when (boundp 'read-buffer-function)
     (setq read-buffer-function 'iswitchb-read-buffer))
@@ -1167,10 +1170,10 @@
 (when (eval-and-compile (require 'thing-opt nil t))
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
-  (define-key global-map (kbd "C-2") 'mark-word*)   ; 単語選択
-  (define-key global-map (kbd "C-3") 'mark-symbol)  ; シンボル
-  (define-key global-map (kbd "C-4") 'mark-up-list) ; リスト選択
-  (define-key global-map (kbd "C-5") 'mark-string)) ; 文字列選択
+  (define-key global-map (kbd "C-c C-w") 'mark-word*)   ; 単語選択
+  (define-key global-map (kbd "C-1") 'mark-symbol)  ; シンボル
+  (define-key global-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
+  (define-key global-map (kbd "C-c C-s") 'mark-string)) ; 文字列選択
 
 ;;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
@@ -1713,7 +1716,14 @@
     "Turn off pseudo-structural editing of Lisp code." t)
   (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook 'disable-paredit-mode))
+  (add-hook 'lisp-interaction-mode-hook
+            (lambda ()
+              (when (fboundp 'enable-paredit-mode)
+                (enable-paredit-mode))
+              (when (boundp 'paredit-mode-map)
+                (define-key paredit-mode-map (kbd "C-j")
+                  'eval-print-last-sexp)))))
+  (add-hook 'ielm-mode-hook 'enable-paredit-mode)
 
 ;;; 自動バイトコンパイル
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
@@ -2597,7 +2607,7 @@
             (when (boundp 'ac-clang-flags)
               (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
             (when (fboundp 'semantic-mode)
-              (semantic-mode t))
+              (semantic-mode 1))
             (when (boundp 'ac-sources)
               (setq ac-sources (append '(ac-source-clang
                                          ac-source-semantic
@@ -2675,12 +2685,12 @@
                 (when (boundp 'ac-sources)
                   (add-to-list 'ac-sources 'ac-source-perl-completion))
                 (when (fboundp 'perl-completion-mode)
-                  (perl-completion-mode t)))
+                  (perl-completion-mode 1)))
               (when (executable-find "perltidy")
                 (require 'perltidy nil t))
               (require 'flymake nil t)
               (when (fboundp 'flymake-mode)
-                (flymake-mode t)))))
+                (flymake-mode 1)))))
 
 ;; Pod
 (when (locate-library "pod-mode")
@@ -2690,10 +2700,10 @@
   (add-hook 'pod-mode-hook
             (lambda ()
               (when (fboundp 'auto-fill-mode)
-                (auto-fill-mode t))
+                (auto-fill-mode 1))
               (require 'flyspell nil t)
               (when (fboundp 'flyspell-mode)
-                (flyspell-mode t)))))
+                (flyspell-mode 1)))))
 
 ;;; Java
 ;; ajc-java-complete
@@ -2791,7 +2801,7 @@
                                                   global-semantic-idle-summary-mode
                                                   global-semantic-mru-bookmark-mode)))
               (when (fboundp 'semantic-mode)
-                (semantic-mode t))
+                (semantic-mode 1))
               (add-hook 'after-save-hook 'malabar-compile-file-silently nil t))))
 
 ;;; ここまでプログラミング用設定
