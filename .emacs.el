@@ -2360,9 +2360,14 @@
 
 ;;; ここからプログラミング用設定
 
-;;; GNU Global
+;;; タグ検索
+;; GNU Global
 ;; wget http://tamacom.com/global/global-6.2.8.tar.gz
-;; タグファイル作成 gtags -vv
+;; タグファイル作成 (gtags -v)
+(defvar etags-lang-file-list '((?e "[e]lisp" "*.el")     ; Emacs Lisp
+                               (?c "[c]"     "*.[h|c]")  ; C
+                               (?j "[j]va"   "*.java")   ; Java
+                               (?p "[p]erl"  "*.perl"))) ; Perl
 (when (and (executable-find "global")
            (locate-library "gtags"))
   (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
@@ -2441,27 +2446,30 @@
          (define-key gtags-select-mode-map "q" 'gtags-pop-stack))
        (message "Loading %s (gtags)...done" this-file-name))))
 
-;;; etags
-;; sudo apt-get install exuberant-ctags
-;; タグファイル作成 ctags -e *.el
+;; etags
+;; タグファイル作成 (etags ファイル名)
 ;; M-. 検索 M-* 戻る
-(defun make-ctags ()
-  "Make ctags file."
+(defun make-etags ()
+  "Make tags file."
   (interactive)
-  (when (boundp 'default-directory)
+  (let ((select "Select language: "))
+    (dolist (lst etags-lang-file-list)
+      (setq select (concat select (car (cdr lst)) " ")))
     (let* ((default default-directory)
-           (dir (read-string "ctags directory: "
+           (dir (read-string "Directory: "
                              default nil default))
-           (src (downcase (read-string "select source: [c] [e]lisp [j]ava " nil nil nil)))
-           (file (cond ((char-equal ?c (aref src 0)) "*.[h|c]")
-                       ((char-equal ?e (aref src 0)) "*.el")
-                       ((char-equal ?j (aref src 0)) "*.java")
-                       (t nil))))
-      (if file
-          (let ((command (concat "find " dir "-name " file " | ctags -e -L -")))
-            (shell-command command)
-            (message "command: %s" command))
-        (message "no such source")))))
+           (char (aref (downcase
+                        (read-string select nil nil nil)) 0))
+           (lang (car (cdr (cdr (assq char etags-lang-file-list))))))
+      (if lang
+          (let ((cmd (concat "find " dir " -name " lang " | etags -")))
+            (shell-command cmd)
+            (message "%s" cmd))
+        (message "no such language")))))
+
+;; Exuberant Ctags
+;; sudo apt-get install exuberant-ctags
+
 
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
