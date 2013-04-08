@@ -104,15 +104,18 @@
 ;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
 ;; * Elisp-ja: (elisp-ja).    Emacs Lisp Reference Manual(Japanese).
 ;; * Emacs-ja: (emacs-ja).    The extensible self-documenting text editor(Japanese).
-(when (file-directory-p "~/.emacs.d/info")
+(when (locate-library "info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
 
   (eval-after-load "info"
     '(progn
-       (when (boundp 'Info-directory-list)
-         (setq Info-directory-list (cons "~/.emacs.d/info"
-                                         Info-default-directory-list)))
-       (message "Loading %s (info)...done" this-file-name))))
+       (let ((info-dir (expand-file-name "~/.emacs.d/info")))
+         (when (and (file-directory-p info-dir) (file-readable-p info-dir)
+                    (boundp 'Info-directory-list))
+             (setq Info-directory-list (cons info-dir
+                                             Info-default-directory-list))
+             (message "Info-directory-list: %s" Info-directory-list)
+           (message "Loading %s (info)...done" this-file-name))))))
 
 ;; Emacs info
 (defun emacs-info (&optional node)
@@ -307,14 +310,14 @@
            (python-mode           . "φ")
            (cperl-mode            . "ψ")
            (nxml-mode             . "χ"))))
-    (dolist (cleaner modes)
-      (let* ((mode (car cleaner))
-             (short (cdr cleaner))
-             (default (cdr (assq mode minor-mode-alist))))
+    (dolist (mode modes)
+      (let* ((name (car mode))
+             (short (cdr mode))
+             (default (cdr (assq name minor-mode-alist))))
         (when default
           (setcar default short))
         ;; メジャーモード
-        (when (eq mode major-mode)
+        (when (eq name major-mode)
           (setq mode-name short))))))
 (add-hook 'after-change-major-mode-hook 'display-short-mode-name)
 
@@ -426,7 +429,7 @@
 
 ;;; 行末の空白を強調表示
 (setq-default show-trailing-whitespace t)
-(set-face-background 'trailing-whitespace "red")
+(set-face-background 'trailing-whitespace "gray50")
 ;; 空白強調表示の必要のないモードはしない
 (add-hook 'fundamental-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
@@ -685,12 +688,6 @@
 ;; エコー領域をクリアする
 (define-key global-map (kbd "C-c C-g") (lambda () (interactive) (message nil)))
 
-;; C-q をプリフィックスキー化
-(define-key global-map (kbd "C-q") (make-sparse-keymap))
-
-;; 制御文字の挿入（デフォルト: C-q）
-(define-key global-map (kbd "C-q C-q") 'quoted-insert)
-
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
 ;;; 行番号表示
@@ -809,7 +806,7 @@
                       (fboundp 'w3m-find-file))
              (let ((file (dired-get-filename)))
                (if (not (file-directory-p file))
-                   (when (y-or-n-p (format "Open 'w3m' %s "
+                   (when (y-or-n-p (format "Open w3m %s "
                                            (file-name-nondirectory file)))
                      (w3m-find-file file))
                  (message "%s is a directory" file)))))
@@ -1083,51 +1080,55 @@
        (when (boundp 'org-startup-truncated)   ; 行の折り返し
          (setq org-startup-truncated nil))
 
-       ;; org-remember
-       (when (boundp 'org-directory)           ; ディレクトリ
-         (setq org-directory (catch 'find (find-directory "org")))
-         (message "org-directory: %s" org-directory))
-       (when (boundp 'org-default-notes-file)  ; ファイル名
-         (setq org-default-notes-file
-               (concat (file-name-as-directory org-directory) "agenda.org"))
-         (message "org-default-notes-file: %s" org-default-notes-file))
-       (when (boundp 'org-remember-templates)  ; テンプレート
-         (setq org-remember-templates
-               '(("Todo"  ?t
-                  "** TODO%?\n%i\n   %a\n   %t\n" nil "Inbox")
-                 ("Bug"   ?b
-                  "** TODO%?   :bug:\n%i\n   %a\n   %t\n" nil "Inbox")
-                 ("Idea"  ?i
-                  "**%?\n%i\n   %a\n   %t\n" nil "New Ideas")
-                 ("Emacs" ?e
-                  "**%?\n%i\n   %a\n   %t\n" nil "Emacs")
-                 ("Memo"  ?m
-                  "**%?\n%i\n   %a\n   %t\n" nil "Memo"))))
-       (when (fboundp 'org-remember-insinuate) ; 初期化
-         (org-remember-insinuate))
-
        ;; org-agenda
-       (when (boundp 'org-agenda-files)        ; 対象ファイル
+       (when (and (eval-and-compile (require 'org-agenda nil t))
+                  (boundp 'org-agenda-files))
+         ;; 対象ファイル
          (setq org-agenda-files (list org-directory)))
 
-       ;; ソースコードを読みメモする
-       (when (and (boundp 'org-directory)
-                  (boundp 'org-default-notes-file)
-                  (boundp 'org-remember-templates))
-         (defun org-remember-code-reading ()
-           "When code reading, org-remember mode."
-           (interactive)
-           (let* ((org-directory (catch 'find (find-directory "code")))
-                  (org-default-notes-file
-                   (concat (file-name-as-directory org-directory)
-                           "code-reading.org"))
-                  (prefix
-                   (concat "[" (substring (symbol-name major-mode) 0 -5) "]"))
-                  (org-remember-templates
-                   `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t\n"
-                      org-directory "Memo"))))
-             (message "org-remember-code-reading: %s" org-default-notes-file)
-             (org-remember))))
+       ;; org-remember
+       (when (eval-and-compile (require 'org-remember nil t))
+         (when (boundp 'org-directory)           ; ディレクトリ
+           (setq org-directory (catch 'find (find-directory "org")))
+           (message "org-directory: %s" org-directory))
+         (when (boundp 'org-default-notes-file)  ; ファイル名
+           (setq org-default-notes-file
+                 (concat (file-name-as-directory org-directory) "agenda.org"))
+           (message "org-default-notes-file: %s" org-default-notes-file))
+         (when (boundp 'org-remember-templates)  ; テンプレート
+           (setq org-remember-templates
+                 '(("Todo"  ?t
+                    "** TODO%?\n%i\n   %a\n   %t\n" nil "Inbox")
+                   ("Bug"   ?b
+                    "** TODO%?   :bug:\n%i\n   %a\n   %t\n" nil "Inbox")
+                   ("Idea"  ?i
+                    "**%?\n%i\n   %a\n   %t\n" nil "New Ideas")
+                   ("Emacs" ?e
+                    "**%?\n%i\n   %a\n   %t\n" nil "Emacs")
+                   ("Memo"  ?m
+                    "**%?\n%i\n   %a\n   %t\n" nil "Memo")))
+           (message "org-remember-templates: %s" org-remember-templates))
+         (when (fboundp 'org-remember-insinuate) ; 初期化
+           (org-remember-insinuate))
+
+         ;; ソースコードを読みメモする
+         (when (and (boundp 'org-directory)
+                    (boundp 'org-default-notes-file)
+                    (boundp 'org-remember-templates))
+           (defun org-remember-code-reading ()
+             "When code reading, org-remember mode."
+             (interactive)
+             (let* ((org-directory (catch 'find (find-directory "code")))
+                    (org-default-notes-file
+                     (concat (file-name-as-directory org-directory)
+                             "code-reading.org"))
+                    (prefix
+                     (concat "[" (substring (symbol-name major-mode) 0 -5) "]"))
+                    (org-remember-templates
+                     `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t\n"
+                        org-directory "Memo"))))
+               (message "org-remember-code-reading: %s" org-default-notes-file)
+               (org-remember)))))
        (message "Loading %s (org)...done" this-file-name))))
 
 ;;; ファイル内のカーソル位置を記録する
@@ -1151,7 +1152,7 @@
 ;; 使用する場合 lisp をロードパスの通ったところにインストールすること
 
 ;;; インストーラ
-;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/auto-install.el")
+;; (install-elisp-from-emacswiki "auto-install.el")
 (when (locate-library "auto-install")
   (autoload 'auto-install "auto-install"
     "Auto install elisp file." t)
@@ -1169,7 +1170,7 @@
          (auto-install-compatibility-setup)))))
 
 ;;; 単語選択 (デフォルト: M-@)
-;; (install-elisp-from-emacswiki "http://www.emacswiki.org/emacs/download/thing-opt.el")
+;; (install-elisp-from-emacswiki "thing-opt.el")
 (when (eval-and-compile (require 'thing-opt nil t))
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
@@ -1177,6 +1178,13 @@
   (define-key global-map (kbd "C-1") 'mark-symbol)      ; シンボル
   (define-key global-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
   (define-key global-map (kbd "C-c C-s") 'mark-string)) ; 文字列選択
+
+;;; 検索
+;; (install-elisp-from-emacswiki "grep-edit.el")
+;; 編集後 C-c C-e, C-x s !
+(when (locate-library "grep-edit")
+  (add-hook 'grep-mode
+            (lambda () (require 'grep-edit nil t))))
 
 ;;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
@@ -1331,10 +1339,10 @@
        ;; バッファ非表示
        (setq tabbar-buffer-list-function
              (lambda ()
-               (let ((case-fold-search nil)
+               (let ((case-fold-search nil) ; 大文字小文字の区別をする
                      (messages "\\(Messages\\)")
                      (scratch  "\\(scratch\\)")
-                     (gtags    "\\(GTAGS\\)")
+                     (gtags    "\\(GTAGS SELECT\\)")
                      (woman    "\\(woman\\)")
                      (man      "\\(man\\)")
                      (term     "\\(terminal\\)")
@@ -1357,6 +1365,8 @@
                            ((char-equal ?\x20 (aref (buffer-name b) 0)) nil)
                            ;; .bash_history は非表示
                            ((string= ".bash_history" (buffer-name b)) nil)
+                           ;; TAGS は非表示
+                           ((string= "TAGS" (buffer-name b)) nil)
                            ;; それ以外は表示
                            (t b)))
                         (buffer-list))))))
@@ -2194,7 +2204,7 @@
     (interactive)
     (when (fboundp 'w3m-browse-url)
       (let ((dir "/usr/share/doc/stl-manual/html"))
-        (if (file-exists-p dir)
+        (if (and (file-directory-p dir) (file-readable-p dir))
             (w3m-browse-url
              (concat "file://"
                      (file-name-as-directory (expand-file-name dir))
@@ -2352,6 +2362,7 @@
 
 ;;; GNU Global
 ;; wget http://tamacom.com/global/global-6.2.8.tar.gz
+;; タグファイル作成 gtags -vv
 (when (and (executable-find "global")
            (locate-library "gtags"))
   (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
@@ -2391,7 +2402,8 @@
        ;; 環境変数の設定
        (defadvice gtags-goto-tag
          (before setenv-gtags-libpath activate compile)
-         (setenv "GTAGSLIBPATH" gtags-libpath)
+         (if gtags-libpath
+             (setenv "GTAGSLIBPATH" gtags-libpath))
          (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
        ;; パスの表示形式
        (when (boundp 'gtags-path-style)
@@ -2428,6 +2440,28 @@
          (define-key gtags-select-mode-map "n" 'next-line)
          (define-key gtags-select-mode-map "q" 'gtags-pop-stack))
        (message "Loading %s (gtags)...done" this-file-name))))
+
+;;; etags
+;; sudo apt-get install exuberant-ctags
+;; タグファイル作成 ctags -e *.el
+;; M-. 検索 M-* 戻る
+(defun make-ctags ()
+  "Make ctags file."
+  (interactive)
+  (when (boundp 'default-directory)
+    (let* ((default default-directory)
+           (dir (read-string "ctags directory: "
+                             default nil default))
+           (src (downcase (read-string "select source: [c] [e]lisp [j]ava " nil nil nil)))
+           (file (cond ((char-equal ?c (aref src 0)) "*.[h|c]")
+                       ((char-equal ?e (aref src 0)) "*.el")
+                       ((char-equal ?j (aref src 0)) "*.java")
+                       (t nil))))
+      (if file
+          (let ((command (concat "find " dir "-name " file " | ctags -e -L -")))
+            (shell-command command)
+            (message "command: %s" command))
+        (message "no such source")))))
 
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
@@ -2639,7 +2673,8 @@
                                "`pkg-config gtk+-2.0 --cflags`")))
            (dolist (include includes)
              (setq c-eldoc-includes
-                   (concat c-eldoc-includes include)))))
+                   (concat c-eldoc-includes include)))
+           (message "c-eldoc-includes: %s" c-eldoc-includes)))
        (message "Loading %s (c-eldoc)...done" this-file-name))))
 
 ;; CEDET
