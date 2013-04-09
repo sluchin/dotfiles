@@ -309,7 +309,8 @@
            (ruby-mode             . "в")
            (python-mode           . "φ")
            (cperl-mode            . "ψ")
-           (nxml-mode             . "χ"))))
+           (nxml-mode             . "χ")
+           (twittering-mode       . "ω"))))
     (dolist (mode modes)
       (let* ((name (car mode))
              (short (cdr mode))
@@ -735,7 +736,7 @@
 ;; dired 設定
 (when (locate-library "dired")
   (autoload 'dired "dired"
-    "\"Edit\" directory DIRNAME--delete, rename, print, etc." t)
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
   ;; 拡張機能を有効にする
   (add-hook 'dired-load-hook (lambda () (load "dired-x")))
   (add-hook 'dired-load-hook (lambda () (load "ls-lisp")))
@@ -770,9 +771,9 @@
               ;; POSIX オプションのみ
               (setq dired-listing-switches "-alF")))
 
-       ;; ディレクトリを再帰的にコピー可能する
+       ;; ディレクトリを再帰的にコピー可能にする
        (setq dired-recursive-copies 'always)
-       ;; ディレクトリを再帰的に削除可能する
+       ;; ディレクトリを再帰的に削除可能にする
        (setq dired-recursive-deletes 'always)
 
        ;; firefox で開く
@@ -1116,7 +1117,7 @@
            (defun org-remember-code-reading ()
              "When code reading, org-remember mode."
              (interactive)
-             (let* ((org-directory (catch 'find (find-directory "code")))
+             (let* ((org-directory (catch 'found (find-directory "code")))
                     (org-default-notes-file
                      (concat (file-name-as-directory org-directory)
                              "code-reading.org"))
@@ -1445,7 +1446,7 @@
          (setq howm-menu-lang 'ja))
        ;; ディレクトリ設定
        (when (boundp 'howm-directory)
-         (setq howm-directory (catch 'find (find-directory "howm"))))
+         (setq howm-directory (catch 'found (find-directory "howm"))))
        (message "howm-directory: %s" howm-directory)
        ;; save 時にメニューを自動更新
        (when (boundp 'howm-menu-refresh-after-save)
@@ -1524,17 +1525,17 @@
 (defun display-direction-word ()
   "Display direction word."
   (interactive)
-  (let ((fn (read-file-name "filename: " "~/.emacs.d/ddskk/"))
+  (let ((file (read-file-name "filename: " "~/.emacs.d/ddskk/"))
         (coding-system-for-read 'euc-jp))
-    (if (file-readable-p fn)
+    (if (file-readable-p file)
         (progn
-          (message "%s" fn)
+          (message "%s" file)
           (with-temp-buffer
-            (insert-file-contents fn nil)
-            (with-output-to-temp-buffer (concat "*" (file-name-nondirectory fn) "*")
+            (insert-file-contents file nil)
+            (with-output-to-temp-buffer (concat "*" (file-name-nondirectory file) "*")
               (while (re-search-forward "^\\([^;]+?\\)\\([ |\t]\\)" nil t)
                 (princ (concat (match-string 1) "\n"))))))
-      (message "can not open %s" fn))))
+      (message "can not open %s" file))))
 
 ;; skk の設定
 (when (locate-library "skk")
@@ -1547,8 +1548,8 @@
        ;; 辞書の登録
        (let ((personal
               (concat (file-name-as-directory
-                       (catch 'find (find-directory "skk")))
-                       ".skk-jisyo"))                              ; 個人辞書
+                       (catch 'found (find-directory "skk")))
+                      ".skk-jisyo"))                               ; 個人辞書
              (large "~/.emacs.d/ddskk/SKK-JISYO.L")                ; 基本辞書
              (lst '("~/.emacs.d/ddskk/SKK-JISYO.assoc"             ; 連想辞書
                     "~/.emacs.d/ddskk/SKK-JISYO.edict"             ; 英和辞典
@@ -1617,10 +1618,6 @@
          (setq skk-sticky-key ";"))
 
        (defadvice skk-mode (after after-skk-mode activate compile)
-         ;; 空白を強調表示しない
-         (if skk-mode
-             (setq-default show-trailing-whitespace nil)
-           (setq-default show-trailing-whitespace t))
          ;; paredit モードで sticky キーを使用する
          (when (and (boundp 'skk-sticky-key)
                     (string= skk-sticky-key ";")
@@ -1759,7 +1756,7 @@
     '(progn
        ;; ディレクトリ
        (when (boundp 'umemo-base-directory)
-         (setq umemo-base-directory (catch 'find (find-directory "umemo")))
+         (setq umemo-base-directory (catch 'found (find-directory "umemo")))
          (message "umemo-base-directory: %s" umemo-base-directory))
        (message "Loading %s (usage-memo)...done" this-file-name))))
 
@@ -2474,7 +2471,7 @@
                    ("s"  "[s]hell"   "sh")
                    ("t"  "[t]cl/tk"  "\\(tcl\\|tk\\)")
                    ("y"  "[y]acc"    "\\(y\\|yy\\)")
-                   ("h"  "[h]tml"    "*.html")))
+                   ("h"  "[h]tml"    "html")))
             (select "Select language: "))
         (dolist (l lst)
           (setq select (concat select (car (cdr l)) " ")))
