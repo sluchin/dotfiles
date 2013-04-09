@@ -2463,8 +2463,7 @@
 ;; M-. 検索, M-* 戻る
 (defun exec-tags-command (exec &rest options)
   "Execute etags or ctags command."
-  (if (and (executable-find "find")
-           (executable-find exec))
+  (if (executable-find exec)
       (let ((lst '(("l"  "[l]isp"    "\\(el\\|cl\\)")
                    ("c"  "[c],c++"   "\\(h\\|c\\|hh\\|cc\\|cpp\\)")
                    ("j"  "[j]ava"    "java")
