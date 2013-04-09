@@ -454,8 +454,7 @@
 ;; migemo
 ;; sudo apt-get install migemo cmigemo
 ;; C-e でトグル
-(when (and (executable-find "cmigemo")
-           (locate-library "migemo"))
+(when (and (executable-find "cmigemo") (locate-library "migemo"))
   (autoload 'migemo-init "migemo"
     "Japanese incremental search through dynamic pattern expansion." t)
   (add-hook 'isearch-mode-hook 'migemo-init)
@@ -843,8 +842,7 @@
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
-(when (and (window-system)
-           (locate-library "speedbar"))
+(when (and (window-system) (locate-library "speedbar"))
   (autoload 'speedbar-get-focus "speedbar"
     "Change frame focus to or from the speedbar frame." t)
   ;; フォントをデフォルトにする
@@ -1340,13 +1338,17 @@
        (setq tabbar-buffer-list-function
              (lambda ()
                (let ((case-fold-search nil) ; 大文字小文字の区別をする
-                     (messages "\\(Messages\\)")
-                     (scratch  "\\(scratch\\)")
-                     (gtags    "\\(GTAGS SELECT\\)")
-                     (woman    "\\(woman\\)")
-                     (man      "\\(man\\)")
-                     (term     "\\(terminal\\)")
-                     (shell    "\\([e]?shell\\)"))
+                     (nondisplay "\\*")
+                     (buffers '("\\(Messages\\)"
+                                "\\(scratch\\)"
+                                "\\(GTAGS SELECT\\)"
+                                "\\(woman\\)"
+                                "\\(man\\)"
+                                "\\(terminal\\)"
+                                "\\([e]?shell\\)")))
+                 (dolist (buffer buffers)
+                   (setq nondisplay (concat nondisplay buffer "\\|")))
+                 (setq nondisplay (concat (substring nondisplay 0 -2) ".*"))
                  (delq nil
                        (mapcar
                         (lambda (b)
@@ -1354,11 +1356,7 @@
                            ;; カレントバッファは表示
                            ((eq (current-buffer) b) b)
                            ;; * で始まる表示するバッファ
-                           ((string-match
-                             (concat "\\*" messages "\\|" scratch "\\|"
-                                     gtags "\\|" woman "\\|" man "\\|"
-                                     term "\\|" shell
-                                     ".*") (buffer-name b)) b)
+                           ((string-match nondisplay (buffer-name b)) b)
                            ;; それ以外の * で始まるバッファは非表示
                            ((char-equal ?* (aref (buffer-name b) 0)) nil)
                            ;; スペースで始まるバッファは非表示
@@ -2115,8 +2113,7 @@
 ;; git clone git://github.com/hayamiz/twittering-mode.git
 ;; sudo apt-get install libxpm-dev
 ;; (eval 'image-types)
-(when (and (executable-find "curl")
-           (locate-library "twittering-mode"))
+(when (and (executable-find "curl") (locate-library "twittering-mode"))
   (autoload 'twit "twittering-mode" "Interface for twitter on Emacs." t)
   (add-hook 'twittering-mode-hook
             (lambda ()
@@ -2244,8 +2241,7 @@
 ;; sudo ruby setup.rb
 ;; C-x C-q  既存ノートを編集
 ;; M-x evernote-change-edit-mode  TEXT または XHTML に変更
-(when (and (executable-find "ruby")
-           (executable-find "w3m")
+(when (and (executable-find "ruby") (executable-find "w3m")
            (locate-library "evernote-mode")
            (locate-library "evernote-account"))
   ;; アカウント
@@ -2363,23 +2359,30 @@
 ;;; タグ検索
 ;; GNU Global
 ;; wget http://tamacom.com/global/global-6.2.8.tar.gz
-;; タグファイル作成 (gtags -v)
+;; タグファイル作成するコマンド (gtags -v)
+;; GTAGS が存在する場合, アップデートする (global -u)
 (defun make-gtags ()
   "Make GTAGS file."
   (interactive)
-  (if (executable-find "gtags")
+  (if (and (executable-find "global") (executable-find "gtags"))
       (let* ((default default-directory)
              (dir (read-string "Directory: "
                                default nil default)))
         (if (and (file-directory-p dir) (file-readable-p dir))
-            (let ((cmd (concat "gtags -v " dir)))
-              (shell-command cmd)
-              (message "%s" cmd))
+            (let (out
+                  (cmd
+                   (if (file-readable-p
+                        (concat (file-name-as-directory dir) "GTAGS"))
+                       (concat "global -uv")
+                     (concat "gtags -v"))))
+              (setq out (shell-command-to-string cmd))
+              (message "%s" cmd)
+              (unless (string= out "") (message "%s" out)))
           (message "no such directory: %s" dir)))
     (message "not found gtags")))
 
-(when (and (executable-find "global")
-           (locate-library "gtags"))
+;; タグ検索 (gtags)
+(when (and (executable-find "global") (locate-library "gtags"))
   (autoload 'gtags-mode "gtags" "Gtags facility for Emacs." t)
   (add-hook 'gtags-select-mode-hook
             (lambda ()
@@ -2390,8 +2393,8 @@
                   (gtags-mode 1))
                 (when (fboundp 'set-gtags-libpath) ; パス設定
                   (set-gtags-libpath)))))
-    (add-hook 'c-mode-common-hook hook) ; C, C++
-    (add-hook 'java-mode-hook hook))    ; Java
+    (add-hook 'c-mode-common-hook hook)            ; C, C++
+    (add-hook 'java-mode-hook hook))               ; Java
 
   (eval-after-load "gtags"
     '(progn
@@ -2456,51 +2459,63 @@
          (define-key gtags-select-mode-map "q" 'gtags-pop-stack))
        (message "Loading %s (gtags)...done" this-file-name))))
 
-;; etags
-;; タグファイル作成 (etags ファイル名)
-;; M-. 検索 M-* 戻る
-(defvar tags-lang-file-list '((?e "[e]lisp" "*.el")     ; Emacs Lisp
-                               (?c "[c]"     "*.[h|c]")  ; C
-                               (?j "[j]va"   "*.java")   ; Java
-                               (?p "[p]erl"  "*.perl"))) ; Perl
-
-(defun make-tags (executable &rest options)
-  "Make tags file."
+;; 標準のタグ検索 (etags)
+;; M-. 検索, M-* 戻る
+(defun exec-tags-command (exec &rest options)
+  "Execute etags or ctags command."
   (if (and (executable-find "find")
-           (executable-find executable))
-      (let ((select "Select language: "))
-        (dolist (lst tags-lang-file-list)
-          (setq select (concat select (car (cdr lst)) " ")))
+           (executable-find exec))
+      (let ((lst '(("l"  "[l]isp"    "\\(el\\|cl\\)")
+                   ("c"  "[c],c++"   "\\(h\\|c\\|hh\\|cc\\|cpp\\)")
+                   ("j"  "[j]ava"    "java")
+                   ("js" "[js]cript" "js")
+                   ("p"  "[p]erl"    "perl")
+                   ("py" "[py]thon"  "py")
+                   ("r"  "[r]uby"    "rb")
+                   ("s"  "[s]hell"   "sh")
+                   ("t"  "[t]cl/tk"  "\\(tcl\\|tk\\)")
+                   ("y"  "[y]acc"    "\\(y\\|yy\\)")
+                   ("h"  "[h]tml"    "*.html")))
+            (select "Select language: "))
+        (dolist (l lst)
+          (setq select (concat select (car (cdr l)) " ")))
         (let* ((default default-directory)
                (dir (read-string "Directory: "
                                  default nil default))
-               (char (aref (downcase
-                            (read-string select nil nil nil)) 0))
-               (lang (car (cdr (cdr (assq char tags-lang-file-list))))))
+               (result (read-string select nil nil nil))
+               (ext (car (cdr (cdr (assoc-string result lst))))))
           (if (and (file-directory-p dir) (file-readable-p dir))
-              (if lang
+              (if ext
                   (let (option-string)
                     (dolist (option options)
                       (setq option-string (concat option-string  " " option)))
-                    (let ((cmd (concat "find " dir " -name " lang " | "
-                                       executable option-string)))
-                      (shell-command cmd)
-                      (message "%s" cmd)))
+                    (let (out (cmd (concat
+                                    "find " dir
+                                    " -type f -regex " "\".*\\." ext "$\"" " | "
+                                    exec option-string
+                                    (when (string= ext "\\(el\\|cl\\)")
+                                      " --exclude=*/undohist/*"))))
+                      (setq out (shell-command-to-string cmd))
+                      (message "%s" cmd)
+                      (unless (string= out "") (message "%s" out))))
                 (message "no such language"))
             (message "no such directory: %s" dir))))
-    (message "not found %s" executable)))
+    (message "not found %s" exec)))
 
+;; etags
+;; タグファイル作成するコマンド (etags)
 (defun make-etags ()
   "Make etags file."
   (interactive)
-  (make-tags "etags" "-"))
+  (exec-tags-command "etags" "-"))
 
 ;; Exuberant Ctags
 ;; sudo apt-get install exuberant-ctags
+;; タグファイル作成するコマンド (ctags-exuberant)
 (defun make-ctags-exuberant ()
   "Make exuberant ctags file."
   (interactive)
-  (make-tags "ctags-exuberant" "-e" "-L" "-"))
+  (exec-tags-command "ctags-exuberant" "-e" "-V" "-L" "-"))
 
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
