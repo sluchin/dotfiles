@@ -2889,6 +2889,19 @@
 
 ;;; ここまでプログラミング用設定
 
+;;; ユーティリティ
+
+;;; xml
+;; (install-elisp-from-emacswiki "xml-parse.el")
+(defun xml-extract-track ()
+  (interactive)
+  (when (eval-and-compile (require 'xml-parse nil t))
+    (dolist (tracklst (read-xml))
+      (when (string= (xml-tag-name tracklst) "trackList")
+        (dolist (track (xml-tag-children tracklst))
+          (when (string= (xml-tag-name track) "track")
+            (message "%s" (xml-tag-children track))))))))
+
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
 
