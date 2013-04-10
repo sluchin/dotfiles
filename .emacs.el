@@ -830,7 +830,7 @@
                  (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
                (or (when (member tarfile (directory-files default-directory))
                      (not (y-or-n-p ; 同名ファイル
-                           (concat "Overwrite `" tarfile "'? [Type yn]"))))
+                           (concat "Overwrite `" tarfile "'? "))))
                    (condition-case err
                        (dired-do-shell-command
                         (concat "tar cfz " tarfile " *") nil files)
@@ -2896,7 +2896,7 @@
 ;;; VLC プレイリストのための XML パーサー
 ;; (install-elisp-from-emacswiki "xml-parse.el")
 ;; CSV 形式で一時バッファに出力する
-(defun vlc-xml2csv-tmpbuffer (tmpbuf &rest tags)
+(defun vlc-xml2csv-tempbuffer (tmpbuf &rest tags)
   "Output temporary buffer."
   (when (eval-and-compile (require 'xml-parse nil t))
     (goto-char (point-min))
@@ -2915,14 +2915,15 @@
 (defun vlc-xml2csv-file ()
   "Conversion from xml to csv for vlc."
   (interactive)
-  (let ((file (read-string "Filename: " "vlc.csv" nil "vlc.csv")))
+  (let* ((default "vlc.csv")
+         (file (read-string "Filename: " default nil default)))
     (or (when (file-exists-p file)
-          (not (y-or-n-p (concat "Overwrite `" file "'? [Type yn]"))))
+          (not (y-or-n-p (concat "Overwrite `" file "'? "))))
         (if (or (not (file-exists-p file)) (file-writable-p file))
             (progn
               (save-current-buffer
                 (let ((tmp " *xspf"))
-                  (vlc-xml2csv-tmpbuffer tmp "creator" "title" "annotation" "location")
+                  (vlc-xml2csv-tempbuffer tmp "creator" "title" "annotation" "location")
                   (set-buffer tmp)
                   (let ((tmpbuf (current-buffer)))
                     (set-buffer (get-buffer-create file))
@@ -2931,6 +2932,38 @@
                     (goto-char (point-min))
                     (while (search-forward "&#39;" nil t)
                       (replace-match "")))))
+              (switch-to-buffer file)
+              (delete-other-windows)
+              (goto-char (point-min))
+              (set-visited-file-name file)
+              (save-buffer)
+              (toggle-truncate-lines 1))
+          (message "Can not write: %s" file))
+        (message "Write file %s...done" file))))
+
+(defun vlc-check-location ()
+  "Check location tag."
+  (interactive)
+  (let* ((default "check-location")
+         (file (read-string "Filename: " default nil default)))
+    (or (when (file-exists-p file)
+          (not (y-or-n-p (concat "Overwrite `" file "'? "))))
+        (if (or (not (file-exists-p file)) (file-writable-p file))
+            (progn
+              (let ((tmp " *xspf"))
+                (vlc-xml2csv-tempbuffer tmp "location")
+                (let (string)
+                  (switch-to-buffer file)
+                  (erase-buffer)
+                  (switch-to-buffer tmp)
+                  (goto-char (point-min))
+                  (while (not (eobp))
+                    (setq string (buffer-substring (point-at-bol) (point-at-eol)))
+                    (with-current-buffer file
+                      (unless (file-exists-p (substring string 7))
+                        (insert string)
+                        (insert "\n")))
+                    (forward-line 1))))
               (switch-to-buffer file)
               (delete-other-windows)
               (goto-char (point-min))
