@@ -1013,7 +1013,7 @@
   "Open my GTD file for work."
   (interactive)
   (let ((file (concat (file-name-as-directory
-                       (catch 'find (find-directory "org")))
+                       (catch 'found (find-directory "org")))
                       "work.org")))
     (message "GTD file for work: %s" file)
     (if (file-exists-p file)
@@ -1029,7 +1029,7 @@
   "Open my GTD file for home."
   (interactive)
   (let ((file (concat (file-name-as-directory
-                       (catch 'find (find-directory "org")))
+                       (catch 'found (find-directory "org")))
                       "home.org")))
     (message "GTD file for home: %s" file)
     (if (file-exists-p file)
@@ -1086,7 +1086,7 @@
        ;; org-remember
        (when (eval-and-compile (require 'org-remember nil t))
          (when (boundp 'org-directory)           ; ディレクトリ
-           (setq org-directory (catch 'find (find-directory "org")))
+           (setq org-directory (catch 'found (find-directory "org")))
            (message "org-directory: %s" org-directory))
          (when (boundp 'org-default-notes-file)  ; ファイル名
            (setq org-default-notes-file
@@ -2893,9 +2893,11 @@
 
 ;;; ユーティリティ
 
-;;; VLC のための XML パーサー
+;;; VLC プレイリストのための XML パーサー
 ;; (install-elisp-from-emacswiki "xml-parse.el")
-(defun vlc-xml-extract-track (tmpbuf &rest tags)
+;; CSV 形式で一時バッファに出力する
+(defun vlc-xml2csv-tmpbuffer (tmpbuf &rest tags)
+  "Output temporary buffer."
   (when (eval-and-compile (require 'xml-parse nil t))
     (goto-char (point-min))
     (with-output-to-temp-buffer tmpbuf
@@ -2909,9 +2911,9 @@
                     (princ "\n")
                   (princ ","))))))))))
 
-;; CSV ファイルに出力する
-(defun vlc-xml2csv ()
-  "From xml to csv for vlc"
+;; CSV 形式でファイルに出力する
+(defun vlc-xml2csv-file ()
+  "Conversion from xml to csv for vlc."
   (interactive)
   (let ((file (read-string "Filename: " "vlc.csv" nil "vlc.csv")))
     (or (when (file-exists-p file)
@@ -2920,12 +2922,15 @@
             (progn
               (save-current-buffer
                 (let ((tmp " *xspf"))
-                  (vlc-xml-extract-track tmp "annotation" "creator" "title" "location")
+                  (vlc-xml2csv-tmpbuffer tmp "creator" "title" "annotation" "location")
                   (set-buffer tmp)
                   (let ((tmpbuf (current-buffer)))
                     (set-buffer (get-buffer-create file))
                     (erase-buffer)
-                    (insert-buffer-substring tmpbuf))))
+                    (insert-buffer-substring tmpbuf)
+                    (goto-char (point-min))
+                    (while (search-forward "&#39;" nil t)
+                      (replace-match "")))))
               (switch-to-buffer file)
               (delete-other-windows)
               (goto-char (point-min))
