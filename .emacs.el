@@ -29,12 +29,12 @@
   (around require-benchmark
           (feature &optional filename noerror)
           activate compile)
-  (let* ((before (time-to-seconds (current-time)))
-         (result ad-do-it)
-         (after (time-to-seconds (current-time)))
-         (time (* (- after before) 1000)))
-    (unless (assq result benchmark-alist)
-      (add-to-list 'benchmark-alist (cons result time)))))
+  (let* ((beg (time-to-seconds (current-time)))
+         (res ad-do-it)
+         (end (time-to-seconds (current-time)))
+         (time (* (- end beg) 1000)))
+    (unless (assq res benchmark-alist)
+      (add-to-list 'benchmark-alist (cons res time)))))
 
 ;; 表示
 (defun print-benchmark ()
@@ -332,7 +332,7 @@
 (let ((lines-chars '(:eval (count-lines-and-chars))))
   (unless (member lines-chars mode-line-format)
     (setq-default mode-line-format
-                  (cons lines-chars mode-line-format))))
+                  (list lines-chars mode-line-format))))
 
 ;;; サーバを起動する
 (when (eval-when-compile (require 'server nil t))
@@ -533,7 +533,7 @@
     (dolist (m mark-ring)
       ;; 一致しない場合, リストに追加
       (if (equal m curpos)
-          (message "deleted mark: %s" m)
+          (message "Deleted mark: %s" m)
         (setq lst (append lst (list m)))))
     (setq mark-ring lst))
   (message "%s - %s" (point) mark-ring))
@@ -834,10 +834,8 @@
                    (condition-case err
                        (dired-do-shell-command
                         (concat "tar cfz " tarfile " *") nil files)
-                     (error (message "%s" err))))
-               (message (concat
-                         "Execute tar command to `"
-                         tarfile "'...done" this-file-name)))))
+                     (error (message "%s" err)))
+                   (message "Execute tar command to %s...done" tarfile)))))
          (when (boundp 'dired-mode-map)
            (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
        (message "Loading %s (dired)...done" this-file-name))))
@@ -1017,7 +1015,7 @@
   (let ((file (concat (file-name-as-directory
                        (catch 'find (find-directory "org")))
                       "work.org")))
-    (message "gtd file for work: %s" file)
+    (message "GTD file for work: %s" file)
     (if (file-exists-p file)
         (if (and (file-readable-p file)
                  (file-writable-p file))
@@ -1033,7 +1031,7 @@
   (let ((file (concat (file-name-as-directory
                        (catch 'find (find-directory "org")))
                       "home.org")))
-    (message "gtd file for home: %s" file)
+    (message "GTD file for home: %s" file)
     (if (file-exists-p file)
         (if (and (file-readable-p file)
                  (file-writable-p file))
@@ -1199,11 +1197,19 @@
     (setq undo-strong-limit 900000))
   (define-key global-map (kbd "C-?") 'redo))
 
-;; アンドゥ履歴
+;;; アンドゥ履歴
 ;; (install-elisp "http://cx4a.org/pub/undohist.el")
 (when (eval-and-compile (require 'undohist nil t))
   (when (fboundp 'undohist-initialize)
     (undohist-initialize)))
+
+;;; CVS モード
+;;(install-elisp "http://bzr.savannah.gnu.org/lh/emacs/elpa/download/head:/csvmode.el-20120312160844-puljoum8kcsf2xcu-2/csv-mode.el")
+(when (locate-library "csv-mode")
+  (add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
+  (autoload 'csv-mode "csv-mode"
+    "Major mode for editing comma-separated value files." t))
+
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
@@ -1489,7 +1495,7 @@
           ;; バックアップ
           (copy-file skk-jisyo
                      (make-backup-file-name (expand-file-name skk-jisyo)) t)
-          (let ((tmp "*skk*")                      ; テンポラリバッファ
+          (let ((tmp " *skk*")                     ; テンポラリバッファ
                 (coding-system-for-read 'euc-jp)   ; euc-jp に変更
                 (coding-system-for-write 'euc-jp))
             ;; マージするコマンド実行
@@ -1532,7 +1538,7 @@
           (message "%s" file)
           (with-temp-buffer
             (insert-file-contents file nil)
-            (with-output-to-temp-buffer (concat "*" (file-name-nondirectory file) "*")
+            (with-output-to-temp-buffer (concat " *" (file-name-nondirectory file) "*")
               (while (re-search-forward "^\\([^;]+?\\)\\([ |\t]\\)" nil t)
                 (princ (concat (match-string 1) "\n"))))))
       (message "can not open %s" file))))
@@ -2052,10 +2058,10 @@
                (mew-icon '(:eval mew-mode-line-biff-icon)))
            (unless (member mew-string mode-line-format)
              (setq-default mode-line-format
-                           (cons mew-string mode-line-format)))
+                           (list mew-string mode-line-format)))
            (unless (member mew-icon mode-line-format)
              (setq-default mode-line-format
-                           (cons mew-icon mode-line-format)))))
+                           (list mew-icon mode-line-format)))))
 
        ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
@@ -2887,17 +2893,47 @@
 
 ;;; ユーティリティ
 
-;;; xml
+;;; VLC のための XML パーサー
 ;; (install-elisp-from-emacswiki "xml-parse.el")
-(defun xml-extract-track ()
-  (interactive)
+(defun vlc-xml-extract-track (tmpbuf &rest tags)
   (when (eval-and-compile (require 'xml-parse nil t))
-    (dolist (tracklst (read-xml))
-      (when (string= (xml-tag-name tracklst) "trackList")
-        (dolist (track (xml-tag-children tracklst))
-          (when (string= (xml-tag-name track) "track")
-            (message "%s" (xml-tag-children track))))))))
+    (goto-char (point-min))
+    (with-output-to-temp-buffer tmpbuf
+      (dolist (tracklst (read-xml))
+        (when (string= (xml-tag-name tracklst) "trackList")
+          (dolist (track (xml-tag-children tracklst))
+            (when (string=  (xml-tag-name track) "track")
+              (dolist (tag tags)
+                (princ (car (xml-tag-children (xml-tag-child track tag))))
+                (if (string= tag (car (last tags)))
+                    (princ "\n")
+                  (princ ","))))))))))
+
+;; CSV ファイルに出力する
+(defun vlc-xml2csv ()
+  "From xml to csv for vlc"
+  (interactive)
+  (let ((file (read-string "Filename: " "vlc.csv" nil "vlc.csv")))
+    (or (when (file-exists-p file)
+          (not (y-or-n-p (concat "Overwrite `" file "'? [Type yn]"))))
+        (if (or (not (file-exists-p file)) (file-writable-p file))
+            (progn
+              (save-current-buffer
+                (let ((tmp " *xspf"))
+                  (vlc-xml-extract-track tmp "annotation" "creator" "title" "location")
+                  (set-buffer tmp)
+                  (let ((tmpbuf (current-buffer)))
+                    (set-buffer (get-buffer-create file))
+                    (erase-buffer)
+                    (insert-buffer-substring tmpbuf))))
+              (switch-to-buffer file)
+              (delete-other-windows)
+              (goto-char (point-min))
+              (set-visited-file-name file)
+              (save-buffer)
+              (toggle-truncate-lines 1))
+          (message "Can not write: %s" file))
+        (message "Write file %s...done" file))))
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
-
