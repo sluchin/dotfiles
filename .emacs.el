@@ -989,13 +989,13 @@
       ;; ディレクトリ探索
       (dolist (dir lst)
         (when (file-directory-p dir)
-          (throw 'find dir)))
+          (throw 'found dir)))
       ;; ディレクトリがない場合ホーム下に作成する
       (let ((default (car (last lst))))
         (condition-case err
             (make-directory default)
           (error (message "%s" err)))
-        (throw 'find default)))))
+        (throw 'found default)))))
 
 ;;; 文書作成 (org-mode)
 ;; Org-mode Reference Card
@@ -2488,9 +2488,7 @@
                     (let (out (cmd (concat
                                     "find " dir
                                     " -type f -regex " "\".*\\." ext "$\"" " | "
-                                    exec option-string
-                                    (when (string= ext "\\(el\\|cl\\)")
-                                      " --exclude=*/undohist/*"))))
+                                    exec option-string)))
                       (setq out (shell-command-to-string cmd))
                       (message "%s" cmd)
                       (unless (string= out "") (message "%s" out))))
@@ -2511,7 +2509,8 @@
 (defun make-ctags-exuberant ()
   "Make exuberant ctags file."
   (interactive)
-  (exec-tags-command "ctags-exuberant" "-e" "-V" "-L" "-"))
+  (exec-tags-command
+   "ctags-exuberant" "-e" "-V" "-L" "-" " --exclude=*/undohist/!*.el"))
 
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
