@@ -128,6 +128,17 @@
         (setq pomodoro-timer nil))
     (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer))))
 
+;; リセット
+(defun pomodoro-reset ()
+  (interactive)
+  ;; 周期で割り切れるようにする
+  (setq pomodoro-count
+        (- pomodoro-count (% pomodoro-count pomodoro-cycle)))
+  (setq pomodoro-total-time      ; トータル時間に記録
+            (+ pomodoro-total-time pomodoro-current-time))
+  (setq pomodoro-current-time 0) ; 初期化
+  (setq pomodoro-status 'work))  ; 状態変更
+
 ;; ストップ
 (defun pomodoro-stop ()
   (interactive)
