@@ -342,6 +342,12 @@
 ;;; 番号付バックアップファイルを作る
 (setq version-control t)
 
+;;; 確認しないで古いものを消す
+(setq delete-old-versions t)
+
+;;; バージョン管理下のファイルもつくる
+(setq vc-make-backup-files t)
+
 ;;; 検索時大文字小文字の区別をする
 (setq-default case-fold-search nil)
 
