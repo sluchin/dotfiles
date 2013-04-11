@@ -332,7 +332,7 @@
 (let ((lines-chars '(:eval (count-lines-and-chars))))
   (unless (member lines-chars mode-line-format)
     (setq-default mode-line-format
-                  (list lines-chars mode-line-format))))
+                  (cons lines-chars mode-line-format))))
 
 ;;; サーバを起動する
 (when (eval-when-compile (require 'server nil t))
@@ -2058,10 +2058,10 @@
                (mew-icon '(:eval mew-mode-line-biff-icon)))
            (unless (member mew-string mode-line-format)
              (setq-default mode-line-format
-                           (list mew-string mode-line-format)))
+                           (cons mew-string mode-line-format)))
            (unless (member mew-icon mode-line-format)
              (setq-default mode-line-format
-                           (list mew-icon mode-line-format)))))
+                           (cons mew-icon mode-line-format)))))
 
        ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
