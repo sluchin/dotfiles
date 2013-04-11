@@ -4,26 +4,26 @@
 ;; Copyright (C) 2013
 ;; Author: Tetsuya Higashi
 
-(defvar pomodoro-timer nil)           ; タイマーオブジェクト
-(defvar pomodoro-work (* 60 25))      ; 25 分
-(defvar pomodoro-rest (* 60 5))       ;  5 分
-(defvar pomodoro-long-rest (* 60 15)) ; 15 分
-(defvar pomodoro-cycle 4)             ; 長い休憩の周期
-(defvar pomodoro-status 'work)        ; 状態
-(defvar pomodoro-timer-icon "")       ; アイコン
-(defvar pomodoro-timer-string "")     ; 文字
-(defvar pomodoro-current-time 0)      ; 現在の時間 (秒)
-(defvar pomodoro-total-time 0)        ; トータル時間
-(defvar pomodoro-count 0)             ; 回数
+(defvar pomodoro-timer          nil)  ; タイマーオブジェクト
+(defvar pomodoro-work            25)  ; 25 分
+(defvar pomodoro-rest             5)  ;  5 分
+(defvar pomodoro-long-rest       15)  ; 15 分
+(defvar pomodoro-cycle            4)  ; 長い休憩の周期
+(defvar pomodoro-status       'work)  ; 状態
+(defvar pomodoro-timer-icon      "")  ; アイコン
+(defvar pomodoro-timer-string    "")  ; 文字
+(defvar pomodoro-current-time     0)  ; 現在の時間 (秒)
+(defvar pomodoro-total-time       0)  ; トータル時間
+(defvar pomodoro-count            0)  ; 回数
 
 ;; フェイス
-(defface pomodoro-timer-face
-  '((t (:foreground "white" :background "gray30" :weight bold)))
+(defface pomodoro-space-face
+  '((t (:foreground "white" :background "grey30" :weight bold)))
   "mode-line-face"
   :group 'pomodoro)
 
 (defface pomodoro-work-face
-  '((t (:foreground "white" :background "red" :weight bold)))
+  '((t (:foreground "red" :background "yellow" :weight bold)))
   "mode-line-face"
   :group 'pomodoro)
 
@@ -37,18 +37,18 @@
   "mode-line-face"
   :group 'pomodoro)
 
+(defface pomodoro-timer-face
+  '((t (:foreground "white" :background "gray30" :weight bold)))
+  "mode-line-face"
+  :group 'pomodoro)
+
 ;; モードライン
-(defun pomodoro-propertize-icon (fmt color)
-  (propertize fmt
-              ;;'display pomodoro-icon-file
-              'face
-              color))
-(defun pomodoro-propertize-string (fmt)
-  (propertize fmt
-              'face
-              'pomodoro-timer-face))
-(defvar pomodoro-mode-line-icon (pomodoro-propertize-icon "" 'pomodoro-work-face))
-(defvar pomodoro-mode-line-string (pomodoro-propertize-string ""))
+(defun pomodoro-propertize (fmt color)
+  (propertize fmt 'face color))
+
+(defvar pomodoro-mode-line-space (pomodoro-propertize "" 'pomodoro-space-face))
+(defvar pomodoro-mode-line-icon (pomodoro-propertize "" 'pomodoro-work-face))
+(defvar pomodoro-mode-line-string (pomodoro-propertize "" 'pomodoro-timer-face))
 
 (unless (member '(:eval pomodoro-mode-line-string) mode-line-format)
   (setq-default mode-line-format
@@ -58,20 +58,32 @@
   (setq-default mode-line-format
                 (cons '(:eval pomodoro-mode-line-icon) mode-line-format)))
 
+(unless (member '(:eval pomodoro-mode-line-space) mode-line-format)
+  (setq-default mode-line-format
+                (cons '(:eval pomodoro-mode-line-space) mode-line-format)))
+
+;; 分に変換
+(defun pomodoro-sectomin ()
+  (setq pomodoro-work (* 60 pomodoro-work))
+  (setq pomodoro-rest (* 60 pomodoro-rest))
+  (setq pomodoro-long-rest (* 60 pomodoro-long-rest)))
+
 ;; ステータスアイコンをモードラインに表示
 (defun pomodoro-display-icon ()
   (cond ((eq pomodoro-status 'rest)
          (setq pomodoro-mode-line-icon
-               (pomodoro-propertize-icon "Ｒ" 'pomodoro-rest-face)))
+               (pomodoro-propertize "Ｒ" 'pomodoro-rest-face)))
         ((eq pomodoro-status 'long-rest)
          (setq pomodoro-mode-line-icon
-               (pomodoro-propertize-icon "Ｌ" 'pomodoro-long-rest-face)))
+               (pomodoro-propertize "Ｌ" 'pomodoro-long-rest-face)))
         (t
          (setq pomodoro-mode-line-icon
-               (pomodoro-propertize-icon "Ｗ" 'pomodoro-work-face)))))
+               (pomodoro-propertize "Ｗ" 'pomodoro-work-face)))))
 
 ;; 残り時間を表示
 (defun pomodoro-display-string ()
+  (setq pomodoro-mode-line-space
+        (pomodoro-propertize " " 'pomodoro-space-face))
   (let ((remain
          (- (cond ((eq pomodoro-status 'rest)
                    (+ pomodoro-work pomodoro-rest))
@@ -80,9 +92,10 @@
                   (t
                    pomodoro-work)) pomodoro-current-time)))
     (setq pomodoro-mode-line-string
-          (pomodoro-propertize-string
+          (pomodoro-propertize
            (format "%02d:%02d"
-                   (/ remain 60) (% remain 60))))))
+                   (/ remain 60) (% remain 60))
+           'pomodoro-timer-face))))
 
 ;; ステータス変更
 (defun pomodoro-switch-status ()
@@ -117,6 +130,7 @@
 (defun pomodoro-start ()
   (interactive)
   (pomodoro-stop)
+  (pomodoro-sectomin)
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
 ;; 一時停止
@@ -145,7 +159,8 @@
   (when pomodoro-timer
     (setq pomodoro-timer (cancel-timer pomodoro-timer)))
   (setq pomodoro-timer nil)
-  (setq pomodoro-mode-line-icon (pomodoro-propertize-icon "" 'pomodoro-work-face))
-  (setq pomodoro-mode-line-string (pomodoro-propertize-string "")))
+  (setq pomodoro-mode-line-space (pomodoro-propertize "" 'pomodoro-space-face))
+  (setq pomodoro-mode-line-icon (pomodoro-propertize "" 'pomodoro-work-face))
+  (setq pomodoro-mode-line-string (pomodoro-propertize "" 'pomodoro-timer-face)))
 
 (provide 'pomodoro)
