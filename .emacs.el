@@ -352,7 +352,7 @@
 (setq-default case-fold-search nil)
 
 ;;; 釣り合いのとれる括弧をハイライトにする
-(when (eval-when-compile (require 'paren nil t))
+(when (eval-and-compile (require 'paren nil t))
   (when (boundp 'show-paren-delay)
     (setq show-paren-delay 0)) ; 初期値は 0.125
   (when (fboundp 'show-paren-mode)
@@ -2922,18 +2922,22 @@
 ;; CSV 形式で一時バッファに出力する
 (defun vlc-xml2csv-tempbuffer (tmpbuf &rest tags)
   "Output temporary buffer from xml to csv."
-  (when (eval-and-compile (require 'xml-parse nil t))
-    (goto-char (point-min))
-    (with-output-to-temp-buffer tmpbuf
-      (dolist (tracklst (read-xml))
-        (when (string= (xml-tag-name tracklst) "trackList")
-          (dolist (track (xml-tag-children tracklst))
-            (when (string=  (xml-tag-name track) "track")
-              (dolist (tag tags)
-                (princ (car (xml-tag-children (xml-tag-child track tag))))
-                (if (string= tag (car (last tags)))
-                    (princ "\n")
-                  (princ ","))))))))))
+  (when (and (fboundp 'read-xml)
+             (fboundp 'xml-tag-name)
+             (fboundp 'xml-tag-children)
+             (fboundp 'xml-tag-child))
+    (when (eval-and-compile (require 'xml-parse nil t))
+      (goto-char (point-min))
+      (with-output-to-temp-buffer tmpbuf
+        (dolist (tracklst (read-xml))
+          (when (string= (xml-tag-name tracklst) "trackList")
+            (dolist (track (xml-tag-children tracklst))
+              (when (string=  (xml-tag-name track) "track")
+                (dolist (tag tags)
+                  (princ (car (xml-tag-children (xml-tag-child track tag))))
+                  (if (string= tag (car (last tags)))
+                      (princ "\n")
+                    (princ ",")))))))))))
 
 ;; CSV 形式でファイルに出力する
 (defun vlc-xml2csv-file ()
