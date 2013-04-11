@@ -339,6 +339,9 @@
   (when (fboundp 'server-start)
     (unless (server-running-p) (server-start))))
 
+;;; 番号付バックアップファイルを作る
+(setq version-control t)
+
 ;;; 検索時大文字小文字の区別をする
 (setq-default case-fold-search nil)
 
@@ -769,9 +772,11 @@
               (setq dired-listing-switches "-alF")))
 
        ;; ディレクトリを再帰的にコピー可能にする
-       (setq dired-recursive-copies 'always)
+       (when (boundp 'dired-recursive-copies)
+         (setq dired-recursive-copies 'always))
        ;; ディレクトリを再帰的に削除可能にする
-       (setq dired-recursive-deletes 'always)
+       (when (boundp 'dired-recursive-deletes)
+         (setq dired-recursive-deletes 'always))
 
        ;; firefox で開く
        (when (and (executable-find "firefox")
@@ -809,6 +814,22 @@
                  (message "%s is a directory" file)))))
          (when (boundp 'dired-mode-map)
            (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file)))
+
+       ;; バックアップファイルを作る
+       (defun dired-make-backup ()
+         "Make buckup file"
+         (interactive)
+         (when (and (fboundp 'dired-get-marked-files)
+                    (fboundp 'dired-copy-file))
+           (let* ((files (dired-get-marked-files))
+                  (date (format-time-string "%Y%m%d%H%M%S")))
+             (mapc (lambda (file)
+                     (let ((backup (format "%s.%s~" file date)))
+                       (dired-copy-file file backup nil)))
+                   files)
+             (revert-buffer))))
+       (when (boundp 'dired-mode-map)
+         (define-key dired-mode-map (kbd "C-c b") 'dired-make-backup))
 
        ;; tar + gzip で圧縮
        (when (and (executable-find "tar")
@@ -1774,16 +1795,12 @@
   (defalias 'ps 'list-processes+))
 
 ;;; ポモドーロタイマ
-;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
-;; git clone git://github.com/konr/tomatinho.git
+;; マイポモドーロ
 (when (locate-library "pomodoro-technique")
   (autoload 'pomodoro-start
-    "pomodoro-technique" "Pomodoro technique timer for emacs." t)
+    "pomodoro-technique" "Pomodoro technique timer for emacs." t))
 
-  (eval-after-load "pomodoro-technique"
-    '(progn
-       (message "Loading %s (pomodoro-technique)...done" this-file-name))))
-
+;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
 (when (locate-library "pomodoro")
   (autoload 'pomodoro:start "pomodoro" "Pomodoro Technique for emacs." t)
 
@@ -1801,6 +1818,7 @@
          (setq pomodoro:long-rest-time 30))
        (message "Loading %s (pomodoro)...done" this-file-name))))
 
+;; git clone git://github.com/konr/tomatinho.git
 (when (locate-library "tomatinho")
   (autoload 'tomatinho "tomatinho" "Pomodoro Technique for emacs." t)
 
@@ -2919,9 +2937,9 @@
          (file (read-string "Filename: " default nil default))
          (tmp " *xspf")
          tmpbuf)
-    (and
+    (or
      (when (file-exists-p file)
-       (y-or-n-p (concat "Overwrite `" file "'? ")))
+       (not (y-or-n-p (concat "Overwrite `" file "'? "))))
      (if (or (not (file-exists-p file)) (file-writable-p file))
          (progn
            (vlc-xml2csv-tempbuffer tmp "creator" "title" "annotation" "location")
@@ -2946,9 +2964,9 @@
          (file (read-string "Filename: " default nil default))
          (tmp " *xspf")
          string)
-    (and
+    (or
      (when (file-exists-p file)
-       (y-or-n-p (concat "Overwrite `" file "'? ")))
+       (not (y-or-n-p (concat "Overwrite `" file "'? "))))
      (if (or (not (file-exists-p file)) (file-writable-p file))
          (progn
            (vlc-xml2csv-tempbuffer tmp "location")
@@ -2980,9 +2998,9 @@
          (dirs (read-string "Directory name: " nil nil nil))
          (tmp " *xspf")
          string)
-    (and
+    (or
      (when (file-exists-p file)
-       (y-or-n-p (concat "Overwrite `" file "'? ")))
+       (not (y-or-n-p (concat "Overwrite `" file "'? "))))
      (if (or (not (file-exists-p file)) (file-writable-p file))
          (progn
            (vlc-xml2csv-tempbuffer tmp "location")
