@@ -347,10 +347,7 @@
   (when (boundp 'show-paren-delay)
     (setq show-paren-delay 0)) ; 初期値は 0.125
   (when (fboundp 'show-paren-mode)
-    (show-paren-mode 1))       ; 有効化
-  ;; ウィンドウ内に収まらないときだけ括弧内も光らせる
-  (when (boundp 'show-paren-style)
-    (setq show-paren-style 'mixed)))
+    (show-paren-mode 1)))      ; 有効化
 
 ;;; 括弧へジャンプ (デフォルト: C-M-n C-M-p)
 (define-key global-map (kbd "C-x %")
@@ -828,14 +825,15 @@
                (unless (string-match
                         "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
                  (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
-               (or (when (member tarfile (directory-files default-directory))
-                     (not (y-or-n-p ; 同名ファイル
-                           (concat "Overwrite `" tarfile "'? "))))
-                   (condition-case err
-                       (dired-do-shell-command
-                        (concat "tar cfz " tarfile " *") nil files)
-                     (error (message "%s" err)))
-                   (message "Execute tar command to %s...done" tarfile)))))
+               (or
+                (when (member tarfile (directory-files default-directory))
+                  (not (y-or-n-p ; 同名ファイル
+                        (concat "Overwrite `" tarfile "'? "))))
+                (condition-case err
+                    (dired-do-shell-command
+                     (concat "tar cfz " tarfile " *") nil files)
+                  (error (message "%s" err)))
+                (message "Execute tar command to %s...done" tarfile)))))
          (when (boundp 'dired-mode-map)
            (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
        (message "Loading %s (dired)...done" this-file-name))))
@@ -1240,6 +1238,8 @@
 
   (eval-after-load "bm"
     '(progn
+       ;; 色の設定
+       (set-face-background 'bm-persistent-face "gray15")
        ;; マークのセーブ
        (when (boundp 'bm-buffer-persistence)
          (setq-default bm-buffer-persistence t))
@@ -2897,7 +2897,7 @@
 ;; (install-elisp-from-emacswiki "xml-parse.el")
 ;; CSV 形式で一時バッファに出力する
 (defun vlc-xml2csv-tempbuffer (tmpbuf &rest tags)
-  "Output temporary buffer."
+  "Output temporary buffer from xml to csv."
   (when (eval-and-compile (require 'xml-parse nil t))
     (goto-char (point-min))
     (with-output-to-temp-buffer tmpbuf
@@ -2916,62 +2916,97 @@
   "Conversion from xml to csv for vlc."
   (interactive)
   (let* ((default "vlc.csv")
-         (file (read-string "Filename: " default nil default)))
+         (file (read-string "Filename: " default nil default))
+         (tmp " *xspf")
+         tmpbuf)
     (or (when (file-exists-p file)
           (not (y-or-n-p (concat "Overwrite `" file "'? "))))
         (if (or (not (file-exists-p file)) (file-writable-p file))
             (progn
-              (save-current-buffer
-                (let ((tmp " *xspf"))
-                  (vlc-xml2csv-tempbuffer tmp "creator" "title" "annotation" "location")
-                  (set-buffer tmp)
-                  (let ((tmpbuf (current-buffer)))
-                    (set-buffer (get-buffer-create file))
-                    (erase-buffer)
-                    (insert-buffer-substring tmpbuf)
-                    (goto-char (point-min))
-                    (while (search-forward "&#39;" nil t)
-                      (replace-match "")))))
-              (switch-to-buffer file)
-              (delete-other-windows)
+              (vlc-xml2csv-tempbuffer tmp "creator" "title" "annotation" "location")
+              (switch-to-buffer (get-buffer-create file))
+              (erase-buffer)
+              (insert-buffer-substring (get-buffer tmp))
               (goto-char (point-min))
+              (while (search-forward "&#39;" nil t)
+                (replace-match ""))
+              (goto-char (point-min))
+              (delete-other-windows)
               (set-visited-file-name file)
-              (save-buffer)
-              (toggle-truncate-lines 1))
+              (save-buffer))
           (message "Can not write: %s" file))
         (message "Write file %s...done" file))))
 
 (defun vlc-check-location ()
-  "Check location tag."
+  "Check if directory of location tag exists."
   (interactive)
   (let* ((default "check-location")
-         (file (read-string "Filename: " default nil default)))
-    (or (when (file-exists-p file)
-          (not (y-or-n-p (concat "Overwrite `" file "'? "))))
-        (if (or (not (file-exists-p file)) (file-writable-p file))
-            (progn
-              (let ((tmp " *xspf"))
-                (vlc-xml2csv-tempbuffer tmp "location")
-                (let (string)
-                  (switch-to-buffer file)
-                  (erase-buffer)
-                  (switch-to-buffer tmp)
-                  (goto-char (point-min))
-                  (while (not (eobp))
-                    (setq string (buffer-substring (point-at-bol) (point-at-eol)))
-                    (with-current-buffer file
-                      (unless (file-exists-p (substring string 7))
-                        (insert string)
-                        (insert "\n")))
-                    (forward-line 1))))
-              (switch-to-buffer file)
-              (delete-other-windows)
-              (goto-char (point-min))
-              (set-visited-file-name file)
-              (save-buffer)
-              (toggle-truncate-lines 1))
-          (message "Can not write: %s" file))
-        (message "Write file %s...done" file))))
+         (file (read-string "Filename: " default nil default))
+         (tmp " *xspf")
+         string)
+    (and
+     (when (file-exists-p file)
+       (y-or-n-p (concat "Overwrite `" file "'? ")))
+     (if (or (not (file-exists-p file)) (file-writable-p file))
+         (progn
+           (vlc-xml2csv-tempbuffer tmp "location")
+           (set-buffer (get-buffer-create file))
+           (erase-buffer)
+           (set-buffer tmp)
+           (goto-char (point-min))
+           (while (not (eobp))
+             (setq string (buffer-substring (point-at-bol) (point-at-eol)))
+             (with-current-buffer file
+               (unless (file-exists-p (substring string 7))
+                 (insert string)
+                 (insert "\n")))
+             (forward-line 1))
+           (switch-to-buffer file)
+           (delete-other-windows)
+           (goto-char (point-min))
+           (set-visited-file-name file)
+           (save-buffer))
+       (message "Can not write: %s" file))
+     (message "Write file %s...done" file))))
+
+(defun vlc-check-directory ()
+  "Check if directories exist in location tag."
+  (interactive)
+  (let* ((default "check-directory")
+         (file (read-string "Filename name: " default nil default))
+         (dirs (read-string "Directory name: " nil nil nil))
+         (tmp " *xspf")
+         string)
+    (and
+     (when (file-exists-p file)
+       (y-or-n-p (concat "Overwrite `" file "'? ")))
+     (if (or (not (file-exists-p file)) (file-writable-p file))
+         (progn
+           (vlc-xml2csv-tempbuffer tmp "location")
+           (set-buffer (get-buffer-create file))
+           (erase-buffer)
+           (set-buffer tmp)
+           (dolist (dir (directory-files dirs t))
+             (goto-char (point-min))
+             (unless (or (string-match "\\.$" dir)
+                         (string-match "\\.\\.$" dir))
+               (unless
+                   (catch 'found
+                     (while (not (eobp))
+                       (setq string (buffer-substring (point-at-bol) (point-at-eol)))
+                       (when (string= dir (substring string 7))
+                         (throw 'found t))
+                       (forward-line 1)) nil)
+                 (with-current-buffer file
+                   (insert dir)
+                   (insert "\n")))))
+           (switch-to-buffer file)
+           (delete-other-windows)
+           (goto-char (point-min))
+           (set-visited-file-name file)
+           (save-buffer))
+       (message "Can not write: %s" file))
+     (message "Write file %s...done" file))))
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
