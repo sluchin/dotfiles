@@ -1527,8 +1527,8 @@
             (kill-buffer tmp)))
       (message "skkdic-tools not found"))))
 
-;; 見出し語をバッファに表示する
-(defun display-direction-word ()
+;; 見出し語を一時バッファに表示する
+(defun print-direction-word ()
   "Display direction word."
   (interactive)
   (let ((file (read-file-name "filename: " "~/.emacs.d/ddskk/"))
@@ -1777,7 +1777,7 @@
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
 ;; git clone git://github.com/konr/tomatinho.git
 (when (locate-library "pomodoro-technique")
-  (autoload 'pomodoro
+  (autoload 'pomodoro-start
     "pomodoro-technique" "Pomodoro technique timer for emacs." t)
 
   (eval-after-load "pomodoro-technique"
@@ -2938,6 +2938,7 @@
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
+;; location タグのディレクトリが実際に存在するかどうか調べる
 (defun vlc-check-location ()
   "Check if directory of location tag exists."
   (interactive)
@@ -2970,6 +2971,7 @@
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
+;; ディレクトリが location タグに網羅されているかどうか調べる
 (defun vlc-check-directory ()
   "Check if directories exist in location tag."
   (interactive)
