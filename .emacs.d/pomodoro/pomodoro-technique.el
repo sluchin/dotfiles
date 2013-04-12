@@ -4,17 +4,37 @@
 ;; Copyright (C) 2013
 ;; Author: Tetsuya Higashi
 
+;;
+;; (when (locate-library "pomodoro-technique")
+;;   (autoload 'pomodoro-start
+;;     "pomodoro-technique" "Pomodoro technique timer for emacs." t)
+;;   (autoload 'pomodoro-restart
+;;     "pomodoro-technique" "Restart pomodoro timer." t)
+;;   (autoload 'pomodoro-pause
+;;     "pomodoro-technique" "Pause pomodoro timer." t)
+;;   (autoload 'pomodoro-save-status
+;;     "pomodoro-technique" "Save status of pomodoro timer." t)
+;;   (define-key global-map (kbd "C-c p o") 'pomodoro-start)
+;;   (define-key global-map (kbd "C-c p r") 'pomodoro-restart)
+;;   (define-key global-map (kbd "C-c p p") 'pomodoro-pause)
+;;   (define-key global-map (kbd "C-c p s") 'pomodoro-save-status))
+;;
+
 (defvar pomodoro-timer          nil)  ; タイマーオブジェクト
 (defvar pomodoro-work            25)  ; 25 分
 (defvar pomodoro-rest             5)  ;  5 分
 (defvar pomodoro-long-rest       15)  ; 15 分
 (defvar pomodoro-cycle            4)  ; 長い休憩の周期
-(defvar pomodoro-status       'work)  ; 状態
+(defvar pomodoro-status       'work)  ; ステータス
 (defvar pomodoro-timer-icon      "")  ; アイコン
 (defvar pomodoro-timer-string    "")  ; 文字
 (defvar pomodoro-current-time     0)  ; 現在の時間 (秒)
 (defvar pomodoro-total-time       0)  ; トータル時間
 (defvar pomodoro-count            0)  ; 回数
+(defvar pomodoro-recovery-info  nil)  ; リカバリ情報
+
+(defvar pomodoro-save-file    "~/pomodoro.org")
+(defvar pomodoro-status-file  "~/.pomodoro")
 
 ;; フェイス
 (defface pomodoro-space-face
@@ -68,6 +88,8 @@
   (setq pomodoro-rest (* 60 pomodoro-rest))
   (setq pomodoro-long-rest (* 60 pomodoro-long-rest)))
 
+(pomodoro-sectomin)
+
 ;; ステータスアイコンをモードラインに表示
 (defun pomodoro-display-icon ()
   (cond ((eq pomodoro-status 'rest)
@@ -97,6 +119,37 @@
                    (/ remain 60) (% remain 60))
            'pomodoro-timer-face))))
 
+;; ポモドーロを保存
+(defun pomodoro-save-org ()
+  (with-temp-buffer
+    (if (file-readable-p pomodoro-save-file)
+        (insert "\n")
+      (insert "* Pomodoro\n\n"))
+    (insert (format-time-string "** %Y-%m-%d %H:%M:%S\n"))
+    (insert (format "   Work %dmin, Rest %dmin, Long Rest %dmin, Cycle %dtimes\n"
+                    (/ pomodoro-work 60)
+                    (/ pomodoro-rest 60)
+                    (/ pomodoro-long-rest 60)
+                    pomodoro-cycle))
+    (insert (format "   Total Time %d, All Pomodoro %d, Pomodoro %d\n"
+                    pomodoro-total-time
+                    pomodoro-count
+                    (/ pomodoro-count pomodoro-cycle)))
+    (append-to-file (point-min) (point-max) pomodoro-save-file)))
+
+;; リカバリ
+(defun pomodoro-recovery ()
+  (if (file-readable-p pomodoro-status-file)
+      (progn
+        (load-file pomodoro-status-file)
+        (setq pomodoro-status (cdr (assq 'pomodoro-status pomodoro-recovery-info)))
+        (setq pomodoro-current-time (cdr (assq 'pomodoro-current-time pomodoro-recovery-info)))
+        (setq pomodoro-count (cdr (assq 'pomodoro-count pomodoro-recovery-info)))
+        (message "status=%s time=%s count=%s"
+                 pomodoro-status pomodoro-current-time pomodoro-count))
+    (pomodoro-start)
+    (message "no file exists: %s" pomodoro-status-file)))
+
 ;; ステータス変更
 (defun pomodoro-switch-status ()
   (let ((rest (if (% pomodoro-count pomodoro-cycle)
@@ -118,7 +171,7 @@
      ;; 変更なし
      (t nil))))
 
-;; タイマーから呼ばれる関数
+;; コールバック関数
 (defun pomodoro-callback-timer ()
   (setq pomodoro-current-time (1+ pomodoro-current-time))
   (pomodoro-switch-status)
@@ -130,7 +183,13 @@
 (defun pomodoro-start ()
   (interactive)
   (pomodoro-stop)
-  (pomodoro-sectomin)
+  (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
+
+;; 再開
+(defun pomodoro-restart ()
+  (interactive)
+  (pomodoro-stop)
+  (pomodoro-recovery)
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
 ;; 一時停止
@@ -162,5 +221,20 @@
   (setq pomodoro-mode-line-space (pomodoro-propertize "" 'pomodoro-space-face))
   (setq pomodoro-mode-line-icon (pomodoro-propertize "" 'pomodoro-work-face))
   (setq pomodoro-mode-line-string (pomodoro-propertize "" 'pomodoro-timer-face)))
+
+;; ステータス保存
+(defun pomodoro-save-status ()
+  (interactive)
+  (pomodoro-save-org)
+  (with-temp-buffer
+    (insert ";;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-\n")
+    (insert "(setq pomodoro-recovery-info\n")
+    (insert (format "  '((pomodoro-status  . %s)\n"
+                    pomodoro-status))
+    (insert (format "    (pomodoro-current-time . %d)\n"
+                    pomodoro-current-time))
+    (insert (format "    (pomodoro-count . %d)))\n"
+                    pomodoro-count))
+    (write-file pomodoro-status-file)))
 
 (provide 'pomodoro)

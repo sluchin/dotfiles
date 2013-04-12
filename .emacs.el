@@ -1348,13 +1348,13 @@
   (defadvice write-file
     (around recentf-save-nobackup (filename &optional confirm) activate compile)
     (if (and (boundp 'recentf-save-file)
-             (string= filename (expand-file-name recentf-save-file))
+             (string= (ad-get-arg 0) (expand-file-name recentf-save-file))
              (not backup-inhibited))
         (progn
-            (setq backup-inhibited t)
-            (ad-do-it)
-            (setq backup-inhibited nil))
-      (ad-do-it)))
+          (setq backup-inhibited t)
+          ad-do-it
+          (setq backup-inhibited nil))
+      ad-do-it))
   ;; キーバインド
   (define-key global-map (kbd "C-c C-f") 'recentf-open-files))
 
@@ -1815,11 +1815,21 @@
     "list-processes+" "A enhance list processes command." t)
   (defalias 'ps 'list-processes+))
 
-;;; ポモドーロタイマ
-;; マイポモドーロ
+;;; ポモドーロタイマー
+;; 自作のポモドーロタイマー
 (when (locate-library "pomodoro-technique")
   (autoload 'pomodoro-start
-    "pomodoro-technique" "Pomodoro technique timer for emacs." t))
+    "pomodoro-technique" "Pomodoro technique timer for emacs." t)
+  (autoload 'pomodoro-restart
+    "pomodoro-technique" "Restart pomodoro timer." t)
+  (autoload 'pomodoro-pause
+    "pomodoro-technique" "Pause pomodoro timer." t)
+  (autoload 'pomodoro-save-status
+    "pomodoro-technique" "Save status of pomodoro timer." t)
+  (define-key global-map (kbd "C-c p o") 'pomodoro-start)
+  (define-key global-map (kbd "C-c p r") 'pomodoro-restart)
+  (define-key global-map (kbd "C-c p p") 'pomodoro-pause)
+  (define-key global-map (kbd "C-c p s") 'pomodoro-save-status))
 
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
 (when (locate-library "pomodoro")
