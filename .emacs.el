@@ -29,9 +29,9 @@
   (around require-benchmark
           (feature &optional filename noerror)
           activate compile)
-  (let* ((beg (time-to-seconds (current-time)))
+  (let* ((beg (float-time (current-time)))
          (res ad-do-it)
-         (end (time-to-seconds (current-time)))
+         (end (float-time (current-time)))
          (time (* (- end beg) 1000)))
     (unless (assq res benchmark-alist)
       (add-to-list 'benchmark-alist (cons res time)))))
@@ -351,27 +351,6 @@
 ;;; 検索時大文字小文字の区別をする
 (setq-default case-fold-search nil)
 
-;;; 釣り合いのとれる括弧をハイライトにする
-(when (eval-and-compile (require 'paren nil t))
-  (when (boundp 'show-paren-delay)
-    (setq show-paren-delay 0)) ; 初期値は 0.125
-  (when (fboundp 'show-paren-mode)
-    (show-paren-mode 1)))      ; 有効化
-
-;;; 括弧へジャンプ (デフォルト: C-M-n C-M-p)
-(define-key global-map (kbd "C-x %")
-  (lambda (&optional arg)
-    "Go to the matching parenthesis if on parenthesis."
-    (interactive "p")
-    (setq arg (or arg 1))
-    (cond ((and (not (bobp))
-                (char-equal ?\x29 (char-syntax (char-before))))
-           (backward-list arg))
-          ((and (not (eobp))
-                (char-equal ?\x28 (char-syntax (char-after))))
-           (forward-list arg))
-          (t (self-insert-command arg)))))
-
 ;;; キーストロークをエコーエリアに早く表示する
 (setq echo-keystrokes 0.1)
 
@@ -571,6 +550,20 @@
       (interactive)
       (load-file buffer-file-name))))
 
+;; 括弧へジャンプ (デフォルト: C-M-n C-M-p)
+(define-key global-map (kbd "C-x %")
+  (lambda (&optional arg)
+    "Go to the matching parenthesis if on parenthesis."
+    (interactive "p")
+    (setq arg (or arg 1))
+    (cond ((and (not (bobp))
+                (char-equal ?\x29 (char-syntax (char-before))))
+           (backward-list arg))
+          ((and (not (eobp))
+                (char-equal ?\x28 (char-syntax (char-after))))
+           (forward-list arg))
+          (t (self-insert-command arg)))))
+
 ;; リージョンまたはワードを返却するマクロ
 (defmacro region-or-word ()
   "Return region or word"
@@ -699,10 +692,12 @@
 ;;; 行番号表示
 ;; 画面左に行数を表示する
 (when (eval-and-compile (require 'linum nil t))
-  ;; 5桁分の領域を確保して行番号を表示
-  (setq linum-format "%5d")
   ;; デフォルトで linum-mode を有効にする
-  (global-linum-mode 1)
+  (when (fboundp 'global-linum-mode)
+    (global-linum-mode 1))
+  ;; 5桁分の領域を確保して行番号を表示
+  (when (boundp 'linum-format)
+    (setq linum-format "%5d"))
   ;; 行番号表示する必要のないモードでは表示しない
   (defadvice linum-on (around linum-off activate compile)
     (unless (or (minibufferp)
@@ -717,6 +712,13 @@
                    navi2ch-list-mode
                    navi2ch-board-mode
                    twittering-mode))) ad-do-it)))
+
+;;; 釣り合いのとれる括弧をハイライトにする
+(when (eval-and-compile (require 'paren nil t))
+  (when (fboundp 'show-paren-mode)
+    (show-paren-mode 1))        ; 有効化
+  (when (boundp 'show-paren-delay)
+    (setq show-paren-delay 0))) ; 初期値は 0.125
 
 ;;; ファイル名をユニークにする
 (when (eval-and-compile (require 'uniquify nil t))
@@ -1342,14 +1344,26 @@
     (setq recentf-exclude
           '("/TAGS$" "/var/tmp/" "/tmp/"
             "~$" "/$" "/howm/" ".howm-keys" ".emacs.d/bookmarks")))
+  ;; .recentf のバックアップファイルをつくらない
+  (defadvice write-file
+    (around recentf-save-nobackup (filename &optional confirm) activate compile)
+    (if (and (boundp 'recentf-save-file)
+             (string= filename (expand-file-name recentf-save-file))
+             (not backup-inhibited))
+        (progn
+            (setq backup-inhibited t)
+            (ad-do-it)
+            (setq backup-inhibited nil))
+      (ad-do-it)))
+  ;; キーバインド
   (define-key global-map (kbd "C-c C-f") 'recentf-open-files))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
 (when (locate-library "tabbar")
   (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
-  ;; M-2 でタブ表示
-  (define-key global-map (kbd "M-2") 'tabbar-mode)
+  ;; タブ表示
+  (define-key global-map (kbd "C-c t") 'tabbar-mode)
 
   (eval-after-load "tabbar"
     '(progn
@@ -1795,6 +1809,7 @@
 
 ;;; プロセスリスト
 ;; (install-elisp-from-emacswiki "list-processes+.el")
+;; C-k kill
 (when (locate-library "list-processes+")
   (autoload 'list-processes+
     "list-processes+" "A enhance list processes command." t)
