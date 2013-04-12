@@ -741,6 +741,7 @@
         (when (y-or-n-p (format "Open '%s' %s "
                                 command (file-name-nondirectory file)))
           (dired-run-shell-command (concat command " " file " &")))))))
+
 ;; dired 設定
 (when (locate-library "dired")
   (autoload 'dired "dired"
@@ -756,16 +757,6 @@
 
   (eval-after-load "dired"
     '(progn
-       ;; 編集可能にする
-       (when (locate-library "wdired")
-         (autoload 'wdired-change-to-wdired-mode "wdired"
-           "Rename files editing their names in dired buffers." t)
-
-         (eval-after-load "wdired"
-           '(progn
-              (when (boundp 'dired-mode-map)
-                (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode)))))
-
        ;; ディレクトリを先に表示する
        (cond ((eq system-type 'windows-nt)
               ;; Windows の場合
@@ -832,7 +823,11 @@
            (let* ((files (dired-get-marked-files))
                   (date (format-time-string "%Y%m%d%H%M%S")))
              (mapc (lambda (file)
-                     (let ((backup (format "%s.%s~" file date)))
+                     (let ((backup
+                            (format "%s_%s.%s"
+                                    (file-name-sans-extension file)
+                                    date
+                                    (file-name-extension file))))
                        (dired-copy-file file backup nil)))
                    files)
              (revert-buffer))))
@@ -865,6 +860,10 @@
                 (message "Execute tar command to %s...done" tarfile)))))
          (when (boundp 'dired-mode-map)
            (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
+
+       ;; 編集可能にする
+       (when (boundp 'dired-mode-map)
+         (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
@@ -1130,18 +1129,17 @@
                    ("Emacs" ?e
                     "**%?\n%i\n   %a\n   %t\n" nil "Emacs")
                    ("Memo"  ?m
-                    "**%?\n%i\n   %a\n   %t\n" nil "Memo")))
-           (message "org-remember-templates: %s" org-remember-templates))
+                    "**%?\n%i\n   %a\n   %t\n" nil "Memo"))))
          (when (fboundp 'org-remember-insinuate) ; 初期化
            (org-remember-insinuate))
 
          ;; ソースコードを読みメモする
-         (when (and (boundp 'org-directory)
-                    (boundp 'org-default-notes-file)
-                    (boundp 'org-remember-templates))
-           (defun org-remember-code-reading ()
-             "When code reading, org-remember mode."
-             (interactive)
+         (defun org-remember-code-reading ()
+           "When code reading, org-remember mode."
+           (interactive)
+           (when (and (boundp 'org-directory)
+                      (boundp 'org-default-notes-file)
+                      (boundp 'org-remember-templates))
              (let* ((org-directory (catch 'found (find-directory "code")))
                     (org-default-notes-file
                      (concat (file-name-as-directory org-directory)
@@ -1342,11 +1340,13 @@
     (setq recentf-max-saved-items 10000))
   (when (boundp 'recentf-exclude)         ; 除外するファイル
     (setq recentf-exclude
-          '("/TAGS$" "/var/tmp/" "/tmp/"
-            "~$" "/$" "/howm/" ".howm-keys" ".emacs.d/bookmarks")))
+          '("/TAGS$" "^/var/tmp/" "^/tmp/"
+            "~$" "/$" "/howm/" "\\.howm-keys$"
+            "\\.emacs\\.d/bookmarks$" "\\.pomodoro$")))
   ;; .recentf のバックアップファイルをつくらない
   (defadvice write-file
-    (around recentf-save-nobackup (filename &optional confirm) activate compile)
+    (around recentf-save-nobackup (filename &optional confirm)
+            activate compile)
     (if (and (boundp 'recentf-save-file)
              (string= (ad-get-arg 0) (expand-file-name recentf-save-file))
              (not backup-inhibited))
@@ -1829,7 +1829,21 @@
   (define-key global-map (kbd "C-c p o") 'pomodoro-start)
   (define-key global-map (kbd "C-c p r") 'pomodoro-restart)
   (define-key global-map (kbd "C-c p p") 'pomodoro-pause)
-  (define-key global-map (kbd "C-c p s") 'pomodoro-save-status))
+  (define-key global-map (kbd "C-c p s") 'pomodoro-save)
+
+  (eval-after-load "pomodoro-technique"
+    '(progn
+       (when (boundp 'pomodoro-org-file)
+         (setq pomodoro-org-file
+               (concat (file-name-as-directory
+                        (catch 'found (find-directory "org")))
+                       "pomodoro.org")))
+       (when (boundp 'pomodoro-status-file)
+         (setq pomodoro-status-file
+               (concat (file-name-as-directory
+                        (catch 'found (find-directory "pomodoro")))
+                       ".pomodoro")))
+       (message "Loading %s (pomodoro-technique)...done" this-file-name))))
 
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
 (when (locate-library "pomodoro")
