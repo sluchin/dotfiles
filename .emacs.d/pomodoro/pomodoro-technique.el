@@ -17,50 +17,78 @@
 ;;   (define-key global-map (kbd "C-c p o") 'pomodoro-start)
 ;;   (define-key global-map (kbd "C-c p r") 'pomodoro-restart)
 ;;   (define-key global-map (kbd "C-c p p") 'pomodoro-pause)
-;;   (define-key global-map (kbd "C-c p s") 'pomodoro-save-status))
+;;   (define-key global-map (kbd "C-c p s") 'pomodoro-save))
 ;;
 
-(defvar pomodoro-timer          nil)  ; タイマーオブジェクト
-(defvar pomodoro-work            25)  ; 25 分
-(defvar pomodoro-rest             5)  ;  5 分
-(defvar pomodoro-long-rest       15)  ; 15 分
-(defvar pomodoro-cycle            4)  ; 長い休憩の周期
-(defvar pomodoro-status       'work)  ; ステータス
-(defvar pomodoro-timer-icon      "")  ; アイコン
-(defvar pomodoro-timer-string    "")  ; 文字
-(defvar pomodoro-current-time     0)  ; 現在の時間 (秒)
-(defvar pomodoro-total-time       0)  ; トータル時間
-(defvar pomodoro-count            0)  ; 回数
-(defvar pomodoro-recovery-info  nil)  ; リカバリ情報
+(eval-and-compile (require 'org nil t))
 
-(defvar pomodoro-save-file    "~/pomodoro.org")
-(defvar pomodoro-status-file  "~/.pomodoro")
+(defcustom pomodoro-work (* 60 25)
+  "Work time (sec)."
+  :group 'pomodoro
+  :type  'integer)
+
+(defcustom pomodoro-rest (* 60  5)
+  "Rest time (sec)."
+  :group 'pomodoro
+  :type  'integer)
+
+(defcustom pomodoro-long (* 60 15)
+  "Long rest time (sec)."
+  :group 'pomodoro
+  :type  'integer)
+
+(defcustom pomodoro-cycle 4
+  "Cycle of long rest."
+  :group 'pomodoro
+  :type  'integer)
+
+;; org-mode ファイル
+(defcustom pomodoro-org-file "~/pomodoro.org"
+  "Regist file for org-mode."
+  :group 'pomodoro
+  :type  'string)
+
+;; ステータスファイル
+(defcustom pomodoro-status-file "~/.pomodoro"
+  "Regist status file for recovery."
+  :group 'pomodoro
+  :type 'string)
 
 ;; フェイス
 (defface pomodoro-space-face
   '((t (:foreground "white" :background "grey30" :weight bold)))
-  "mode-line-face"
+  "Mode line face for space."
   :group 'pomodoro)
 
 (defface pomodoro-work-face
   '((t (:foreground "red" :background "yellow" :weight bold)))
-  "mode-line-face"
+  "Mode line face for work icon."
   :group 'pomodoro)
 
 (defface pomodoro-rest-face
   '((t (:foreground "white" :background "blue" :weight bold)))
-  "mode-line-face"
+  "Mode line face for rest icon."
   :group 'pomodoro)
 
 (defface pomodoro-long-rest-face
   '((t (:foreground "white" :background "green" :weight bold)))
-  "mode-line-face"
+  "Mode line face for long rest icon."
   :group 'pomodoro)
 
 (defface pomodoro-timer-face
   '((t (:foreground "white" :background "gray30" :weight bold)))
-  "mode-line-face"
+  "Mode line face for time."
   :group 'pomodoro)
+
+(defvar pomodoro-timer              nil)  ; タイマーオブジェクト
+(defvar pomodoro-status           'work)  ; ステータス
+(defvar pomodoro-timer-icon          "")  ; アイコン
+(defvar pomodoro-timer-string        "")  ; 文字
+(defvar pomodoro-current-time         0)  ; 現在の時間 (秒)
+(defvar pomodoro-total-time         nil)  ; トータル時間
+(defvar pomodoro-count                0)  ; 回数
+(defvar pomodoro-recovery-info      nil)  ; リカバリ情報
+(defvar pomodoro-start-time          "")  ; 開始時間
 
 ;; モードライン
 (defun pomodoro-propertize (fmt color)
@@ -82,14 +110,6 @@
   (setq-default mode-line-format
                 (cons '(:eval pomodoro-mode-line-space) mode-line-format)))
 
-;; 分に変換
-(defun pomodoro-sectomin ()
-  (setq pomodoro-work (* 60 pomodoro-work))
-  (setq pomodoro-rest (* 60 pomodoro-rest))
-  (setq pomodoro-long-rest (* 60 pomodoro-long-rest)))
-
-(pomodoro-sectomin)
-
 ;; ステータスアイコンをモードラインに表示
 (defun pomodoro-display-icon ()
   (cond ((eq pomodoro-status 'rest)
@@ -110,7 +130,7 @@
          (- (cond ((eq pomodoro-status 'rest)
                    (+ pomodoro-work pomodoro-rest))
                   ((eq pomodoro-status 'long-rest)
-                   (+ pomodoro-work pomodoro-long-rest))
+                   (+ pomodoro-work pomodoro-long))
                   (t
                    pomodoro-work)) pomodoro-current-time)))
     (setq pomodoro-mode-line-string
@@ -118,24 +138,6 @@
            (format "%02d:%02d"
                    (/ remain 60) (% remain 60))
            'pomodoro-timer-face))))
-
-;; ポモドーロを保存
-(defun pomodoro-save-org ()
-  (with-temp-buffer
-    (if (file-readable-p pomodoro-save-file)
-        (insert "\n")
-      (insert "* Pomodoro\n\n"))
-    (insert (format-time-string "** %Y-%m-%d %H:%M:%S\n"))
-    (insert (format "   Work %dmin, Rest %dmin, Long Rest %dmin, Cycle %dtimes\n"
-                    (/ pomodoro-work 60)
-                    (/ pomodoro-rest 60)
-                    (/ pomodoro-long-rest 60)
-                    pomodoro-cycle))
-    (insert (format "   Total Time %d, All Pomodoro %d, Pomodoro %d\n"
-                    pomodoro-total-time
-                    pomodoro-count
-                    (/ pomodoro-count pomodoro-cycle)))
-    (append-to-file (point-min) (point-max) pomodoro-save-file)))
 
 ;; リカバリ
 (defun pomodoro-recovery ()
@@ -148,19 +150,19 @@
         (message "status=%s time=%s count=%s"
                  pomodoro-status pomodoro-current-time pomodoro-count))
     (pomodoro-start)
-    (message "no file exists: %s" pomodoro-status-file)))
+    (message "no %s exists" pomodoro-status-file)))
 
 ;; ステータス変更
 (defun pomodoro-switch-status ()
   (let ((rest (if (% pomodoro-count pomodoro-cycle)
                   pomodoro-rest
-                pomodoro-long-rest)))
+                pomodoro-long)))
     (cond
      ;; ステータスをお仕事にする
      ((<= (+ pomodoro-work rest) pomodoro-current-time)
-      (setq pomodoro-count (1+ pomodoro-count)) ; 回数インクリメント
+      (setq pomodoro-count (1+ pomodoro-count)) ; ポモドーロインクリメント
       (setq pomodoro-total-time                 ; トータル時間に記録
-            (+ pomodoro-total-time pomodoro-current-time))
+            (+ (or pomodoro-total-time 0) pomodoro-current-time))
       (setq pomodoro-current-time 0)            ; 初期化
       (setq pomodoro-status 'work))             ; 状態変更
      ;; ステータスを休憩にする
@@ -179,13 +181,26 @@
   (pomodoro-display-string)
   (force-mode-line-update))
 
+(defun pomodoro-set-start-time ()
+  (let ((system-time-locale "C"))
+    (setq pomodoro-start-time (format-time-string "%Y-%m-%d %a %H:%M"))))
+
 ;; スタート
 (defun pomodoro-start ()
   (interactive)
   (pomodoro-stop)
+  (pomodoro-set-start-time)
+  (setq pomodoro-count (1+ pomodoro-count))
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
-;; 再開
+;; 休憩からスタート
+(defun pomodoro-start-rest ()
+  (interactive)
+  (pomodoro-stop)
+  (setq pomodoro-current-time pomodoro-work)
+  (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
+
+;; 再スタート
 (defun pomodoro-restart ()
   (interactive)
   (pomodoro-stop)
@@ -208,7 +223,7 @@
   (setq pomodoro-count
         (- pomodoro-count (% pomodoro-count pomodoro-cycle)))
   (setq pomodoro-total-time      ; トータル時間に記録
-            (+ pomodoro-total-time pomodoro-current-time))
+        (+ (or pomodoro-total-time 0) pomodoro-current-time))
   (setq pomodoro-current-time 0) ; 初期化
   (setq pomodoro-status 'work))  ; 状態変更
 
@@ -222,10 +237,42 @@
   (setq pomodoro-mode-line-icon (pomodoro-propertize "" 'pomodoro-work-face))
   (setq pomodoro-mode-line-string (pomodoro-propertize "" 'pomodoro-timer-face)))
 
+;; ポモドーロを保存
+(defun pomodoro-save-org ()
+  "Pomodoro, org-remember mode."
+  (interactive)
+  (when (and (boundp 'org-directory)
+             (boundp 'org-default-notes-file)
+             (boundp 'org-remember-templates))
+    (let* ((org-directory (file-name-directory pomodoro-org-file))
+           (org-default-notes-file pomodoro-org-file)
+           (system-time-locale "C")
+           (start pomodoro-start-time)
+           (total (format "%02d:%02d:%02d"
+                          (/ (/ (+ (or pomodoro-total-time 0)
+                                   pomodoro-current-time) 60) 60)
+                          (% (/ (+ (or pomodoro-total-time 0)
+                                   pomodoro-current-time) 60) 60)
+                          (% (+ (or pomodoro-total-time 0)
+                                pomodoro-current-time) 60)))
+           (pomodoro (number-to-string pomodoro-count))
+           (org-remember-templates
+            `(("Work" ?w "** %t%? \n
+   CLOCK: [%(identity start)]--%U\n
+   Time     %(identity total)
+   Pomodoro %(identity pomodoro)\n"
+               org-directory "Work")
+              ("Home" ?h "** %t%? \n
+   CLOCK: [%(identity start)]--%U\n
+   Time     %(identity total)
+   Pomodoro %(identity pomodoro)\n"
+               org-directory "Home"))))
+      (message "pomodoro-org-remember: %s" org-default-notes-file)
+      (org-remember))))
+
 ;; ステータス保存
 (defun pomodoro-save-status ()
   (interactive)
-  (pomodoro-save-org)
   (with-temp-buffer
     (insert ";;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-\n")
     (insert "(setq pomodoro-recovery-info\n")
@@ -236,5 +283,20 @@
     (insert (format "    (pomodoro-count . %d)))\n"
                     pomodoro-count))
     (write-file pomodoro-status-file)))
+
+(defun pomodoro-save ()
+  (interactive)
+  (pomodoro-save-org)
+  (pomodoro-save-status)
+  (pomodoro-set-start-time))
+
+(defun pomodoro-print-status ()
+  (interactive)
+  (message "Work=%d Rest=%d Long=%d Cycle=%d"
+           (/ pomodoro-work 60) (/ pomodoro-rest 60)
+           (/ pomodoro-long 60) pomodoro-cycle)
+  (message "[%s] Total=%d Pomodoro=%d"
+           pomodoro-start-time
+           (+ (or pomodoro-total-time 0) pomodoro-current-time) pomodoro-count))
 
 (provide 'pomodoro)
