@@ -187,10 +187,14 @@
   (if (file-readable-p pomodoro-status-file)
       (progn
         (load-file pomodoro-status-file)
-        (setq pomodoro-status (cdr (assq 'pomodoro-status pomodoro-recovery-info)))
-        (setq pomodoro-current-time (cdr (assq 'pomodoro-current-time pomodoro-recovery-info)))
-        (setq pomodoro-count (cdr (assq 'pomodoro-count pomodoro-recovery-info)))
-        (setq pomodoro-start-time (cdr (assq 'pomodoro-start-time pomodoro-recovery-info)))
+        (setq pomodoro-status
+              (cdr (assq 'pomodoro-status pomodoro-recovery-info)))
+        (setq pomodoro-current-time
+              (cdr (assq 'pomodoro-current-time pomodoro-recovery-info)))
+        (setq pomodoro-count
+              (cdr (assq 'pomodoro-count pomodoro-recovery-info)))
+        (setq pomodoro-start-time
+              (cdr (assq 'pomodoro-start-time pomodoro-recovery-info)))
         (message "status=%s time=%s count=%s"
                  pomodoro-status pomodoro-current-time pomodoro-count))
     (pomodoro-start)
@@ -210,18 +214,21 @@
     (setq pomodoro-status
           (if (and (not (= pomodoro-count 0))
                    (= (% pomodoro-count pomodoro-cycle) 0))
-              pomodoro-long
-            pomodoro-rest)))
+              'long 'rest))
+    (message "pomodoro switch status: %s" pomodoro-status))
    ;; 休憩終了
-   ((and (not (eq pomodoro-status 'work))
-         (<= (+ pomodoro-work (if (eq pomodoro-status 'long)
-                                  pomodoro-long
-                                pomodoro-rest)) pomodoro-current-time))
+   ((<= (+ pomodoro-work
+           (if (eq pomodoro-status 'rest)
+               pomodoro-rest
+             pomodoro-long)) pomodoro-current-time)
+    (when (eq pomodoro-status 'work)
+      (error "pomodoro status error: %s" pomodoro-status))
     (setq pomodoro-total-time                  ; トータル時間に記録
           (+ (or pomodoro-total-time 0) pomodoro-current-time))
     ;; ステータスをお仕事にする
     (setq pomodoro-current-time 0)             ; 初期化
-    (setq pomodoro-status 'work))              ; ステータス変更
+    (setq pomodoro-status 'work)              ; ステータス変更
+    (message "pomodoro switch status: %s" pomodoro-status))
    ;; 変更なし
    (t nil)))
 
@@ -247,6 +254,14 @@
   (interactive)
   (pomodoro-stop)
   (pomodoro-set-start-time)
+  (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
+
+;; お仕事からスタート
+(defun pomodoro-start-work ()
+  "Start pomodoro timer from work."
+  (interactive)
+  (pomodoro-stop)
+  (setq pomodoro-current-time 0)
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
 ;; 休憩からスタート
