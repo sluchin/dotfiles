@@ -2963,28 +2963,9 @@
 ;;; ユーティリティ
 
 ;;; VLC プレイリストのための XML パーサー
+;; http://xspf.org/ns/0/XSPF.rdf
 ;; (install-elisp-from-emacswiki "xml-parse.el")
-;; CSV 形式で一時バッファに出力する
-;; (defun vlc-xml2csv-tempbuffer (tmpbuf &rest tags)
-;;   "Output temporary buffer from xml to csv."
-;;   (when (eval-and-compile (require 'xml-parse nil t))
-;;     (when (and (fboundp 'read-xml)
-;;                (fboundp 'xml-tag-name)
-;;                (fboundp 'xml-tag-children)
-;;                (fboundp 'xml-tag-child))
-;;       (goto-char (point-min))
-;;       (with-output-to-temp-buffer tmpbuf
-;;         (dolist (tracklst (read-xml))
-;;           (when (string= (xml-tag-name tracklst) "trackList")
-;;             (dolist (track (xml-tag-children tracklst))
-;;               (when (string=  (xml-tag-name track) "track")
-;;                 (dolist (tag tags)
-;;                   (princ (car (xml-tag-children (xml-tag-child track tag))))
-;;                   (if (string= tag (car (last tags)))
-;;                       (princ "\n")
-;;                     (princ ",")))))))))))
-
-;; CSV 形式で一時バッファに出力する
+;; CSV 形式で標準出力に出力する
 (defun vlc-xml2csv-tempbuffer (&rest tags)
   "Output temporary buffer from xml to csv."
   (when (and (eval-and-compile (require 'xml-parse nil t))
@@ -3006,33 +2987,6 @@
                 (princ ",")))))))
     (goto-char (point-min))
     (message "xml parse end")))
-
-;; CSV 形式でファイルに出力する
-;; (defun vlc-xml2csv-file ()
-;;   "Conversion from xml to csv for vlc."
-;;   (interactive)
-;;   (let* ((default "vlc.csv")
-;;          (file (read-string "Filename: " default nil default))
-;;          (tmp " *xspf")
-;;          tmpbuf)
-;;     (or
-;;      (when (file-exists-p file)
-;;        (not (y-or-n-p (concat "Overwrite `" file "'? "))))
-;;      (if (or (not (file-exists-p file)) (file-writable-p file))
-;;          (progn
-;;            (vlc-xml2csv-tempbuffer tmp "creator" "title" "annotation" "location")
-;;            (switch-to-buffer (get-buffer-create file))
-;;            (erase-buffer)
-;;            (insert-buffer-substring (get-buffer tmp))
-;;            (goto-char (point-min))
-;;            (while (search-forward "&#39;" nil t)
-;;              (replace-match ""))
-;;            (goto-char (point-min))
-;;            (delete-other-windows)
-;;            (set-visited-file-name file)
-;;            (save-buffer))
-;;        (message "Can not write: %s" file))
-;;      (message "Write file %s...done" file))))
 
 ;; CSV 形式でファイルに出力する
 (defun vlc-xml2csv-file ()
