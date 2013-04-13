@@ -74,7 +74,7 @@
   "Mode line face for rest icon."
   :group 'pomodoro)
 
-(defface pomodoro-long-rest-face
+(defface pomodoro-long-face
   '((t (:foreground "white" :background "green" :weight bold)))
   "Mode line face for long rest icon."
   :group 'pomodoro)
@@ -84,24 +84,37 @@
   "Mode line face for time."
   :group 'pomodoro)
 
-(defvar pomodoro-timer              nil)  ; タイマーオブジェクト
-(defvar pomodoro-status           'work)  ; ステータス
-(defvar pomodoro-timer-icon          "")  ; アイコン
-(defvar pomodoro-timer-string        "")  ; 文字
-(defvar pomodoro-current-time         0)  ; 現在の時間 (秒)
-(defvar pomodoro-total-time         nil)  ; トータル時間
-(defvar pomodoro-work-time          nil)  ; トータル仕事時間
-(defvar pomodoro-count                0)  ; 回数
-(defvar pomodoro-recovery-info      nil)  ; リカバリ情報
-(defvar pomodoro-start-time          "")  ; 開始時間
+(defvar pomodoro-timer           nil)  ; タイマーオブジェクト
+(defvar pomodoro-status        'work)  ; ステータス
+(defvar pomodoro-timer-icon       "")  ; アイコン
+(defvar pomodoro-timer-string     "")  ; 文字
+(defvar pomodoro-current-time      0)  ; 現在の時間 (秒)
+(defvar pomodoro-total-time      nil)  ; トータル時間
+(defvar pomodoro-work-time       nil)  ; トータル仕事時間
+(defvar pomodoro-count             0)  ; 回数
+(defvar pomodoro-recovery-info   nil)  ; リカバリ情報
+(defvar pomodoro-start-time       "")  ; 開始時間
+
+;; アイコン
+(defvar pomodoro-icon-file
+    (find-image '((:type xpm :file "tomato.xpm" :ascent center))))
 
 ;; モードライン
+(defun pomodoro-propertize-icon (fmt color)
+  "Set format and color in mode line."
+  (propertize fmt
+              'display pomodoro-icon-file
+              'face
+              color))
+
 (defun pomodoro-propertize (fmt color)
   "Set format and color in mode line."
-  (propertize fmt 'face color))
+  (propertize fmt
+              'face
+              color))
 
 (defvar pomodoro-mode-line-space (pomodoro-propertize "" 'pomodoro-space-face))
-(defvar pomodoro-mode-line-icon (pomodoro-propertize "" 'pomodoro-work-face))
+(defvar pomodoro-mode-line-icon (pomodoro-propertize-icon "" 'pomodoro-work-face))
 (defvar pomodoro-mode-line-string (pomodoro-propertize "" 'pomodoro-timer-face))
 
 (unless (member '(:eval pomodoro-mode-line-string) mode-line-format)
@@ -132,29 +145,45 @@
   "Display icon in mode line."
   (cond ((eq pomodoro-status 'rest)
          (setq pomodoro-mode-line-icon
-               (pomodoro-propertize "Ｒ" 'pomodoro-rest-face)))
+               (pomodoro-propertize-icon " " 'pomodoro-rest-face)))
         ((eq pomodoro-status 'long)
          (setq pomodoro-mode-line-icon
-               (pomodoro-propertize "Ｌ" 'pomodoro-long-rest-face)))
+               (pomodoro-propertize-icon " " 'pomodoro-long-face)))
         (t
          (setq pomodoro-mode-line-icon
-               (pomodoro-propertize "Ｗ" 'pomodoro-work-face)))))
+               (pomodoro-propertize-icon " " 'pomodoro-work-face)))))
 
 ;; 残り時間を表示
 (defun pomodoro-display-string ()
   "Display pomodoro remain time in mode line."
   (setq pomodoro-mode-line-space
         (pomodoro-propertize " " 'pomodoro-space-face))
-  (let ((remain
-         (- (cond ((eq pomodoro-status 'rest)
-                   (+ pomodoro-work pomodoro-rest))
-                  ((eq pomodoro-status 'long)
-                   (+ pomodoro-work pomodoro-long))
-                  (t
-                   pomodoro-work)) pomodoro-current-time)))
-    (setq pomodoro-mode-line-string
-          (pomodoro-propertize (pomodoro-min-sec remain)
-           'pomodoro-timer-face))))
+  (cond ((eq pomodoro-status 'rest) ; 休憩
+         (setq pomodoro-mode-line-string
+               (pomodoro-propertize
+                (format "%s(%d)"
+                        (pomodoro-min-sec
+                         (- (+ pomodoro-work pomodoro-rest)
+                            pomodoro-current-time))
+                        pomodoro-count)
+                'pomodoro-rest-face)))
+        ((eq pomodoro-status 'long) ; 長い休憩
+         (setq pomodoro-mode-line-string
+               (pomodoro-propertize
+                (format "%s(%d)"
+                        (pomodoro-min-sec
+                         (- (+ pomodoro-work pomodoro-long)
+                            pomodoro-current-time))
+                        pomodoro-count)
+                'pomodoro-long-face)))
+        (t                          ; お仕事
+         (setq pomodoro-mode-line-string
+               (pomodoro-propertize
+                (format "%s(%d)"
+                        (pomodoro-min-sec
+                         (- pomodoro-work pomodoro-current-time))
+                        pomodoro-count)
+                'pomodoro-work-face)))))
 
 ;; リカバリ
 (defun pomodoro-recovery ()
