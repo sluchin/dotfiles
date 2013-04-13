@@ -182,6 +182,7 @@
   (force-mode-line-update))
 
 (defun pomodoro-set-start-time ()
+  (interactive)
   (let ((system-time-locale "C"))
     (setq pomodoro-start-time (format-time-string "%Y-%m-%d %a %H:%M"))))
 
