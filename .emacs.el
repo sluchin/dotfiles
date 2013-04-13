@@ -862,7 +862,7 @@
            (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
 
        ;; 編集可能にする
-       (when (boundp 'dired-mode-map)
+       (when (and (locate-library "wdired") (boundp 'dired-mode-map))
          (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
        (message "Loading %s (dired)...done" this-file-name))))
 
@@ -1819,13 +1819,17 @@
 ;; 自作のポモドーロタイマー
 (when (locate-library "pomodoro-technique")
   (autoload 'pomodoro-start
-    "pomodoro-technique" "Pomodoro technique timer for emacs." t)
+    "pomodoro-technique" "Start pomodoro timer." t)
   (autoload 'pomodoro-restart
     "pomodoro-technique" "Restart pomodoro timer." t)
+  (autoload 'pomodoro-reset
+    "pomodoro-technique" "Reset pomodoro timer." t)
   (autoload 'pomodoro-pause
     "pomodoro-technique" "Pause pomodoro timer." t)
-  (autoload 'pomodoro-save-status
+  (autoload 'pomodoro-save
     "pomodoro-technique" "Save status of pomodoro timer." t)
+  (autoload 'pomodoro-stop
+    "pomodoro-technique" "Stop pomodoro timer." t)
   (define-key global-map (kbd "C-c p o") 'pomodoro-start)
   (define-key global-map (kbd "C-c p r") 'pomodoro-restart)
   (define-key global-map (kbd "C-c p i") 'pomodoro-reset)
@@ -2961,30 +2965,81 @@
 ;;; VLC プレイリストのための XML パーサー
 ;; (install-elisp-from-emacswiki "xml-parse.el")
 ;; CSV 形式で一時バッファに出力する
-(defun vlc-xml2csv-tempbuffer (tmpbuf &rest tags)
+;; (defun vlc-xml2csv-tempbuffer (tmpbuf &rest tags)
+;;   "Output temporary buffer from xml to csv."
+;;   (when (eval-and-compile (require 'xml-parse nil t))
+;;     (when (and (fboundp 'read-xml)
+;;                (fboundp 'xml-tag-name)
+;;                (fboundp 'xml-tag-children)
+;;                (fboundp 'xml-tag-child))
+;;       (goto-char (point-min))
+;;       (with-output-to-temp-buffer tmpbuf
+;;         (dolist (tracklst (read-xml))
+;;           (when (string= (xml-tag-name tracklst) "trackList")
+;;             (dolist (track (xml-tag-children tracklst))
+;;               (when (string=  (xml-tag-name track) "track")
+;;                 (dolist (tag tags)
+;;                   (princ (car (xml-tag-children (xml-tag-child track tag))))
+;;                   (if (string= tag (car (last tags)))
+;;                       (princ "\n")
+;;                     (princ ",")))))))))))
+
+;; CSV 形式で一時バッファに出力する
+(defun vlc-xml2csv-tempbuffer (&rest tags)
   "Output temporary buffer from xml to csv."
-  (when (and (fboundp 'read-xml)
+  (when (and (eval-and-compile (require 'xml-parse nil t))
+             (fboundp 'read-xml)
              (fboundp 'xml-tag-name)
              (fboundp 'xml-tag-children)
              (fboundp 'xml-tag-child))
-    (when (eval-and-compile (require 'xml-parse nil t))
-      (goto-char (point-min))
-      (with-output-to-temp-buffer tmpbuf
-        (dolist (tracklst (read-xml))
-          (when (string= (xml-tag-name tracklst) "trackList")
-            (dolist (track (xml-tag-children tracklst))
-              (when (string=  (xml-tag-name track) "track")
-                (dolist (tag tags)
-                  (princ (car (xml-tag-children (xml-tag-child track tag))))
-                  (if (string= tag (car (last tags)))
-                      (princ "\n")
-                    (princ ",")))))))))))
+    (message "xml parse begin")
+    (dolist (tracklst (read-xml))
+      (when (string= (xml-tag-name tracklst) "trackList")
+        (message "found tag of trackList")
+        (dolist (track (xml-tag-children tracklst))
+          (when (string=  (xml-tag-name track) "track")
+            (message "found tag of track")
+            (dolist (tag tags)
+              (princ (car (xml-tag-children (xml-tag-child track tag))))
+              (if (string= tag (car (last tags)))
+                  (princ "\n")
+                (princ ",")))))))
+    (goto-char (point-min))
+    (message "xml parse end")))
+
+;; CSV 形式でファイルに出力する
+;; (defun vlc-xml2csv-file ()
+;;   "Conversion from xml to csv for vlc."
+;;   (interactive)
+;;   (let* ((default "vlc.csv")
+;;          (file (read-string "Filename: " default nil default))
+;;          (tmp " *xspf")
+;;          tmpbuf)
+;;     (or
+;;      (when (file-exists-p file)
+;;        (not (y-or-n-p (concat "Overwrite `" file "'? "))))
+;;      (if (or (not (file-exists-p file)) (file-writable-p file))
+;;          (progn
+;;            (vlc-xml2csv-tempbuffer tmp "creator" "title" "annotation" "location")
+;;            (switch-to-buffer (get-buffer-create file))
+;;            (erase-buffer)
+;;            (insert-buffer-substring (get-buffer tmp))
+;;            (goto-char (point-min))
+;;            (while (search-forward "&#39;" nil t)
+;;              (replace-match ""))
+;;            (goto-char (point-min))
+;;            (delete-other-windows)
+;;            (set-visited-file-name file)
+;;            (save-buffer))
+;;        (message "Can not write: %s" file))
+;;      (message "Write file %s...done" file))))
 
 ;; CSV 形式でファイルに出力する
 (defun vlc-xml2csv-file ()
   "Conversion from xml to csv for vlc."
   (interactive)
-  (let* ((default "vlc.csv")
+  (let* ((buffer (current-buffer))
+         (default "vlc.csv")
          (file (read-string "Filename: " default nil default))
          (tmp " *xspf")
          tmpbuf)
@@ -2993,17 +3048,17 @@
        (not (y-or-n-p (concat "Overwrite `" file "'? "))))
      (if (or (not (file-exists-p file)) (file-writable-p file))
          (progn
-           (vlc-xml2csv-tempbuffer tmp "creator" "title" "annotation" "location")
-           (switch-to-buffer (get-buffer-create file))
-           (erase-buffer)
-           (insert-buffer-substring (get-buffer tmp))
-           (goto-char (point-min))
-           (while (search-forward "&#39;" nil t)
-             (replace-match ""))
-           (goto-char (point-min))
-           (delete-other-windows)
-           (set-visited-file-name file)
-           (save-buffer))
+           (with-output-to-temp-buffer tmp
+             (set-buffer buffer)
+             (goto-char (point-min))
+             (vlc-xml2csv-tempbuffer "creator" "title" "annotation" "location")
+             (set-buffer tmp)
+             (goto-char (point-min))
+             (while (search-forward "&#39;" nil t)
+               (replace-match ""))
+             (write-file file))
+           (switch-to-buffer file)
+           (delete-other-windows))
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
@@ -3011,7 +3066,8 @@
 (defun vlc-check-location ()
   "Check if directory of location tag exists."
   (interactive)
-  (let* ((default "check-location")
+  (let* ((buffer (current-buffer))
+         (default "check-location")
          (file (read-string "Filename: " default nil default))
          (tmp " *xspf")
          string)
@@ -3020,23 +3076,29 @@
        (not (y-or-n-p (concat "Overwrite `" file "'? "))))
      (if (or (not (file-exists-p file)) (file-writable-p file))
          (progn
-           (vlc-xml2csv-tempbuffer tmp "location")
-           (set-buffer (get-buffer-create file))
-           (erase-buffer)
-           (set-buffer tmp)
-           (goto-char (point-min))
-           (while (not (eobp))
-             (setq string (buffer-substring (point-at-bol) (point-at-eol)))
-             (with-current-buffer file
-               (unless (file-exists-p (substring string 7))
-                 (insert string)
-                 (insert "\n")))
-             (forward-line 1))
-           (switch-to-buffer file)
-           (delete-other-windows)
-           (goto-char (point-min))
-           (set-visited-file-name file)
-           (save-buffer))
+           (with-output-to-temp-buffer tmp
+             (set-buffer buffer)
+             (goto-char (point-min))
+             (vlc-xml2csv-tempbuffer "location")
+             (set-buffer (get-buffer-create file))
+             (erase-buffer)
+             (set-buffer tmp)
+             (goto-char (point-min))
+             (while (not (eobp))
+               ;; 一行取得
+               (setq string (buffer-substring (point-at-bol) (point-at-eol)))
+               (with-current-buffer file
+                 ;; ファイルが存在する場合, 挿入
+                 (unless (file-exists-p (substring string 7))
+                   (insert string)
+                   (insert "\n")))
+               ;; 次の行へ進む
+               (forward-line 1))
+             (switch-to-buffer file)
+             (delete-other-windows)
+             (goto-char (point-min))
+             (set-visited-file-name file)
+             (save-buffer)))
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
@@ -3044,7 +3106,8 @@
 (defun vlc-check-directory ()
   "Check if directories exist in location tag."
   (interactive)
-  (let* ((default "check-directory")
+  (let* ((buffer (current-buffer))
+         (default "check-directory")
          (file (read-string "Filename name: " default nil default))
          (dirs (read-string "Directory name: " nil nil nil))
          (tmp " *xspf")
@@ -3054,26 +3117,34 @@
        (not (y-or-n-p (concat "Overwrite `" file "'? "))))
      (if (or (not (file-exists-p file)) (file-writable-p file))
          (progn
-           (vlc-xml2csv-tempbuffer tmp "location")
-           (set-buffer (get-buffer-create file))
-           (erase-buffer)
-           (set-buffer tmp)
-           (dolist (dir (directory-files dirs t))
-             (when (and (file-directory-p dir)
-                        (not (member
-                              (file-name-nondirectory dir) '("." ".."))))
-               (goto-char (point-min))
-               (unless
-                   (catch 'found
-                     (while (not (eobp))
-                       (setq string
-                             (buffer-substring (point-at-bol) (point-at-eol)))
-                       (when (string= dir (substring string 7))
-                         (throw 'found t))
-                       (forward-line 1)) nil)
-                 (with-current-buffer file
-                   (insert dir)
-                   (insert "\n")))))
+           (with-output-to-temp-buffer tmp
+             (set-buffer buffer)
+             (goto-char (point-min))
+             (vlc-xml2csv-tempbuffer "location")
+             (set-buffer (get-buffer-create file))
+             (erase-buffer)
+             (set-buffer tmp)
+             ;; ディレクトリを探索する
+             (dolist (dir (directory-files dirs t))
+               (when (and (file-directory-p dir)
+                          (not (member
+                                (file-name-nondirectory dir) '("." ".."))))
+                 (goto-char (point-min))
+                 (unless
+                     (catch 'found
+                       (while (not (eobp))
+                         ;; 一行取得
+                         (setq string
+                               (buffer-substring (point-at-bol) (point-at-eol)))
+                         ;; 一致した場合, t を返却
+                         (when (string= dir (substring string 7))
+                           (throw 'found t))
+                         ;; 次の行へ進む
+                         (forward-line 1)) nil)
+                   ;; 一致しなかった場合, ファイルに書き込む
+                   (with-current-buffer file
+                     (insert dir)
+                     (insert "\n"))))))
            (switch-to-buffer file)
            (delete-other-windows)
            (goto-char (point-min))
