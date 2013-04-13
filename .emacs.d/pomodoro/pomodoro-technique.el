@@ -200,7 +200,7 @@
 (defun pomodoro-switch-status ()
   "Switch status."
   (let ((rest (if (and (not (= pomodoro-count 0))
-                       (= (% (+ pomodoro-count 1) pomodoro-cycle) 0))
+                       (= (% pomodoro-count pomodoro-cycle) 0))
                   pomodoro-long
                 pomodoro-rest)))
     (cond
@@ -358,9 +358,9 @@
 (defun print-pomodoro ()
   "Print status."
   (interactive)
-  (message "Work[%d] Rest[%d] Long[%d] Cycle[%d]"
-           (/ pomodoro-work 60) (/ pomodoro-rest 60)
-           (/ pomodoro-long 60) pomodoro-cycle)
+  (message "Work[%d] Rest[%d] Long[%d] Current[%d] Cycle[%d]"
+           pomodoro-work pomodoro-rest
+           pomodoro-long pomodoro-current-time pomodoro-cycle)
   (message "Pomodoro[%d] Status[%s] Start[%s] Total[%s(%d)] Work[%s(%d)]"
            pomodoro-count
            pomodoro-status
