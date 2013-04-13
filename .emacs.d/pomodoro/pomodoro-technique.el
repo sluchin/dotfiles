@@ -199,30 +199,31 @@
 ;; ステータス変更
 (defun pomodoro-switch-status ()
   "Switch status."
-  (let ((rest (if (and (not (= pomodoro-count 0))
-                       (= (% pomodoro-count pomodoro-cycle) 0))
-                  pomodoro-long
-                pomodoro-rest)))
-    (cond
-     ;; 仕事終了
-     ((= pomodoro-work pomodoro-current-time)
-      (setq pomodoro-work-time                   ; トータル仕事時間に記録
-            (+ (or pomodoro-work-time 0) pomodoro-current-time))
-      (setq pomodoro-count (1+ pomodoro-count))  ; ポモドーロインクリメント
-      (message "%d Pomodoro !!" pomodoro-count)
-      ;; ステータスを休憩にする
-      (if (= pomodoro-rest rest)                 ; ステータス変更
-          (setq pomodoro-status 'rest)
-        (setq pomodoro-status 'long)))
-     ;; 休憩終了
-     ((<= (+ pomodoro-work rest) pomodoro-current-time)
-      (setq pomodoro-total-time                  ; トータル時間に記録
-            (+ (or pomodoro-total-time 0) pomodoro-current-time))
-      ;; ステータスをお仕事にする
-      (setq pomodoro-current-time 0)             ; 初期化
-      (setq pomodoro-status 'work))              ; ステータス変更
-     ;; 変更なし
-     (t nil))))
+  (cond
+   ;; 仕事終了
+   ((= pomodoro-work pomodoro-current-time)
+    (setq pomodoro-work-time                   ; トータル仕事時間に記録
+          (+ (or pomodoro-work-time 0) pomodoro-current-time))
+    (setq pomodoro-count (1+ pomodoro-count))  ; ポモドーロインクリメント
+    (message "%d Pomodoro !!" pomodoro-count)
+    ;; ステータスを休憩にする
+    (setq pomodoro-status
+          (if (and (not (= pomodoro-count 0))
+                   (= (% pomodoro-count pomodoro-cycle) 0))
+              pomodoro-long
+            pomodoro-rest)))
+   ;; 休憩終了
+   ((and (not (eq pomodoro-status 'work))
+         (<= (+ pomodoro-work (if (eq pomodoro-status 'long)
+                                  pomodoro-long
+                                pomodoro-rest)) pomodoro-current-time))
+    (setq pomodoro-total-time                  ; トータル時間に記録
+          (+ (or pomodoro-total-time 0) pomodoro-current-time))
+    ;; ステータスをお仕事にする
+    (setq pomodoro-current-time 0)             ; 初期化
+    (setq pomodoro-status 'work))              ; ステータス変更
+   ;; 変更なし
+   (t nil)))
 
 ;; コールバック関数
 (defun pomodoro-callback-timer ()
@@ -296,7 +297,7 @@
   (setq pomodoro-mode-line-string
         (pomodoro-propertize-string "" 'pomodoro-timer-face)))
 
-;; ポモドーロを保存
+;; ポモドーロを保存し, タスクを記録する
 (defun pomodoro-save-org ()
   "Pomodoro for org-mode."
   (interactive)
@@ -348,6 +349,7 @@
                     pomodoro-start-time))
     (write-file pomodoro-status-file)))
 
+;; ステータス保存とタスクの記録
 (defun pomodoro-save ()
   "Save status and org."
   (interactive)
@@ -355,6 +357,7 @@
   (pomodoro-save-status)
   (pomodoro-set-start-time))
 
+;; ポモドーロ表示
 (defun print-pomodoro ()
   "Print status."
   (interactive)
