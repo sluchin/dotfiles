@@ -816,7 +816,7 @@
 
        ;; バックアップファイルを作る
        (defun dired-make-backup ()
-         "Make buckup file"
+         "Make buckup file."
          (interactive)
          (when (and (fboundp 'dired-get-marked-files)
                     (fboundp 'dired-copy-file))
@@ -832,7 +832,7 @@
                    files)
              (revert-buffer))))
        (when (boundp 'dired-mode-map)
-         (define-key dired-mode-map (kbd "C-c b") 'dired-make-backup))
+         (define-key dired-mode-map (kbd "b") 'dired-make-backup))
 
        ;; tar + gzip で圧縮
        (when (and (executable-find "tar")
@@ -859,7 +859,7 @@
                   (error (message "%s" err)))
                 (message "Execute tar command to %s...done" tarfile)))))
          (when (boundp 'dired-mode-map)
-           (define-key dired-mode-map (kbd "C-c z") 'dired-do-tar-gzip)))
+           (define-key dired-mode-map (kbd "C-z") 'dired-do-tar-gzip)))
 
        ;; 編集可能にする
        (when (and (locate-library "wdired") (boundp 'dired-mode-map))
