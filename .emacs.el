@@ -841,7 +841,7 @@
                       (fboundp 'dired-do-shell-command))
              (let* ((files (dired-get-marked-files t current-prefix-arg))
                     (default (concat (car files) ".tar.gz"))
-                    (tarfile (read-file-name "File name: "
+                    (tarfile (read-file-name "Filename: "
                                              dired-directory
                                              default nil default)))
                (unless (string-match
@@ -2437,8 +2437,8 @@
   (interactive)
   (if (and (executable-find "global") (executable-find "gtags"))
       (let* ((default default-directory)
-             (dir (read-string "Directory: "
-                               default nil default)))
+             (dir (read-directory-name "Directory: "
+                               default nil nil nil)))
         (if (and (file-directory-p dir) (file-readable-p dir))
             (let (out
                   (cmd
@@ -2535,33 +2535,34 @@
 (defun exec-tags-command (exec &rest options)
   "Execute etags or ctags command."
   (if (executable-find exec)
-      (let ((lst '(("l"  "[l]isp"    "\\(el\\|cl\\)")
-                   ("c"  "[c],c++"   "\\(h\\|c\\|hh\\|cc\\|cpp\\)")
-                   ("j"  "[j]ava"    "java")
-                   ("js" "[js]cript" "js")
-                   ("p"  "[p]erl"    "perl")
-                   ("py" "[py]thon"  "py")
-                   ("r"  "[r]uby"    "rb")
-                   ("s"  "[s]hell"   "sh")
-                   ("t"  "[t]cl/tk"  "\\(tcl\\|tk\\)")
-                   ("y"  "[y]acc"    "\\(y\\|yy\\)")
-                   ("h"  "[h]tml"    "html")))
+      (let ((lst '(("l"  "[l]isp"    ".*\\.\\(el\\|cl\\)")
+                   ("c"  "[c],c++"   ".*\\.\\(h\\|c\\|hh\\|cc\\|cpp\\)")
+                   ("j"  "[j]ava"    ".*\\.java")
+                   ("js" "[js]cript" ".*\\.js")
+                   ("p"  "[p]erl"    ".*\\.perl")
+                   ("py" "[py]thon"  ".*\\.py")
+                   ("r"  "[r]uby"    ".*\\.rb")
+                   ("s"  "[s]hell"   ".*\\.sh")
+                   ("m"  "[m]ake"    "Makefile*")
+                   ("t"  "[t]cl/tk"  ".*\\.\\(tcl\\|tk\\)")
+                   ("y"  "[y]acc"    ".*\\.\\(y\\|yy\\)")
+                   ("h"  "[h]tml"    ".*\\.html")))
             (select "Select language: "))
         (dolist (l lst)
           (setq select (concat select (car (cdr l)) " ")))
         (let* ((default default-directory)
-               (dir (read-string "Directory: "
-                                 default nil default))
+               (dir (read-directory-name "Directory: "
+                                 default nil nil nil))
                (result (read-string select nil nil nil))
-               (ext (car (cdr (cdr (assoc-string result lst))))))
+               (files (car (cdr (cdr (assoc-string result lst))))))
           (if (and (file-directory-p dir) (file-readable-p dir))
-              (if ext
+              (if files
                   (let (option-string)
                     (dolist (option options)
                       (setq option-string (concat option-string  " " option)))
                     (let (out (cmd (concat
                                     "find " dir
-                                    " -type f -regex " "\".*\\." ext "$\"" " | "
+                                    " -type f -regex " "\"" files "$\"" " | "
                                     exec option-string)))
                       (setq out (shell-command-to-string cmd))
                       (message "%s" cmd)
@@ -2584,7 +2585,7 @@
   "Make exuberant ctags file."
   (interactive)
   (exec-tags-command
-   "ctags-exuberant" "-e" "-V" "-L" "-" " --exclude=*/undohist/!*.el"))
+   "ctags-exuberant" "-e" "-V" "-L" "-" "--exclude=*/undohist/!*.el"))
 
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
@@ -2993,7 +2994,7 @@
   (interactive)
   (let* ((buffer (current-buffer))
          (default "vlc.csv")
-         (file (read-file-name "File name: " default-directory default nil default))
+         (file (read-file-name "Filename: " default-directory default nil default))
          (tmp " *xspf")
          tmpbuf)
     (or
@@ -3021,7 +3022,7 @@
   (interactive)
   (let* ((buffer (current-buffer))
          (default "check-location")
-         (file (read-file-name "File name: " default-directory default nil default))
+         (file (read-file-name "Filename: " default-directory default nil default))
          (tmp " *xspf")
          string)
     (or
@@ -3060,9 +3061,10 @@
   "Check if directories exist in location tag."
   (interactive)
   (let* ((buffer (current-buffer))
-         (default "check-directory")
-         (file (read-file-name "File name: " default-directory default nil default))
-         (dirs (read-directory-name "Directory name: " "/media/" nil nil))
+         (default-dir "/media")
+         (default-file "check-directory")
+         (file (read-file-name "Filename: " default-directory default-file nil default-file))
+         (dirs (read-directory-name "Directory: " default-dir nil nil nil))
          (tmp " *xspf")
          string)
     (or
