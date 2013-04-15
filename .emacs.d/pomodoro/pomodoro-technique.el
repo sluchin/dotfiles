@@ -26,35 +26,26 @@
 
 (eval-and-compile (require 'org nil t))
 
-(defcustom pomodoro-work (* 60 25)
-  "Work time (sec)."
+(defcustom pomodoro-default-time '(25 5 15 4)
+  "Time list. Work and rest and long rest."
   :group 'pomodoro
-  :type  'integer)
-
-(defcustom pomodoro-rest (* 60  5)
-  "Rest time (sec)."
-  :group 'pomodoro
-  :type  'integer)
-
-(defcustom pomodoro-long (* 60 15)
-  "Long rest time (sec)."
-  :group 'pomodoro
-  :type  'integer)
-
-(defcustom pomodoro-cycle 4
-  "Cycle of long rest."
-  :group 'pomodoro
-  :type  'integer)
+  :type 'sexp)
 
 ;; org-mode ファイル
 (defcustom pomodoro-org-file "~/pomodoro.org"
   "Regist file for org-mode."
   :group 'pomodoro
-  :type  'string)
+  :type  'file)
 
 ;; ステータスファイル
 (defcustom pomodoro-status-file "~/.pomodoro"
   "Regist status file for recovery."
+  :group 'pomodoro
+  :type 'file)
+
+;; アイコンディレクトリ
+(defcustom pomodoro-icon-directory "~/.emacs.d/pomodoro/icon"
+  "Icon directory."
   :group 'pomodoro
   :type 'string)
 
@@ -75,9 +66,12 @@
   :group 'pomodoro)
 
 (defvar pomodoro-timer           nil)  ; タイマーオブジェクト
+(defvar pomodoro-time-list       nil)  ; 時間リスト
+(defvar pomodoro-work              0)  ; 仕事時間
+(defvar pomodoro-rest              0)  ; 休憩時間
+(defvar pomodoro-long              0)  ; 長い休憩時間
+(defvar pomodoro-cycle             0)  ; 周期
 (defvar pomodoro-status        'work)  ; ステータス
-(defvar pomodoro-timer-icon       "")  ; アイコン
-(defvar pomodoro-timer-string     "")  ; 文字
 (defvar pomodoro-current-time      0)  ; 現在の時間 (秒)
 (defvar pomodoro-work-time         0)  ; トータル仕事時間
 (defvar pomodoro-rest-time         0)  ; トータル休憩時間
@@ -85,12 +79,27 @@
 (defvar pomodoro-recovery-info   nil)  ; リカバリ情報
 (defvar pomodoro-start-time       "")  ; 開始時間
 
-;; アイコン
+;; D-Bus 通知アイコン
+(defvar pomodoro-notify-icon-file
+  (concat (file-name-as-directory
+           (expand-file-name pomodoro-icon-directory))
+          "tomato-work.xpm"))
+
+;; モードラインアイコン
+(defvar pomodoro-work-icon-file
+  (concat (file-name-as-directory
+           (expand-file-name pomodoro-icon-directory))
+          "tomato-work.xpm"))
+(defvar pomodoro-rest-icon-file
+  (concat (file-name-as-directory
+           (expand-file-name pomodoro-icon-directory))
+          "tomato-rest.xpm"))
+
 (defvar pomodoro-work-icon
-    (find-image '((:type xpm :file "tomato-work.xpm" :ascent center))))
+  (find-image (list (list :type 'xpm :file pomodoro-work-icon-file :ascent 'center))))
 
 (defvar pomodoro-rest-icon
-    (find-image '((:type xpm :file "tomato-rest.xpm" :ascent center))))
+  (find-image (list (list :type 'xpm :file pomodoro-rest-icon-file :ascent 'center))))
 
 ;; モードライン
 (defun pomodoro-propertize-icon (file fmt color)
@@ -190,8 +199,11 @@
               (cdr (assq 'pomodoro-count pomodoro-recovery-info)))
         (setq pomodoro-start-time
               (cdr (assq 'pomodoro-start-time pomodoro-recovery-info)))
-        (message "status=%s time=%s count=%s"
-                 pomodoro-status pomodoro-current-time pomodoro-count))
+        (setq pomodoro-time-list
+              (cdr (assq 'pomodoro-time-list pomodoro-recovery-info)))
+        (message "status=%s current=%s count=%s time=%s"
+                 pomodoro-status pomodoro-current-time
+                 pomodoro-count pomodoro-time-list))
     (pomodoro-start)
     (message "no %s exists" pomodoro-status-file)))
 
@@ -217,7 +229,16 @@
               (if (and (not (= pomodoro-count 0))
                        (= (% pomodoro-count pomodoro-cycle) 0))
                   'long 'rest))
+        ;; D-Bus 経由で通知
+        (when (fboundp 'notifications-notify)
+          (notifications-notify
+           :title "Emacs/Pomodoro"
+           :body (format "Pomodoro: %d\nStatus: %s"
+                         pomodoro-count pomodoro-status)
+           :app-icon pomodoro-notify-icon-file
+           :timeout 5000))
         (message "pomodoro switch status: %s" pomodoro-status))
+       ;; ここにはこない
        (t (error "pomodoro work error")))
     (let ((rest (if (eq pomodoro-status 'rest)
                     pomodoro-rest
@@ -230,9 +251,18 @@
        ((<= (+ pomodoro-work rest) pomodoro-current-time)
         (setq pomodoro-rest-time (1+ pomodoro-rest-time))
         ;; ステータスをお仕事にする
-        (setq pomodoro-current-time 0)   ; 初期化
-        (setq pomodoro-status 'work)     ; ステータス変更
+        (setq pomodoro-current-time 0) ; 初期化
+        (setq pomodoro-status 'work)   ; ステータス変更
+        ;; D-Bus 経由で通知
+        (when (fboundp 'notifications-notify)
+          (notifications-notify
+           :title "Emacs/Pomodoro"
+           :body (format "Pomodoro: %d\nStatus: %s"
+                         (1+ pomodoro-count) pomodoro-status)
+           :app-icon pomodoro-notify-icon-file
+           :timeout 5000))
         (message "pomodoro switch status: %s" pomodoro-status))
+       ;; ここにはこない
        (t (error "pomodoro rest error"))))))
 
 ;; コールバック関数
@@ -250,11 +280,34 @@
   (let ((system-time-locale "C"))
     (setq pomodoro-start-time (format-time-string "%Y-%m-%d %a %H:%M"))))
 
+;; 時間リストから変数へ代入する
+(defun pomodoro-set-time (time-lst)
+  (if (not (= 4 (length time-lst)))
+      (error "time list length error")
+    (setq pomodoro-work (* 60 (nth 0 time-lst)))
+    (setq pomodoro-rest (* 60 (nth 1 time-lst)))
+    (setq pomodoro-long (* 60 (nth 2 time-lst)))
+    (setq pomodoro-cycle (nth 3 time-lst))))
+
+;; 仕事時間, 休憩時間を設定する
+(defun pomodoro-setting (&optional default-time)
+  "Set work time and rest time."
+  (interactive)
+  (let* ((default (format "%s" (or default-time pomodoro-default-time)))
+         (time (read (read-string "Time (work rest long cycle): "
+                                  default nil default))))
+    (when (or (not time)
+              (= 4 (length time)))
+      (setq pomodoro-time-list time)))
+  (message "%s" pomodoro-time-list)
+  (pomodoro-set-time pomodoro-time-list))
+
 ;; スタート
 (defun pomodoro-start ()
   "Start pomodoro timer."
   (interactive)
   (pomodoro-stop)
+  (pomodoro-setting pomodoro-time-list)
   (pomodoro-set-start-time)
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
@@ -276,10 +329,11 @@
 
 ;; 再スタート
 (defun pomodoro-restart ()
-  "Restart pomodoro timer."
+  "Restart pomodoro timer. Configure from recovery file."
   (interactive)
   (pomodoro-stop)
   (pomodoro-recovery)
+  (pomodoro-set-time pomodoro-time-list)
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
 ;; 一時停止
@@ -296,10 +350,12 @@
 (defun pomodoro-reset ()
   "Reset pomodoro timer."
   (interactive)
-  (setq pomodoro-count 1)
+  (setq pomodoro-count 0)
   (setq pomodoro-work-time 0)
   (setq pomodoro-rest-time 0)
   (setq pomodoro-current-time 0)
+  (pomodoro-set-time
+   (setq pomodoro-time-list pomodoro-default-time))
   (pomodoro-set-start-time)
   (setq pomodoro-status 'work))
 
@@ -361,8 +417,10 @@
                     pomodoro-current-time))
     (insert (format "    (pomodoro-count . %d)\n"
                     pomodoro-count))
-    (insert (format "    (pomodoro-start-time . \"%s\")))\n"
+    (insert (format "    (pomodoro-start-time . \"%s\")\n"
                     pomodoro-start-time))
+    (insert (format "    (pomodoro-time-list . %s)))\n"
+                    pomodoro-time-list))
     (write-file pomodoro-status-file)))
 
 ;; ステータス保存とタスクの記録
@@ -377,10 +435,8 @@
 (defun print-pomodoro ()
   "Print status."
   (interactive)
-  (message "Work[%d] Rest[%d] Long[%d] Current[%d] Cycle[%d]"
-           pomodoro-work pomodoro-rest
-           pomodoro-long pomodoro-current-time pomodoro-cycle)
-  (message "Pomodoro[%d] Status[%s] Start[%s] Total[%s(%d)] Work[%s(%d)]"
+  (message "Current=%d Pomodoro=%d Status=%s Start=\"%s\" Total=%s(%d) Work=%s(%d) Time=%s"
+           pomodoro-current-time
            (if (< pomodoro-current-time pomodoro-work)
                pomodoro-count
              (1+ pomodoro-count))
@@ -389,6 +445,6 @@
            (pomodoro-hour-min-sec (+ pomodoro-work-time pomodoro-rest-time))
            (+ pomodoro-work-time pomodoro-rest-time)
            (pomodoro-hour-min-sec pomodoro-work-time)
-           pomodoro-work-time))
+           pomodoro-work-time pomodoro-time-list))
 
 (provide 'pomodoro)

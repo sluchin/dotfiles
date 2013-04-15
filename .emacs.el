@@ -544,11 +544,7 @@
 
 ;; f3 でロードする
 (when (boundp 'emacs-lisp-mode-map)
-  (define-key emacs-lisp-mode-map (kbd "<f3>")
-    (lambda ()
-      "Load the current buffer."
-      (interactive)
-      (load-file buffer-file-name))))
+  (define-key emacs-lisp-mode-map (kbd "<f3>") 'eval-buffer))
 
 ;; 括弧へジャンプ (デフォルト: C-M-n C-M-p)
 (define-key global-map (kbd "C-x %")
@@ -845,7 +841,9 @@
                       (fboundp 'dired-do-shell-command))
              (let* ((files (dired-get-marked-files t current-prefix-arg))
                     (default (concat (car files) ".tar.gz"))
-                    (tarfile (read-string "Filename: " default nil default)))
+                    (tarfile (read-file-name "File name: "
+                                             dired-directory
+                                             default nil default)))
                (unless (string-match
                         "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
                  (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
@@ -2109,12 +2107,12 @@
                      (setq mew-mode-line-biff-string
                            (mew-propertized-biff-string (format "(%d)" n)))
                      ;; メール数が増えた場合, D-Bus 経由で通知
-                     (when (< mew-mode-line-biff-quantity n)
-                       (notifications-notify
-                        :title "Emacs/Mew"
-                        :body  (format "You got mail(s): %d" n)
-                        :timeout 5000))
-
+                     (when (fboundp 'notifications-notify)
+                       (when (< mew-mode-line-biff-quantity n)
+                         (notifications-notify
+                          :title "Emacs/Mew"
+                          :body  (format "You got mail(s): %d" n)
+                          :timeout 5000)))
                      (setq mew-mode-line-biff-quantity n)))))
          ;; 着信後呼ばれる関数
          (defadvice mew-biff-clear (after mew-biff-clear-icon activate compile)
@@ -2994,7 +2992,7 @@
   (interactive)
   (let* ((buffer (current-buffer))
          (default "vlc.csv")
-         (file (read-string "Filename: " default nil default))
+         (file (read-file-name "File name: " default-directory default nil default))
          (tmp " *xspf")
          tmpbuf)
     (or
@@ -3022,7 +3020,7 @@
   (interactive)
   (let* ((buffer (current-buffer))
          (default "check-location")
-         (file (read-string "Filename: " default nil default))
+         (file (read-file-name "File name: " default-directory default nil default))
          (tmp " *xspf")
          string)
     (or
@@ -3047,12 +3045,12 @@
                    (insert string)
                    (insert "\n")))
                ;; 次の行へ進む
-               (forward-line 1))
+               (forward-line 1)))
              (switch-to-buffer file)
              (delete-other-windows)
              (goto-char (point-min))
              (set-visited-file-name file)
-             (save-buffer)))
+             (save-buffer))
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
@@ -3062,8 +3060,8 @@
   (interactive)
   (let* ((buffer (current-buffer))
          (default "check-directory")
-         (file (read-string "Filename name: " default nil default))
-         (dirs (read-string "Directory name: " nil nil nil))
+         (file (read-file-name "File name: " default-directory default nil default))
+         (dirs (read-directory-name "Directory name: " "/media/" nil nil))
          (tmp " *xspf")
          string)
     (or
