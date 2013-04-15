@@ -26,6 +26,7 @@
 
 (eval-and-compile (require 'org nil t))
 
+;; 時間リスト (work rest long cycle)
 (defcustom pomodoro-default-time '(25 5 15 4)
   "Time list. Work and rest and long rest."
   :group 'pomodoro
@@ -42,12 +43,6 @@
   "Regist status file for recovery."
   :group 'pomodoro
   :type 'file)
-
-;; アイコンディレクトリ
-(defcustom pomodoro-icon-directory "~/.emacs.d/pomodoro/icon"
-  "Icon directory."
-  :group 'pomodoro
-  :type 'string)
 
 ;; フェイス
 (defface pomodoro-work-face
@@ -79,20 +74,21 @@
 (defvar pomodoro-recovery-info   nil)  ; リカバリ情報
 (defvar pomodoro-start-time       "")  ; 開始時間
 
+;; アイコンディレクトリ
+(defvar pomodoro-icon-directory
+  (concat (file-name-directory load-file-name) "icon"))
+
 ;; D-Bus 通知アイコン
 (defvar pomodoro-notify-icon-file
-  (concat (file-name-as-directory
-           (expand-file-name pomodoro-icon-directory))
-          "tomato-work.xpm"))
+  (concat (file-name-as-directory pomodoro-icon-directory)
+          "tomato-notify.xpm"))
 
 ;; モードラインアイコン
 (defvar pomodoro-work-icon-file
-  (concat (file-name-as-directory
-           (expand-file-name pomodoro-icon-directory))
+  (concat (file-name-as-directory pomodoro-icon-directory)
           "tomato-work.xpm"))
 (defvar pomodoro-rest-icon-file
-  (concat (file-name-as-directory
-           (expand-file-name pomodoro-icon-directory))
+  (concat (file-name-as-directory pomodoro-icon-directory)
           "tomato-rest.xpm"))
 
 (defvar pomodoro-work-icon
@@ -435,7 +431,8 @@
 (defun print-pomodoro ()
   "Print status."
   (interactive)
-  (message "Current=%d Pomodoro=%d Status=%s Start=\"%s\" Total=%s(%d) Work=%s(%d) Time=%s"
+  (message "Current=%s(%d) Pomodoro=%d Status=%s Start=\"%s\" Total=%s(%d) Work=%s(%d) Time=%s"
+           (pomodoro-min-sec pomodoro-current-time)
            pomodoro-current-time
            (if (< pomodoro-current-time pomodoro-work)
                pomodoro-count

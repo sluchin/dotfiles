@@ -1354,7 +1354,8 @@
           (setq backup-inhibited nil))
       ad-do-it))
   ;; キーバインド
-  (define-key global-map (kbd "C-c C-f") 'recentf-open-files))
+  (define-key global-map (kbd "C-c C-f") 'recentf-open-files)
+  (define-key global-map (kbd "<f12>") 'recentf-open-files))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
