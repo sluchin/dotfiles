@@ -21,6 +21,7 @@
 ;; (define-key global-map (kbd "C-c p i") 'pomodoro-reset)
 ;; (define-key global-map (kbd "C-c p p") 'pomodoro-pause)
 ;; (define-key global-map (kbd "C-c p s") 'pomodoro-save)
+;; (define-key global-map (kbd "C-c p t") 'pomodoro-save-time)
 ;; (define-key global-map (kbd "C-c p q") 'pomodoro-stop)
 
 
@@ -62,14 +63,14 @@
 
 (defvar pomodoro-timer           nil)  ; タイマーオブジェクト
 (defvar pomodoro-time-list       nil)  ; 時間リスト
-(defvar pomodoro-work              0)  ; 仕事時間
-(defvar pomodoro-rest              0)  ; 休憩時間
-(defvar pomodoro-long              0)  ; 長い休憩時間
+(defvar pomodoro-work              0)  ; 仕事時間 (秒)
+(defvar pomodoro-rest              0)  ; 休憩時間 (秒)
+(defvar pomodoro-long              0)  ; 長い休憩時間 (秒)
 (defvar pomodoro-cycle             0)  ; 周期
 (defvar pomodoro-status        'work)  ; ステータス
 (defvar pomodoro-current-time      0)  ; 現在の時間 (秒)
-(defvar pomodoro-work-time         0)  ; トータル仕事時間
-(defvar pomodoro-rest-time         0)  ; トータル休憩時間
+(defvar pomodoro-work-time         0)  ; トータル仕事時間 (秒)
+(defvar pomodoro-rest-time         0)  ; トータル休憩時間 (秒)
 (defvar pomodoro-count             0)  ; 回数
 (defvar pomodoro-recovery-info   nil)  ; リカバリ情報
 (defvar pomodoro-start-time       "")  ; 開始時間
@@ -83,10 +84,11 @@
   (concat (file-name-as-directory pomodoro-icon-directory)
           "tomato-notify.xpm"))
 
-;; モードラインアイコン
+;; モードライン
 (defvar pomodoro-work-icon-file
   (concat (file-name-as-directory pomodoro-icon-directory)
           "tomato-work.xpm"))
+
 (defvar pomodoro-rest-icon-file
   (concat (file-name-as-directory pomodoro-icon-directory)
           "tomato-rest.xpm"))
@@ -97,7 +99,6 @@
 (defvar pomodoro-rest-icon
   (find-image (list (list :type 'xpm :file pomodoro-rest-icon-file :ascent 'center))))
 
-;; モードライン
 (defun pomodoro-propertize-icon (file fmt color)
   "Set format and color in mode line."
   (propertize fmt
@@ -228,7 +229,7 @@
         ;; D-Bus 経由で通知
         (when (fboundp 'notifications-notify)
           (notifications-notify
-           :title "Emacs/Pomodoro"
+           :title "Pomodoro Timer"
            :body (format "Pomodoro: %d\nStatus: %s"
                          pomodoro-count pomodoro-status)
            :app-icon pomodoro-notify-icon-file
@@ -313,6 +314,7 @@
   (interactive)
   (pomodoro-stop)
   (setq pomodoro-current-time 0)
+  (setq pomodoro-status 'work)
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
 ;; 休憩からスタート
@@ -321,6 +323,7 @@
   (interactive)
   (pomodoro-stop)
   (setq pomodoro-current-time pomodoro-work)
+  (setq pomodoro-status 'rest)
   (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer)))
 
 ;; 再スタート
@@ -401,7 +404,7 @@
       (org-remember))))
 
 ;; ステータス保存
-(defun pomodoro-save-status ()
+(defun pomodoro-save-time ()
   "Save status."
   (interactive)
   (with-temp-buffer
@@ -424,7 +427,7 @@
   "Save status and org."
   (interactive)
   (pomodoro-save-org)
-  (pomodoro-save-status)
+  (pomodoro-save-time)
   (pomodoro-set-start-time))
 
 ;; ポモドーロ表示
