@@ -77,7 +77,7 @@
 
 ;; アイコンディレクトリ
 (defvar pomodoro-icon-directory
-  (concat (file-name-directory load-file-name) "icon"))
+  (concat (file-name-directory load-file-name) "icons"))
 
 ;; D-Bus 通知アイコン
 (defvar pomodoro-notify-icon-file
@@ -253,7 +253,7 @@
         ;; D-Bus 経由で通知
         (when (fboundp 'notifications-notify)
           (notifications-notify
-           :title "Emacs/Pomodoro"
+           :title "Pomodoro Timer"
            :body (format "Pomodoro: %d\nStatus: %s"
                          (1+ pomodoro-count) pomodoro-status)
            :app-icon pomodoro-notify-icon-file
@@ -353,8 +353,7 @@
   (setq pomodoro-work-time 0)
   (setq pomodoro-rest-time 0)
   (setq pomodoro-current-time 0)
-  (pomodoro-set-time
-   (setq pomodoro-time-list pomodoro-default-time))
+  (pomodoro-setting pomodoro-time-list)
   (pomodoro-set-start-time)
   (setq pomodoro-status 'work))
 
@@ -384,9 +383,7 @@
            (total (pomodoro-hour-min-sec
                    (+ pomodoro-work-time pomodoro-rest-time)))
            (work (pomodoro-hour-min-sec pomodoro-work-time))
-           (pomodoro (if (< pomodoro-current-time pomodoro-work)
-                         (number-to-string pomodoro-count)
-                       (number-to-string (1+ pomodoro-count))))
+           (pomodoro pomodoro-count)
            (org-remember-templates
             `(("Work" ?w "** %t%? \n
    CLOCK: [%(identity start)]--%U\n
@@ -437,9 +434,7 @@
   (message "Current=%s(%d) Pomodoro=%d Status=%s Start=\"%s\" Total=%s(%d) Work=%s(%d) Time=%s"
            (pomodoro-min-sec pomodoro-current-time)
            pomodoro-current-time
-           (if (< pomodoro-current-time pomodoro-work)
-               pomodoro-count
-             (1+ pomodoro-count))
+           pomodoro-count
            pomodoro-status
            pomodoro-start-time
            (pomodoro-hour-min-sec (+ pomodoro-work-time pomodoro-rest-time))

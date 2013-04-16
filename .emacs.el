@@ -251,7 +251,14 @@
 
 ;; ヘッダラインに関数名表示
 (when (eval-when-compile (require 'which-func nil t))
-  (delete (assoc 'which-func-mode mode-line-format) mode-line-format)
+  ;; 24.2.1 まで
+  (setq mode-line-format 
+        (delete (assoc 'which-func-mode mode-line-format)
+                mode-line-format))
+  ;; 24.3.1 から
+  (setq mode-line-misc-info
+        (delete (assoc 'which-func-mode mode-line-misc-info)
+                mode-line-misc-info))
   (setq-default header-line-format '(which-func-mode ("" which-func-format)))
   ;; 色
   (set-face-foreground 'which-func "chocolate1")
@@ -2104,8 +2111,8 @@
                            '(:foreground "white" :background "red1"))))
        (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
        (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
-       (defvar mew-notify-biff-icon
-         "/usr/share/app-install/icons/gmail-notify-icon.png")
+       (defvar mew-notify-biff-icon "~/.emacs.d/icons/letter.xpm")
+
        (when (boundp 'mew-biff-function)
          ;; mew-biff-interval の間隔で呼ばれる関数
          (let* ((mew-mode-line-biff-quantity 0))
@@ -2488,14 +2495,17 @@
        ;; ローカルバッファ変数
        (defvar gtags-libpath nil "Library directory of language.")
        (make-variable-buffer-local 'gtags-libpath)
-       
+
        ;; ローカルバッファ変数にパスを設定する関数定義
+       ;; sudo apt-get install linux-source-3.2.0
+       ;; sudo apt-get install eglibc-source
        (defun set-gtags-libpath ()
          "Set gtags-libpath."
          (let (path-string
                (dirs (cond
                       ((eq major-mode 'c-mode)
-                       '("/usr/src/linux-source-3.2.0"
+                       '("/usr/src/linux-source"
+                         "/usr/src/glibc"
                          "/usr/include"))
                       ((eq major-mode 'c++-mode)
                        '("/usr/include")))))
@@ -2509,32 +2519,12 @@
                  (message "gtags-libpath: %s" gtags-libpath))
              (message "Failed to set gtags-libpath"))))
 
-       ;; パスを選択し, 設定する
-       (defun select-gtags-libpath ()
-         "Select gtags libpath and set libpath."
-         (interactive)
-         (let ((lst '((1 . "/usr/include")
-                      (2 . "/usr/src/linux-source-3.2.0")
-                      (3 . "~/src/eglibc-2.15")))
-               (select "Select path: "))
-           (dolist (l lst)
-             (setq select (concat select
-                                  "[" (number-to-string (car l)) "]" (cdr l) " ")))
-           (let* ((number (read-string select nil nil nil))
-                  (dir (cdr (assq (string-to-number number) lst))))
-             (if (and (boundp 'gtags-libpath) dir)
-                 (if (file-readable-p (concat (file-name-as-directory dir) "GTAGS"))
-                     (progn
-                       (setq gtags-libpath dir)
-                       (message "gtags-libpath: %s" gtags-libpath))
-                   (message "Not found GTAGS: %s" dir))
-               (message "Failed to set gtags-libpath")))))
-
        ;; 環境変数の設定
        (defadvice gtags-goto-tag
          (before setenv-gtags-libpath activate compile)
-         (if gtags-libpath
-             (setenv "GTAGSLIBPATH" gtags-libpath))
+         (when gtags-libpath
+           (setenv "GTAGSLIBPATH" gtags-libpath)
+           (setenv "GTAGSTHROUGH" ""))
          (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
 
        ;; パスの表示形式
