@@ -263,16 +263,17 @@ A numeric argument serves as a repeat count."
 (unless (featurep 'xemacs)
   ;; condition to undo
   (mapc (lambda (map)
-	  (setcar (cdr (memq :enable (assq 'undo (cdr map))))
-		  '(and (not buffer-read-only)
-			(consp buffer-undo-list)
-			(or (not (or (eq last-buffer-undo-list
-					 buffer-undo-list)
-				     (eq last-buffer-undo-list
-					 (cdr buffer-undo-list))))
-			    (listp pending-undo-list)))))
-	(append (list menu-bar-edit-menu)
-		(if window-system (list tool-bar-map))))
+          (let ((elem (copy-sequence (cdr (assq 'undo (cdr map))))))
+            (setcar (cdr (memq :enable elem))
+                    '(and (not buffer-read-only)
+                          (consp buffer-undo-list)
+                          (or (not (or (eq last-buffer-undo-list
+                                           buffer-undo-list)
+                                       (eq last-buffer-undo-list
+                                           (cdr buffer-undo-list))))
+                              (listp pending-undo-list))))))
+        (append (list menu-bar-edit-menu)
+                (if window-system (list tool-bar-map))))
   ;; redo's menu-bar entry
   (define-key-after menu-bar-edit-menu [redo]
     '(menu-item "Redo" redo

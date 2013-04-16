@@ -5,6 +5,8 @@
 ;; Author: Tetsuya Higashi
 
 ;;; バージョン
+;; 2013-04-16
+;; GNU Emacs 24.3.1 (i686-pc-linux-gnu, GTK+ Version 3.4.2)
 ;; 2012-12-28
 ;; GNU Emacs 24.2.1 (i686-pc-linux-gnu, GTK+ Version 2.24.10)
 ;; 2012-11-27
@@ -58,15 +60,19 @@
         (append '(
                   "/usr/share/emacs/site-lisp/mew"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
-                  "/usr/share/emacs/site-lisp/ddskk"
-                  "/usr/share/emacs/site-lisp/migemo"
-                  "/usr/local/share/gtags"
+                   "/usr/local/share/gtags"
                   ) load-path))
   ;; バージョン 24
-  (unless (= emacs-major-version 23)
+  (if (= emacs-major-version 23)
+      (setq load-path
+            (append '(
+                      "/usr/share/emacs/site-lisp/ddskk"
+                      "/usr/share/emacs/site-lisp/migemo"
+                      ) load-path))
     (setq load-path
           (append '(
-                    "/usr/share/emacs23/site-lisp/ddskk"
+                    ;;"/usr/share/emacs23/site-lisp/ddskk"
+                    "/usr/share/emacs/site-lisp/ddskk"
                     "/usr/share/emacs23/site-lisp/migemo"
                     ) load-path))))
 (setq load-path
@@ -336,7 +342,8 @@
 
 ;;; サーバを起動する
 (when (eval-when-compile (require 'server nil t))
-  (when (fboundp 'server-start)
+  (when (and (fboundp 'server-start)
+             (fboundp 'server-running-p))
     (unless (server-running-p) (server-start))))
 
 ;;; 番号付バックアップファイルを作る
@@ -1834,6 +1841,7 @@
   (define-key global-map (kbd "C-c p i") 'pomodoro-reset)
   (define-key global-map (kbd "C-c p p") 'pomodoro-pause)
   (define-key global-map (kbd "C-c p s") 'pomodoro-save)
+  (define-key global-map (kbd "C-c p t") 'pomodoro-save-time)
   (define-key global-map (kbd "C-c p q") 'pomodoro-stop)
 
   (eval-after-load "pomodoro-technique"
@@ -2096,9 +2104,11 @@
                            '(:foreground "white" :background "red1"))))
        (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
        (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
-       (let* ((mew-mode-line-biff-quantity 0))
-         (when (boundp 'mew-biff-function)
-           ;; mew-biff-interval の間隔で呼ばれる関数
+       (defvar mew-notify-biff-icon
+         "/usr/share/app-install/icons/gmail-notify-icon.png")
+       (when (boundp 'mew-biff-function)
+         ;; mew-biff-interval の間隔で呼ばれる関数
+         (let* ((mew-mode-line-biff-quantity 0))
            (setq mew-biff-function
                  (lambda (n)
                    (if (= n 0)
@@ -2111,8 +2121,10 @@
                      (when (fboundp 'notifications-notify)
                        (when (< mew-mode-line-biff-quantity n)
                          (notifications-notify
-                          :title "Emacs/Mew"
+                          :title "Mew Mail"
                           :body  (format "You got mail(s): %d" n)
+                          :app-icon (if (file-readable-p mew-notify-biff-icon)
+                                        mew-notify-biff-icon nil)
                           :timeout 5000)))
                      (setq mew-mode-line-biff-quantity n)))))
          ;; 着信後呼ばれる関数
@@ -2121,7 +2133,7 @@
            (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
            (setq mew-mode-line-biff-quantity 0))
 
-         ;; モードラインのフォーマット
+         ;; モードライン
          (let ((mew-string '(:eval mew-mode-line-biff-string))
                (mew-icon '(:eval mew-mode-line-biff-icon)))
            (unless (member mew-string mode-line-format)
@@ -2438,17 +2450,21 @@
   (if (and (executable-find "global") (executable-find "gtags"))
       (let* ((default default-directory)
              (dir (read-directory-name "Directory: "
-                               default nil nil nil)))
+                                       default nil nil nil)))
         (if (and (file-directory-p dir) (file-readable-p dir))
             (let (out
                   (cmd
                    (if (file-readable-p
                         (concat (file-name-as-directory dir) "GTAGS"))
-                       (concat "global -uv")
+                       (progn
+                         (if (y-or-n-p "Update? ")
+                             (concat "global -uv")
+                           (concat "gtags -v")))
                      (concat "gtags -v"))))
+              (cd dir)
               (setq out (shell-command-to-string cmd))
-              (message "%s" cmd)
-              (unless (string= out "") (message "%s" out)))
+              (message "%s" out)
+              (cd default))
           (message "no such directory: %s" dir)))
     (message "not found gtags")))
 
@@ -2472,8 +2488,10 @@
        ;; ローカルバッファ変数
        (defvar gtags-libpath nil "Library directory of language.")
        (make-variable-buffer-local 'gtags-libpath)
+       
        ;; ローカルバッファ変数にパスを設定する関数定義
        (defun set-gtags-libpath ()
+         "Set gtags-libpath."
          (let (path-string
                (dirs (cond
                       ((eq major-mode 'c-mode)
@@ -2486,14 +2504,40 @@
                  (setq path-string (concat path-string dir ":"))
                (message "GTAGS does't exist: %s" dir)))
            (if (and (boundp 'gtags-libpath) path-string)
-               (setq gtags-libpath (substring path-string 0 -1)))
-           (message "gtags-libpath: %s" gtags-libpath)))
+               (progn
+                 (setq gtags-libpath (substring path-string 0 -1))
+                 (message "gtags-libpath: %s" gtags-libpath))
+             (message "Failed to set gtags-libpath"))))
+
+       ;; パスを選択し, 設定する
+       (defun select-gtags-libpath ()
+         "Select gtags libpath and set libpath."
+         (interactive)
+         (let ((lst '((1 . "/usr/include")
+                      (2 . "/usr/src/linux-source-3.2.0")
+                      (3 . "~/src/eglibc-2.15")))
+               (select "Select path: "))
+           (dolist (l lst)
+             (setq select (concat select
+                                  "[" (number-to-string (car l)) "]" (cdr l) " ")))
+           (let* ((number (read-string select nil nil nil))
+                  (dir (cdr (assq (string-to-number number) lst))))
+             (message "%s %s" lst dir)
+             (if (and (boundp 'gtags-libpath) dir)
+                 (if (file-readable-p (concat (file-name-as-directory dir) "GTAGS"))
+                     (progn
+                       (setq gtags-libpath dir)
+                       (message "gtags-libpath: %s" gtags-libpath))
+                   (message "Not found GTAGS: %s" dir))
+               (message "Failed to set gtags-libpath")))))
+
        ;; 環境変数の設定
        (defadvice gtags-goto-tag
          (before setenv-gtags-libpath activate compile)
          (if gtags-libpath
              (setenv "GTAGSLIBPATH" gtags-libpath))
          (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
+
        ;; パスの表示形式
        (when (boundp 'gtags-path-style)
          (setq gtags-path-style 'absolute))
@@ -2566,7 +2610,7 @@
                                     exec option-string)))
                       (setq out (shell-command-to-string cmd))
                       (message "%s" cmd)
-                      (unless (string= out "") (message "%s" out))))
+                      (message "%s" out)))
                 (message "no such language"))
             (message "no such directory: %s" dir))))
     (message "not found %s" exec)))
