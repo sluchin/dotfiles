@@ -2523,8 +2523,8 @@
        (defadvice gtags-goto-tag
          (before setenv-gtags-libpath activate compile)
          (when gtags-libpath
-           (setenv "GTAGSLIBPATH" gtags-libpath)
-           (setenv "GTAGSTHROUGH" ""))
+           (setenv "GTAGSLIBPATH" gtags-libpath))
+         (setenv "GTAGSTHROUGH" "")
          (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
 
        ;; パスの表示形式
