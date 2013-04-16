@@ -2522,7 +2522,6 @@
                                   "[" (number-to-string (car l)) "]" (cdr l) " ")))
            (let* ((number (read-string select nil nil nil))
                   (dir (cdr (assq (string-to-number number) lst))))
-             (message "%s %s" lst dir)
              (if (and (boundp 'gtags-libpath) dir)
                  (if (file-readable-p (concat (file-name-as-directory dir) "GTAGS"))
                      (progn
