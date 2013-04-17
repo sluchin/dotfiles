@@ -715,8 +715,9 @@
                  '(eshell-mode
                    term-mode
                    dired-mode
-                   mew-summary-mode
+                   calendar-mode
                    speedbar-mode
+                   mew-summary-mode
                    compilation-mode
                    navi2ch-list-mode
                    navi2ch-board-mode
@@ -823,26 +824,6 @@
          (when (boundp 'dired-mode-map)
            (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file)))
 
-       ;; バックアップファイルを作る
-       (defun dired-make-backup ()
-         "Make buckup file."
-         (interactive)
-         (when (and (fboundp 'dired-get-marked-files)
-                    (fboundp 'dired-copy-file))
-           (let* ((files (dired-get-marked-files))
-                  (date (format-time-string "%Y%m%d%H%M%S")))
-             (mapc (lambda (file)
-                     (let ((backup
-                            (format "%s_%s.%s"
-                                    (file-name-sans-extension file)
-                                    date
-                                    (file-name-extension file))))
-                       (dired-copy-file file backup nil)))
-                   files)
-             (revert-buffer))))
-       (when (boundp 'dired-mode-map)
-         (define-key dired-mode-map (kbd "b") 'dired-make-backup))
-
        ;; tar + gzip で圧縮
        (when (and (executable-find "tar")
                   (executable-find "gzip"))
@@ -872,9 +853,34 @@
          (when (boundp 'dired-mode-map)
            (define-key dired-mode-map (kbd "C-z") 'dired-do-tar-gzip)))
 
-       ;; 編集可能にする
-       (when (and (locate-library "wdired") (boundp 'dired-mode-map))
-         (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+       ;; バックアップファイルを作る
+       (defun dired-make-backup ()
+         "Make buckup file."
+         (interactive)
+         (when (and (fboundp 'dired-get-marked-files)
+                    (fboundp 'dired-copy-file))
+           (let* ((files (dired-get-marked-files))
+                  (date (format-time-string "%Y%m%d%H%M%S")))
+             (mapc (lambda (file)
+                     (let ((backup
+                            (format "%s_%s.%s"
+                                    (file-name-sans-extension file)
+                                    date
+                                    (file-name-extension file))))
+                       (dired-copy-file file backup nil)))
+                   files)
+             (revert-buffer))))
+
+       (when (boundp 'dired-mode-map)
+         ;; バックアップファイル
+         (define-key dired-mode-map (kbd "b") 'dired-make-backup)
+         ;; 編集可能にする
+         (when (locate-library "wdired")
+           (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+         ;; 新規バッファを作らない
+         (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+         ;; 新規バッファを作る
+         (define-key dired-mode-map (kbd "a") 'dired-advertised-find-file))
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
@@ -1041,7 +1047,7 @@
             (lambda ()
               (setq show-trailing-whitespace nil)
               (setq header-line-format nil)))
-
+  (define-key global-map (kbd "C-c d c") 'calendar)
   (eval-after-load "calendar"
     '(progn
        ;; 祝日を表示
@@ -1054,17 +1060,39 @@
        (add-hook 'today-invisible-calendar-hook 'calendar-mark-weekend)
        ;; 今日をマークする
        (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
-       ;; キーバインド
-       (when (boundp 'calendar-mode-map)
-         (define-key calendar-mode-map "f" 'calendar-forward-day)
-         (define-key calendar-mode-map "n" 'calendar-forward-day)
-         (define-key calendar-mode-map "b" 'calendar-backward-day))
        ;; 日本の祝日を表示
        (when (eval-and-compile (and (require 'holidays nil t)
                                     (require 'japanese-holidays nil t)))
          (setq calendar-holidays (append japanese-holidays
                                          holiday-local-holidays
                                          holiday-other-holidays)))
+       ;; 日誌ファイル
+       (when (boundp 'diary-file)
+         (setq diary-file
+               (concat (file-name-as-directory
+                        (catch 'found (find-directory "calendar")))
+                       "diary")))
+       ;; 緯度経度
+       ;; http://api.knecht.jp/geocoding
+       (when (boundp 'calendar-latitude)
+         (setq calendar-latitude 43.06))
+       (when (boundp 'calendar-longitude)
+         (setq calendar-longitude 141.35))
+       (when (boundp 'calendar-location-name)
+         (setq calendar-location-name "Sappro, JP"))
+       ;; 観測地点を東京に設定
+       (when (boundp 'calendar-time-zone)
+         (setq calendar-time-zone +540))
+       (when (boundp 'calendar-standard-time-zone-name)
+         (setq calendar-standard-time-zone-name "JST"))
+       (when (boundp 'calendar-daylight-time-zone-name)
+         (setq calendar-daylight-time-zone-name "JST"))
+       ;; キーバインド
+       (when (boundp 'calendar-mode-map)
+         (define-key calendar-mode-map "f" 'calendar-forward-day)
+         (define-key calendar-mode-map "b" 'calendar-backward-day)
+         (define-key calendar-mode-map "n" 'calendar-forward-week)
+         (define-key calendar-mode-map "p" 'calendar-backward-week))
        (message "Loading %s (calendar)...done" this-file-name))))
 
 ;;; 文書作成 (org-mode)
@@ -1188,7 +1216,7 @@
                                     (format "%%[%s]" book-tmpl) "") "\n")))
              (setq org-remember-templates
                    (list (list "todo"    ?t
-                               "** TODO %^{Brief Description}\n%?Added: %U\n"
+                               "** TODO %^{Brief Description}\n%?\nAdded: %U\n"
                                nil "Tasks")
                          (list "bug"     ?b
                                "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
@@ -1321,9 +1349,7 @@
   (autoload 'turn-on-tempbuf-mode "tempbuf"
     "Kill unused buffers in the background." t)
   (add-hook 'evernote-mode-hook 'turn-on-tempbuf-mode)
-  (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode)
-  (add-hook 'help-mode-hook 'turn-on-tempbuf-mode)
-  (add-hook 'dired-mode-hook 'turn-on-tempbuf-mode))
+  (add-hook 'sdcv-mode-hook 'turn-on-tempbuf-mode))
 
 ;;; カーソル位置に印をつけ移動する
 ;; git clone git://github.com/joodland/bm.git
@@ -1473,7 +1499,8 @@
                                 "\\(woman\\)"
                                 "\\(man\\)"
                                 "\\(terminal\\)"
-                                "\\([e]?shell\\)")))
+                                "\\([e]?shell\\)"
+                                "\\(Help\\)")))
                  (dolist (buffer buffers)
                    (setq nondisplay (concat nondisplay buffer "\\|")))
                  (setq nondisplay (concat (substring nondisplay 0 -2) ".*"))
@@ -3214,3 +3241,4 @@
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
+
