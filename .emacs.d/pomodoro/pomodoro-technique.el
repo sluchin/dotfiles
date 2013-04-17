@@ -192,6 +192,10 @@
               (cdr (assq 'pomodoro-status pomodoro-recovery-info)))
         (setq pomodoro-current-time
               (cdr (assq 'pomodoro-current-time pomodoro-recovery-info)))
+        (setq pomodoro-work-time
+              (cdr (assq 'pomodoro-work-time pomodoro-recovery-info)))
+        (setq pomodoro-rest-time
+              (cdr (assq 'pomodoro-rest-time pomodoro-recovery-info)))
         (setq pomodoro-count
               (cdr (assq 'pomodoro-count pomodoro-recovery-info)))
         (setq pomodoro-start-time
@@ -376,28 +380,22 @@
   (when (and (boundp 'org-directory)
              (boundp 'org-default-notes-file)
              (boundp 'org-remember-templates))
-    (let* ((org-directory (file-name-directory pomodoro-org-file))
-           (org-default-notes-file pomodoro-org-file)
-           (system-time-locale "C")
-           (start pomodoro-start-time)
-           (total (pomodoro-hour-min-sec
-                   (+ pomodoro-work-time pomodoro-rest-time)))
-           (work (pomodoro-hour-min-sec pomodoro-work-time))
-           (pomodoro pomodoro-count)
+    (let* ((system-time-locale "C")
+           (string
+            (format "%s\n\nCLOCK: [%s]--%%U\n%%?\n%s%s\n%s%s\n%s%d %s\n"
+                    "** %^{Task} %U"
+                    pomodoro-start-time
+                    "Total    "
+                    (pomodoro-hour-min-sec
+                     (+ pomodoro-work-time pomodoro-rest-time))
+                    "Work     "
+                    (pomodoro-hour-min-sec pomodoro-work-time)
+                    "Pomodoro "
+                    pomodoro-count
+                    pomodoro-time-list))
            (org-remember-templates
-            `(("Work" ?w "** %t%? \n
-   CLOCK: [%(identity start)]--%U\n
-   Total    %(identity total)
-   Work     %(identity work)
-   Pomodoro %(identity pomodoro)\n"
-               org-directory "Work")
-              ("Home" ?h "** %t%? \n
-   CLOCK: [%(identity start)]--%U\n
-   Total    %(identity total)
-   Work     %(identity work)
-   Pomodoro %(identity pomodoro)\n"
-               org-directory "Home"))))
-      (message "pomodoro-org-remember: %s" org-default-notes-file)
+            (list (list "work" ?w string pomodoro-org-file "Work")
+                  (list "home" ?h string pomodoro-org-file "Home"))))
       (org-remember))))
 
 ;; ステータス保存
@@ -411,6 +409,10 @@
                     pomodoro-status))
     (insert (format "    (pomodoro-current-time . %d)\n"
                     pomodoro-current-time))
+    (insert (format "    (pomodoro-work-time . %d)\n"
+                    pomodoro-work-time))
+    (insert (format "    (pomodoro-rest-time . %d)\n"
+                    pomodoro-rest-time))
     (insert (format "    (pomodoro-count . %d)\n"
                     pomodoro-count))
     (insert (format "    (pomodoro-start-time . \"%s\")\n"

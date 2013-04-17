@@ -147,7 +147,7 @@
 (setq inhibit-startup-screen t)
 
 ;;; 各種文字コード設定
-;; (install-elisp http://nijino.homelinux.net/emacs/cp5022x.el)
+;; (install-elisp "http://nijino.homelinux.net/emacs/cp5022x.el")
 (eval-and-compile (require 'cp5022x nil t))
 (set-default-coding-systems 'utf-8-emacs)
 (setq default-file-name-coding-system 'utf-8-emacs)
@@ -256,9 +256,10 @@
         (delete (assoc 'which-func-mode mode-line-format)
                 mode-line-format))
   ;; 24.3.1 から
-  (setq mode-line-misc-info
-        (delete (assoc 'which-func-mode mode-line-misc-info)
-                mode-line-misc-info))
+  (when (boundp 'mode-line-misc-info)
+    (setq mode-line-misc-info
+          (delete (assoc 'which-func-mode mode-line-misc-info)
+                  mode-line-misc-info)))
   (setq-default header-line-format '(which-func-mode ("" which-func-format)))
   ;; 色
   (set-face-foreground 'which-func "chocolate1")
@@ -427,13 +428,11 @@
 (add-hook 'makefile-mode-hook       ; makefile ではスペースにしない
           (lambda () (setq indent-tabs-mode t)))
 
-;;; 行末の空白を強調表示
+;;; 行末空白強調表示
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "gray50")
-;; 空白強調表示の必要のないモードはしない
+;; 行末空白強調表示をしない
 (add-hook 'fundamental-mode-hook
-          (lambda () (setq show-trailing-whitespace nil)))
-(add-hook 'calendar-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'compilation-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
@@ -558,7 +557,7 @@
 
 ;; f3 でロードする
 (when (boundp 'emacs-lisp-mode-map)
-  (define-key emacs-lisp-mode-map (kbd "<f3>") 'eval-buffer))
+  (define-key emacs-lisp-mode-map (kbd "<f3>") 'eval-current-buffer))
 
 ;; 括弧へジャンプ (デフォルト: C-M-n C-M-p)
 (define-key global-map (kbd "C-x %")
@@ -589,7 +588,7 @@
     (interactive)
     (browse-url (concat "https://www.google.co.jp/search?q="
                         (let ((region (region-or-word)))
-                          (read-string "google search: " region nil region))
+                          (read-string "google search: " region t region))
                         "&ie=utf-8&oe=utf-8&hl=ja")))
   (define-key global-map (kbd "C-c f s") 'firefox-google-search)
 
@@ -631,14 +630,14 @@
   "Insert date."
   (interactive)
   (insert (format-time-string "%Y-%m-%d")))
-(define-key global-map (kbd "C-c d d") 'insert-date)
+(define-key global-map (kbd "C-c d t") 'insert-date)
 
 ;; 時間挿入
-(defun insert-time ()
+(defun insert-date-time ()
   "Insert time."
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
-(define-key global-map (kbd "C-c d t") 'insert-time)
+(define-key global-map (kbd "C-c d T") 'insert-date-time)
 
 ;; C-; で略語展開
 (setq hippie-expand-try-functions-list
@@ -1033,6 +1032,41 @@
           (error (message "%s" err)))
         (throw 'found default)))))
 
+;;; カレンダ
+;; (install-elisp "http://www.meadowy.org/meadow/netinstall/export/799/branches/3.00/pkginfo/japanese-holidays/japanese-holidays.el")
+(when (locate-library "calendar")
+  (autoload 'calendar "calendar" "Calendar." t)
+  ;; 行末空白強調表示, ヘッダ表示をしない
+  (add-hook 'calendar-mode-hook
+            (lambda ()
+              (setq show-trailing-whitespace nil)
+              (setq header-line-format nil)))
+
+  (eval-after-load "calendar"
+    '(progn
+       ;; 祝日を表示
+       (when (boundp 'calendar-mark-holidays-flag)
+         (setq calendar-mark-holidays-flag t))
+       ;; 日曜日を赤字にする
+       (when (boundp 'calendar-weekend-marker)
+         (setq calendar-weekend-marker 'diary))
+       (add-hook 'today-visible-calendar-hook 'calendar-mark-weekend)
+       (add-hook 'today-invisible-calendar-hook 'calendar-mark-weekend)
+       ;; 今日をマークする
+       (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
+       ;; キーバインド
+       (when (boundp 'calendar-mode-map)
+         (define-key calendar-mode-map "f" 'calendar-forward-day)
+         (define-key calendar-mode-map "n" 'calendar-forward-day)
+         (define-key calendar-mode-map "b" 'calendar-backward-day))
+       ;; 日本の祝日を表示
+       (when (eval-and-compile (and (require 'holidays nil t)
+                                    (require 'japanese-holidays nil t)))
+         (setq calendar-holidays (append japanese-holidays
+                                         holiday-local-holidays
+                                         holiday-other-holidays)))
+       (message "Loading %s (calendar)...done" this-file-name))))
+
 ;;; 文書作成 (org-mode)
 ;; Org-mode Reference Card
 (defun org-ref ()
@@ -1084,12 +1118,17 @@
            (locate-library "org-remember"))
   ;; 自動で org-mode にする
   (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (add-hook 'org-mode-hook
-            (lambda ()
+  (let ((hook (lambda ()
               ;; 日付を英語で挿入する
               (set (make-local-variable 'system-time-locale) "C")
               ;; org-mode での強調表示を可能にする
-              (turn-on-font-lock)))
+              (turn-on-font-lock))))
+    (add-hook 'org-mode-hook hook)
+    (add-hook 'org-remember-mode-hook hook))
+  (defadvice org-remember-apply-template
+    (before org-remember-locale
+            (&optional use-char skip-interactive) activate compile)
+    (set (make-local-variable 'system-time-locale) "C"))
   (autoload 'org-sotre-link "org"
     "Store an org-link to the current location." t)
   (autoload 'org-agenda "org-agenda"
@@ -1114,6 +1153,11 @@
          (setq org-return-follows-link t))
        (when (boundp 'org-startup-truncated)   ; 行の折り返し
          (setq org-startup-truncated nil))
+       ;; Todo で使用するキーワードを定義。
+       (when (boundp 'org-todo-keywords)
+         (setq org-todo-keywords
+               '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "|"
+                           "CANCELED(c)"))))
 
        ;; org-agenda
        (when (and (eval-and-compile (require 'org-agenda nil t))
@@ -1122,26 +1166,47 @@
          (setq org-agenda-files (list org-directory)))
 
        ;; org-remember
-       (when (eval-and-compile (require 'org-remember nil t))
-         (when (boundp 'org-directory)           ; ディレクトリ
-           (setq org-directory (catch 'found (find-directory "org")))
-           (message "org-directory: %s" org-directory))
+       (when (and (eval-and-compile (require 'org-remember nil t))
+                  (boundp 'org-directory))
+         (setq org-directory (catch 'found (find-directory "org")))
+         (message "org-directory: %s" org-directory)
          (when (boundp 'org-default-notes-file)  ; ファイル名
            (setq org-default-notes-file
                  (concat (file-name-as-directory org-directory) "agenda.org"))
            (message "org-default-notes-file: %s" org-default-notes-file))
          (when (boundp 'org-remember-templates)  ; テンプレート
-           (setq org-remember-templates
-                 '(("Todo"  ?t
-                    "** TODO%?\n%i\n   %a\n   %t\n" nil "Inbox")
-                   ("Bug"   ?b
-                    "** TODO%?   :bug:\n%i\n   %a\n   %t\n" nil "Inbox")
-                   ("Idea"  ?i
-                    "**%?\n%i\n   %a\n   %t\n" nil "New Ideas")
-                   ("Emacs" ?e
-                    "**%?\n%i\n   %a\n   %t\n" nil "Emacs")
-                   ("Memo"  ?m
-                    "**%?\n%i\n   %a\n   %t\n" nil "Memo"))))
+           (let* ((dir (file-name-as-directory org-directory))
+                  (book-tmpl "~/.emacs.d/org/templates/book.txt")
+                  (journal-file (concat dir "journal.org"))
+                  (emacs-file (concat dir "emacs.org"))
+                  (memo-file (concat dir "memo.org"))
+                  (book-file (concat dir "book.org"))
+                  (private-file (concat dir "private.org"))
+                  (book-string (concat "\n* %^{Book Title} "
+                                "%t :BOOK: \n"
+                                (if (file-readable-p book-tmpl)
+                                    (format "%%[%s]" book-tmpl) "") "\n")))
+             (setq org-remember-templates
+                   (list (list "todo"    ?t
+                               "** TODO %^{Brief Description}\n%?Added: %U\n"
+                               nil "Tasks")
+                         (list "bug"     ?b
+                               "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
+                               nil "Tasks")
+                         (list "idea"    ?i
+                               "** %^{Idea} %U\n%i%?\n" nil "Ideas")
+                         (list "journal" ?j
+                               "** %^{Head Line} %U\n%i%?\n"
+                               journal-file "Inbox")
+                         (list "emacs"   ?e
+                               "** %^{Title} %U\n%a\n%i%?\n"
+                               emacs-file "Emacs")
+                         (list "memo"    ?m
+                               "** %^{Title} %U\n%a\n%i%?\n"
+                               memo-file "Memo")
+                         (list "private" ?p
+                               "** %^{topic} %U \n%i%?\n" private-file)
+                         (list "book"    ?k book-string book-file)))))
          (when (fboundp 'org-remember-insinuate) ; 初期化
            (org-remember-insinuate))
 
@@ -1152,16 +1217,18 @@
            (when (and (boundp 'org-directory)
                       (boundp 'org-default-notes-file)
                       (boundp 'org-remember-templates))
-             (let* ((org-directory (catch 'found (find-directory "code")))
-                    (org-default-notes-file
-                     (concat (file-name-as-directory org-directory)
+             (let* ((system-time-locale "C")
+                    (file
+                     (concat (file-name-as-directory
+                              (catch 'found (find-directory "code")))
                              "code-reading.org"))
-                    (prefix
-                     (concat "[" (substring (symbol-name major-mode) 0 -5) "]"))
+                    (string
+                     (concat "** ["
+                             (substring (symbol-name major-mode) 0 -5)
+                             "] %^{Title} %U\n%a\n%i%?\n"))
                     (org-remember-templates
-                     `(("CodeReading" ?r "** %(identity prefix)%?\n\n   %a\n   %t\n"
-                        org-directory "Memo"))))
-               (message "org-remember-code-reading: %s" org-default-notes-file)
+                     (list (list "CodeReading" ?r string file "Code Reading"))))
+               (message "org-remember-code-reading: %s" file)
                (org-remember)))))
        (message "Loading %s (org)...done" this-file-name))))
 
@@ -1863,6 +1930,7 @@
                (concat (file-name-as-directory
                         (catch 'found (find-directory "pomodoro")))
                        ".pomodoro")))
+       (add-hook 'kill-emacs-hook 'pomodoro-save-time)
        (message "Loading %s (pomodoro-technique)...done" this-file-name))))
 
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
@@ -2031,12 +2099,12 @@
   (autoload 'mew-user-agent-compose "mew"
     "Set up message composition draft with Mew." t)
   (setq read-mail-command 'mew)
-  ;; 空白強調表示をしない
+  ;; 行末空白強調表示をしない
   (let ((hook (lambda ()
                 (setq show-trailing-whitespace nil))))
     (add-hook 'mew-summary-mode-hook hook)
     (add-hook 'mew-draft-mode-hook hook))
-  ;; ヘッダ表示と空白強調表示をしない
+  ;; 行末空白強調表示, ヘッダ表示をしない
   (let ((hook (lambda ()
                 (setq header-line-format nil)
                 (setq show-trailing-whitespace nil))))
@@ -2397,12 +2465,12 @@
 
 ;;; 端末エミュレータ
 ;; eshell
-;; 空白を強調表示しない
+;; 行末空白強調表示をしない
 (add-hook 'eshell-mode-hook
           (lambda ()
             (setq show-trailing-whitespace nil)))
 ;; shell
-;; 空白を強調表示しない
+;; 行末空白強調表示をしない
 (add-hook 'shell-mode-hook
           (lambda ()
             (setq show-trailing-whitespace nil)))
@@ -2487,7 +2555,8 @@
                   (gtags-mode 1))
                 (when (fboundp 'set-gtags-libpath) ; パス設定
                   (set-gtags-libpath)))))
-    (add-hook 'c-mode-common-hook hook)            ; C, C++
+    (add-hook 'c-mode-hook hook)                   ; C
+    (add-hook 'c++-mode-hook hook)                 ; C++
     (add-hook 'java-mode-hook hook))               ; Java
 
   (eval-after-load "gtags"
@@ -2504,9 +2573,9 @@
          (let (path-string
                (dirs (cond
                       ((eq major-mode 'c-mode)
-                       '("/usr/src/linux-source"
+                       '("/usr/include"
                          "/usr/src/glibc"
-                         "/usr/include"))
+                         "/usr/src/linux-source"))
                       ((eq major-mode 'c++-mode)
                        '("/usr/include")))))
            (dolist (dir dirs)
@@ -2524,7 +2593,7 @@
          (before setenv-gtags-libpath activate compile)
          (when gtags-libpath
            (setenv "GTAGSLIBPATH" gtags-libpath))
-         (setenv "GTAGSTHROUGH" "")
+         (setenv "GTAGSTHROUGH" "") ; 全てのパスを走査する
          (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
 
        ;; パスの表示形式
@@ -2745,7 +2814,7 @@
        (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
 ;;; nXML モード
-(when (locate-library "nxml")
+(when (locate-library "nxml-mode")
   ;; 拡張子のリスト
   (setq auto-mode-alist
         (append
@@ -2753,7 +2822,7 @@
            ("\\.xhtml\\([.]?\\w+\\)*$" . nxml-mode))
          auto-mode-alist))
 
-  (eval-after-load "nxml"
+  (eval-after-load "nxml-mode"
     '(progn
        ;; スラッシュの入力で終了タグを自動補完
        (when (boundp 'nxml-slash-auto-complete-flag)
@@ -2776,12 +2845,15 @@
        ;; グリフは非表示
        (when (boundp 'nxml-char-ref-display-glyph-flag)
          (setq nxml-char-ref-display-glyph-flag nil))
+       ;; Tab で補完 (デフォルト: M-Tab)
+       (when (boundp 'nxml-mode-map)
+         (define-key nxml-mode-map (kbd "TAB") 'completion-at-point))
        (message "Loading %s (nxml)...done" this-file-name))))
 
 ;;; C 言語
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
 ;; clang -cc1 -x c-header stdafx.h -emit-pch -o stdafx.pch
-(add-hook 'c-mode-common-hook
+(add-hook 'c-mode-hook
           (lambda ()
             (when (fboundp 'c-set-style)
               (c-set-style "k&r"))
@@ -3006,20 +3078,19 @@
              (fboundp 'xml-tag-name)
              (fboundp 'xml-tag-children)
              (fboundp 'xml-tag-child))
-    (message "xml parse begin")
+    (message "[%s] Xml parse started." (format-time-string "%Y-%m-%d %H:%M:%S"))
     (dolist (tracklst (read-xml))
       (when (string= (xml-tag-name tracklst) "trackList")
         (message "found tag of trackList")
         (dolist (track (xml-tag-children tracklst))
           (when (string=  (xml-tag-name track) "track")
-            (message "found tag of track")
             (dolist (tag tags)
               (princ (car (xml-tag-children (xml-tag-child track tag))))
               (if (string= tag (car (last tags)))
                   (princ "\n")
                 (princ ",")))))))
     (goto-char (point-min))
-    (message "xml parse end")))
+    (message "[%s] Done." (format-time-string "%Y-%m-%d %H:%M:%S"))))
 
 ;; CSV 形式でファイルに出力する
 (defun vlc-xml2csv-file ()
