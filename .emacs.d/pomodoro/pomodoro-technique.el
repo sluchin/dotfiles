@@ -23,6 +23,10 @@
 ;; (define-key global-map (kbd "C-c p s") 'pomodoro-save)
 ;; (define-key global-map (kbd "C-c p t") 'pomodoro-save-time)
 ;; (define-key global-map (kbd "C-c p q") 'pomodoro-stop)
+;;
+;; (eval-after-load "pomodoro-technique"
+;;   '(progn
+;;      (add-hook 'kill-emacs-hook 'pomodoro-save-time)))
 
 
 (eval-and-compile (require 'org nil t))
@@ -284,7 +288,7 @@
 ;; 時間リストから変数へ代入する
 (defun pomodoro-set-time (time-lst)
   (if (not (= 4 (length time-lst)))
-      (error "time list length error")
+      (error "time list length error: %s" time-lst)
     (setq pomodoro-work (* 60 (nth 0 time-lst)))
     (setq pomodoro-rest (* 60 (nth 1 time-lst)))
     (setq pomodoro-long (* 60 (nth 2 time-lst)))
@@ -347,6 +351,7 @@
       (progn
         (setq pomodoro-timer (cancel-timer pomodoro-timer))
         (setq pomodoro-timer nil))
+    (pomodoro-set-time (or pomodoro-time-list pomodoro-default-time))
     (setq pomodoro-timer (run-with-timer 0 1 'pomodoro-callback-timer))))
 
 ;; リセット
@@ -377,9 +382,7 @@
 (defun pomodoro-save-org ()
   "Pomodoro for org-mode."
   (interactive)
-  (when (and (boundp 'org-directory)
-             (boundp 'org-default-notes-file)
-             (boundp 'org-remember-templates))
+  (when (boundp 'org-remember-templates)
     (let* ((system-time-locale "C")
            (string
             (format "%s\n\nCLOCK: [%s]--%%U\n%%?\n%s%s\n%s%s\n%s%d %s\n"
