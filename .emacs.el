@@ -38,15 +38,27 @@
     (unless (assq res benchmark-alist)
       (add-to-list 'benchmark-alist (cons res time)))))
 
-;; 表示
+;; require 時間表示
 (defun print-benchmark ()
   "Print benchmark."
   (interactive)
-  (let ((all 0))
+  (let ((all 0.0))
     (dolist (alist (reverse benchmark-alist))
       (setq all (+ all (cdr alist)))
       (message "%-18s %.6f msec" (car alist) (cdr alist)))
     (message "%-18s %.6f msec" "all" all)))
+
+;; ロード履歴の表示
+(defun print-load ()
+  "Print load-history."
+  (interactive)
+  (let ((all 0.0))
+    (dolist (lst load-history)
+      (let* ((file (car lst))
+             (bytes (nth 7 (file-attributes file))))
+        (message "%-8s %s" bytes file)
+        (setq all (+ all bytes))))
+    (message "%.6fM (%d)" (/ (/ all 1024.0) 1024.0) all)))
 
 ;;; ファイル名を保持
 (defconst this-file-name load-file-name)
@@ -58,23 +70,12 @@
 (when (eq system-type 'gnu/linux)
   (setq load-path
         (append '(
+                  "/usr/share/emacs/site-lisp/migemo"
+                  "/usr/share/emacs/site-lisp/ddskk"
                   "/usr/share/emacs/site-lisp/mew"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
-                   "/usr/local/share/gtags"
-                  ) load-path))
-  ;; バージョン 24
-  (if (= emacs-major-version 23)
-      (setq load-path
-            (append '(
-                      "/usr/share/emacs/site-lisp/ddskk"
-                      "/usr/share/emacs/site-lisp/migemo"
-                      ) load-path))
-    (setq load-path
-          (append '(
-                    ;;"/usr/share/emacs23/site-lisp/ddskk"
-                    "/usr/share/emacs/site-lisp/ddskk"
-                    "/usr/share/emacs23/site-lisp/migemo"
-                    ) load-path))))
+                  "/usr/local/share/gtags"
+                  ) load-path)))
 (setq load-path
       (append '(
                 "~/.emacs.d"
@@ -349,9 +350,9 @@
                   (cons lines-chars mode-line-format))))
 
 ;;; サーバを起動する
-(when (eval-when-compile (require 'server nil t))
-  (when (and (fboundp 'server-start)
-             (fboundp 'server-running-p))
+(when (eval-and-compile (require 'server nil t))
+  (when (and (fboundp 'server-running-p)
+             (fboundp 'server-start))
     (unless (server-running-p) (server-start))))
 
 ;;; 番号付バックアップファイルを作る
@@ -435,6 +436,8 @@
 (add-hook 'fundamental-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'compilation-mode-hook
+          (lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'buffer-menu-mode-hook
           (lambda () (setq show-trailing-whitespace nil)))
 
 ;;; 検索 (isearch)
@@ -573,8 +576,8 @@
            (forward-list arg))
           (t (self-insert-command arg)))))
 
-;; リージョンまたはワードを返却するマクロ
-(defmacro region-or-word ()
+;; リージョンまたはワードを返却
+(defun region-or-word ()
   "Return region or word"
   (if mark-active
       (buffer-substring-no-properties (region-beginning) (region-end))
@@ -586,20 +589,20 @@
   (defun firefox-google-search ()
     "Search google in firefox."
     (interactive)
-    (browse-url (concat "https://www.google.co.jp/search?q="
-                        (let ((region (region-or-word)))
-                          (read-string "google search: " region t region))
-                        "&ie=utf-8&oe=utf-8&hl=ja")))
+    (let* ((region (region-or-word))
+           (string (read-string "google search: " region t region)))
+      (browse-url (concat "https://www.google.co.jp/search?q="
+                          string
+                          "&ie=utf-8&oe=utf-8&hl=ja"))))
   (define-key global-map (kbd "C-c f s") 'firefox-google-search)
 
   ;; ウィキペディア検索
   (defun firefox-wikipedia-search ()
     "Search wikipedia in firefox."
     (interactive)
-    (browse-url (concat "https://ja.wikipedia.org/wiki/"
-                        (let ((region (region-or-word)))
-                          (read-string "wikipedia search: "
-                                       region nil region)))))
+    (let* ((region (region-or-word))
+           (string (read-string "wikipedia search: " region t region)))
+      (browse-url (concat "https://ja.wikipedia.org/wiki/" string))))
   (define-key global-map (kbd "C-c f w") 'firefox-wikipedia-search)
 
   ;; URL を開く
@@ -696,6 +699,9 @@
 ;; エコー領域をクリアする
 (define-key global-map (kbd "C-c C-g") (lambda () (interactive) (message nil)))
 
+;; 空白を一つ残して削除 (デフォルト: M-SPC)
+(define-key global-map (kbd "C-S-k") 'just-one-space)
+
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
 ;;; 行番号表示
@@ -786,6 +792,9 @@
        ;; ディレクトリを再帰的に削除可能にする
        (when (boundp 'dired-recursive-deletes)
          (setq dired-recursive-deletes 'always))
+
+       ;; 無効コマンドを有効にする
+       (put 'dired-find-alternate-file 'disabled nil)
 
        ;; firefox で開く
        (when (and (executable-find "firefox")
@@ -967,7 +976,7 @@
   (autoload 'diff "diff" "run diff" t)
   (add-hook 'diff-mode-hook
             (lambda ()
-              ;; 空白の強調表示をしない
+              ;; 行末空白強調表示をしない
               (setq show-trailing-whitespace nil)
               ;; diff を表示したらすぐに文字単位での強調表示も行う
               (when (fboundp 'diff-auto-refine-mode)
@@ -1048,6 +1057,7 @@
               (setq show-trailing-whitespace nil)
               (setq header-line-format nil)))
   (define-key global-map (kbd "C-c d c") 'calendar)
+
   (eval-after-load "calendar"
     '(progn
        ;; 祝日を表示
@@ -1074,25 +1084,31 @@
                        "diary")))
        ;; 緯度経度
        ;; http://api.knecht.jp/geocoding
-       (when (boundp 'calendar-latitude)
-         (setq calendar-latitude 43.06))
-       (when (boundp 'calendar-longitude)
-         (setq calendar-longitude 141.35))
-       (when (boundp 'calendar-location-name)
-         (setq calendar-location-name "Sappro, JP"))
+       (when (eval-and-compile (require 'solar nil t))
+         (when (boundp 'calendar-latitude)
+           (setq calendar-latitude 43.06))
+         (when (boundp 'calendar-longitude)
+           (setq calendar-longitude 141.35))
+         (when (boundp 'calendar-location-name)
+           (setq calendar-location-name "Sappro, JP")))
        ;; 観測地点を東京に設定
-       (when (boundp 'calendar-time-zone)
-         (setq calendar-time-zone +540))
-       (when (boundp 'calendar-standard-time-zone-name)
-         (setq calendar-standard-time-zone-name "JST"))
-       (when (boundp 'calendar-daylight-time-zone-name)
-         (setq calendar-daylight-time-zone-name "JST"))
+       (when (eval-and-compile (require 'cal-dst nil t))
+         (when (boundp 'calendar-time-zone)
+           (setq calendar-time-zone +540))
+         (when (boundp 'calendar-standard-time-zone-name)
+           (setq calendar-standard-time-zone-name "JST"))
+         (when (boundp 'calendar-daylight-time-zone-name)
+           (setq calendar-daylight-time-zone-name "JST")))
        ;; キーバインド
        (when (boundp 'calendar-mode-map)
-         (define-key calendar-mode-map "f" 'calendar-forward-day)
-         (define-key calendar-mode-map "b" 'calendar-backward-day)
-         (define-key calendar-mode-map "n" 'calendar-forward-week)
-         (define-key calendar-mode-map "p" 'calendar-backward-week))
+         (define-key calendar-mode-map (kbd "f") 'calendar-forward-day)
+         (define-key calendar-mode-map (kbd "b") 'calendar-backward-day)
+         (define-key calendar-mode-map (kbd "n") 'calendar-forward-week)
+         (define-key calendar-mode-map (kbd "p") 'calendar-backward-week)
+         (define-key calendar-mode-map (kbd "M-n") 'calendar-forward-month)
+         (define-key calendar-mode-map (kbd "M-p") 'calendar-backward-month)
+         (define-key calendar-mode-map (kbd "<M-right>") 'calendar-forward-month)
+         (define-key calendar-mode-map (kbd "<M-left>") 'calendar-backward-month))
        (message "Loading %s (calendar)...done" this-file-name))))
 
 ;;; 文書作成 (org-mode)
@@ -1153,10 +1169,12 @@
               (turn-on-font-lock))))
     (add-hook 'org-mode-hook hook)
     (add-hook 'org-remember-mode-hook hook))
+
   (defadvice org-remember-apply-template
     (before org-remember-locale
             (&optional use-char skip-interactive) activate compile)
     (set (make-local-variable 'system-time-locale) "C"))
+
   (autoload 'org-sotre-link "org"
     "Store an org-link to the current location." t)
   (autoload 'org-agenda "org-agenda"
@@ -1166,11 +1184,44 @@
   (autoload 'org-remember-code-reading
     "org-remember" "Fast note taking in Org-mode for code reading" t)
   (autoload 'org-iswitchb "org" "Switch between Org buffers." t)
+
   (define-key global-map (kbd "C-c o l") 'org-store-link)
   (define-key global-map (kbd "C-c o a") 'org-agenda)
   (define-key global-map (kbd "C-c o r") 'org-remember)
   (define-key global-map (kbd "C-c o c") 'org-remember-code-reading)
   (define-key global-map (kbd "C-c o b") 'org-iswitchb)
+
+  (defun org-dired ()
+    "Open org file at dired."
+    (interactive)
+    (when (and (require 'org-remember nil t)
+               (boundp 'org-directory))
+      (dired org-directory))
+    ;; バックアップファイルを除外する (M-o)
+    (when (and (require 'dired-x nil t)
+               (fboundp 'dired-omit-mode))
+      (dired-omit-mode 1)))
+  (define-key global-map (kbd "C-c o d") 'org-dired)
+
+  (defun org-kill-buffer ()
+    "Kill org-mode buffer."
+    (interactive)
+    (let ((current (buffer-name (current-buffer))))
+      (dolist (buffer (buffer-list))
+        (when (and (require 'org nil t)
+                   (fboundp 'org-mode))
+          (switch-to-buffer buffer)
+          (when (and
+                 (not (string= (buffer-name buffer) current))
+                 (or (eq major-mode 'org-mode)
+                     (string-match
+                      "\\(\\*Org Agenda\\*\\)\\|\\( \\*Agenda Commands\\*\\)"
+                      (buffer-name buffer))))
+            (message "kill buffer: %s (%s)" buffer major-mode)
+            (when (buffer-live-p buffer)
+              (kill-buffer buffer)))))
+      (switch-to-buffer current)))
+  (define-key global-map (kbd "C-c o k") 'org-kill-buffer)
 
   (eval-after-load "org"
     '(progn
@@ -1186,24 +1237,20 @@
          (setq org-todo-keywords
                '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "|"
                            "CANCELED(c)"))))
-
-       ;; org-agenda
-       (when (and (eval-and-compile (require 'org-agenda nil t))
-                  (boundp 'org-agenda-files))
-         ;; 対象ファイル
-         (setq org-agenda-files (list org-directory)))
-
        ;; org-remember
        (when (and (eval-and-compile (require 'org-remember nil t))
                   (boundp 'org-directory))
          (setq org-directory (catch 'found (find-directory "org")))
          (message "org-directory: %s" org-directory)
+
          (when (boundp 'org-default-notes-file)  ; ファイル名
            (setq org-default-notes-file
                  (concat (file-name-as-directory org-directory) "agenda.org"))
            (message "org-default-notes-file: %s" org-default-notes-file))
+
          (when (boundp 'org-remember-templates)  ; テンプレート
-           (let* ((dir (file-name-as-directory org-directory))
+           (let* ((setq org-tags-overlay)
+                  (dir (file-name-as-directory org-directory))
                   (book-tmpl "~/.emacs.d/org/templates/book.txt")
                   (journal-file (concat dir "journal.org"))
                   (emacs-file (concat dir "emacs.org"))
@@ -1215,26 +1262,26 @@
                                 (if (file-readable-p book-tmpl)
                                     (format "%%[%s]" book-tmpl) "") "\n")))
              (setq org-remember-templates
-                   (list (list "todo"    ?t
+                   (list (list "Todo"    ?t
                                "** TODO %^{Brief Description}\n%?\nAdded: %U\n"
                                nil "Tasks")
-                         (list "bug"     ?b
+                         (list "Bug"     ?b
                                "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
                                nil "Tasks")
-                         (list "idea"    ?i
+                         (list "Idea"    ?i
                                "** %^{Idea} %U\n%i%?\n" nil "Ideas")
-                         (list "journal" ?j
+                         (list "Journal" ?j
                                "** %^{Head Line} %U\n%i%?\n"
                                journal-file "Inbox")
-                         (list "emacs"   ?e
+                         (list "Emacs"   ?e
                                "** %^{Title} %U\n%a\n%i%?\n"
                                emacs-file "Emacs")
-                         (list "memo"    ?m
+                         (list "Memo"    ?m
                                "** %^{Title} %U\n%a\n%i%?\n"
                                memo-file "Memo")
-                         (list "private" ?p
-                               "** %^{topic} %U \n%i%?\n" private-file)
-                         (list "book"    ?k book-string book-file)))))
+                         (list "Private" ?p
+                               "** %^{Topic} %U \n%i%?\n" private-file)
+                         (list "Book"    ?k book-string book-file)))))
          (when (fboundp 'org-remember-insinuate) ; 初期化
            (org-remember-insinuate))
 
@@ -1246,10 +1293,8 @@
                       (boundp 'org-default-notes-file)
                       (boundp 'org-remember-templates))
              (let* ((system-time-locale "C")
-                    (file
-                     (concat (file-name-as-directory
-                              (catch 'found (find-directory "code")))
-                             "code-reading.org"))
+                    (dir (file-name-as-directory org-directory))
+                    (file (concat dir "code-reading.org"))
                     (string
                      (concat "** ["
                              (substring (symbol-name major-mode) 0 -5)
@@ -1258,6 +1303,13 @@
                      (list (list "CodeReading" ?r string file "Code Reading"))))
                (message "org-remember-code-reading: %s" file)
                (org-remember)))))
+
+       ;; org-agenda
+       (when (and (eval-and-compile (require 'org-agenda nil t))
+                  (boundp 'org-agenda-files))
+         ;; 対象ファイル
+         (setq org-agenda-files (list org-directory)))
+
        (message "Loading %s (org)...done" this-file-name))))
 
 ;;; ファイル内のカーソル位置を記録する
@@ -2353,6 +2405,8 @@
   (autoload 'w3m-search "w3m-search" "Search QUERY using SEARCH-ENGINE." t)
   (autoload 'w3m-weather "w3m-weather" "Display weather report." t)
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
+  (autoload 'w3m-search-new-session "w3m-search"
+    "Search a word using search engines in a new session." t)
 
   ;; グーグルで検索する
   (define-key global-map (kbd "C-c 3 s") 'w3m-search-new-session)
