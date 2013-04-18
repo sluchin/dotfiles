@@ -26,17 +26,15 @@
 (setq debug-on-error t)
 
 ;;; require 時間を計測する
-(defvar benchmark-alist nil)
+(defvar benchmark-alist nil
+  "Time of require alist.")
 (defadvice require
   (around require-benchmark
           (feature &optional filename noerror)
           activate compile)
-  (let* ((beg (float-time (current-time)))
-         (res ad-do-it)
-         (end (float-time (current-time)))
-         (time (* (- end beg) 1000)))
-    (unless (assq res benchmark-alist)
-      (add-to-list 'benchmark-alist (cons res time)))))
+  (let* ((time (car (benchmark-run ad-do-it))))
+    (unless (assq (ad-get-arg 0) benchmark-alist)
+      (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time)))))
 
 ;; require 時間表示
 (defun print-benchmark ()
@@ -45,15 +43,15 @@
   (let ((all 0.0))
     (dolist (alist (reverse benchmark-alist))
       (setq all (+ all (cdr alist)))
-      (message "%-18s %.6f msec" (car alist) (cdr alist)))
-    (message "%-18s %.6f msec" "all" all)))
+      (message "%-18s %.6f" (car alist) (cdr alist)))
+    (message "%-18s %.6f" "all" all)))
 
 ;; ロード履歴の表示
 (defun print-load ()
   "Print load-history."
   (interactive)
   (let ((all 0.0))
-    (dolist (lst load-history)
+    (dolist (lst (reverse load-history))
       (let* ((file (car lst))
              (bytes (nth 7 (file-attributes file))))
         (message "%-8s %s" bytes file)
@@ -1113,8 +1111,8 @@
 
 ;;; 文書作成 (org-mode)
 ;; Org-mode Reference Card
-(defun org-ref ()
-  "Read reference for Org-mode."
+(defun org-reference ()
+  "Open reference for Org-mode."
   (interactive) (find-file "~/.emacs.d/org/reference-card.org"))
 
 ;; Org-mode 日本語 info
@@ -1552,7 +1550,8 @@
                                 "\\(man\\)"
                                 "\\(terminal\\)"
                                 "\\([e]?shell\\)"
-                                "\\(Help\\)")))
+                                "\\(Help\\)"
+                                "\\(info\\)")))
                  (dolist (buffer buffers)
                    (setq nondisplay (concat nondisplay buffer "\\|")))
                  (setq nondisplay (concat (substring nondisplay 0 -2) ".*"))
@@ -1582,8 +1581,18 @@
 ;;; 2chビューア (navi2ch)
 ;; wget -O- http://sourceforge.net/projects/navi2ch/files/navi2ch/navi2ch-1.8.4/
 ;; navi2ch-1.8.4.tar.gz/download | tar xfz -
+;; リファレンス
+(defun navi2ch-reference ()
+  "Open reference for navi2ch."
+  (interactive) (find-file "~/.emacs.d/ref/navi2ch.org"))
+
 (when (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t)
+  ;; ヘッダを表示しない
+  (let ((hook (lambda () (setq header-line-format nil))))
+    (add-hook 'navi2ch-list-mode-hook hook)
+    (add-hook 'navi2ch-board-mode-hook hook)
+    (add-hook 'navi2ch-article-mode-hook hook))
   ;; AAを綺麗に表示する
   ;; モナーフォントをインストールしておくこと
   ;; sudo apt-get install fonts-monapo
@@ -1637,6 +1646,11 @@
        ;; 3 ペインモードにする
        (when (boundp 'navi2ch-list-stay-list-window)
          (setq navi2ch-list-stay-list-window t))
+       ;; 送信控えをとる
+       (when (boundp 'navi2ch-message-save-sendlog)
+         (setq navi2ch-message-save-sendlog t)
+         (add-to-list 'navi2ch-list-navi2ch-category-alist
+                      navi2ch-message-sendlog-board))
        (message "Loading %s (navi2ch)...done" this-file-name))))
 
 ;;; メモ (howm)
@@ -2172,6 +2186,11 @@
 
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
+;; Mew info
+(defun mew-info (&optional node)
+  "Read documentation for Emacs in the info system."
+  (interactive) (info (format "(mew.jis.info)%s" (or node ""))))
+
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
@@ -2398,6 +2417,11 @@
 ;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
+;; emacs-w3m Info
+(defun w3m-info (&optional node)
+  "Read documentation for Emacs in the info system."
+  (interactive) (info (format "(emacs-w3m-ja.info)%s" (or node ""))))
+
 (when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
   (autoload 'w3m-find-file "w3m" "w3m interface function for local file." t)
@@ -2622,7 +2646,7 @@
               (message "%s" out)
               (cd default))
           (message "no such directory: %s" dir)))
-    (message "not found gtags")))
+    (message "not found global")))
 
 ;; タグ検索 (gtags)
 (when (and (executable-find "global") (locate-library "gtags"))
