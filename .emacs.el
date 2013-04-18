@@ -1255,8 +1255,8 @@
                   (memo-file (concat dir "memo.org"))
                   (book-file (concat dir "book.org"))
                   (private-file (concat dir "private.org"))
-                  (book-string (concat "\n* %^{Book Title} "
-                                "%t :BOOK: \n"
+                  (book-string (concat "** %^{Brief Description} "
+                                "%U  :BOOK:\n"
                                 (if (file-readable-p book-tmpl)
                                     (format "%%[%s]" book-tmpl) "") "\n")))
              (setq org-remember-templates
@@ -1278,8 +1278,8 @@
                                "** %^{Title} %U\n%a\n%i%?\n"
                                memo-file "Memo")
                          (list "Private" ?p
-                               "** %^{Topic} %U \n%i%?\n" private-file)
-                         (list "Book"    ?k book-string book-file)))))
+                               "** %^{Topic} %U \n%i%?\n" private-file "Private")
+                         (list "Book"    ?k book-string book-file "Books")))))
          (when (fboundp 'org-remember-insinuate) ; 初期化
            (org-remember-insinuate))
 
