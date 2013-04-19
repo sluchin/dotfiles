@@ -244,7 +244,7 @@
            :timeout 5000))
         (message "pomodoro switch status: %s" pomodoro-status))
        ;; ここにはこない
-       (t (error "pomodoro work error")))
+       (t (error "pomodoro %s error" pomodoro-status)))
     (let ((rest (if (eq pomodoro-status 'rest)
                     pomodoro-rest
                   pomodoro-long)))
@@ -268,7 +268,7 @@
            :timeout 5000))
         (message "pomodoro switch status: %s" pomodoro-status))
        ;; ここにはこない
-       (t (error "pomodoro rest error"))))))
+       (t (error "pomodoro %s error" pomodoro-status))))))
 
 ;; コールバック関数
 (defun pomodoro-callback-timer ()
