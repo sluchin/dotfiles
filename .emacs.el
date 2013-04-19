@@ -32,7 +32,7 @@
   (around require-benchmark
           (feature &optional filename noerror)
           activate compile)
-  (let* ((time (car (benchmark-run ad-do-it))))
+  (let ((time (car (benchmark-run ad-do-it))))
     (unless (assq (ad-get-arg 0) benchmark-alist)
       (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time)))))
 
@@ -104,44 +104,6 @@
                 "~/.emacs.d/auto-install"
                 ) load-path))
 
-;;; 日本語の info のバスを設定
-;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xfz -
-;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
-;; * Elisp-ja: (elisp-ja).    Emacs Lisp Reference Manual(Japanese).
-;; * Emacs-ja: (emacs-ja).    The extensible self-documenting text editor(Japanese).
-(when (locate-library "info")
-  (autoload 'info "info" "Enter Info, the documentation browser." t)
-
-  (eval-after-load "info"
-    '(progn
-       (let ((info-dir (expand-file-name "~/.emacs.d/info")))
-         (when (and (file-directory-p info-dir) (file-readable-p info-dir)
-                    (boundp 'Info-directory-list))
-             (setq Info-directory-list (cons info-dir
-                                             Info-default-directory-list))
-             (message "Info-directory-list: %s" Info-directory-list)
-           (message "Loading %s (info)...done" this-file-name))))))
-
-;; Emacs info
-(defun emacs-info (&optional node)
-  "Read documentation for Emacs in the info system."
-  (interactive) (info (format "(emacs)%s" (or node ""))))
-
-;; Emacs info 日本語
-(defun emacs-ja-info (&optional node)
-  "Read documentation for Emacs-ja in the info system."
-  (interactive) (info (format "(emacs-ja)%s" (or node ""))))
-
-;; Emacs Lisp info
-(defun elisp-info (&optional node)
-  "Read documentation for Elisp in the info system."
-  (interactive) (info (format "(elisp)%s" (or node ""))))
-
-;; Emacs Lisp info 日本語
-(defun elisp-ja-info (&optional node)
-  "Read documentation for Elisp-ja in the info system."
-  (interactive) (info (format "(elisp-ja)%s" (or node ""))))
-
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
 
@@ -163,12 +125,6 @@
                             'euc-jp
                             'iso-2022-jp
                             'cp932)
-
-;;; 色
-;; reverse video に設定
-(set-face-foreground 'default "white")
-(set-face-background 'default "black")
-(setq frame-background-mode 'dark)
 
 ;;; フォントの設定
 ;; Linux と Windows で変える
@@ -204,33 +160,6 @@
   "Set default font in current buffer."
   (interactive)
   (buffer-face-set (font-face-attributes (frame-parameter nil 'font))))
-
-;;; フレームサイズ
-;; 幅  (frame-width)
-;; 高さ (frame-height)
-(when window-system
-  ;; 起動時のフレームサイズ
-  (if (= (x-display-pixel-height) 900)
-      ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-      (set-frame-size (selected-frame) 110 54)
-    (set-frame-size (selected-frame) 110 70))
-  ;; フレームサイズを動的に変更する
-  (defun resize-frame-interactively ()
-    "Resize frame interactively."
-    (interactive)
-    (let (key width height)
-      (catch 'quit
-        (while t
-          (setq width (frame-width) height (frame-height))
-          (message "Resize frame by [npfb] (%dx%d): " width height)
-          (setq key (read-event))
-          (cond
-           ((eq key ?f) (set-frame-width (selected-frame) (1+ width)))
-           ((eq key ?b) (set-frame-width (selected-frame) (1- width)))
-           ((eq key ?n) (set-frame-height (selected-frame) (1+ height)))
-           ((eq key ?p) (set-frame-height (selected-frame) (1- height)))
-           ((eq key ?q) (throw 'quit t)))))))
-  (define-key global-map (kbd "<f11>") 'resize-frame-interactively))
 
 ;;; タイトルバーにパス名またはバッファ名を表示
 (when window-system
@@ -347,11 +276,140 @@
     (setq-default mode-line-format
                   (cons lines-chars mode-line-format))))
 
+;;; 色
+;; reverse video に設定
+(set-face-foreground 'default "white")
+(set-face-background 'default "black")
+(setq frame-background-mode 'dark)
+
+;;; フレームサイズ
+;; 幅   (frame-width)
+;; 高さ (frame-height)
+(when window-system
+  ;; 起動時のフレームサイズ
+  (if (= 900 (x-display-pixel-height))
+      ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
+      (set-frame-size (selected-frame) 110 54)
+    (set-frame-size (selected-frame) 110 70))
+  ;; フレームサイズを動的に変更する
+  (defun resize-frame-interactively ()
+    "Resize frame interactively."
+    (interactive)
+    (let (key width height)
+      (catch 'quit
+        (while t
+          (setq width (frame-width) height (frame-height))
+          (message "Resize frame by [npfb] (%dx%d): " width height)
+          (setq key (read-event))
+          (cond
+           ((eq key ?f) (set-frame-width (selected-frame) (1+ width)))
+           ((eq key ?b) (set-frame-width (selected-frame) (1- width)))
+           ((eq key ?n) (set-frame-height (selected-frame) (1+ height)))
+           ((eq key ?p) (set-frame-height (selected-frame) (1- height)))
+           ((eq key ?q) (throw 'quit t)))))))
+  (define-key global-map (kbd "<f11>") 'resize-frame-interactively))
+
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
   (when (and (fboundp 'server-running-p)
              (fboundp 'server-start))
     (unless (server-running-p) (server-start))))
+
+;;; 日本語の info のバスを設定
+;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xfz -
+;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
+;; * Elisp-ja: (elisp-ja).    Emacs Lisp Reference Manual(Japanese).
+;; * Emacs-ja: (emacs-ja).    The extensible self-documenting text editor(Japanese).
+(when (locate-library "info")
+  (autoload 'info "info" "Enter Info, the documentation browser." t)
+
+  (eval-after-load "info"
+    '(progn
+       (let ((info-dir (expand-file-name "~/.emacs.d/info")))
+         (when (and (file-directory-p info-dir) (file-readable-p info-dir)
+                    (boundp 'Info-directory-list))
+           (setq Info-directory-list (cons info-dir
+                                           Info-default-directory-list))
+           (message "Info-directory-list: %s" Info-directory-list)))
+       ;; キーバインド
+       ;; 履歴 次へ (デフォルト: r)
+       (define-key Info-mode-map (kbd "<M-right>") 'Info-history-forward)
+       ;; 履歴 戻る (デフォルト: l)
+       (define-key Info-mode-map (kbd "<M-left>") 'Info-history-back)
+       (message "Loading %s (info)...done" this-file-name))))
+
+;; Emacs info
+(defun emacs-info (&optional node)
+  "Read documentation for Emacs-ja in the info system."
+  (interactive) (info (format "(emacs)%s" (or node ""))))
+;; Emacs info 日本語
+(defun emacs-ja-info (&optional node)
+  "Read documentation for Emacs-ja in the info system."
+  (interactive) (info (format "(emacs-ja)%s" (or node ""))))
+;; Emacs Lisp info
+(defun elisp-info (&optional node)
+  "Read documentation for Elisp in the info system."
+  (interactive) (info (format "(elisp)%s" (or node ""))))
+;; Emacs Lisp info 日本語
+(defun elisp-ja-info (&optional node)
+  "Read documentation for Elisp-ja in the info system."
+  (interactive) (info (format "(elisp-ja)%s" (or node ""))))
+
+;;; ミニバッファの入力補完
+;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/completing-help.el")
+(when (locate-library "completing-help")
+  (autoload 'completing-help-mode "completing-help"
+    "Toggle a facility to display information on completions." t)
+  (autoload 'turn-on-completing-help-mode "completing-help"
+    "Turn on a facility to display information on completions." t)
+  (autoload 'turn-off-completing-help-mode "completing-help"
+    "Turn off a facility to display information of completions." t))
+
+;;; マニュアルと info (iman)
+;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/iman.el")
+(when (locate-library "iman")
+  (autoload 'iman "iman" "call man & Info viewers with completion" t)
+  (add-hook 'iman-load-hook 'turn-on-completing-help-mode)
+
+  (eval-after-load "iman"
+    '(progn
+       (when (boundp 'iman-Man-index-command-and-args)
+         (setq iman-Man-index-command-and-args '("man" "-k" "[a-z]"))))))
+
+;;; マニュアル (man)
+(when (locate-library "man")
+  (autoload 'man "man" "Browse a UNIX manual pages." t)
+  (add-hook 'Man-mode-hook 'turn-on-completing-help-mode)
+
+  (eval-after-load "man"
+    '(progn
+       (set-face-foreground 'Man-overstrike "yellow")
+       (set-face-foreground 'Man-underline "green")
+       (set-face-foreground 'Man-reverse "pink"))))
+
+;;; マニュアル (woman)
+(when (locate-library "woman")
+  (autoload 'woman "woman"
+    "Decode and browse a UN*X man page." t)
+  (autoload 'woman-find-file "woman"
+    "Find, decode and browse a specific UN*X man-page file." t)
+  (autoload 'woman-dired-find-file "woman"
+    "In dired, run the WoMan man-page browser on this file." t)
+
+  (eval-after-load "woman"
+    '(progn
+       ;; キャッシュを作成 (更新は C-u を付ける)
+       (when (eval-and-compile (require 'woman nil t))
+         (when (boundp 'woman-cache-filename)
+           (setq woman-cache-filename (expand-file-name "~/.emacs.d/woman_cache.el"))))
+       ;; 新たにフレームは作らない
+       (when (boundp 'woman-use-own-frame)
+         (setq woman-use-own-frame nil))
+       ;; 色の設定
+       (set-face-foreground 'woman-italic "green")
+       (set-face-foreground 'woman-bold "yellow")
+       (set-face-foreground 'woman-addition "pink")
+       (set-face-foreground 'woman-unknown "blue"))))
 
 ;;; 番号付バックアップファイルを作る
 (setq version-control t)
@@ -744,6 +802,15 @@
   (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;;; ファイラ (dired)
+;; dired info
+(defun dired-info ()
+  "Read documentation for Emacs in the info system."
+  (interactive) (info "(emacs)Dired"))
+;; dired info 日本語
+(defun dired-ja-info ()
+  "Read documentation for Emacs in the info system."
+  (interactive) (info "(emacs-ja)Dired"))
+
 ;; dired でコマンドを実行する関数定義
 (defun dired-run-command (command)
   "Open file in command."
@@ -1047,6 +1114,15 @@
 
 ;;; カレンダ
 ;; (install-elisp "http://www.meadowy.org/meadow/netinstall/export/799/branches/3.00/pkginfo/japanese-holidays/japanese-holidays.el")
+;; calendar info
+(defun calendar-info ()
+  "Read documentation for Emacs in the info system."
+  (interactive) (info "(emacs)Calendar/Diary"))
+;; calendar info 日本語
+(defun calendar-ja-info ()
+  "Read documentation for Emacs in the info system."
+  (interactive) (info "(emacs-ja)Calendar/Diary"))
+
 (when (locate-library "calendar")
   (autoload 'calendar "calendar" "Calendar." t)
   ;; 行末空白強調表示, ヘッダ表示をしない
@@ -1541,41 +1617,38 @@
        ;; バッファ非表示
        (setq tabbar-buffer-list-function
              (lambda ()
-               (let ((case-fold-search nil) ; 大文字小文字の区別をする
-                     (nondisplay "\\*")
-                     (buffers '("\\(Messages\\)"
-                                "\\(scratch\\)"
-                                "\\(GTAGS SELECT\\)"
-                                "\\(woman\\)"
-                                "\\(man\\)"
-                                "\\(terminal\\)"
-                                "\\([e]?shell\\)"
-                                "\\(Help\\)"
-                                "\\(info\\)")))
-                 (dolist (buffer buffers)
-                   (setq nondisplay (concat nondisplay buffer "\\|")))
-                 (setq nondisplay (concat (substring nondisplay 0 -2) ".*"))
-                 (delq nil
-                       (mapcar
-                        (lambda (b)
-                          (cond
-                           ;; カレントバッファは表示
-                           ((eq (current-buffer) b) b)
-                           ;; * で始まる表示するバッファ
-                           ((string-match nondisplay (buffer-name b)) b)
-                           ;; それ以外の * で始まるバッファは非表示
-                           ((char-equal ?* (aref (buffer-name b) 0)) nil)
-                           ;; スペースで始まるバッファは非表示
-                           ((char-equal ?\x20 (aref (buffer-name b) 0)) nil)
-                           ;; .bash_history は非表示
-                           ((string= ".bash_history" (buffer-name b)) nil)
-                           ;; TAGS は非表示
-                           ((string= "TAGS" (buffer-name b)) nil)
-                           ;; それ以外は表示
-                           (t b)))
-                        (buffer-list))))))
-       (define-key global-map (kbd "<M-right>") 'tabbar-forward-tab)
-       (define-key global-map (kbd "<M-left>") 'tabbar-backward-tab)
+               (delq nil
+                     (mapcar
+                      (lambda (b)
+                        (cond
+                         ;; カレントバッファは表示
+                         ((eq (current-buffer) b) b)
+                         ;; * で始まる表示するバッファ
+                         ((string= "*Messages*" (buffer-name b)) b)
+                         ((string= "*scratch*" (buffer-name b)) b)
+                         ((string= "*info*" (buffer-name b)) b)
+                         ((string= "*Help*" (buffer-name b)) b)
+                         ((string-match
+                           "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
+                         ((string-match
+                           "\\*terminal.*\\*" (buffer-name b)) b)
+                         ((string-match
+                           "\\*[e]?shell.*\\*" (buffer-name b)) b)
+                         ((string-match
+                           "\\*\\(Wo\\)?Man[^(-Log)].*\\*" (buffer-name b)) b)
+                         ;; それ以外の * で始まるバッファは非表示
+                         ((char-equal ?* (aref (buffer-name b) 0)) nil)
+                         ;; スペースで始まるバッファは非表示
+                         ((char-equal ?\x20 (aref (buffer-name b) 0)) nil)
+                         ;; .bash_history は非表示
+                         ((string= ".bash_history" (buffer-name b)) nil)
+                         ;; TAGS は非表示
+                         ((string= "TAGS" (buffer-name b)) nil)
+                         ;; それ以外は表示
+                         (t b)))
+                      (buffer-list)))))
+       (define-key tabbar-mode-map (kbd "<C-S-right>") 'tabbar-forward-tab)
+       (define-key tabbar-mode-map (kbd "<C-S-left>") 'tabbar-backward-tab)
        (message "Loading %s (tabbar)...done" this-file-name))))
 
 ;;; 2chビューア (navi2ch)
@@ -2417,10 +2490,14 @@
 ;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
-;; emacs-w3m Info
+;; emacs-w3m info
 (defun w3m-info (&optional node)
   "Read documentation for Emacs in the info system."
-  (interactive) (info (format "(emacs-w3m-ja.info)%s" (or node ""))))
+  (interactive) (info (format "(emacs-w3m)%s" (or node ""))))
+;; emacs-w3m info 日本語
+(defun w3m-ja-info (&optional node)
+  "Read documentation for Emacs in the info system."
+  (interactive) (info (format "(emacs-w3m-ja)%s" (or node ""))))
 
 (when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
@@ -3319,4 +3396,5 @@
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
+
 
