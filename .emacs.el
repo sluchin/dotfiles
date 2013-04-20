@@ -309,12 +309,6 @@
            ((eq key ?q) (throw 'quit t)))))))
   (define-key global-map (kbd "<f11>") 'resize-frame-interactively))
 
-;;; サーバを起動する
-(when (eval-and-compile (require 'server nil t))
-  (when (and (fboundp 'server-running-p)
-             (fboundp 'server-start))
-    (unless (server-running-p) (server-start))))
-
 ;;; 日本語の info のバスを設定
 ;; wget -O- http://www.rubyist.net/~rubikitch/archive/emacs-elisp-info-ja.tgz | tar xfz -
 ;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
@@ -427,6 +421,12 @@
        (set-face-foreground 'woman-addition "pink")
        (set-face-foreground 'woman-unknown "blue")
        (message "Loading %s (woman)...done" this-file-name))))
+
+;;; サーバを起動する
+(when (eval-and-compile (require 'server nil t))
+  (when (and (fboundp 'server-running-p)
+             (fboundp 'server-start))
+    (unless (server-running-p) (server-start))))
 
 ;;; 番号付バックアップファイルを作る
 (setq version-control t)
@@ -715,6 +715,20 @@
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c d T") 'insert-date-time)
 
+;; デスクトップ復元
+(defun desktop-recover ()
+  (interactive)
+  (desktop-save-mode 1)
+  (desktop-read default-directory))
+(define-key global-map (kbd "<f10>") 'desktop-recover)
+
+;; デスクトップ保存
+(defun desktop-save* ()
+  (interactive)
+  (desktop-save-mode 1)
+  (desktop-save default-directory))
+(define-key global-map (kbd "<S-f10>") 'desktop-save*)
+
 ;; C-; で略語展開
 (setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
@@ -819,8 +833,8 @@
   (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;;; ファイラ (dired)
-;; dired info
 (when (locate-library "info")
+  ;; dired info
   (defun dired-info ()
     "Read documentation for Dired in the info system."
     (interactive) (info "(emacs)Dired"))
@@ -971,9 +985,17 @@
                    files)
              (revert-buffer))))
 
+       (defun dired-kill-buffer ()
+         "Kill dired current buffer."
+         (interactive)
+         (when (eq major-mode 'dired-mode)
+           (kill-buffer (current-buffer))))
+
        (when (boundp 'dired-mode-map)
          ;; バックアップファイル
          (define-key dired-mode-map (kbd "b") 'dired-make-backup)
+         ;; kill する
+         (define-key dired-mode-map (kbd "k") 'dired-kill-buffer)
          ;; 編集可能にする
          (when (locate-library "wdired")
            (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
@@ -1213,17 +1235,15 @@
        (message "Loading %s (calendar)...done" this-file-name))))
 
 ;;; 文書作成 (org-mode)
-;; Org-mode Reference Card
+;; org-mode Reference Card
 (defun org-reference ()
   "Open reference for Org-mode."
   (interactive) (find-file "~/.emacs.d/org/reference-card.org"))
 
-;; Org-mode 日本語 info
+;; org-mode 日本語 info
 ;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
 ;; * Org Mode Ja: (org-ja).    Outline-based notes management and organizer (Japanese).
 (when (locate-library "info")
-  ;; org-info 英語
-  ;; org-mode info 日本語
   (defun org-ja-info (&optional node)
     "Read documentation for Org-mode japanese in the info system."
     (interactive) (info (format "(org-ja)%s" (or node "")))))
@@ -1261,160 +1281,170 @@
         (find-file file)))))
 
 ;; org-mode 設定
-(when (and (locate-library "org")
-           (locate-library "org-agenda")
-           (locate-library "org-remember"))
+(when (locate-library "org")
   ;; 自動で org-mode にする
   (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (let ((hook (lambda ()
-              ;; 日付を英語で挿入する
-              (set (make-local-variable 'system-time-locale) "C")
-              ;; org-mode での強調表示を可能にする
-              (turn-on-font-lock))))
-    (add-hook 'org-mode-hook hook)
-    (add-hook 'org-remember-mode-hook hook))
-
-  (defadvice org-remember-apply-template
-    (before org-remember-locale
-            (&optional use-char skip-interactive) activate compile)
-    (set (make-local-variable 'system-time-locale) "C"))
-
-  (autoload 'org-sotre-link "org"
-    "Store an org-link to the current location." t)
-  (autoload 'org-agenda "org-agenda"
-    "Dynamic task and appointment lists for Org" t)
-  (autoload 'org-remember "org-remember"
-    "Fast note taking in Org-mode" t)
-  (autoload 'org-remember-code-reading
-    "org-remember" "Fast note taking in Org-mode for code reading" t)
-  (autoload 'org-iswitchb "org" "Switch between Org buffers." t)
-
-  (define-key global-map (kbd "C-c o l") 'org-store-link)
-  (define-key global-map (kbd "C-c o a") 'org-agenda)
-  (define-key global-map (kbd "C-c o r") 'org-remember)
-  (define-key global-map (kbd "C-c o c") 'org-remember-code-reading)
-  (define-key global-map (kbd "C-c o b") 'org-iswitchb)
 
   (defun org-dired ()
     "Open org file at dired."
     (interactive)
-    (when (and (require 'org-remember nil t)
+    (when (and (require 'org nil t)
                (boundp 'org-directory))
       (dired org-directory))
     ;; バックアップファイルを除外する (M-o)
     (when (and (require 'dired-x nil t)
                (fboundp 'dired-omit-mode))
       (dired-omit-mode 1)))
-  (define-key global-map (kbd "C-c o d") 'org-dired)
 
   (defun org-kill-buffer ()
     "Kill org-mode buffer."
     (interactive)
-    (let ((current (buffer-name (current-buffer))))
-      (dolist (buffer (buffer-list))
-        (when (and (require 'org nil t)
-                   (fboundp 'org-mode))
-          (switch-to-buffer buffer)
-          (when (and
-                 (not (string= (buffer-name buffer) current))
-                 (or (eq major-mode 'org-mode)
-                     (string-match
-                      "\\(\\*Org Agenda\\*\\)\\|\\( \\*Agenda Commands\\*\\)"
-                      (buffer-name buffer))))
-            (message "kill buffer: %s (%s)" buffer major-mode)
-            (when (buffer-live-p buffer)
-              (kill-buffer buffer)))))
-      (switch-to-buffer current)))
+    (when (and (require 'org nil t)
+               (fboundp 'org-mode))
+      (save-excursion
+        (save-window-excursion
+          (dolist (buffer (buffer-list))
+            (switch-to-buffer buffer)
+            (when (or (eq major-mode 'org-mode)
+                      (string-match
+                       "\\(\\*Org Agenda\\*\\)\\|\\( \\*Agenda Commands\\*\\)"
+                       (buffer-name buffer)))
+              (message "kill buffer: %s (%s)" buffer major-mode)
+              (when (buffer-live-p buffer)
+                (kill-buffer buffer))))))))
+
+  (autoload 'org-sotre-link "org"
+    "Store an org-link to the current location." t)
+  (autoload 'org-iswitchb "org" "Switch between Org buffers." t)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              ;; 日付を英語で挿入する
+              (set (make-local-variable 'system-time-locale) "C")
+              ;; org-mode での強調表示を可能にする
+              (turn-on-font-lock)))
+  (define-key global-map (kbd "C-c o d") 'org-dired)
   (define-key global-map (kbd "C-c o k") 'org-kill-buffer)
+  (define-key global-map (kbd "C-c o l") 'org-store-link)
+  (define-key global-map (kbd "C-c o b") 'org-iswitchb)
 
   (eval-after-load "org"
     '(progn
-       ;; org-mode
        (when (boundp 'org-hide-leading-stars)  ; 見出しの余分な * を消す
          (setq org-hide-leading-stars t))
        (when (boundp 'org-return-follows-link) ; RET でカーソル下のリンクを開く
          (setq org-return-follows-link t))
        (when (boundp 'org-startup-truncated)   ; 行の折り返し
          (setq org-startup-truncated nil))
+       (when (boundp 'org-directory)           ; ディレクトリ
+         (setq org-directory (catch 'found (find-directory "org")))
+         (message "org-directory: %s" org-directory))
+         (when (boundp 'org-default-notes-file) ; ファイル名
+           (setq org-default-notes-file
+                 (concat (file-name-as-directory org-directory) "agenda.org"))
+           (message "org-default-notes-file: %s" org-default-notes-file))
        ;; Todo で使用するキーワードを定義。
        (when (boundp 'org-todo-keywords)
          (setq org-todo-keywords
                '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "|"
                            "CANCELED(c)"))))
-       ;; org-remember
-       (when (and (eval-and-compile (require 'org-remember nil t))
+       (message "Loading %s (org)...done" this-file-name))))
+
+;; org-agenda 設定
+(when (locate-library "org-agenda")
+  (autoload 'org-agenda "org-agenda"
+    "Dynamic task and appointment lists for Org" t)
+  (define-key global-map (kbd "C-c o a") 'org-agenda)
+
+  (eval-after-load "org-agenda"
+    '(progn
+       (when (and (boundp 'org-agenda-files)
                   (boundp 'org-directory))
-         (setq org-directory (catch 'found (find-directory "org")))
-         (message "org-directory: %s" org-directory)
-
-         (when (boundp 'org-default-notes-file)  ; ファイル名
-           (setq org-default-notes-file
-                 (concat (file-name-as-directory org-directory) "agenda.org"))
-           (message "org-default-notes-file: %s" org-default-notes-file))
-
-         (when (boundp 'org-remember-templates)  ; テンプレート
-           (let* ((setq org-tags-overlay)
-                  (dir (file-name-as-directory org-directory))
-                  (book-tmpl "~/.emacs.d/org/templates/book.txt")
-                  (journal-file (concat dir "journal.org"))
-                  (emacs-file (concat dir "emacs.org"))
-                  (memo-file (concat dir "memo.org"))
-                  (book-file (concat dir "book.org"))
-                  (private-file (concat dir "private.org"))
-                  (book-string (concat "** %^{Brief Description} "
-                                "%U  :BOOK:\n"
-                                (if (file-readable-p book-tmpl)
-                                    (format "%%[%s]" book-tmpl) "") "\n")))
-             (setq org-remember-templates
-                   (list (list "Todo"    ?t
-                               "** TODO %^{Brief Description}\n%?\nAdded: %U\n"
-                               nil "Tasks")
-                         (list "Bug"     ?b
-                               "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
-                               nil "Tasks")
-                         (list "Idea"    ?i
-                               "** %^{Idea} %U\n%i%?\n" nil "Ideas")
-                         (list "Journal" ?j
-                               "** %^{Head Line} %U\n%i%?\n"
-                               journal-file "Inbox")
-                         (list "Emacs"   ?e
-                               "** %^{Title} %U\n%a\n%i%?\n"
-                               emacs-file "Emacs")
-                         (list "Memo"    ?m
-                               "** %^{Title} %U\n%a\n%i%?\n"
-                               memo-file "Memo")
-                         (list "Private" ?p
-                               "** %^{Topic} %U \n%i%?\n" private-file "Private")
-                         (list "Book"    ?k book-string book-file "Books")))))
-         (when (fboundp 'org-remember-insinuate) ; 初期化
-           (org-remember-insinuate))
-
-         ;; ソースコードを読みメモする
-         (defun org-remember-code-reading ()
-           "When code reading, org-remember mode."
-           (interactive)
-           (when (and (boundp 'org-directory)
-                      (boundp 'org-default-notes-file)
-                      (boundp 'org-remember-templates))
-             (let* ((system-time-locale "C")
-                    (dir (file-name-as-directory org-directory))
-                    (file (concat dir "code-reading.org"))
-                    (string
-                     (concat "** ["
-                             (substring (symbol-name major-mode) 0 -5)
-                             "] %^{Title} %U\n%a\n%i%?\n"))
-                    (org-remember-templates
-                     (list (list "CodeReading" ?r string file "Code Reading"))))
-               (message "org-remember-code-reading: %s" file)
-               (org-remember)))))
-
-       ;; org-agenda
-       (when (and (eval-and-compile (require 'org-agenda nil t))
-                  (boundp 'org-agenda-files))
          ;; 対象ファイル
          (setq org-agenda-files (list org-directory)))
+       (message "Loading %s (org-agenda)...done" this-file-name))))
 
-       (message "Loading %s (org)...done" this-file-name))))
+;; org-remember 設定
+(when (locate-library "org-remember")
+  ;; ロケールを C にする
+  (defadvice org-remember-apply-template
+    (before org-remember-locale
+            (&optional use-char skip-interactive) activate compile)
+    (set (make-local-variable 'system-time-locale) "C"))
+
+  ;; ソースコードを読みメモする
+  (defun org-remember-code-reading ()
+    "When code reading, org-remember mode."
+    (interactive)
+    (when (and (require 'org-remember nil t)
+               (boundp 'org-directory)
+               (boundp 'org-default-notes-file)
+               (boundp 'org-remember-templates))
+      (let* ((system-time-locale "C")
+             (dir (file-name-as-directory org-directory))
+             (file (concat dir "code-reading.org"))
+             (string
+              (concat "** ["
+                      (substring (symbol-name major-mode) 0 -5)
+                      "] %^{Title} %U\n%a\n%i%?\n"))
+             (org-remember-templates
+              (list (list "CodeReading" ?r string file "Code Reading"))))
+        (message "org-remember-code-reading: %s" file)
+        (when (fboundp 'org-remember)
+          (org-remember)))))
+
+  (autoload 'org-remember "org-remember"
+    "Fast note taking in Org-mode" t)
+  (autoload 'org-remember-code-reading
+    "org-remember" "Fast note taking in Org-mode for code reading" t)
+  (add-hook 'org-remember-mode-hook
+            (lambda ()
+              ;; 日付を英語で挿入する
+              (set (make-local-variable 'system-time-locale) "C")
+              ;; org-mode での強調表示を可能にする
+              (turn-on-font-lock)))
+  (define-key global-map (kbd "C-c o r") 'org-remember)
+  (define-key global-map (kbd "C-c o c") 'org-remember-code-reading)
+
+  (eval-after-load "org-remember"
+    '(progn
+       ;; テンプレート
+       (when (boundp 'org-remember-templates)
+         (let* ((setq org-tags-overlay)
+                (dir (file-name-as-directory org-directory))
+                (book-tmpl "~/.emacs.d/org/templates/book.txt")
+                (journal-file (concat dir "journal.org"))
+                (emacs-file (concat dir "emacs.org"))
+                (memo-file (concat dir "memo.org"))
+                (book-file (concat dir "book.org"))
+                (private-file (concat dir "private.org"))
+                (book-string (concat "** %^{Brief Description} "
+                                     "%U  :BOOK:\n"
+                                     (if (file-readable-p book-tmpl)
+                                         (format "%%[%s]" book-tmpl) "") "\n")))
+           (setq org-remember-templates
+                 (list (list "Todo"    ?t
+                             "** TODO %^{Title}\n%?\nAdded: %U\n"
+                             nil "Tasks")
+                       (list "Bug"     ?b
+                             "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
+                             nil "Tasks")
+                       (list "Idea"    ?i
+                             "** %^{Idea} %U\n%i%?\n" nil "Ideas")
+                       (list "Journal" ?j
+                             "** %^{Head Line} %U\n%i%?\n"
+                             journal-file "Inbox")
+                       (list "Emacs"   ?e
+                             "** %^{Title} %U\n%a\n%i%?\n"
+                             emacs-file "Emacs")
+                       (list "Memo"    ?m
+                             "** %^{Title} %U\n%a\n%i%?\n"
+                             memo-file "Memo")
+                       (list "Private" ?p
+                             "** %^{Topic} %U \n%i%?\n" private-file "Private")
+                       (list "Book"    ?k book-string book-file "Books")))))
+       (when (fboundp 'org-remember-insinuate) ; 初期化
+         (org-remember-insinuate))
+       (message "Loading %s (org-remember)...done" this-file-name))))
 
 ;;; ファイル内のカーソル位置を記録する
 (when (eval-and-compile (require 'saveplace nil t))
@@ -1483,8 +1513,12 @@
 (when (eval-and-compile (require 'thing-opt nil t))
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
-  (keyboard-translate ?\C-i ?\H-i)
-  (define-key emacs-lisp-mode-map (kbd "H-i") 'mark-symbol)      ; シンボル
+  ;; シンボル
+  (if window-system
+      (progn
+        (keyboard-translate ?\C-i ?\H-i)
+        (define-key emacs-lisp-mode-map (kbd "H-i") 'mark-symbol))
+    (define-key emacs-lisp-mode-map (kbd "C-c C-i") 'mark-symbol))
   (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
   (define-key global-map (kbd "C-c C-w") 'mark-word*)            ; 単語選択
   (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
@@ -3355,6 +3389,9 @@
              (goto-char (point-min))
              (while (search-forward "&#39;" nil t)
                (replace-match ""))
+             (goto-char (point-min))
+             (while (search-forward "&amp;" nil t)
+               (replace-match "&"))
              (write-file file))
            (switch-to-buffer file)
            (delete-other-windows))
