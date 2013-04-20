@@ -23,10 +23,6 @@
 ;; (define-key global-map (kbd "C-c p s") 'pomodoro-save)
 ;; (define-key global-map (kbd "C-c p t") 'pomodoro-save-time)
 ;; (define-key global-map (kbd "C-c p q") 'pomodoro-stop)
-;;
-;; (eval-after-load "pomodoro-technique"
-;;   '(progn
-;;      (add-hook 'kill-emacs-hook 'pomodoro-save-time)))
 
 
 (eval-and-compile (require 'org nil t))
@@ -76,7 +72,6 @@
 (defvar pomodoro-work-time         0)  ; トータル仕事時間 (秒)
 (defvar pomodoro-rest-time         0)  ; トータル休憩時間 (秒)
 (defvar pomodoro-count             0)  ; 回数
-(defvar pomodoro-recovery-info   nil)  ; リカバリ情報
 (defvar pomodoro-start-time       "")  ; 開始時間
 
 ;; アイコンディレクトリ
@@ -191,24 +186,26 @@
   "Recovery pomodoro timer from saved file."
   (if (file-readable-p pomodoro-status-file)
       (progn
-        (load-file pomodoro-status-file)
-        (setq pomodoro-status
-              (cdr (assq 'pomodoro-status pomodoro-recovery-info)))
-        (setq pomodoro-current-time
-              (cdr (assq 'pomodoro-current-time pomodoro-recovery-info)))
-        (setq pomodoro-work-time
-              (cdr (assq 'pomodoro-work-time pomodoro-recovery-info)))
-        (setq pomodoro-rest-time
-              (cdr (assq 'pomodoro-rest-time pomodoro-recovery-info)))
-        (setq pomodoro-count
-              (cdr (assq 'pomodoro-count pomodoro-recovery-info)))
-        (setq pomodoro-start-time
-              (cdr (assq 'pomodoro-start-time pomodoro-recovery-info)))
-        (setq pomodoro-time-list
-              (cdr (assq 'pomodoro-time-list pomodoro-recovery-info)))
-        (message "status=%s current=%s count=%s time=%s"
-                 pomodoro-status pomodoro-current-time
-                 pomodoro-count pomodoro-time-list))
+        (let (lst)
+          (with-temp-buffer
+            (insert-file-contents pomodoro-status-file)
+            (setq lst (read (current-buffer))))
+          (message "%s" lst)
+          (setq pomodoro-status
+                (cdr (assq 'pomodoro-status lst)))
+          (setq pomodoro-current-time
+                (cdr (assq 'pomodoro-current-time lst)))
+          (setq pomodoro-work-time
+                (cdr (assq 'pomodoro-work-time lst)))
+          (setq pomodoro-rest-time
+                (cdr (assq 'pomodoro-rest-time lst)))
+          (setq pomodoro-count
+                (cdr (assq 'pomodoro-count lst)))
+          (setq pomodoro-start-time
+                (cdr (assq 'pomodoro-start-time lst)))
+          (setq pomodoro-time-list
+                (cdr (assq 'pomodoro-time-list lst)))
+          (print-pomodoro)))
     (pomodoro-start)
     (message "no %s exists" pomodoro-status-file)))
 
@@ -406,21 +403,19 @@
   "Save status."
   (interactive)
   (with-temp-buffer
-    (insert ";;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-\n")
-    (insert "(setq pomodoro-recovery-info\n")
-    (insert (format "  '((pomodoro-status  . %s)\n"
+    (insert (format "((pomodoro-status  . %s) "
                     pomodoro-status))
-    (insert (format "    (pomodoro-current-time . %d)\n"
+    (insert (format "(pomodoro-current-time . %d) "
                     pomodoro-current-time))
-    (insert (format "    (pomodoro-work-time . %d)\n"
+    (insert (format "(pomodoro-work-time . %d) "
                     pomodoro-work-time))
-    (insert (format "    (pomodoro-rest-time . %d)\n"
+    (insert (format "(pomodoro-rest-time . %d) "
                     pomodoro-rest-time))
-    (insert (format "    (pomodoro-count . %d)\n"
+    (insert (format "(pomodoro-count . %d) "
                     pomodoro-count))
-    (insert (format "    (pomodoro-start-time . \"%s\")\n"
+    (insert (format "(pomodoro-start-time . \"%s\") "
                     pomodoro-start-time))
-    (insert (format "    (pomodoro-time-list . %s)))\n"
+    (insert (format "(pomodoro-time-list . %s))"
                     pomodoro-time-list))
     (write-file pomodoro-status-file)))
 
@@ -436,15 +431,31 @@
 (defun print-pomodoro ()
   "Print status."
   (interactive)
-  (message "Current=%s(%d) Pomodoro=%d Status=%s Start=\"%s\" Total=%s(%d) Work=%s(%d) Time=%s"
+  (message "%s=%s(%d) %s=%d %s=%s %s=\"%s\" %s=%s(%d) %s=%s(%d) %s=%s"
+           "Current"
            (pomodoro-min-sec pomodoro-current-time)
            pomodoro-current-time
+           "Pomodoro"
            pomodoro-count
+           "Status"
            pomodoro-status
+           "Start"
            pomodoro-start-time
+           "Total"
            (pomodoro-hour-min-sec (+ pomodoro-work-time pomodoro-rest-time))
            (+ pomodoro-work-time pomodoro-rest-time)
+           "Work"
            (pomodoro-hour-min-sec pomodoro-work-time)
-           pomodoro-work-time pomodoro-time-list))
+           pomodoro-work-time
+           "Time"
+           pomodoro-time-list))
+
+(add-hook 'kill-emacs-hook 'pomodoro-save-time)
+
+(defun pomodoro-no-save-kill-emacs ()
+  "Pomodoro no save kill emacs."
+  (interactive)
+  (remove-hook 'kill-emacs-hook 'pomodoro-save-time)
+  (kill-emacs))
 
 (provide 'pomodoro)

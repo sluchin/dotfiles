@@ -2186,7 +2186,6 @@
                (concat (file-name-as-directory
                         (catch 'found (find-directory "pomodoro")))
                        ".pomodoro")))
-       (add-hook 'kill-emacs-hook 'pomodoro-save-time)
        (message "Loading %s (pomodoro-technique)...done" this-file-name))))
 
 ;; (install-elisp "https://raw.github.com/syohex/emacs-utils/master/pomodoro.el")
