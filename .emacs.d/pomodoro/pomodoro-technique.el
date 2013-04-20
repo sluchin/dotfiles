@@ -2,6 +2,7 @@
 ;;; pomodoro-technique.el --- Pomodoro timer
 
 ;; Copyright (C) 2013
+
 ;; Author: Tetsuya Higashi
 
 ;; (autoload 'pomodoro-start
@@ -24,6 +25,7 @@
 ;; (define-key global-map (kbd "C-c p t") 'pomodoro-save-time)
 ;; (define-key global-map (kbd "C-c p q") 'pomodoro-stop)
 
+;; Code:
 
 (eval-and-compile (require 'org nil t))
 
