@@ -37,7 +37,7 @@
       (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time)))))
 
 ;; require 時間表示
-(defun print-benchmark ()
+(defun print-require-benchmark ()
   "Print benchmark."
   (interactive)
   (let ((all 0.0))
@@ -47,7 +47,7 @@
     (message "%-18s %.6f" "all" all)))
 
 ;; ロード履歴の表示
-(defun print-load ()
+(defun print-load-file ()
   "Print load-history."
   (interactive)
   (let ((all 0.0))
@@ -332,60 +332,69 @@
                                            Info-default-directory-list))
            (message "Info-directory-list: %s" Info-directory-list)))
        ;; キーバインド
-       ;; 履歴 次へ (デフォルト: r)
-       (define-key Info-mode-map (kbd "<M-right>") 'Info-history-forward)
-       ;; 履歴 戻る (デフォルト: l)
-       (define-key Info-mode-map (kbd "<M-left>") 'Info-history-back)
+       (when (boundp 'Info-mode-map)
+         ;; 履歴 次へ (デフォルト: r)
+         (define-key Info-mode-map (kbd "<M-right>") 'Info-history-forward)
+         ;; 履歴 戻る (デフォルト: l)
+         (define-key Info-mode-map (kbd "<M-left>") 'Info-history-back))
        (message "Loading %s (info)...done" this-file-name))))
 
-;; Emacs info
-(defun emacs-info (&optional node)
-  "Read documentation for Emacs-ja in the info system."
-  (interactive) (info (format "(emacs)%s" (or node ""))))
-;; Emacs info 日本語
-(defun emacs-ja-info (&optional node)
-  "Read documentation for Emacs-ja in the info system."
-  (interactive) (info (format "(emacs-ja)%s" (or node ""))))
-;; Emacs Lisp info
-(defun elisp-info (&optional node)
-  "Read documentation for Elisp in the info system."
-  (interactive) (info (format "(elisp)%s" (or node ""))))
-;; Emacs Lisp info 日本語
-(defun elisp-ja-info (&optional node)
-  "Read documentation for Elisp-ja in the info system."
-  (interactive) (info (format "(elisp-ja)%s" (or node ""))))
-
-;;; ミニバッファの入力補完
-;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/completing-help.el")
-(when (locate-library "completing-help")
-  (autoload 'completing-help-mode "completing-help"
-    "Toggle a facility to display information on completions." t)
-  (autoload 'turn-on-completing-help-mode "completing-help"
-    "Turn on a facility to display information on completions." t)
-  (autoload 'turn-off-completing-help-mode "completing-help"
-    "Turn off a facility to display information of completions." t))
-
-;;; マニュアルと info (iman)
-;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/iman.el")
-(when (locate-library "iman")
-  (autoload 'iman "iman" "call man & Info viewers with completion" t)
-  (add-hook 'iman-load-hook 'turn-on-completing-help-mode)
-
-  (eval-after-load "iman"
-    '(progn
-       (when (boundp 'iman-Man-index-command-and-args)
-         (setq iman-Man-index-command-and-args '("man" "-k" "[a-z]"))))))
+(when (locate-library "info")
+  ;; Emacs info
+  (defun emacs-info (&optional node)
+    "Read documentation for Emacs in the info system."
+    (interactive) (info (format "(emacs)%s" (or node ""))))
+  ;; Emacs info 日本語
+  (defun emacs-ja-info (&optional node)
+    "Read documentation for Emacs-ja in the info system."
+    (interactive) (info (format "(emacs-ja)%s" (or node ""))))
+  ;; Emacs Lisp info
+  (defun elisp-info (&optional node)
+    "Read documentation for Elisp in the info system."
+    (interactive) (info (format "(elisp)%s" (or node ""))))
+  ;; Emacs Lisp info 日本語
+  (defun elisp-ja-info (&optional node)
+    "Read documentation for Elisp-ja in the info system."
+    (interactive) (info (format "(elisp-ja)%s" (or node "")))))
 
 ;;; マニュアル (man)
 (when (locate-library "man")
   (autoload 'man "man" "Browse a UNIX manual pages." t)
   (add-hook 'Man-mode-hook 'turn-on-completing-help-mode)
+  (define-key global-map (kbd "<f1>")
+    (lambda () (interactive) (manual-entry (current-word))))
 
   (eval-after-load "man"
     '(progn
+       ;; バグ修正
+       (defun Man-next-section (n)
+         "Move point to Nth next section (default 1)."
+         (interactive "p")
+         (when (boundp 'Man-heading-regexp)
+           (let ((case-fold-search nil)
+                 (start (point)))
+             (if (looking-at Man-heading-regexp)
+                 (forward-line 1))
+             (if (re-search-forward Man-heading-regexp (point-max) t n)
+                 (beginning-of-line)
+               (goto-char (point-max)))
+             (if (< (point) start) (goto-char start)))))
+
+       ;; r で関連項目へジャンプ
+       (when (boundp 'Man-see-also-regexp)
+         (setq Man-see-also-regexp "\\(SEE ALSO\\)\\|\\(関連項目\\)"))
+       ;; 各ヘッダ間を n, p でジャンプ
+       (when (boundp 'Man-first-heading-regexp)
+         (setq
+          Man-first-heading-regexp
+          "^[ \t]*NAME$\\|^[ \t]*名[前称]$\\|^[ \t]*No manual entry fo.*$"))
+       (when (boundp 'Man-heading-regexp)
+         (setq Man-heading-regexp
+               "^\\([A-Zーぁ-んァ-ヶ亜-瑤][A-Zーぁ-んァ-ヶ亜-瑤 \t]+\\)$"))
        (set-face-foreground 'Man-overstrike "yellow")
        (set-face-foreground 'Man-underline "green")
-       (set-face-foreground 'Man-reverse "pink"))))
+       (set-face-foreground 'Man-reverse "pink")
+       (message "Loading %s (man)...done" this-file-name))))
 
 ;;; マニュアル (woman)
 (when (locate-library "woman")
@@ -395,13 +404,20 @@
     "Find, decode and browse a specific UN*X man-page file." t)
   (autoload 'woman-dired-find-file "woman"
     "In dired, run the WoMan man-page browser on this file." t)
+  (define-key global-map (kbd "<S-f1>")
+    (lambda () (interactive) (woman (current-word))))
 
   (eval-after-load "woman"
     '(progn
+       ;; man パスの設定
+       (when (boundp 'woman-manpath)
+         (setq woman-manpath '("/usr/share/man/ja"
+                               "/usr/share/man"
+                               "/usr/local/share/man")))
        ;; キャッシュを作成 (更新は C-u を付ける)
-       (when (eval-and-compile (require 'woman nil t))
-         (when (boundp 'woman-cache-filename)
-           (setq woman-cache-filename (expand-file-name "~/.emacs.d/woman_cache.el"))))
+       (when (boundp 'woman-cache-filename)
+         (setq woman-cache-filename
+               (expand-file-name "~/.emacs.d/woman_cache.el")))
        ;; 新たにフレームは作らない
        (when (boundp 'woman-use-own-frame)
          (setq woman-use-own-frame nil))
@@ -409,7 +425,8 @@
        (set-face-foreground 'woman-italic "green")
        (set-face-foreground 'woman-bold "yellow")
        (set-face-foreground 'woman-addition "pink")
-       (set-face-foreground 'woman-unknown "blue"))))
+       (set-face-foreground 'woman-unknown "blue")
+       (message "Loading %s (woman)...done" this-file-name))))
 
 ;;; 番号付バックアップファイルを作る
 (setq version-control t)
@@ -594,7 +611,7 @@
         (setq lst (append lst (list m)))))
     (setq mark-ring lst))
   (message "%s - %s" (point) mark-ring))
-(define-key global-map (kbd "C-2") 'delete-mark-ring)
+(define-key global-map (kbd "M-2") 'delete-mark-ring)
 
 ;; mark-ring を全削除
 (defun clear-mark-ring ()
@@ -693,7 +710,7 @@
 
 ;; 時間挿入
 (defun insert-date-time ()
-  "Insert time."
+  "Insert date and time."
   (interactive)
   (insert (format-time-string "%H:%M:%S")))
 (define-key global-map (kbd "C-c d T") 'insert-date-time)
@@ -713,7 +730,7 @@
 (define-key global-map (kbd "C-;") 'hippie-expand)
 
 ;; lisp 補完
-;; Tab で補完 (デフォルト: M-Tab)
+;; Tab で補完 (デフォルト: M-Tab または C-i)
 (when (boundp 'emacs-lisp-mode-map)
   (define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol))
 (when (boundp 'lisp-interaction-mode-map)
@@ -724,7 +741,7 @@
   (define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol))
 
 ;; 改行と同時にインデントも行う
-(define-key global-map (kbd "C-m") 'newline-and-indent)
+(define-key global-map (kbd "RET") 'newline-and-indent)
 
 ;; find-function のキー割り当て
 ;; C-x F 関数, C-x V 変数, C-x K キー割り当てコマンド
@@ -803,13 +820,14 @@
 
 ;;; ファイラ (dired)
 ;; dired info
-(defun dired-info ()
-  "Read documentation for Emacs in the info system."
-  (interactive) (info "(emacs)Dired"))
-;; dired info 日本語
-(defun dired-ja-info ()
-  "Read documentation for Emacs in the info system."
-  (interactive) (info "(emacs-ja)Dired"))
+(when (locate-library "info")
+  (defun dired-info ()
+    "Read documentation for Dired in the info system."
+    (interactive) (info "(emacs)Dired"))
+  ;; dired info 日本語
+  (defun dired-ja-info ()
+    "Read documentation for Dired japanese in the info system."
+    (interactive) (info "(emacs-ja)Dired")))
 
 ;; dired でコマンドを実行する関数定義
 (defun dired-run-command (command)
@@ -864,23 +882,31 @@
        ;; firefox で開く
        (when (and (executable-find "firefox")
                   (boundp 'dired-mode-map))
-         (define-key dired-mode-map (kbd "C-f")
-           (lambda () (interactive) (dired-run-command "firefox"))))
+         (defun dired-run-firefox ()
+           "Run firefox."
+           (interactive) (dired-run-command "firefox"))
+         (define-key dired-mode-map (kbd "C-f") 'dired-run-firefox))
        ;; libreoffice で開く
        (when (and (executable-find "libreoffice")
                   (boundp 'dired-mode-map))
-         (define-key dired-mode-map (kbd "C-l")
-           (lambda () (interactive) (dired-run-command "libreoffice"))))
+         (defun dired-run-libreoffice ()
+           "Run libreoffice."
+           (interactive) (dired-run-command "libreoffice"))
+         (define-key dired-mode-map (kbd "C-l") 'dired-run-libreoffice))
        ;; evince で開く
        (when (and (executable-find "evince")
                   (boundp 'dired-mode-map))
-         (define-key dired-mode-map (kbd "C-e")
-           (lambda () (interactive) (dired-run-command "evince"))))
+         (defun dired-run-evince ()
+           "Run evince."
+           (interactive) (dired-run-command "evince"))
+         (define-key dired-mode-map (kbd "C-e") 'dired-run-evince))
        ;; vlc で開く
        (when (and (executable-find "vlc")
                   (boundp 'dired-mode-map))
-         (define-key dired-mode-map (kbd "C-v")
-           (lambda () (interactive) (dired-run-command "vlc"))))
+         (defun dired-run-vlc ()
+           "Run vlc."
+           (interactive) (dired-run-command "vlc"))
+         (define-key dired-mode-map (kbd "C-v") 'dired-run-vlc))
        ;; w3m で開く
        (when (and (executable-find "w3m") (locate-library "w3m"))
          (autoload 'w3m-find-file "w3m" "Function used to open FILE" t)
@@ -1115,13 +1141,14 @@
 ;;; カレンダ
 ;; (install-elisp "http://www.meadowy.org/meadow/netinstall/export/799/branches/3.00/pkginfo/japanese-holidays/japanese-holidays.el")
 ;; calendar info
-(defun calendar-info ()
-  "Read documentation for Emacs in the info system."
-  (interactive) (info "(emacs)Calendar/Diary"))
-;; calendar info 日本語
-(defun calendar-ja-info ()
-  "Read documentation for Emacs in the info system."
-  (interactive) (info "(emacs-ja)Calendar/Diary"))
+(when (locate-library "info")
+  (defun calendar-info ()
+    "Read documentation for Calendar/Diary in the info system."
+    (interactive) (info "(emacs)Calendar/Diary"))
+  ;; calendar info 日本語
+  (defun calendar-ja-info ()
+    "Read documentation for Calendar/Diary japanese in the info system."
+    (interactive) (info "(emacs-ja)Calendar/Diary")))
 
 (when (locate-library "calendar")
   (autoload 'calendar "calendar" "Calendar." t)
@@ -1194,9 +1221,12 @@
 ;; Org-mode 日本語 info
 ;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
 ;; * Org Mode Ja: (org-ja).    Outline-based notes management and organizer (Japanese).
-(defun org-ja-info (&optional node)
-  "Read documentation for Org-mode(japanese) in the info system."
-  (interactive) (info (format "(org-ja)%s" (or node ""))))
+(when (locate-library "info")
+  ;; org-info 英語
+  ;; org-mode info 日本語
+  (defun org-ja-info (&optional node)
+    "Read documentation for Org-mode japanese in the info system."
+    (interactive) (info (format "(org-ja)%s" (or node "")))))
 
 ;; 仕事用 GTD ファイルを開く
 (defun gtd ()
@@ -1415,6 +1445,7 @@
     "Install an elisp file from a given url." t)
   (autoload 'install-elisp-from-emacswiki "auto-install"
     "Install an elisp file from EmacsWiki.org." t)
+
   (eval-after-load "auto-install"
     '(progn
        ;; 起動時に EmacsWiki のページ名を補完候補に加える
@@ -1422,17 +1453,41 @@
          (auto-install-update-emacswiki-package-name t))
        ;; install-elisp.el 互換モードにする
        (when (fboundp 'auto-install-compatibility-setup)
-         (auto-install-compatibility-setup)))))
+         (auto-install-compatibility-setup))
+       (message "Loading %s (auto-install)...done" this-file-name))))
+
+;;; ミニバッファの入力補完
+;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/completing-help.el")
+(when (locate-library "completing-help")
+  (autoload 'completing-help-mode "completing-help"
+    "Toggle a facility to display information on completions." t)
+  (autoload 'turn-on-completing-help-mode "completing-help"
+    "Turn on a facility to display information on completions." t)
+  (autoload 'turn-off-completing-help-mode "completing-help"
+    "Turn off a facility to display information of completions." t))
+
+;;; マニュアルと info (iman)
+;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/iman.el")
+(when (locate-library "iman")
+  (autoload 'iman "iman" "call man & Info viewers with completion" t)
+  (add-hook 'iman-load-hook 'turn-on-completing-help-mode)
+
+  (eval-after-load "iman"
+    '(progn
+       (when (boundp 'iman-Man-index-command-and-args)
+         (setq iman-Man-index-command-and-args '("man" "-k" "[a-z]")))
+       (message "Loading %s (iman)...done" this-file-name))))
 
 ;;; 単語選択 (デフォルト: M-@)
 ;; (install-elisp-from-emacswiki "thing-opt.el")
 (when (eval-and-compile (require 'thing-opt nil t))
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
-  (define-key global-map (kbd "C-c C-w") 'mark-word*)   ; 単語選択
-  (define-key global-map (kbd "C-1") 'mark-symbol)      ; シンボル
-  (define-key global-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
-  (define-key global-map (kbd "C-c C-s") 'mark-string)) ; 文字列選択
+  (keyboard-translate ?\C-i ?\H-i)
+  (define-key emacs-lisp-mode-map (kbd "H-i") 'mark-symbol)      ; シンボル
+  (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
+  (define-key global-map (kbd "C-c C-w") 'mark-word*)            ; 単語選択
+  (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
 
 ;;; 検索
 ;; (install-elisp-from-emacswiki "grep-edit.el")
@@ -2035,7 +2090,8 @@
     '(progn
        ;; バイトコンパイルしないファイル
        (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
-         (setq auto-async-byte-compile-exclude-files-regexp "/junk/"))
+         (setq auto-async-byte-compile-exclude-files-regexp
+               "\\(/junk/\\)\\|\\(/woman_cache.el$\\)"))
        (message "Loading %s (auto-async-byte-compile)...done" this-file-name))))
 
 ;;; *Help* にメモを書き込む
@@ -2260,9 +2316,10 @@
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
 ;; Mew info
-(defun mew-info (&optional node)
-  "Read documentation for Emacs in the info system."
-  (interactive) (info (format "(mew.jis.info)%s" (or node ""))))
+(when (locate-library "info")
+  (defun mew-info (&optional node)
+    "Read documentation for Mew in the info system."
+    (interactive) (info (format "(mew.jis.info)%s" (or node "")))))
 
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
@@ -2491,13 +2548,15 @@
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
 ;; emacs-w3m info
-(defun w3m-info (&optional node)
-  "Read documentation for Emacs in the info system."
-  (interactive) (info (format "(emacs-w3m)%s" (or node ""))))
-;; emacs-w3m info 日本語
-(defun w3m-ja-info (&optional node)
-  "Read documentation for Emacs in the info system."
-  (interactive) (info (format "(emacs-w3m-ja)%s" (or node ""))))
+(when (locate-library "info")
+  ;; emacs-w3m info
+  (defun w3m-info (&optional node)
+    "Read documentation for emacs-w3m in the info system."
+    (interactive) (info (format "(emacs-w3m)%s" (or node ""))))
+  ;; emacs-w3m info 日本語
+  (defun w3m-ja-info (&optional node)
+    "Read documentation for emacs-w3m-ja in the info system."
+    (interactive) (info (format "(emacs-w3m-ja)%s" (or node "")))))
 
 (when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
