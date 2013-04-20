@@ -28,6 +28,9 @@
 ;;; バックトレースを有効にする
 (setq debug-on-error t)
 
+;;; ファイル名を保持
+(defconst this-file-name load-file-name)
+
 ;;; require 時間を計測する
 (defvar benchmark-alist nil
   "Time of require alist.")
@@ -61,8 +64,12 @@
         (setq all (+ all bytes))))
     (message "%.6fM (%d)" (/ (/ all 1024.0) 1024.0) all)))
 
-;;; ファイル名を保持
-(defconst this-file-name load-file-name)
+;; リージョンまたはワードを返却
+(defun region-or-word ()
+  "Return region or word"
+  (if mark-active
+      (buffer-substring-no-properties (region-beginning) (region-end))
+    (thing-at-point 'word)))
 
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
@@ -353,6 +360,15 @@
   (defun elisp-ja-info (&optional node)
     "Read documentation for Elisp-ja in the info system."
     (interactive) (info (format "(elisp-ja)%s" (or node "")))))
+
+(when (locate-library "info")
+  (defun info-apropos-region-or-word ()
+    "Info apropos from region or word."
+    (interactive)
+    (let* ((default (region-or-word))
+           (string (read-string "Info apropos: " default nil default)))
+      (info-apropos string)))
+    (define-key global-map (kbd "C-c i") 'info-apropos-region-or-word))
 
 ;;; マニュアル (man)
 (when (locate-library "man")
@@ -651,13 +667,6 @@
                 (char-equal ?\x28 (char-syntax (char-after))))
            (forward-list arg))
           (t (self-insert-command arg)))))
-
-;; リージョンまたはワードを返却
-(defun region-or-word ()
-  "Return region or word"
-  (if mark-active
-      (buffer-substring-no-properties (region-beginning) (region-end))
-    (thing-at-point 'word)))
 
 ;; firefox で開く
 (when (executable-find "firefox")
@@ -1520,13 +1529,9 @@
 (when (eval-and-compile (require 'thing-opt nil t))
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
-  ;; シンボル
-  (if window-system
-      (progn
-        (keyboard-translate ?\C-i ?\H-i)
-        (define-key emacs-lisp-mode-map (kbd "H-i") 'mark-symbol))
-    (define-key emacs-lisp-mode-map (kbd "C-c C-i") 'mark-symbol))
   (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
+  (keyboard-translate ?\C-m ?\H-m)
+  (define-key global-map (kbd "H-m") 'mark-symbol)               ; シンボル選択
   (define-key global-map (kbd "C-c C-w") 'mark-word*)            ; 単語選択
   (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
 
@@ -2334,24 +2339,26 @@
 ;; sudo ln -s ~/stardict /usr/share/stardict/dic/eijiro
 ;; (install-elisp "http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el")
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/sdcv.el")
-(when (let ((dir  "/usr/share/stardict/dic/eijiro/"))
-        (and (executable-find "sdcv") (locate-library "sdcv")
-             (file-readable-p (concat dir "EIJI127.idx"))))
-  (autoload 'sdcv-search-input "sdcv" "Translate current input word." t)
-  (autoload 'sdcv-search-pointer+ "sdcv" "Translate current point word." t)
-  ;; バッファに表示
-  (define-key global-map (kbd "C-c w") 'sdcv-search-input)
-  ;; ポップアップ
-  (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)
+(when window-system
+  (when (let ((dir  "/usr/share/stardict/dic/eijiro/"))
+          (and (executable-find "sdcv") (locate-library "sdcv")
+               (file-readable-p (concat dir "EIJI127.idx"))))
+    (autoload 'sdcv-search-input "sdcv" "Translate current input word." t)
+    (autoload 'sdcv-search-pointer+ "sdcv" "Translate current point word." t)
+    ;; バッファに表示
+    (define-key global-map (kbd "C-c w") 'sdcv-search-input)
+    ;; ポップアップ
+    (keyboard-translate ?\C-i ?\H-i)
+    (define-key global-map (kbd "H-i") 'sdcv-search-pointer+)
 
-  (eval-after-load "sdcv"
-    '(progn
-       (when (boundp 'sdcv-dictionary-simple-list)
-         (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
-       (when (boundp 'sdcv-dictionary-complete-list)
-         (setq sdcv-dictionary-complete-list
-               '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
-       (message "Loading %s (sdcv)...done" this-file-name))))
+    (eval-after-load "sdcv"
+      '(progn
+         (when (boundp 'sdcv-dictionary-simple-list)
+           (setq sdcv-dictionary-simple-list '("EIJI127" "WAEI127")))
+         (when (boundp 'sdcv-dictionary-complete-list)
+           (setq sdcv-dictionary-complete-list
+                 '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
+         (message "Loading %s (sdcv)...done" this-file-name)))))
 
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
