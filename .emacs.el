@@ -2,9 +2,10 @@
 ;;; .emacs.el --- Emacs initialize file
 
 ;; Copyright (C) 2012 2013
+
 ;; Author: Tetsuya Higashi
 
-;;; バージョン
+;;; Emacs バージョン
 ;; 2013-04-16
 ;; GNU Emacs 24.3.1 (i686-pc-linux-gnu, GTK+ Version 3.4.2)
 ;; 2012-12-28
@@ -21,6 +22,8 @@
 ;;; NTEmacs 設定
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
+
+;;; Code:
 
 ;;; バックトレースを有効にする
 (setq debug-on-error t)
@@ -1313,7 +1316,7 @@
               (when (buffer-live-p buffer)
                 (kill-buffer buffer))))))))
 
-  (autoload 'org-sotre-link "org"
+  (autoload 'org-store-link "org"
     "Store an org-link to the current location." t)
   (autoload 'org-iswitchb "org" "Switch between Org buffers." t)
   (add-hook 'org-mode-hook
@@ -1454,12 +1457,15 @@
 ;;; 矩形選択
 ;; M-x cua-mode
 ;; <C-enter> で矩形選択モード
-(eval-after-load "cua-base"
-  '(progn
-     ;; キーバインドを無効化
-     (when (boundp 'cua-enable-cua-keys)
-       (setq cua-enable-cua-keys nil))
-     (message "Loading %s (cua-base)...done" this-file-name)))
+(when (locate-library "cua-base")
+  (autoload 'cua-mode "cua-base" "Toggle Common User Access style editing" t)
+
+  (eval-after-load "cua-base"
+    '(progn
+       ;; キーバインドを無効化
+       (when (boundp 'cua-enable-cua-keys)
+         (setq cua-enable-cua-keys nil))
+       (message "Loading %s (cua-base)...done" this-file-name))))
 
 ;;; ここまで標準 lisp
 
@@ -1501,6 +1507,7 @@
 (when (locate-library "iman")
   (autoload 'iman "iman" "call man & Info viewers with completion" t)
   (add-hook 'iman-load-hook 'turn-on-completing-help-mode)
+  (define-key global-map (kbd "<M-f1>") 'iman)
 
   (eval-after-load "iman"
     '(progn
@@ -1661,7 +1668,7 @@
   (when (boundp 'recentf-exclude)         ; 除外するファイル
     (setq recentf-exclude
           '("/TAGS$" "^/var/tmp/" "^/tmp/"
-            "~$" "/$" "/howm/" "\\.howm-keys$"
+            "~$" "/$" "/howm/" "\\.howm-keys$" "/.emacs.bmk$"
             "\\.emacs\\.d/bookmarks$" "\\.pomodoro$")))
   ;; .recentf のバックアップファイルをつくらない
   (defadvice write-file
@@ -3393,7 +3400,10 @@
                (replace-match "&"))
              (write-file file))
            (switch-to-buffer file)
-           (delete-other-windows))
+           (delete-other-windows)
+           (when (and (require 'csv-mode nil t)
+                      (fboundp 'csv-mode))
+             (csv-mode)))
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
