@@ -335,6 +335,9 @@
            (setq Info-directory-list (cons info-dir
                                            Info-default-directory-list))
            (message "Info-directory-list: %s" Info-directory-list)))
+       ;; ヘッダラインを使用しない
+       (when (boundp 'Info-use-header-line)
+         (setq Info-use-header-line nil))
        ;; キーバインド
        (when (boundp 'Info-mode-map)
          ;; 履歴 次へ (デフォルト: r)
