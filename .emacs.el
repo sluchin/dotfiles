@@ -1,5 +1,5 @@
-;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 ;;; .emacs.el --- Emacs initialize file
+;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
 ;; Copyright (C) 2012 2013
 
@@ -528,12 +528,12 @@
 (setq-default show-trailing-whitespace t)
 (set-face-background 'trailing-whitespace "gray50")
 ;; 行末空白強調表示をしない
-(add-hook 'fundamental-mode-hook
-          (lambda () (setq show-trailing-whitespace nil)))
-(add-hook 'compilation-mode-hook
-          (lambda () (setq show-trailing-whitespace nil)))
-(add-hook 'buffer-menu-mode-hook
-          (lambda () (setq show-trailing-whitespace nil)))
+(let ((hook (lambda () (setq show-trailing-whitespace nil))))
+  (add-hook 'fundamental-mode-hook hook)
+  (add-hook 'compilation-mode-hook hook)
+  (add-hook 'buffer-menu-mode-hook hook)
+  (add-hook 'man-mode-hook hook)
+  (add-hook 'woman-mode-hook hook))
 
 ;;; 検索 (isearch)
 (when (locate-library "isearch")
@@ -831,10 +831,15 @@
 
 ;;; 釣り合いのとれる括弧をハイライトにする
 (when (eval-and-compile (require 'paren nil t))
-  (when (fboundp 'show-paren-mode)
-    (show-paren-mode 1))        ; 有効化
-  (when (boundp 'show-paren-delay)
-    (setq show-paren-delay 0))) ; 初期値は 0.125
+  (when (fboundp 'show-paren-mode)  ; 有効化
+    (show-paren-mode 1))
+  (when (boundp 'show-paren-delay)  ; 初期値は 0.125
+    (setq show-paren-delay 0))
+  (when (boundp 'show-paren-style)  ; スタイル
+    (setq show-paren-style 'parenthesis))
+  ;; 色
+  (set-face-background 'show-paren-match-face "gray40")
+  (set-face-underline 'show-paren-match-face "blue"))
 
 ;;; ファイル名をユニークにする
 (when (eval-and-compile (require 'uniquify nil t))
@@ -1469,6 +1474,38 @@
   (when (boundp 'save-place)
     (setq-default save-place t)))
 
+;;; 最近使ったファイルを保存
+(when (eval-and-compile (require 'recentf nil t))
+  (when (boundp 'recentf-max-menu-items)  ; メニュー表示最大数
+    (setq recentf-max-menu-items 30))
+  (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
+    (setq recentf-max-saved-items 300))
+  (when (boundp 'recentf-auto-cleanup)    ; クリーンアップしない
+    (setq recentf-auto-cleanup 'never))
+  (when (boundp 'recentf-exclude)         ; 除外するファイル
+    (setq recentf-exclude
+          '("/TAGS$" "^/var/tmp/" "^/tmp/"
+            "~$" "/$" "/howm/" "\\.howm-keys$" "/\\.emacs\\.bmk$"
+            "\\.emacs\\.d/bookmarks$" "\\.pomodoro$" "/org/.*\\.org")))
+  ;; .recentf のバックアップファイルをつくらない
+  (defadvice write-file
+    (around recentf-save-nobackup (filename &optional confirm)
+            activate compile)
+    (if (and (boundp 'recentf-save-file)
+             (string= (ad-get-arg 0) (expand-file-name recentf-save-file))
+             (not backup-inhibited))
+        (progn
+          (setq backup-inhibited t)
+          ad-do-it
+          (setq backup-inhibited nil))
+      ad-do-it))
+  ;; 有効にする
+  (when (fboundp 'recentf-mode)
+    (recentf-mode 1))
+  ;; キーバインド
+  (define-key global-map (kbd "C-c C-f") 'recentf-open-files)
+  (define-key global-map (kbd "<f12>") 'recentf-open-files))
+
 ;;; 矩形選択
 ;; M-x cua-mode
 ;; <C-enter> で矩形選択モード
@@ -1536,8 +1573,7 @@
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
   (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
-  (keyboard-translate ?\C-m ?\H-m)
-  (define-key global-map (kbd "H-m") 'mark-symbol)               ; シンボル選択
+  (define-key global-map (kbd "C-c C-m") 'mark-symbol)           ; シンボル選択
   (define-key global-map (kbd "C-c C-w") 'mark-word*)            ; 単語選択
   (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
 
@@ -1670,32 +1706,6 @@
 ;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
 (eval-and-compile (require 'minibuf-isearch nil t))
-
-;;; 最近使ったファイルを保存
-;; (install-elisp-from-emacswiki "recentf-ext.el")
-(when (eval-and-compile (require 'recentf-ext nil t))
-  (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
-    (setq recentf-max-saved-items 10000))
-  (when (boundp 'recentf-exclude)         ; 除外するファイル
-    (setq recentf-exclude
-          '("/TAGS$" "^/var/tmp/" "^/tmp/"
-            "~$" "/$" "/howm/" "\\.howm-keys$" "/.emacs.bmk$"
-            "\\.emacs\\.d/bookmarks$" "\\.pomodoro$")))
-  ;; .recentf のバックアップファイルをつくらない
-  (defadvice write-file
-    (around recentf-save-nobackup (filename &optional confirm)
-            activate compile)
-    (if (and (boundp 'recentf-save-file)
-             (string= (ad-get-arg 0) (expand-file-name recentf-save-file))
-             (not backup-inhibited))
-        (progn
-          (setq backup-inhibited t)
-          ad-do-it
-          (setq backup-inhibited nil))
-      ad-do-it))
-  ;; キーバインド
-  (define-key global-map (kbd "C-c C-f") 'recentf-open-files)
-  (define-key global-map (kbd "<f12>") 'recentf-open-files))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
@@ -2354,8 +2364,7 @@
     ;; バッファに表示
     (define-key global-map (kbd "C-c w") 'sdcv-search-input)
     ;; ポップアップ
-    (keyboard-translate ?\C-i ?\H-i)
-    (define-key global-map (kbd "H-i") 'sdcv-search-pointer+)
+    (define-key global-map (kbd "C-c i") 'sdcv-search-pointer+)
 
     (eval-after-load "sdcv"
       '(progn
@@ -3512,7 +3521,60 @@
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
+;;; インデント
+(defun c-indent ()
+  "C indent."
+  (interactive)
+  (if (and (require 'em-glob nil t)
+           (fboundp 'eshell-extended-glob))
+      (let* ((backup "_BAK")
+             (default (file-name-directory
+                       (or (buffer-file-name (current-buffer)) "")))
+             (dir (read-directory-name "Directory: "
+                                       default nil nil nil))
+             (files (eshell-extended-glob
+                     (concat (file-name-as-directory dir) "**/*.[h|c]"))))
+        (message "%s" files)
+        (dolist (file files)
+          (when (and (not (file-directory-p file))
+                     (file-readable-p file)
+                     (file-writable-p file))
+            (message "file: %s" file)
+            (copy-file file (concat file backup) t)
+            (with-temp-buffer
+              (insert-file-contents file nil)
+              (when (fboundp 'c-mode)
+                (c-mode))
+              (when (fboundp 'c-set-style)
+                (c-set-style "k&r"))
+              (when (boundp 'indent-tabs-mode)
+                (setq indent-tabs-mode nil))
+              (when (fboundp 'indent-region)
+                (indent-region (point-min) (point-max)))
+              (when (fboundp 'c-indent-defun)
+                (c-indent-defun))
+              (when (fboundp 'untabify)
+                (untabify (point-min) (point-max)))
+              (when (fboundp 'delete-trailing-whitespace)
+                (delete-trailing-whitespace (point-min) (point-max)))
+              (goto-char (point-min))
+              (while (re-search-forward
+                      "\\(if\\|for\\|while\\)\\([ ]*\\)(" nil t)
+                (replace-match (concat (match-string 1) " (")))
+              (goto-char (point-min))
+              (while (re-search-forward "([ ]*" nil t)
+                (replace-match "("))
+              (goto-char (point-min))
+              (while (re-search-forward "[ ]*)" nil t)
+                (replace-match ")"))
+              (write-file file)))))
+    (message "em-glob require error")))
+
+;;; sl
+;; (install-elisp-from-emacswiki "sl.el")
+(when (locate-library "sl")
+  (autoload 'sl "sl" "This is joke command." t))
+
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
-
 
