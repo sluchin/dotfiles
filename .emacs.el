@@ -590,13 +590,6 @@
        ;; 起動時アスキーモード
        (when (boundp 'skk-isearch-start-mode)
          (setq skk-isearch-start-mode 'latin))
-       ;; 変換でエラーを捕捉しない
-       (defadvice skk-isearch-wrapper
-         (around skk-isearch-wrapper-nil (&rest arg) activate compile)
-         (if (null (car arg))            ; (nil) の場合
-             (let ((skk-dcomp-multiple-activate nil))
-               (ignore-errors ad-do-it)) ; エラーを無視する
-           ad-do-it))
        (message "Loading %s (skk-isearch)...done" this-file-name))))
 
 ;;; マークの設定
