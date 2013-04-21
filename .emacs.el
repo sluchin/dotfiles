@@ -801,6 +801,11 @@
 ;; 空白を一つ残して削除 (デフォルト: M-SPC)
 (define-key global-map (kbd "C-S-k") 'just-one-space)
 
+;; 文字を入れ替える
+;; 間違えて気づかないことがあるので, C-S-t に変更する
+(define-key global-map (kbd "C-t") nil)
+(define-key global-map (kbd "C-S-t") 'transpose-chars)
+
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
 ;;; 行番号表示
@@ -1174,6 +1179,11 @@
 
 ;;; カレンダ
 ;; (install-elisp "http://www.meadowy.org/meadow/netinstall/export/799/branches/3.00/pkginfo/japanese-holidays/japanese-holidays.el")
+;; リファレンス
+(defun calendar-reference ()
+  "Open reference for calendar-mode."
+  (interactive) (find-file "~/.emacs.d/ref/calendar.org"))
+
 ;; calendar info
 (when (locate-library "info")
   (defun calendar-info ()
