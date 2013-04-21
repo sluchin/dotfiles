@@ -1,5 +1,5 @@
-;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 ;;; pomodoro-technique.el --- Pomodoro timer
+;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
 ;; Copyright (C) 2013
 
@@ -346,7 +346,7 @@
 (defun pomodoro-pause ()
   "Pause pomodoro timer."
   (interactive)
-  (if pomodoro-timer
+  (if (timerp pomodoro-timer)
       (progn
         (setq pomodoro-timer (cancel-timer pomodoro-timer))
         (setq pomodoro-timer nil))
@@ -369,7 +369,7 @@
 (defun pomodoro-stop ()
   "Stop pomodoro timer."
   (interactive)
-  (when pomodoro-timer
+  (when (timerp pomodoro-timer)
     (setq pomodoro-timer (cancel-timer pomodoro-timer)))
   (setq pomodoro-timer nil)
   (setq pomodoro-mode-line-icon
