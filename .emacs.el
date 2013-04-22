@@ -866,14 +866,16 @@
 ;; dired でコマンドを実行する関数定義
 (defun dired-run-command (command)
   "Open file in command."
-  (when (and (fboundp 'dired-run-shell-command)
-             (fboundp 'dired-get-filename))
-    (let ((file (dired-get-filename)))
-      (if (and (file-directory-p file) (not (string= command "vlc")))
-          (message "%s is a directory" (file-name-nondirectory file))
-        (when (y-or-n-p (format "Open '%s' %s "
-                                command (file-name-nondirectory file)))
-          (dired-run-shell-command (concat command " " file " &")))))))
+  (if (executable-find command)
+      (when (and (fboundp 'dired-run-shell-command)
+                 (fboundp 'dired-get-filename))
+        (let ((file (dired-get-filename)))
+          (if (and (file-directory-p file) (not (string= command "vlc")))
+              (message "%s is a directory" (file-name-nondirectory file))
+            (when (y-or-n-p (format "Open '%s' %s "
+                                    command (file-name-nondirectory file)))
+              (dired-run-shell-command (concat command " " file " &"))))))
+    (message "not found: %s" command)))
 
 ;; dired 設定
 (when (locate-library "dired")
@@ -914,78 +916,66 @@
        (put 'dired-find-alternate-file 'disabled nil)
 
        ;; firefox で開く
-       (when (and (executable-find "firefox")
-                  (boundp 'dired-mode-map))
-         (defun dired-run-firefox ()
-           "Run firefox."
-           (interactive) (dired-run-command "firefox"))
-         (define-key dired-mode-map (kbd "C-f") 'dired-run-firefox))
+       (defun dired-run-firefox ()
+         "Run firefox."
+         (interactive) (dired-run-command "firefox"))
        ;; libreoffice で開く
-       (when (and (executable-find "libreoffice")
-                  (boundp 'dired-mode-map))
-         (defun dired-run-libreoffice ()
-           "Run libreoffice."
-           (interactive) (dired-run-command "libreoffice"))
-         (define-key dired-mode-map (kbd "C-l") 'dired-run-libreoffice))
+       (defun dired-run-libreoffice ()
+         "Run libreoffice."
+         (interactive) (dired-run-command "libreoffice"))
        ;; evince で開く
-       (when (and (executable-find "evince")
-                  (boundp 'dired-mode-map))
-         (defun dired-run-evince ()
-           "Run evince."
-           (interactive) (dired-run-command "evince"))
-         (define-key dired-mode-map (kbd "C-e") 'dired-run-evince))
+       (defun dired-run-evince ()
+         "Run evince."
+         (interactive) (dired-run-command "evince"))
        ;; vlc で開く
-       (when (and (executable-find "vlc")
-                  (boundp 'dired-mode-map))
-         (defun dired-run-vlc ()
-           "Run vlc."
-           (interactive) (dired-run-command "vlc"))
-         (define-key dired-mode-map (kbd "C-v") 'dired-run-vlc))
+       (defun dired-run-vlc ()
+         "Run vlc."
+         (interactive) (dired-run-command "vlc"))
+
        ;; w3m で開く
-       (when (and (executable-find "w3m") (locate-library "w3m"))
-         (autoload 'w3m-find-file "w3m" "Function used to open FILE" t)
-         (defun dired-w3m-find-file ()
-           "Open file in w3m."
-           (interactive)
-           (when (and (fboundp 'dired-get-filename)
-                      (fboundp 'w3m-find-file))
-             (let ((file (dired-get-filename)))
-               (if (not (file-directory-p file))
-                   (when (y-or-n-p (format "Open w3m %s "
-                                           (file-name-nondirectory file)))
-                     (w3m-find-file file))
-                 (message "%s is a directory" file)))))
-         (when (boundp 'dired-mode-map)
-           (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file)))
+       (defun dired-w3m-find-file ()
+         "Open file in w3m."
+         (interactive)
+         (if (executable-find "w3m")
+             (if (require 'w3m nil t)
+                 (when (and (fboundp 'dired-get-filename)
+                            (fboundp 'w3m-find-file))
+                   (let ((file (dired-get-filename)))
+                     (if (not (file-directory-p file))
+                         (when (y-or-n-p (format "Open w3m %s "
+                                                 (file-name-nondirectory file)))
+                           (w3m-find-file file))
+                       (message "%s is a directory" file))))
+               (message "w3m require error"))
+           (message "not found w3m")))
 
        ;; tar + gzip で圧縮
-       (when (and (executable-find "tar")
+       (defun dired-do-tar-gzip (arg)
+         "Execute tar and gzip command."
+         (interactive "P")
+         (if (and (executable-find "tar")
                   (executable-find "gzip"))
-         (defun dired-do-tar-gzip (arg)
-           "Execute tar and gzip command."
-           (interactive "P")
-           (when (and (fboundp 'dired-get-marked-files)
-                      (boundp 'current-prefix-arg)
-                      (fboundp 'dired-do-shell-command))
-             (let* ((files (dired-get-marked-files t current-prefix-arg))
-                    (default (concat (car files) ".tar.gz"))
-                    (tarfile (read-file-name "Filename: "
-                                             dired-directory
-                                             default nil default)))
-               (unless (string-match
-                        "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
-                 (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
-               (or
-                (when (member tarfile (directory-files default-directory))
-                  (not (y-or-n-p ; 同名ファイル
-                        (concat "Overwrite `" tarfile "'? "))))
-                (condition-case err
-                    (dired-do-shell-command
-                     (concat "tar cfz " tarfile " *") nil files)
-                  (error (message "%s" err)))
-                (message "Execute tar command to %s...done" tarfile)))))
-         (when (boundp 'dired-mode-map)
-           (define-key dired-mode-map (kbd "C-z") 'dired-do-tar-gzip)))
+             (when (and (fboundp 'dired-get-marked-files)
+                        (boundp 'current-prefix-arg)
+                        (fboundp 'dired-do-shell-command))
+               (let* ((files (dired-get-marked-files t current-prefix-arg))
+                      (default (concat (car files) ".tar.gz"))
+                      (tarfile (read-file-name "Filename: "
+                                               dired-directory
+                                               default nil default)))
+                 (unless (string-match
+                          "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
+                   (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
+                 (or
+                  (when (member tarfile (directory-files default-directory))
+                    (not (y-or-n-p ; 同名ファイル
+                          (concat "Overwrite `" tarfile "'? "))))
+                  (condition-case err
+                      (dired-do-shell-command
+                       (concat "tar cfz " tarfile " *") nil files)
+                    (error (message "%s" err)))
+                  (message "Execute tar command to %s...done" tarfile))))
+           (message "not found tar or gzip")))
 
        ;; バックアップファイルを作る
        (defun dired-make-backup ()
@@ -1005,6 +995,21 @@
                    files)
              (revert-buffer))))
 
+       ;; 日本語入力のための設定
+       (prefer-coding-system 'utf-8-unix)
+       ;; 文字コードをトグルする
+       (defun dired-file-name-jp ()
+         "Change coding system."
+         (interactive)
+         (if (eq system-type 'windows-nt)
+             (if file-name-coding-system
+                 (setq file-name-coding-system nil)
+               (setq file-name-coding-system 'japanese-shift-jis-dos))
+           (if file-name-coding-system
+               (setq file-name-coding-system nil)
+             (setq file-name-coding-system 'shift_jis)))
+         (revert-buffer))
+
        (defun dired-kill-buffer ()
          "Kill dired current buffer."
          (interactive)
@@ -1012,8 +1017,22 @@
            (kill-buffer (current-buffer))))
 
        (when (boundp 'dired-mode-map)
+         ;; firefox で開く
+         (define-key dired-mode-map (kbd "C-f") 'dired-run-firefox)
+         ;; libreoffice で開く
+         (define-key dired-mode-map (kbd "C-l") 'dired-run-libreoffice)
+         ;; evince で開く
+         (define-key dired-mode-map (kbd "C-e") 'dired-run-evince)
+         ;; vlc で開く
+         (define-key dired-mode-map (kbd "C-v") 'dired-run-vlc)
+         ;; w3m で開く
+         (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file)
+         ;; tar + gzip で圧縮
+         (define-key dired-mode-map (kbd "C-z") 'dired-do-tar-gzip)
          ;; バックアップファイル
          (define-key dired-mode-map (kbd "b") 'dired-make-backup)
+         ;; 文字コードをトグルする
+         (define-key dired-mode-map (kbd "c") 'dired-file-name-jp)
          ;; kill する
          (define-key dired-mode-map (kbd "k") 'dired-kill-buffer)
          ;; 編集可能にする
