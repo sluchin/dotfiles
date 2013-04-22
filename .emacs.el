@@ -1035,6 +1035,8 @@
               (buffer-face-set
                (font-face-attributes (frame-parameter nil 'font)))
               (setq header-line-format nil)))
+  ;; 更新する
+  (define-key global-map (kbd "C-c g") 'speedbar-refresh)
   ;; フォーカスを移す
   (define-key global-map (kbd "M-`") 'speedbar-get-focus)
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
@@ -1069,24 +1071,26 @@
        ;; 拡張子の追加
        (when (fboundp 'speedbar-add-supported-extension)
          (speedbar-add-supported-extension
-          '("js" "as" "html" "css" "php"
-            "rst" "howm" "org" "ml" "scala" "*")))
+          '("js" "as" "html" "css" "php" "org" "scala" "gz")))
        ;; 隠しファイルの表示
        (when (boundp 'speedbar-directory-unshown-regexp)
          (setq speedbar-directory-unshown-regexp "^\\'"))
+       ;; 自動更新しない
+       (when (fboundp 'speedbar-disable-update)
+         (speedbar-disable-update))
 
        ;; キーバインドのカスタマイズ
-       ;; "a" で無視ファイル表示・非表示のトグル
-       (define-key speedbar-file-key-map (kbd "a") 'speedbar-toggle-show-all-files)
-       ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
-       (define-key speedbar-file-key-map (kbd "<right>") 'speedbar-expand-line)
-       (define-key speedbar-file-key-map (kbd "C-f") 'speedbar-expand-line)
-       (define-key speedbar-file-key-map (kbd "<left>") 'speedbar-contract-line)
-       (define-key speedbar-file-key-map (kbd "C-b") 'speedbar-contract-line)
-       ;; BS でも上位ディレクトリへ (デフォルト: `U')
-       (define-key speedbar-file-key-map
-         (kbd "<backspace>") 'speedbar-up-directory)
-       (define-key speedbar-file-key-map (kbd "C-h") 'speedbar-up-directory)
+       (let ((map speedbar-file-key-map))
+         ;; "a" で無視ファイル表示・非表示のトグル
+         (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
+         ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
+         (define-key map (kbd "<right>") 'speedbar-expand-line)
+         (define-key map (kbd "C-f") 'speedbar-expand-line)
+         (define-key map (kbd "<left>") 'speedbar-contract-line)
+         (define-key map (kbd "C-b") 'speedbar-contract-line)
+         ;; BS でも上位ディレクトリへ (デフォルト: `U')
+         (define-key map (kbd "<backspace>") 'speedbar-up-directory)
+         (define-key map (kbd "C-h") 'speedbar-up-directory))
        (message "Loading %s (speedbar)...done" this-file-name))))
 
 ;;; 差分表示 (diff-mode)
@@ -1492,6 +1496,7 @@
           '("/TAGS$" "^/var/tmp/" "^/tmp/"
             "~$" "/$" "/howm/" "\\.howm-keys$" "/\\.emacs\\.bmk$"
             "\\.emacs\\.d/bookmarks$" "\\.pomodoro$" "/org/.*\\.org")))
+
   ;; 開いたファイルを選択しない
   (when (boundp 'recentf-menu-action)
     (setq recentf-menu-action
