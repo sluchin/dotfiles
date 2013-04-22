@@ -396,6 +396,8 @@
                (goto-char (point-max)))
              (if (< (point) start) (goto-char start)))))
 
+       (when (boundp 'Man-width)
+         (setq Man-width 70))
        ;; r で関連項目へジャンプ
        (when (boundp 'Man-see-also-regexp)
          (setq Man-see-also-regexp "\\(SEE ALSO\\)\\|\\(関連項目\\)"))
@@ -839,7 +841,7 @@
     (setq show-paren-style 'parenthesis))
   ;; 色
   (set-face-background 'show-paren-match-face "gray40")
-  (set-face-underline 'show-paren-match-face "blue"))
+  (set-face-underline 'show-paren-match-face "red"))
 
 ;;; ファイル名をユニークにする
 (when (eval-and-compile (require 'uniquify nil t))
@@ -1476,6 +1478,9 @@
 
 ;;; 最近使ったファイルを保存
 (when (eval-and-compile (require 'recentf nil t))
+  ;; 有効にする
+  (when (fboundp 'recentf-mode)
+    (recentf-mode 1))
   (when (boundp 'recentf-max-menu-items)  ; メニュー表示最大数
     (setq recentf-max-menu-items 30))
   (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
@@ -1487,6 +1492,27 @@
           '("/TAGS$" "^/var/tmp/" "^/tmp/"
             "~$" "/$" "/howm/" "\\.howm-keys$" "/\\.emacs\\.bmk$"
             "\\.emacs\\.d/bookmarks$" "\\.pomodoro$" "/org/.*\\.org")))
+  ;; 開いたファイルを選択しない
+  (when (boundp 'recentf-menu-action)
+    (setq recentf-menu-action
+          (lambda (file)
+            (if (file-readable-p file)
+                (find-file-noselect file)
+              (message "Can not open: %s" file)))))
+
+  ;; recentf バッファを kill しない
+  (defadvice recentf-open-files-action
+    (around recentf-open-files-action-no-kill (widget &rest _ignore)
+            activate compile)
+    (when (eval-when-compile (require 'cl nil t))
+      (defsubst kill-buffer-orig () nil)
+      (letf* (((symbol-function 'kill-buffer-orig) (symbol-function 'kill-buffer))
+              ((symbol-function 'kill-buffer)
+               (lambda (&optional b)
+                 (if (string= (buffer-name b) (format "*%s*" recentf-menu-title))
+                     nil (kill-buffer-orig b)))))
+        ad-do-it)))
+
   ;; .recentf のバックアップファイルをつくらない
   (defadvice write-file
     (around recentf-save-nobackup (filename &optional confirm)
@@ -1499,10 +1525,8 @@
           ad-do-it
           (setq backup-inhibited nil))
       ad-do-it))
-  ;; 有効にする
-  (when (fboundp 'recentf-mode)
-    (recentf-mode 1))
   ;; キーバインド
+  (define-key recentf-dialog-mode-map (kbd "w") 'recentf-edit-list)
   (define-key global-map (kbd "C-c C-f") 'recentf-open-files)
   (define-key global-map (kbd "<f12>") 'recentf-open-files))
 
@@ -1519,30 +1543,42 @@
          (setq cua-enable-cua-keys nil))
        (message "Loading %s (cua-base)...done" this-file-name))))
 
+;;; Anything
+;; (auto-install-batch "anything")
+(when (locate-library "anything-config")
+  (autoload 'anything-recentf "anything-config"
+    "Preconfigured `anything' for `recentf'." t)
+  (autoload 'anything-for-files "anything-config"
+    "Preconfigured `anything' for opening files." t)
+  (define-key global-map (kbd "C-c a f") 'anything-recentf)
+  (define-key global-map (kbd "C-c a b") 'anything-for-files)
+
 ;;; ここまで標準 lisp
 
 ;;; ここから拡張 lisp の設定
 ;; 使用する場合 lisp をロードパスの通ったところにインストールすること
 
 ;;; インストーラ
-;; (install-elisp-from-emacswiki "auto-install.el")
-(when (locate-library "auto-install")
-  (autoload 'auto-install "auto-install"
-    "Auto install elisp file." t)
-  (autoload 'install-elisp "auto-install"
-    "Install an elisp file from a given url." t)
-  (autoload 'install-elisp-from-emacswiki "auto-install"
-    "Install an elisp file from EmacsWiki.org." t)
+  ;; (install-elisp-from-emacswiki "auto-install.el")
+  (when (locate-library "auto-install")
+    (autoload 'auto-install "auto-install"
+      "Auto install elisp file." t)
+    (autoload 'auto-install-batch "auto-install"
+      "Batch install many files." t)
+    (autoload 'install-elisp "auto-install"
+      "Install an elisp file from a given url." t)
+    (autoload 'install-elisp-from-emacswiki "auto-install"
+      "Install an elisp file from EmacsWiki.org." t)
 
-  (eval-after-load "auto-install"
-    '(progn
-       ;; 起動時に EmacsWiki のページ名を補完候補に加える
-       (when (fboundp 'auto-install-update-emacswiki-package-name)
-         (auto-install-update-emacswiki-package-name t))
-       ;; install-elisp.el 互換モードにする
-       (when (fboundp 'auto-install-compatibility-setup)
-         (auto-install-compatibility-setup))
-       (message "Loading %s (auto-install)...done" this-file-name))))
+    (eval-after-load "auto-install"
+      '(progn
+         ;; 起動時に EmacsWiki のページ名を補完候補に加える
+         (when (fboundp 'auto-install-update-emacswiki-package-name)
+           (auto-install-update-emacswiki-package-name t))
+         ;; install-elisp.el 互換モードにする
+         (when (fboundp 'auto-install-compatibility-setup)
+           (auto-install-compatibility-setup))
+         (message "Loading %s (auto-install)...done" this-file-name)))))
 
 ;;; ミニバッファの入力補完
 ;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/completing-help.el")
@@ -1745,6 +1781,7 @@
                          ((string= "*scratch*" (buffer-name b)) b)
                          ((string= "*info*" (buffer-name b)) b)
                          ((string= "*Help*" (buffer-name b)) b)
+                         ((string= "*Open Recent*" (buffer-name b)) b)
                          ((string-match
                            "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
                          ((string-match
@@ -1757,9 +1794,9 @@
                          ((char-equal ?* (aref (buffer-name b) 0)) nil)
                          ;; スペースで始まるバッファは非表示
                          ((char-equal ?\x20 (aref (buffer-name b) 0)) nil)
-                         ;; .bash_history は非表示
+                         ;; 非表示バッファ
                          ((string= ".bash_history" (buffer-name b)) nil)
-                         ;; TAGS は非表示
+                         ((string= "ede-projects.el" (buffer-name b)) nil)
                          ((string= "TAGS" (buffer-name b)) nil)
                          ;; それ以外は表示
                          (t b)))
@@ -3211,17 +3248,28 @@
 
 ;; CEDET
 (when (locate-library "cedet")
-  (let ((hook (lambda ()
-                (require 'cedet nil t)
-                (when (fboundp 'global-ede-mode)
-                  (global-ede-mode 1))
-                (when (fboundp 'semantic-load-enable-code-helpers)
-                  (semantic-load-enable-code-helpers))
-                (when (fboundp 'global-srecode-minor-mode)
-                  (global-srecode-minor-mode 1))
-                (message "Loading %s (cedet)...done" this-file-name))))
-    (add-hook 'c-mode-common-hook hook) ; C, C++
-    (add-hook 'java-mode-hook hook)))   ; Java
+  (defun enable-cedet ()
+    "Enable cedet"
+    (interactive)
+    (require 'cedet nil t)
+    (when (fboundp 'global-ede-mode)
+      (global-ede-mode 1))
+    (when (fboundp 'semantic-load-enable-code-helpers)
+      (semantic-load-enable-code-helpers))
+    (when (fboundp 'global-srecode-minor-mode)
+      (global-srecode-minor-mode 1)))
+
+  (defun enable-cedet-hook ()
+    "Enable cedet hook"
+    (interactive)
+    (add-hook 'c-mode-hook 'enable-cedet)
+    (add-hook 'java-mode-hook 'enable-cedet))
+
+  (defun disable-cedet-hook ()
+    "Disable cedet hook"
+    (interactive)
+    (remove-hook 'c-mode-hook 'enable-cedet)
+    (remove-hook 'java-mode-hook 'enable-cedet)))
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
@@ -3555,8 +3603,6 @@
                 (c-indent-defun))
               (when (fboundp 'untabify)
                 (untabify (point-min) (point-max)))
-              (when (fboundp 'delete-trailing-whitespace)
-                (delete-trailing-whitespace (point-min) (point-max)))
               (goto-char (point-min))
               (while (re-search-forward
                       "\\(if\\|for\\|while\\)\\([ ]*\\)(" nil t)
@@ -3567,6 +3613,11 @@
               (goto-char (point-min))
               (while (re-search-forward "[ ]*)" nil t)
                 (replace-match ")"))
+              (goto-char (point-min))
+              (while (re-search-forward "" nil t)
+                (replace-match ""))
+              (when (fboundp 'delete-trailing-whitespace)
+                (delete-trailing-whitespace (point-min) (point-max)))
               (write-file file)))))
     (message "em-glob require error")))
 
