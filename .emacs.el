@@ -118,10 +118,14 @@
 (setq inhibit-startup-screen t)
 
 ;;; 各種文字コード設定
+;; (list-coding-systems)
 ;; (install-elisp "http://nijino.homelinux.net/emacs/cp5022x.el")
 (eval-and-compile (require 'cp5022x nil t))
 (set-default-coding-systems 'utf-8-emacs)
 (setq default-file-name-coding-system 'utf-8-emacs)
+;; 日本語入力のための設定
+(prefer-coding-system 'utf-8-unix)
+
 ;; charset の優先度設定
 (set-charset-priority 'ascii
                       'japanese-jisx0208
@@ -667,37 +671,56 @@
           (t (self-insert-command arg)))))
 
 ;; firefox で開く
-(when (executable-find "firefox")
-  ;; グーグル検索
-  (defun firefox-google-search ()
-    "Search google in firefox."
-    (interactive)
-    (let* ((region (region-or-word))
-           (string (read-string "google search: " region t region)))
-      (browse-url (concat "https://www.google.co.jp/search?q="
-                          string
-                          "&ie=utf-8&oe=utf-8&hl=ja"))))
-  (define-key global-map (kbd "C-c f s") 'firefox-google-search)
+;; グーグル検索
+(defun firefox-google-search ()
+  "Search google in firefox."
+  (interactive)
+  (if (executable-find "firefox")
+      (let* ((region (region-or-word))
+             (string (read-string "Google search: " region t region)))
+        (browse-url (concat "https://www.google.co.jp/search?q="
+                            string
+                            "&ie=utf-8&oe=utf-8&hl=ja")))
+    (message "not found firefox")))
 
-  ;; ウィキペディア検索
-  (defun firefox-wikipedia-search ()
-    "Search wikipedia in firefox."
-    (interactive)
-    (let* ((region (region-or-word))
-           (string (read-string "wikipedia search: " region t region)))
-      (browse-url (concat "https://ja.wikipedia.org/wiki/" string))))
-  (define-key global-map (kbd "C-c f w") 'firefox-wikipedia-search)
+;; ウィキペディア検索
+(defun firefox-wikipedia-search ()
+  "Search wikipedia in firefox."
+  (interactive)
+  (if (executable-find "firefox")
+      (let* ((region (region-or-word))
+             (string (read-string "Wikipedia search: " region t region)))
+        (browse-url (concat "https://ja.wikipedia.org/wiki/" string)))
+    (message "not found firefox")))
 
-  ;; URL を開く
-  (defun firefox-url-at-point ()
-    "Browse url in firefox."
-    (interactive)
-    (let ((url-region (bounds-of-thing-at-point 'url)))
-      (when url-region
-        (start-process "firefox" nil "firefox"
-                       (buffer-substring-no-properties (car url-region)
-                                                       (cdr url-region))))))
-  (define-key global-map (kbd "C-c f u") 'firefox-url-at-point))
+;; URL を開く
+(defun firefox-url-at-point ()
+  "Browse url in firefox."
+  (interactive)
+  (if (executable-find "firefox")
+      (let ((url-region (bounds-of-thing-at-point 'url)))
+        (if url-region
+            (start-process "firefox" nil "firefox"
+                           (buffer-substring-no-properties (car url-region)
+                                                           (cdr url-region)))
+          (message "no URL: %s" url-region)))
+    (message "not found firefox")))
+
+;; 選択して firefox で検索
+(defun firefox-choice-search ()
+  "Seach firefox."
+  (interactive)
+  (let ((lst '((?s "Google(s)"    firefox-google-search)
+               (?w "Wikipedia(w)" firefox-wikipedia-search)
+               (?u "URL(u)"       firefox-url-at-point)))
+        (prompt "Firefox search: ")
+        chars)
+    (dolist (l lst)
+      (setq prompt (concat prompt (car (cdr l)) " "))
+      (add-to-list 'chars (car l)))
+    (let ((char (read-char-choice prompt chars)))
+      (funcall (car (cdr (cdr (assq char lst))))))))
+(define-key global-map (kbd "C-c f") 'firefox-choice-search)
 
 ;; vlc で URL を開く
 (when (executable-find "vlc")
@@ -998,6 +1021,7 @@
        ;; 日本語入力のための設定
        (prefer-coding-system 'utf-8-unix)
        ;; 文字コードをトグルする
+       ;; (list-coding-systems)
        (defun dired-file-name-jp ()
          "Change coding system."
          (interactive)
@@ -1007,7 +1031,7 @@
                (setq file-name-coding-system 'japanese-shift-jis-dos))
            (if file-name-coding-system
                (setq file-name-coding-system nil)
-             (setq file-name-coding-system 'shift_jis)))
+             (setq file-name-coding-system 'japanese-shift-jis)))
          (revert-buffer))
 
        (defun dired-kill-buffer ()
@@ -1054,10 +1078,9 @@
               (buffer-face-set
                (font-face-attributes (frame-parameter nil 'font)))
               (setq header-line-format nil)))
-  ;; 更新する
-  (define-key global-map (kbd "C-c g") 'speedbar-refresh)
+
   ;; フォーカスを移す
-  (define-key global-map (kbd "M-`") 'speedbar-get-focus)
+  (define-key global-map (kbd "C-c t") 'speedbar-get-focus)
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
 
   (eval-after-load "speedbar"
@@ -1098,8 +1121,18 @@
        (when (fboundp 'speedbar-disable-update)
          (speedbar-disable-update))
 
+       ;; 更新する
+       (defun speedbar-focus-refresh ()
+         "Get focus and refresh."
+         (interactive)
+         (speedbar-get-focus)
+         (speedbar-refresh)
+         (speedbar-get-focus))
+
        ;; キーバインドのカスタマイズ
        (let ((map speedbar-file-key-map))
+         ;; 更新する
+         (define-key map (kbd "g") 'speedbar-focus-refresh)
          ;; "a" で無視ファイル表示・非表示のトグル
          (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
          ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
@@ -3013,13 +3046,13 @@
                    ("t"  "[t]cl/tk"  ".*\\.\\(tcl\\|tk\\)")
                    ("y"  "[y]acc"    ".*\\.\\(y\\|yy\\)")
                    ("h"  "[h]tml"    ".*\\.html")))
-            (select "Select language: "))
+            (prompt "Select language: "))
         (dolist (l lst)
-          (setq select (concat select (car (cdr l)) " ")))
+          (setq prompt (concat prompt (car (cdr l)) " ")))
         (let* ((default default-directory)
                (dir (read-directory-name "Directory: "
                                  default nil nil nil))
-               (result (read-string select nil nil nil))
+               (result (read-string prompt nil nil nil))
                (files (car (cdr (cdr (assoc-string result lst))))))
           (if (and (file-directory-p dir) (file-readable-p dir))
               (if files
