@@ -703,17 +703,17 @@
             (start-process "firefox" nil "firefox"
                            (buffer-substring-no-properties (car url-region)
                                                            (cdr url-region)))
-          (message "no URL: %s" url-region)))
+          (message "no url: %s" url-region)))
     (message "not found firefox")))
 
 ;; 選択して firefox で検索
 (defun firefox-choice-search ()
-  "Seach firefox."
+  "Firefox search."
   (interactive)
-  (let ((lst '((?s "Google(s)"    firefox-google-search)
-               (?w "Wikipedia(w)" firefox-wikipedia-search)
-               (?u "URL(u)"       firefox-url-at-point)))
-        (prompt "Firefox search: ")
+  (let ((lst '((?g "[g]oogle"    firefox-google-search)
+               (?w "[w]ikipedia" firefox-wikipedia-search)
+               (?u "[u]rl"       firefox-url-at-point)))
+        (prompt "Firefox: ")
         chars)
     (dolist (l lst)
       (setq prompt (concat prompt (car (cdr l)) " "))
@@ -2255,7 +2255,11 @@
 (when (locate-library "usage-memo")
   (autoload 'umemo-initialize "usage-memo"
     "Integration of Emacs help system and memo." t)
-  (add-hook 'help-mode-hook 'umemo-initialize)
+  (add-hook 'help-mode-hook
+            (lambda ()
+              (when (fboundp 'umemo-initialize)
+                (umemo-initialize))
+              (setq header-line-format nil)))
 
   (eval-after-load "usage-memo"
     '(progn
@@ -2725,7 +2729,13 @@
     "Search a word using search engines in a new session." t)
 
   ;; グーグルで検索する
-  (define-key global-map (kbd "C-c 3 s") 'w3m-search-new-session)
+  (defun w3m-search-google ()
+    "Search google in w3m"
+    (interactive)
+    (when (fboundp 'w3m-search-new-session)
+      (let* ((region (region-or-word))
+             (string (read-string "Google search: " region t region)))
+        (w3m-search-new-session "google" string))))
 
   ;; ウィキペディアで検索する
   (defun w3m-search-wikipedia ()
@@ -2734,20 +2744,35 @@
     (when (fboundp 'w3m-browse-url)
       (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
                               (let ((region (region-or-word)))
-                                (read-string "wikipedia search: " region nil region)))))
-    (define-key global-map (kbd "C-c 3 w") 'w3m-search-wikipedia))
+                                (read-string "Wikipedia search: " region nil region))))))
 
   ;; URL を開く
   (defun w3m-url-at-point ()
     "Browse url in w3m."
     (interactive)
-    ;; デフォルトを w3m にする
-    (setq browse-url-browser-function 'w3m-browse-url)
-    ;; ブラウザで開く
-    (browse-url-at-point)
-    ;; デフォルトに戻す
-    (setq browse-url-browser-function 'browse-url-default-browser))
-  (define-key global-map (kbd "C-c 3 u") 'w3m-url-at-point)
+    (when (fboundp 'w3m-goto-url-new-session)
+      (let ((url-region (bounds-of-thing-at-point 'url)))
+        (if url-region
+            (w3m-goto-url-new-session
+             (buffer-substring-no-properties (car url-region)
+                                             (cdr url-region)))
+          (message "no url: %s" url-region)))))
+
+  ;; 選択して w3m で検索
+  (defun w3m-choice-search ()
+    "w3m search."
+    (interactive)
+    (let ((lst '((?g "[g]oogle"    w3m-search-google)
+                 (?w "[w]ikipedia" w3m-search-wikipedia)
+                 (?u "[u]rl"       w3m-url-at-point)))
+          (prompt "w3m: ")
+          chars)
+      (dolist (l lst)
+        (setq prompt (concat prompt (car (cdr l)) " "))
+        (add-to-list 'chars (car l)))
+      (let ((char (read-char-choice prompt chars)))
+        (funcall (car (cdr (cdr (assq char lst))))))))
+  (define-key global-map (kbd "C-c 3") 'w3m-choice-search)
 
   ;; stl-manual を閲覧する
   ;; sudo apt-get install stl-manual
@@ -3261,8 +3286,8 @@
               (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
             (when (boundp 'ac-clang-flags)
               (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
-            (when (fboundp 'semantic-mode)
-              (semantic-mode 1))
+            ;; (when (fboundp 'semantic-mode)
+            ;;   (semantic-mode 1))
             (when (boundp 'ac-sources)
               (setq ac-sources (append '(ac-source-clang
                                          ac-source-semantic
