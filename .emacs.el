@@ -194,7 +194,7 @@
 ;; ヘッダラインに関数名表示
 (when (eval-when-compile (require 'which-func nil t))
   ;; 24.2.1 まで
-  (setq mode-line-format 
+  (setq mode-line-format
         (delete (assoc 'which-func-mode mode-line-format)
                 mode-line-format))
   ;; 24.3.1 から
@@ -373,7 +373,7 @@
     "Info apropos from region or word."
     (interactive)
     (let* ((default (region-or-word))
-           (string (read-string "Info apropos: " default nil default)))
+           (string (read-string "Info apropos: " default t default)))
       (info-apropos string)))
     (define-key global-map (kbd "C-c i") 'info-apropos-region-or-word))
 
@@ -698,28 +698,32 @@
   "Browse url in firefox."
   (interactive)
   (if (executable-find "firefox")
-      (let ((url-region (bounds-of-thing-at-point 'url)))
-        (if url-region
-            (start-process "firefox" nil "firefox"
-                           (buffer-substring-no-properties (car url-region)
-                                                           (cdr url-region)))
-          (message "no url: %s" url-region)))
+      (let (alist)
+        (setq alist (append alist (bounds-of-thing-at-point 'url)))
+        (let* ((region (if (null alist) nil
+                         (buffer-substring-no-properties (car alist)
+                                                         (cdr alist))))
+               (string (read-string "URL: " region t region)))
+          (if (equal string "")
+              (message "no url")
+            (start-process "firefox" nil "firefox" string))))
     (message "not found firefox")))
 
 ;; 選択して firefox で検索
 (defun firefox-choice-search ()
   "Firefox search."
   (interactive)
-  (let ((lst '((?g "[g]oogle"    firefox-google-search)
-               (?w "[w]ikipedia" firefox-wikipedia-search)
-               (?u "[u]rl"       firefox-url-at-point)))
-        (prompt "Firefox: ")
-        chars)
-    (dolist (l lst)
-      (setq prompt (concat prompt (car (cdr l)) " "))
-      (add-to-list 'chars (car l)))
-    (let ((char (read-char-choice prompt chars)))
-      (funcall (car (cdr (cdr (assq char lst))))))))
+  (when (fboundp 'read-char-choice)
+    (let ((lst '((?g "[g]oogle"    firefox-google-search)
+                 (?w "[w]ikipedia" firefox-wikipedia-search)
+                 (?u "[u]rl"       firefox-url-at-point)))
+          (prompt "Firefox: ")
+          chars)
+      (dolist (l lst)
+        (setq prompt (concat prompt (car (cdr l)) " "))
+        (add-to-list 'chars (car l)))
+      (let ((char (read-char-choice prompt chars)))
+        (funcall (car (cdr (cdr (assq char lst)))))))))
 (define-key global-map (kbd "C-c f") 'firefox-choice-search)
 
 ;; vlc で URL を開く
@@ -863,8 +867,7 @@
   (when (boundp 'show-paren-style)  ; スタイル
     (setq show-paren-style 'parenthesis))
   ;; 色
-  (set-face-background 'show-paren-match-face "gray40")
-  (set-face-underline 'show-paren-match-face "red"))
+  (set-face-background 'show-paren-match-face "gray40"))
 
 ;;; ファイル名をユニークにする
 (when (eval-and-compile (require 'uniquify nil t))
@@ -895,7 +898,7 @@
         (let ((file (dired-get-filename)))
           (if (and (file-directory-p file) (not (string= command "vlc")))
               (message "%s is a directory" (file-name-nondirectory file))
-            (when (y-or-n-p (format "Open '%s' %s "
+            (when (y-or-n-p (format "Open `%s' %s "
                                     command (file-name-nondirectory file)))
               (dired-run-shell-command (concat command " " file " &"))))))
     (message "not found: %s" command)))
@@ -934,9 +937,6 @@
        ;; ディレクトリを再帰的に削除可能にする
        (when (boundp 'dired-recursive-deletes)
          (setq dired-recursive-deletes 'always))
-
-       ;; 無効コマンドを有効にする
-       (put 'dired-find-alternate-file 'disabled nil)
 
        ;; firefox で開く
        (defun dired-run-firefox ()
@@ -1062,6 +1062,8 @@
          ;; 編集可能にする
          (when (locate-library "wdired")
            (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
+         ;; 無効コマンドを有効にする
+         (put 'dired-find-alternate-file 'disabled nil)
          ;; 新規バッファを作らない
          (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
          ;; 新規バッファを作る
@@ -1162,7 +1164,7 @@
 
 ;; diff-mode
 (when (locate-library "diff")
-  (autoload 'diff "diff" "run diff" t)
+  (autoload 'diff "diff" "Run diff." t)
   (add-hook 'diff-mode-hook
             (lambda ()
               ;; 行末空白強調表示をしない
@@ -1403,10 +1405,6 @@
               (set (make-local-variable 'system-time-locale) "C")
               ;; org-mode での強調表示を可能にする
               (turn-on-font-lock)))
-  (define-key global-map (kbd "C-c o d") 'org-dired)
-  (define-key global-map (kbd "C-c o k") 'org-kill-buffer)
-  (define-key global-map (kbd "C-c o l") 'org-store-link)
-  (define-key global-map (kbd "C-c o b") 'org-iswitchb)
 
   (eval-after-load "org"
     '(progn
@@ -1434,7 +1432,6 @@
 (when (locate-library "org-agenda")
   (autoload 'org-agenda "org-agenda"
     "Dynamic task and appointment lists for Org" t)
-  (define-key global-map (kbd "C-c o a") 'org-agenda)
 
   (eval-after-load "org-agenda"
     '(progn
@@ -1483,8 +1480,6 @@
               (set (make-local-variable 'system-time-locale) "C")
               ;; org-mode での強調表示を可能にする
               (turn-on-font-lock)))
-  (define-key global-map (kbd "C-c o r") 'org-remember)
-  (define-key global-map (kbd "C-c o c") 'org-remember-code-reading)
 
   (eval-after-load "org-remember"
     '(progn
@@ -1527,6 +1522,31 @@
          (org-remember-insinuate))
        (message "Loading %s (org-remember)...done" this-file-name))))
 
+;; org-mode キーバインド
+(when (and (locate-library "org")
+           (locate-library "org-agenda")
+           (locate-library "org-remember"))
+  ;; org-mode を選択
+  (defun org-choice-mode ()
+    "org-mode choice."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?a "[a]genda"   org-agenda)
+                   (?r "[r]member"  org-remember)
+                   (?c "[c]oding"   org-remember-code-reading)
+                   (?l "[l]ink"     org-store-link)
+                   (?i "[i]switchb" org-iswitchb)
+                   (?d "[d]ired"    org-dired)
+                   (?k "[k]ill"     org-kill-buffer)))
+            (prompt "org-mode: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let ((char (read-char-choice prompt chars)))
+          (funcall (car (cdr (cdr (assq char lst)))))))))
+  (define-key global-map (kbd "C-c o") 'org-choice-mode))
+
 ;;; ファイル内のカーソル位置を記録する
 (when (eval-and-compile (require 'saveplace nil t))
   (when (boundp 'save-place)
@@ -1554,8 +1574,10 @@
     (setq recentf-menu-action
           (lambda (file)
             (if (file-readable-p file)
-                (find-file-noselect file)
-              (message "Can not open: %s" file)))))
+                (progn
+                  (find-file-noselect file)
+                  (message "Open file `%s'" file))
+              (message "Can not open `%s'" file)))))
 
   ;; recentf バッファを kill しない
   (defadvice recentf-open-files-action
@@ -2292,13 +2314,27 @@
     "pomodoro-technique" "Save status of pomodoro timer." t)
   (autoload 'pomodoro-stop
     "pomodoro-technique" "Stop pomodoro timer." t)
-  (define-key global-map (kbd "C-c p o") 'pomodoro-start)
-  (define-key global-map (kbd "C-c p r") 'pomodoro-restart)
-  (define-key global-map (kbd "C-c p i") 'pomodoro-reset)
-  (define-key global-map (kbd "C-c p p") 'pomodoro-pause)
-  (define-key global-map (kbd "C-c p s") 'pomodoro-save)
-  (define-key global-map (kbd "C-c p t") 'pomodoro-save-time)
-  (define-key global-map (kbd "C-c p q") 'pomodoro-stop)
+
+  ;; pomodoro を選択
+  (defun pomodoro-choice ()
+    "Pomodoro choice."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?o "start(o)"    pomodoro-start)
+                   (?r "restart(r)"  pomodoro-restart)
+                   (?i "reset(i)"    pomodoro-reset)
+                   (?p "pause(p)"    pomodoro-pause)
+                   (?s "save(s)"     pomodoro-save)
+                   (?t "savetime(t)" pomodoro-save-time)
+                   (?q "stop(q)"     pomodoro-stop)))
+            (prompt "Pomodoro: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let ((char (read-char-choice prompt chars)))
+          (funcall (car (cdr (cdr (assq char lst)))))))))
+  (define-key global-map (kbd "C-c p") 'pomodoro-choice)
 
   (eval-after-load "pomodoro-technique"
     '(progn
@@ -2744,34 +2780,38 @@
     (when (fboundp 'w3m-browse-url)
       (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
                               (let ((region (region-or-word)))
-                                (read-string "Wikipedia search: " region nil region))))))
+                                (read-string "Wikipedia search: " region t region))))))
 
   ;; URL を開く
   (defun w3m-url-at-point ()
     "Browse url in w3m."
     (interactive)
     (when (fboundp 'w3m-goto-url-new-session)
-      (let ((url-region (bounds-of-thing-at-point 'url)))
-        (if url-region
-            (w3m-goto-url-new-session
-             (buffer-substring-no-properties (car url-region)
-                                             (cdr url-region)))
-          (message "no url: %s" url-region)))))
+      (let (alist)
+        (setq alist (append alist (bounds-of-thing-at-point 'url)))
+        (let* ((region (if (null alist) nil
+                         (buffer-substring-no-properties (car alist)
+                                                         (cdr alist))))
+               (string (read-string "URL: " region t region)))
+          (if (equal string "")
+              (message "no url")
+            (w3m-goto-url-new-session string))))))
 
   ;; 選択して w3m で検索
   (defun w3m-choice-search ()
     "w3m search."
     (interactive)
-    (let ((lst '((?g "[g]oogle"    w3m-search-google)
-                 (?w "[w]ikipedia" w3m-search-wikipedia)
-                 (?u "[u]rl"       w3m-url-at-point)))
-          (prompt "w3m: ")
-          chars)
-      (dolist (l lst)
-        (setq prompt (concat prompt (car (cdr l)) " "))
-        (add-to-list 'chars (car l)))
-      (let ((char (read-char-choice prompt chars)))
-        (funcall (car (cdr (cdr (assq char lst))))))))
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?g "[g]oogle"    w3m-search-google)
+                   (?w "[w]ikipedia" w3m-search-wikipedia)
+                   (?u "[u]rl"       w3m-url-at-point)))
+            (prompt "w3m: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let ((char (read-char-choice prompt chars)))
+          (funcall (car (cdr (cdr (assq char lst)))))))))
   (define-key global-map (kbd "C-c 3") 'w3m-choice-search)
 
   ;; stl-manual を閲覧する
@@ -3077,7 +3117,7 @@
         (let* ((default default-directory)
                (dir (read-directory-name "Directory: "
                                  default nil nil nil))
-               (result (read-string prompt nil nil nil))
+               (result (read-string prompt nil t nil))
                (files (car (cdr (cdr (assoc-string result lst))))))
           (if (and (file-directory-p dir) (file-readable-p dir))
               (if files
@@ -3698,8 +3738,10 @@
               (goto-char (point-min))
               (while (re-search-forward "" nil t)
                 (replace-match ""))
+              (when (fboundp 'mark-whole-buffer)
+                (mark-whole-buffer))
               (when (fboundp 'delete-trailing-whitespace)
-                (delete-trailing-whitespace (point-min) (point-max)))
+                (delete-trailing-whitespace))
               (write-file file)))))
     (message "em-glob require error")))
 
@@ -3707,6 +3749,53 @@
 ;; (install-elisp-from-emacswiki "sl.el")
 (when (locate-library "sl")
   (autoload 'sl "sl" "This is joke command." t))
+
+;; 24.3 以降 subr.el で定義
+(unless (fboundp 'read-char-choice)
+  (defun read-char-choice (prompt chars &optional inhibit-keyboard-quit)
+    "Read and return one of CHARS, prompting for PROMPT.
+Any input that is not one of CHARS is ignored.
+
+If optional argument INHIBIT-KEYBOARD-QUIT is non-nil, ignore
+keyboard-quit events while waiting for a valid input."
+    (unless (consp chars)
+      (error "Called `read-char-choice' without valid char choices"))
+    (let (char done show-help (helpbuf " *Char Help*"))
+      (let ((cursor-in-echo-area t)
+            (executing-kbd-macro executing-kbd-macro)
+            (esc-flag nil))
+        (save-window-excursion	      ; in case we call help-form-show
+          (while (not done)
+            (unless (get-text-property 0 'face prompt)
+              (setq prompt (propertize prompt 'face 'minibuffer-prompt)))
+            (setq char (let ((inhibit-quit inhibit-keyboard-quit))
+                         (read-key prompt)))
+            (and show-help (buffer-live-p (get-buffer helpbuf))
+                 (kill-buffer helpbuf))
+            (cond
+             ((not (numberp char)))
+             ;; If caller has set help-form, that's enough.
+             ;; They don't explicitly have to add help-char to chars.
+             ((and help-form
+                   (eq char help-char)
+                   (setq show-help t)
+                   (help-form-show)))
+             ((memq char chars)
+              (setq done t))
+             ((and executing-kbd-macro (= char -1))
+              ;; read-event returns -1 if we are in a kbd macro and
+              ;; there are no more events in the macro.  Attempt to
+              ;; get an event interactively.
+              (setq executing-kbd-macro nil))
+             ((not inhibit-keyboard-quit)
+              (cond
+               ((and (null esc-flag) (eq char ?\e))
+                (setq esc-flag t))
+               ((memq char '(?\C-g ?\e))
+                (keyboard-quit))))))))
+      ;; Display the question with the answer.  But without cursor-in-echo-area.
+      (message "%s%s" prompt (char-to-string char))
+      char)))
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
