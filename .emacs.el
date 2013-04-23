@@ -1424,8 +1424,7 @@
        ;; Todo で使用するキーワードを定義。
        (when (boundp 'org-todo-keywords)
          (setq org-todo-keywords
-               '((sequence "TODO(t)" "WAIT(w)" "|" "DONE(d)" "|"
-                           "CANCELED(c)"))))
+               '((sequence "TODO(t)" "WAIT(w)" "DONE(d)" "CANCELED(c)"))))
        (message "Loading %s (org)...done" this-file-name))))
 
 ;; org-agenda 設定
@@ -1531,13 +1530,13 @@
     "org-mode choice."
     (interactive)
     (when (fboundp 'read-char-choice)
-      (let ((lst '((?a "[a]genda"   org-agenda)
-                   (?r "[r]member"  org-remember)
-                   (?c "[c]oding"   org-remember-code-reading)
-                   (?l "[l]ink"     org-store-link)
-                   (?i "[i]switchb" org-iswitchb)
-                   (?d "[d]ired"    org-dired)
-                   (?k "[k]ill"     org-kill-buffer)))
+      (let ((lst '((?a "[a]genda"    org-agenda)
+                   (?r "[r]member"   org-remember)
+                   (?c "[c]oding"    org-remember-code-reading)
+                   (?s "[s]torelink" org-store-link)
+                   (?i "[i]switchb"  org-iswitchb)
+                   (?d "[d]ired"     org-dired)
+                   (?k "[k]ill"      org-kill-buffer)))
             (prompt "org-mode: ")
             chars)
         (dolist (l lst)
