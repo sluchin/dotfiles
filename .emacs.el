@@ -2985,6 +2985,11 @@
 ;; multi-term
 ;; zsh に設定
 ;; (install-elisp-from-emacswiki "multi-term.el")
+;; zsh info
+(defun zsh-info (&optional node)
+  "Read documentation for zsh in the info system."
+  (interactive) (info (format "(zsh)%s" (or node ""))))
+
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
   (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t)
