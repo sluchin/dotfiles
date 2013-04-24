@@ -1474,7 +1474,8 @@
   (eval-after-load "org-table"
     '(progn
        ;; 表で日本語を崩れないようにするパッチ
-       (load "org-table-patch")
+       (when (locate-library "org-table-patch")
+         (load "org-table-patch"))
        (message "Loading %s (org-table)...done" this-file-name))))
 
 ;; org-agenda 設定
