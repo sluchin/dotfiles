@@ -74,7 +74,27 @@
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
-;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
+;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)
+;; ファイル削除してバイトコンパイル
+(defun byte-compile-directory ()
+  "Byte compile for directory."
+  (interactive)
+  (when (and (require 'em-glob nil t)
+             (fboundp 'eshell-extended-glob))
+    (let ((dir (read-directory-name "Directory: " "~/.emacs.d"))
+          files)
+      (setq files (append (eshell-extended-glob
+                           (concat (file-name-as-directory dir)
+                                   "**/*.elc")) files))
+      (message "files: %s" files)
+      (dolist (file files)
+        (if (and (stringp file)
+                 (file-writable-p file))
+            (progn
+              (message "delete file: %s" file)
+              (delete-file file)))))
+    (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)))
+
 (when (eq system-type 'gnu/linux)
   (setq load-path
         (append '(
@@ -596,7 +616,14 @@
        ;; 起動時アスキーモード
        (when (boundp 'skk-isearch-start-mode)
          (setq skk-isearch-start-mode 'latin))
-       (message "Loading %s (skk-isearch)...done" this-file-name))))
+       ;; 変換でエラーを捕捉しない
+       (defadvice skk-isearch-wrapper
+         (around skk-isearch-wrapper-nil (&rest arg) activate compile)
+         (if (null (car arg))            ; (nil) の場合
+             (let ((skk-dcomp-multiple-activate nil))
+               (ignore-errors ad-do-it)) ; エラーを無視する
+           ad-do-it))))
+  (message "Loading %s (skk-isearch)...done" this-file-name))
 
 ;;; マークの設定
 ;; C-g でリージョン強調表示解除
@@ -709,48 +736,33 @@
             (start-process "firefox" nil "firefox" string))))
     (message "not found firefox")))
 
-;; 選択して firefox で検索
-(defun firefox-choice-search ()
+;; vlc で URL を開く
+(defun vlc-url-at-point ()
+  "Get url and open vlc."
+  (interactive)
+  (if (executable-find "vlc")
+    (let ((url-region (bounds-of-thing-at-point 'url)))
+      (when url-region
+        (start-process "vlc" nil "vlc"
+                       (buffer-substring-no-properties (car url-region)
+                                                       (cdr url-region)))))))
+;; 選択して firefox で検索または vlc で開く
+(defun firefox-vlc-choice-search ()
   "Firefox search."
   (interactive)
   (when (fboundp 'read-char-choice)
     (let ((lst '((?g "[g]oogle"    firefox-google-search)
                  (?w "[w]ikipedia" firefox-wikipedia-search)
-                 (?u "[u]rl"       firefox-url-at-point)))
-          (prompt "Firefox: ")
+                 (?u "[u]rl"       firefox-url-at-point)
+                 (?v "[v]lc"       vlc-url-at-point)))
+          (prompt "Open at ?: ")
           chars)
       (dolist (l lst)
         (setq prompt (concat prompt (car (cdr l)) " "))
         (add-to-list 'chars (car l)))
       (let ((char (read-char-choice prompt chars)))
         (funcall (car (cdr (cdr (assq char lst)))))))))
-(define-key global-map (kbd "C-c f") 'firefox-choice-search)
-
-;; vlc で URL を開く
-(when (executable-find "vlc")
-  (defun vlc-url-at-point ()
-    "Get url and open vlc."
-    (interactive)
-    (let ((url-region (bounds-of-thing-at-point 'url)))
-      (when url-region
-        (start-process "vlc" nil "vlc"
-                       (buffer-substring-no-properties (car url-region)
-                                                       (cdr url-region))))))
-  (define-key global-map (kbd "C-c v") 'vlc-url-at-point))
-
-;; 日付挿入
-(defun insert-date ()
-  "Insert date."
-  (interactive)
-  (insert (format-time-string "%Y-%m-%d")))
-(define-key global-map (kbd "C-c d t") 'insert-date)
-
-;; 時間挿入
-(defun insert-date-time ()
-  "Insert date and time."
-  (interactive)
-  (insert (format-time-string "%H:%M:%S")))
-(define-key global-map (kbd "C-c d T") 'insert-date-time)
+(define-key global-map (kbd "C-c f") 'firefox-vlc-choice-search)
 
 ;; デスクトップ復元
 (defun desktop-recover ()
@@ -867,7 +879,9 @@
   (when (boundp 'show-paren-style)  ; スタイル
     (setq show-paren-style 'parenthesis))
   ;; 色
-  (set-face-background 'show-paren-match-face "gray40"))
+  (set-face-attribute 'show-paren-match-face nil
+                      :background "gray20" :foreground "green"
+                      :underline "yellow" :weight 'extra-bold))
 
 ;;; ファイル名をユニークにする
 (when (eval-and-compile (require 'uniquify nil t))
@@ -1255,6 +1269,18 @@
     "Read documentation for Calendar/Diary japanese in the info system."
     (interactive) (info "(emacs-ja)Calendar/Diary")))
 
+;; 日付挿入
+(defun insert-date ()
+  "Insert date."
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d")))
+
+;; 時間挿入
+(defun insert-date-time ()
+  "Insert date and time."
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
+
 (when (locate-library "calendar")
   (autoload 'calendar "calendar" "Calendar." t)
   ;; 行末空白強調表示, ヘッダ表示をしない
@@ -1262,7 +1288,23 @@
             (lambda ()
               (setq show-trailing-whitespace nil)
               (setq header-line-format nil)))
-  (define-key global-map (kbd "C-c d c") 'calendar)
+
+  ;; カレンダと日付挿入を選択
+  (defun calendar-datetime-choice ()
+    "org-mode choice."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?d "calendar(d)" calendar)
+                   (?t "time(t)"     insert-date)
+                   (?T "datetime(T)" insert-date-time)))
+            (prompt "Calendar ?: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let ((char (read-char-choice prompt chars)))
+          (funcall (car (cdr (cdr (assq char lst)))))))))
+  (define-key global-map (kbd "C-c d") 'calendar-datetime-choice)
 
   (eval-after-load "calendar"
     '(progn
@@ -1426,6 +1468,14 @@
          (setq org-todo-keywords
                '((sequence "TODO(t)" "WAIT(w)" "DONE(d)" "CANCELED(c)"))))
        (message "Loading %s (org)...done" this-file-name))))
+
+;; org-table 設定
+(when (locate-library "org-table")
+  (eval-after-load "org-table"
+    '(progn
+       ;; 表で日本語を崩れないようにするパッチ
+       (load "org-table-patch")
+       (message "Loading %s (org-table)...done" this-file-name))))
 
 ;; org-agenda 設定
 (when (locate-library "org-agenda")
@@ -1603,8 +1653,24 @@
           ad-do-it
           (setq backup-inhibited nil))
       ad-do-it))
+
+  ;; ソート順をトグルする
+  (defun recentf-sort-files ()
+    "Toggle sort files."
+    (interactive)
+    (when (boundp 'recentf-menu-filter)
+      (if (eq recentf-menu-filter 'recentf-sort-ascending)
+          (setq recentf-menu-filter 'recentf-sort-descending)
+        (if recentf-menu-filter
+            (setq recentf-menu-filter nil)
+          (setq recentf-menu-filter 'recentf-sort-ascending))))
+    (when (fboundp 'recentf-open-files)
+      (recentf-open-files)))
+
   ;; キーバインド
-  (define-key recentf-dialog-mode-map (kbd "w") 'recentf-edit-list)
+  (when (boundp 'recentf-dialog-mode-map)
+    (define-key recentf-dialog-mode-map (kbd "s") 'recentf-sort-files)
+    (define-key recentf-dialog-mode-map (kbd "w") 'recentf-edit-list))
   (define-key global-map (kbd "C-c C-f") 'recentf-open-files)
   (define-key global-map (kbd "<f12>") 'recentf-open-files))
 
@@ -1787,8 +1853,7 @@
   (define-key global-map (kbd "<S-f8>") 'goto-last-change-reverse))
 
 ;;; セッション保存
-;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/
-;; session-2.3a.tar.gz | tar xfz -
+;; wget -O- http://jaist.dl.sourceforge.net/project/emacs-session/session/session-2.3a.tar.gz | tar xfz -
 (when (locate-library "session")
   (autoload 'session-jump-to-last-change "session"
     "Rename files editing their names in dired buffers." t)
@@ -1811,7 +1876,8 @@
          ;; キルリング, カーソル位置, ファイル履歴
          (setq session-globals-include '((kill-ring 50)
                                          (session-file-alist 500 t)
-                                         (file-name-history 10000))))
+                                         (file-name-history 10000)
+                                         search-ring regexp-search-ring)))
        ;; 前回閉じたときの位置にカーソルを復帰
        (when (boundp 'session-undo-check)
          (setq session-undo-check -1))
@@ -1860,6 +1926,7 @@
                          ((string= "*info*" (buffer-name b)) b)
                          ((string= "*Help*" (buffer-name b)) b)
                          ((string= "*Open Recent*" (buffer-name b)) b)
+                         ((string= "*compilation*" (buffer-name b)) b)
                          ((string-match
                            "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
                          ((string-match
@@ -2278,9 +2345,9 @@
     "Integration of Emacs help system and memo." t)
   (add-hook 'help-mode-hook
             (lambda ()
-              (when (fboundp 'umemo-initialize)
-                (umemo-initialize))
-              (setq header-line-format nil)))
+              (let (header-line-format) ; ヘッダを変えない
+                (when (fboundp 'umemo-initialize)
+                  (umemo-initialize)))))
 
   (eval-after-load "usage-memo"
     '(progn
@@ -2411,37 +2478,6 @@
                   (file-exists-p "~/.emacs.d/tomatinho/tick.wav"))
              (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav"))
        (message "Loading %s (tea-time)...done" this-file-name))))
-
-;;; git の設定
-;; git clone git://github.com/magit/magit.git
-(when (and (executable-find "git") (locate-library "magit"))
-  (autoload 'magit-status "magit" "Interface for git on Emacs." t)
-
-  (eval-after-load "magit"
-    '(progn
-       ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
-       (when (boundp 'magit-diff-refine-hunk)
-         (setq magit-diff-refine-hunk 'all))
-       ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
-       (set-face-attribute 'magit-item-highlight nil :inherit nil)
-       ;; 色の設定
-       (when (and (eval-when-compile (require 'diff-mode nil t))
-                  (fboundp 'diff-mode-setup-faces))
-         (diff-mode-setup-faces)) ; diff-mode で定義済み
-       ;; 空白無視をトグルする
-       (defun magit-toggle-whitespace ()
-         (interactive)
-         (if (member "-w" magit-diff-options)
-             (setq magit-diff-options (remove "-w" magit-diff-options))
-           (add-to-list 'magit-diff-options "-w"))
-         (if (member "-b" magit-diff-options)
-             (setq magit-diff-options (remove "-b" magit-diff-options))
-           (add-to-list 'magit-diff-options "-b"))
-         (magit-refresh)
-         (message "magit-diff-options %s" magit-diff-options))
-       (when (boundp 'magit-mode-map)
-         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))
-       (message "Loading %s (magit)...done" this-file-name))))
 
 ;;; Windows の設定
 (eval-and-compile
@@ -2975,6 +3011,71 @@
 
 ;;; ここからプログラミング用設定
 
+;;; git の設定
+;; git clone git://github.com/magit/magit.git
+(when (and (executable-find "git") (locate-library "magit"))
+  (autoload 'magit-status "magit" "Interface for git on Emacs." t)
+
+  (eval-after-load "magit"
+    '(progn
+       ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
+       (when (boundp 'magit-diff-refine-hunk)
+         (setq magit-diff-refine-hunk 'all))
+       ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
+       (set-face-attribute 'magit-item-highlight nil :inherit nil)
+       ;; 色の設定
+       (when (and (eval-when-compile (require 'diff-mode nil t))
+                  (fboundp 'diff-mode-setup-faces))
+         (diff-mode-setup-faces)) ; diff-mode で定義済み
+       ;; 空白無視をトグルする
+       (defun magit-toggle-whitespace ()
+         (interactive)
+         (if (member "-w" magit-diff-options)
+             (setq magit-diff-options (remove "-w" magit-diff-options))
+           (add-to-list 'magit-diff-options "-w"))
+         (if (member "-b" magit-diff-options)
+             (setq magit-diff-options (remove "-b" magit-diff-options))
+           (add-to-list 'magit-diff-options "-b"))
+         (magit-refresh)
+         (message "magit-diff-options %s" magit-diff-options))
+       (when (boundp 'magit-mode-map)
+         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))
+       (message "Loading %s (magit)...done" this-file-name))))
+
+;; バージョン管理
+(when (locate-library "vc")
+  (autoload 'vc-print-log "vc" "VC log." t)
+  (autoload 'vc-diff "vc" "VC diff." t)
+  (autoload 'vc-next-action "vc" "VC commit." t)
+  (autoload 'vc-update "vc" "VC update." t)
+  (autoload 'vc-register "vc" "VC register." t)
+  (autoload 'vc-revert "vc" "VC revert." t)
+  (autoload 'vc-revision-other-window "vc" "VC revision." t)
+
+  ;; 選択してバージョン管理
+  (defun vc-choice-control ()
+    "Version control."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?d "status(d)" vc-dir)
+                   (?l "log(l)"    vc-print-log)
+                   (?= "diff(=)"   vc-diff)
+                   (?v "commit(v)" vc-next-action)
+                   (?+ "update(+)" vc-update)
+                   (?i "add(i)"    vc-register)
+                   (?u "revert(u)" vc-revert)
+                   (?g "blame(g)"  vc-annotate)
+                   (?~ "cat(~)"    vc-revision-other-window)))
+            (prompt "vc: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let* ((char (read-char-choice prompt chars))
+               (func (car (cdr (cdr (assq char lst))))))
+          (call-interactively func)))))
+  (define-key global-map (kbd "C-c v") 'vc-choice-control))
+
 ;;; タグ検索
 ;; GNU Global
 ;; wget http://tamacom.com/global/global-6.2.8.tar.gz
@@ -3066,22 +3167,30 @@
        ;; 選択バッファを一段階のみ有効
        (when (boundp 'gtags-select-buffer-single)
          (setq gtags-select-buffer-single t))
+       ;; 選択して タグ検索
+       (defun gtags-choice-search ()
+         "Gtags search."
+         (interactive)
+         (when (fboundp 'read-char-choice)
+           (let ((lst '((?d "tag(d)"     gtags-find-tag)
+                        (?r "rtag(r)"    gtas-find-rtag)
+                        (?s "symbol(s)"  gtas-find-symbol)
+                        (?g "grep(g)"    gtas-find-with-grep)
+                        (?p "pattern(p)" gtas-find-pattern)
+                        (?P "file(P)"    gtas-find-file)
+                        (?f "parse(f)"   gtags-parse-file)))
+                 (prompt "gtags: ")
+                 chars)
+             (dolist (l lst)
+               (setq prompt (concat prompt (car (cdr l)) " "))
+               (add-to-list 'chars (car l)))
+             (let ((char (read-char-choice prompt chars)))
+               (funcall (car (cdr (cdr (assq char lst)))))))))
+
        ;; キーバインド
        (when (boundp 'gtags-mode-map)
-         ;; 定義タグ検索
-         (define-key gtags-mode-map (kbd "C-c g d") 'gtags-find-tag)
-         ;; 参照タグ検索
-         (define-key gtags-mode-map (kbd "C-c g r") 'gtags-find-rtag)
-         ;; シンボル一覧表示
-         (define-key gtags-mode-map (kbd "C-c g s") 'gtags-find-symbol)
-         ;; grep 検索
-         (define-key gtags-mode-map (kbd "C-c g g") 'gtags-find-with-grep)
-         ;; POSIX 正規表現検索
-         (define-key gtags-mode-map (kbd "C-c g p") 'gtags-find-pattern)
-         ;; パス名検索
-         (define-key gtags-mode-map (kbd "C-c g P") 'gtags-find-file)
-         ;; ファイルの定義タグ検索
-         (define-key gtags-mode-map (kbd "C-c g f") 'gtags-parse-file)
+         ;; 選択してタグ検索
+         (define-key gtags-mode-map (kbd "C-c g") 'gtags-choice-search)
          ;; コンテキスト検索
          (define-key gtags-mode-map (kbd "C-]") 'gtags-find-tag-from-here)
          ;; タグスタックをポップ
@@ -3318,7 +3427,8 @@
           (lambda ()
             (when (fboundp 'c-set-style)
               (c-set-style "k&r"))
-            (define-key mode-specific-map "c" 'compile)
+            (when (boundp 'mode-specific-map)
+              (define-key mode-specific-map "c" 'compile))
             (require 'auto-complete-clang nil t)
             (require 'auto-complete nil t)
             (when (boundp 'ac-clang-prefix-header)
@@ -3332,6 +3442,22 @@
                                          ac-source-semantic
                                          ac-source-gtags)
                                        ac-sources)))))
+
+(add-hook 'compilation-mode-hook
+          (lambda ()
+            ;; 保存するときに聞かない
+            (when (boundp 'compilation-asc-abount-save)
+              (setq compilation-ask-about-save nil))
+            ;; コンパイル結果をスクロールさせる
+            (when (boundp 'compilation-scroll-output)
+              (setq compilation-scroll-output t))))
+
+;; クリーン
+(defun make-clean ()
+  "make clean command."
+  (interactive)
+  (let ((compile-command "make clean"))
+    (call-interactively 'compile)))
 
 ;; ミニバッファにプロトタイプ表示
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
@@ -3701,11 +3827,14 @@
                        (or (buffer-file-name (current-buffer)) "")))
              (dir (read-directory-name "Directory: "
                                        default nil nil nil))
-             (files (eshell-extended-glob
-                     (concat (file-name-as-directory dir) "**/*.[h|c]"))))
+             files)
+        (setq files (append (eshell-extended-glob
+                             (concat (file-name-as-directory dir)
+                                     "**/*.[h|c]")) files))
         (message "%s" files)
         (dolist (file files)
-          (when (and (not (file-directory-p file))
+          (when (and (stringp file)
+                     (not (file-directory-p file))
                      (file-readable-p file)
                      (file-writable-p file))
             (message "file: %s" file)
