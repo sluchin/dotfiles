@@ -1289,7 +1289,7 @@
 
   ;; カレンダと日付挿入を選択
   (defun calendar-datetime-choice ()
-    "org-mode choice."
+    "Calendar and insert date choice."
     (interactive)
     (when (fboundp 'read-char-choice)
       (let ((lst '((?d "calendar(d)" calendar)
@@ -2962,14 +2962,25 @@
 ;;; 端末エミュレータ
 ;; eshell
 ;; 行末空白強調表示をしない
-(add-hook 'eshell-mode-hook
-          (lambda ()
-            (setq show-trailing-whitespace nil)))
+(when (locate-library "eshell")
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (setq show-trailing-whitespace nil)))
+  (eval-after-load "eshell"
+    '(progn
+       ;; 確認なしでヒストリ保存
+       (setq eshell-ask-to-save-history (quote always))
+       ;; zsh のヒストリと共有
+       (setq eshell-history-file-name "~/.zsh_history")
+       ;; ヒストリサイズ
+       (setq eshell-history-size 100000))))
+
 ;; shell
 ;; 行末空白強調表示をしない
-(add-hook 'shell-mode-hook
-          (lambda ()
-            (setq show-trailing-whitespace nil)))
+(when (locate-library "shell")
+  (add-hook 'shell-mode-hook
+            (lambda ()
+              (setq show-trailing-whitespace nil))))
 
 ;; multi-term
 ;; zsh に設定
@@ -3065,7 +3076,7 @@
                    (?u "revert(u)" vc-revert)
                    (?g "blame(g)"  vc-annotate)
                    (?~ "cat(~)"    vc-revision-other-window)))
-            (prompt "vc: ")
+            (prompt "VC: ")
             chars)
         (dolist (l lst)
           (setq prompt (concat prompt (car (cdr l)) " "))
@@ -3885,44 +3896,55 @@ Any input that is not one of CHARS is ignored.
 
 If optional argument INHIBIT-KEYBOARD-QUIT is non-nil, ignore
 keyboard-quit events while waiting for a valid input."
-    (unless (consp chars)
-      (error "Called `read-char-choice' without valid char choices"))
-    (let (char done show-help (helpbuf " *Char Help*"))
-      (let ((cursor-in-echo-area t)
-            (executing-kbd-macro executing-kbd-macro)
-            (esc-flag nil))
-        (save-window-excursion	      ; in case we call help-form-show
-          (while (not done)
-            (unless (get-text-property 0 'face prompt)
-              (setq prompt (propertize prompt 'face 'minibuffer-prompt)))
-            (setq char (let ((inhibit-quit inhibit-keyboard-quit))
-                         (read-key prompt)))
-            (and show-help (buffer-live-p (get-buffer helpbuf))
-                 (kill-buffer helpbuf))
-            (cond
-             ((not (numberp char)))
-             ;; If caller has set help-form, that's enough.
-             ;; They don't explicitly have to add help-char to chars.
-             ((and help-form
-                   (eq char help-char)
-                   (setq show-help t)
-                   (help-form-show)))
-             ((memq char chars)
-              (setq done t))
-             ((and executing-kbd-macro (= char -1))
-              ;; read-event returns -1 if we are in a kbd macro and
-              ;; there are no more events in the macro.  Attempt to
-              ;; get an event interactively.
-              (setq executing-kbd-macro nil))
-             ((not inhibit-keyboard-quit)
+    (when (fboundp 'help-form-show)
+      (unless (consp chars)
+        (error "Called `read-char-choice' without valid char choices"))
+      (let (char done show-help (helpbuf " *Char Help*"))
+        (let ((cursor-in-echo-area t)
+              (executing-kbd-macro executing-kbd-macro)
+              (esc-flag nil))
+          (save-window-excursion	      ; in case we call help-form-show
+            (while (not done)
+              (unless (get-text-property 0 'face prompt)
+                (setq prompt (propertize prompt 'face 'minibuffer-prompt)))
+              (setq char (let ((inhibit-quit inhibit-keyboard-quit))
+                           (read-key prompt)))
+              (and show-help (buffer-live-p (get-buffer helpbuf))
+                   (kill-buffer helpbuf))
               (cond
-               ((and (null esc-flag) (eq char ?\e))
-                (setq esc-flag t))
-               ((memq char '(?\C-g ?\e))
-                (keyboard-quit))))))))
-      ;; Display the question with the answer.  But without cursor-in-echo-area.
-      (message "%s%s" prompt (char-to-string char))
-      char)))
+               ((not (numberp char)))
+               ;; If caller has set help-form, that's enough.
+               ;; They don't explicitly have to add help-char to chars.
+               ((and help-form
+                     (eq char help-char)
+                     (setq show-help t)
+                     (help-form-show)))
+               ((memq char chars)
+                (setq done t))
+               ((and executing-kbd-macro (= char -1))
+                ;; read-event returns -1 if we are in a kbd macro and
+                ;; there are no more events in the macro.  Attempt to
+                ;; get an event interactively.
+                (setq executing-kbd-macro nil))
+               ((not inhibit-keyboard-quit)
+                (cond
+                 ((and (null esc-flag) (eq char ?\e))
+                  (setq esc-flag t))
+                 ((memq char '(?\C-g ?\e))
+                  (keyboard-quit))))))))
+        ;; Display the question with the answer.  But without cursor-in-echo-area.
+        (message "%s%s" prompt (char-to-string char))
+        char))))
+
+;; 24.3 以降 help.el で定義
+(unless (fboundp 'help-from-show)
+  ;; Don't print to *Help*; that would clobber Help history.
+  (defun help-form-show ()
+    "Display the output of a non-nil `help-form'."
+    (let ((msg (eval help-form)))
+      (if (stringp msg)
+          (with-output-to-temp-buffer " *Char Help*"
+            (princ msg))))))
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
