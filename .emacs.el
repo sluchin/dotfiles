@@ -144,7 +144,7 @@
 (set-default-coding-systems 'utf-8-emacs)
 (setq default-file-name-coding-system 'utf-8-emacs)
 ;; 日本語入力のための設定
-(prefer-coding-system 'utf-8-unix)
+(prefer-coding-system 'utf-8-emacs)
 
 ;; charset の優先度設定
 (set-charset-priority 'ascii
@@ -1032,8 +1032,6 @@
                    files)
              (revert-buffer))))
 
-       ;; 日本語入力のための設定
-       (prefer-coding-system 'utf-8-unix)
        ;; 文字コードをトグルする
        ;; (list-coding-systems)
        (defun dired-file-name-jp ()
