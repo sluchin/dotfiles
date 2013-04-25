@@ -3188,11 +3188,11 @@
          (interactive)
          (when (fboundp 'read-char-choice)
            (let ((lst '((?d "tag(d)"     gtags-find-tag)
-                        (?r "rtag(r)"    gtas-find-rtag)
-                        (?s "symbol(s)"  gtas-find-symbol)
-                        (?g "grep(g)"    gtas-find-with-grep)
-                        (?p "pattern(p)" gtas-find-pattern)
-                        (?P "file(P)"    gtas-find-file)
+                        (?r "rtag(r)"    gtags-find-rtag)
+                        (?s "symbol(s)"  gtags-find-symbol)
+                        (?g "grep(g)"    gtags-find-with-grep)
+                        (?p "pattern(p)" gtags-find-pattern)
+                        (?P "file(P)"    gtags-find-file)
                         (?f "parse(f)"   gtags-parse-file)))
                  (prompt "gtags: ")
                  chars)
@@ -3457,22 +3457,38 @@
                                          ac-source-semantic
                                          ac-source-gtags)
                                        ac-sources)))))
-
-(add-hook 'compilation-mode-hook
-          (lambda ()
-            ;; 保存するときに聞かない
-            (when (boundp 'compilation-asc-abount-save)
-              (setq compilation-ask-about-save nil))
-            ;; コンパイル結果をスクロールさせる
-            (when (boundp 'compilation-scroll-output)
-              (setq compilation-scroll-output t))))
-
 ;; クリーン
 (defun make-clean ()
   "make clean command."
   (interactive)
   (let ((compile-command "make clean"))
     (call-interactively 'compile)))
+
+(when (locate-library "compile")
+  (add-hook 'compilation-mode-hook
+            (lambda ()
+              ;; 保存するときに聞かない
+              (when (boundp 'compilation-asc-abount-save)
+                (setq compilation-ask-about-save nil))
+              ;; コンパイル結果をスクロールさせる
+              (when (boundp 'compilation-scroll-output)
+                (setq compilation-scroll-output t))))
+  (eval-after-load "compile"
+    '(progn
+       (defun recompile-make-clean-all ()
+         "Make clean for compilation-mode."
+         (interactive)
+         (let (cmd)
+           (add-to-list 'cmd "make clean all")
+           (apply 'compilation-start cmd)))
+       (defun recompile-make()
+         "Make clean for compilation-mode."
+         (interactive)
+         (let (cmd)
+           (add-to-list 'cmd "make")
+           (apply 'compilation-start cmd)))
+       (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
+       (define-key compilation-mode-map (kbd "m") 'recompile-make))))
 
 ;; ミニバッファにプロトタイプ表示
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
