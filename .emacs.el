@@ -3457,24 +3457,42 @@
                                          ac-source-semantic
                                          ac-source-gtags)
                                        ac-sources)))))
-;; クリーン
-(defun make-clean ()
-  "make clean command."
-  (interactive)
-  (let ((compile-command "make clean"))
-    (call-interactively 'compile)))
 
 (when (locate-library "compile")
-  (add-hook 'compilation-mode-hook
-            (lambda ()
-              ;; 保存するときに聞かない
-              (when (boundp 'compilation-asc-abount-save)
-                (setq compilation-ask-about-save nil))
-              ;; コンパイル結果をスクロールさせる
-              (when (boundp 'compilation-scroll-output)
-                (setq compilation-scroll-output t))))
+  (autoload 'compile "compile" "Compile for compilation-mode." t)
+
+  ;; クリーン
+  (defun make-clean ()
+    "make clean command."
+    (interactive)
+    (let ((compile-command "make clean"))
+      (call-interactively 'compile)))
+
+  (define-key global-map (kbd "<f10>") 'compile)
+
   (eval-after-load "compile"
     '(progn
+       ;; 保存するときに聞かない
+       (when (boundp 'compilation-asc-abount-save)
+         (setq compilation-ask-about-save nil))
+       ;; コンパイル結果をスクロールさせる
+       (when (boundp 'compilation-scroll-output)
+         (setq compilation-scroll-output t))
+       (when (boundp 'compilation-window-height)
+         (setq compilation-window-height 10))
+       (when (boundp 'compilation-environment)
+         (setq compilation-environment "LC_ALL=C"))
+       (add-to-list
+        'compilation-error-regexp-alist-alist
+        '(gcc-ja "^\\([\x20-\x7E]+\\):\\([0-9]+\\): \\(エラー\\|警告\\)" 1 2 nil nil))
+
+       (add-to-list 'compilation-error-regexp-alist 'gcc-ja)
+
+       (defadvice compilation-find-file
+         (before compilation-find-file-log activate compile)
+         (message "compilation-find-file: %s %s %s"
+                  (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2)))
+
        (defun recompile-make-clean-all ()
          "Make clean for compilation-mode."
          (interactive)
