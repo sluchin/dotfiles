@@ -97,16 +97,13 @@
 
 (when (eq system-type 'gnu/linux)
   (setq load-path
-        (append '(
-                  "/usr/share/emacs/site-lisp/migemo"
+        (append '("/usr/share/emacs/site-lisp/migemo"
                   "/usr/share/emacs/site-lisp/ddskk"
                   "/usr/share/emacs/site-lisp/mew"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
-                  "/usr/local/share/gtags"
-                  ) load-path)))
+                  "/usr/local/share/gtags") load-path)))
 (setq load-path
-      (append '(
-                "~/.emacs.d"
+      (append '("~/.emacs.d"
                 "~/.emacs.d/howm"
                 "~/.emacs.d/navi2ch"
                 "~/.emacs.d/magit"
@@ -131,8 +128,7 @@
                 "~/.emacs.d/malabar-mode/lisp"
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
-                "~/.emacs.d/auto-install"
-                ) load-path))
+                "~/.emacs.d/auto-install") load-path))
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
@@ -3900,7 +3896,7 @@
       (message "replace-match(` (')...done"))
     (goto-char (point-min))
     ;; 開きカッコの次の空白削除
-    (while (re-search-forward "([ ]+" nil t)
+    (while (re-search-forward "[^\\\\]([ ]+" nil t)
       (replace-match "(")
       (message "replace-match(`(')...done"))
     (goto-char (point-min))
@@ -3910,7 +3906,7 @@
       (message "replace-match(`)')...done"))
     (goto-char (point-min))
     ;; ^M 削除
-    (while (re-search-forward "" nil t)
+    (while (re-search-forward "" nil t)
       (replace-match "")
       (message "replace-match(`^M')...done"))
     ;; 全選択
@@ -4075,4 +4071,3 @@ keyboard-quit events while waiting for a valid input."
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
-
