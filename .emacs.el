@@ -265,9 +265,9 @@
 
 ;; 割合 バイト数/総行数 [行数:カラム数:カーソル位置]
 (setq mode-line-position
-        '(:eval (format "%%p %%I/L%d [%%l:%%c:%d]"
-                        (count-lines (point-max) (point-min))
-                        (point))))
+      '(:eval (format "%%p %%I/L%d [%%l:%%c:%d]"
+                      (count-lines (point-max) (point-min))
+                      (point))))
 
 ;; モード名を短縮して表示
 (defun display-short-mode-name ()
@@ -386,7 +386,11 @@
   ;; Emacs Lisp info 日本語
   (defun elisp-ja-info (&optional node)
     "Read documentation for Elisp-ja in the info system."
-    (interactive) (info (format "(elisp-ja)%s" (or node "")))))
+    (interactive) (info (format "(elisp-ja)%s" (or node ""))))
+  ;; Tramp info 日本語
+  (defun tramp-ja-info (&optional node)
+    "Read documentation for Tramp japanese manual in the info system."
+    (interactive) (info (format "(tramp_ja)%s" (or node "")))))
 
 (when (locate-library "info")
   (defun info-apropos-region-or-word ()
@@ -395,7 +399,7 @@
     (let* ((default (region-or-word))
            (string (read-string "Info apropos: " default t default)))
       (info-apropos string)))
-    (define-key global-map (kbd "C-c i") 'info-apropos-region-or-word))
+  (define-key global-map (kbd "C-c i") 'info-apropos-region-or-word))
 
 ;;; マニュアル (man)
 (when (locate-library "man")
@@ -741,11 +745,13 @@
   "Get url and open vlc."
   (interactive)
   (if (executable-find "vlc")
-    (let ((url-region (bounds-of-thing-at-point 'url)))
-      (when url-region
-        (start-process "vlc" nil "vlc"
-                       (buffer-substring-no-properties (car url-region)
-                                                       (cdr url-region)))))))
+      (let ((url-region (bounds-of-thing-at-point 'url)))
+        (when url-region
+          (start-process "vlc" nil "vlc"
+                         (buffer-substring-no-properties (car url-region)
+                                                         (cdr url-region)))))
+    (message "not found vlc")))
+
 ;; 選択して firefox で検索または vlc で開く
 (defun firefox-vlc-choice-search ()
   "Firefox search."
@@ -1094,7 +1100,7 @@
               (setq header-line-format nil)))
 
   ;; フォーカスを移す
-  (define-key global-map (kbd "C-c t") 'speedbar-get-focus)
+  (define-key global-map (kbd "C-c x") 'speedbar-get-focus)
   (define-key global-map (kbd "<f6>") 'speedbar-get-focus)
 
   (eval-after-load "speedbar"
@@ -1457,10 +1463,10 @@
        (when (boundp 'org-directory)           ; ディレクトリ
          (setq org-directory (catch 'found (find-directory "org")))
          (message "org-directory: %s" org-directory))
-         (when (boundp 'org-default-notes-file) ; ファイル名
-           (setq org-default-notes-file
-                 (concat (file-name-as-directory org-directory) "agenda.org"))
-           (message "org-default-notes-file: %s" org-default-notes-file))
+       (when (boundp 'org-default-notes-file) ; ファイル名
+         (setq org-default-notes-file
+               (concat (file-name-as-directory org-directory) "agenda.org"))
+         (message "org-default-notes-file: %s" org-default-notes-file))
        ;; Todo で使用するキーワードを定義。
        (when (boundp 'org-todo-keywords)
          (setq org-todo-keywords
@@ -1605,6 +1611,8 @@
   ;; 有効にする
   (when (fboundp 'recentf-mode)
     (recentf-mode 1))
+  (when (boundp 'recentf-menu-title)
+    (setq recentf-menu-title "Recentf"))
   (when (boundp 'recentf-max-menu-items)  ; メニュー表示最大数
     (setq recentf-max-menu-items 30))
   (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
@@ -1670,7 +1678,7 @@
   (when (boundp 'recentf-dialog-mode-map)
     (define-key recentf-dialog-mode-map (kbd "s") 'recentf-sort-files)
     (define-key recentf-dialog-mode-map (kbd "w") 'recentf-edit-list))
-  (define-key global-map (kbd "C-c C-f") 'recentf-open-files)
+  (define-key global-map (kbd "C-c C-x") 'recentf-open-files)
   (define-key global-map (kbd "<f12>") 'recentf-open-files))
 
 ;;; 矩形選択
@@ -1694,7 +1702,7 @@
   (autoload 'anything-for-files "anything-config"
     "Preconfigured `anything' for opening files." t)
   (define-key global-map (kbd "C-c a f") 'anything-recentf)
-  (define-key global-map (kbd "C-c a b") 'anything-for-files)
+  (define-key global-map (kbd "C-c a b") 'anything-for-files))
 
 ;;; ここまで標準 lisp
 
@@ -1702,26 +1710,26 @@
 ;; 使用する場合 lisp をロードパスの通ったところにインストールすること
 
 ;;; インストーラ
-  ;; (install-elisp-from-emacswiki "auto-install.el")
-  (when (locate-library "auto-install")
-    (autoload 'auto-install "auto-install"
-      "Auto install elisp file." t)
-    (autoload 'auto-install-batch "auto-install"
-      "Batch install many files." t)
-    (autoload 'install-elisp "auto-install"
-      "Install an elisp file from a given url." t)
-    (autoload 'install-elisp-from-emacswiki "auto-install"
-      "Install an elisp file from EmacsWiki.org." t)
+;; (install-elisp-from-emacswiki "auto-install.el")
+(when (locate-library "auto-install")
+  (autoload 'auto-install "auto-install"
+    "Auto install elisp file." t)
+  (autoload 'auto-install-batch "auto-install"
+    "Batch install many files." t)
+  (autoload 'install-elisp "auto-install"
+    "Install an elisp file from a given url." t)
+  (autoload 'install-elisp-from-emacswiki "auto-install"
+    "Install an elisp file from EmacsWiki.org." t)
 
-    (eval-after-load "auto-install"
-      '(progn
-         ;; 起動時に EmacsWiki のページ名を補完候補に加える
-         (when (fboundp 'auto-install-update-emacswiki-package-name)
-           (auto-install-update-emacswiki-package-name t))
-         ;; install-elisp.el 互換モードにする
-         (when (fboundp 'auto-install-compatibility-setup)
-           (auto-install-compatibility-setup))
-         (message "Loading %s (auto-install)...done" this-file-name)))))
+  (eval-after-load "auto-install"
+    '(progn
+       ;; 起動時に EmacsWiki のページ名を補完候補に加える
+       (when (fboundp 'auto-install-update-emacswiki-package-name)
+         (auto-install-update-emacswiki-package-name t))
+       ;; install-elisp.el 互換モードにする
+       (when (fboundp 'auto-install-compatibility-setup)
+         (auto-install-compatibility-setup))
+       (message "Loading %s (auto-install)...done" this-file-name))))
 
 ;;; ミニバッファの入力補完
 ;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/completing-help.el")
@@ -1907,9 +1915,12 @@
        ;; タブがはみ出たときスクロールさせる
        (when (boundp 'tabbar-auto-scroll-flag)
          (setq tabbar-auto-scroll-flag t))
-       ;; タブホームボタン非表示
-       (when (boundp 'tabbar-buffer-home-button)
-         (setq tabbar-buffer-home-button (quote (("") ""))))
+       ;; タブ左ボタン非表示
+       (dolist (btn '(tabbar-buffer-home-button
+                      tabbar-scroll-left-button
+                      tabbar-scroll-right-button))
+         (set btn (cons (cons "" nil) (cons "" nil))))
+
        ;; バッファ非表示
        (setq tabbar-buffer-list-function
              (lambda ()
@@ -1924,7 +1935,7 @@
                          ((string= "*scratch*" (buffer-name b)) b)
                          ((string= "*info*" (buffer-name b)) b)
                          ((string= "*Help*" (buffer-name b)) b)
-                         ((string= "*Open Recent*" (buffer-name b)) b)
+                         ((string= "*Recentf*" (buffer-name b)) b)
                          ((string= "*compilation*" (buffer-name b)) b)
                          ((string-match
                            "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
@@ -2318,8 +2329,8 @@
                 (enable-paredit-mode))
               (when (boundp 'paredit-mode-map)
                 (define-key paredit-mode-map (kbd "C-j")
-                  'eval-print-last-sexp)))))
-  (add-hook 'ielm-mode-hook 'enable-paredit-mode)
+                  'eval-print-last-sexp))))
+  (add-hook 'ielm-mode-hook 'enable-paredit-mode))
 
 ;;; 自動バイトコンパイル
 ;; (install-elisp-from-emacswiki "auto-async-byte-compile.el")
@@ -2475,7 +2486,7 @@
        ;; サウンドファイルのパス
        (when (and (boundp 'tea-time-sound)
                   (file-exists-p "~/.emacs.d/tomatinho/tick.wav"))
-             (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav"))
+         (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav"))
        (message "Loading %s (tea-time)...done" this-file-name))))
 
 ;;; Windows の設定
@@ -2599,9 +2610,9 @@
                        (goto-char p)))))
        ;; Summary モードの書式変更
        (when (boundp 'mew-summary-form)
-           (setq mew-summary-form
-                 '(type (5 date) "-" (-4 time) " "
-                        (14 from) " " t (30 subj) "|" (0 body))))
+         (setq mew-summary-form
+               '(type (5 date) "-" (-4 time) " "
+                      (14 from) " " t (30 subj) "|" (0 body))))
        (when (boundp 'mew-use-fancy-thread)      ; スレッドの親子関係を可視化
          (setq mew-use-fancy-thread t))
        (when (boundp 'mew-use-thread-separator)  ; スレッド間に区切りを表示
@@ -3239,7 +3250,7 @@
           (setq prompt (concat prompt (car (cdr l)) " ")))
         (let* ((default default-directory)
                (dir (read-directory-name "Directory: "
-                                 default nil nil nil))
+                                         default nil nil nil))
                (result (read-string prompt nil t nil))
                (files (car (cdr (cdr (assoc-string result lst))))))
           (if (and (file-directory-p dir) (file-readable-p dir))
@@ -3740,12 +3751,11 @@
     (message "[%s] Done." (format-time-string "%Y-%m-%d %H:%M:%S"))))
 
 ;; CSV 形式でファイルに出力する
-(defun vlc-xml2csv-file ()
+(defun vlc-xml2csv-file (file)
   "Conversion from xml to csv for vlc."
-  (interactive)
+  (interactive "fFilename: ")
   (let* ((buffer (current-buffer))
          (default "vlc.csv")
-         (file (read-file-name "Filename: " default-directory default nil default))
          (tmp " *xspf")
          tmpbuf)
     (or
@@ -3774,12 +3784,11 @@
      (message "Write file %s...done" file))))
 
 ;; location タグのディレクトリが実際に存在するかどうか調べる
-(defun vlc-check-location ()
+(defun vlc-check-location (file)
   "Check if directory of location tag exists."
-  (interactive)
+  (interactive "fFilename: ")
   (let* ((buffer (current-buffer))
          (default "check-location")
-         (file (read-file-name "Filename: " default-directory default nil default))
          (tmp " *xspf")
          string)
     (or
@@ -3805,11 +3814,11 @@
                    (insert "\n")))
                ;; 次の行へ進む
                (forward-line 1)))
-             (switch-to-buffer file)
-             (delete-other-windows)
-             (goto-char (point-min))
-             (set-visited-file-name file)
-             (save-buffer))
+           (switch-to-buffer file)
+           (delete-other-windows)
+           (goto-char (point-min))
+           (set-visited-file-name file)
+           (save-buffer))
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
@@ -3820,7 +3829,8 @@
   (let* ((buffer (current-buffer))
          (default-dir "/media")
          (default-file "check-directory")
-         (file (read-file-name "Filename: " default-directory default-file nil default-file))
+         (file (read-file-name "Filename: "
+                               default-directory default-file nil default-file))
          (dirs (read-directory-name "Directory: " default-dir nil nil nil))
          (tmp " *xspf")
          string)
@@ -3865,62 +3875,140 @@
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
-;;; インデント
-(defun c-indent ()
-  "C indent."
+;;; インデント整形
+(defun execute-indent ()
+  "Execute indent."
   (interactive)
-  (if (and (require 'em-glob nil t)
-           (fboundp 'eshell-extended-glob))
-      (let* ((backup "_BAK")
-             (default (file-name-directory
-                       (or (buffer-file-name (current-buffer)) "")))
-             (dir (read-directory-name "Directory: "
-                                       default nil nil nil))
-             files)
-        (setq files (append (eshell-extended-glob
-                             (concat (file-name-as-directory dir)
-                                     "**/*.[h|c]")) files))
-        (message "%s" files)
-        (dolist (file files)
-          (when (and (stringp file)
-                     (not (file-directory-p file))
-                     (file-readable-p file)
-                     (file-writable-p file))
-            (message "file: %s" file)
-            (copy-file file (concat file backup) t)
-            (with-temp-buffer
-              (insert-file-contents file nil)
-              (when (fboundp 'c-mode)
-                (c-mode))
-              (when (fboundp 'c-set-style)
-                (c-set-style "k&r"))
-              (when (boundp 'indent-tabs-mode)
-                (setq indent-tabs-mode nil))
-              (when (fboundp 'indent-region)
-                (indent-region (point-min) (point-max)))
-              (when (fboundp 'c-indent-defun)
-                (c-indent-defun))
-              (when (fboundp 'untabify)
-                (untabify (point-min) (point-max)))
-              (goto-char (point-min))
-              (while (re-search-forward
-                      "\\(if\\|for\\|while\\)\\([ ]*\\)(" nil t)
-                (replace-match (concat (match-string 1) " (")))
-              (goto-char (point-min))
-              (while (re-search-forward "([ ]*" nil t)
-                (replace-match "("))
-              (goto-char (point-min))
-              (while (re-search-forward "[ ]*)" nil t)
-                (replace-match ")"))
-              (goto-char (point-min))
-              (while (re-search-forward "" nil t)
-                (replace-match ""))
-              (when (fboundp 'mark-whole-buffer)
-                (mark-whole-buffer))
-              (when (fboundp 'delete-trailing-whitespace)
-                (delete-trailing-whitespace))
-              (write-file file)))))
-    (message "em-glob require error")))
+  (save-excursion
+    ;; インデント
+    (when (fboundp 'indent-region)
+      (indent-region (point-min) (point-max))
+      (message "indent-region...done"))
+    (when (and (fboundp 'c-indent-defun)
+               (eq major-mode 'c-mode))
+      (c-indent-defun)
+      (message "c-indent-defun...done"))
+    ;; タブをスペースにする
+    (when (fboundp 'untabify)
+      (untabify (point-min) (point-max))
+      (message "untabify...done"))
+    (goto-char (point-min))
+    ;; if, for, while の次は空白をいれる
+    (while (re-search-forward
+            "\\(if\\|for\\|while\\)\\((\\| [ ]+(\\)" nil t)
+      (replace-match (concat (match-string 1) " ("))
+      (message "replace-match(` (')...done"))
+    (goto-char (point-min))
+    ;; 開きカッコの次の空白削除
+    (while (re-search-forward "([ ]+" nil t)
+      (replace-match "(")
+      (message "replace-match(`(')...done"))
+    (goto-char (point-min))
+    ;; 閉じカッコの前の空白削除
+    (while (re-search-forward "[ ]+)" nil t)
+      (replace-match ")")
+      (message "replace-match(`)')...done"))
+    (goto-char (point-min))
+    ;; ^M 削除
+    (while (re-search-forward "" nil t)
+      (replace-match "")
+      (message "replace-match(`^M')...done"))
+    ;; 全選択
+    (mark-whole-buffer)
+    ;; 末尾の空白削除
+    (when (fboundp 'delete-trailing-whitespace)
+      (delete-trailing-whitespace)
+      (message "delete-trailing-whitespace...done"))
+    (message "execute-indent...done")))
+
+;; ディレクトリ配下すべてのファイルをリストにする
+(defun recursive-directory (dir)
+  "Make file list under directory."
+  (let (files)
+    (unless (listp dir)
+      (setq dir (list dir)))
+    (dolist (file dir)
+      (if (file-directory-p file)
+          (setq files
+                (append
+                 files
+                 (recursive-directory
+                  (let (recursive)
+                    (dolist (f (directory-files file t))
+                      (unless (string-match "/\\.$\\|/\\.\\.$" f)
+                        (add-to-list 'recursive f)))
+                    recursive))))
+        (add-to-list 'files file)))
+    files))
+
+;;; ディレクトリ配下すべてのファイルをインデント
+(defun indent-all (dir)
+  "Execute indent for all files."
+  (interactive "DDirectory: ")
+  (let* ((backup "_BAK")
+         (default (file-name-directory
+                   (or (buffer-file-name (current-buffer)) "")))
+         files)
+    (setq files (recursive-directory dir))
+    (message "%s" files)
+    (dolist (file files)
+      (when (and (stringp file)
+                 (not (file-directory-p file))
+                 (file-readable-p file)
+                 (file-writable-p file))
+        (when (string-match ".*\\.\\(el$\\)\\|[hc]$" file)
+          (message "file: %s" file)
+          ;; バックアップ
+          (copy-file file (concat file backup) t)
+          (save-excursion
+            (save-window-excursion
+              (find-file file)
+              (switch-to-buffer file)
+              (when (eq major-mode 'c-mode)
+                (when (fboundp 'c-set-style)
+                  (c-set-style "k&r"))
+                (when (boundp 'indent-tabs-mode)
+                  (setq indent-tabs-mode nil)))
+              ;; インデント
+              (execute-indent)
+              (save-buffer)
+              (kill-buffer file))))))))
+
+;;; VCステーダスが edited と added のファイルをインデント
+(defun indent-for-vc-state (dir)
+  "When vc-state is edited and added, execute indent."
+  (interactive "DDirectory: ")
+  (let* ((backup "_BAK")
+         (default (file-name-directory
+                   (or (buffer-file-name (current-buffer)) "")))
+         files)
+    (setq files (recursive-directory dir))
+    (dolist (file files)
+      (when (and (stringp file)
+                 (not (file-directory-p file))
+                 (file-readable-p file)
+                 (file-writable-p file))
+        (when (and (require 'vc nil t)
+                   (fboundp 'vc-state))
+          (let ((status (vc-state file (vc-backend file))))
+            (when (or (eq status 'edited)
+                      (eq status 'added))
+              (when (string-match ".*\\.\\(el$\\)\\|[hc]$" file)
+                (message "status: %s(%s)" status file)
+                ;; バックアップ
+                (copy-file file (concat file backup) t)
+                (save-excursion
+                  (save-window-excursion
+                    (find-file file)
+                    (switch-to-buffer file)
+                    (when (eq major-mode 'c-mode)
+                      (when (fboundp 'c-set-style)
+                        (c-set-style "k&r"))
+                      (when (boundp 'indent-tabs-mode)
+                        (setq indent-tabs-mode nil)))
+                    ;; インデント
+                    (execute-indent)
+                    (save-buffer)))))))))))
 
 ;;; sl
 ;; (install-elisp-from-emacswiki "sl.el")
@@ -3942,7 +4030,7 @@ keyboard-quit events while waiting for a valid input."
         (let ((cursor-in-echo-area t)
               (executing-kbd-macro executing-kbd-macro)
               (esc-flag nil))
-          (save-window-excursion	      ; in case we call help-form-show
+          (save-window-excursion          ; in case we call help-form-show
             (while (not done)
               (unless (get-text-property 0 'face prompt)
                 (setq prompt (propertize prompt 'face 'minibuffer-prompt)))
