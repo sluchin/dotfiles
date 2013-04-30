@@ -395,7 +395,7 @@
     (let* ((default (region-or-word))
            (string (read-string "Info apropos: " default t default)))
       (info-apropos string)))
-  (define-key global-map (kbd "C-c i") 'info-apropos-region-or-word))
+  (define-key global-map (kbd "C-c C-i") 'info-apropos-region-or-word))
 
 ;;; マニュアル (man)
 (when (locate-library "man")
@@ -1025,11 +1025,12 @@
            (let* ((files (dired-get-marked-files))
                   (date (format-time-string "%Y%m%d%H%M%S")))
              (mapc (lambda (file)
-                     (let ((backup
-                            (format "%s_%s.%s"
-                                    (file-name-sans-extension file)
-                                    date
-                                    (or (file-name-extension file) ""))))
+                     (let* ((ext (file-name-extension file))
+                            (backup 
+                             (format "%s_%s%s"
+                                     (file-name-sans-extension file)
+                                     date
+                                     (if ext (concat "." ext) ""))))
                        (dired-copy-file file backup nil)))
                    files)
              (revert-buffer))))
@@ -3969,19 +3970,17 @@
           (message "file: %s" file)
           ;; バックアップ
           (copy-file file (concat file backup) t)
-          (save-excursion
-            (save-window-excursion
-              (find-file file)
-              (switch-to-buffer file)
-              (when (eq major-mode 'c-mode)
-                (when (fboundp 'c-set-style)
-                  (c-set-style "k&r"))
-                (when (boundp 'indent-tabs-mode)
-                  (setq indent-tabs-mode nil)))
-              ;; インデント
-              (execute-indent)
-              (save-buffer)
-              (kill-buffer file))))))))
+          (find-file-noselect file)
+          (switch-to-buffer file)
+          (when (eq major-mode 'c-mode)
+            (when (fboundp 'c-set-style)
+              (c-set-style "k&r"))
+            (when (boundp 'indent-tabs-mode)
+              (setq indent-tabs-mode nil)))
+          ;; インデント
+          (execute-indent)
+          (save-buffer)
+          (kill-buffer file))))))
 
 ;;; VCステーダスが edited と added のファイルをインデント
 (defun indent-for-vc-state (dir)
@@ -4006,19 +4005,17 @@
                 (message "status: %s(%s)" status file)
                 ;; バックアップ
                 (copy-file file (concat file backup) t)
-                (save-excursion
-                  (save-window-excursion
-                    (find-file-noselect file)
-                    (switch-to-buffer file)
-                    (when (eq major-mode 'c-mode)
-                      (when (fboundp 'c-set-style)
-                        (c-set-style "k&r"))
-                      (when (boundp 'indent-tabs-mode)
-                        (setq indent-tabs-mode nil)))
-                    ;; インデント
-                    (execute-indent)
-                    (save-buffer)
-                    (kill-buffer file)))))))))))
+                (find-file-noselect file)
+                (switch-to-buffer file)
+                (when (eq major-mode 'c-mode)
+                  (when (fboundp 'c-set-style)
+                    (c-set-style "k&r"))
+                  (when (boundp 'indent-tabs-mode)
+                    (setq indent-tabs-mode nil)))
+                ;; インデント
+                (execute-indent)
+                (save-buffer)
+                (kill-buffer file)))))))))
 
 ;;; sl
 ;; (install-elisp-from-emacswiki "sl.el")
