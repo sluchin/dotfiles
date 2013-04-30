@@ -3908,6 +3908,11 @@
       (replace-match ")")
       (message "replace-match(`)')...done"))
     (goto-char (point-min))
+    ;; 閉じカッコと次のブレスの間の空白挿入
+    (while (re-search-forward "){" nil t)
+      (replace-match ") {")
+      (message "replace-match(`) {')...done"))
+    (goto-char (point-min))
     ;; ^M 削除
     (while (re-search-forward "$" nil t)
       (replace-match "")
