@@ -771,14 +771,14 @@
   (interactive)
   (desktop-save-mode 1)
   (desktop-read default-directory))
-(define-key global-map (kbd "<f10>") 'desktop-recover)
+(define-key global-map (kbd "<f9>") 'desktop-recover)
 
 ;; デスクトップ保存
 (defun desktop-save* ()
   (interactive)
   (desktop-save-mode 1)
   (desktop-save default-directory))
-(define-key global-map (kbd "<S-f10>") 'desktop-save*)
+(define-key global-map (kbd "<S-f9>") 'desktop-save*)
 
 ;; C-; で略語展開
 (setq hippie-expand-try-functions-list
@@ -1029,7 +1029,7 @@
                             (format "%s_%s.%s"
                                     (file-name-sans-extension file)
                                     date
-                                    (file-name-extension file))))
+                                    (or (file-name-extension file) ""))))
                        (dired-copy-file file backup nil)))
                    files)
              (revert-buffer))))
@@ -1295,7 +1295,7 @@
     (interactive)
     (when (fboundp 'read-char-choice)
       (let ((lst '((?d "calendar(d)" calendar)
-                   (?t "time(t)"     insert-date)
+                   (?t "date(t)"     insert-date)
                    (?T "datetime(T)" insert-date-time)))
             (prompt "Calendar ?: ")
             chars)
@@ -1619,7 +1619,8 @@
     (setq recentf-exclude
           '("/TAGS$" "^/var/tmp/" "^/tmp/"
             "~$" "/$" "/howm/" "\\.howm-keys$" "/\\.emacs\\.bmk$"
-            "\\.emacs\\.d/bookmarks$" "\\.pomodoro$" "/org/.*\\.org")))
+            "\\.emacs\\.d/bookmarks$" "\\.pomodoro$" "/org/.*\\.org"
+            "/.eshell/alias$")))
 
   ;; 開いたファイルを選択しない
   (when (boundp 'recentf-menu-action)
@@ -1788,12 +1789,18 @@
     (undohist-initialize)))
 
 ;;; CVS モード
-;;(install-elisp "http://bzr.savannah.gnu.org/lh/emacs/elpa/download/head:/csvmode.el-20120312160844-puljoum8kcsf2xcu-2/csv-mode.el")
+;; (install-elisp "http://bzr.savannah.gnu.org/lh/emacs/elpa/download/head:/csvmode.el-20120312160844-puljoum8kcsf2xcu-2/csv-mode.el")
 (when (locate-library "csv-mode")
   (add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
   (autoload 'csv-mode "csv-mode"
     "Major mode for editing comma-separated value files." t))
 
+;; syslog モード
+;; (install-elisp-from-emacswiki "hide-lines.el")
+;; (install-elisp-from-emacswiki "syslog-mode.el")
+(when (locate-library "syslog-mode")
+  (autoload 'syslog-mode "syslog-mode" "Mode for viewing system logfiles" t)
+  (add-to-list 'auto-mode-alist '("/var/log.*\\'" . syslog-mode)))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
@@ -1932,6 +1939,7 @@
                          ((string= "*info*" (buffer-name b)) b)
                          ((string= "*Help*" (buffer-name b)) b)
                          ((string= "*Recentf*" (buffer-name b)) b)
+                         ((string= "*Diff*" (buffer-name b)) b)
                          ((string= "*compilation*" (buffer-name b)) b)
                          ((string-match
                            "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
@@ -3486,7 +3494,7 @@
        (when (boundp 'compilation-scroll-output)
          (setq compilation-scroll-output t))
        (when (boundp 'compilation-window-height)
-         (setq compilation-window-height 10))
+         (setq compilation-window-height 20))
        (when (boundp 'compilation-environment)
          (setq compilation-environment "LC_ALL=C"))
        (add-to-list
@@ -3513,7 +3521,8 @@
            (add-to-list 'cmd "make")
            (apply 'compilation-start cmd)))
        (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
-       (define-key compilation-mode-map (kbd "m") 'recompile-make))))
+       (define-key compilation-mode-map (kbd "m") 'recompile-make)
+       (message "Loading %s (compile)...done" this-file-name))))
 
 ;; ミニバッファにプロトタイプ表示
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
@@ -3876,14 +3885,7 @@
   "Execute indent."
   (interactive)
   (save-excursion
-    ;; インデント
-    (when (fboundp 'indent-region)
-      (indent-region (point-min) (point-max))
-      (message "indent-region...done"))
-    (when (and (fboundp 'c-indent-defun)
-               (eq major-mode 'c-mode))
-      (c-indent-defun)
-      (message "c-indent-defun...done"))
+    (goto-char (point-min))
     ;; タブをスペースにする
     (when (fboundp 'untabify)
       (untabify (point-min) (point-max))
@@ -3906,15 +3908,26 @@
       (message "replace-match(`)')...done"))
     (goto-char (point-min))
     ;; ^M 削除
-    (while (re-search-forward "" nil t)
+    (while (re-search-forward "$" nil t)
       (replace-match "")
       (message "replace-match(`^M')...done"))
+    (goto-char (point-min))
     ;; 全選択
     (mark-whole-buffer)
     ;; 末尾の空白削除
     (when (fboundp 'delete-trailing-whitespace)
       (delete-trailing-whitespace)
       (message "delete-trailing-whitespace...done"))
+    (goto-char (point-min))
+    ;; インデント
+    (when (fboundp 'indent-region)
+      (indent-region (point-min) (point-max))
+      (message "indent-region...done"))
+    (goto-char (point-min))
+    (when (and (fboundp 'c-indent-defun)
+               (eq major-mode 'c-mode))
+      (c-indent-defun)
+      (message "c-indent-defun...done"))
     (message "execute-indent...done")))
 
 ;; ディレクトリ配下すべてのファイルをリストにする
@@ -3989,13 +4002,13 @@
           (let ((status (vc-state file (vc-backend file))))
             (when (or (eq status 'edited)
                       (eq status 'added))
-              (when (string-match ".*\\.\\(el$\\)\\|[hc]$" file)
+              (when (string-match ".*\\.el$\\|.*\\.[hc]$" file)
                 (message "status: %s(%s)" status file)
                 ;; バックアップ
                 (copy-file file (concat file backup) t)
                 (save-excursion
                   (save-window-excursion
-                    (find-file file)
+                    (find-file-noselect file)
                     (switch-to-buffer file)
                     (when (eq major-mode 'c-mode)
                       (when (fboundp 'c-set-style)
@@ -4004,7 +4017,8 @@
                         (setq indent-tabs-mode nil)))
                     ;; インデント
                     (execute-indent)
-                    (save-buffer)))))))))))
+                    (save-buffer)
+                    (kill-buffer file)))))))))))
 
 ;;; sl
 ;; (install-elisp-from-emacswiki "sl.el")
