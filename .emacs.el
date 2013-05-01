@@ -513,8 +513,8 @@
 (setq use-dialog-box nil)
 (defalias 'message-box 'message)
 
-;;; ログの記録行数を減らす (デフォルトは 100100)
-(setq message-log-max 10010)
+;;; ログの記録行数を増やす (デフォルトは 100100)
+(setq message-log-max 1001000)
 
 ;;; 履歴を保存する
 (savehist-mode 1)
@@ -954,6 +954,10 @@
        (when (boundp 'dired-recursive-deletes)
          (setq dired-recursive-deletes 'always))
 
+       ;; wdired のとき上書きで聞かない
+       (when (boundp 'wdired-confirm-overwrite)
+         (setq wdired-confirm-overwrite nil))
+
        ;; firefox で開く
        (defun dired-run-firefox ()
          "Run firefox."
@@ -1186,14 +1190,30 @@
               (setq show-trailing-whitespace nil)
               ;; diff を表示したらすぐに文字単位での強調表示も行う
               (when (fboundp 'diff-auto-refine-mode)
-                (diff-auto-refine-mode 1))))
+                (diff-auto-refine-mode 1))
+              ;; diff オプション
+              (when (boundp 'diff-switches)
+                (setq diff-switches '("-u" "-p" "-N" "-w" "-b" "-B" "-E")))))
 
-  (eval-after-load "diff"
+  (eval-after-load "diff-mode"
     '(progn
        ;; 色の設定
        (when (and (eval-when-compile (require 'diff-mode nil t))
                   (fboundp 'diff-mode-setup-faces))
          (diff-mode-setup-faces))
+       ;; 空白無視をトグルする
+       (defun diff-toggle-whitespace ()
+         "Toggle whitespace."
+         (interactive)
+         (when (boundp 'diff-switches)
+           (dolist (option (list "-w" "-b" "-B" "-E" ))
+             (if (member option diff-switches)
+                 (setq diff-switches (remove option diff-switches))
+               (add-to-list 'diff-switches option)))
+           (revert-buffer)
+           (message "diff-switches %s" diff-switches)))
+       (when (boundp 'diff-mode-shared-map)
+         (define-key diff-mode-shared-map (kbd "w") 'diff-toggle-whitespace))
        (message "Loading %s (diff)...done" this-file-name))))
 
 ;; Ediff Control Panel 専用のフレームを作成しない
@@ -1209,7 +1229,7 @@
          (setq ediff-window-setup-function 'ediff-setup-windows-plain))
        ;; diff オプション
        (when (boundp 'diff-switches)
-         (setq diff-switches '("-u" "-p" "-N")))
+         (setq diff-switches '("-u" "-p" "-N" "-w" "-b" "-B" "-E")))
        (message "Loading %s (ediff)...done" this-file-name))))
 
 ;;; バッファの切り替えをインクリメンタルにする
@@ -1644,7 +1664,10 @@
                (lambda (&optional b)
                  (if (string= (buffer-name b) (format "*%s*" recentf-menu-title))
                      nil (kill-buffer-orig b)))))
-        ad-do-it)))
+        ad-do-it)
+      ;; tabbar-mode を有効
+      (when (fboundp 'tabbar-mode)
+        (tabbar-mode 1))))
 
   ;; .recentf のバックアップファイルをつくらない
   (defadvice write-file
@@ -3042,38 +3065,7 @@
 
 ;;; ここからプログラミング用設定
 
-;;; git の設定
-;; git clone git://github.com/magit/magit.git
-(when (and (executable-find "git") (locate-library "magit"))
-  (autoload 'magit-status "magit" "Interface for git on Emacs." t)
-
-  (eval-after-load "magit"
-    '(progn
-       ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
-       (when (boundp 'magit-diff-refine-hunk)
-         (setq magit-diff-refine-hunk 'all))
-       ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
-       (set-face-attribute 'magit-item-highlight nil :inherit nil)
-       ;; 色の設定
-       (when (and (eval-when-compile (require 'diff-mode nil t))
-                  (fboundp 'diff-mode-setup-faces))
-         (diff-mode-setup-faces)) ; diff-mode で定義済み
-       ;; 空白無視をトグルする
-       (defun magit-toggle-whitespace ()
-         (interactive)
-         (if (member "-w" magit-diff-options)
-             (setq magit-diff-options (remove "-w" magit-diff-options))
-           (add-to-list 'magit-diff-options "-w"))
-         (if (member "-b" magit-diff-options)
-             (setq magit-diff-options (remove "-b" magit-diff-options))
-           (add-to-list 'magit-diff-options "-b"))
-         (magit-refresh)
-         (message "magit-diff-options %s" magit-diff-options))
-       (when (boundp 'magit-mode-map)
-         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))
-       (message "Loading %s (magit)...done" this-file-name))))
-
-;; バージョン管理
+;;; バージョン管理
 (when (locate-library "vc")
   (autoload 'vc-print-log "vc" "VC log." t)
   (autoload 'vc-diff "vc" "VC diff." t)
@@ -3106,6 +3098,51 @@
                (func (car (cdr (cdr (assq char lst))))))
           (call-interactively func)))))
   (define-key global-map (kbd "C-c v") 'vc-choice-control))
+
+;; magit の設定
+;; git clone git://github.com/magit/magit.git
+(when (and (executable-find "git") (locate-library "magit"))
+  (autoload 'magit-status "magit" "Interface for git on Emacs." t)
+
+  (eval-after-load "magit"
+    '(progn
+       ;; all ではなく t にすると現在選択中の hunk のみ強調表示する
+       (when (boundp 'magit-diff-refine-hunk)
+         (setq magit-diff-refine-hunk 'all))
+       ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
+       (set-face-attribute 'magit-item-highlight nil :inherit nil)
+       ;; 色の設定
+       (when (and (eval-when-compile (require 'diff-mode nil t))
+                  (fboundp 'diff-mode-setup-faces))
+         (diff-mode-setup-faces)) ; diff-mode で定義済み
+       ;; 空白無視をトグルする
+       (defun magit-toggle-whitespace ()
+         "Toggle whitespace."
+         (interactive)
+         (when (boundp 'magit-diff-options)
+           (dolist (option (list "-w" "-b" "-B" "-E" ))
+             (if (member option magit-diff-options)
+                 (setq magit-diff-options (remove option magit-diff-options))
+               (add-to-list 'magit-diff-options option)))
+           (when (fboundp 'magit-refresh)
+             (magit-refresh))
+           (message "magit-diff-options %s" magit-diff-options)))
+       (when (boundp 'magit-mode-map)
+         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))
+       (message "Loading %s (magit)...done" this-file-name))))
+
+;; psvn の設定
+(when (locate-library "psvn")
+  (autoload 'svn-status "psvn" "Subversion interface for emacs" t)
+  (eval-after-load "psvn"
+    '(progn
+       ;; ヘッダを使わない
+       (when (boundp 'svn-status-use-header-line)
+         (setq svn-status-use-header-line nil))
+       ;; オプションの設定
+       (when (boundp 'svn-status-default-diff-arguments)
+         (setq svn-status-default-diff-arguments
+               '("--diff-cmd" "diff" "-x" "-wbBEu"))))))
 
 ;;; タグ検索
 ;; GNU Global
@@ -3892,33 +3929,44 @@
       (untabify (point-min) (point-max))
       (message "untabify...done"))
     (goto-char (point-min))
-    ;; if, for, while の次は空白をいれる
+    ;; if, else if, for, while のカッコの次は空白をいれる
     (while (re-search-forward
-            "\\(if\\|for\\|while\\)\\((\\| [ ]+(\\)" nil t)
+            "\\(if\\|else if\\|for\\|while\\)\\((\\)" nil t)
       (replace-match (concat (match-string 1) " ("))
-      (message "replace-match(` (')...done"))
+      (message "[%d]replace-match(` (')...done" (line-number-at-pos)))
+    (goto-char (point-min))
+    ;; else if, else と次のブレスの間に空白をいれる
+    (while (re-search-forward
+            "\\(else if[ ]*(.*)\\|else\\)\\({\\)" nil t)
+      (replace-match (concat (match-string 1) " {"))
+      (message "[%d]replace-match(` {')...done" (line-number-at-pos)))
+    (goto-char (point-min))
+    ;; else if, else と次のブレスの間に空白をいれる
+    (while (re-search-forward
+            "\\(}\\)\\(else if\\|else\\)" nil t)
+      (replace-match (concat "} " (match-string 2)))
+      (message "[%d]replace-match(`} ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 開きカッコの次の空白削除
-    (while (re-search-forward "[^\\\\]([ ]+" nil t)
-      (replace-match "(")
-      (message "replace-match(`(')...done"))
+    (while (re-search-forward "\\([^\\\\]\\)([ ]+" nil t)
+      (replace-match (concat (match-string 1) "("))
+      (message "[%d]replace-match(`(')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 閉じカッコの前の空白削除
     (while (re-search-forward "[ ]+)" nil t)
       (replace-match ")")
-      (message "replace-match(`)')...done"))
+2      (message "[%d]replace-match(`)')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 閉じカッコと次のブレスの間の空白挿入
     (while (re-search-forward "){" nil t)
       (replace-match ") {")
-      (message "replace-match(`) {')...done"))
+      (message "[%d]replace-match(`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; ^M 削除
     (while (re-search-forward "$" nil t)
       (replace-match "")
-      (message "replace-match(`^M')...done"))
+      (message "[%d]replace-match(`^M')...done" (line-number-at-pos)))
     (goto-char (point-min))
-    ;; 全選択
     (mark-whole-buffer)
     ;; 末尾の空白削除
     (when (fboundp 'delete-trailing-whitespace)
@@ -3930,6 +3978,7 @@
       (indent-region (point-min) (point-max))
       (message "indent-region...done"))
     (goto-char (point-min))
+    (mark-whole-buffer)
     (when (and (fboundp 'c-indent-defun)
                (eq major-mode 'c-mode))
       (c-indent-defun)
@@ -3975,17 +4024,20 @@
           (message "file: %s" file)
           ;; バックアップ
           (copy-file file (concat file backup) t)
-          (find-file-noselect file)
-          (switch-to-buffer file)
-          (when (eq major-mode 'c-mode)
-            (when (fboundp 'c-set-style)
-              (c-set-style "k&r"))
-            (when (boundp 'indent-tabs-mode)
-              (setq indent-tabs-mode nil)))
-          ;; インデント
-          (execute-indent)
-          (save-buffer)
-          (kill-buffer file))))))
+          (save-excursion
+            (save-window-excursion
+              (find-file file)
+              (switch-to-buffer (file-name-nondirectory file))
+              (when (eq major-mode 'c-mode)
+                (when (fboundp 'c-set-style)
+                  (c-set-style "k&r"))
+                (when (boundp 'indent-tabs-mode)
+                  (setq indent-tabs-mode nil)))
+              ;; インデント
+              (execute-indent)
+              (save-buffer)
+              (message "kill-buffer: %s" (current-buffer))
+              (kill-buffer (current-buffer)))))))))
 
 ;;; VCステーダスが edited と added のファイルをインデント
 (defun indent-for-vc-state (dir)
@@ -4010,17 +4062,20 @@
                 (message "status: %s(%s)" status file)
                 ;; バックアップ
                 (copy-file file (concat file backup) t)
-                (find-file-noselect file)
-                (switch-to-buffer file)
-                (when (eq major-mode 'c-mode)
-                  (when (fboundp 'c-set-style)
-                    (c-set-style "k&r"))
-                  (when (boundp 'indent-tabs-mode)
-                    (setq indent-tabs-mode nil)))
-                ;; インデント
-                (execute-indent)
-                (save-buffer)
-                (kill-buffer file)))))))))
+                (save-excursion
+                  (save-window-excursion
+                    (find-file file)
+                    (switch-to-buffer (file-name-nondirectory file))
+                    (when (eq major-mode 'c-mode)
+                      (when (fboundp 'c-set-style)
+                        (c-set-style "k&r"))
+                      (when (boundp 'indent-tabs-mode)
+                        (setq indent-tabs-mode nil)))
+                    ;; インデント
+                    (execute-indent)
+                    (save-buffer)
+                    (message "kill-buffer: %s" (current-buffer))
+                    (kill-buffer (current-buffer))))))))))))
 
 ;;; sl
 ;; (install-elisp-from-emacswiki "sl.el")
