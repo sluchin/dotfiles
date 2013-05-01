@@ -1221,10 +1221,9 @@
                (add-to-list 'diff-switches option)))
            (if (and (fboundp 'diff)
                     diff-old-filename diff-new-filename)
-               (display-buffer
-                (diff diff-old-filename
-                      diff-new-filename
-                      diff-switches)))
+               (diff diff-old-filename
+                     diff-new-filename
+                     diff-switches))
            (message "diff-switches %s" diff-switches)))
        (when (boundp 'diff-mode-map)
          (define-key diff-mode-map (kbd "M-w") 'diff-toggle-whitespace))
