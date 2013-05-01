@@ -1219,7 +1219,8 @@
              (if (member option diff-switches)
                  (setq diff-switches (remove option diff-switches))
                (add-to-list 'diff-switches option)))
-           (if (and diff-old-filename diff-new-filename)
+           (if (and (fboundp 'diff)
+                    diff-old-filename diff-new-filename)
                (display-buffer
                 (diff diff-old-filename
                       diff-new-filename
