@@ -1184,23 +1184,32 @@
 ;; diff-mode
 (when (locate-library "diff")
   (autoload 'diff "diff" "Run diff." t)
-  (add-hook 'diff-mode-hook
-            (lambda ()
-              ;; 行末空白強調表示をしない
-              (setq show-trailing-whitespace nil)
-              ;; diff を表示したらすぐに文字単位での強調表示も行う
-              (when (fboundp 'diff-auto-refine-mode)
-                (diff-auto-refine-mode 1))
-              ;; diff オプション
-              (when (boundp 'diff-switches)
-                (setq diff-switches '("-u" "-p" "-N" "-w" "-b" "-B" "-E")))))
 
-  (eval-after-load "diff-mode"
+  (eval-after-load "diff"
     '(progn
+       ;; 行末空白強調表示をしない
+       (setq show-trailing-whitespace nil)
+       ;; diff を表示したらすぐに文字単位での強調表示も行う
+       (when (fboundp 'diff-auto-refine-mode)
+         (diff-auto-refine-mode 1))
+       ;; diff オプション
+       (when (boundp 'diff-switches)
+         (setq diff-switches
+               '("-u" "-p" "-N" "-w" "-b" "-B" "-E")))
        ;; 色の設定
        (when (and (eval-when-compile (require 'diff-mode nil t))
                   (fboundp 'diff-mode-setup-faces))
          (diff-mode-setup-faces))
+
+       ;; old ファイル名と new ファイル名を保持する
+       (defvar diff-old-filname nil)
+       (defvar diff-new-filname nil)
+       (defadvice diff (before diff-keep-arg
+                               (old new &optional switches no-async)
+                               activate compile)
+         (setq diff-old-filename (ad-get-arg 0))
+         (setq diff-new-filename (ad-get-arg 1)))
+
        ;; 空白無視をトグルする
        (defun diff-toggle-whitespace ()
          "Toggle whitespace."
@@ -1210,10 +1219,14 @@
              (if (member option diff-switches)
                  (setq diff-switches (remove option diff-switches))
                (add-to-list 'diff-switches option)))
-           (revert-buffer)
+           (if (and diff-old-filename diff-new-filename)
+               (display-buffer
+                (diff diff-old-filename
+                      diff-new-filename
+                      diff-switches)))
            (message "diff-switches %s" diff-switches)))
-       (when (boundp 'diff-mode-shared-map)
-         (define-key diff-mode-shared-map (kbd "w") 'diff-toggle-whitespace))
+       (when (boundp 'diff-mode-map)
+         (define-key diff-mode-map (kbd "M-w") 'diff-toggle-whitespace))
        (message "Loading %s (diff)...done" this-file-name))))
 
 ;; Ediff Control Panel 専用のフレームを作成しない
@@ -3128,7 +3141,7 @@
              (magit-refresh))
            (message "magit-diff-options %s" magit-diff-options)))
        (when (boundp 'magit-mode-map)
-         (define-key magit-mode-map (kbd "W") 'magit-toggle-whitespace))
+         (define-key magit-mode-map (kbd "M-w") 'magit-toggle-whitespace))
        (message "Loading %s (magit)...done" this-file-name))))
 
 ;; psvn の設定
@@ -3142,7 +3155,20 @@
        ;; オプションの設定
        (when (boundp 'svn-status-default-diff-arguments)
          (setq svn-status-default-diff-arguments
-               '("--diff-cmd" "diff" "-x" "-wbBEu"))))))
+               '("--diff-cmd" "diff" "-x" "-wbup")))
+       (defun psvn-toggle-whitespace ()
+         "Toggle whitespace."
+         (interactive)
+         (when (boundp 'svn-status-default-diff-arguments)
+           (if (member "-x" svn-status-default-diff-arguments)
+               (setq svn-status-default-diff-arguments
+                     '("--diff-cmd" "diff" ))
+             (setq svn-status-default-diff-arguments
+                   '("--diff-cmd" "diff" "-x" "-wbup"))))
+         (revert-buffer))
+       (when (boundp 'svn-status-diff-mode-map)
+         (define-key svn-status-diff-mode-map (kbd "M-w") 'magit-toggle-whitespace))
+       (message "Loading %s (psvn)...done" this-file-name))))
 
 ;;; タグ検索
 ;; GNU Global
