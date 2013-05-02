@@ -470,6 +470,18 @@
        (set-face-foreground 'woman-unknown "blue")
        (message "Loading %s (woman)...done" this-file-name))))
 
+;;; Devhelp
+;; (install-elisp "ftp://download.tuxfamily.org/user42/gtk-look.el")
+(when (and (locate-library "info")
+           (locate-library "gtk-look"))
+  (autoload 'gtk-lookup-symbol "gtk-look" "lookup Gtk and Gnome documentation." t)
+  (defun w3m-gtk-lookup ()
+    "Gtk lookup for w3m."
+    (interactive)
+    (let ((browse-url-browser-function 'w3m-browse-url))
+      (call-interactively 'gtk-lookup-symbol)))
+  (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
+
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
   (when (and (fboundp 'server-running-p)
@@ -3230,6 +3242,7 @@
                (dirs (cond
                       ((eq major-mode 'c-mode)
                        '("/usr/include"
+                         "/usr/include/libxml2/libxml"
                          "/usr/src/glibc"
                          "/usr/src/linux-source"))
                       ((eq major-mode 'c++-mode)
@@ -3378,9 +3391,10 @@
 
   (eval-after-load "auto-complete"
     '(progn
-       (when (boundp 'ac-dictionary-directories)
-         (add-to-list 'ac-dictionary-directories
-                      "~/.emacs.d/auto-complete/dict"))
+       (let ((file "~/.emacs.d/auto-complete/dict"))
+         (when (and (boundp 'ac-dictionary-directories)
+                    (file-readable-p file))
+           (add-to-list 'ac-dictionary-directories file)))
        (when (boundp 'ac-comphist-file)    ; ソースファイル
          (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
        (when (fboundp 'ac-config-default)  ; デフォルト設定にする
@@ -3525,15 +3539,23 @@
               (define-key mode-specific-map "c" 'compile))
             (require 'auto-complete-clang nil t)
             (require 'auto-complete nil t)
+            (require 'auto-complete-config nil t)
             (when (boundp 'ac-clang-prefix-header)
               (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
             (when (boundp 'ac-clang-flags)
               (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
-            ;; (when (fboundp 'semantic-mode)
-            ;;   (semantic-mode 1))
+            ;; (when (fboundp 'enable-cedet)
+            ;;   (enable-cedet))
             (when (boundp 'ac-sources)
               (setq ac-sources (append '(ac-source-clang
-                                         ac-source-semantic
+                                         ac-source-dictionary
+                                         ;; ac-source-semantic-raw
+                                         ac-source-words-in-buffer
+                                         ac-source-words-in-same-mode-buffers
+                                         ac-source-filename
+                                         ac-source-files-in-current-dir
+                                         ac-source-functions
+                                         ;;ac-source-semantic
                                          ac-source-gtags)
                                        ac-sources)))))
 
@@ -3627,13 +3649,56 @@
   (defun enable-cedet ()
     "Enable cedet"
     (interactive)
+    ;; Configuration variables here:
+    (when (boundp 'semantic-load-turn-useful-things-on)
+      (setq semantic-load-turn-useful-things-on t))
+    (when (boundp 'semantic-load-turn-everything-on)
+      (setq semantic-load-turn-everything-on t))
+
+    ;; ロード前設定が必要な変数, defcustom系変数
+    (when (boundp 'semantic-default-submodes)
+      (setq semantic-default-submodes
+            '(;; Semanticデータベース
+              global-semanticdb-minor-mode
+              ;; アイドルタイムに semantic-add-system-include
+              ;; で追加されたパスグループを再解析
+              global-semantic-idle-scheduler-mode
+              ;; タグのサマリを表示
+              global-semantic-idle-summary-mode
+              ;; タグの補完を表示
+              ;; (plugin auto-completeでac-source-semantic を使うので disable)
+              ;; global-semantic-idle-completions-mode
+              ;; タグを装飾
+              global-semantic-decoration-mode
+              ;; 現在カーソルでポイントされているfunctionの宣言をハイライト
+              global-semantic-highlight-func-mode
+              ;; ?
+              global-semantic-mru-bookmark-mode
+              ;; ?
+              global-semantic-stickyfunc-mode)))
+
+    ;; アイドルタイムに semantic-add-system-include
+    ;; で追加されたパスグループをパースする
+    (when (boundp 'semantic-idle-work-update-headers-flag)2
+          (setq semantic-idle-work-update-headers-flag t))
+
+    (when (fboundp 'semantic-add-system-include)
+      (semantic-add-system-include "/usr/include" 'c-mode)
+      (semantic-add-system-include "/usr/share/include" 'c-mode)
+      (semantic-add-system-include "/usr/local/include" 'c-mode)
+      (semantic-add-system-include "/usr/include" 'c++-mode)
+      (semantic-add-system-include "/usr/share/include" 'c++-mode)
+      (semantic-add-system-include "/usr/local/include" 'c++-mode))
+
     (require 'cedet nil t)
     (when (fboundp 'global-ede-mode)
       (global-ede-mode 1))
-    (when (fboundp 'semantic-load-enable-code-helpers)
-      (semantic-load-enable-code-helpers))
-    (when (fboundp 'global-srecode-minor-mode)
-      (global-srecode-minor-mode 1)))
+    ;; (when (fboundp 'semantic-load-enable-code-helpers)
+    ;;   (semantic-load-enable-code-helpers))
+    ;; (when (fboundp 'global-srecode-minor-mode)
+    ;;   (global-srecode-minor-mode 1))
+    (when (fboundp 'semantic-mode)
+      (semantic-mode 1)))
 
   (defun enable-cedet-hook ()
     "Enable cedet hook"
