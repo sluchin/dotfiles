@@ -369,6 +369,10 @@
          (define-key Info-mode-map (kbd "<M-left>") 'Info-history-back))
        (message "Loading %s (info)...done" this-file-name))))
 
+;; info+
+;; (install-elisp-from-emacswiki "info+.el")
+(eval-after-load "info" '(require 'info+))
+
 (when (locate-library "info")
   ;; Emacs info
   (defun emacs-info (&optional node)
@@ -386,7 +390,15 @@
   (defun elisp-ja-info (&optional node)
     "Read documentation for Elisp-ja in the info system."
     (interactive) (info (format "(elisp-ja)%s" (or node ""))))
-  ;; Tramp info 日本語
+  ;; libc info
+  (defun libc-info (&optional node)
+    "Read documentation for libc in the info system."
+    (interactive) (info (format "(libc)%s" (or node ""))))
+  ;; Perl info 日本語
+  (defun perl-ja-info (&optional node)
+    "Read documentation for perl in the info system."
+    (interactive) (info (format "(perl-ja)%s" (or node ""))))
+   ;; Tramp info 日本語
   (defun tramp-ja-info (&optional node)
     "Read documentation for Tramp japanese manual in the info system."
     (interactive) (info (format "(tramp_ja)%s" (or node "")))))
@@ -398,7 +410,8 @@
     (let* ((default (region-or-word))
            (string (read-string "Info apropos: " default t default)))
       (info-apropos string)))
-  (define-key global-map (kbd "C-c C-i") 'info-apropos-region-or-word))
+  (define-key global-map (kbd "C-c C-i") 'info-apropos-region-or-word)
+  (define-key global-map (kbd "C-h C-i") 'info-lookup-symbol))
 
 ;;; マニュアル (man)
 (when (locate-library "man")
@@ -1667,9 +1680,9 @@
   (when (boundp 'recentf-exclude)         ; 除外するファイル
     (setq recentf-exclude
           '("/TAGS$" "^/var/tmp/" "^/tmp/"
-            "~$" "/$" "/howm/" "\\.howm-keys$" "/\\.emacs\\.bmk$"
-            "\\.emacs\\.d/bookmarks$" "\\.pomodoro$" "/org/.*\\.org"
-            "/.eshell/alias$")))
+            "~$" "/$" "/howm/" "\\.howm-keys$" "\\.howm-history$"
+            "/\\.emacs\\.bmk$" "\\.emacs\\.d/bookmarks$"
+            "\\.pomodoro$" "/org/.*\\.org" "/.eshell/alias$")))
 
   ;; 開いたファイルを選択しない
   (when (boundp 'recentf-menu-action)
@@ -3631,25 +3644,29 @@
               (add-ac-sources '(ac-source-clang)))
             (when (require 'cedet nil t)
               (when (fboundp 'global-ede-mode)
-                (global-ede-mode 1))
-              (when (require 'semantic nil t)
-                (add-ac-sources '(ac-source-semantic-raw
-                                  ac-source-semantic))))
+                (global-ede-mode 1)))
+            (when (require 'semantic nil t)
+              (add-ac-sources '(ac-source-semantic-raw
+                                ac-source-semantic)))
+            (when (require 'semantic-load nil t)
+              (when (fboundp 'semantic-load--enable-code-helpers)
+                (semantic-load--enable-code-helpers)))
             (when (locate-library "gtags")
               (add-ac-sources '(ac-source-gtags)))
             (when (boundp 'ac-sources)
               (message "ac-sources: %s" ac-sources))))
 
 ;;; CEDET
-(defun cedet-info (&optional node)
-  "Read documentation for cedet in the info system."
-  (interactive) (info (format "(cedet)%s" (or node ""))))
-(defun semantic-user-info (&optional node)
-  "Read documentation for semantic-user in the info system."
-  (interactive) (info (format "(semantic-user)%s" (or node ""))))
-(defun semantic-info (&optional node)
-  "Read documentation for cedet in the info system."
-  (interactive) (info (format "(semantic)%s" (or node ""))))
+(when (locate-library "info")
+  (defun cedet-info (&optional node)
+    "Read documentation for cedet in the info system."
+    (interactive) (info (format "(cedet)%s" (or node ""))))
+  (defun semantic-user-info (&optional node)
+    "Read documentation for semantic-user in the info system."
+    (interactive) (info (format "(semantic-user)%s" (or node ""))))
+  (defun semantic-info (&optional node)
+    "Read documentation for cedet in the info system."
+    (interactive) (info (format "(semantic)%s" (or node "")))))
 
 (when (locate-library "ede")
   (autoload 'global-ede-mode "ede" "Emacs Development Environment gloss." t)
@@ -3661,14 +3678,16 @@
   (eval-after-load "semantic-load"
     '(progn
        (when (boundp 'semantic-load-turn-useful-things-on)
-         (setq semantic-load-turn-useful-things-on t)))))
+         (setq semantic-load-turn-useful-things-on t))
+       (message "Loading %s (semantic-load)...done" this-file-name))))
 
 (when (locate-library "semantic-ia")
-  (autoload 'semantic-iaa-complete-symbol "semantic-ia" "Semantic buffer evaluator." t)
+  (autoload 'semantic-ia-complete-symbol "semantic-ia"
+    "Semantic buffer evaluator." t)
 
   (eval-after-load "semantic-ia"
     '(progn
-       (message "Loading %s (semantic)...done" this-file-name))))
+       (message "Loading %s (semantic-ia)...done" this-file-name))))
 
 (when (locate-library "srecode")
   (autoload 'global-srecode-minor-mode "srecode"
@@ -3907,9 +3926,7 @@
              (write-file file))
            (switch-to-buffer file)
            (delete-other-windows)
-           (when (and (require 'csv-mode nil t)
-                      (fboundp 'csv-mode))
-             (csv-mode)))
+           (revert-buffer))
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
