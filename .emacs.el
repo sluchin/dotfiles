@@ -128,6 +128,9 @@
                 "~/.emacs.d/malabar-mode/lisp"
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
+                "~/.emacs.d/cedet/common"
+                "~/.emacs.d/cedet/ede"
+                "~/.emacs.d/cedet/semantic"
                 "~/.emacs.d/auto-install") load-path))
 
 ;;; 初期画面を表示しない
@@ -1987,7 +1990,8 @@
                          ((string= "*scratch*" (buffer-name b)) b)
                          ((string= "*info*" (buffer-name b)) b)
                          ((string= "*Help*" (buffer-name b)) b)
-                         ((string= "*Recentf*" (buffer-name b)) b)
+                         ((string-match "*Open Recent*\\|*Recentf*"
+                                        (buffer-name b)) b)
                          ((string= "*Diff*" (buffer-name b)) b)
                          ((string= "*compilation*" (buffer-name b)) b)
                          ((string-match
@@ -3442,6 +3446,75 @@
                        auto-insert-alist)))
        (message "Loading %s (autoinsert)...done" this-file-name))))
 
+(when (locate-library "compile")
+  (autoload 'compile "compile" "Compile for compilation-mode." t)
+
+  ;; クリーン
+  (defun make-clean ()
+    "make clean command."
+    (interactive)
+    (let ((compile-command "make clean"))
+      (call-interactively 'compile)))
+
+  ;; ディレクトリ指定してコンパイル
+  (defun compile-directory (dir)
+    (interactive "DDirectory: ")
+    (let ((default-directory dir)
+          (compile-command
+            (cond ((or (eq major-mode 'c-mode)
+                       (eq major-mode 'c++mode))
+                   "make -k ")
+                  ((eq major-mode 'java-mode)
+                   (concat "javac "
+                           (file-name-nondirectory (buffer-file-name))))
+                  (t compile-command))))
+      (call-interactively 'compile)))
+  (define-key global-map (kbd "C-c c") 'compile-directory)
+
+  (eval-after-load "compile"
+    '(progn
+       ;; 保存するときに聞かない
+       (when (boundp 'compilation-asc-abount-save)
+         (setq compilation-ask-about-save nil))
+       ;; コンパイル結果をスクロールさせる
+       (when (boundp 'compilation-scroll-output)
+         (setq compilation-scroll-output t))
+       (when (boundp 'compilation-window-height)
+         (setq compilation-window-height 20))
+       (when (boundp 'compilation-environment)
+         (setq compilation-environment "LC_ALL=C"))
+       (add-to-list
+        'compilation-error-regexp-alist-alist
+        '(gcc-ja "^\\([\x20-\x7E]+\\):\\([0-9]+\\): \\(エラー\\|警告\\)" 1 2 nil nil))
+
+       (add-to-list 'compilation-error-regexp-alist 'gcc-ja)
+
+       (defadvice compilation-find-file
+         (before compilation-find-file-log activate compile)
+         (message "compilation-find-file: %s %s %s"
+                  (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2)))
+
+       (defun recompile-make-clean-all ()
+         "Make clean for compilation-mode."
+         (interactive)
+         (when (string-match "make .*" compile-command)
+           (let (cmd)
+             (add-to-list 'cmd "make clean all")
+             (apply 'compilation-start cmd))))
+       (defun recompile-make()
+         "Make clean for compilation-mode."
+         (interactive)
+         (when (string-match "make .*" compile-command)
+           (let (cmd)
+             (add-to-list 'cmd "make -k")
+             (apply 'compilation-start cmd))))
+
+       ;; C-c c でコンパイル
+       (when (boundp 'compilation-mode-map)
+         (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
+         (define-key compilation-mode-map (kbd "m") 'recompile-make))
+       (message "Loading %s (compile)...done" this-file-name))))
+
 ;;; 略語から定型文を入力する
 ;; [new] git clone https://github.com/capitaomorte/yasnippet.git
 ;; [old] wget -O- http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2 | tar xfj -
@@ -3531,84 +3604,78 @@
 ;;; C 言語
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
 ;; clang -cc1 -x c-header stdafx.h -emit-pch -o stdafx.pch
+(defun add-ac-sources (sources)
+  "Add list of ac-souces."
+  (when (boundp 'ac-sources)
+    (dolist (source sources)
+      (unless (member source ac-sources)
+        (add-to-list 'ac-sources source)))))
+
 (add-hook 'c-mode-hook
           (lambda ()
             (when (fboundp 'c-set-style)
               (c-set-style "k&r"))
-            (when (boundp 'mode-specific-map)
-              (define-key mode-specific-map "c" 'compile))
-            (require 'auto-complete-clang nil t)
-            (require 'auto-complete nil t)
-            (require 'auto-complete-config nil t)
-            (when (boundp 'ac-clang-prefix-header)
-              (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
-            (when (boundp 'ac-clang-flags)
-              (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
-            ;; (when (fboundp 'enable-cedet)
-            ;;   (enable-cedet))
+            (when (and (require 'auto-complete nil t)
+                       (require 'auto-complete-config nil t))
+                  (add-ac-sources  '(ac-source-dictionary
+                                     ac-source-words-in-buffer
+                                     ac-source-words-in-same-mode-buffers
+                                     ac-source-filename
+                                     ac-source-files-in-current-dir)))
+            (when (require 'auto-complete-clang nil t)
+              (when (boundp 'ac-clang-prefix-header)
+                (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
+              (when (boundp 'ac-clang-flags)
+                (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
+              (add-ac-sources '(ac-source-clang)))
+            (when (require 'cedet nil t)
+              (when (fboundp 'global-ede-mode)
+                (global-ede-mode 1))
+              (when (require 'semantic nil t)
+                (add-ac-sources '(ac-source-semantic-raw
+                                  ac-source-semantic))))
+            (when (locate-library "gtags")
+              (add-ac-sources '(ac-source-gtags)))
             (when (boundp 'ac-sources)
-              (setq ac-sources (append '(ac-source-clang
-                                         ac-source-dictionary
-                                         ;; ac-source-semantic-raw
-                                         ac-source-words-in-buffer
-                                         ac-source-words-in-same-mode-buffers
-                                         ac-source-filename
-                                         ac-source-files-in-current-dir
-                                         ac-source-functions
-                                         ;;ac-source-semantic
-                                         ac-source-gtags)
-                                       ac-sources)))))
+              (message "ac-sources: %s" ac-sources))))
 
-(when (locate-library "compile")
-  (autoload 'compile "compile" "Compile for compilation-mode." t)
+;;; CEDET
+(defun cedet-info (&optional node)
+  "Read documentation for cedet in the info system."
+  (interactive) (info (format "(cedet)%s" (or node ""))))
+(defun semantic-user-info (&optional node)
+  "Read documentation for semantic-user in the info system."
+  (interactive) (info (format "(semantic-user)%s" (or node ""))))
+(defun semantic-info (&optional node)
+  "Read documentation for cedet in the info system."
+  (interactive) (info (format "(semantic)%s" (or node ""))))
 
-  ;; クリーン
-  (defun make-clean ()
-    "make clean command."
-    (interactive)
-    (let ((compile-command "make clean"))
-      (call-interactively 'compile)))
-
-  (define-key global-map (kbd "<f10>") 'compile)
-
-  (eval-after-load "compile"
+(when (locate-library "ede")
+  (autoload 'global-ede-mode "ede" "Emacs Development Environment gloss." t)
+  (eval-after-load "ede"
     '(progn
-       ;; 保存するときに聞かない
-       (when (boundp 'compilation-asc-abount-save)
-         (setq compilation-ask-about-save nil))
-       ;; コンパイル結果をスクロールさせる
-       (when (boundp 'compilation-scroll-output)
-         (setq compilation-scroll-output t))
-       (when (boundp 'compilation-window-height)
-         (setq compilation-window-height 20))
-       (when (boundp 'compilation-environment)
-         (setq compilation-environment "LC_ALL=C"))
-       (add-to-list
-        'compilation-error-regexp-alist-alist
-        '(gcc-ja "^\\([\x20-\x7E]+\\):\\([0-9]+\\): \\(エラー\\|警告\\)" 1 2 nil nil))
+       (message "Loading %s (ede)...done" this-file-name))))
 
-       (add-to-list 'compilation-error-regexp-alist 'gcc-ja)
+(when (locate-library "semantic-load")
+  (eval-after-load "semantic-load"
+    '(progn
+       (when (boundp 'semantic-load-turn-useful-things-on)
+         (setq semantic-load-turn-useful-things-on t)))))
 
-       (defadvice compilation-find-file
-         (before compilation-find-file-log activate compile)
-         (message "compilation-find-file: %s %s %s"
-                  (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2)))
+(when (locate-library "semantic-ia")
+  (autoload 'semantic-iaa-complete-symbol "semantic-ia" "Semantic buffer evaluator." t)
 
-       (defun recompile-make-clean-all ()
-         "Make clean for compilation-mode."
-         (interactive)
-         (let (cmd)
-           (add-to-list 'cmd "make clean all")
-           (apply 'compilation-start cmd)))
-       (defun recompile-make()
-         "Make clean for compilation-mode."
-         (interactive)
-         (let (cmd)
-           (add-to-list 'cmd "make")
-           (apply 'compilation-start cmd)))
-       (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
-       (define-key compilation-mode-map (kbd "m") 'recompile-make)
-       (message "Loading %s (compile)...done" this-file-name))))
+  (eval-after-load "semantic-ia"
+    '(progn
+       (message "Loading %s (semantic)...done" this-file-name))))
+
+(when (locate-library "srecode")
+  (autoload 'global-srecode-minor-mode "srecode"
+    "Minor-mode for managing and using SRecode templates" t)
+
+  (eval-after-load "srecode"
+    '(progn
+       (message "Loading %s (srecode)...done" this-file-name))))
 
 ;; ミニバッファにプロトタイプ表示
 ;; (install-elisp-from-emacswiki "c-eldoc.el")
@@ -3643,74 +3710,6 @@
                    (concat c-eldoc-includes include)))
            (message "c-eldoc-includes: %s" c-eldoc-includes)))
        (message "Loading %s (c-eldoc)...done" this-file-name))))
-
-;; CEDET
-(when (locate-library "cedet")
-  (defun enable-cedet ()
-    "Enable cedet"
-    (interactive)
-    ;; Configuration variables here:
-    (when (boundp 'semantic-load-turn-useful-things-on)
-      (setq semantic-load-turn-useful-things-on t))
-    (when (boundp 'semantic-load-turn-everything-on)
-      (setq semantic-load-turn-everything-on t))
-
-    ;; ロード前設定が必要な変数, defcustom系変数
-    (when (boundp 'semantic-default-submodes)
-      (setq semantic-default-submodes
-            '(;; Semanticデータベース
-              global-semanticdb-minor-mode
-              ;; アイドルタイムに semantic-add-system-include
-              ;; で追加されたパスグループを再解析
-              global-semantic-idle-scheduler-mode
-              ;; タグのサマリを表示
-              global-semantic-idle-summary-mode
-              ;; タグの補完を表示
-              ;; (plugin auto-completeでac-source-semantic を使うので disable)
-              ;; global-semantic-idle-completions-mode
-              ;; タグを装飾
-              global-semantic-decoration-mode
-              ;; 現在カーソルでポイントされているfunctionの宣言をハイライト
-              global-semantic-highlight-func-mode
-              ;; ?
-              global-semantic-mru-bookmark-mode
-              ;; ?
-              global-semantic-stickyfunc-mode)))
-
-    ;; アイドルタイムに semantic-add-system-include
-    ;; で追加されたパスグループをパースする
-    (when (boundp 'semantic-idle-work-update-headers-flag)2
-          (setq semantic-idle-work-update-headers-flag t))
-
-    (when (fboundp 'semantic-add-system-include)
-      (semantic-add-system-include "/usr/include" 'c-mode)
-      (semantic-add-system-include "/usr/share/include" 'c-mode)
-      (semantic-add-system-include "/usr/local/include" 'c-mode)
-      (semantic-add-system-include "/usr/include" 'c++-mode)
-      (semantic-add-system-include "/usr/share/include" 'c++-mode)
-      (semantic-add-system-include "/usr/local/include" 'c++-mode))
-
-    (require 'cedet nil t)
-    (when (fboundp 'global-ede-mode)
-      (global-ede-mode 1))
-    ;; (when (fboundp 'semantic-load-enable-code-helpers)
-    ;;   (semantic-load-enable-code-helpers))
-    ;; (when (fboundp 'global-srecode-minor-mode)
-    ;;   (global-srecode-minor-mode 1))
-    (when (fboundp 'semantic-mode)
-      (semantic-mode 1)))
-
-  (defun enable-cedet-hook ()
-    "Enable cedet hook"
-    (interactive)
-    (add-hook 'c-mode-hook 'enable-cedet)
-    (add-hook 'java-mode-hook 'enable-cedet))
-
-  (defun disable-cedet-hook ()
-    "Disable cedet hook"
-    (interactive)
-    (remove-hook 'c-mode-hook 'enable-cedet)
-    (remove-hook 'java-mode-hook 'enable-cedet)))
 
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
@@ -3791,10 +3790,7 @@
                     (setq ajc-tag-file "~/.java_base.tag")
                   (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
               (when (fboundp 'ajc-java-complete-mode)
-                (ajc-java-complete-mode))
-              (setq compile-command
-                    (concat "javac "
-                            (file-name-nondirectory (buffer-file-name)))))))
+                (ajc-java-complete-mode)))))
 
 ;; malabar-mode
 ;; git clone git://github.com/espenhw/malabar-mode.git または
@@ -3846,13 +3842,12 @@
                   (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
               (when (fboundp 'ajc-java-complete-mode)
                 (ajc-java-complete-mode))
+              (require 'semantic nil t)
               (when (boundp 'semantic-default-submodes)
                 (setq semantic-default-submodes '(global-semantic-idle-scheduler-mode
                                                   global-semanticdb-minor-mode
                                                   global-semantic-idle-summary-mode
                                                   global-semantic-mru-bookmark-mode)))
-              (when (fboundp 'semantic-mode)
-                (semantic-mode 1))
               (add-hook 'after-save-hook 'malabar-compile-file-silently nil t))))
 
 ;;; ここまでプログラミング用設定
@@ -4024,39 +4019,39 @@
     (while (re-search-forward
             "\\(if\\|else if\\|for\\|while\\)\\((\\)" nil t)
       (replace-match (concat (match-string 1) " ("))
-      (message "[%d]replace-match(` (')...done" (line-number-at-pos)))
+      (message "[%d] replace-match (` (')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; else if, else と次のブレスの間に空白をいれる
     (while (re-search-forward
             "\\(else if[ ]*(.*)\\|else\\)\\({\\)" nil t)
       (replace-match (concat (match-string 1) " {"))
-      (message "[%d]replace-match(` {')...done" (line-number-at-pos)))
+      (message "[%d] replace-match (` {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; else if, else と次のブレスの間に空白をいれる
     (while (re-search-forward
             "\\(}\\)\\(else if\\|else\\)" nil t)
       (replace-match (concat "} " (match-string 2)))
-      (message "[%d]replace-match(`} ')...done" (line-number-at-pos)))
+      (message "[%d] replace-match (`} ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 開きカッコの次の空白削除
     (while (re-search-forward "\\([^\\\\]\\)([ ]+" nil t)
       (replace-match (concat (match-string 1) "("))
-      (message "[%d]replace-match(`(')...done" (line-number-at-pos)))
+      (message "[%d] replace-match (`(')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 閉じカッコの前の空白削除
     (while (re-search-forward "[ ]+)" nil t)
       (replace-match ")")
-2      (message "[%d]replace-match(`)')...done" (line-number-at-pos)))
+2      (message "[%d] replace-match (`)')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 閉じカッコと次のブレスの間の空白挿入
     (while (re-search-forward "){" nil t)
       (replace-match ") {")
-      (message "[%d]replace-match(`) {')...done" (line-number-at-pos)))
+      (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; ^M 削除
     (while (re-search-forward "$" nil t)
       (replace-match "")
-      (message "[%d]replace-match(`^M')...done" (line-number-at-pos)))
+      (message "[%d] replace-match (`^M')...done" (line-number-at-pos)))
     (goto-char (point-min))
     (mark-whole-buffer)
     ;; 末尾の空白削除
