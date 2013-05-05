@@ -3501,6 +3501,7 @@
            (let (cmd)
              (add-to-list 'cmd "make clean all")
              (apply 'compilation-start cmd))))
+
        (defun recompile-make()
          "Make clean for compilation-mode."
          (interactive)
