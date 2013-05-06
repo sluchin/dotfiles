@@ -350,6 +350,14 @@
 (when (locate-library "info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
 
+  ;; info ディレクトリ追加
+  (let ((info-dir (expand-file-name "~/.emacs.d/info")))
+    (when (and (file-directory-p info-dir) (file-readable-p info-dir)
+               (boundp 'Info-directory-list))
+      (setq Info-directory-list (cons info-dir
+                                      Info-default-directory-list))
+      (message "Info-directory-list: %s" Info-directory-list)))
+
   (defun info-apropos-region-or-word ()
     "Info apropos from region or word."
     (interactive)
@@ -364,12 +372,6 @@
        ;; info+
        ;; (install-elisp-from-emacswiki "info+.el")
        (require 'info+ nil t)
-       (let ((info-dir (expand-file-name "~/.emacs.d/info")))
-         (when (and (file-directory-p info-dir) (file-readable-p info-dir)
-                    (boundp 'Info-directory-list))
-           (setq Info-directory-list (cons info-dir
-                                           Info-default-directory-list))
-           (message "Info-directory-list: %s" Info-directory-list)))
        ;; ヘッダラインを使用しない
        (when (boundp 'Info-use-header-line)
          (setq Info-use-header-line nil))
@@ -516,6 +518,7 @@
 
 ;; Html マニュアル
 (when (locate-library "w3m")
+  ;; Devhelp マニュアル
   (defun w3m-devhelp-command (cmd)
     "Devhelp command."
     (when (fboundp 'w3m-goto-url-new-session)
@@ -530,6 +533,7 @@
           `(lambda ()
              (interactive)
              (w3m-devhelp-command ,pg))))))
+  ;; Python マニュアル
   ;; sudo apt-get install python2.7-doc
   (defun w3m-python-manual ()
     "Python manual."
@@ -548,6 +552,7 @@
         (if (file-readable-p html)
             (w3m-goto-url-new-session (concat "file:/" html))
           (message "no file: %s" html)))))
+  ;; Haskell マニュアル
   ;; sudo apt-get install ghc-doc
   (defun w3m-haskell-manual ()
     "Haskell manual."
