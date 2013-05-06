@@ -350,6 +350,15 @@
 (when (locate-library "info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
 
+  (defun info-apropos-region-or-word ()
+    "Info apropos from region or word."
+    (interactive)
+    (let* ((default (region-or-word))
+           (string (read-string "Info apropos: " default t default)))
+      (info-apropos string)))
+  (define-key global-map (kbd "C-c C-i") 'info-apropos-region-or-word)
+  (define-key global-map (kbd "C-h C-i") 'info-lookup-symbol)
+
   (eval-after-load "info"
     '(progn
        (let ((info-dir (expand-file-name "~/.emacs.d/info")))
@@ -398,20 +407,22 @@
   (defun perl-ja-info (&optional node)
     "Read documentation for perl in the info system."
     (interactive) (info (format "(perl-ja)%s" (or node ""))))
-   ;; Tramp info 日本語
+  ;; Python info
+  (defun python-info (&optional node)
+    "Read documentation for python in the info system."
+    (interactive) (info (format "(python)%s" (or node ""))))
+  ;; Tramp info 日本語
   (defun tramp-ja-info (&optional node)
     "Read documentation for Tramp japanese manual in the info system."
     (interactive) (info (format "(tramp_ja)%s" (or node "")))))
 
-(when (locate-library "info")
-  (defun info-apropos-region-or-word ()
-    "Info apropos from region or word."
-    (interactive)
-    (let* ((default (region-or-word))
-           (string (read-string "Info apropos: " default t default)))
-      (info-apropos string)))
-  (define-key global-map (kbd "C-c C-i") 'info-apropos-region-or-word)
-  (define-key global-map (kbd "C-h C-i") 'info-lookup-symbol))
+;;; ヘルプ
+(when (locate-library "help")
+  (eval-after-load "help"
+    '(progn
+       (define-key help-mode-map (kbd "M-<right>") 'help-go-forward)
+       (define-key help-mode-map (kbd "M-<left>") 'help-go-back)
+       (message "Loading %s (help)...done" this-file-name))))
 
 ;;; マニュアル (man)
 (when (locate-library "man")
@@ -777,22 +788,22 @@
     (message "not found vlc")))
 
 ;; 選択して firefox で検索または vlc で開く
-(defun firefox-vlc-choice-search ()
+(defun firefox-vlc-choice ()
   "Firefox search."
   (interactive)
   (when (fboundp 'read-char-choice)
-    (let ((lst '((?g "[g]oogle"    firefox-google-search)
-                 (?w "[w]ikipedia" firefox-wikipedia-search)
-                 (?u "[u]rl"       firefox-url-at-point)
-                 (?v "[v]lc"       vlc-url-at-point)))
+    (let ((lst '((?g "google(g)"    firefox-google-search)
+                 (?w "wikipedia(w)" firefox-wikipedia-search)
+                 (?u "url(u)"       firefox-url-at-point)
+                 (?v "vlc(v)"       vlc-url-at-point)))
           (prompt "Open at ?: ")
           chars)
       (dolist (l lst)
         (setq prompt (concat prompt (car (cdr l)) " "))
         (add-to-list 'chars (car l)))
       (let ((char (read-char-choice prompt chars)))
-        (funcall (car (cdr (cdr (assq char lst)))))))))
-(define-key global-map (kbd "C-c f") 'firefox-vlc-choice-search)
+        (call-interactively (car (cdr (cdr (assq char lst)))))))))
+(define-key global-map (kbd "C-c f") 'firefox-vlc-choice)
 
 ;; デスクトップ復元
 (defun desktop-recover ()
@@ -1365,7 +1376,7 @@
           (setq prompt (concat prompt (car (cdr l)) " "))
           (add-to-list 'chars (car l)))
         (let ((char (read-char-choice prompt chars)))
-          (funcall (car (cdr (cdr (assq char lst)))))))))
+          (call-interactively (car (cdr (cdr (assq char lst)))))))))
   (define-key global-map (kbd "C-c d") 'calendar-datetime-choice)
 
   (eval-after-load "calendar"
@@ -1639,25 +1650,25 @@
            (locate-library "org-agenda")
            (locate-library "org-remember"))
   ;; org-mode を選択
-  (defun org-choice-mode ()
+  (defun org-choice ()
     "org-mode choice."
     (interactive)
     (when (fboundp 'read-char-choice)
-      (let ((lst '((?a "[a]genda"    org-agenda)
-                   (?r "[r]member"   org-remember)
-                   (?c "[c]oding"    org-remember-code-reading)
-                   (?s "[s]torelink" org-store-link)
-                   (?i "[i]switchb"  org-iswitchb)
-                   (?d "[d]ired"     org-dired)
-                   (?k "[k]ill"      org-kill-buffer)))
+      (let ((lst '((?a "agenda(a)"    org-agenda)
+                   (?r "rmember(r)"   org-remember)
+                   (?c "coding(c)"    org-remember-code-reading)
+                   (?s "storelink(s)" org-store-link)
+                   (?i "iswitchb(i)"  org-iswitchb)
+                   (?d "dired(d)"     org-dired)
+                   (?k "kill(k)"      org-kill-buffer)))
             (prompt "org-mode: ")
             chars)
         (dolist (l lst)
           (setq prompt (concat prompt (car (cdr l)) " "))
           (add-to-list 'chars (car l)))
         (let ((char (read-char-choice prompt chars)))
-          (funcall (car (cdr (cdr (assq char lst)))))))))
-  (define-key global-map (kbd "C-c o") 'org-choice-mode))
+          (call-interactively (car (cdr (cdr (assq char lst)))))))))
+  (define-key global-map (kbd "C-c o") 'org-choice))
 
 ;;; ファイル内のカーソル位置を記録する
 (when (eval-and-compile (require 'saveplace nil t))
@@ -2003,6 +2014,7 @@
                          ((string= "*scratch*" (buffer-name b)) b)
                          ((string= "*info*" (buffer-name b)) b)
                          ((string= "*Help*" (buffer-name b)) b)
+                         ((string= "*Apropos*" (buffer-name b)) b)
                          ((string-match "*Open Recent*\\|*Recentf*"
                                         (buffer-name b)) b)
                          ((string= "*Diff*" (buffer-name b)) b)
@@ -2423,14 +2435,15 @@
 (when (locate-library "usage-memo")
   (autoload 'umemo-initialize "usage-memo"
     "Integration of Emacs help system and memo." t)
-  (add-hook 'help-mode-hook
-            (lambda ()
-              (let (header-line-format) ; ヘッダを変えない
-                (when (fboundp 'umemo-initialize)
-                  (umemo-initialize)))))
+  (add-hook 'help-mode-hook 'umemo-initialize)
 
   (eval-after-load "usage-memo"
     '(progn
+       ;; ヘッダを使用しない
+       (defadvice usage-memo-mode
+         (around usage-memo-no-header activate compile)
+         (let (header-line-format)
+           ad-do-it))
        ;; ディレクトリ
        (when (boundp 'umemo-base-directory)
          (setq umemo-base-directory (catch 'found (find-directory "umemo")))
@@ -2479,7 +2492,7 @@
           (setq prompt (concat prompt (car (cdr l)) " "))
           (add-to-list 'chars (car l)))
         (let ((char (read-char-choice prompt chars)))
-          (funcall (car (cdr (cdr (assq char lst)))))))))
+          (call-interactively (car (cdr (cdr (assq char lst)))))))))
   (define-key global-map (kbd "C-c p") 'pomodoro-choice)
 
   (eval-after-load "pomodoro-technique"
@@ -2913,21 +2926,21 @@
             (w3m-goto-url-new-session string))))))
 
   ;; 選択して w3m で検索
-  (defun w3m-choice-search ()
+  (defun w3m-choice ()
     "w3m search."
     (interactive)
     (when (fboundp 'read-char-choice)
-      (let ((lst '((?g "[g]oogle"    w3m-search-google)
-                   (?w "[w]ikipedia" w3m-search-wikipedia)
-                   (?u "[u]rl"       w3m-url-at-point)))
+      (let ((lst '((?g "google(g)"    w3m-search-google)
+                   (?w "wikipedia(w)" w3m-search-wikipedia)
+                   (?u "url(u)"       w3m-url-at-point)))
             (prompt "w3m: ")
             chars)
         (dolist (l lst)
           (setq prompt (concat prompt (car (cdr l)) " "))
           (add-to-list 'chars (car l)))
         (let ((char (read-char-choice prompt chars)))
-          (funcall (car (cdr (cdr (assq char lst)))))))))
-  (define-key global-map (kbd "C-c 3") 'w3m-choice-search)
+          (call-interactively (car (cdr (cdr (assq char lst)))))))))
+  (define-key global-map (kbd "C-c 3") 'w3m-choice)
 
   ;; stl-manual を閲覧する
   ;; sudo apt-get install stl-manual
@@ -3001,21 +3014,28 @@
     "evernote-mode" "Post the region as an evernote." t)
   (autoload 'evernote-browser
     "evernote-mode" "Open an evernote browser." t)
-  ;; キーバインド
-  ;; 新規ノート作成
-  (define-key global-map (kbd "C-c e c") 'evernote-create-note)
-  ;; タグ選択して開く
-  (define-key global-map (kbd "C-c e o") 'evernote-open-note)
-  ;; 検索
-  (define-key global-map (kbd "C-c e s") 'evernote-search-notes)
-  ;; 保存されたワードで検索
-  (define-key global-map (kbd "C-c e S") 'evernote-do-saved-search)
-  ;; 現在バッファを書き込み
-  (define-key global-map (kbd "C-c e w") 'evernote-write-note)
-  ;; 選択範囲を書き込み
-  (define-key global-map (kbd "C-c e p") 'evernote-post-region)
-  ;; ブラウザ起動
-  (define-key global-map (kbd "C-c e b") 'evernote-browser)
+
+  ;; 選択して evernote を起動
+  (defun evernote-choice ()
+    "Evernote."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?c "create(c)"  evernote-create-note)
+                   (?o "open(o)"    evernote-open-note)
+                   (?s "search(s)"  evernote-search-notes)
+                   (?S "saved(S)"   evernote-do-saved-search)
+                   (?w "write(w)"   evernote-write-note)
+                   (?p "region(p)"  evernote-post-region)
+                   (?b "browser(b)" evernote-browser)))
+            (prompt "Evernote: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let* ((char (read-char-choice prompt chars))
+               (func (car (cdr (cdr (assq char lst))))))
+          (call-interactively func)))))
+  (define-key global-map (kbd "C-c e") 'evernote-choice)
 
   (eval-after-load "evernote-mode"
     '(progn
@@ -3118,7 +3138,7 @@
   (autoload 'vc-revision-other-window "vc" "VC revision." t)
 
   ;; 選択してバージョン管理
-  (defun vc-choice-control ()
+  (defun vc-choice ()
     "Version control."
     (interactive)
     (when (fboundp 'read-char-choice)
@@ -3139,7 +3159,7 @@
         (let* ((char (read-char-choice prompt chars))
                (func (car (cdr (cdr (assq char lst))))))
           (call-interactively func)))))
-  (define-key global-map (kbd "C-c v") 'vc-choice-control))
+  (define-key global-map (kbd "C-c v") 'vc-choice))
 
 ;; magit の設定
 ;; git clone git://github.com/magit/magit.git
@@ -3292,7 +3312,7 @@
        (when (boundp 'gtags-select-buffer-single)
          (setq gtags-select-buffer-single t))
        ;; 選択して タグ検索
-       (defun gtags-choice-search ()
+       (defun gtags-choice ()
          "Gtags search."
          (interactive)
          (when (fboundp 'read-char-choice)
@@ -3309,12 +3329,12 @@
                (setq prompt (concat prompt (car (cdr l)) " "))
                (add-to-list 'chars (car l)))
              (let ((char (read-char-choice prompt chars)))
-               (funcall (car (cdr (cdr (assq char lst)))))))))
+               (call-interactively (car (cdr (cdr (assq char lst)))))))))
 
        ;; キーバインド
        (when (boundp 'gtags-mode-map)
          ;; 選択してタグ検索
-         (define-key gtags-mode-map (kbd "C-c g") 'gtags-choice-search)
+         (define-key gtags-mode-map (kbd "C-c g") 'gtags-choice)
          ;; コンテキスト検索
          (define-key gtags-mode-map (kbd "C-]") 'gtags-find-tag-from-here)
          ;; タグスタックをポップ
