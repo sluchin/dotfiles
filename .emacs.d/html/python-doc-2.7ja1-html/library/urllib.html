@@ -1,0 +1,502 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>20.5. urllib — URL による任意のリソースへのアクセス &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="20. インターネットプロトコルとその支援" href="internet.html" />
+    <link rel="next" title="20.6. urllib2 — URL を開くための拡張可能なライブラリ" href="urllib2.html" />
+    <link rel="prev" title="20.4. wsgiref — WSGI ユーティリティとリファレンス実装" href="wsgiref.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="urllib2.html" title="20.6. urllib2 — URL を開くための拡張可能なライブラリ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="wsgiref.html" title="20.4. wsgiref — WSGI ユーティリティとリファレンス実装"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" accesskey="U">20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">20.5. <tt class="docutils literal"><span class="pre">urllib</span></tt> &#8212; URL による任意のリソースへのアクセス</a><ul>
+<li><a class="reference internal" href="#id1">20.5.1. 高レベルインタフェース</a></li>
+<li><a class="reference internal" href="#id2">20.5.2. ユーティリティー関数</a></li>
+<li><a class="reference internal" href="#url-opener">20.5.3. URL Opener オブジェクト</a></li>
+<li><a class="reference internal" href="#urllib">20.5.4. <tt class="docutils literal"><span class="pre">urllib</span></tt> の制限</a></li>
+<li><a class="reference internal" href="#urllib-examples">20.5.5. 使用例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="wsgiref.html"
+                        title="前の章へ">20.4. <tt class="docutils literal docutils literal"><span class="pre">wsgiref</span></tt> &#8212; WSGI ユーティリティとリファレンス実装</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="urllib2.html"
+                        title="次の章へ">20.6. <tt class="docutils literal docutils literal"><span class="pre">urllib2</span></tt> &#8212; URL を開くための拡張可能なライブラリ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/urllib.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-urllib">
+<span id="urllib-url"></span><h1>20.5. <a class="reference internal" href="#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a> &#8212; URL による任意のリソースへのアクセス<a class="headerlink" href="#module-urllib" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a> モジュールは、Python 3.0では <tt class="xref py py-mod docutils literal"><span class="pre">urllib.request</span></tt>, <tt class="xref py py-mod docutils literal"><span class="pre">urllib.parse</span></tt>,
+<tt class="xref py py-mod docutils literal"><span class="pre">urllib.error</span></tt> モジュールに分解されました。
+<a class="reference internal" href="../glossary.html#term-to3"><em class="xref std std-term">2to3</em></a> ツールが自動的にソースコードのimportを修正します。また、 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urllib.urlopen()</span></tt></a> 関数は削除され、 <a class="reference internal" href="urllib2.html#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urllib2.urlopen()</span></tt></a> が残りました。</p>
+</div>
+<p id="index-0">このモジュールはワールドワイドウェブ (World Wide Web) を介してデータを取り寄せるための高レベルのインタフェースを提供します。特に、関数 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> は組み込み関数 <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> と同様に動作し、ファイル名の代わりにファイルユニバーサルリソースロケータ (URL)
+を指定することができます。いくつかの制限はあります &#8212; URL は読み出し専用でしか開けませんし、seek 操作を行うことはできません。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">HTTPS URL を開くときに、サーバ証明書を検証しようとはしません。自己責任でお使い下さい。</p>
+</div>
+<div class="section" id="id1">
+<h2>20.5.1. 高レベルインタフェース<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="urllib.urlopen">
+<tt class="descclassname">urllib.</tt><tt class="descname">urlopen</tt><big>(</big><em>url</em><span class="optional">[</span>, <em>data</em><span class="optional">[</span>, <em>proxies</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.urlopen" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL で表されるネットワーク上のオブジェクトを読み込み用に開きます。 URL がスキーム識別子を持たないか、スキーム識別子が <tt class="file docutils literal"><span class="pre">file:</span></tt>
+である場合、ローカルシステムのファイルが (広範囲の改行サポートなしで) 開かれます。それ以外の場合はネットワーク上のどこかにあるサーバへのソケットを開きます。接続を作ることができない場合、例外 <a class="reference internal" href="exceptions.html#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a>
+が送出されます。全ての処理がうまくいけば、ファイル類似のオブジェクトが返されます。このオブジェクトは以下のメソッド: <tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt>,
+<a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a>, <tt class="xref py py-meth docutils literal"><span class="pre">readlines()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">fileno()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">info()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">getcode()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">geturl()</span></tt>
+をサポートします。また、イテレータ(<a class="reference internal" href="../glossary.html#term-iterator"><em class="xref std std-term">iterator</em></a>)プロトコルも正しくサポートしています。注意:
+<tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt> の引数を省略または負の値を指定しても、データストリームの最後まで読みこむ訳ではありません。ソケットからすべてのストリームを読み込んだことを決定する一般的な方法は存在しません。</p>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">info()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">getcode()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">geturl()</span></tt> メソッドを除き、これらのメソッドはファイルオブジェクトと同じインタフェースを持っています
+&#8212; このマニュアルの <a class="reference internal" href="stdtypes.html#bltin-file-objects"><em>ファイルオブジェクト</em></a> セクションを参照してください。
+(このオブジェクトは組み込みのファイルオブジェクトではありませんが、まれに本物の組み込みファイルオブジェクトが必要な場所で使うことができません)</p>
+<p id="index-1"><tt class="xref py py-meth docutils literal"><span class="pre">info()</span></tt> メソッドは開いた URL に関連付けられたメタ情報を含む
+<a class="reference internal" href="mimetools.html#mimetools.Message" title="mimetools.Message"><tt class="xref py py-class docutils literal"><span class="pre">mimetools.Message</span></tt></a> クラスのインスタンスを返します。
+URL へのアクセスメソッドが HTTP である場合、メタ情報中のヘッダ情報はサーバが HTML
+ページを返すときに先頭に付加するヘッダ情報です (Content-Length および Content-Type を含みます)。アクセスメソッドが FTP
+の場合、ファイル取得リクエストに応答してサーバがファイルの長さを返したときには (これは現在では普通になりましたが) Content-Length
+ヘッダがメタ情報に含められます。
+Content-type ヘッダは MIME タイプが推測可能なときにメタ情報に含められます。アクセスメソッドがローカルファイルの場合、返されるヘッダ情報にはファイルの最終更新日時を表す Date エントリ、ファイルのサイズを示す
+Content-Length エントリ、そして推測されるファイル形式の Content-Type エントリが含まれます。 <a class="reference internal" href="mimetools.html#module-mimetools" title="mimetools: MIME-スタイルのメッセージ本体を解析するためのツール。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">mimetools</span></tt></a>
+モジュールを参照してください。</p>
+<p id="index-2"><tt class="xref py py-meth docutils literal"><span class="pre">geturl()</span></tt> メソッドはページの実際の URL を返します。場合によっては、HTTP サーバはクライアントの要求を他の URL に振り向け
+(redirect 、リダイレクト ) します。関数 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> はユーザに対してリダイレクトを透過的に行いますが、呼び出し側にとってクライアントがどの URL にリダイレクトされたかを知りたいときがあります。 <tt class="xref py py-meth docutils literal"><span class="pre">geturl()</span></tt> メソッドを使うと、このリダイレクトされた URL を取得できます。</p>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">getcode()</span></tt> メソッドは、レスポンスと共に送られてきたHTTPステータスコードを返します。
+URLがHTTP URLでなかった場合は、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+<p><em>url</em> に <tt class="file docutils literal"><span class="pre">http:</span></tt> スキーム識別子を使う場合、 <em>data</em> 引数を与えて <tt class="docutils literal"><span class="pre">POST</span></tt> 形式のリクエストを行うことができます
+(通常リクエストの形式は <tt class="docutils literal"><span class="pre">GET</span></tt> です)。引数 <em>data</em> は標準の
+<em class="mimetype">application/x-www-form-urlencoded</em> 形式でなければなりません; 以下の
+<a class="reference internal" href="#urllib.urlencode" title="urllib.urlencode"><tt class="xref py py-func docutils literal"><span class="pre">urlencode()</span></tt></a> 関数を参照してください。</p>
+<p><a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> 関数は認証を必要としないプロキシ (proxy) に対して透過的に動作します。Unix または Windows 環境では、
+Python を起動する前に、環境変数 <span class="target" id="index-3"></span><tt class="xref std std-envvar docutils literal"><span class="pre">http_proxy</span></tt>, <span class="target" id="index-4"></span><tt class="xref std std-envvar docutils literal"><span class="pre">ftp_proxy</span></tt>
+にそれぞれのプロキシサーバを指定する URL を設定してください。例えば (<tt class="docutils literal"><span class="pre">'%'</span></tt>
+はコマンドプロンプトです):</p>
+<div class="highlight-python"><pre>% http_proxy="http://www.someproxy.com:3128"
+% export http_proxy
+% python
+...</pre>
+</div>
+<p><span class="target" id="index-5"></span><tt class="xref std std-envvar docutils literal"><span class="pre">no_proxy</span></tt> 環境変数は、proxyを利用せずにアクセスするべきホストを指定するために利用されます。設定する場合は、カンマ区切りの、ホストネーム suffix のリストで、オプションとして <tt class="docutils literal"><span class="pre">:port</span></tt>
+を付けることができます。例えば、 <tt class="docutils literal"><span class="pre">cern.ch,ncsa.uiuc.edu,some.host:8080</span></tt>.</p>
+<p>Windows 環境では、プロキシを指定する環境変数が設定されていない場合、プロキシの設定値はレジストリの Internet Settings
+セクションから取得されます。</p>
+<p id="index-6">Mac OS X では、 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> はプロキシの情報をシステム設定フレームワーク
+(Mac OS X System Configuration Framework) から取得します。これはシステム環境設定のネットワークパネルから設定できます。</p>
+<p>別の方法として、オプション引数 <em>proxies</em> を使って明示的にプロキシを設定することができます。この引数はスキーム名をプロキシの URL にマップする辞書型のオブジェクトでなくてはなりません。空の辞書を指定するとプロキシを使いません。 <tt class="docutils literal"><span class="pre">None</span></tt> (デフォルトの値です) を指定すると、上で述べたように環境変数で指定されたプロキシ設定を使います。例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># http://www.someproxy.com:3128 を http プロキシに使う</span>
+<span class="n">proxies</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;http&#39;</span><span class="p">:</span> <span class="s">&#39;http://www.someproxy.com:3128&#39;</span><span class="p">}</span>
+<span class="n">filehandle</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">some_url</span><span class="p">,</span> <span class="n">proxies</span><span class="o">=</span><span class="n">proxies</span><span class="p">)</span>
+<span class="c"># プロキシを使わない</span>
+<span class="n">filehandle</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">some_url</span><span class="p">,</span> <span class="n">proxies</span><span class="o">=</span><span class="p">{})</span>
+<span class="c"># 環境変数からプロキシを使う - 両方の表記とも同じ意味です。</span>
+<span class="n">filehandle</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">some_url</span><span class="p">,</span> <span class="n">proxies</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">filehandle</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">some_url</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>認証を必要とするプロキシは現在のところサポートされていません。これは実装上の制限 (implementation limitation) と考えています。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span><em>proxies</em> のサポートを追加しました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>結果オブジェクトに <tt class="xref py py-meth docutils literal"><span class="pre">getcode()</span></tt> を追加し、 <span class="target" id="index-7"></span><tt class="xref std std-envvar docutils literal"><span class="pre">no_proxy</span></tt> 環境変数に対応しました。</p>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃: </span><a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> 関数は、Python 3.0では <a class="reference internal" href="urllib2.html#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urllib2.urlopen()</span></tt></a> に取って変わられるため、
+廃止予定(deprecated)になりました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.urlretrieve">
+<tt class="descclassname">urllib.</tt><tt class="descname">urlretrieve</tt><big>(</big><em>url</em><span class="optional">[</span>, <em>filename</em><span class="optional">[</span>, <em>reporthook</em><span class="optional">[</span>, <em>data</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.urlretrieve" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL で表されるネットワーク上のオブジェクトを、必要に応じてローカルなファイルにコピーします。URL がローカルなファイルを指定していたり、オブジェクトのコピーが正しくキャッシュされていれば、そのオブジェクトはコピーされません。タプル <tt class="docutils literal"><span class="pre">(filename,</span> <span class="pre">headers)</span></tt> を返し、 <em>filename</em> はローカルで見つかったオブジェクトに対するファイル名で、 <em>headers</em> は <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> が返した
+(おそらくキャッシュされているリモートの) オブジェクトに <tt class="xref py py-meth docutils literal"><span class="pre">info()</span></tt> を適用して得られるものになります。 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a>
+と同じ例外を送出します。</p>
+<p>2 つめの引数がある場合、オブジェクトのコピー先となるファイルの位置を指定します (もしなければ、ファイルの場所は一時ファイル (tmpfile) の置き場になり、名前は適当につけられます)。 3 つめの引数がある場合、ネットワークとの接続が確立された際に一度呼び出され、以降データのブロックが読み出されるたびに呼び出されるフック関数 (hook function) を指定します。フック関数には 3 つの引数が渡されます; これまで転送されたブロック数のカウント、バイト単位で表されたブロックサイズ、ファイルの総サイズです。3 つ目のファイルの総サイズは、ファイル取得の際の応答時にファイルサイズを返さない古い FTP サーバでは <tt class="docutils literal"><span class="pre">-1</span></tt> になります。</p>
+<p><em>url</em> が <tt class="file docutils literal"><span class="pre">http:</span></tt> スキーム識別子を使っていた場合、オプション引数 <em>data</em> を与えることで <tt class="docutils literal"><span class="pre">POST</span></tt>
+リクエストを行うよう指定することができます (通常リクエストの形式は <tt class="docutils literal"><span class="pre">GET</span></tt> です)。 <em>data</em> 引数は標準の
+<em class="mimetype">application/x-www-form-urlencoded</em> 形式でなくてはなりません; 以下の
+<a class="reference internal" href="#urllib.urlencode" title="urllib.urlencode"><tt class="xref py py-func docutils literal"><span class="pre">urlencode()</span></tt></a> 関数を参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> は、予想 (これは <em>Content-Length</em> ヘッダにより通知されるサイズです)
+よりも取得できるデータ量が少ないことを検知した場合、 <a class="reference internal" href="#urllib.ContentTooShortError" title="urllib.ContentTooShortError"><tt class="xref py py-exc docutils literal"><span class="pre">ContentTooShortError</span></tt></a> を発生します。これは、例えば、ダウンロードが
+中断された場合などに発生します。<p><em>Content-Length</em> は下限として扱われます: より多いデータがある場合、
+<a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> はそのデータを読みますが、より少ないデータしか取得できない場合、これは exception を発生します。</p>
+<p>このような場合にもダウンロードされたデータを取得することは可能で、これは exception インスタンスの <tt class="xref py py-attr docutils literal"><span class="pre">content</span></tt>
+属性に保存されています。</p>
+<p><em>Content-Length</em> ヘッダが無い場合、 <a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> はダウンロードされたデータのサイズをチェックできず、単にそれを返します。この場合は、ダウンロードは成功したと見なす必要があります。</p>
+</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="urllib._urlopener">
+<tt class="descclassname">urllib.</tt><tt class="descname">_urlopener</tt><a class="headerlink" href="#urllib._urlopener" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パブリック関数 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> および <a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a>  は <a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a>
+クラスのインスタンスを生成します。インスタンスは要求された動作に応じて使用されます。この機能をオーバライドするために、プログラマは
+<a class="reference internal" href="#urllib.URLopener" title="urllib.URLopener"><tt class="xref py py-class docutils literal"><span class="pre">URLopener</span></tt></a>  または <a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a> のサブクラスを作り、そのクラスから生成したインスタンスを変数
+<tt class="docutils literal"><span class="pre">urllib._urlopener</span></tt> に代入した後、呼び出したい関数を呼ぶことができます。例えば、アプリケーションが
+<a class="reference internal" href="#urllib.URLopener" title="urllib.URLopener"><tt class="xref py py-class docutils literal"><span class="pre">URLopener</span></tt></a> が定義しているのとは異なった <em class="mailheader">User-Agent</em> ヘッダを指定したい場合があるかもしれません。この機能は以下のコードで実現できます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">urllib</span>
+
+<span class="k">class</span> <span class="nc">AppURLopener</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">FancyURLopener</span><span class="p">):</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="s">&quot;App/1.7&quot;</span>
+
+<span class="n">urllib</span><span class="o">.</span><span class="n">_urlopener</span> <span class="o">=</span> <span class="n">AppURLopener</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.urlcleanup">
+<tt class="descclassname">urllib.</tt><tt class="descname">urlcleanup</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib.urlcleanup" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>以前の <a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> で生成された可能性のあるキャッシュを消去します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h2>20.5.2. ユーティリティー関数<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="urllib.quote">
+<tt class="descclassname">urllib.</tt><tt class="descname">quote</tt><big>(</big><em>string</em><span class="optional">[</span>, <em>safe</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.quote" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>string</em> に含まれる特殊文字を <tt class="docutils literal"><span class="pre">%xx</span></tt> エスケープで置換（quote）します。アルファベット、数字、および文字 <tt class="docutils literal"><span class="pre">'_.-'</span></tt> はに対しては quote 処理を行いません。この関数はデフォルトでは URL の path セクションに対するクォートを想定しています。オプションのパラメタ <em>safe</em> は quote 処理しない追加の文字を指定します &#8212;
+デフォルトの値は <tt class="docutils literal"><span class="pre">'/'</span></tt> です。</p>
+<p>例: <tt class="docutils literal"><span class="pre">quote('/~connolly/')</span></tt> は <tt class="docutils literal"><span class="pre">'/%7econnolly/'</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.quote_plus">
+<tt class="descclassname">urllib.</tt><tt class="descname">quote_plus</tt><big>(</big><em>string</em><span class="optional">[</span>, <em>safe</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.quote_plus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib.quote" title="urllib.quote"><tt class="xref py py-func docutils literal"><span class="pre">quote()</span></tt></a> と似ていますが、加えて空白文字をプラス記号 (&#8220;+&#8221;)
+に置き換えます。これは HTML フォームの値をURLに付加するクエリ文字列にする際に必要な機能です。もとの文字列におけるプラス記号は <em>safe</em> に含まれていない限りエスケープ置換されます。上と同様に、 <em>safe</em> のデフォルトの値は <tt class="docutils literal"><span class="pre">'/'</span></tt> です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.unquote">
+<tt class="descclassname">urllib.</tt><tt class="descname">unquote</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#urllib.unquote" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">%xx</span></tt> エスケープをエスケープが表す 1 文字に置き換えます。</p>
+<p>例: <tt class="docutils literal"><span class="pre">unquote('/%7Econnolly/')</span></tt> は <tt class="docutils literal"><span class="pre">'/~connolly/'</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.unquote_plus">
+<tt class="descclassname">urllib.</tt><tt class="descname">unquote_plus</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#urllib.unquote_plus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib.unquote" title="urllib.unquote"><tt class="xref py py-func docutils literal"><span class="pre">unquote()</span></tt></a> と似ていますが、加えてプラス記号を空白文字に置き換えます。これは quote 処理された HTML
+フォームの値を元に戻すのに必要な機能です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.urlencode">
+<tt class="descclassname">urllib.</tt><tt class="descname">urlencode</tt><big>(</big><em>query</em><span class="optional">[</span>, <em>doseq</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.urlencode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>マップ型オブジェクト、または 2要素のタプルからなるシーケンスを、
+&#8220;パーセントエンコードされた (percent-encoded)&#8221; 文字列に変換して、上述の
+<a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> のオプション引数 <em>data</em> に適した形式にします。この関数はフォームのフィールド値でできた辞書を <tt class="docutils literal"><span class="pre">POST</span></tt> 型のリクエストに渡すときに便利です。返される文字列は <tt class="docutils literal"><span class="pre">key=value</span></tt> のペアを <tt class="docutils literal"><span class="pre">'&amp;'</span></tt>
+で区切ったシーケンスで、 <em>key</em> と <em>value</em> の双方は上の <a class="reference internal" href="#urllib.quote_plus" title="urllib.quote_plus"><tt class="xref py py-func docutils literal"><span class="pre">quote_plus()</span></tt></a> でクォートされます。
+2つの要素をもったタプルからなるシーケンスが引数 <em>query</em> として使われた場合、各タプルの最初の値が key で、2 番目の値が value になります。どちらのケースでも <em>value</em> にはシーケンスを入れることができ、その場合オプションのパラメタ <em>doseq</em> の評価結果が真であったなら、その <em>key</em> の各々の
+<em>value</em> に対して <tt class="docutils literal"><span class="pre">'&amp;'</span></tt> で区切られた <tt class="docutils literal"><span class="pre">key=value</span></tt> のペアが生成されます。このときエンコードされた文字列中のパラメタの順番はシーケンス中のタプルの順番と同じになります。 <a class="reference internal" href="urlparse.html#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-mod docutils literal"><span class="pre">urlparse</span></tt></a> モジュールでは、関数
+<tt class="xref py py-func docutils literal"><span class="pre">parse_qs()</span></tt> および <tt class="xref py py-func docutils literal"><span class="pre">parse_qsl()</span></tt> を提供しており、クエリ文字列を解析して Python のデータ構造にするのに利用できます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.pathname2url">
+<tt class="descclassname">urllib.</tt><tt class="descname">pathname2url</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#urllib.pathname2url" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ローカルシステムにおける記法で表されたパス名 <em>path</em> を、URL におけるパス部分の形式に変換します。この関数は完全な URL を生成するわけではありません。返される値は常に <a class="reference internal" href="#urllib.quote" title="urllib.quote"><tt class="xref py py-func docutils literal"><span class="pre">quote()</span></tt></a> を使って quote 処理されたものになります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.url2pathname">
+<tt class="descclassname">urllib.</tt><tt class="descname">url2pathname</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#urllib.url2pathname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL のパスの部分 <em>path</em> をパーセントエンコードされた URL の形式からローカルシステムにおけるパス記法に変換します。この関数は <em>path</em> をデコードするために <a class="reference internal" href="#urllib.unquote" title="urllib.unquote"><tt class="xref py py-func docutils literal"><span class="pre">unquote()</span></tt></a> を使います。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib.getproxies">
+<tt class="descclassname">urllib.</tt><tt class="descname">getproxies</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib.getproxies" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このヘルパ関数はスキーマからプロキシサーバーのURLへのマッピングを行う辞書を返します。この関数はまず、どのOSでも最初に <tt class="docutils literal"><span class="pre">&lt;scheme&gt;_proxy</span></tt> という名前の環境変数をスキャンします。そこで見つからなかった場合、 Max OS X の場合は Mac OSX
+システム環境設定を、 Windows の場合はシステムレジストリを参照します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="url-opener">
+<h2>20.5.3. URL Opener オブジェクト<a class="headerlink" href="#url-opener" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="urllib.URLopener">
+<em class="property">class </em><tt class="descclassname">urllib.</tt><tt class="descname">URLopener</tt><big>(</big><span class="optional">[</span><em>proxies</em><span class="optional">[</span>, <em>**x509</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.URLopener" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL をオープンし、読み出すためのクラスの基礎クラス (base class)です。 <tt class="file docutils literal"><span class="pre">http:</span></tt>, <tt class="file docutils literal"><span class="pre">ftp:</span></tt>,
+<tt class="file docutils literal"><span class="pre">file:</span></tt> 以外のスキームを使ったオブジェクトのオープンをサポートしたいのでないかぎり、
+<a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a> を使おうと思うことになるでしょう。</p>
+<p>デフォルトでは、 <a class="reference internal" href="#urllib.URLopener" title="urllib.URLopener"><tt class="xref py py-class docutils literal"><span class="pre">URLopener</span></tt></a> クラスは <em class="mailheader">User-Agent</em> ヘッダとして <tt class="docutils literal"><span class="pre">urllib/VVV</span></tt>
+を送信します。ここで <em>VVV</em> は <a class="reference internal" href="#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a> のバージョン番号です。アプリケーションで独自の
+<em class="mailheader">User-Agent</em> ヘッダを送信したい場合は、 <a class="reference internal" href="#urllib.URLopener" title="urllib.URLopener"><tt class="xref py py-class docutils literal"><span class="pre">URLopener</span></tt></a>  かまたは
+<a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a> のサブクラスを作成し、サブクラス定義においてクラス属性 <a class="reference internal" href="#urllib.URLopener.version" title="urllib.URLopener.version"><tt class="xref py py-attr docutils literal"><span class="pre">version</span></tt></a> を適切な文字列値に設定することで行うことができます。</p>
+<p>オプションのパラメタ <em>proxies</em> はスキーム名をプロキシの URL にマップする辞書でなくてはなりません。空の辞書はプロキシ機能を完全にオフにします。デフォルトの値は <tt class="docutils literal"><span class="pre">None</span></tt> で、この場合、 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> の定義で述べたように、プロキシを設定する環境変数が存在するならそれを使います。</p>
+<p>追加のキーワードパラメタは <em>x509</em> に集められますが、これは <tt class="file docutils literal"><span class="pre">https:</span></tt> スキームを使った際のクライアント認証に使われることがあります。キーワード引数 <em>key_file</em> および <em>cert_file</em> が SSL 鍵と証明書を設定するためにサポートされています;
+クライアント認証をするには両方が必要です。</p>
+<p><a class="reference internal" href="#urllib.URLopener" title="urllib.URLopener"><tt class="xref py py-class docutils literal"><span class="pre">URLopener</span></tt></a> オブジェクトは、サーバがエラーコードを返した時には <a class="reference internal" href="exceptions.html#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> を発生します。</p>
+<dl class="method">
+<dt id="urllib.URLopener.open">
+<tt class="descname">open</tt><big>(</big><em>fullurl</em><span class="optional">[</span>, <em>data</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.URLopener.open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>適切なプロトコルを使って <em>fullurl</em> を開きます。このメソッドはキャッシュとプロキシ情報を設定し、その後適切な open メソッドを入力引数つきで呼び出します。認識できないスキームが与えられた場合、 <a class="reference internal" href="#urllib.URLopener.open_unknown" title="urllib.URLopener.open_unknown"><tt class="xref py py-meth docutils literal"><span class="pre">open_unknown()</span></tt></a> が呼び出されます。 <em>data</em> 引数は
+<a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> の引数 <em>data</em> と同じ意味を持っています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib.URLopener.open_unknown">
+<tt class="descname">open_unknown</tt><big>(</big><em>fullurl</em><span class="optional">[</span>, <em>data</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.URLopener.open_unknown" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オーバライド可能な、未知のタイプの URL を開くためのインタフェースです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib.URLopener.retrieve">
+<tt class="descname">retrieve</tt><big>(</big><em>url</em><span class="optional">[</span>, <em>filename</em><span class="optional">[</span>, <em>reporthook</em><span class="optional">[</span>, <em>data</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.URLopener.retrieve" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>url</em> のコンテンツを取得し、 <em>filename</em> に書き込みます。返り値はタプルで、ローカルシステムにおけるファイル名と、応答ヘッダを含む <a class="reference internal" href="mimetools.html#mimetools.Message" title="mimetools.Message"><tt class="xref py py-class docutils literal"><span class="pre">mimetools.Message</span></tt></a>
+オブジェクト(URLがリモートを指している場合)、または <tt class="docutils literal"><span class="pre">None</span></tt>  (URL がローカルを指している場合) からなります。呼び出し側の処理はその後
+<em>filename</em> を開いて内容を読み出さなくてはなりません。 <em>filename</em> が与えられており、かつ URL がローカルシステム上のファイルを示している場合、入力ファイル名が返されます。
+URL がローカルのファイルを示しておらず、かつ <em>filename</em> が与えられていない場合、ファイル名は入力 URL の最後のパス構成要素につけられた拡張子と同じ拡張子を <a class="reference internal" href="tempfile.html#tempfile.mktemp" title="tempfile.mktemp"><tt class="xref py py-func docutils literal"><span class="pre">tempfile.mktemp()</span></tt></a>
+につけたものになります。 <em>reporthook</em> を与える場合、この変数は 3 つの数値パラメタを受け取る関数でなくてはなりません。この関数はデータの塊
+(chunk) がネットワークから読み込まれるたびに呼び出されます。ローカルの URL を与えた場合 <em>reporthook</em> は無視されます。</p>
+<p><em>url</em> が <tt class="file docutils literal"><span class="pre">http:</span></tt> スキーム識別子を使っている場合、オプションの引数  <em>data</em> を与えて <tt class="docutils literal"><span class="pre">POST</span></tt>
+リクエストを行うよう指定できます(通常のリクエストの形式は <tt class="docutils literal"><span class="pre">GET</span></tt> です)。引数 <em>data</em> は標準の <em class="mimetype">application/x-www-form-urlencoded</em> 形式でなくてはなりません; 上の
+<a class="reference internal" href="#urllib.urlencode" title="urllib.urlencode"><tt class="xref py py-func docutils literal"><span class="pre">urlencode()</span></tt></a> を参照して下さい。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="urllib.URLopener.version">
+<tt class="descname">version</tt><a class="headerlink" href="#urllib.URLopener.version" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL をオープンするオブジェクトのユーザエージェントを指定する変数です。 <a class="reference internal" href="#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a> を特定のユーザエージェントであるとサーバに通知するには、サブクラスの中でこの値をクラス変数として値を設定するか、コンストラクタの中でベースクラスを呼び出す前に値を設定してください。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib.FancyURLopener">
+<em class="property">class </em><tt class="descclassname">urllib.</tt><tt class="descname">FancyURLopener</tt><big>(</big><em>...</em><big>)</big><a class="headerlink" href="#urllib.FancyURLopener" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a> は <a class="reference internal" href="#urllib.URLopener" title="urllib.URLopener"><tt class="xref py py-class docutils literal"><span class="pre">URLopener</span></tt></a> のサブクラスで、以下の HTTP レスポンスコード:
+301、302、303、 307、および 401 を取り扱う機能を提供します。レスポンスコード 30x に対しては、
+<em class="mailheader">Location</em> ヘッダを使って実際の URL を取得します。レスポンスコード 401 (認証が要求されていることを示す)
+に対しては、BASIC認証 (basic HTTP authintication) が行われます。レスポンスコード 30x に対しては、最大で
+<em>maxtries</em> 属性に指定された数だけ再帰呼び出しを行うようになっています。この値はデフォルトで 10 です。</p>
+<p>その他のレスポンスコードについては、 <tt class="xref py py-meth docutils literal"><span class="pre">http_error_default()</span></tt> が呼ばれます。これはサブクラスでエラーを適切に処理するようにオーバーライドすることができます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><span class="target" id="index-8"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2616.html"><strong>RFC 2616</strong></a> によると、 POST 要求に対する 301 および 302  応答はユーザの承認無しに自動的にリダイレクトしてはなりません。実際は、これらの応答に対して自動リダイレクトを許すブラウザでは POST を GET に変更しており、 <a class="reference internal" href="#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a> でもこの動作を再現します。</p>
+</div>
+<p>コンストラクタに与えるパラメタは <a class="reference internal" href="#urllib.URLopener" title="urllib.URLopener"><tt class="xref py py-class docutils literal"><span class="pre">URLopener</span></tt></a> と同じです。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">基本的な HTTP 認証を行う際、 <a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a> インスタンスは <a class="reference internal" href="#urllib.FancyURLopener.prompt_user_passwd" title="urllib.FancyURLopener.prompt_user_passwd"><tt class="xref py py-meth docutils literal"><span class="pre">prompt_user_passwd()</span></tt></a>
+メソッドを呼び出します。このメソッドはデフォルトでは実行を制御している端末上で認証に必要な情報を要求するように実装されています。必要ならば、このクラスのサブクラスにおいてより適切な動作をサポートするために <a class="reference internal" href="#urllib.FancyURLopener.prompt_user_passwd" title="urllib.FancyURLopener.prompt_user_passwd"><tt class="xref py py-meth docutils literal"><span class="pre">prompt_user_passwd()</span></tt></a>
+メソッドをオーバライドしてもかまいません。</p>
+</div>
+<p><a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a> クラスはオーバライド可能な追加のメソッドを提供しており、適切な振る舞いをさせることができます:</p>
+<dl class="method">
+<dt id="urllib.FancyURLopener.prompt_user_passwd">
+<tt class="descname">prompt_user_passwd</tt><big>(</big><em>host</em>, <em>realm</em><big>)</big><a class="headerlink" href="#urllib.FancyURLopener.prompt_user_passwd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたセキュリティ領域 (security realm) 下にある与えられたホストにおいて、ユーザ認証に必要な情報を返すための関数です。この関数が返す値は <tt class="docutils literal"><span class="pre">(user,</span> <span class="pre">password)</span></tt> 、からなるタプルなくてはなりません。値はベーシック認証 (basic authentication)
+で使われます。</p>
+<p>このクラスでの実装では、端末に情報を入力するようプロンプトを出します; ローカルの環境において適切な形で対話型モデルを使うには、このメソッドをオーバライドしなければなりません。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="urllib.ContentTooShortError">
+<em class="property">exception </em><tt class="descclassname">urllib.</tt><tt class="descname">ContentTooShortError</tt><big>(</big><em>msg</em><span class="optional">[</span>, <em>content</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib.ContentTooShortError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この例外は <a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> 関数が、ダウンロードされたデータの量が予期した量 (<em>Content-Length</em> ヘッダで与えられる)
+よりも少ないことを検知した際に発生します。 <tt class="xref py py-attr docutils literal"><span class="pre">content</span></tt> 属性には (恐らく途中までの)  ダウンロードされたデータが格納されています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+</div>
+<div class="section" id="urllib">
+<h2>20.5.4. <a class="reference internal" href="#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a> の制限<a class="headerlink" href="#urllib" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<blockquote>
+<div></div></blockquote>
+<ul id="index-9">
+<li><p class="first">現在のところ、以下のプロトコルだけがサポートされています: HTTP、 (バージョン 0.9 および 1.0)、
+FTP、およびローカルファイル。</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> のキャッシュ機能は、有効期限ヘッダ (Expiration time header)
+を正しく処理できるようにハックするための時間を取れるまで、無効にしてあります。</p>
+</li>
+<li><p class="first">ある URL がキャッシュにあるかどうか調べるような関数があればと思っています。。</p>
+</li>
+<li><p class="first">後方互換性のため、 URL がローカルシステム上のファイルを指しているように見えるにも関わらずファイルを開くことができなければ、 URL は FTP
+プロトコルを使って再解釈されます。この機能は時として混乱を招くエラーメッセージを引き起こします。</p>
+</li>
+<li><p class="first">関数 <a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> および <a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> は、ネットワーク接続が確立されるまでの間、一定でない長さの遅延を引き起こすことがあります。このことは、これらの関数を使ってインタラクティブな Web
+クライアントを構築するのはスレッドなしには難しいことを意味します。</p>
+</li>
+<li id="index-10"><p class="first"><a class="reference internal" href="#urllib.urlopen" title="urllib.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> または <a class="reference internal" href="#urllib.urlretrieve" title="urllib.urlretrieve"><tt class="xref py py-func docutils literal"><span class="pre">urlretrieve()</span></tt></a> が返すデータはサーバが返す生のデータです。このデータはバイナリデータ
+(画像データ等) 、生テキスト (plain text)、または (例えば) HTML でもかまいません。HTTP プロトコルはリプライヘッダ (reply
+header) にデータのタイプに関する情報を返します。タイプは <em class="mailheader">Content-Type</em> ヘッダを見ることで推測できます。返されたデータがHTML であれば、 <a class="reference internal" href="htmllib.html#module-htmllib" title="htmllib: HTML 文書の解析器。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">htmllib</span></tt></a> を使ってパースすることができます。</p>
+<p id="index-11">FTP プロトコルを扱うコードでは、ファイルとディレクトリを区別できません。このことから、アクセスできないファイルを指している URL
+からデータを読み出そうとすると、予期しない動作を引き起こす場合があります。 URL が <tt class="docutils literal"><span class="pre">/</span></tt> で終わっていれば、ディレクトリを指しているものとみなして、それに適した処理を行います。しかし、ファイルの読み出し操作が 550 エラー (URL が存在しないか、主にパーミッションの理由でアクセスできない) になった場合、 URL がディレクトリを指していて、末尾の <tt class="docutils literal"><span class="pre">/</span></tt> を忘れたケースを処理するため、パスをディレクトリとして扱います。このために、パーミッションのためにアクセスできないファイルを fetch しようとすると、FTP
+コードはそのファイルを開こうとして 550  エラーに陥り、次にディレクトリ一覧を表示しようとするため、誤解を生むような結果を引き起こす可能性があるのです。よく調整された制御が必要なら、 <a class="reference internal" href="ftplib.html#module-ftplib" title="ftplib: FTPプロトコルクライアント(ソケットを必要とします)。"><tt class="xref py py-mod docutils literal"><span class="pre">ftplib</span></tt></a> モジュールを使うか、 <a class="reference internal" href="#urllib.FancyURLopener" title="urllib.FancyURLopener"><tt class="xref py py-class docutils literal"><span class="pre">FancyURLopener</span></tt></a> をサブクラス化するか、
+<em>_urlopener</em> を変更して目的に合わせるよう検討してください。</p>
+</li>
+<li><p class="first">このモジュールは認証を必要とするプロキシをサポートしません。将来実装されるかもしれません。</p>
+</li>
+<li id="index-12"><p class="first"><a class="reference internal" href="#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a> モジュールは URL 文字列を解釈したり構築したりする (ドキュメント化されていない) ルーチンを含んでいますが、URL
+を操作するためのインタフェースとしては、 <a class="reference internal" href="urlparse.html#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-mod docutils literal"><span class="pre">urlparse</span></tt></a> モジュールをお勧めします。</p>
+</li>
+</ul>
+</div>
+<div class="section" id="urllib-examples">
+<span id="id3"></span><h2>20.5.5. 使用例<a class="headerlink" href="#urllib-examples" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下は <tt class="docutils literal"><span class="pre">GET</span></tt> メソッドを使ってパラメタを含む URL を取得するセッションの例です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&#39;spam&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;bacon&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&quot;http://www.musi-cal.com/cgi-bin/query?</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>以下は <tt class="docutils literal"><span class="pre">POST</span></tt> メソッドを代わりに使った例です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&#39;spam&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;bacon&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&quot;http://www.musi-cal.com/cgi-bin/query&quot;</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>以下の例では、環境変数による設定内容に対して上書きする形で HTTP プロキシを明示的に設定しています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">proxies</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;http&#39;</span><span class="p">:</span> <span class="s">&#39;http://proxy.example.com:8080/&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">FancyURLopener</span><span class="p">(</span><span class="n">proxies</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;http://www.python.org&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>以下の例では、環境変数による設定内容に対して上書きする形で、まったくプロキシを使わないよう設定しています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">FancyURLopener</span><span class="p">({})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;http://www.python.org/&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="urllib2.html" title="20.6. urllib2 — URL を開くための拡張可能なライブラリ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="wsgiref.html" title="20.4. wsgiref — WSGI ユーティリティとリファレンス実装"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" >20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

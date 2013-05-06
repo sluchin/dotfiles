@@ -1,0 +1,965 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>20.6. urllib2 — URL を開くための拡張可能なライブラリ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="20. インターネットプロトコルとその支援" href="internet.html" />
+    <link rel="next" title="20.7. httplib — HTTP プロトコルクライアント" href="httplib.html" />
+    <link rel="prev" title="20.5. urllib — URL による任意のリソースへのアクセス" href="urllib.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="httplib.html" title="20.7. httplib — HTTP プロトコルクライアント"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="urllib.html" title="20.5. urllib — URL による任意のリソースへのアクセス"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" accesskey="U">20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">20.6. <tt class="docutils literal"><span class="pre">urllib2</span></tt> &#8212; URL を開くための拡張可能なライブラリ</a><ul>
+<li><a class="reference internal" href="#request">20.6.1. Request オブジェクト</a></li>
+<li><a class="reference internal" href="#openerdirector">20.6.2. OpenerDirector オブジェクト</a></li>
+<li><a class="reference internal" href="#basehandler">20.6.3. BaseHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httpredirecthandler">20.6.4. HTTPRedirectHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httpcookieprocessor">20.6.5. HTTPCookieProcessor オブジェクト</a></li>
+<li><a class="reference internal" href="#proxyhandler">20.6.6. ProxyHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httppasswordmgr">20.6.7. HTTPPasswordMgr オブジェクト</a></li>
+<li><a class="reference internal" href="#abstractbasicauthhandler">20.6.8. AbstractBasicAuthHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httpbasicauthhandler">20.6.9. HTTPBasicAuthHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#proxybasicauthhandler">20.6.10. ProxyBasicAuthHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#abstractdigestauthhandler">20.6.11. AbstractDigestAuthHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httpdigestauthhandler">20.6.12. HTTPDigestAuthHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#proxydigestauthhandler">20.6.13. ProxyDigestAuthHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httphandler">20.6.14. HTTPHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httpshandler">20.6.15. HTTPSHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#filehandler">20.6.16. FileHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#ftphandler">20.6.17. FTPHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#cacheftphandler">20.6.18. CacheFTPHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#unknownhandler">20.6.19. UnknownHandler オブジェクト</a></li>
+<li><a class="reference internal" href="#httperrorprocessor">20.6.20. HTTPErrorProcessor オブジェクト</a></li>
+<li><a class="reference internal" href="#urllib2-examples">20.6.21. 例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="urllib.html"
+                        title="前の章へ">20.5. <tt class="docutils literal docutils literal"><span class="pre">urllib</span></tt> &#8212; URL による任意のリソースへのアクセス</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="httplib.html"
+                        title="次の章へ">20.7. <tt class="docutils literal docutils literal docutils literal"><span class="pre">httplib</span></tt> &#8212; HTTP プロトコルクライアント</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/urllib2.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="urllib2-url">
+<h1>20.6. <a class="reference internal" href="#module-urllib2" title="urllib2: URLを開く次世代ライブラリ"><tt class="xref py py-mod docutils literal"><span class="pre">urllib2</span></tt></a> &#8212; URL を開くための拡張可能なライブラリ<a class="headerlink" href="#urllib2-url" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<span class="target" id="module-urllib2"></span><div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#module-urllib2" title="urllib2: URLを開く次世代ライブラリ"><tt class="xref py py-mod docutils literal"><span class="pre">urllib2</span></tt></a> モジュールは、Python 3.0で <tt class="xref py py-mod docutils literal"><span class="pre">urllib.request</span></tt>, <tt class="xref py py-mod docutils literal"><span class="pre">urllib.error</span></tt>
+に分割されました。
+<a class="reference internal" href="../glossary.html#term-to3"><em class="xref std std-term">2to3</em></a> ツールが自動的にソースコードのimportを修正します。</p>
+</div>
+<p><a class="reference internal" href="#module-urllib2" title="urllib2: URLを開く次世代ライブラリ"><tt class="xref py py-mod docutils literal"><span class="pre">urllib2</span></tt></a> モジュールは基本的な認証、暗号化認証、リダイレクション、クッキー、その他の介在する複雑なアクセス環境において (大抵は HTTP
+で)  URL を開くための関数とクラスを定義します。</p>
+<p><a class="reference internal" href="#module-urllib2" title="urllib2: URLを開く次世代ライブラリ"><tt class="xref py py-mod docutils literal"><span class="pre">urllib2</span></tt></a> モジュールでは以下の関数を定義しています:</p>
+<dl class="function">
+<dt id="urllib2.urlopen">
+<tt class="descclassname">urllib2.</tt><tt class="descname">urlopen</tt><big>(</big><em>url[, data][, timeout]</em><big>)</big><a class="headerlink" href="#urllib2.urlopen" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL <em>url</em> を開きます。 <em>url</em> は文字列でも <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> オブジェクトでもかまいません。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">HTTPS のリクエストはサーバーの認証を一切行いません。</p>
+</div>
+<p><em>data</em> はサーバに送信する追加のデータを示す文字列か、そのようなデータが無ければ
+<em>None</em> を指定します。現時点でHTTPリクエストは <em>data</em> をサポートする唯一のリクエスト形式です;
+<em>data</em> パラメタが指定が指定された場合、HTTP リクエストは GET でなく POST になります。
+<em>data</em> は標準的な <em class="mimetype">application/x-www-form-urlencoded</em> 形式のバッファでなくてはなりません。
+<a class="reference internal" href="urllib.html#urllib.urlencode" title="urllib.urlencode"><tt class="xref py py-func docutils literal"><span class="pre">urllib.urlencode()</span></tt></a> 関数はマップ型か2タプルのシーケンスを取り、この形式の文字列を返します。
+urllib2 モジュールは HTTP/1.1 リクエストを <cite>Connection:close</cite> ヘッダ付きで送信します。</p>
+<p>オプションの <em>timeout</em> 引数は、接続開始などのブロックする操作におけるタイムアウト時間を秒数で指定します。
+(指定されなかった場合、グローバルのデフォルトタイムアウト時間が利用されます)
+この引数は、 HTTP, HTTPS, FTP 接続でのみ有効です。</p>
+<p>この関数は以下の 2 つのメソッドを持つファイル類似のオブジェクトを返します:</p>
+<ul class="simple">
+<li><tt class="xref py py-meth docutils literal"><span class="pre">geturl()</span></tt> &#8212; 取得されたリソースの URL を返します。主に、リダイレクトが発生したかどうかを確認するために利用します。</li>
+<li><tt class="xref py py-meth docutils literal"><span class="pre">info()</span></tt> &#8212; 取得されたページのヘッダーなどのメタ情報を、 <a class="reference internal" href="mimetools.html#mimetools.Message" title="mimetools.Message"><tt class="xref py py-class docutils literal"><span class="pre">mimetools.Message</span></tt></a>
+インスタンスとして返します。
+(<a class="reference external" href="http://www.cs.tut.fi/~jkorpela/http.html">Quick Reference to HTTP Headers</a> を参照してください)</li>
+</ul>
+<p>エラーが発生した場合 <a class="reference internal" href="#urllib2.URLError" title="urllib2.URLError"><tt class="xref py py-exc docutils literal"><span class="pre">URLError</span></tt></a> を送出します。</p>
+<p>どのハンドラもリクエストを処理しなかった場合には <tt class="docutils literal"><span class="pre">None</span></tt> を返すことがあるので注意してください (デフォルトでインストールされるグローバルハンドラの <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> は、 <a class="reference internal" href="#urllib2.UnknownHandler" title="urllib2.UnknownHandler"><tt class="xref py py-class docutils literal"><span class="pre">UnknownHandler</span></tt></a>
+を使って上記の問題が起きないようにしています)。</p>
+<p>さらに、プロキシが設定されているときは、デフォルトでインストールされる <a class="reference internal" href="#urllib2.ProxyHandler" title="urllib2.ProxyHandler"><tt class="xref py py-class docutils literal"><span class="pre">ProxyHandler</span></tt></a> がリクエストを処理するようになっています。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>timeout</em> 引数が追加されました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib2.install_opener">
+<tt class="descclassname">urllib2.</tt><tt class="descname">install_opener</tt><big>(</big><em>opener</em><big>)</big><a class="headerlink" href="#urllib2.install_opener" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>標準で URL を開くオブジェクトとして <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> のインスタンスをインストールします。このコードは引数が本当に
+<a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> のインスタンスであるかどうかはチェックしないので、適切なインタフェースを持ったクラスは何でも動作します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urllib2.build_opener">
+<tt class="descclassname">urllib2.</tt><tt class="descname">build_opener</tt><big>(</big><span class="optional">[</span><em>handler</em>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.build_opener" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた順番に URL ハンドラを連鎖させる <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a>  のインスタンスを返します。 <em>handler</em> は
+<a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> または <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> のサブクラスのインスタンスのどちらかです
+(どちらの場合も、コンストラクトは引数無しで呼び出せるようになっていなければなりません) 。以下のクラス:</p>
+<p><a class="reference internal" href="#urllib2.ProxyHandler" title="urllib2.ProxyHandler"><tt class="xref py py-class docutils literal"><span class="pre">ProxyHandler</span></tt></a>, <a class="reference internal" href="#urllib2.UnknownHandler" title="urllib2.UnknownHandler"><tt class="xref py py-class docutils literal"><span class="pre">UnknownHandler</span></tt></a>, <a class="reference internal" href="#urllib2.HTTPHandler" title="urllib2.HTTPHandler"><tt class="xref py py-class docutils literal"><span class="pre">HTTPHandler</span></tt></a>,
+<a class="reference internal" href="#urllib2.HTTPDefaultErrorHandler" title="urllib2.HTTPDefaultErrorHandler"><tt class="xref py py-class docutils literal"><span class="pre">HTTPDefaultErrorHandler</span></tt></a>, <a class="reference internal" href="#urllib2.HTTPRedirectHandler" title="urllib2.HTTPRedirectHandler"><tt class="xref py py-class docutils literal"><span class="pre">HTTPRedirectHandler</span></tt></a>,
+<a class="reference internal" href="#urllib2.FTPHandler" title="urllib2.FTPHandler"><tt class="xref py py-class docutils literal"><span class="pre">FTPHandler</span></tt></a>, <a class="reference internal" href="#urllib2.FileHandler" title="urllib2.FileHandler"><tt class="xref py py-class docutils literal"><span class="pre">FileHandler</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">HTTPErrorProcessor</span></tt></p>
+<p>については、そのクラスのインスタンスか、そのサブクラスのインスタンスが <em>handler</em>  に含まれていない限り、 <em>handler</em> よりも先に連鎖します。</p>
+<p>Python が SSL をサポートするように設定してインストールされている場合 (すなわち、 <a class="reference internal" href="ssl.html#module-ssl" title="ssl: ソケットオブジェクトに対する TLS/SSL ラッパー"><tt class="xref py py-mod docutils literal"><span class="pre">ssl</span></tt></a> モジュールを
+import できる場合) <a class="reference internal" href="#urllib2.HTTPSHandler" title="urllib2.HTTPSHandler"><tt class="xref py py-class docutils literal"><span class="pre">HTTPSHandler</span></tt></a> も追加されます。</p>
+<p>Python 2.3 からは、 <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> サブクラスでも  <tt class="xref py py-attr docutils literal"><span class="pre">handler_order</span></tt>
+メンバ変数を変更して、ハンドラリスト内での場所を変更できるようになりました。</p>
+</dd></dl>
+
+<p>状況に応じて、以下の例外が送出されます:</p>
+<dl class="exception">
+<dt id="urllib2.URLError">
+<em class="property">exception </em><tt class="descclassname">urllib2.</tt><tt class="descname">URLError</tt><a class="headerlink" href="#urllib2.URLError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ハンドラが何らかの問題に遭遇した場合、この例外 (またはこの例外から派生した例外)を送出します。この例外は <a class="reference internal" href="exceptions.html#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> のサブクラスです。</p>
+<dl class="attribute">
+<dt id="urllib2.URLError.reason">
+<tt class="descname">reason</tt><a class="headerlink" href="#urllib2.URLError.reason" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このエラーの原因。メッセージ文字列か、他の例外のインスタンス(リモートURLの場合は <a class="reference internal" href="socket.html#socket.error" title="socket.error"><tt class="xref py py-exc docutils literal"><span class="pre">socket.error</span></tt></a>,
+ローカルURLの場合は <a class="reference internal" href="exceptions.html#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a>)。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="urllib2.HTTPError">
+<em class="property">exception </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPError</tt><a class="headerlink" href="#urllib2.HTTPError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは例外(<a class="reference internal" href="#urllib2.URLError" title="urllib2.URLError"><tt class="xref py py-exc docutils literal"><span class="pre">URLError</span></tt></a> のサブクラス)ですが、このオブジェクトは例外でないファイル類似のオブジェクトとして返り値に使うことができます
+(<a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> が返すのと同じものです)。この機能は、例えばサーバからの認証リクエストのように、変わった HTTP エラーを処理するのに役立ちます。</p>
+<dl class="attribute">
+<dt id="urllib2.HTTPError.code">
+<tt class="descname">code</tt><a class="headerlink" href="#urllib2.HTTPError.code" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference external" href="http://www.faqs.org/rfcs/rfc2616.html">RFC 2616</a> に定義されているHTTPステータスコード。この数値型の値は、 <tt class="xref py py-attr docutils literal"><span class="pre">BaseHTTPServer.BaseHTTPRequestHandler.responses</span></tt>
+の辞書に登録されているコードに対応します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>以下のクラスが提供されています:</p>
+<dl class="class">
+<dt id="urllib2.Request">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">Request</tt><big>(</big><em>url[, data][, headers][, origin_req_host][, unverifiable]</em><big>)</big><a class="headerlink" href="#urllib2.Request" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスは URL リクエストを抽象化したものです。</p>
+<p><em>url</em> は有効な URL を指す文字列でなくてはなりません。</p>
+<p><em>data</em> はサーバに送信する追加のデータを示す文字列か、そのようなデータが無ければ <em>None</em> を指定します。現時点でHTTP リクエストは <em>data</em>
+をサポートする唯一のリクエスト形式です; <em>data</em> パラメタが指定が指定された場合、HTTP リクエストは GET でなく POST になります。
+<em>data</em> は標準的な <em class="mimetype">application/x-www-form-urlencoded</em> 形式のバッファでなくてはなりません。
+<a class="reference internal" href="urllib.html#urllib.urlencode" title="urllib.urlencode"><tt class="xref py py-func docutils literal"><span class="pre">urllib.urlencode()</span></tt></a> 関数はマップ型か2タプルのシーケンスを取り、この形式の文字列を返します。</p>
+<p><em>headers</em> は辞書でなくてはなりません。この辞書は <a class="reference internal" href="#urllib2.Request.add_header" title="urllib2.Request.add_header"><tt class="xref py py-meth docutils literal"><span class="pre">add_header()</span></tt></a> を辞書のキーおよび値を引数として呼び出した時と同じように扱われます。この引数はよく、ブラウザが何であるかを特定する <tt class="docutils literal"><span class="pre">User-Agent</span></tt> ヘッダを偽装するために用いられます。幾つかのHTTPサーバーが、スクリプトからのアクセスを禁止するために、一般的なブラウザの <tt class="docutils literal"><span class="pre">User-Agent</span></tt>
+ヘッダーしか許可しないからです。例えば、 Mozilla Firefox は <tt class="docutils literal"><span class="pre">User-Agent</span></tt> に <tt class="docutils literal"><span class="pre">&quot;Mozilla/5.</span> <span class="pre">(X11;</span> <span class="pre">U;</span> <span class="pre">Linux</span> <span class="pre">i686)</span> <span class="pre">Gecko/20071127</span> <span class="pre">Firefox/2.0.0.11&quot;</span></tt>
+のように設定し、 <a class="reference internal" href="#module-urllib2" title="urllib2: URLを開く次世代ライブラリ"><tt class="xref py py-mod docutils literal"><span class="pre">urllib2</span></tt></a> はデフォルトで <tt class="docutils literal"><span class="pre">&quot;Python-urllib/2.6&quot;</span></tt> (Python 2.6の場合)と設定します。</p>
+<p>最後の二つの引数は、サードパーティの HTTP クッキーを正しく扱いたい場合にのみ関係してきます:</p>
+<p><em>origin_req_host</em> は、 <span class="target" id="index-0"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2965.html"><strong>RFC 2965</strong></a> で定義されている元のトランザクションにおけるリクエストホスト (request-host of
+the origin transaction) です。デフォルトの値は <tt class="docutils literal"><span class="pre">cookielib.request_host(self)</span></tt> です。この値は、ユーザによって開始された元々のリクエストにおけるホスト名や IP アドレスです。例えば、もしリクエストがある HTML
+ドキュメント内の画像を指していれば、この値は画像を含んでいるページへのリクエストにおけるリクエストホストになるはずです。</p>
+<p><em>unverifiable</em> は、 <span class="target" id="index-1"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2965.html"><strong>RFC 2965</strong></a> の定義において、該当するリクエストが証明不能 (unverifiable)
+であるかどうかを示します。デフォルトの値は False です。証明不能なリクエストとは、ユーザが受け入れの可否を選択できないような URL
+を持つリクエストのことです。例えば、リクエストが HTML ドキュメント中の画像であり、ユーザがこの画像を自動的に取得するかどうかを選択できない場合には、証明不能フラグは True になります。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.OpenerDirector">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">OpenerDirector</tt><a class="headerlink" href="#urllib2.OpenerDirector" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> クラスは、 <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> の連鎖的に呼び出して URL
+を開きます。このクラスはハンドラをどのように連鎖させるか、またどのようにエラーをリカバリするかを管理します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.BaseHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">BaseHandler</tt><a class="headerlink" href="#urllib2.BaseHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスはハンドラ連鎖に登録される全てのハンドラがベースとしているクラスです &#8211; このクラスでは登録のための単純なメカニズムだけを扱います。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPDefaultErrorHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPDefaultErrorHandler</tt><a class="headerlink" href="#urllib2.HTTPDefaultErrorHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTP エラー応答のための標準のハンドラを定義します; 全てのレスポンスに対して、例外 <a class="reference internal" href="#urllib2.HTTPError" title="urllib2.HTTPError"><tt class="xref py py-exc docutils literal"><span class="pre">HTTPError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPRedirectHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPRedirectHandler</tt><a class="headerlink" href="#urllib2.HTTPRedirectHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>リダイレクションを扱うクラスです。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPCookieProcessor">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPCookieProcessor</tt><big>(</big><span class="optional">[</span><em>cookiejar</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.HTTPCookieProcessor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTP Cookie を扱うためのクラスです。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.ProxyHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">ProxyHandler</tt><big>(</big><span class="optional">[</span><em>proxies</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.ProxyHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスはプロキシを通過してリクエストを送らせます。引数 <em>proxies</em> を与える場合、プロトコル名からプロキシの URL
+へ対応付ける辞書でなくてはなりません。標準では、プロキシのリストを環境変数 <span class="target" id="index-2"></span><tt class="xref std std-envvar docutils literal"><span class="pre">&lt;protocol&gt;_proxy</span></tt>  から読み出します。</p>
+<p>プロキシ環境変数が設定されていない場合は、 Windows 環境では、レジストリのインターネット設定セクションからプロキシ設定を手に入れ、
+Mac OS X 環境では、 OS X システム設定フレームワーク
+(System Configuration Framework) からプロキシ情報を取得します。</p>
+<p>自動検出されたproxyを無効にするには、空の辞書を渡してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPPasswordMgr">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPPasswordMgr</tt><a class="headerlink" href="#urllib2.HTTPPasswordMgr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(realm,</span> <span class="pre">uri)</span> <span class="pre">-&gt;</span> <span class="pre">(user,</span> <span class="pre">password)</span></tt> の対応付けデータベースを保持します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPPasswordMgrWithDefaultRealm">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPPasswordMgrWithDefaultRealm</tt><a class="headerlink" href="#urllib2.HTTPPasswordMgrWithDefaultRealm" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(realm,</span> <span class="pre">uri)</span> <span class="pre">-&gt;</span> <span class="pre">(user,</span> <span class="pre">password)</span></tt>  の対応付けデータベースを保持します。レルム <tt class="docutils literal"><span class="pre">None</span></tt>
+はその他諸々のレルムを表し、他のレルムが該当しない場合に検索されます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.AbstractBasicAuthHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">AbstractBasicAuthHandler</tt><big>(</big><span class="optional">[</span><em>password_mgr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.AbstractBasicAuthHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスはHTTP 認証を補助するための混ぜ込みクラス (mixin class) です。遠隔ホストとプロキシの両方に対応しています。
+<em>password_mgr</em> を与える場合、 <a class="reference internal" href="#urllib2.HTTPPasswordMgr" title="urllib2.HTTPPasswordMgr"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgr</span></tt></a> と互換性がなければなりません;
+互換性のためにサポートしなければならないインタフェースについての情報はセクション <a class="reference internal" href="#http-password-mgr"><em>HTTPPasswordMgr オブジェクト</em></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPBasicAuthHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPBasicAuthHandler</tt><big>(</big><span class="optional">[</span><em>password_mgr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.HTTPBasicAuthHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>遠隔ホストとの間での認証を扱います。 <em>password_mgr</em> を与える場合、 <a class="reference internal" href="#urllib2.HTTPPasswordMgr" title="urllib2.HTTPPasswordMgr"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgr</span></tt></a> と互換性がなければなりません;  互換性のためにサポートしなければならないインタフェースについての情報はセクション <a class="reference internal" href="#http-password-mgr"><em>HTTPPasswordMgr オブジェクト</em></a>
+を参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.ProxyBasicAuthHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">ProxyBasicAuthHandler</tt><big>(</big><span class="optional">[</span><em>password_mgr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.ProxyBasicAuthHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プロキシとの間での認証を扱います。 <em>password_mgr</em> を与える場合、 <a class="reference internal" href="#urllib2.HTTPPasswordMgr" title="urllib2.HTTPPasswordMgr"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgr</span></tt></a> と互換性がなければなりません;  互換性のためにサポートしなければならないインタフェースについての情報はセクション <a class="reference internal" href="#http-password-mgr"><em>HTTPPasswordMgr オブジェクト</em></a>
+を参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.AbstractDigestAuthHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">AbstractDigestAuthHandler</tt><big>(</big><span class="optional">[</span><em>password_mgr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.AbstractDigestAuthHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスはHTTP 認証を補助するための混ぜ込みクラス (mixin class) です。遠隔ホストとプロキシの両方に対応しています。
+<em>password_mgr</em> を与える場合、 <a class="reference internal" href="#urllib2.HTTPPasswordMgr" title="urllib2.HTTPPasswordMgr"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgr</span></tt></a> と互換性がなければなりません;
+互換性のためにサポートしなければならないインタフェースについての情報はセクション <a class="reference internal" href="#http-password-mgr"><em>HTTPPasswordMgr オブジェクト</em></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPDigestAuthHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPDigestAuthHandler</tt><big>(</big><span class="optional">[</span><em>password_mgr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.HTTPDigestAuthHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>遠隔ホストとの間での認証を扱います。 <em>password_mgr</em> を与える場合、 <a class="reference internal" href="#urllib2.HTTPPasswordMgr" title="urllib2.HTTPPasswordMgr"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgr</span></tt></a> と互換性がなければなりません;  互換性のためにサポートしなければならないインタフェースについての情報はセクション <a class="reference internal" href="#http-password-mgr"><em>HTTPPasswordMgr オブジェクト</em></a>
+を参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.ProxyDigestAuthHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">ProxyDigestAuthHandler</tt><big>(</big><span class="optional">[</span><em>password_mgr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.ProxyDigestAuthHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プロキシとの間での認証を扱います。 <em>password_mgr</em> を与える場合、 <a class="reference internal" href="#urllib2.HTTPPasswordMgr" title="urllib2.HTTPPasswordMgr"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgr</span></tt></a> と互換性がなければなりません;  互換性のためにサポートしなければならないインタフェースについての情報はセクション <a class="reference internal" href="#http-password-mgr"><em>HTTPPasswordMgr オブジェクト</em></a>
+を参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPHandler</tt><a class="headerlink" href="#urllib2.HTTPHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTP の URL を開きます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.HTTPSHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">HTTPSHandler</tt><a class="headerlink" href="#urllib2.HTTPSHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTPS の URL を開きます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.FileHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">FileHandler</tt><a class="headerlink" href="#urllib2.FileHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ローカルファイルを開きます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.FTPHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">FTPHandler</tt><a class="headerlink" href="#urllib2.FTPHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>FTP の URL を開きます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.CacheFTPHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">CacheFTPHandler</tt><a class="headerlink" href="#urllib2.CacheFTPHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>FTP の URL を開きます。遅延を最小限にするために、開かれている FTP  接続に対するキャッシュを保持します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urllib2.UnknownHandler">
+<em class="property">class </em><tt class="descclassname">urllib2.</tt><tt class="descname">UnknownHandler</tt><a class="headerlink" href="#urllib2.UnknownHandler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>その他諸々のためのクラスで、未知のプロトコルの URL を開きます。</p>
+</dd></dl>
+
+<div class="section" id="request">
+<span id="request-objects"></span><h2>20.6.1. Request オブジェクト<a class="headerlink" href="#request" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下のメソッドは <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> の全ての公開インタフェースを記述します。従ってサブクラスではこれら全てのメソッドをオーバライドしなければなりません。</p>
+<dl class="method">
+<dt id="urllib2.Request.add_data">
+<tt class="descclassname">Request.</tt><tt class="descname">add_data</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#urllib2.Request.add_data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> のデータを <em>data</em> に設定します。この値は HTTP  ハンドラ以外のハンドラでは無視されます。HTTP
+ハンドラでは、データはバイト文字列でなくてはなりません。このメソッドを使うとリクエストの形式が <tt class="docutils literal"><span class="pre">GET</span></tt> から <tt class="docutils literal"><span class="pre">POST</span></tt> に変更されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.get_method">
+<tt class="descclassname">Request.</tt><tt class="descname">get_method</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.get_method" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTP リクエストメソッドを示す文字列を返します。このメソッドは HTTP リクエストだけに対して意味があり、現状では常に <tt class="docutils literal"><span class="pre">'GET'</span></tt> か
+<tt class="docutils literal"><span class="pre">'POST'</span></tt> のいずれかの値を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.has_data">
+<tt class="descclassname">Request.</tt><tt class="descname">has_data</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.has_data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インスタンスが <tt class="docutils literal"><span class="pre">None</span></tt> でないデータを持つかどうかを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.get_data">
+<tt class="descclassname">Request.</tt><tt class="descname">get_data</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.get_data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インスタンスのデータを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.add_header">
+<tt class="descclassname">Request.</tt><tt class="descname">add_header</tt><big>(</big><em>key</em>, <em>val</em><big>)</big><a class="headerlink" href="#urllib2.Request.add_header" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>リクエストに新たなヘッダを追加します。ヘッダは HTTP ハンドラ以外のハンドラでは無視されます。HTTP ハンドラでは、引数はサーバに送信されるヘッダのリストに追加されます。同じ名前を持つヘッダを 2 つ以上持つことはできず、 <em>key</em> の衝突が生じた場合、後で追加したヘッダが前に追加したヘッダを上書きします。現時点では、この機能は HTTP の機能を損ねることはありません。というのは、複数回呼び出したときに意味を持つようなヘッダには、どれもただ一つのヘッダを使って同じ機能を果たすための (ヘッダ特有の) 方法があるからです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.add_unredirected_header">
+<tt class="descclassname">Request.</tt><tt class="descname">add_unredirected_header</tt><big>(</big><em>key</em>, <em>header</em><big>)</big><a class="headerlink" href="#urllib2.Request.add_unredirected_header" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>リダイレクトされたリクエストには追加されないヘッダを追加します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.has_header">
+<tt class="descclassname">Request.</tt><tt class="descname">has_header</tt><big>(</big><em>header</em><big>)</big><a class="headerlink" href="#urllib2.Request.has_header" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インスタンスが名前つきヘッダであるかどうかを (通常のヘッダと非リダイレクトヘッダの両方を調べて) 返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.get_full_url">
+<tt class="descclassname">Request.</tt><tt class="descname">get_full_url</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.get_full_url" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンストラクタで与えられた URL を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.get_type">
+<tt class="descclassname">Request.</tt><tt class="descname">get_type</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.get_type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL のタイプ &#8212; いわゆるスキーム (scheme) &#8212; を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.get_host">
+<tt class="descclassname">Request.</tt><tt class="descname">get_host</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.get_host" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>接続を行う先のホスト名を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.get_selector">
+<tt class="descclassname">Request.</tt><tt class="descname">get_selector</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.get_selector" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セレクタ &#8212; サーバに送られる URL の一部分 &#8212; を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.set_proxy">
+<tt class="descclassname">Request.</tt><tt class="descname">set_proxy</tt><big>(</big><em>host</em>, <em>type</em><big>)</big><a class="headerlink" href="#urllib2.Request.set_proxy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>リクエストがプロキシサーバを経由するように準備します。 <em>host</em> および <em>type</em> はインスタンスのもとの設定と置き換えられます。インスタンスのセレクタはコンストラクタに与えたもともとの URL になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.get_origin_req_host">
+<tt class="descclassname">Request.</tt><tt class="descname">get_origin_req_host</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.get_origin_req_host" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><span class="target" id="index-3"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2965.html"><strong>RFC 2965</strong></a> の定義よる、始原トランザクションのリクエストホストを返します。 <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> コンストラクタのドキュメントを参照してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.Request.is_unverifiable">
+<tt class="descclassname">Request.</tt><tt class="descname">is_unverifiable</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.Request.is_unverifiable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>リクエストが <span class="target" id="index-4"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2965.html"><strong>RFC 2965</strong></a> の定義における証明不能リクエストであるかどうかを返します。 <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a>
+コンストラクタのドキュメントを参照してください。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="openerdirector">
+<span id="opener-director-objects"></span><h2>20.6.2. OpenerDirector オブジェクト<a class="headerlink" href="#openerdirector" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> インスタンスは以下のメソッドを持っています:</p>
+<dl class="method">
+<dt id="urllib2.OpenerDirector.add_handler">
+<tt class="descclassname">OpenerDirector.</tt><tt class="descname">add_handler</tt><big>(</big><em>handler</em><big>)</big><a class="headerlink" href="#urllib2.OpenerDirector.add_handler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>handler</em> は <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> のインスタンスでなければなりません。以下のメソッドを使った検索が行われ、URL
+を取り扱うことが可能なハンドラの連鎖が追加されます (HTTP エラーは特別扱いされているので注意してください)。</p>
+<ul class="simple">
+<li><tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_open</span></tt> &#8212; ハンドラが <em>protocol</em> の URL を開く方法を知っているかどうかを調べます。</li>
+<li><tt class="samp docutils literal"><span class="pre">http_error_</span><em><span class="pre">type</span></em></tt> &#8212; ハンドラが HTTP エラーコード <em>type</em> の処理方法を知っていることを示すシグナルです。</li>
+<li><tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_error</span></tt> &#8212; ハンドラが (<tt class="docutils literal"><span class="pre">http</span></tt> でない) <em>protocol</em> のエラーを処理する方法を知っていることを示すシグナルです。</li>
+<li><tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_request</span></tt> &#8212; ハンドラが <em>protocol</em> リクエストのプリプロセス方法を知っていることを示すシグナルです。</li>
+<li><tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_response</span></tt> &#8212; ハンドラが <em>protocol</em> リクエストのポストプロセス方法を知っていることを示すシグナルです。</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.OpenerDirector.open">
+<tt class="descclassname">OpenerDirector.</tt><tt class="descname">open</tt><big>(</big><em>url[, data][, timeout]</em><big>)</big><a class="headerlink" href="#urllib2.OpenerDirector.open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた <em>url</em> (リクエストオブジェクトでも文字列でもかまいません) を開きます。オプションとして <em>data</em> を与えることができます。引数、返り値、および送出される例外は <a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> と同じです (<a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> の場合、標準でインストールされているグローバルな <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> の <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt></a> メソッドを呼び出します) 。オプションの <em>timeout</em> 引数は、接続開始のようなブロックする処理におけるタイムアウト時間を秒数で指定します。(指定しなかった場合は、グローバルのデフォルト設定が利用されます)
+タイムアウト機能は、 HTTP, HTTPS, FTP 接続でのみ有効です。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>timeout</em> 引数が追加されました</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.OpenerDirector.error">
+<tt class="descclassname">OpenerDirector.</tt><tt class="descname">error</tt><big>(</big><em>proto</em><span class="optional">[</span>, <em>arg</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urllib2.OpenerDirector.error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたプロトコルにおけるエラーを処理します。このメソッドは与えられたプロトコルにおける登録済みのエラーハンドラを (プロトコル固有の)
+引数で呼び出します。 HTTP プロトコルは特殊なケースで、特定のエラーハンドラを選び出すのに HTTP レスポンスコードを使います; ハンドラクラスの
+<tt class="xref py py-meth docutils literal"><span class="pre">http_error_*()</span></tt> メソッドを参照してください。</p>
+<p>返り値および送出される例外は <a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> と同じものです。</p>
+</dd></dl>
+
+<p>OpenerDirector オブジェクトは、以下の 3 つのステージに分けて URL を開きます:</p>
+<p>各ステージで OpenerDirector オブジェクトのメソッドがどのような順で呼び出されるかは、ハンドラインスタンスの並び方で決まります。</p>
+<ol class="arabic">
+<li><p class="first"><tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_request</span></tt> 形式のメソッドを持つ全てのハンドラに対してそのメソッドを呼び出し、リクエストのプリプロセスを行います。</p>
+</li>
+<li><p class="first"><tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_open</span></tt> 形式のメソッドを持つハンドラを呼び出し、リクエストを処理します。このステージは、ハンドラが <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> でない値 (すなわちレスポンス) を返すか、例外 (通常は <a class="reference internal" href="#urllib2.URLError" title="urllib2.URLError"><tt class="xref py py-exc docutils literal"><span class="pre">URLError</span></tt></a>)
+を送出した時点で終了します。例外は伝播 (propagate) できます。</p>
+<p>実際には、上のアルゴリズムではまず <tt class="xref py py-meth docutils literal"><span class="pre">default_open()</span></tt> という名前のメソッドを呼び出します。このメソッドが全て
+<a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返す場合、同じアルゴリズムを繰り返して、今度は <tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_open</span></tt>
+形式のメソッドを試します。メソッドが全て <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返すと、さらに同じアルゴリズムを繰り返して <tt class="xref py py-meth docutils literal"><span class="pre">unknown_open()</span></tt>
+を呼び出します。</p>
+<p>これらのメソッドの実装には、親となる <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> インスタンスの <tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt>
+や <tt class="xref py py-meth docutils literal"><span class="pre">error()</span></tt> といったメソッド呼び出しが入る場合があるので注意してください。</p>
+</li>
+<li><p class="first"><tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_response</span></tt> 形式のメソッドを持つ全てのハンドラに対してそのメソッドを呼び出し、リクエストのポストプロセスを行います。</p>
+</li>
+</ol>
+</div>
+<div class="section" id="basehandler">
+<span id="base-handler-objects"></span><h2>20.6.3. BaseHandler オブジェクト<a class="headerlink" href="#basehandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> オブジェクトは直接的に役に立つ 2 つのメソッドと、その他として派生クラスで使われることを想定したメソッドを提供します。以下は直接的に使うためのメソッドです:</p>
+<dl class="method">
+<dt id="urllib2.BaseHandler.add_parent">
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">add_parent</tt><big>(</big><em>director</em><big>)</big><a class="headerlink" href="#urllib2.BaseHandler.add_parent" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>親オブジェクトとして、 <tt class="docutils literal"><span class="pre">director</span></tt> を追加します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.BaseHandler.close">
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.BaseHandler.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての親オブジェクトを削除します。</p>
+</dd></dl>
+
+<p>以下のメンバおよびメソッドは <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> から派生したクラスでのみ使われます:</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">慣習的に、 <tt class="xref py py-meth docutils literal"><span class="pre">protocol_request()</span></tt> や <tt class="xref py py-meth docutils literal"><span class="pre">protocol_response()</span></tt> といったメソッドを定義しているサブクラスは <tt class="xref py py-class docutils literal"><span class="pre">*Processor</span></tt> と名づけ、その他は <tt class="xref py py-class docutils literal"><span class="pre">*</span> <span class="pre">Handler</span></tt> と名づけることになっています</p>
+</div>
+<dl class="attribute">
+<dt id="urllib2.BaseHandler.parent">
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">parent</tt><a class="headerlink" href="#urllib2.BaseHandler.parent" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>有効な <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> です。この値は違うプロトコルを使って URL を開く場合やエラーを処理する際に使われます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.BaseHandler.default_open">
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">default_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#urllib2.BaseHandler.default_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> では定義されて <em>いません</em> 。しかし、全ての URL をキャッチさせたいなら、サブクラスで定義する必要があります。</p>
+<p>このメソッドが定義されていた場合、 <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> から呼び出されます。このメソッドは
+<a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> のメソッド <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt></a> が返す値について記述されているようなファイル類似のオブジェクトか、 <tt class="docutils literal"><span class="pre">None</span></tt> を返さなくてはなりません。このメソッドが送出する例外は、真に例外的なことが起きない限り、 <a class="reference internal" href="#urllib2.URLError" title="urllib2.URLError"><tt class="xref py py-exc docutils literal"><span class="pre">URLError</span></tt></a>
+を送出しなければなりません (例えば、 <a class="reference internal" href="exceptions.html#exceptions.MemoryError" title="exceptions.MemoryError"><tt class="xref py py-exc docutils literal"><span class="pre">MemoryError</span></tt></a> を <a class="reference internal" href="#urllib2.URLError" title="urllib2.URLError"><tt class="xref py py-exc docutils literal"><span class="pre">URLError</span></tt></a> をマップしてはいけません)。</p>
+<p>このメソッドはプロトコル固有のオープンメソッドが呼び出される前に呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">protocol_open</tt><big>(</big><em>req</em><big>)</big></dt>
+<dd><p>(&#8220;protocol&#8221; は実際にはプロトコル名です)</p>
+<p>このメソッドは <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> では定義されて <em>いません</em> 。しかし <em>protocol</em> の URL
+をキャッチしたいなら、サブクラスで定義する必要があります。</p>
+<p>このメソッドが定義されていた場合、 <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> から呼び出されます。戻り値は <tt class="xref py py-meth docutils literal"><span class="pre">default_open()</span></tt>
+と同じでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.BaseHandler.unknown_open">
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">unknown_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#urllib2.BaseHandler.unknown_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> では定義されて <em>いません</em> 。しかし URL を開くための特定のハンドラが登録されていないような
+URL をキャッチしたいなら、サブクラスで定義する必要があります。</p>
+<p>このメソッドが定義されていた場合、 <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> から呼び出されます。戻り値は <a class="reference internal" href="#urllib2.BaseHandler.default_open" title="urllib2.BaseHandler.default_open"><tt class="xref py py-meth docutils literal"><span class="pre">default_open()</span></tt></a>
+と同じでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.BaseHandler.http_error_default">
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">http_error_default</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.BaseHandler.http_error_default" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> では定義されて <em>いません</em> 。しかしその他の処理されなかった HTTP
+エラーを処理する機能をもたせたいなら、サブクラスで定義する必要があります。このメソッドはエラーに遭遇した <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a>
+から自動的に呼び出されます。その他の状況では普通呼び出すべきではありません。</p>
+<p><em>req</em> は <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> オブジェクトで、 <em>fp</em> は HTTP エラー本体を読み出せるようなファイル類似のオブジェクトになります。 <em>code</em> は 3 桁の 10 進数からなるエラーコードで、 <em>msg</em> ユーザ向けのエラーコード解説です。 <em>hdrs</em> はエラー応答のヘッダをマップしたオブジェクトです。</p>
+<p>返される値および送出される例外は <a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> と同じものでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.BaseHandler.http_error_nnn">
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">http_error_nnn</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.BaseHandler.http_error_nnn" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>nnn</em> は 3 桁の 10 進数からなる HTTP エラーコードでなくてはなりません。このメソッドも <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a>
+では定義されていませんが、サブクラスのインスタンスで定義されていた場合、エラーコード <em>nnn</em> の HTTP エラーが発生した際に呼び出されます。</p>
+<p>特定の HTTP エラーに対する処理を行うためには、このメソッドをサブクラスでオーバライドする必要があります。</p>
+<p>引数、返される値、および送出される例外は <a class="reference internal" href="#urllib2.BaseHandler.http_error_default" title="urllib2.BaseHandler.http_error_default"><tt class="xref py py-meth docutils literal"><span class="pre">http_error_default()</span></tt></a> と同じものでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">protocol_request</tt><big>(</big><em>req</em><big>)</big></dt>
+<dd><p>(&#8220;protocol&#8221; は実際にはプロトコル名です)</p>
+<p>このメソッドは <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> では <em>定義されていません</em> が、サブクラスで特定の <em>protocol</em>
+のリクエストのプリプロセスを行いたい場合には定義する必要があります。</p>
+<p>このメソッドが定義されていると、親となる <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> から呼び出されます。その際、 <em>req</em>
+は <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> オブジェクトになります。戻り値は <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> オブジェクトでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">BaseHandler.</tt><tt class="descname">protocol_response</tt><big>(</big><em>req</em>, <em>response</em><big>)</big></dt>
+<dd><p>(&#8220;protocol&#8221; は実際にはプロトコル名です)</p>
+<p>このメソッドは <a class="reference internal" href="#urllib2.BaseHandler" title="urllib2.BaseHandler"><tt class="xref py py-class docutils literal"><span class="pre">BaseHandler</span></tt></a> では <em>定義されていません</em> が、サブクラスで特定の <em>protocol</em>
+のリクエストのポストプロセスを行いたい場合には定義する必要があります。</p>
+<p>このメソッドが定義されていると、親となる <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> から呼び出されます。その際、 <em>req</em>
+は <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> オブジェクトになります。 <em>response</em> は <a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> の戻り値と同じインタフェースを実装したオブジェクトになります。戻り値もまた、 <a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> の戻り値と同じインタフェースを実装したオブジェクトでなければなりません。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httpredirecthandler">
+<span id="http-redirect-handler"></span><h2>20.6.4. HTTPRedirectHandler オブジェクト<a class="headerlink" href="#httpredirecthandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">HTTP リダイレクトによっては、このモジュールのクライアントコード側での処理を必要とします。その場合、 <a class="reference internal" href="#urllib2.HTTPError" title="urllib2.HTTPError"><tt class="xref py py-exc docutils literal"><span class="pre">HTTPError</span></tt></a> が送出されます。様々なリダイレクトコードの厳密な意味に関する詳細は <span class="target" id="index-5"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2616.html"><strong>RFC 2616</strong></a> を参照してください。</p>
+</div>
+<dl class="method">
+<dt id="urllib2.HTTPRedirectHandler.redirect_request">
+<tt class="descclassname">HTTPRedirectHandler.</tt><tt class="descname">redirect_request</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em>, <em>newurl</em><big>)</big><a class="headerlink" href="#urllib2.HTTPRedirectHandler.redirect_request" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>リダイレクトの通知に応じて、 <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> または <tt class="docutils literal"><span class="pre">None</span></tt> を返します。このメソッドは <tt class="docutils literal"><span class="pre">http_error_30*()</span></tt>
+メソッドにおいて、リダイレクトの通知をサーバから受信した際に、デフォルトの実装として呼び出されます。リダイレクトを起こす場合、新たな
+<a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> を生成して、 <tt class="docutils literal"><span class="pre">http_error_30*()</span></tt> が <em>newurl</em> へリダイレクトを実行できるようにします。そうでない場合、他のどのハンドラにもこの URL を処理させたくなければ <a class="reference internal" href="#urllib2.HTTPError" title="urllib2.HTTPError"><tt class="xref py py-exc docutils literal"><span class="pre">HTTPError</span></tt></a> を送出し、リダイレクト処理を行うことはできないが他のハンドラなら可能かもしれない場合には <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">このメソッドのデフォルトの実装は、 <span class="target" id="index-6"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2616.html"><strong>RFC 2616</strong></a> に厳密に従ったものではありません。 <span class="target" id="index-7"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2616.html"><strong>RFC 2616</strong></a> では、 <tt class="docutils literal"><span class="pre">POST</span></tt>
+リクエストに対する 301 および 302 応答が、ユーザの承認なく自動的にリダイレクトされてはならないと述べています。現実には、ブラウザは POST を
+<tt class="docutils literal"><span class="pre">GET</span></tt> に変更することで、これらの応答に対して自動的にリダイレクトを行えるようにしています。デフォルトの実装でも、この挙動を再現しています。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.HTTPRedirectHandler.http_error_301">
+<tt class="descclassname">HTTPRedirectHandler.</tt><tt class="descname">http_error_301</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.HTTPRedirectHandler.http_error_301" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">Location:</span></tt> か <tt class="docutils literal"><span class="pre">URI:</span></tt> のURL にリダイレクトします。このメソッドは HTTP  における &#8216;moved permanently&#8217; レスポンスを取得した際に親オブジェクトとなる <a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> によって呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.HTTPRedirectHandler.http_error_302">
+<tt class="descclassname">HTTPRedirectHandler.</tt><tt class="descname">http_error_302</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.HTTPRedirectHandler.http_error_302" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib2.HTTPRedirectHandler.http_error_301" title="urllib2.HTTPRedirectHandler.http_error_301"><tt class="xref py py-meth docutils literal"><span class="pre">http_error_301()</span></tt></a> と同じですが、&#8217;found&#8217; レスポンスに対して呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.HTTPRedirectHandler.http_error_303">
+<tt class="descclassname">HTTPRedirectHandler.</tt><tt class="descname">http_error_303</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.HTTPRedirectHandler.http_error_303" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib2.HTTPRedirectHandler.http_error_301" title="urllib2.HTTPRedirectHandler.http_error_301"><tt class="xref py py-meth docutils literal"><span class="pre">http_error_301()</span></tt></a> と同じですが、&#8217;see other&#8217; レスポンスに対して呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.HTTPRedirectHandler.http_error_307">
+<tt class="descclassname">HTTPRedirectHandler.</tt><tt class="descname">http_error_307</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.HTTPRedirectHandler.http_error_307" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urllib2.HTTPRedirectHandler.http_error_301" title="urllib2.HTTPRedirectHandler.http_error_301"><tt class="xref py py-meth docutils literal"><span class="pre">http_error_301()</span></tt></a> と同じですが、&#8217;temporary redirect&#8217;  レスポンスに対して呼び出されます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httpcookieprocessor">
+<span id="http-cookie-processor"></span><h2>20.6.5. HTTPCookieProcessor オブジェクト<a class="headerlink" href="#httpcookieprocessor" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+<p><a class="reference internal" href="#urllib2.HTTPCookieProcessor" title="urllib2.HTTPCookieProcessor"><tt class="xref py py-class docutils literal"><span class="pre">HTTPCookieProcessor</span></tt></a> インスタンスは属性をひとつだけ持ちます:</p>
+<dl class="attribute">
+<dt id="urllib2.HTTPCookieProcessor.cookiejar">
+<tt class="descclassname">HTTPCookieProcessor.</tt><tt class="descname">cookiejar</tt><a class="headerlink" href="#urllib2.HTTPCookieProcessor.cookiejar" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>クッキーの入っている <a class="reference internal" href="cookielib.html#cookielib.CookieJar" title="cookielib.CookieJar"><tt class="xref py py-class docutils literal"><span class="pre">cookielib.CookieJar</span></tt></a> オブジェクトです。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="proxyhandler">
+<span id="proxy-handler"></span><h2>20.6.6. ProxyHandler オブジェクト<a class="headerlink" href="#proxyhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt>
+<tt class="descclassname">ProxyHandler.</tt><tt class="descname">protocol_open</tt><big>(</big><em>request</em><big>)</big></dt>
+<dd><p>(&#8220;protocol&#8221; は実際にはプロトコル名です)</p>
+<p><a class="reference internal" href="#urllib2.ProxyHandler" title="urllib2.ProxyHandler"><tt class="xref py py-class docutils literal"><span class="pre">ProxyHandler</span></tt></a> は、コンストラクタで与えた辞書 <em>proxies</em> にプロキシが設定されているような <em>protocol</em>
+全てについて、メソッド  <tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_open</span></tt> を持つことになります。このメソッドは <tt class="docutils literal"><span class="pre">request.set_proxy()</span></tt>
+を呼び出して、リクエストがプロキシを通過できるように修正します。その後連鎖するハンドラの中から次のハンドラを呼び出して実際にプロトコルを実行します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httppasswordmgr">
+<span id="http-password-mgr"></span><h2>20.6.7. HTTPPasswordMgr オブジェクト<a class="headerlink" href="#httppasswordmgr" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下のメソッドは <a class="reference internal" href="#urllib2.HTTPPasswordMgr" title="urllib2.HTTPPasswordMgr"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgr</span></tt></a> および <a class="reference internal" href="#urllib2.HTTPPasswordMgrWithDefaultRealm" title="urllib2.HTTPPasswordMgrWithDefaultRealm"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgrWithDefaultRealm</span></tt></a>
+オブジェクトで利用できます。</p>
+<dl class="method">
+<dt id="urllib2.HTTPPasswordMgr.add_password">
+<tt class="descclassname">HTTPPasswordMgr.</tt><tt class="descname">add_password</tt><big>(</big><em>realm</em>, <em>uri</em>, <em>user</em>, <em>passwd</em><big>)</big><a class="headerlink" href="#urllib2.HTTPPasswordMgr.add_password" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>uri</em> は単一の URI でも複数の URI からなるシーケンスでもかまいません。 <em>realm</em> 、 <em>user</em> および <em>passwd</em>
+は文字列でなくてはなりません。このメソッドによって、 <em>realm</em> と与えられた URI の上位 URI に対して <tt class="docutils literal"><span class="pre">(user,</span> <span class="pre">passwd)</span></tt>
+が認証トークンとして使われるようになります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.HTTPPasswordMgr.find_user_password">
+<tt class="descclassname">HTTPPasswordMgr.</tt><tt class="descname">find_user_password</tt><big>(</big><em>realm</em>, <em>authuri</em><big>)</big><a class="headerlink" href="#urllib2.HTTPPasswordMgr.find_user_password" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたレルムおよび URI に対するユーザ名またはパスワードがあればそれを取得します。該当するユーザ名／パスワードが存在しない場合、このメソッドは
+<tt class="docutils literal"><span class="pre">(None,</span> <span class="pre">None)</span></tt> を返します。</p>
+<p><a class="reference internal" href="#urllib2.HTTPPasswordMgrWithDefaultRealm" title="urllib2.HTTPPasswordMgrWithDefaultRealm"><tt class="xref py py-class docutils literal"><span class="pre">HTTPPasswordMgrWithDefaultRealm</span></tt></a> オブジェクトでは、与えられた <em>realm</em>
+に対して該当するユーザ名/パスワードが存在しない場合、レルム <tt class="docutils literal"><span class="pre">None</span></tt> が検索されます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="abstractbasicauthhandler">
+<span id="abstract-basic-auth-handler"></span><h2>20.6.8. AbstractBasicAuthHandler オブジェクト<a class="headerlink" href="#abstractbasicauthhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.AbstractBasicAuthHandler.http_error_auth_reqed">
+<tt class="descclassname">AbstractBasicAuthHandler.</tt><tt class="descname">http_error_auth_reqed</tt><big>(</big><em>authreq</em>, <em>host</em>, <em>req</em>, <em>headers</em><big>)</big><a class="headerlink" href="#urllib2.AbstractBasicAuthHandler.http_error_auth_reqed" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザ名／パスワードを取得し、再度サーバへのリクエストを試みることで、サーバからの認証リクエストを処理します。 <em>authreq</em> はリクエストにおいてレルムに関する情報が含まれているヘッダの名前、 <em>host</em> は認証を行う対象の URL とパスを指定します、 <em>req</em> は (失敗した)
+<a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> オブジェクト、そして <em>headers</em> はエラーヘッダでなくてはなりません。</p>
+<p><em>host</em> は、オーソリティ (例 <tt class="docutils literal"><span class="pre">&quot;python.org&quot;</span></tt>) か、オーソリティコンポーネントを含む URL (例
+<tt class="docutils literal"><span class="pre">&quot;http://python.org&quot;</span></tt>) です。どちらの場合も、オーソリティはユーザ情報コンポーネントを含んではいけません
+(なので、 <tt class="docutils literal"><span class="pre">&quot;python.org&quot;</span></tt> や <tt class="docutils literal"><span class="pre">&quot;python.org:80&quot;</span></tt> は正しく、 <tt class="docutils literal"><span class="pre">&quot;joe:password&#64;python.org&quot;</span></tt>
+は不正です) 。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httpbasicauthhandler">
+<span id="http-basic-auth-handler"></span><h2>20.6.9. HTTPBasicAuthHandler オブジェクト<a class="headerlink" href="#httpbasicauthhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.HTTPBasicAuthHandler.http_error_401">
+<tt class="descclassname">HTTPBasicAuthHandler.</tt><tt class="descname">http_error_401</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.HTTPBasicAuthHandler.http_error_401" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>認証情報がある場合、認証情報付きで再度リクエストを試みます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="proxybasicauthhandler">
+<span id="proxy-basic-auth-handler"></span><h2>20.6.10. ProxyBasicAuthHandler オブジェクト<a class="headerlink" href="#proxybasicauthhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.ProxyBasicAuthHandler.http_error_407">
+<tt class="descclassname">ProxyBasicAuthHandler.</tt><tt class="descname">http_error_407</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.ProxyBasicAuthHandler.http_error_407" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>認証情報がある場合、認証情報付きで再度リクエストを試みます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="abstractdigestauthhandler">
+<span id="abstract-digest-auth-handler"></span><h2>20.6.11. AbstractDigestAuthHandler オブジェクト<a class="headerlink" href="#abstractdigestauthhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.AbstractDigestAuthHandler.http_error_auth_reqed">
+<tt class="descclassname">AbstractDigestAuthHandler.</tt><tt class="descname">http_error_auth_reqed</tt><big>(</big><em>authreq</em>, <em>host</em>, <em>req</em>, <em>headers</em><big>)</big><a class="headerlink" href="#urllib2.AbstractDigestAuthHandler.http_error_auth_reqed" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>authreq</em> はリクエストにおいてレルムに関する情報が含まれているヘッダの名前、 <em>host</em> は認証を行う対象のホスト名、 <em>req</em> は  (失敗した)
+<a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> オブジェクト、そして <em>headers</em> はエラーヘッダでなくてはなりません。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httpdigestauthhandler">
+<span id="http-digest-auth-handler"></span><h2>20.6.12. HTTPDigestAuthHandler オブジェクト<a class="headerlink" href="#httpdigestauthhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.HTTPDigestAuthHandler.http_error_401">
+<tt class="descclassname">HTTPDigestAuthHandler.</tt><tt class="descname">http_error_401</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.HTTPDigestAuthHandler.http_error_401" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>認証情報がある場合、認証情報付きで再度リクエストを試みます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="proxydigestauthhandler">
+<span id="proxy-digest-auth-handler"></span><h2>20.6.13. ProxyDigestAuthHandler オブジェクト<a class="headerlink" href="#proxydigestauthhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.ProxyDigestAuthHandler.http_error_407">
+<tt class="descclassname">ProxyDigestAuthHandler.</tt><tt class="descname">http_error_407</tt><big>(</big><em>req</em>, <em>fp</em>, <em>code</em>, <em>msg</em>, <em>hdrs</em><big>)</big><a class="headerlink" href="#urllib2.ProxyDigestAuthHandler.http_error_407" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>認証情報がある場合、認証情報付きで再度リクエストを試みます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httphandler">
+<span id="http-handler-objects"></span><h2>20.6.14. HTTPHandler オブジェクト<a class="headerlink" href="#httphandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.HTTPHandler.http_open">
+<tt class="descclassname">HTTPHandler.</tt><tt class="descname">http_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#urllib2.HTTPHandler.http_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTP リクエストを送ります。 <tt class="docutils literal"><span class="pre">req.has_data()</span></tt> に応じて、 GET または POST のどちらでも送ることができます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httpshandler">
+<span id="https-handler-objects"></span><h2>20.6.15. HTTPSHandler オブジェクト<a class="headerlink" href="#httpshandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.HTTPSHandler.https_open">
+<tt class="descclassname">HTTPSHandler.</tt><tt class="descname">https_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#urllib2.HTTPSHandler.https_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTPS リクエストを送ります。 <tt class="docutils literal"><span class="pre">req.has_data()</span></tt> に応じて、 GET または POST のどちらでも送ることができます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="filehandler">
+<span id="file-handler-objects"></span><h2>20.6.16. FileHandler オブジェクト<a class="headerlink" href="#filehandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.FileHandler.file_open">
+<tt class="descclassname">FileHandler.</tt><tt class="descname">file_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#urllib2.FileHandler.file_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ホスト名がない場合、またはホスト名が <tt class="docutils literal"><span class="pre">'localhost'</span></tt> の場合にファイルをローカルでオープンします。そうでない場合、プロトコルを <tt class="docutils literal"><span class="pre">ftp</span></tt>
+に切り替え、 <tt class="xref py py-attr docutils literal"><span class="pre">parent</span></tt> を使って再度オープンを試みます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="ftphandler">
+<span id="ftp-handler-objects"></span><h2>20.6.17. FTPHandler オブジェクト<a class="headerlink" href="#ftphandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.FTPHandler.ftp_open">
+<tt class="descclassname">FTPHandler.</tt><tt class="descname">ftp_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#urllib2.FTPHandler.ftp_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>req</em> で表されるファイルを FTP 越しにオープンします。ログインは常に空のユーザネームおよびパスワードで行われます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="cacheftphandler">
+<span id="cacheftp-handler-objects"></span><h2>20.6.18. CacheFTPHandler オブジェクト<a class="headerlink" href="#cacheftphandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#urllib2.CacheFTPHandler" title="urllib2.CacheFTPHandler"><tt class="xref py py-class docutils literal"><span class="pre">CacheFTPHandler</span></tt></a> オブジェクトは <a class="reference internal" href="#urllib2.FTPHandler" title="urllib2.FTPHandler"><tt class="xref py py-class docutils literal"><span class="pre">FTPHandler</span></tt></a> オブジェクトに以下のメソッドを追加したものです:</p>
+<dl class="method">
+<dt id="urllib2.CacheFTPHandler.setTimeout">
+<tt class="descclassname">CacheFTPHandler.</tt><tt class="descname">setTimeout</tt><big>(</big><em>t</em><big>)</big><a class="headerlink" href="#urllib2.CacheFTPHandler.setTimeout" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>接続のタイムアウトを <em>t</em> 秒に設定します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="urllib2.CacheFTPHandler.setMaxConns">
+<tt class="descclassname">CacheFTPHandler.</tt><tt class="descname">setMaxConns</tt><big>(</big><em>m</em><big>)</big><a class="headerlink" href="#urllib2.CacheFTPHandler.setMaxConns" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>キャッシュ付き接続の最大接続数を <em>m</em> に設定します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="unknownhandler">
+<span id="unknown-handler-objects"></span><h2>20.6.19. UnknownHandler オブジェクト<a class="headerlink" href="#unknownhandler" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="urllib2.UnknownHandler.unknown_open">
+<tt class="descclassname">UnknownHandler.</tt><tt class="descname">unknown_open</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.UnknownHandler.unknown_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>例外 <a class="reference internal" href="#urllib2.URLError" title="urllib2.URLError"><tt class="xref py py-exc docutils literal"><span class="pre">URLError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="httperrorprocessor">
+<span id="http-error-processor-objects"></span><h2>20.6.20. HTTPErrorProcessor オブジェクト<a class="headerlink" href="#httperrorprocessor" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+<dl class="method">
+<dt id="urllib2.HTTPErrorProcessor.unknown_open">
+<tt class="descclassname">HTTPErrorProcessor.</tt><tt class="descname">unknown_open</tt><big>(</big><big>)</big><a class="headerlink" href="#urllib2.HTTPErrorProcessor.unknown_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>HTTP エラーレスポンスを処理します。</p>
+<p>エラーコード 200 の場合、レスポンスオブジェクトを即座に返します。</p>
+<p>200 以外のエラーコードの場合、 <a class="reference internal" href="#urllib2.OpenerDirector.error" title="urllib2.OpenerDirector.error"><tt class="xref py py-meth docutils literal"><span class="pre">OpenerDirector.error()</span></tt></a> を介して <tt class="samp docutils literal"><em><span class="pre">protocol</span></em><span class="pre">_error_code</span></tt>
+メソッドに仕事を引き渡します。最終的にどのハンドラもエラーを処理しなかった場合、 <a class="reference internal" href="#urllib2.HTTPDefaultErrorHandler" title="urllib2.HTTPDefaultErrorHandler"><tt class="xref py py-class docutils literal"><span class="pre">urllib2.HTTPDefaultErrorHandler</span></tt></a> が <a class="reference internal" href="#urllib2.HTTPError" title="urllib2.HTTPError"><tt class="xref py py-exc docutils literal"><span class="pre">HTTPError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="urllib2-examples">
+<span id="id1"></span><h2>20.6.21. 例<a class="headerlink" href="#urllib2-examples" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下の例では、 python.org のメインページを取得して、その最初の 100 バイト分を表示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&#39;http://www.python.org/&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;&gt;</span>
+<span class="go">&lt;?xml-stylesheet href=&quot;./css/ht2html</span>
+</pre></div>
+</div>
+<p>今度は CGI の標準入力にデータストリームを送信し、CGI が返すデータを読み出します。この例は Python が SSL をサポートしている場合にのみ動作することに注意してください。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">req</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s">&#39;https://localhost/cgi-bin/test.cgi&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                      <span class="n">data</span><span class="o">=</span><span class="s">&#39;This data is passed to stdin of the CGI&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="go">Got Data: &quot;This data is passed to stdin of the CGI&quot;</span>
+</pre></div>
+</div>
+<p>上の例で使われているサンプルの CGI は以下のようになっています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;Content-type: text-plain</span><span class="se">\n\n</span><span class="s">Got Data: &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">data</span>
+</pre></div>
+</div>
+<p>以下はベーシック HTTP 認証の例です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="c"># ベーシック HTTP 認証をサポートする OpenerDirector を作成する...</span>
+<span class="n">auth_handler</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPBasicAuthHandler</span><span class="p">()</span>
+<span class="n">auth_handler</span><span class="o">.</span><span class="n">add_password</span><span class="p">(</span><span class="n">realm</span><span class="o">=</span><span class="s">&#39;PDQ Application&#39;</span><span class="p">,</span>
+                          <span class="n">uri</span><span class="o">=</span><span class="s">&#39;https://mahler:8092/site-updates.py&#39;</span><span class="p">,</span>
+                          <span class="n">user</span><span class="o">=</span><span class="s">&#39;klem&#39;</span><span class="p">,</span>
+                          <span class="n">passwd</span><span class="o">=</span><span class="s">&#39;kadidd!ehopper&#39;</span><span class="p">)</span>
+<span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">auth_handler</span><span class="p">)</span>
+<span class="c"># ...urlopen から利用できるよう、グローバルにインストールする</span>
+<span class="n">urllib2</span><span class="o">.</span><span class="n">install_opener</span><span class="p">(</span><span class="n">opener</span><span class="p">)</span>
+<span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="s">&#39;http://www.example.com/login.html&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#urllib2.build_opener" title="urllib2.build_opener"><tt class="xref py py-func docutils literal"><span class="pre">build_opener()</span></tt></a> はデフォルトで沢山のハンドラを提供しており、その中に <a class="reference internal" href="#urllib2.ProxyHandler" title="urllib2.ProxyHandler"><tt class="xref py py-class docutils literal"><span class="pre">ProxyHandler</span></tt></a>
+があります。デフォルトでは、 <a class="reference internal" href="#urllib2.ProxyHandler" title="urllib2.ProxyHandler"><tt class="xref py py-class docutils literal"><span class="pre">ProxyHandler</span></tt></a> は <tt class="docutils literal"><span class="pre">&lt;scheme&gt;_proxy</span></tt> という環境変数を使います。ここで <tt class="docutils literal"><span class="pre">&lt;scheme&gt;</span></tt> は URL スキームです。例えば、 HTTP プロキシの URL を得るには、環境変数 <span class="target" id="index-8"></span><tt class="xref std std-envvar docutils literal"><span class="pre">http_proxy</span></tt>
+を読み出します。</p>
+<p>この例では、デフォルトの <a class="reference internal" href="#urllib2.ProxyHandler" title="urllib2.ProxyHandler"><tt class="xref py py-class docutils literal"><span class="pre">ProxyHandler</span></tt></a> を置き換えてプログラム的に作成したプロキシ URL を使うようにし、
+<a class="reference internal" href="#urllib2.ProxyBasicAuthHandler" title="urllib2.ProxyBasicAuthHandler"><tt class="xref py py-class docutils literal"><span class="pre">ProxyBasicAuthHandler</span></tt></a> でプロキシ認証サポートを追加します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">proxy_handler</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">ProxyHandler</span><span class="p">({</span><span class="s">&#39;http&#39;</span><span class="p">:</span> <span class="s">&#39;http://www.example.com:3128/&#39;</span><span class="p">})</span>
+<span class="n">proxy_auth_handler</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">ProxyBasicAuthHandler</span><span class="p">()</span>
+<span class="n">proxy_auth_handler</span><span class="o">.</span><span class="n">add_password</span><span class="p">(</span><span class="s">&#39;realm&#39;</span><span class="p">,</span> <span class="s">&#39;host&#39;</span><span class="p">,</span> <span class="s">&#39;username&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">)</span>
+
+<span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">proxy_handler</span><span class="p">,</span> <span class="n">proxy_auth_handler</span><span class="p">)</span>
+<span class="c"># 今回は OpenerDirector をインストールするのではなく直接使います:</span>
+<span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;http://www.example.com/login.html&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>以下は HTTP ヘッダを追加する例です:</p>
+<p><em>headers</em> 引数を使って <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> コンストラクタを呼び出す方法の他に、以下のようにできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="n">req</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="s">&#39;http://www.example.com/&#39;</span><span class="p">)</span>
+<span class="n">req</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s">&#39;Referer&#39;</span><span class="p">,</span> <span class="s">&#39;http://www.python.org/&#39;</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#urllib2.OpenerDirector" title="urllib2.OpenerDirector"><tt class="xref py py-class docutils literal"><span class="pre">OpenerDirector</span></tt></a> は全ての <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> に <em class="mailheader">User-Agent</em>
+ヘッダを自動的に追加します。これを変更するには:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">()</span>
+<span class="n">opener</span><span class="o">.</span><span class="n">addheaders</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;User-agent&#39;</span><span class="p">,</span> <span class="s">&#39;Mozilla/5.0&#39;</span><span class="p">)]</span>
+<span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;http://www.example.com/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>のようにします。</p>
+<p>また、 <a class="reference internal" href="#urllib2.Request" title="urllib2.Request"><tt class="xref py py-class docutils literal"><span class="pre">Request</span></tt></a> が <a class="reference internal" href="#urllib2.urlopen" title="urllib2.urlopen"><tt class="xref py py-func docutils literal"><span class="pre">urlopen()</span></tt></a> (や <a class="reference internal" href="#urllib2.OpenerDirector.open" title="urllib2.OpenerDirector.open"><tt class="xref py py-meth docutils literal"><span class="pre">OpenerDirector.open()</span></tt></a>)
+に渡される際には、いくつかの標準ヘッダ (<em class="mailheader">Content-Length</em>, <em class="mailheader">Content-Type</em>
+および <em class="mailheader">Host</em>) も追加されることを忘れないでください。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="httplib.html" title="20.7. httplib — HTTP プロトコルクライアント"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="urllib.html" title="20.5. urllib — URL による任意のリソースへのアクセス"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" >20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

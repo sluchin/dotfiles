@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>23.2. shlex — 単純な字句解析 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="23. プログラムのフレームワーク" href="frameworks.html" />
+    <link rel="next" title="24. Tkを用いたグラフィカルユーザインターフェイス" href="tk.html" />
+    <link rel="prev" title="23.1. cmd — 行指向のコマンドインタープリタのサポート" href="cmd.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tk.html" title="24. Tkを用いたグラフィカルユーザインターフェイス"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="cmd.html" title="23.1. cmd — 行指向のコマンドインタープリタのサポート"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="frameworks.html" accesskey="U">23. プログラムのフレームワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">23.2. <tt class="docutils literal"><span class="pre">shlex</span></tt> &#8212; 単純な字句解析</a><ul>
+<li><a class="reference internal" href="#id1">23.2.1. モジュールの内容</a></li>
+<li><a class="reference internal" href="#shlex-objects">23.2.2. shlex オブジェクト</a></li>
+<li><a class="reference internal" href="#shlex-parsing-rules">23.2.3. 解析規則</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="cmd.html"
+                        title="前の章へ">23.1. <tt class="docutils literal docutils literal docutils literal"><span class="pre">cmd</span></tt> &#8212; 行指向のコマンドインタープリタのサポート</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tk.html"
+                        title="次の章へ">24. Tkを用いたグラフィカルユーザインターフェイス</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/shlex.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-shlex">
+<span id="shlex"></span><h1>23.2. <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-mod docutils literal"><span class="pre">shlex</span></tt></a> &#8212; 単純な字句解析<a class="headerlink" href="#module-shlex" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+<p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> クラスは Unix シェルを思わせる単純な構文に対する字句解析器を簡単に書けるようにします。このクラスはしばしば、 Python アプリケーションのための実行制御ファイルのような小規模言語を書く上で便利です。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">モジュール <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-mod docutils literal"><span class="pre">shlex</span></tt></a> は今のところユニコード入力をサポートしていません。</p>
+</div>
+<div class="section" id="id1">
+<h2>23.2.1. モジュールの内容<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-mod docutils literal"><span class="pre">shlex</span></tt></a> モジュールは以下の関数を定義します。</p>
+<dl class="function">
+<dt id="shlex.split">
+<tt class="descclassname">shlex.</tt><tt class="descname">split</tt><big>(</big><em>s</em><span class="optional">[</span>, <em>comments</em><span class="optional">[</span>, <em>posix</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shlex.split" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シェル類似の文法を使って、文字列 <em>s</em> を分割します。
+<em>comments</em> が <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> (デフォルト値) の場合、受理した文字列内のコメントを解析しません
+(<a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> インスタンスの <tt class="xref py py-attr docutils literal"><span class="pre">commenters</span></tt> メンバの値を空文字列にします)。この関数はデフォルトでは POSIX モードで動作し、
+<em>posix</em> 引数が false の場合は non-POSIX モードで動作します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>posix</em> パラメータを追加。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#shlex.split" title="shlex.split"><tt class="xref py py-func docutils literal"><span class="pre">split()</span></tt></a> 関数は <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> クラスのインスタンスを利用するので、
+<em>s</em> に <tt class="docutils literal"><span class="pre">None</span></tt> を渡すと標準入力から分割する文字列を読み込みます。</p>
+</div>
+</dd></dl>
+
+<p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-mod docutils literal"><span class="pre">shlex</span></tt></a> モジュールは以下のクラスを定義します。</p>
+<dl class="class">
+<dt id="shlex.shlex">
+<em class="property">class </em><tt class="descclassname">shlex.</tt><tt class="descname">shlex</tt><big>(</big><span class="optional">[</span><em>instream</em><span class="optional">[</span>, <em>infile</em><span class="optional">[</span>, <em>posix</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shlex.shlex" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> クラスとサブクラスのインスタンスは、字句解析器オブジェクトです。初期化引数を与えると、どこから文字を読み込むかを指定できます。指定先は <tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt> メソッドと <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a> メソッドを持つファイル/ストリーム類似オブジェクトか、文字列でなくてはいけません（文字列が受理されるようになったのは Python 2.3 以降）。引数が与えられなければ、 <tt class="docutils literal"><span class="pre">sys.stdin</span></tt> から入力を受け付けます。第 2 引数は、ファイル名を表す文字列で、 <a class="reference internal" href="#shlex.shlex.infile" title="shlex.shlex.infile"><tt class="xref py py-attr docutils literal"><span class="pre">infile</span></tt></a> メンバの値の初期値を決定します。
+<em>instream</em>  引数が省略された場合や、この値が <tt class="docutils literal"><span class="pre">sys.stdin</span></tt> である場合、第2引数のデフォルト値は &#8220;stdin&#8221; になります。
+<em>posix</em> 引数は Python 2.3 で導入されました。これは動作モードを定義します。
+<em>posix</em> が真でない場合（デフォルト）、 <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> インスタンスは互換モードで動作します。
+POSIX モードで動作中、 <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> は、できる限り POSIX シェルの解析規則に似せようとします。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="configparser.html#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-mod docutils literal"><span class="pre">ConfigParser</span></tt></a></dt>
+<dd>Windows <tt class="file docutils literal"><span class="pre">.ini</span></tt> ファイルに似た設定ファイルのパーザ。</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="shlex-objects">
+<span id="id2"></span><h2>23.2.2. shlex オブジェクト<a class="headerlink" href="#shlex-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> インスタンスは以下のメソッドを持っています:</p>
+<dl class="method">
+<dt id="shlex.shlex.get_token">
+<tt class="descclassname">shlex.</tt><tt class="descname">get_token</tt><big>(</big><big>)</big><a class="headerlink" href="#shlex.shlex.get_token" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トークンを一つ返します。トークンが <a class="reference internal" href="#shlex.shlex.push_token" title="shlex.shlex.push_token"><tt class="xref py py-meth docutils literal"><span class="pre">push_token()</span></tt></a> で使ってスタックに積まれていた場合、トークンをスタックからポップします。そうでない場合、トークンを一つ入力ストリームから読み出します。読み出し即時にファイル終了子に遭遇した場合、 <tt class="xref py py-attr docutils literal"><span class="pre">self.eof</span></tt> (非 POSIX モードでは空文字列
+(<tt class="docutils literal"><span class="pre">''</span></tt>)、POSIX モードでは <tt class="docutils literal"><span class="pre">None</span></tt>) が返されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shlex.shlex.push_token">
+<tt class="descclassname">shlex.</tt><tt class="descname">push_token</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#shlex.shlex.push_token" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トークンスタックに引数文字列をスタックします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shlex.shlex.read_token">
+<tt class="descclassname">shlex.</tt><tt class="descname">read_token</tt><big>(</big><big>)</big><a class="headerlink" href="#shlex.shlex.read_token" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>生 (raw) のトークンを読み出します。プッシュバックスタックを無視し、かつソースリクエストを解釈しません
+(通常これは便利なエントリポイントではありません。完全性のためにここで記述されています)。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shlex.shlex.sourcehook">
+<tt class="descclassname">shlex.</tt><tt class="descname">sourcehook</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#shlex.shlex.sourcehook" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> がソースリクエスト (下の <a class="reference internal" href="#shlex.shlex.source" title="shlex.shlex.source"><tt class="xref py py-attr docutils literal"><span class="pre">source</span></tt></a> を参照してください)
+を検出した際、このメソッドはその後に続くトークンを引数として渡され、ファイル名と開かれたファイル類似オブジェクトからなるタプルを返すとされています。</p>
+<p>通常、このメソッドはまず引数から何らかのクオートを剥ぎ取ります。処理後の引数が絶対パス名であった場合か、以前に有効になったソースリクエストが存在しない場合か、以前のソースが (<tt class="docutils literal"><span class="pre">sys.stdin</span></tt> のような) ストリームであった場合、この結果はそのままにされます。そうでない場合で、処理後の引数が相対パス名の場合、ソースインクルードスタックにある直前のファイル名からディレクトリ部分が取り出され、相対パスの前の部分に追加されます
+(この動作は C 言語プリプロセッサにおける <tt class="docutils literal"><span class="pre">#include</span> <span class="pre">&quot;file.h&quot;</span></tt> の扱いと同様です) 。</p>
+<p>これらの操作の結果はファイル名として扱われ、タプルの最初の要素として返されます。同時にこのファイル名で <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> を呼び出した結果が二つ目の要素になります
+(注意: インスタンス初期化のときとは引数の並びが逆になっています！)</p>
+<p>このフックはディレクトリサーチパスや、ファイル拡張子の追加、その他の名前空間に関するハックを実装できるようにするために公開されています。
+&#8216;close&#8217; フックに対応するものはありませんが、shlex インスタンスはソースリクエストされている入力ストリームが
+EOF を返した時には <tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt> を呼び出します。</p>
+<p>ソーススタックをより明示的に操作するには、 <a class="reference internal" href="#shlex.shlex.push_source" title="shlex.shlex.push_source"><tt class="xref py py-meth docutils literal"><span class="pre">push_source()</span></tt></a>  および <a class="reference internal" href="#shlex.shlex.pop_source" title="shlex.shlex.pop_source"><tt class="xref py py-meth docutils literal"><span class="pre">pop_source()</span></tt></a> メソッドを使ってください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shlex.shlex.push_source">
+<tt class="descclassname">shlex.</tt><tt class="descname">push_source</tt><big>(</big><em>stream</em><span class="optional">[</span>, <em>filename</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#shlex.shlex.push_source" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>入力ソースストリームを入力スタックにプッシュします。ファイル名引数が指定された場合、以後のエラーメッセージ中で利用することができます。
+<a class="reference internal" href="#shlex.shlex.sourcehook" title="shlex.shlex.sourcehook"><tt class="xref py py-meth docutils literal"><span class="pre">sourcehook()</span></tt></a> メソッドが内部で使用しているのと同じメソッドです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.1 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shlex.shlex.pop_source">
+<tt class="descclassname">shlex.</tt><tt class="descname">pop_source</tt><big>(</big><big>)</big><a class="headerlink" href="#shlex.shlex.pop_source" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最後にプッシュされた入力ソースを入力スタックからポップします。字句解析器がスタック上の入力ストリームの EOF に到達した際に利用するメソッドと同じです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.1 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shlex.shlex.error_leader">
+<tt class="descclassname">shlex.</tt><tt class="descname">error_leader</tt><big>(</big><span class="optional">[</span><em>file</em><span class="optional">[</span>, <em>line</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shlex.shlex.error_leader" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドはエラーメッセージの論述部分を Unix C コンパイラエラーラベルの形式で生成します;
+この書式は <tt class="docutils literal"><span class="pre">'&quot;%s&quot;,</span> <span class="pre">line</span> <span class="pre">%d:</span> <span class="pre">'</span></tt> で、 <tt class="docutils literal"><span class="pre">%s</span></tt> は現在のソースファイル名で置き換えられ、
+<tt class="docutils literal"><span class="pre">%d</span></tt> は現在の入力行番号で置き換えられます
+(オプションの引数を使ってこれらを上書きすることもできます)。</p>
+<p>このやり方は、 <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-mod docutils literal"><span class="pre">shlex</span></tt></a> のユーザに対して、Emacs やその他の Unix
+ツール群が解釈できる一般的な書式でのメッセージを生成することを推奨するために提供されています。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> サブクラスのインスタンスは、字句解析を制御したり、デバッグに使えるような public なインスタンス変数を持っています:</p>
+<dl class="attribute">
+<dt id="shlex.shlex.commenters">
+<tt class="descclassname">shlex.</tt><tt class="descname">commenters</tt><a class="headerlink" href="#shlex.shlex.commenters" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コメントの開始として認識される文字列です。コメントの開始から行末までのすべてのキャラクタ文字は無視されます。標準では単に <tt class="docutils literal"><span class="pre">'#'</span></tt> が入っています。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.wordchars">
+<tt class="descclassname">shlex.</tt><tt class="descname">wordchars</tt><a class="headerlink" href="#shlex.shlex.wordchars" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>複数文字からなるトークンを構成するためにバッファに蓄積していくような文字からなる文字列です。標準では、全ての ASCII 英数字およびアンダースコアが入っています。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.whitespace">
+<tt class="descclassname">shlex.</tt><tt class="descname">whitespace</tt><a class="headerlink" href="#shlex.shlex.whitespace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>空白と見なされ、読み飛ばされる文字群です。空白はトークンの境界を作ります。標準では、スペース、タブ、改行 (linefeed) および復帰 (carriage-return) が入っています。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.escape">
+<tt class="descclassname">shlex.</tt><tt class="descname">escape</tt><a class="headerlink" href="#shlex.shlex.escape" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エスケープ文字と見なされる文字群です。これは POSIX モードでのみ使われ、デフォルトでは <tt class="docutils literal"><span class="pre">'\'</span></tt> だけが入っています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.quotes">
+<tt class="descclassname">shlex.</tt><tt class="descname">quotes</tt><a class="headerlink" href="#shlex.shlex.quotes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列引用符と見なされる文字群です。トークンを構成する際、同じクオートが再び出現するまで文字をバッファに蓄積します
+(すなわち、異なるクオート形式はシェル中で互いに保護し合う関係にあります)。標準では、ASCII 単引用符および二重引用符が入っています。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.escapedquotes">
+<tt class="descclassname">shlex.</tt><tt class="descname">escapedquotes</tt><a class="headerlink" href="#shlex.shlex.escapedquotes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#shlex.shlex.quotes" title="shlex.shlex.quotes"><tt class="xref py py-attr docutils literal"><span class="pre">quotes</span></tt></a> のうち、 <a class="reference internal" href="#shlex.shlex.escape" title="shlex.shlex.escape"><tt class="xref py py-attr docutils literal"><span class="pre">escape</span></tt></a> で定義されたエスケープ文字を解釈する文字群です。これは POSIX モードでのみ使われ、デフォルトでは  <tt class="docutils literal"><span class="pre">'&quot;'</span></tt> だけが入っています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.whitespace_split">
+<tt class="descclassname">shlex.</tt><tt class="descname">whitespace_split</tt><a class="headerlink" href="#shlex.shlex.whitespace_split" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この値が <tt class="docutils literal"><span class="pre">True</span></tt> であれば、トークンは空白文字でのみで分割されます。たとえば <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> がシェル引数と同じ方法で、コマンドラインを解析するのに便利です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.infile">
+<tt class="descclassname">shlex.</tt><tt class="descname">infile</tt><a class="headerlink" href="#shlex.shlex.infile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の入力ファイル名です。クラスのインスタンス化時に初期設定されるか、その後のソースリクエストでスタックされます。エラーメッセージを構成する際にこの値を調べると便利なことがあります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.instream">
+<tt class="descclassname">shlex.</tt><tt class="descname">instream</tt><a class="headerlink" href="#shlex.shlex.instream" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> インスタンスが文字を読み出している入力ストリームです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.source">
+<tt class="descclassname">shlex.</tt><tt class="descname">source</tt><a class="headerlink" href="#shlex.shlex.source" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメンバ変数は標準で <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を取ります。この値に文字列を代入すると、その文字列は多くのシェルにおける <tt class="docutils literal"><span class="pre">source</span></tt>
+キーワードに似た、字句解析レベルでのインクルード要求として認識されます。すなわち、その直後に現れるトークンをファイル名として新たなストリームを開き、そのストリームを入力として、EOF に到達するまで読み込まれます。新たなストリームの EOF に到達した時点で <tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt> が呼び出され、入力は元の入力ストリームに戻されます。ソースリクエストは任意のレベルの深さまでスタックしてかまいません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.debug">
+<tt class="descclassname">shlex.</tt><tt class="descname">debug</tt><a class="headerlink" href="#shlex.shlex.debug" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメンバ変数が数値で、かつ <tt class="docutils literal"><span class="pre">1</span></tt> またはそれ以上の値の場合、
+<a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> インスタンスは動作に関する冗長な進捗報告を出力します。この出力を使いたいなら、モジュールのソースコードを読めば詳細を学ぶことができます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.lineno">
+<tt class="descclassname">shlex.</tt><tt class="descname">lineno</tt><a class="headerlink" href="#shlex.shlex.lineno" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ソース行番号 (遭遇した改行の数に 1 を加えたもの) です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.token">
+<tt class="descclassname">shlex.</tt><tt class="descname">token</tt><a class="headerlink" href="#shlex.shlex.token" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トークンバッファです。例外を捕捉した際にこの値を調べると便利なことがあります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shlex.shlex.eof">
+<tt class="descclassname">shlex.</tt><tt class="descname">eof</tt><a class="headerlink" href="#shlex.shlex.eof" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルの終端を決定するのに使われるトークンです。非 POSIX モードでは空文字列 (<tt class="docutils literal"><span class="pre">''</span></tt>) 、POSIX モードでは <tt class="docutils literal"><span class="pre">None</span></tt> が入ります。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="shlex-parsing-rules">
+<span id="id3"></span><h2>23.2.3. 解析規則<a class="headerlink" href="#shlex-parsing-rules" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>非 POSIX モードで動作中の <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> は以下の規則に従おうとします。</p>
+<ul class="simple">
+<li>ワード内の引用符を認識しない (<tt class="docutils literal"><span class="pre">Do&quot;Not&quot;Separate</span></tt> は単一ワード  <tt class="docutils literal"><span class="pre">Do&quot;Not&quot;Separate</span></tt> として解析されます)</li>
+<li>エスケープ文字を認識しない</li>
+<li>引用符で囲まれた文字列は、引用符内の全ての文字リテラルを保持する</li>
+<li>閉じ引用符でワードを区切る (<tt class="docutils literal"><span class="pre">&quot;Do&quot;Separate</span></tt> は、 <tt class="docutils literal"><span class="pre">&quot;Do&quot;</span></tt> と <tt class="docutils literal"><span class="pre">Separate</span></tt> であると解析されます)</li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">whitespace_split</span></tt> が <tt class="docutils literal"><span class="pre">False</span></tt> の場合、wordchar、 whitespace または quote
+として宣言されていない全ての文字を、単一の文字トークンとして返す。
+<tt class="docutils literal"><span class="pre">True</span></tt> の場合、 <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> は空白文字でのみ単語を区切る。</li>
+<li>空文字列 (<tt class="docutils literal"><span class="pre">''</span></tt>) で EOF を送出する</li>
+<li>引用符に囲んであっても、空文字列を解析しない</li>
+</ul>
+<p>POSIX モードで動作中の <a class="reference internal" href="#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-class docutils literal"><span class="pre">shlex</span></tt></a> は以下の解析規則に従おうとします。</p>
+<ul class="simple">
+<li>引用符を取り除き、引用符で単語を分解しない  (<tt class="docutils literal"><span class="pre">&quot;Do&quot;Not&quot;Separate&quot;</span></tt> は単一ワード  <tt class="docutils literal"><span class="pre">DoNotSeparate</span></tt>
+として解析されます)</li>
+<li>引用符で囲まれないエスケープ文字群 (<tt class="docutils literal"><span class="pre">'\'</span></tt>  など)  は直後に続く文字のリテラル値を保持する</li>
+<li><tt class="xref py py-attr docutils literal"><span class="pre">escapedquotes</span></tt> でない引用符文字 (<tt class="docutils literal"><span class="pre">&quot;'&quot;</span></tt> など) で囲まれている全ての文字のリテラル値を保持する</li>
+<li>引用符に囲まれた <tt class="xref py py-attr docutils literal"><span class="pre">escapedquotes</span></tt> に含まれる文字  (<tt class="docutils literal"><span class="pre">'&quot;'</span></tt> など) は、 <tt class="xref py py-attr docutils literal"><span class="pre">escape</span></tt>
+に含まれる文字を除き、全ての文字のリテラル値を保持する。エスケープ文字群は使用中の引用符、または、そのエスケープ文字自身が直後にある場合のみ、特殊な機能を保持する。他の場合にはエスケープ文字は普通の文字とみなされる。</li>
+<li><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> で EOF を送出する</li>
+<li>引用符に囲まれた空文字列 (<tt class="docutils literal"><span class="pre">''</span></tt>) を許す</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tk.html" title="24. Tkを用いたグラフィカルユーザインターフェイス"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="cmd.html" title="23.1. cmd — 行指向のコマンドインタープリタのサポート"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="frameworks.html" >23. プログラムのフレームワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

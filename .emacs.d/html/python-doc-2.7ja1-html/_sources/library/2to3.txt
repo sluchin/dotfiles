@@ -1,0 +1,695 @@
+.. _2to3-reference:
+
+2to3 - Python 2 から 3 への自動コード変換
+===============================================
+
+.. sectionauthor:: Benjamin Peterson <benjamin@python.org>
+
+
+.. 2to3 is a Python program that reads Python 2.x source code and applies a series
+.. of *fixers* to transform it into valid Python 3.x code.  The standard library
+.. contains a rich set of fixers that will handle almost all code.  2to3 supporting
+.. library :mod:`lib2to3` is, however, a flexible and generic library, so it is
+.. possible to write your own fixers for 2to3.  :mod:`lib2to3` could also be
+.. adapted to custom applications in which Python code needs to be edited
+.. automatically.
+
+2to3 は、 Python 2.x のソースコードを読み込み、一連の *変換プログラム*
+を適用して Python 3.x のコードに変換するプログラムです。標準ライブラリ
+はほとんど全てのコードを取り扱うのに十分な変換プログラムを含んでいます。
+ただし 2to3 を構成している :mod:`lib2to3` は柔軟かつ一般的なライブラリ
+なので、 2to3 のために自分で変換プログラムを書くこともできます。
+:mod:`lib2to3` は、 Python コードを自動編集する必要がある場合にも適用
+することができます。
+
+
+.. _2to3-using:
+
+2to3 の使用
+-----------
+
+.. 2to3 will usually be installed with the Python interpreter as a script.  It is
+.. also located in the :file:`Tools/scripts` directory of the Python root.
+
+2to3 は大抵の場合、 Python インタープリターと共に、スクリプトとしてイ
+ンストールされます。場所は、 Python のルートディレクトリにある、
+:file:`Tools/scripts` ディレクトリです。
+
+
+.. 2to3's basic arguments are a list of files or directories to transform.  The
+.. directories are to recursively traversed for Python sources.
+
+2to3 に与える基本の引数は、変換対象のファイル、もしくは、ディレクトリ
+のリストです。ディレクトリの場合は、 Python ソースコードを再帰的に探索
+します。
+
+
+.. Here is a sample Python 2.x source file, :file:`example.py`:
+
+Python 2.x のサンプルコード、 :file:`example.py` を示します。
+
+
+::
+
+   def greet(name):
+       print "Hello, {0}!".format(name)
+   print "What's your name?"
+   name = raw_input()
+   greet(name)
+
+
+.. It can be converted to Python 3.x code via 2to3 on the command line:
+
+これは、コマンドラインから 2to3 を呼び出すことで、 Python 3.x コードに
+変換されます。
+
+
+::
+
+   $ 2to3 example.py
+
+
+.. A diff against the original source file is printed.  2to3 can also write the
+.. needed modifications right back to the source file.  (A backup of the original
+.. file is made unless :option:`-n` is also given.)  Writing the changes back is
+.. enabled with the :option:`-w` flag:
+
+オリジナルのソースファイルに対する差分が表示されます。 2to3 は必要となる
+変更をソースファイルに書き込むこともできます (もちろんオリジナルの
+バックアップも作成されます)。変更の書き戻しは :option:`-w` フラグ
+によって有効化されます。
+
+
+::
+
+   $ 2to3 -w example.py
+
+
+.. After transformation, :file:`example.py` looks like this:
+
+変換後、 :file:`example.py` は以下のようになります。
+
+
+::
+
+   def greet(name):
+       print("Hello, {0}!".format(name))
+   print("What's your name?")
+   name = input()
+   greet(name)
+
+
+.. Comments and exact indentation are preserved throughout the translation process.
+
+変換処理を通じて、コメントと、インデントは保存されます。
+
+
+.. By default, 2to3 runs a set of :ref:`predefined fixers <2to3-fixers>`.  The
+.. :option:`-l` flag lists all available fixers.  An explicit set of fixers to run
+.. can be given with :option:`-f`.  Likewise the :option:`-x` explicitly disables a
+.. fixer.  The following example runs only the ``imports`` and ``has_key`` fixers:
+
+デフォルトでは、 2to3 は一連の `事前定義された変換プログラム
+<2to3-fixers>`_ を実行します。 :option:`-l` フラグは、利用可能な変換プ
+ログラムの一覧を表示します。 :option:`-f` フラグにより、実行する変換プ
+ログラムを明示的に与えることもできます。下記の例では、 ``imports`` と
+``has_key`` 変換プログラムだけを実行します。
+
+
+::
+
+   $ 2to3 -f imports -f has_key example.py
+
+
+.. This command runs every fixer except the ``apply`` fixer:
+
+このコマンドは ``apply`` 以外のすべての変換プログラムを実行します。
+
+
+::
+
+   $ 2to3 -x apply example.py
+
+
+.. Some fixers are *explicit*, meaning they aren't run by default and must be
+.. listed on the command line to be run.  Here, in addition to the default fixers,
+.. the ``idioms`` fixer is run:
+
+いくつかの変換プログラムは *明示的* 、つまり、デフォルトでは実行され
+ず、コマンドラインで実行するものとして列記する必要があります。
+デフォルトの変換プログラムに ``idioms`` 変換プログラムを追加して実行す
+るには、下記のようにします。
+
+
+::
+
+   $ 2to3 -f all -f idioms example.py
+
+
+.. Notice how passing ``all`` enables all default fixers.
+
+ここで、 ``all`` を指定することで、全てのデフォルトの変換プログラムを
+有効化できることに注意して下さい。
+
+
+.. Sometimes 2to3 will find a place in your source code that needs to be changed,
+.. but 2to3 cannot fix automatically.  In this case, 2to3 will print a warning
+.. beneath the diff for a file.  You should address the warning in order to have
+.. compliant 3.x code.
+
+2to3 がソースコードに修正すべき点を見つけても、自動的には修正できない場
+合もあります。この場合、 2to3 はファイルの変更点の下に警告を表示します。
+3.x に準拠したコードにするために、あなたはこの警告に対処しなくてはなり
+ません。
+
+
+.. 2to3 can also refactor doctests.  To enable this mode, use the :option:`-d`
+.. flag.  Note that *only* doctests will be refactored.  This also doesn't require
+.. the module to be valid Python.  For example, doctest like examples in a reST
+.. document could also be refactored with this option.
+
+2to3 は doctest の修正もできます。このモードを有効化するには
+:option:`-d` フラグを指定して下さい。 doctest *だけ* が修正されることに
+注意して下さい。これは、モジュールが有効な Python コードであることを要
+求しないということでもあります。例えば、 reST ドキュメント中の doctest
+に似たサンプルコードなども、このオプションで修正することができます。
+
+
+.. The :option:`-v` option enables output of more information on the translation
+.. process.
+
+:option:`-v` は、変換処理のより詳しい情報の出力を有効化します。
+
+
+.. Since some print statements can be parsed as function calls or statements, 2to3
+.. cannot always read files containing the print function.  When 2to3 detects the
+.. presence of the ``from __future__ import print_function`` compiler directive, it
+.. modifies its internal grammar to interpret :func:`print` as a function.  This
+.. change can also be enabled manually with the :option:`-p` flag.  Use
+.. :option:`-p` to run fixers on code that already has had its print statements
+.. converted.
+
+いくつかの print 文は関数呼び出しとしても文としても解析できるので、
+2to3 は print 関数を含むファイルを常に読めるとは限りません。 2to3 は
+``from __future__ import print_function`` コンパイラディレクティブが存
+在することを検出すると、内部の文法を変更して :func:`print` を関数として
+解釈するようになります。 :option:`-p` フラグによって手動でこの変更を有
+効化することもできます。 print 文を変換済みのコードに対して変換プログラ
+ムを適用するには :option:`-p` を使用してください。
+
+
+.. _2to3-fixers:
+
+変換プログラム
+--------------
+
+.. Each step of transforming code is encapsulated in a fixer.  The command ``2to3
+.. -l`` lists them.  As :ref:`documented above <2to3-using>`, each can be turned on
+.. and off individually.  They are described here in more detail.
+
+コード変形の各ステップは変換プログラムに隠蔽されます。  ``2to3 -l`` コ
+マンドは変換プログラムのリストを表示します。 :ref:`上記 <2to3-using>` の通り、
+それぞれの変換プログラムを個別に有効化したり無効化したりすることができ
+ます。ここではそれらをさらに詳細に説明します。
+
+
+
+.. 2to3fixer:: apply
+
+   .. Removes usage of :func:`apply`.  For example ``apply(function, *args,
+   .. **kwargs)`` is converted to ``function(*args, **kwargs)``.
+
+   :func:`apply` の使用を削除します。例えば ``apply(function, *args,
+   **kwargs)`` は ``function(*args, **kwargs)`` に変換されます。
+
+
+.. 2to3fixer:: basestring
+
+   .. Converts :class:`basestring` to :class:`str`.
+
+   :class:`basestring` を :class:`str` に変換します。
+
+
+.. 2to3fixer:: buffer
+
+   .. Converts :class:`buffer` to :class:`memoryview`.  This fixer is optional
+   .. because the :class:`memoryview` API is similar but not exactly the same as
+   .. that of :class:`buffer`.
+
+   :class:`buffer` を :class:`memoryview` に変換します。
+   :class:`memoryview` API は :class:`buffer` と似ているものの厳密に同
+   じではないので、この変換プログラムはオプションです。
+
+
+.. 2to3fixer:: callable
+
+   .. Converts ``callable(x)`` to ``isinstance(x, collections.Callable)``, adding
+   .. an import to :mod:`collections` if needed.
+
+   ``callable(x)`` を ``isinstance(x, collections.Callable)`` に変換し、
+   必要なら :mod:`collections` のインポートを追加します。
+
+
+.. 2to3fixer:: dict
+
+   .. Fixes dictionary iteration methods.  :meth:`dict.iteritems` is converted to
+   .. :meth:`dict.items`, :meth:`dict.iterkeys` to :meth:`dict.keys`, and
+   .. :meth:`dict.itervalues` to :meth:`dict.values`.  Similarly,
+   .. :meth:`dict.viewitems`, :meth:`dict.viewkeys` and :meth:`dict.viewvalues` are
+   .. converted respectively to :meth:`dict.items`, :meth:`dict.keys` and
+   .. :meth:`dict.values`.  It also wraps existing usages of :meth:`dict.items`,
+   .. :meth:`dict.keys`, and :meth:`dict.values` in a call to :class:`list`.
+
+   辞書をイテレートするメソッドを修正します。 :meth:`dict.iteritems` は
+   :meth:`dict.items` に、 :meth:`dict.iterkeys` は :meth:`dict.keys`
+   に、 :meth:`dict.itervalues` は :meth:`dict.values` に変換されます。
+   同様に :meth:`dict.viewitems`, :meth:`dict.viewkeys`
+   :meth:`dict.viewvalues` はそれぞれ :meth:`dict.items`,
+   :meth:`dict.keys`, :meth:`dict.values` に変換されます。また、
+   :class:`list` の呼び出しの中で :meth:`dict.items`,
+   :meth:`dict.keys`, :meth:`dict.values` を使用している場合はそれをラッ
+   プします。
+
+
+.. 2to3fixer:: except
+
+   .. Converts ``except X, T`` to ``except X as T``.
+
+   ``except X, T`` を ``except X as T`` に変換します。
+
+
+.. 2to3fixer:: exec
+
+   .. Converts the :keyword:`exec` statement to the :func:`exec` function.
+
+   :keyword:`exec` 文を :func:`exec` 関数に変換します。
+
+
+.. 2to3fixer:: execfile
+
+   .. Removes usage of :func:`execfile`.  The argument to :func:`execfile` is
+   .. wrapped in calls to :func:`open`, :func:`compile`, and :func:`exec`.
+
+   :func:`execfile` の使用を削除します。 :func:`execfile` への引数は
+   :func:`open`, :func:`compile`, :func:`exec` の呼び出しでラップされま
+   す。
+
+
+.. 2to3fixer:: exitfunc
+
+   .. Changes assignment of :attr:`sys.exitfunc` to use of the :mod:`atexit`
+   .. module.
+
+   :attr:`sys.exitfunc` への代入を :mod:`atexit` モジュールの使用に変更
+   します。
+
+
+.. 2to3fixer:: filter
+
+   .. Wraps :func:`filter` usage in a :class:`list` call.
+
+   :class:`list` 呼び出しの中で :func:`filter` を使用している部分をラッ
+   プします。
+
+
+.. 2to3fixer:: funcattrs
+
+   .. Fixes function attributes that have been renamed.  For example,
+   .. ``my_function.func_closure`` is converted to ``my_function.__closure__``.
+
+   名前が変更された関数の属性を修正します。例えば
+   ``my_function.func_closure`` は ``my_function.__closure__`` に変換さ
+   れます。
+
+
+.. 2to3fixer:: future
+
+   .. Removes ``from __future__ import new_feature`` statements.
+
+   ``from __future__ import new_feature`` 文を削除します。
+
+
+.. 2to3fixer:: getcwdu
+
+   .. Renames :func:`os.getcwdu` to :func:`os.getcwd`.
+
+   :func:`os.getcwdu` を :func:`os.getcwd` に置き換えます。
+
+
+.. 2to3fixer:: has_key
+
+   .. Changes ``dict.has_key(key)`` to ``key in dict``.
+
+   ``dict.has_key(key)`` を ``key in dict`` に変更します。
+
+
+.. 2to3fixer:: idioms
+
+   .. This optional fixer performs several transformations that make Python code
+   .. more idiomatic.  Type comparisons like ``type(x) is SomeClass`` and
+   .. ``type(x) == SomeClass`` are converted to ``isinstance(x, SomeClass)``.
+   .. ``while 1`` becomes ``while True``.  This fixer also tries to make use of
+   .. :func:`sorted` in appropriate places.  For example, this block :
+
+   このオプションの変換プログラムは、 Python コードをより Python らしい
+   書き方にするいくつかの変形を行います。 ``type(x) is SomeClass`` や
+   ``type(x) == SomeClass`` のような型の比較は ``isinstance(x,
+   SomeClass)`` に変換されます。 ``while 1`` は ``while True`` になりま
+   す。また、適切な場所では :func:`sorted` が使われるようにします。例え
+   ば、このブロックは::
+
+
+       L = list(some_iterable)
+       L.sort()
+
+
+   .. is changed to :
+
+   次のように変更されます::
+
+
+      L = sorted(some_iterable)
+
+
+.. 2to3fixer:: import
+
+   .. Detects sibling imports and converts them to relative imports.
+
+   暗黙の相対インポート (sibling imports) を検出して、明示的な相対イン
+   ポート (relative imports) に変換します。
+
+
+.. 2to3fixer:: imports
+
+   .. Handles module renames in the standard library.
+
+   標準ライブラリ中のモジュール名の変更を扱います。
+
+
+.. 2to3fixer:: imports2
+
+   .. Handles other modules renames in the standard library.  It is separate from
+   .. the :2to3fixer:`imports` fixer only because of technical limitations.
+
+   標準ライブラリ中の別のモジュール名の変更を扱います。単に技術的な制約
+   のために :2to3fixer:`imports` とは別になっています。
+
+
+.. 2to3fixer:: input
+
+   .. Converts ``input(prompt)`` to ``eval(input(prompt))``.
+
+   ``input(prompt)`` を ``eval(input(prompt))`` に変換します。
+
+
+.. 2to3fixer:: intern
+
+   .. Converts :func:`intern` to :func:`sys.intern`.
+
+   :func:`intern` を :func:`sys.intern` に変換します。
+
+
+.. 2to3fixer:: isinstance
+
+   .. Fixes duplicate types in the second argument of :func:`isinstance`.  For
+   .. example, ``isinstance(x, (int, int))`` is converted to ``isinstance(x,
+   .. (int))``.
+
+   :func:`isinstance` の第 2 引数の重複を修正します。例えば
+   ``isinstance(x, (int, int))`` は ``isinstance(x, (int))`` に変換され
+   ます。
+
+
+.. 2to3fixer:: itertools_imports
+
+   .. Removes imports of :func:`itertools.ifilter`, :func:`itertools.izip`, and
+   .. :func:`itertools.imap`.  Imports of :func:`itertools.ifilterfalse` are also
+   .. changed to :func:`itertools.filterfalse`.
+
+   :func:`itertools.ifilter`, :func:`itertools.izip`,
+   :func:`itertools.imap` のインポートを削除します。また
+   :func:`itertools.ifilterfalse` のインポートを
+   :func:`itertools.filterfalse` に変換します。
+
+
+.. 2to3fixer:: itertools
+
+   .. Changes usage of :func:`itertools.ifilter`, :func:`itertools.izip`, and
+   .. :func:`itertools.imap` to their built-in equivalents.
+   .. :func:`itertools.ifilterfalse` is changed to :func:`itertools.filterfalse`.
+
+   :func:`itertools.ifilter`, :func:`itertools.izip`,
+   :func:`itertools.imap` を使っている箇所を同等の組み込み関数で置き換
+   えます。 :func:`itertools.ifilterfalse` は
+   :func:`itertools.filterfalse` に変換されます。
+
+
+.. 2to3fixer:: long
+
+   .. Strips the ``L`` prefix on long literals and renames :class:`long` to
+   .. :class:`int`.
+
+   long リテラルの末尾の ``L`` を取り除き、 :class:`long` を
+   :class:`int` に変更します。
+
+
+.. 2to3fixer:: map
+
+   .. Wraps :func:`map` in a :class:`list` call.  It also changes ``map(None, x)``
+   .. to ``list(x)``.  Using ``from future_builtins import map`` disables this
+   .. fixer.
+
+   :class:`list` 呼び出しの中の :func:`map` をラップします。また、
+   ``map(None, x)`` を ``list(x)`` に変換します。 ``from
+   future_builtins import map`` を使うと、この変換プログラムを無効にで
+   きます。
+
+
+.. 2to3fixer:: metaclass
+
+   .. Converts the old metaclass syntax (``__metaclass__ = Meta`` in the class
+   .. body) to the new (``class X(metaclass=Meta)``).
+
+   古いメタクラス構文 (クラス定義中の ``__metaclass__ = Meta``) を、新
+   しい構文 (``class X(metaclass=Meta)``) に変換します。
+
+
+.. 2to3fixer:: methodattrs
+
+   .. Fixes old method attribute names.  For example, ``meth.im_func`` is converted
+   .. to ``meth.__func__``.
+
+   古いメソッドの属性名を修正します。例えば ``meth.im_func`` は
+   ``meth.__func__`` に変換されます。
+
+
+.. 2to3fixer:: ne
+
+   .. Converts the old not-equal syntax, ``<>``, to ``!=``.
+
+   古い不等号の構文 ``<>`` を ``!=`` に変換します。
+
+
+.. 2to3fixer:: next
+
+   .. Converts the use of iterator's :meth:`~iterator.next` methods to the
+   .. :func:`next` function.  It also renames :meth:`next` methods to
+   .. :meth:`~object.__next__`.
+
+   イテレータの :meth:`~iterator.next` メソッドの使用を :func:`next` 関
+   数に変換します。また :meth:`next` メソッドを
+   :meth:`~object.__next__` に変更します。
+
+
+.. 2to3fixer:: nonzero
+
+   .. Renames :meth:`~object.__nonzero__` to :meth:`~object.__bool__`.
+
+   :meth:`~object.__nonzero__` を :meth:`~object.__bool__` に変更します。
+
+
+.. 2to3fixer:: numliterals
+
+   .. Converts octal literals into the new syntax.
+
+   8進数リテラルを新しい構文に変換します。
+
+
+.. 2to3fixer:: paren
+
+   .. Add extra parenthesis where they are required in list comprehensions.  For
+   .. example, ``[x for x in 1, 2]`` becomes ``[x for x in (1, 2)]``.
+
+   リスト内包表記で必要になる括弧を追加します。例えば ``[x for x in 1,
+   2]`` は ``[x for x in (1, 2)]`` になります。
+
+
+.. 2to3fixer:: print
+
+   .. Converts the :keyword:`print` statement to the :func:`print` function.
+
+   :keyword:`print` 文を :func:`print` 関数に変換します。
+
+
+.. 2to3fixer:: raise
+
+   .. Converts ``raise E, V`` to ``raise E(V)``, and ``raise E, V, T`` to ``raise
+   .. E(V).with_traceback(T)``.  If ``E`` is a tuple, the translation will be
+   .. incorrect because substituting tuples for exceptions has been removed in 3.0.
+
+   ``raise E, V`` を ``raise E(V)`` に、 ``raise E, V, T`` を ``raise
+   E(V).with_traceback(T)`` に変換します。例外の代わりにタプルを使用す
+   ることは 3.0 で削除されたので、 ``E`` がタプルならこの変換は不正確に
+   なります。
+
+
+.. 2to3fixer:: raw_input
+
+   .. Converts :func:`raw_input` to :func:`input`.
+
+   :func:`raw_input` を :func:`input` に変換します。
+
+
+.. 2to3fixer:: reduce
+
+   .. Handles the move of :func:`reduce` to :func:`functools.reduce`.
+
+   :func:`reduce` が :func:`functools.reduce` に移動されたことを扱います。
+
+
+.. 2to3fixer:: renames
+
+   .. Changes :data:`sys.maxint` to :data:`sys.maxsize`.
+
+   :data:`sys.maxint` を :data:`sys.maxsize` に変更します。
+
+
+.. 2to3fixer:: repr
+
+   .. Replaces backtick repr with the :func:`repr` function.
+
+   バッククォートを使った repr を :func:`repr` 関数に置き換えます。
+
+
+.. 2to3fixer:: set_literal
+
+   .. Replaces use of the :class:`set` constructor with set literals.  This fixer
+   .. is optional.
+
+   :class:`set` コンストラクタの使用を set リテラルに置換します.  この
+   変換プログラムはオプションです。
+
+
+.. 2to3fixer:: standard_error
+
+   .. Renames :exc:`StandardError` to :exc:`Exception`.
+
+   :exc:`StandardError` を :exc:`Exception` に変更します。
+
+
+.. 2to3fixer:: sys_exc
+
+   .. Changes the deprecated :data:`sys.exc_value`, :data:`sys.exc_type`,
+   .. :data:`sys.exc_traceback` to use :func:`sys.exc_info`.
+
+   廃止された :data:`sys.exc_value`, :data:`sys.exc_type`,
+   :data:`sys.exc_traceback` の代わりに :func:`sys.exc_info` を使うよう
+   に変更します。
+
+
+.. 2to3fixer:: throw
+
+   .. Fixes the API change in generator's :meth:`throw` method.
+
+   ジェネレータの :meth:`throw` メソッドの API 変更を修正します。
+
+
+.. 2to3fixer:: tuple_params
+
+   .. Removes implicit tuple parameter unpacking.  This fixer inserts temporary
+   .. variables.
+
+   関数定義における暗黙的なタプルパラメータの展開を取り除きます。この変
+   換プログラムによって一時変数が追加されます。
+
+
+.. 2to3fixer:: types
+
+   .. Fixes code broken from the removal of some members in the :mod:`types`
+   .. module.
+
+   :mod:`types` モジュールのいくつかのメンバオブジェクトが削除されたこ
+   とによって壊れたコードを修正します。
+
+
+.. 2to3fixer:: unicode
+
+   .. Renames :class:`unicode` to :class:`str`.
+
+   :class:`unicode` を :class:`str` に変更します。
+
+
+.. 2to3fixer:: urllib
+
+   .. Handles the rename of :mod:`urllib` and :mod:`urllib2` to the :mod:`urllib`
+   .. package.
+
+   :mod:`urllib` と :mod:`urllib2` が :mod:`urllib` パッケージに変更さ
+   れたことを扱います。
+
+
+.. 2to3fixer:: ws_comma
+
+   .. Removes excess whitespace from comma separated items.  This fixer is
+   .. optional.
+
+   コンマ区切りの要素から余計な空白を取り除きます。この変換プログラムは
+   オプションです。
+
+
+.. 2to3fixer:: xrange
+
+   .. Renames :func:`xrange` to :func:`range` and wraps existing :func:`range`
+   .. calls with :class:`list`.
+
+   :func:`xrange` を :func:`range` に変更して、既存の :func:`range` 
+   呼び出しを :class:`list` でラップします。
+
+
+.. 2to3fixer:: xreadlines
+
+   .. Changes ``for x in file.xreadlines()`` to ``for x in file``.
+
+   ``for x in file.xreadlines()`` を ``for x in file`` に変更します。
+
+
+.. 2to3fixer:: zip
+
+   .. Wraps :func:`zip` usage in a :class:`list` call.  This is disabled when
+   .. ``from future_builtins import zip`` appears.
+
+   :class:`list` 呼び出しの中で使われている :func:`zip` をラップします。
+   これは ``from future_builtins import zip`` が見つかった場合は無効に
+   されます。
+
+
+:mod:`lib2to3` - 2to3's library
+-------------------------------
+
+.. module:: lib2to3
+   :synopsis: the 2to3 library
+.. moduleauthor:: Guido van Rossum
+.. moduleauthor:: Collin Winter
+.. moduleauthor:: Benjamin Peterson <benjamin@python.org>
+
+
+.. note::
+
+   .. The :mod:`lib2to3` API should be considered unstable and may change
+   .. drastically in the future.
+
+   :mod:`lib2to3` API は安定しておらず、将来、劇的に変更されるかも知れないと
+   考えるべきです。
+
+
+.. XXX What is the public interface anyway?

@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>カプセル (Capsules) &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="具象オブジェクト (concrete object) レイヤ" href="concrete.html" />
+    <link rel="next" title="Cオブジェクト (CObject)" href="cobject.html" />
+    <link rel="prev" title="弱参照オブジェクト (weak reference object)" href="weakref.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="cobject.html" title="Cオブジェクト (CObject)"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="weakref.html" title="弱参照オブジェクト (weak reference object)"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" accesskey="U">具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="weakref.html"
+                        title="前の章へ">弱参照オブジェクト (weak reference object)</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="cobject.html"
+                        title="次の章へ">Cオブジェクト (CObject)</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/capsule.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="capsules">
+<span id="id1"></span><h1>カプセル (Capsules)<a class="headerlink" href="#capsules" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0"><cite>using-capsules</cite> 以下のオブジェクトを使う方法については <a class="reference internal" href="../extending/extending.html#using-capsules"><em>拡張モジュールに C API を提供する</em></a>
+を参照してください。</p>
+<dl class="type">
+<dt id="PyCapsule">
+<tt class="descname">PyCapsule</tt><a class="headerlink" href="#PyCapsule" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="structures.html#PyObject" title="PyObject"><tt class="xref c c-type docutils literal"><span class="pre">PyObject</span></tt></a> のサブタイプは、任意の値を表し、C拡張モジュールから
+Pythonコードを経由して他のC言語のコードに任意の値を(<tt class="xref c c-type docutils literal"><span class="pre">void*</span></tt> ポインタの形で)渡す必要があるときに有用です。あるモジュール内で定義されているC言語関数のポインタを、他のモジュールに渡してそこから呼び出せるようにするためによく使われます。これにより、動的にロードされるモジュールの中の C API に通常の import 機構を通してアクセスすることができます。</p>
+</dd></dl>
+
+<dl class="type">
+<dt id="PyCapsule_Destructor">
+<tt class="descname">PyCapsule_Destructor</tt><a class="headerlink" href="#PyCapsule_Destructor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カプセルに対するデストラクタコールバック型. 次のように定義されます:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">typedef</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">PyCapsule_Destructor</span><span class="p">)(</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>PyCapsule_Destructor コールバックの動作については <a class="reference internal" href="#PyCapsule_New" title="PyCapsule_New"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_New()</span></tt></a>
+を参照してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_CheckExact">
+int <tt class="descname">PyCapsule_CheckExact</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyCapsule_CheckExact" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が <a class="reference internal" href="#PyCapsule" title="PyCapsule"><tt class="xref c c-type docutils literal"><span class="pre">PyCapsule</span></tt></a> だったときに true を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_New">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCapsule_New</tt><big>(</big>void<em>&nbsp;*pointer</em>, const char<em>&nbsp;*name</em>, <a class="reference internal" href="#PyCapsule_Destructor" title="PyCapsule_Destructor">PyCapsule_Destructor</a><em>&nbsp;destructor</em><big>)</big><a class="headerlink" href="#PyCapsule_New" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>pointer</em> を格納する <a class="reference internal" href="#PyCapsule" title="PyCapsule"><tt class="xref c c-type docutils literal"><span class="pre">PyCapsule</span></tt></a> を作成します。
+<em>pointer</em> 引数は <em>NULL</em> であってはなりません。</p>
+<p>失敗した場合、例外を設定して <em>NULL</em> を返します。</p>
+<p><em>name</em> 文字列は <em>NULL</em> か、有効なC文字列へのポインタです。
+<em>NULL</em> で無い場合、この文字列は少なくともカプセルより長く生存する必要があります。
+(<em>destructor</em> の中で解放することは許可されています)</p>
+<p><em>destructor</em> が <em>NULL</em> で無い場合、カプセルが削除されるときにそのカプセルを引数として呼び出されます。</p>
+<p>このカプセルがモジュールの属性として保存される場合、 <em>name</em> は
+<tt class="docutils literal"><span class="pre">modulename.attributename</span></tt> と指定されるべきです。こうすると、他のモジュールがそのカプセルを <a class="reference internal" href="#PyCapsule_Import" title="PyCapsule_Import"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_Import()</span></tt></a> でインポートすることができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_GetPointer">
+void* <tt class="descname">PyCapsule_GetPointer</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em>, const char<em>&nbsp;*name</em><big>)</big><a class="headerlink" href="#PyCapsule_GetPointer" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カプセルに保存されている <em>pointer</em> を取り出します。失敗した場合は例外を設定して <em>NULL</em> を返します。</p>
+<p><em>name</em> 引数はカプセルに保存されている名前と正確に一致しなければなりません。もしカプセルに格納されている name が <em>NULL</em> なら、この関数の <em>name</em> 引数も同じく <em>NULL</em> でなければなりません。 Python は C言語の <tt class="xref c c-func docutils literal"><span class="pre">strcmp()</span></tt>
+を使ってこの name を比較します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_GetDestructor">
+<a class="reference internal" href="#PyCapsule_Destructor" title="PyCapsule_Destructor">PyCapsule_Destructor</a> <tt class="descname">PyCapsule_GetDestructor</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em><big>)</big><a class="headerlink" href="#PyCapsule_GetDestructor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カプセルに保存されている現在のデストラクタを返します。失敗した場合、例外を設定して <em>NULL</em> を返します。</p>
+<p>カプセルは <em>NULL</em> をデストラクタとして持つことができます。従って、戻り値の <em>NULL</em> がエラーを指してない可能性があります。
+<a class="reference internal" href="#PyCapsule_IsValid" title="PyCapsule_IsValid"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_IsValid()</span></tt></a> か <cite>PyErr_Occurred</cite> を利用して確認してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_GetContext">
+void* <tt class="descname">PyCapsule_GetContext</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em><big>)</big><a class="headerlink" href="#PyCapsule_GetContext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カプセルに保存されている現在のコンテキスト(context)を返します。失敗した場合、例外を設定して <em>NULL</em> を返します。</p>
+<p>カプセルは <em>NULL</em> をコンテキストとして持つことができます。従って、戻り値の <em>NULL</em> がエラーを指してない可能性があります。
+<a class="reference internal" href="#PyCapsule_IsValid" title="PyCapsule_IsValid"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_IsValid()</span></tt></a> か <cite>PyErr_Occurred</cite> を利用して確認してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_GetName">
+const char* <tt class="descname">PyCapsule_GetName</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em><big>)</big><a class="headerlink" href="#PyCapsule_GetName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カプセルに保存されている現在の name を返します。失敗した場合、例外を設定して <em>NULL</em> を返します。</p>
+<p>カプセルは <em>NULL</em> を name として持つことができます。従って、戻り値の <em>NULL</em> がエラーを指してない可能性があります。
+<a class="reference internal" href="#PyCapsule_IsValid" title="PyCapsule_IsValid"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_IsValid()</span></tt></a> か <cite>PyErr_Occurred</cite> を利用して確認してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_Import">
+void* <tt class="descname">PyCapsule_Import</tt><big>(</big>const char<em>&nbsp;*name</em>, int<em>&nbsp;no_block</em><big>)</big><a class="headerlink" href="#PyCapsule_Import" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールのカプセル属性から Cオブジェクトへのポインタをインポートします。
+<em>name</em> 引数はその属性の完全名を <tt class="docutils literal"><span class="pre">module.attribute</span></tt> のように指定しなければなりません。カプセルに格納されている <em>name</em> はこの文字列に正確に一致しなければなりません。
+<em>no_block</em> が真の時、モジュールを(<tt class="xref c c-func docutils literal"><span class="pre">PyImport_InportModuleNoBlock()</span></tt> を使って)
+ブロックせずにインポートします。 <em>no_block</em> が偽の時、モジュールは (<a class="reference internal" href="import.html#PyImport_ImportModule" title="PyImport_ImportModule"><tt class="xref c c-func docutils literal"><span class="pre">PyImport_ImportModule()</span></tt></a>
+を使って) 通常の方法でインポートされます。</p>
+<p>成功した場合、カプセル内部の <em>pointer</em> を返します。失敗した場合、例外を設定して <em>NULL</em> を返します。ただし、 <em>no_block</em> が真だった場合は、
+<a class="reference internal" href="#PyCapsule_Import" title="PyCapsule_Import"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_Import()</span></tt></a> はモジュールのインポートに失敗しても例外を設定しません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_IsValid">
+int <tt class="descname">PyCapsule_IsValid</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em>, const char<em>&nbsp;*name</em><big>)</big><a class="headerlink" href="#PyCapsule_IsValid" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>capsule</em> が有効なカプセルであるかどうかをチェックします。有効な <em>capsule</em> は、非 <em>NULL</em> で、 <a class="reference internal" href="#PyCapsule_CheckExact" title="PyCapsule_CheckExact"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_CheckExact()</span></tt></a> をパスし、非 <em>NULL</em> なポインタを格納していて、内部の name が引数 <em>name</em> とマッチします。
+(name の比較方法については <a class="reference internal" href="#PyCapsule_GetPointer" title="PyCapsule_GetPointer"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_GetPointer()</span></tt></a> を参照)</p>
+<p>言い換えると、 <a class="reference internal" href="#PyCapsule_IsValid" title="PyCapsule_IsValid"><tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_IsValid()</span></tt></a> が真を返す場合、全てのアクセッサ
+(<tt class="xref c c-func docutils literal"><span class="pre">PyCapsule_Get()</span></tt> で始まる全ての関数) が成功することが保証されます。</p>
+<p>オブジェクトが有効で name がマッチした場合に非0を、それ以外の場合に 0 を返します。この関数は絶対に失敗しません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_SetContext">
+int <tt class="descname">PyCapsule_SetContext</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em>, void<em>&nbsp;*context</em><big>)</big><a class="headerlink" href="#PyCapsule_SetContext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>capsule</em> 内部のコンテキストポインタを <em>context</em> に設定します。</p>
+<p>成功したら 0 を、失敗したら例外を設定して 非0 を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_SetDestructor">
+int <tt class="descname">PyCapsule_SetDestructor</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em>, <a class="reference internal" href="#PyCapsule_Destructor" title="PyCapsule_Destructor">PyCapsule_Destructor</a><em>&nbsp;destructor</em><big>)</big><a class="headerlink" href="#PyCapsule_SetDestructor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>capsule</em> 内部のデストラクタを <em>destructor</em> に設定します。</p>
+<p>成功したら 0 を、失敗したら例外を設定して 非0 を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_SetName">
+int <tt class="descname">PyCapsule_SetName</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em>, const char<em>&nbsp;*name</em><big>)</big><a class="headerlink" href="#PyCapsule_SetName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>capsule</em> 内部の name を <em>name</em> に設定します。 <em>name</em> が非 <em>NULL</em> のとき、それは <em>capsule</em> よりも長い寿命を持つ必要があります。もしすでに <em>capsule</em> に非 <em>NULL</em> の <em>name</em> が保存されていた場合、それに対する開放は行われません。</p>
+<p>成功したら 0 を、失敗したら例外を設定して 非0 を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCapsule_SetPointer">
+int <tt class="descname">PyCapsule_SetPointer</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*capsule</em>, void<em>&nbsp;*pointer</em><big>)</big><a class="headerlink" href="#PyCapsule_SetPointer" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>capsule</em> 内部のポインタを <em>pointer</em> に設定します。 <em>pointer</em> は <em>NULL</em>
+であってはなりません。</p>
+<p>成功したら 0 を、失敗したら例外を設定して 非0 を返します。</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="cobject.html" title="Cオブジェクト (CObject)"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="weakref.html" title="弱参照オブジェクト (weak reference object)"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" >具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

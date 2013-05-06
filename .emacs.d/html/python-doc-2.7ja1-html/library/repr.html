@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.19. repr — もう一つの repr() の実装 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="8. データ型" href="datatypes.html" />
+    <link rel="next" title="9. 数値と数学モジュール" href="numeric.html" />
+    <link rel="prev" title="8.18. pprint — データ出力の整然化" href="pprint.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="numeric.html" title="9. 数値と数学モジュール"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="pprint.html" title="8.18. pprint — データ出力の整然化"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" accesskey="U">8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.19. <tt class="docutils literal"><span class="pre">repr</span></tt> &#8212; もう一つの <tt class="docutils literal"><span class="pre">repr()</span></tt> の実装</a><ul>
+<li><a class="reference internal" href="#repr">8.19.1. Reprオブジェクト</a></li>
+<li><a class="reference internal" href="#subclassing-reprs">8.19.2. Reprオブジェクトをサブクラス化する</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="pprint.html"
+                        title="前の章へ">8.18. <tt class="docutils literal docutils literal docutils literal"><span class="pre">pprint</span></tt> &#8212; データ出力の整然化</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="numeric.html"
+                        title="次の章へ">9. 数値と数学モジュール</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/repr.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-repr">
+<span id="repr-repr"></span><h1>8.19. <a class="reference internal" href="#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">repr</span></tt></a> &#8212; もう一つの <a class="reference internal" href="#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-func docutils literal"><span class="pre">repr()</span></tt></a> の実装<a class="headerlink" href="#module-repr" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">repr</span></tt></a> モジュールは Python 3.0 では <tt class="xref py py-mod docutils literal"><span class="pre">reprlib</span></tt> にリネームされました。
+<a class="reference internal" href="../glossary.html#term-to3"><em class="xref std std-term">2to3</em></a> ツールはソースコード内の import 文を自動で 3.0 に適応させます。</p>
+</div>
+<p><a class="reference internal" href="#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">repr</span></tt></a> モジュールは結果の文字列の大きさを制限したオブジェクト表現を作り出すための方法を提供します。これはPythonデバッガで使われていますが、他の状況でも同じように役に立つかもしれません。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/repr.py?view=markup">repr module Python ソースコード</a></p>
+</div>
+<p>このモジュールはクラスとインスタンス、それに関数を提供します:</p>
+<dl class="class">
+<dt id="repr.Repr">
+<em class="property">class </em><tt class="descclassname">repr.</tt><tt class="descname">Repr</tt><a class="headerlink" href="#repr.Repr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>組み込みクラス <a class="reference internal" href="#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-func docutils literal"><span class="pre">repr()</span></tt></a> によく似た関数を実装するために役に立つ書式化サービスを提供します。過度に長い表現を作り出さないように、異なるオブジェクト型に対する大きさの制限が追加されます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="repr.aRepr">
+<tt class="descclassname">repr.</tt><tt class="descname">aRepr</tt><a class="headerlink" href="#repr.aRepr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは下で説明される <a class="reference internal" href="#repr.repr" title="repr.repr"><tt class="xref py py-func docutils literal"><span class="pre">repr()</span></tt></a> 関数を提供するために使われる <a class="reference internal" href="#repr.Repr" title="repr.Repr"><tt class="xref py py-class docutils literal"><span class="pre">Repr</span></tt></a>
+のインスタンスです。このオブジェクトの属性を変更すると、 <a class="reference internal" href="#repr.repr" title="repr.repr"><tt class="xref py py-func docutils literal"><span class="pre">repr()</span></tt></a> と
+Python デバッガが使うサイズ制限に影響します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="repr.repr">
+<tt class="descclassname">repr.</tt><tt class="descname">repr</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#repr.repr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは <tt class="docutils literal"><span class="pre">aRepr</span></tt> の <a class="reference internal" href="#repr.Repr.repr" title="repr.Repr.repr"><tt class="xref py py-meth docutils literal"><span class="pre">repr()</span></tt></a> メソッドです。同じ名前の組み込み関数が返す文字列と似ていますが、最大サイズに制限のある文字列を返します。</p>
+</dd></dl>
+
+<div class="section" id="repr">
+<span id="repr-objects"></span><h2>8.19.1. Reprオブジェクト<a class="headerlink" href="#repr" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#repr.Repr" title="repr.Repr"><tt class="xref py py-class docutils literal"><span class="pre">Repr</span></tt></a> インスタンスは様々なオブジェクト型の表現にサイズ制限を与えるために使えるいくつかのメンバーと、特定のオブジェクト型を書式化するメソッドを提供します。</p>
+<dl class="attribute">
+<dt id="repr.Repr.maxlevel">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxlevel</tt><a class="headerlink" href="#repr.Repr.maxlevel" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>再帰的な表現を作る場合の深さ制限。デフォルトは <tt class="docutils literal"><span class="pre">6</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="repr.Repr.maxdict">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxdict</tt><a class="headerlink" href="#repr.Repr.maxdict" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="repr.Repr.maxlist">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxlist</tt><a class="headerlink" href="#repr.Repr.maxlist" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="repr.Repr.maxtuple">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxtuple</tt><a class="headerlink" href="#repr.Repr.maxtuple" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="repr.Repr.maxset">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxset</tt><a class="headerlink" href="#repr.Repr.maxset" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="repr.Repr.maxfrozenset">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxfrozenset</tt><a class="headerlink" href="#repr.Repr.maxfrozenset" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="repr.Repr.maxdeque">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxdeque</tt><a class="headerlink" href="#repr.Repr.maxdeque" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="repr.Repr.maxarray">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxarray</tt><a class="headerlink" href="#repr.Repr.maxarray" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたオブジェクト型に対するエントリ表現の数についての制限。
+<a class="reference internal" href="#repr.Repr.maxdict" title="repr.Repr.maxdict"><tt class="xref py py-attr docutils literal"><span class="pre">maxdict</span></tt></a> に対するデフォルトは <tt class="docutils literal"><span class="pre">4</span></tt> で、 <a class="reference internal" href="#repr.Repr.maxarray" title="repr.Repr.maxarray"><tt class="xref py py-attr docutils literal"><span class="pre">maxarray</span></tt></a> は <tt class="docutils literal"><span class="pre">5</span></tt> 、その他に対しては <tt class="docutils literal"><span class="pre">6</span></tt> です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加: </span><a class="reference internal" href="#repr.Repr.maxset" title="repr.Repr.maxset"><tt class="xref py py-attr docutils literal"><span class="pre">maxset</span></tt></a>, <a class="reference internal" href="#repr.Repr.maxfrozenset" title="repr.Repr.maxfrozenset"><tt class="xref py py-attr docutils literal"><span class="pre">maxfrozenset</span></tt></a>, <a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-attr docutils literal"><span class="pre">set</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="repr.Repr.maxlong">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxlong</tt><a class="headerlink" href="#repr.Repr.maxlong" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>長整数の表現のおける文字数の最大値。中央の数字が抜け落ちます。デフォルトは <tt class="docutils literal"><span class="pre">40</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="repr.Repr.maxstring">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxstring</tt><a class="headerlink" href="#repr.Repr.maxstring" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列の表現における文字数の制限。文字列の&#8221;通常の&#8221;表現は文字の材料だということに注意してください:
+表現にエスケープシーケンスが必要とされる場合は、表現が短縮されたときにこれらはマングルされます。デフォルトは <tt class="docutils literal"><span class="pre">30</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="repr.Repr.maxother">
+<tt class="descclassname">Repr.</tt><tt class="descname">maxother</tt><a class="headerlink" href="#repr.Repr.maxother" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この制限は <a class="reference internal" href="#repr.Repr" title="repr.Repr"><tt class="xref py py-class docutils literal"><span class="pre">Repr</span></tt></a> オブジェクトに利用できる特定の書式化メソッドがないオブジェクト型のサイズをコントロールするために使われます。 <a class="reference internal" href="#repr.Repr.maxstring" title="repr.Repr.maxstring"><tt class="xref py py-attr docutils literal"><span class="pre">maxstring</span></tt></a> と同じようなやり方で適用されます。デフォルトは <tt class="docutils literal"><span class="pre">20</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="repr.Repr.repr">
+<tt class="descclassname">Repr.</tt><tt class="descname">repr</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#repr.Repr.repr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インスタンスが強制する書式化を使う組み込み <a class="reference internal" href="#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-func docutils literal"><span class="pre">repr()</span></tt></a> と等価なもの。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="repr.Repr.repr1">
+<tt class="descclassname">Repr.</tt><tt class="descname">repr1</tt><big>(</big><em>obj</em>, <em>level</em><big>)</big><a class="headerlink" href="#repr.Repr.repr1" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#repr.Repr.repr" title="repr.Repr.repr"><tt class="xref py py-meth docutils literal"><span class="pre">repr()</span></tt></a> が使う再帰的な実装。これはどの書式化メソッドを呼び出すかを決定するために <em>obj</em> の型を使い、それを <em>obj</em> と <em>level</em> に渡します。再帰呼び出しにおいて <em>level</em> の値に対して
+<tt class="docutils literal"><span class="pre">level</span> <span class="pre">-</span> <span class="pre">1</span></tt> を与える再帰的な書式化を実行するために、型に固有のメソッドは <a class="reference internal" href="#repr.Repr.repr1" title="repr.Repr.repr1"><tt class="xref py py-meth docutils literal"><span class="pre">repr1()</span></tt></a> を呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Repr.</tt><tt class="descname">repr_TYPE</tt><big>(</big><em>obj</em>, <em>level</em><big>)</big></dt>
+<dd><p>型名に基づく名前をもつメソッドとして、特定の型に対する書式化メソッドは実装されます。メソッド名では、 <strong>TYPE</strong> は <tt class="docutils literal"><span class="pre">string.join(string.split(type(obj).__name__,</span> <span class="pre">'_'))</span></tt>
+に置き換えられます。これらのメソッドへのディスパッチは <tt class="xref py py-meth docutils literal"><span class="pre">repr1()</span></tt> によって処理されます。再帰的に値の書式を整える必要がある型固有のメソッドは、 <tt class="docutils literal"><span class="pre">self.repr1(subobj,</span> <span class="pre">level</span> <span class="pre">-</span> <span class="pre">1)</span></tt>
+を呼び出します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="subclassing-reprs">
+<span id="id1"></span><h2>8.19.2. Reprオブジェクトをサブクラス化する<a class="headerlink" href="#subclassing-reprs" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>更なる組み込みオブジェクト型へのサポートを追加するためや、すでにサポートされている型の扱いを変更するために、
+<a class="reference internal" href="#repr.Repr.repr1" title="repr.Repr.repr1"><tt class="xref py py-meth docutils literal"><span class="pre">Repr.repr1()</span></tt></a> による動的なディスパッチを使って <a class="reference internal" href="#repr.Repr" title="repr.Repr"><tt class="xref py py-class docutils literal"><span class="pre">Repr</span></tt></a> をサブクラス化することができます。この例はファイルオブジェクトのための特別なサポートを追加する方法を示しています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">repr</span> <span class="kn">as</span> <span class="nn">reprlib</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">class</span> <span class="nc">MyRepr</span><span class="p">(</span><span class="n">reprlib</span><span class="o">.</span><span class="n">Repr</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">repr_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;&lt;stdin&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;stdout&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;stderr&gt;&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+<span class="n">aRepr</span> <span class="o">=</span> <span class="n">MyRepr</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">aRepr</span><span class="o">.</span><span class="n">repr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">)</span>          <span class="c"># prints &#39;&lt;stdin&gt;&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="numeric.html" title="9. 数値と数学モジュール"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="pprint.html" title="8.18. pprint — データ出力の整然化"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" >8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

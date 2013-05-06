@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.7. sets — ユニークな要素の順序なしコレクション &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="8. データ型" href="datatypes.html" />
+    <link rel="next" title="8.8. sched — イベントスケジューラ" href="sched.html" />
+    <link rel="prev" title="8.6. array — 効率のよい数値アレイ" href="array.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="sched.html" title="8.8. sched — イベントスケジューラ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="array.html" title="8.6. array — 効率のよい数値アレイ"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" accesskey="U">8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.7. <tt class="docutils literal"><span class="pre">sets</span></tt> &#8212; ユニークな要素の順序なしコレクション</a><ul>
+<li><a class="reference internal" href="#set">8.7.1. Set オブジェクト</a></li>
+<li><a class="reference internal" href="#set-example">8.7.2. 使用例</a></li>
+<li><a class="reference internal" href="#immutable-transforms">8.7.3. 不変に自動変換するためのプロトコル</a></li>
+<li><a class="reference internal" href="#comparison-to-builtin-set">8.7.4. 組み込み <tt class="docutils literal"><span class="pre">set</span></tt> 型との比較</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="array.html"
+                        title="前の章へ">8.6. <tt class="docutils literal docutils literal docutils literal"><span class="pre">array</span></tt> &#8212; 効率のよい数値アレイ</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="sched.html"
+                        title="次の章へ">8.8. <tt class="docutils literal docutils literal docutils literal"><span class="pre">sched</span></tt> &#8212; イベントスケジューラ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/sets.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-sets">
+<span id="sets"></span><h1>8.7. <a class="reference internal" href="#module-sets" title="sets: ユニークな要素の集合の実装 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">sets</span></tt></a> &#8212; ユニークな要素の順序なしコレクション<a class="headerlink" href="#module-sets" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃: </span>組み込みの <a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a>/<a class="reference internal" href="stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> 型がこのモジュールを置き換えます。</p>
+<p><a class="reference internal" href="#module-sets" title="sets: ユニークな要素の集合の実装 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">sets</span></tt></a> モジュールは、ユニークな要素の順序なしコレクションを構築し、操作するためのクラスを提供します。帰属関係のテストやシーケンスから重複を取り除いたり、積集合・和集合・差集合・対称差集合のような標準的な数学操作などを含みます。</p>
+<p>他のコレクションのように、 <tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">set</span></tt>, <tt class="docutils literal"><span class="pre">len(set)</span></tt>, <tt class="docutils literal"><span class="pre">for</span> <span class="pre">x</span> <span class="pre">in</span> <span class="pre">set</span></tt> をサポートします。順序なしコレクションは、挿入の順序や要素位置を記録しません。従って、インデックス・スライス・他のシーケンス的な振舞いをサポートしません。</p>
+<p>ほとんどの集合のアプリケーションは、 <a class="reference internal" href="../reference/datamodel.html#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> を除いてすべての集合のメソッドを提供する <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> クラスを使用します。ハッシュを要求する高度なアプリケーションについては、 <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> クラスが <a class="reference internal" href="../reference/datamodel.html#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> メソッドを加えているが、集合の内容を変更するメソッドは省略されます。 <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> と <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> は、何が集合(<tt class="docutils literal"><span class="pre">isinstance(obj,</span> <span class="pre">BaseSet)</span></tt>)であるか決めるのに役立つ抽象クラス <tt class="xref py py-class docutils literal"><span class="pre">BaseSet</span></tt> から派生します。</p>
+<p>集合クラスは辞書を使用して実装されます。このことから、集合の要素にするには辞書のキーと同様の要件を満たさなければなりません。具体的には、要素になるものには
+<a class="reference internal" href="../reference/datamodel.html#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a> と <a class="reference internal" href="../reference/datamodel.html#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> が定義されているという条件です。その結果、集合はリストや辞書のような変更可能な要素を含むことができません。しかしそれらは、タプルや <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> のインスタンスのような不変コレクションを含むことができます。集合の集合の実装中の便宜については、内部集合が自動的に変更不可能な形式に変換されます。例えば、 <tt class="docutils literal"><span class="pre">Set([Set(['dog'])])</span></tt> は <tt class="docutils literal"><span class="pre">Set([ImmutableSet(['dog'])])</span></tt> へ変換されます。</p>
+<dl class="class">
+<dt id="sets.Set">
+<em class="property">class </em><tt class="descclassname">sets.</tt><tt class="descname">Set</tt><big>(</big><span class="optional">[</span><em>iterable</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sets.Set" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい空の <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> オブジェクトを構築します。もしオプション <em>iterable</em> が与えられたら、イタレータから得られた要素を備えた集合として更新します。 <em>iterable</em> 中の全ての要素は、変更不可能であるか、または <a class="reference internal" href="#immutable-transforms"><em>不変に自動変換するためのプロトコル</em></a> で記述されたプロトコルを使って変更不可能なものに変換可能であるべきです。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sets.ImmutableSet">
+<em class="property">class </em><tt class="descclassname">sets.</tt><tt class="descname">ImmutableSet</tt><big>(</big><span class="optional">[</span><em>iterable</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sets.ImmutableSet" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい空の <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> オブジェクトを構築します。もしオプション <em>iterable</em> が与えられたら、イタレータから得られた要素を備えた集合として更新します。 <em>iterable</em> 中の全ての要素は、変更不可能であるか、または <a class="reference internal" href="#immutable-transforms"><em>不変に自動変換するためのプロトコル</em></a> で記述されたプロトコルを使って変更不可能なものに変換可能であるべきです。</p>
+<p><a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> オブジェクトは <a class="reference internal" href="../reference/datamodel.html#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> メソッドを備えているので、集合要素または辞書キーとして使用することができます。 <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> オブジェクトは要素を加えたり取り除いたりするメソッドを持っていません。したがって、コンストラクタが呼ばれたとき要素はすべて知られていなければなりません。</p>
+</dd></dl>
+
+<div class="section" id="set">
+<span id="set-objects"></span><h2>8.7.1. Set オブジェクト<a class="headerlink" href="#set" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> と <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> のインスタンスはともに、以下の操作を備えています:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="13%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">演算</th>
+<th class="head">等価な演算</th>
+<th class="head">結果</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">len(s)</span></tt></td>
+<td>&nbsp;</td>
+<td>集合 <em>s</em> の濃度 (cardinality)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">s</span></tt></td>
+<td>&nbsp;</td>
+<td><em>x</em> が <em>s</em> に帰属していれば真を返す</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">x</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">s</span></tt></td>
+<td>&nbsp;</td>
+<td><em>x</em> が <em>s</em> に帰属していなければ真を返す</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.issubset(t)</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">s</span> <span class="pre">&lt;=</span> <span class="pre">t</span></tt></td>
+<td><em>s</em> のすべての要素が <em>t</em> に帰属していれば真を返す</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.issuperset(t)</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">s</span> <span class="pre">&gt;=</span> <span class="pre">t</span></tt></td>
+<td><em>t</em> のすべての要素が <em>s</em> に帰属していれば真を返す</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.union(t)</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">s</span> <span class="pre">|</span> <span class="pre">t</span></tt></td>
+<td><em>s</em> と <em>t</em> の両方の要素からなる新しい集合</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.intersection(t)</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">s</span> <span class="pre">&amp;</span> <span class="pre">t</span></tt></td>
+<td><em>s</em> と <em>t</em> で共通する要素からなる新しい集合</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.difference(t)</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">s</span> <span class="pre">-</span> <span class="pre">t</span></tt></td>
+<td><em>s</em> にあるが <em>t</em> にない要素からなる新しい集合</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.symmetric_difference(t)</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">s</span> <span class="pre">^</span> <span class="pre">t</span></tt></td>
+<td><em>s</em> と <em>t</em> のどちらか一方に属する要素からなる集合</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.copy()</span></tt></td>
+<td>&nbsp;</td>
+<td><em>s</em> の浅いコピーからなる集合</td>
+</tr>
+</tbody>
+</table>
+<p>演算子を使わない書き方である <tt class="xref py py-meth docutils literal"><span class="pre">union()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">intersection()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">difference()</span></tt>, および <tt class="xref py py-meth docutils literal"><span class="pre">symmetric_difference()</span></tt> は任意のイテレート可能オブジェクトを引数として受け取るのに対し、演算子を使った書き方の方では引数は集合型でなければならないので注意してください。これはエラーの元となる <tt class="docutils literal"><span class="pre">Set('abc')</span> <span class="pre">&amp;</span> <span class="pre">'cbs'</span></tt> のような書き方を排除し、より可読性のある <tt class="docutils literal"><span class="pre">Set('abc').intersection('cbs')</span></tt> を選ばせるための仕様です。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3.1 で変更: </span>以前は全ての引数が集合型でなければなりませんでした。</p>
+<p>加えて、 <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> と <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> は集合間の比較をサポートしています。二つの集合は、各々の集合のすべての要素が他方に含まれて (各々が他方の部分集合) いる場合、かつその場合に限り等価になります。ある集合は、他方の集合の真の部分集合 (proper subset、部分集合であるが非等価) である場合、かつその場合に限り、他方の集合より小さくなります。ある集合は、他方の集合の真の上位集合 (proper superset、上位集合であるが非等価)
+である場合、かつその場合に限り、他方の集合より大きくなります。</p>
+<p>部分集合比較やと等値比較では、完全な順序決定関数を一般化できません。たとえば、互いに素な 2 つの集合は等しくありませんし、互いの部分集合でもないので、 <tt class="docutils literal"><span class="pre">a&lt;b</span></tt>, <tt class="docutils literal"><span class="pre">a==b</span></tt>, <tt class="docutils literal"><span class="pre">a&gt;b</span></tt> は <em>すべて</em> <tt class="docutils literal"><span class="pre">False</span></tt> を返します。したがって集合は
+<a class="reference internal" href="../reference/datamodel.html#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> メソッドを実装しません。</p>
+<p>集合は一部の順序（部分集合の関係）を定義するだけなので、集合のリストにおいて <tt class="xref py py-meth docutils literal"><span class="pre">list.sort()</span></tt> メソッドの出力は未定義です。</p>
+<p>以下は <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> で利用可能であるが <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> にはない操作です:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">演算</th>
+<th class="head">結果</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">hash(s)</span></tt></td>
+<td><em>s</em> のハッシュ値を返す</td>
+</tr>
+</tbody>
+</table>
+<p>以下は <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> で利用可能であるが <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> にはない操作です:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="37%" />
+<col width="13%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">演算</th>
+<th class="head">等価な演算</th>
+<th class="head">結果</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.update(t)</span></tt></td>
+<td><em>s</em> |= <em>t</em></td>
+<td><em>t</em> を加えた要素からなる集合 <em>s</em> を返します</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.intersection_update(t)</span></tt></td>
+<td><em>s</em> &amp;= <em>t</em></td>
+<td><em>t</em> でも見つかった要素だけを持つ集合 <em>s</em> を返します</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.difference_update(t)</span></tt></td>
+<td><em>s</em> -= <em>t</em></td>
+<td><em>t</em> にあった要素を取り除いた後の集合 <em>s</em> を返します</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.symmetric_difference_update(t)</span></tt></td>
+<td><em>s</em> ^= <em>t</em></td>
+<td><em>s</em> と <em>t</em> のどちらか一方に属する要素からなる集合
+<em>s</em> を返します</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.add(x)</span></tt></td>
+<td>&nbsp;</td>
+<td>要素 <em>x</em> を集合 <em>s</em> に加えます</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.remove(x)</span></tt></td>
+<td>&nbsp;</td>
+<td>要素 <em>x</em> を集合 <em>s</em> から取り除きます;
+<em>x</em> がなければ <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を送出します</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.discard(x)</span></tt></td>
+<td>&nbsp;</td>
+<td>要素 <em>x</em> が存在すれば、集合 <em>s</em> から取り除きます</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s.pop()</span></tt></td>
+<td>&nbsp;</td>
+<td><em>s</em> から要素を取り除き、それを返します;
+集合が空なら <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を送出します</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">s.clear()</span></tt></td>
+<td>&nbsp;</td>
+<td>集合 <em>s</em> からすべての要素を取り除きます</td>
+</tr>
+</tbody>
+</table>
+<p>演算子を使わない書き方である <tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">intersection_update()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">difference_update()</span></tt>,
+および <tt class="xref py py-meth docutils literal"><span class="pre">symmetric_difference_update()</span></tt> は任意のイテレート可能オブジェクトを引数として受け取るので注意してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3.1 で変更: </span>以前は全ての引数が集合型でなければなりませんでした。</p>
+<p>もう一つ注意を述べますが、このモジュールでは <tt class="xref py py-meth docutils literal"><span class="pre">union_update()</span></tt> が <tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt> の別名として含まれています。このメソッドは後方互換性のために残されているものです。プログラマは組み込みの <a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set()</span></tt></a> および <a class="reference internal" href="stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset()</span></tt></a>
+でサポートされている <tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt> を選ぶべきです。</p>
+</div>
+<div class="section" id="set-example">
+<span id="id1"></span><h2>8.7.2. 使用例<a class="headerlink" href="#set-example" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sets</span> <span class="kn">import</span> <span class="n">Set</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">engineers</span> <span class="o">=</span> <span class="n">Set</span><span class="p">([</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="s">&#39;Jack&#39;</span><span class="p">,</span> <span class="s">&#39;Janice&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">programmers</span> <span class="o">=</span> <span class="n">Set</span><span class="p">([</span><span class="s">&#39;Jack&#39;</span><span class="p">,</span> <span class="s">&#39;Sam&#39;</span><span class="p">,</span> <span class="s">&#39;Susan&#39;</span><span class="p">,</span> <span class="s">&#39;Janice&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">managers</span> <span class="o">=</span> <span class="n">Set</span><span class="p">([</span><span class="s">&#39;Jane&#39;</span><span class="p">,</span> <span class="s">&#39;Jack&#39;</span><span class="p">,</span> <span class="s">&#39;Susan&#39;</span><span class="p">,</span> <span class="s">&#39;Zack&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">employees</span> <span class="o">=</span> <span class="n">engineers</span> <span class="o">|</span> <span class="n">programmers</span> <span class="o">|</span> <span class="n">managers</span>           <span class="c"># union</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">engineering_management</span> <span class="o">=</span> <span class="n">engineers</span> <span class="o">&amp;</span> <span class="n">managers</span>            <span class="c"># intersection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fulltime_management</span> <span class="o">=</span> <span class="n">managers</span> <span class="o">-</span> <span class="n">engineers</span> <span class="o">-</span> <span class="n">programmers</span> <span class="c"># difference</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">engineers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;Marvin&#39;</span><span class="p">)</span>                                  <span class="c"># add element</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">engineers</span> <span class="c"># doctest: +SKIP</span>
+<span class="go">Set([&#39;Jane&#39;, &#39;Marvin&#39;, &#39;Janice&#39;, &#39;John&#39;, &#39;Jack&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">employees</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">engineers</span><span class="p">)</span>     <span class="c"># superset test</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">employees</span><span class="o">.</span><span class="n">union_update</span><span class="p">(</span><span class="n">engineers</span><span class="p">)</span>   <span class="c"># update from another set</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">employees</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">engineers</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="p">[</span><span class="n">engineers</span><span class="p">,</span> <span class="n">programmers</span><span class="p">,</span> <span class="n">managers</span><span class="p">,</span> <span class="n">employees</span><span class="p">]:</span> <span class="c"># doctest: +SKIP</span>
+<span class="gp">... </span>    <span class="n">group</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="s">&#39;Susan&#39;</span><span class="p">)</span>          <span class="c"># unconditionally remove element</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">group</span>
+<span class="gp">...</span>
+<span class="go">Set([&#39;Jane&#39;, &#39;Marvin&#39;, &#39;Janice&#39;, &#39;John&#39;, &#39;Jack&#39;])</span>
+<span class="go">Set([&#39;Janice&#39;, &#39;Jack&#39;, &#39;Sam&#39;])</span>
+<span class="go">Set([&#39;Jane&#39;, &#39;Zack&#39;, &#39;Jack&#39;])</span>
+<span class="go">Set([&#39;Jack&#39;, &#39;Sam&#39;, &#39;Jane&#39;, &#39;Marvin&#39;, &#39;Janice&#39;, &#39;John&#39;, &#39;Zack&#39;])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="immutable-transforms">
+<span id="id2"></span><h2>8.7.3. 不変に自動変換するためのプロトコル<a class="headerlink" href="#immutable-transforms" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>集合は変更不可能な要素だけを含むことできます。都合上、変更可能な <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> オブジェクトは、集合要素として加えられる前に、自動的に <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> へコピーします。そのメカニズムはハッシュ可能な(<a class="reference internal" href="../glossary.html#term-hashable"><em class="xref std std-term">hashable</em></a>)要素を常に加えることですが、もしハッシュ不可能な場合は、その要素は変更不可能な等価物を返す <tt class="xref py py-meth docutils literal"><span class="pre">__as_immutable__()</span></tt> メソッドを持っているかどうかチェックされます。</p>
+<p><a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> オブジェクトは、 <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> のインスタンスを返す
+<tt class="xref py py-meth docutils literal"><span class="pre">__as_immutable__()</span></tt> メソッドを持っているので、集合の集合を構築することが可能です。</p>
+<p>集合内のメンバーであることをチェックするために、要素をハッシュする必要がある <a class="reference internal" href="../reference/datamodel.html#object.__contains__" title="object.__contains__"><tt class="xref py py-meth docutils literal"><span class="pre">__contains__()</span></tt></a> メソッドと
+<tt class="xref py py-meth docutils literal"><span class="pre">remove()</span></tt> メソッドが、同様のメカニズムを必要としています。これらのメソッドは要素がハッシュできるかチェックします。もし出来なければ&#8211;<a class="reference internal" href="../reference/datamodel.html#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a>, <a class="reference internal" href="../reference/datamodel.html#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a>, <a class="reference internal" href="../reference/datamodel.html#object.__ne__" title="object.__ne__"><tt class="xref py py-meth docutils literal"><span class="pre">__ne__()</span></tt></a>
+のための一時的なメソッドを備えたクラスによってラップされた要素を返すメソッド&#8211;
+<tt class="xref py py-meth docutils literal"><span class="pre">__as_temporarily_immutable__()</span></tt> メソッドをチェックします。</p>
+<p>代理メカニズムは、オリジナルの可変オブジェクトから分かれたコピーを組み上げる手間を助けてくれます。</p>
+<p><a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> オブジェクトは、新しいクラス <tt class="xref py py-class docutils literal"><span class="pre">_TemporarilyImmutableSet</span></tt>
+によってラップされた <a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> オブジェクトを返す、 <tt class="xref py py-meth docutils literal"><span class="pre">__as_temporarily_immutable__()</span></tt> メソッドを実装します。</p>
+<p>ハッシュ可能を与えるための2つのメカニズムは通常ユーザーに見えません。しかしながら、マルチスレッド環境下においては、
+<tt class="xref py py-class docutils literal"><span class="pre">_TemporarilyImmutableSet</span></tt> によって一時的にラップされたものを持っているスレッドがあるときに、もう一つのスレッドが集合を更新することで、衝突を発生させることができます。言いかえれば、変更可能な集合の集合はスレッドセーフではありません。</p>
+</div>
+<div class="section" id="comparison-to-builtin-set">
+<span id="id3"></span><h2>8.7.4. 組み込み <a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> 型との比較<a class="headerlink" href="#comparison-to-builtin-set" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>組み込みの <a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> および <a class="reference internal" href="stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> 型はこの <a class="reference internal" href="#module-sets" title="sets: ユニークな要素の集合の実装 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">sets</span></tt></a> で学んだことを生かして設計されています。主な違いは次の通りです。</p>
+<ul class="simple">
+<li><a class="reference internal" href="#sets.Set" title="sets.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> と <a class="reference internal" href="#sets.ImmutableSet" title="sets.ImmutableSet"><tt class="xref py py-class docutils literal"><span class="pre">ImmutableSet</span></tt></a> は <a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> と <a class="reference internal" href="stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a>
+に改名されました。</li>
+<li><tt class="xref py py-class docutils literal"><span class="pre">BaseSet</span></tt> に相当するものはありません。代わりに <tt class="docutils literal"><span class="pre">isinstance(x,</span> <span class="pre">(set,</span> <span class="pre">frozenset))</span></tt>
+を使って下さい。</li>
+<li>組み込みのものに使われているハッシュアルゴリズムは、多くのデータ集合に対してずっと良い性能(少ない衝突)を実現します。</li>
+<li>組み込みのものはより空間効率良く pickle 化できます。</li>
+<li>組み込みのものには <tt class="xref py py-meth docutils literal"><span class="pre">union_update()</span></tt> メソッドがありません。代わりに同じ機能の <tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt>
+メソッドを使って下さい。</li>
+<li>組み込みのものには <cite>_repr(sorted=True)</cite> メソッドがありません。代わりに組み込み関数の <a class="reference internal" href="repr.html#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-func docutils literal"><span class="pre">repr()</span></tt></a> と
+<a class="reference internal" href="functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> を使って <tt class="docutils literal"><span class="pre">repr(sorted(s))</span></tt> として下さい。</li>
+<li>組み込みのものは変更不可能なものに自動で変換するプロトコルがありません。この機能は多くの人が困惑を覚えるわりに、コミュニティの誰からも実際的な使用例の報告がありませんでした。</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="sched.html" title="8.8. sched — イベントスケジューラ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="array.html" title="8.6. array — 効率のよい数値アレイ"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" >8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

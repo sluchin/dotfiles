@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Python インタプリタの拡張と埋め込み &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="next" title="1. C や C++ による Python の拡張" href="extending.html" />
+    <link rel="prev" title="41. 日本語訳について" href="../library/jptranslation.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="extending.html" title="1. C や C++ による Python の拡張"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="../library/jptranslation.html" title="41. 日本語訳について"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="../library/jptranslation.html"
+                        title="前の章へ">41. 日本語訳について</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="extending.html"
+                        title="次の章へ">1. C や C++ による Python の拡張</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/extending/index.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="python">
+<span id="extending-index"></span><h1>Python インタプリタの拡張と埋め込み<a class="headerlink" href="#python" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Release:</th><td class="field-body">2.7</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">2011年 12月 26日</td>
+</tr>
+</tbody>
+</table>
+<p>このドキュメントでは、Python インタプリタを拡張するために C/C++
+でモジュールを書く方法について述べます。拡張モジュールでは、新たな関数を定義できるだけでなく、新たなオブジェクト型とそのメソッドも定義できます。このドキュメントではまた、Python インタプリタを別のアプリケーションに埋め込み (embedding)、拡張言語として使う方法についても述べます。また、動的に(実行時に)拡張モジュールをロードする機能をOSがサポートしている場合に、動的ロード可能な拡張モジュールをコンパイルしてリンクする方法を示します。</p>
+<p>このドキュメントでは、読者は Python について基礎的な知識を持ち合わせているものと仮定しています。形式ばらない Python 言語の入門には、
+<a class="reference internal" href="../tutorial/index.html#tutorial-index"><em>Python チュートリアル</em></a> を読んでください。
+<a class="reference internal" href="../reference/index.html#reference-index"><em>Python 言語リファレンス</em></a> を読めば、
+Python 言語についてより形式的な定義を得られます。また、 <a class="reference internal" href="../library/index.html#library-index"><em>Python 標準ライブラリ</em></a> では、Python に広い適用範囲をもたらしている既存のオブジェクト型、関数、および (組み込み、および Python で書かれたものの両方の) モジュールについて解説しています。</p>
+<p>Python/C API 全体の詳しい説明は、別のドキュメントである、
+<a class="reference internal" href="../c-api/index.html#c-api-index"><em>Python/C API リファレンスマニュアル</em></a> を参照してください。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="extending.html">1. C や C++ による Python の拡張</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#extending-simpleexample">1.1. 簡単な例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#extending-errors">1.2. 幕間小話: エラーと例外</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#backtoexample">1.3. 例に戻る</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#methodtable">1.4. モジュールのメソッドテーブルと初期化関数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#compilation">1.5. コンパイルとリンク</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#c-python">1.6. C から Python 関数を呼び出す</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#parsetuple">1.7. 拡張モジュール関数でのパラメタ展開</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#parsetupleandkeywords">1.8. 拡張モジュール関数のキーワードパラメタ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#buildvalue">1.9. 任意の値を構築する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#refcounts">1.10. 参照カウント法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#c">1.11. C++での拡張モジュール作成</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#c-api">1.12. 拡張モジュールに C API を提供する</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="newtypes.html">2. 新しい型を定義する</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="newtypes.html#dnt-basics">2.1. 基本的なこと</a></li>
+<li class="toctree-l2"><a class="reference internal" href="newtypes.html#dnt-type-methods">2.2. タイプメソッド</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">3. distutils による C および C++ 拡張モジュールのビルド</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="building.html#distributing">3.1. 拡張モジュールの配布</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="windows.html">4. Windows 上での C および C++ 拡張モジュールのビルド</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="windows.html#win-cookbook">4.1. 型どおりのアプローチ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windows.html#unix-windows">4.2. Unix と Windows の相違点</a></li>
+<li class="toctree-l2"><a class="reference internal" href="windows.html#dll">4.3. DLL 使用の実際</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="embedding.html">5. 他のアプリケーションへの Python の埋め込み</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="embedding.html#high-level-embedding">5.1. 高水準の埋め込み</a></li>
+<li class="toctree-l2"><a class="reference internal" href="embedding.html#lower-level-embedding">5.2. 超高水準の埋め込みから踏み出す: 概要</a></li>
+<li class="toctree-l2"><a class="reference internal" href="embedding.html#pure-embedding">5.3. 純粋な埋め込み</a></li>
+<li class="toctree-l2"><a class="reference internal" href="embedding.html#extending-with-embedding">5.4. 埋め込まれた Python の拡張</a></li>
+<li class="toctree-l2"><a class="reference internal" href="embedding.html#c-python">5.5. C++による Python の埋め込み</a></li>
+<li class="toctree-l2"><a class="reference internal" href="embedding.html#link-reqs">5.6. リンクに関する要件</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="jptranslation.html">6. このドキュメントについて</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="jptranslation.html#id2">6.1. 翻訳者一覧 (敬称略)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="extending.html" title="1. C や C++ による Python の拡張"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="../library/jptranslation.html" title="41. 日本語訳について"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

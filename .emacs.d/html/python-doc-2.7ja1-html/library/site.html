@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>27.14. site — サイト固有の設定フック &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="27. Python ランタイムサービス" href="python.html" />
+    <link rel="next" title="27.15. user — ユーザー設定のフック" href="user.html" />
+    <link rel="prev" title="27.13. inspect — 活動中のオブジェクトの情報を取得する" href="inspect.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="user.html" title="27.15. user — ユーザー設定のフック"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="inspect.html" title="27.13. inspect — 活動中のオブジェクトの情報を取得する"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" accesskey="U">27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="inspect.html"
+                        title="前の章へ">27.13. <tt class="docutils literal docutils literal docutils literal"><span class="pre">inspect</span></tt> &#8212; 活動中のオブジェクトの情報を取得する</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="user.html"
+                        title="次の章へ">27.15. <tt class="docutils literal docutils literal"><span class="pre">user</span></tt> &#8212; ユーザー設定のフック</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/site.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-site">
+<span id="site"></span><h1>27.14. <a class="reference internal" href="#module-site" title="site: サイト固有のモジュールを参照する標準の方法。"><tt class="xref py py-mod docutils literal"><span class="pre">site</span></tt></a> &#8212; サイト固有の設定フック<a class="headerlink" href="#module-site" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><strong>このモジュールは初期化中に自動的にインポートされます。</strong>
+自動インポートはインタプリタの <a class="reference internal" href="../using/cmdline.html#cmdoption-S"><em class="xref std std-option">-S</em></a> オプションで禁止できます。</p>
+<p id="index-0">このモジュールをインポートすることで、サイト固有のパスをモジュール検索パスへ付け加えます。</p>
+<p id="index-1">サイト固有のパスは、前部と後部から構築される最大で四つまでのディレクトリから始めます。前部には、 <tt class="docutils literal"><span class="pre">sys.prefix</span></tt> と <tt class="docutils literal"><span class="pre">sys.exec_prefix</span></tt> を使用します。空の前部は省略されます。後部には、まず空文字列を使い、次に <tt class="file docutils literal"><span class="pre">lib/site-packages</span></tt> (Windows) または
+<tt class="file docutils literal"><span class="pre">lib/python|version|/site-packages</span></tt>, そして <tt class="file docutils literal"><span class="pre">lib/site-python</span></tt> (Unix と
+Macintosh)を使います。前部-後部の組み合わせのそれぞれに対して、それが存在するディレクトリを参照しているかどうかを調べ、もしそうならば <tt class="docutils literal"><span class="pre">sys.path</span></tt> へ追加します。そして、パス設定ファイルを新しく追加されたパスからも検索します。</p>
+<p>パス設定ファイルは <tt class="file docutils literal"><span class="pre">package.pth</span></tt> という形式の名前をもつファイルで、上の4つのディレクトリのひとつにあります。その内容は <tt class="docutils literal"><span class="pre">sys.path</span></tt> に追加される追加項目(一行に一つ)です。存在しない項目は <tt class="docutils literal"><span class="pre">sys.path</span></tt> へは決して追加されませんが、項目が(ファイルではなく)
+ディレクトリを参照しているかどうかはチェックされません。項目が <tt class="docutils literal"><span class="pre">sys.path</span></tt> へ二回以上追加されることはありません。空行と <tt class="docutils literal"><span class="pre">#</span></tt> で始まる行は読み飛ばされます。
+<tt class="docutils literal"><span class="pre">import</span></tt> で始まる(そしてその後ろにスペースかタブが続く)行は実行されます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>import キーワードの後ろにスペースかタブが必要になりました。</p>
+<p id="index-2">例えば、 <tt class="docutils literal"><span class="pre">sys.prefix</span></tt> と <tt class="docutils literal"><span class="pre">sys.exec_prefix</span></tt> が <tt class="file docutils literal"><span class="pre">/usr/local</span></tt> に設定されていると仮定します。そのときPython X.Y
+ライブラリは <tt class="file docutils literal"><span class="pre">/usr/local/lib/python</span><em><span class="pre">X.Y</span></em></tt> にインストールされています(ここで、 <tt class="docutils literal"><span class="pre">sys.version</span></tt> の最初の三文字だけがインストールパス名を作るために使われます)。ここにはサブディレクトリ <tt class="file docutils literal"><span class="pre">/usr/local/lib/python</span><em><span class="pre">X.Y</span></em><span class="pre">|/site-packages</span></tt>
+があり、その中に三つのサブディレクトリ <tt class="file docutils literal"><span class="pre">foo</span></tt>, <tt class="file docutils literal"><span class="pre">bar</span></tt> および <tt class="file docutils literal"><span class="pre">spam</span></tt> と二つのパス設定ファイル <tt class="file docutils literal"><span class="pre">foo.pth</span></tt> と <tt class="file docutils literal"><span class="pre">bar.pth</span></tt> をもつと仮定します。 <tt class="file docutils literal"><span class="pre">foo.pth</span></tt> には以下のものが記載されていると想定してください:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># foo package configuration</span>
+
+<span class="n">foo</span>
+<span class="n">bar</span>
+<span class="n">bletch</span>
+</pre></div>
+</div>
+<p>また、 <tt class="file docutils literal"><span class="pre">bar.pth</span></tt> には:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># bar package configuration</span>
+
+<span class="n">bar</span>
+</pre></div>
+</div>
+<p>が記載されているとします。そのとき、次のバージョンごとのディレクトリが <tt class="docutils literal"><span class="pre">sys.path</span></tt> へこの順番んで追加されます:</p>
+<div class="highlight-python"><pre>/usr/local/lib/pythonX.Y/site-packages/bar
+/usr/local/lib/pythonX.Y/site-packages/foo</pre>
+</div>
+<p><tt class="file docutils literal"><span class="pre">bletch</span></tt> は存在しないため省略されるということに注意してください。 <tt class="file docutils literal"><span class="pre">bar</span></tt> ディレクトリは <tt class="file docutils literal"><span class="pre">foo</span></tt> ディレクトリの前に来ます。なぜなら、 <tt class="file docutils literal"><span class="pre">bar.pth</span></tt> がアルファベット順で <tt class="file docutils literal"><span class="pre">foo.pth</span></tt> の前に来るからです。また、 <tt class="file docutils literal"><span class="pre">spam</span></tt> はどちらのパス設定ファイルにも記載されていないため、省略されます。</p>
+<p id="index-3">これらのパス操作の後に、 <tt class="xref py py-mod docutils literal"><span class="pre">sitecustomize</span></tt> という名前のモジュールをインポートしようします。そのモジュールは任意のサイト固有のカスタマイゼーションを行うことができます。 <a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> 例外が発生してこのインポートに失敗した場合は、何も表示せずに無視されます。</p>
+<p id="index-4">いくつかの非Unixシステムでは、 <tt class="docutils literal"><span class="pre">sys.prefix</span></tt> と <tt class="docutils literal"><span class="pre">sys.exec_prefix</span></tt> は空で、パス操作は省略されます。しかし、 <tt class="xref py py-mod docutils literal"><span class="pre">sitecustomize</span></tt> のインポートはそのときでも試みられます。</p>
+<dl class="data">
+<dt id="site.PREFIXES">
+<tt class="descclassname">site.</tt><tt class="descname">PREFIXES</tt><a class="headerlink" href="#site.PREFIXES" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>siteパッケージディレクトリのprefixのリスト</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="site.ENABLE_USER_SITE">
+<tt class="descclassname">site.</tt><tt class="descname">ENABLE_USER_SITE</tt><a class="headerlink" href="#site.ENABLE_USER_SITE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザーサイトディレクトリのステータスを示すフラグ。
+Trueの場合、ユーザーサイトディレクトリが有効で sys.path に追加されていることを意味しています。
+None の場合、セキュリティ上の理由でユーザーサイトディレクトリが無効になっていることを示しています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="site.USER_SITE">
+<tt class="descclassname">site.</tt><tt class="descname">USER_SITE</tt><a class="headerlink" href="#site.USER_SITE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のPythonバージョン用のユーザーサイトディレクトリのパス。もしくは None.</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="site.USER_BASE">
+<tt class="descclassname">site.</tt><tt class="descname">USER_BASE</tt><a class="headerlink" href="#site.USER_BASE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザーサイトディレクトリのベースディレクトリ</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-PYTHONNOUSERSITE">
+<tt class="descname">PYTHONNOUSERSITE</tt><a class="headerlink" href="#envvar-PYTHONNOUSERSITE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="envvar">
+<dt id="envvar-PYTHONUSERBASE">
+<tt class="descname">PYTHONUSERBASE</tt><a class="headerlink" href="#envvar-PYTHONUSERBASE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="site.addsitedir">
+<tt class="descclassname">site.</tt><tt class="descname">addsitedir</tt><big>(</big><em>sitedir</em>, <em>known_paths=None</em><big>)</big><a class="headerlink" href="#site.addsitedir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ディレクトリを sys.path に追加して、その中の pth ファイルも処理する。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="site.getsitepackages">
+<tt class="descclassname">site.</tt><tt class="descname">getsitepackages</tt><big>(</big><big>)</big><a class="headerlink" href="#site.getsitepackages" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全てのグローバルの site-packages (site-python が含まれる場合もある)
+ディレクトリを含むリストを返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="site.getuserbase">
+<tt class="descclassname">site.</tt><tt class="descname">getuserbase</tt><big>(</big><big>)</big><a class="headerlink" href="#site.getuserbase" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;ユーザーベース&#8221; ディレクトリのパスを返します。</p>
+<p>&#8220;ユーザーベース&#8221; ディレクトリをデータを保存するために使うことができます。グローバル変数 <tt class="docutils literal"><span class="pre">USER_BASE</span></tt> がまだ初期化されていない場合、その初期化を行います。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="site.getusersitepackages">
+<tt class="descclassname">site.</tt><tt class="descname">getusersitepackages</tt><big>(</big><big>)</big><a class="headerlink" href="#site.getusersitepackages" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザー専用の site-packages ディレクトリパスを返します。</p>
+<p>グローバル変数 <tt class="docutils literal"><span class="pre">USER_SITE</span></tt> が初期化されていない場合、初期化します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="user.html" title="27.15. user — ユーザー設定のフック"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="inspect.html" title="27.13. inspect — 活動中のオブジェクトの情報を取得する"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" >27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

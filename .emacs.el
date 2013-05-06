@@ -361,6 +361,9 @@
 
   (eval-after-load "info"
     '(progn
+       ;; info+
+       ;; (install-elisp-from-emacswiki "info+.el")
+       (require 'info+ nil t)
        (let ((info-dir (expand-file-name "~/.emacs.d/info")))
          (when (and (file-directory-p info-dir) (file-readable-p info-dir)
                     (boundp 'Info-directory-list))
@@ -377,10 +380,6 @@
          ;; 履歴 戻る (デフォルト: l)
          (define-key Info-mode-map (kbd "<M-left>") 'Info-history-back))
        (message "Loading %s (info)...done" this-file-name))))
-
-;; info+
-;; (install-elisp-from-emacswiki "info+.el")
-(eval-after-load "info" '(require 'info+))
 
 (when (locate-library "info")
   ;; Emacs info
@@ -411,6 +410,10 @@
   (defun python-info (&optional node)
     "Read documentation for python in the info system."
     (interactive) (info (format "(python)%s" (or node ""))))
+  ;; Tcl/Tk info
+  (defun tcl-info (&optional node)
+    "Read documentation for Tcl/Tk in the info system."
+    (interactive) (info (format "(tcl)%s" (or node ""))))
   ;; Tramp info 日本語
   (defun tramp-ja-info (&optional node)
     "Read documentation for Tramp japanese manual in the info system."
@@ -420,8 +423,9 @@
 (when (locate-library "help")
   (eval-after-load "help"
     '(progn
-       (define-key help-mode-map (kbd "M-<right>") 'help-go-forward)
-       (define-key help-mode-map (kbd "M-<left>") 'help-go-back)
+       (when (boundp 'help-mode-map)
+         (define-key help-mode-map (kbd "M-<right>") 'help-go-forward)
+         (define-key help-mode-map (kbd "M-<left>") 'help-go-back))
        (message "Loading %s (help)...done" this-file-name))))
 
 ;;; マニュアル (man)
@@ -498,6 +502,7 @@
        (message "Loading %s (woman)...done" this-file-name))))
 
 ;;; Devhelp
+;; sudo apt-get install devhelp
 ;; (install-elisp "ftp://download.tuxfamily.org/user42/gtk-look.el")
 (when (and (locate-library "info")
            (locate-library "gtk-look"))
@@ -508,6 +513,50 @@
     (let ((browse-url-browser-function 'w3m-browse-url))
       (call-interactively 'gtk-lookup-symbol)))
   (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
+
+;; Html マニュアル
+(when (locate-library "w3m")
+  (defun w3m-devhelp-command (cmd)
+    "Devhelp command."
+    (when (fboundp 'w3m-goto-url-new-session)
+      (let ((html (format "/usr/share/gtk-doc/html/%s/index.html" cmd)))
+        (if (file-readable-p html)
+            (w3m-goto-url-new-session (concat "file:/" html))
+          (message "no file: %s" html)))))
+  (when (fboundp 'w3m-devhelp-command)
+    (dolist (pg '("glib" "gtk3" "gdk3" "gio" "gobject" "libxml2"))
+      (let ((cmd (intern (format "w3m-devhelp-%s" pg))))
+        (defalias cmd
+          `(lambda ()
+             (interactive)
+             (w3m-devhelp-command ,pg))))))
+  ;; sudo apt-get install python2.7-doc
+  (defun w3m-python-manual ()
+    "Python manual."
+    (interactive)
+    (when (fboundp 'w3m-goto-url-new-session)
+      (let ((html "/usr/share/doc/python2.7/html/index.html"))
+        (if (file-readable-p html)
+            (w3m-goto-url-new-session (concat "file:/" html))
+          (message "no file: %s" html)))))
+  (defun w3m-python-ja-manual ()
+    "Python japanese manual."
+    (interactive)
+    (when (fboundp 'w3m-goto-url-new-session)
+      (let ((html (expand-file-name
+                   "~/.emacs.d/html/python-doc-2.7ja1-html/index.html")))
+        (if (file-readable-p html)
+            (w3m-goto-url-new-session (concat "file:/" html))
+          (message "no file: %s" html)))))
+  ;; sudo apt-get install ghc-doc
+  (defun w3m-haskell-manual ()
+    "Haskell manual."
+    (interactive)
+    (when (fboundp 'w3m-goto-url-new-session)
+      (let ((html "/usr/share/doc/ghc-doc/html/index.html"))
+        (if (file-readable-p html)
+            (w3m-goto-url-new-session (concat "file:/" html))
+          (message "no file: %s" html))))))
 
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
@@ -2019,6 +2068,8 @@
                                         (buffer-name b)) b)
                          ((string= "*Diff*" (buffer-name b)) b)
                          ((string= "*compilation*" (buffer-name b)) b)
+                         ((string= "*haskell*" (buffer-name b)) b)
+                         ((string= "*w3m*" (buffer-name b)) b)
                          ((string-match
                            "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
                          ((string-match
@@ -2891,6 +2942,8 @@
   (autoload 'w3m-antenna "w3m-antenna" "Report chenge of WEB sites." t)
   (autoload 'w3m-search-new-session "w3m-search"
     "Search a word using search engines in a new session." t)
+  (autoload 'w3m-goto-url-new-session "w3m"
+    "Visit World Wide Web pages in a new session." t)
 
   ;; グーグルで検索する
   (defun w3m-search-google ()

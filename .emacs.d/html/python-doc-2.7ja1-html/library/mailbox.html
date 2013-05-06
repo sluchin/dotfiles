@@ -1,0 +1,1934 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>18.4. mailbox — 様々な形式のメールボックス操作 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="18. インターネット上のデータの操作" href="netdata.html" />
+    <link rel="next" title="18.5. mhlib — MH のメールボックスへのアクセス機構" href="mhlib.html" />
+    <link rel="prev" title="18.3. mailcap — mailcap ファイルの操作" href="mailcap.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="mhlib.html" title="18.5. mhlib — MH のメールボックスへのアクセス機構"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="mailcap.html" title="18.3. mailcap — mailcap ファイルの操作"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="netdata.html" accesskey="U">18. インターネット上のデータの操作</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">18.4. <tt class="docutils literal"><span class="pre">mailbox</span></tt> &#8212; 様々な形式のメールボックス操作</a><ul>
+<li><a class="reference internal" href="#mailbox-objects">18.4.1. <tt class="docutils literal"><span class="pre">Mailbox</span></tt> オブジェクト</a><ul>
+<li><a class="reference internal" href="#maildir">18.4.1.1. <tt class="docutils literal"><span class="pre">Maildir</span></tt></a></li>
+<li><a class="reference internal" href="#mbox">18.4.1.2. <tt class="docutils literal"><span class="pre">mbox</span></tt></a></li>
+<li><a class="reference internal" href="#mh">18.4.1.3. <tt class="docutils literal"><span class="pre">MH</span></tt></a></li>
+<li><a class="reference internal" href="#babyl">18.4.1.4. <tt class="docutils literal"><span class="pre">Babyl</span></tt></a></li>
+<li><a class="reference internal" href="#mmdf">18.4.1.5. <tt class="docutils literal"><span class="pre">MMDF</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#message-objects">18.4.2. <tt class="docutils literal"><span class="pre">Message</span></tt> objects</a><ul>
+<li><a class="reference internal" href="#maildirmessage">18.4.2.1. <tt class="docutils literal"><span class="pre">MaildirMessage</span></tt></a></li>
+<li><a class="reference internal" href="#mboxmessage">18.4.2.2. <tt class="docutils literal"><span class="pre">mboxMessage</span></tt></a></li>
+<li><a class="reference internal" href="#mhmessage">18.4.2.3. <tt class="docutils literal"><span class="pre">MHMessage</span></tt></a></li>
+<li><a class="reference internal" href="#babylmessage">18.4.2.4. <tt class="docutils literal"><span class="pre">BabylMessage</span></tt></a></li>
+<li><a class="reference internal" href="#mmdfmessage">18.4.2.5. <tt class="docutils literal"><span class="pre">MMDFMessage</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">18.4.3. 例外</a></li>
+<li><a class="reference internal" href="#mailbox-deprecated">18.4.4. 撤廃されたクラスとメソッド</a></li>
+<li><a class="reference internal" href="#mailbox-examples">18.4.5. 例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="mailcap.html"
+                        title="前の章へ">18.3. <tt class="docutils literal docutils literal"><span class="pre">mailcap</span></tt> &#8212; mailcap ファイルの操作</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="mhlib.html"
+                        title="次の章へ">18.5. <tt class="docutils literal"><span class="pre">mhlib</span></tt> &#8212; MH のメールボックスへのアクセス機構</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/mailbox.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-mailbox">
+<span id="mailbox"></span><h1>18.4. <a class="reference internal" href="#module-mailbox" title="mailbox: 様々な形式のメールボックス操作"><tt class="xref py py-mod docutils literal"><span class="pre">mailbox</span></tt></a> &#8212; 様々な形式のメールボックス操作<a class="headerlink" href="#module-mailbox" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>このモジュールでは二つのクラス <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> および <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>
+をディスク上のメールボックスとそこに収められたメッセージへのアクセスと操作のために定義しています。
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> は辞書のようなキーからメッセージへの対応付けを提供しています。
+<a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> は <tt class="xref py py-mod docutils literal"><span class="pre">email.Message</span></tt> モジュールの
+<a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> を拡張して形式ごとの状態と振る舞いを追加しています。サポートされるメールボックスの形式は Maildir, mbox, MH, Babyl, MMDF です。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="email.html#module-email" title="email: 電子メールのメッセージを解析、操作および生成を支援するパッケージ。 これには MIME 文書もふくまれる。"><tt class="xref py py-mod docutils literal"><span class="pre">email</span></tt></a></dt>
+<dd>メッセージの表現と操作</dd>
+</dl>
+</div>
+<div class="section" id="mailbox-objects">
+<span id="id1"></span><h2>18.4.1. <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> オブジェクト<a class="headerlink" href="#mailbox-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="mailbox.Mailbox">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">Mailbox</tt><a class="headerlink" href="#mailbox.Mailbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックス。中を見られたり変更されたりします。</p>
+<p><a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> 自体はインタフェースを定義し形式ごとのサブクラスに継承されるように意図されたもので、インスタンス化されることは想定されていません。インスタンス化したいならばサブクラスを代わりに使うべきです。</p>
+<p><a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のインタフェースは辞書風で、小さなキーがメッセージに対応します。キーは対象となる <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a>
+インスタンスが発行するもので、そのインスタンスに対してのみ意味を持ちます。一つのキーは一つのメッセージにひも付けられ、その対応はメッセージが他のメッセージで置き換えられるような更新をされたあとも続きます。</p>
+<p>メッセージを <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスに追加するには集合風のメソッド
+<a class="reference internal" href="#mailbox.Mailbox.add" title="mailbox.Mailbox.add"><tt class="xref py py-meth docutils literal"><span class="pre">add()</span></tt></a> を使います。また削除は <tt class="docutils literal"><span class="pre">del</span></tt> 文または集合風の <a class="reference internal" href="#mailbox.Mailbox.remove" title="mailbox.Mailbox.remove"><tt class="xref py py-meth docutils literal"><span class="pre">remove()</span></tt></a> や <a class="reference internal" href="#mailbox.Mailbox.discard" title="mailbox.Mailbox.discard"><tt class="xref py py-meth docutils literal"><span class="pre">discard()</span></tt></a>
+を使って行ないます。</p>
+<p><a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インタフェースのセマンティクスと辞書のそれとは注意すべき違いがあります。メッセージは、要求されるたびに新しい表現(典型的には
+<a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンス)が現在のメールボックスの状態に基づいて生成されます。同様に、メッセージが <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a>
+インスタンスに追加される時も、渡されたメッセージ表現の内容がコピーされます。どちらの場合も <tt class="xref py py-class docutils literal"><span class="pre">Makebox</span></tt> インスタンスにメッセージ表現への参照は保たれません。</p>
+<p>デフォルトの <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> イテレータはメッセージ表現ごとに繰り返すもので、辞書のイテレータのようにキーごとの繰り返しではありません。さらに、繰り返し中のメールボックスを変更することは安全であり整合的に定義されています。イテレータが作られた後にメールボックスに追加されたメッセージはそのイテレータからは見えません。そのイテレータが yield するまえにメールボックスから削除されたメッセージは黙ってスキップされますが、イテレータからのキーを使ったときにはそのキーに対応するメッセージが削除されているならば <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を受け取ることになります。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">十分な注意を、何か他のプロセスによっても同時に変更される可能性のあるメールボックスを更新する時は、払わなければなりません。そのようなタスクをこなすのに最も安全なメールボックス形式は Maildir で、
+mbox のような単一ファイルの形式を並行した書き込みに利用するのは避けるように努力しましょう。メールボックスを更新する場面では、 <em>必ず</em> <a class="reference internal" href="#mailbox.Mailbox.lock" title="mailbox.Mailbox.lock"><tt class="xref py py-meth docutils literal"><span class="pre">lock()</span></tt></a> と <a class="reference internal" href="#mailbox.Mailbox.unlock" title="mailbox.Mailbox.unlock"><tt class="xref py py-meth docutils literal"><span class="pre">unlock()</span></tt></a>
+メソッドを、ファイル内のメッセージを読んだり書き込んだり削除したりといった操作をする
+<em>前</em> に、呼び出してロックします。メールボックスをロックし損なうと、メッセージを失ったりメールボックス全体をぐちゃぐちゃにしたりする羽目に陥ります。</p>
+</div>
+<p><a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスには次のメソッドがあります。</p>
+<dl class="method">
+<dt id="mailbox.Mailbox.add">
+<tt class="descname">add</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.add" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスに <em>message</em> を追加し、それに割り当てられたキーを返します。</p>
+<p>引数 <em>message</em> は <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンス、
+<tt class="xref py py-class docutils literal"><span class="pre">email.Message.Message</span></tt> インスタンス、文字列、ファイル風オブジェクト
+(テキストモードで開かれていなければなりませんが)を使えます。
+<em>message</em> が適切な形式に特化した <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> サブクラスのインスタンス
+(例えばメールボックスが <a class="reference internal" href="#mailbox.mbox" title="mailbox.mbox"><tt class="xref py py-class docutils literal"><span class="pre">mbox</span></tt></a> インスタンスのときの
+<a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> インスタンス)であれば、形式ごとの情報が利用されます。そうでなければ、形式ごとに必要な情報は適当なデフォルトが使われます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.remove">
+<tt class="descname">remove</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.remove" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.__delitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.discard">
+<tt class="descname">discard</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.discard" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスから <em>key</em> に対応するメッセージを削除します。</p>
+<p>対応するメッセージが無い場合、メソッドが <a class="reference internal" href="#mailbox.Mailbox.remove" title="mailbox.Mailbox.remove"><tt class="xref py py-meth docutils literal"><span class="pre">remove()</span></tt></a> または
+<a class="reference internal" href="#mailbox.Mailbox.__delitem__" title="mailbox.Mailbox.__delitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__delitem__()</span></tt></a> として呼び出されている時は
+<a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外が送出されます。しかし、 <a class="reference internal" href="#mailbox.Mailbox.discard" title="mailbox.Mailbox.discard"><tt class="xref py py-meth docutils literal"><span class="pre">discard()</span></tt></a> として呼び出されている場合は例外は発生しません。基づいているメールボックス形式が別のプロセスからの平行した変更をサポートしているならば、この <a class="reference internal" href="#mailbox.Mailbox.discard" title="mailbox.Mailbox.discard"><tt class="xref py py-meth docutils literal"><span class="pre">discard()</span></tt></a> の振る舞いの方が好まれるかもしれません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>message</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.__setitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>key</em> に対応するメッセージを <em>message</em> で置き換えます。
+<em>key</em> に対応しているメッセージが既に無くなっている場合
+<a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外が送出されます。</p>
+<p><a class="reference internal" href="#mailbox.Mailbox.add" title="mailbox.Mailbox.add"><tt class="xref py py-meth docutils literal"><span class="pre">add()</span></tt></a> と同様に、引数の <em>message</em> には <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンス、
+<tt class="xref py py-class docutils literal"><span class="pre">email.Message.Message</span></tt> インスタンス、文字列、ファイル風オブジェクト
+(テキストモードで開かれていなければなりませんが)を使えます。
+<em>message</em> が適切な形式に特化した <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> サブクラスのインスタンス
+(例えばメールボックスが <a class="reference internal" href="#mailbox.mbox" title="mailbox.mbox"><tt class="xref py py-class docutils literal"><span class="pre">mbox</span></tt></a> インスタンスのときの <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a>
+インスタンス)であれば、形式ごとの情報が利用されます。そうでなければ、現在 <em>key</em> に対応するメッセージの形式ごとの情報が変更されずに残ります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.iterkeys">
+<tt class="descname">iterkeys</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.iterkeys" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.keys" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#mailbox.Mailbox.iterkeys" title="mailbox.Mailbox.iterkeys"><tt class="xref py py-meth docutils literal"><span class="pre">iterkeys()</span></tt></a> として呼び出されると全てのキーについてのイテレータを返しますが、
+<a class="reference internal" href="#mailbox.Mailbox.keys" title="mailbox.Mailbox.keys"><tt class="xref py py-meth docutils literal"><span class="pre">keys()</span></tt></a> として呼び出されるとキーのリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.itervalues">
+<tt class="descname">itervalues</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.itervalues" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.__iter__">
+<tt class="descname">__iter__</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.__iter__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.values" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#mailbox.Mailbox.itervalues" title="mailbox.Mailbox.itervalues"><tt class="xref py py-meth docutils literal"><span class="pre">itervalues()</span></tt></a> または <a class="reference internal" href="#mailbox.Mailbox.__iter__" title="mailbox.Mailbox.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a>
+として呼び出されると全てのメッセージの表現についてのイテレータを返しますが、
+<a class="reference internal" href="#mailbox.Mailbox.values" title="mailbox.Mailbox.values"><tt class="xref py py-meth docutils literal"><span class="pre">values()</span></tt></a> として呼び出されるとその表現のリストを返します。メッセージは適切な形式ごとの <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>
+サブクラスのインスタンスとして表現されるのが普通ですが、
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスが初期化されるときに指定すればお好みのメッセージファクトリを使うこともできます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#mailbox.Mailbox.__iter__" title="mailbox.Mailbox.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a> は辞書のそれのようにキーについてのイテレータではありません。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.iteritems">
+<tt class="descname">iteritems</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.iteritems" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.items" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>(<em>key</em>, <em>message</em>) ペア、ただし <em>key</em> はキーで <em>message</em> はメッセージ表現、のイテレータ(<a class="reference internal" href="#mailbox.Mailbox.iteritems" title="mailbox.Mailbox.iteritems"><tt class="xref py py-meth docutils literal"><span class="pre">iteritems()</span></tt></a> として呼び出された場合)、またはリスト(<a class="reference internal" href="#mailbox.Mailbox.items" title="mailbox.Mailbox.items"><tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt></a> として呼び出された場合)を返します。メッセージは適切な形式ごとの <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>
+サブクラスのインスタンスとして表現されるのが普通ですが、
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスが初期化されるときに指定すればお好みのメッセージファクトリを使うこともできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.get">
+<tt class="descname">get</tt><big>(</big><em>key</em><span class="optional">[</span>, <em>default=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.Mailbox.get" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.__getitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>key</em> に対応するメッセージの表現を返します。対応するメッセージが存在しない場合、 <a class="reference internal" href="#mailbox.Mailbox.get" title="mailbox.Mailbox.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> として呼び出されたなら
+<em>default</em> を返しますが、 <a class="reference internal" href="#mailbox.Mailbox.__getitem__" title="mailbox.Mailbox.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> として呼び出されたなら
+<a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外が送出されます。メッセージは適切な形式ごとの <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>
+サブクラスのインスタンスとして表現されるのが普通ですが、
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスが初期化されるときに指定すればお好みのメッセージファクトリを使うこともできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.get_message">
+<tt class="descname">get_message</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.get_message" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>key</em> に対応するメッセージの表現を形式ごとの <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>
+サブクラスのインスタンスとして返します。もし対応するメッセージが存在しなければ <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.get_string">
+<tt class="descname">get_string</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.get_string" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>key</em> に対応するメッセージの表現を文字列として返します。もし対応するメッセージが存在しなければ <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.get_file">
+<tt class="descname">get_file</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.get_file" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>key</em> に対応するメッセージの表現をファイル風表現として返します。もし対応するメッセージが存在しなければ <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外が送出されます。ファイル風オブジェクトはバイナリモードで開かれているように振る舞います。このファイルは必要がなくなったら閉じなければなりません。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">他の表現方法とは違い、ファイル風オブジェクトはそれを作り出した
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスやそれが基づいているメールボックスと独立である必要がありません。より詳細な説明は各サブクラスごとにあります。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.has_key" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Mailbox.__contains__">
+<tt class="descname">__contains__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.__contains__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>key</em> がメッセージに対応していれば <tt class="docutils literal"><span class="pre">True</span></tt> を、そうでなければ <tt class="docutils literal"><span class="pre">False</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.__len__">
+<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.__len__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックス中のメッセージ数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.clear" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスから全てのメッセージを削除します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.pop">
+<tt class="descname">pop</tt><big>(</big><em>key</em><span class="optional">[</span>, <em>default</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.Mailbox.pop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>key</em> に対応するメッセージの表現を返します。もし対応するメッセージが存在しなければ <em>default</em>
+が供給されていればその値を返し、そうでなければ
+<a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外を送出します。メッセージは適切な形式ごとの <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>
+サブクラスのインスタンスとして表現されるのが普通ですが、
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスが初期化されるときに指定すればお好みのメッセージファクトリを使うこともできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.popitem">
+<tt class="descname">popitem</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.popitem" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>任意に選んだ (<em>key</em>, <em>message</em>) ペアを返します。ただしここで <em>key</em> はキーで <em>message</em> はメッセージ表現です。もしメールボックスが空ならば、 <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外を送出します。メッセージは適切な形式ごとの <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>
+サブクラスのインスタンスとして表現されるのが普通ですが、
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスが初期化されるときに指定すればお好みのメッセージファクトリを使うこともできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.update">
+<tt class="descname">update</tt><big>(</big><em>arg</em><big>)</big><a class="headerlink" href="#mailbox.Mailbox.update" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数 <em>arg</em> は <em>key</em> から <em>message</em> へのマッピングまたは (<em>key</em>, <em>message</em>)
+ペアのイテレート可能オブジェクトでなければなりません。メールボックスは、各 <em>key</em> と <em>message</em> のペアについて
+<a class="reference internal" href="#mailbox.Mailbox.__setitem__" title="mailbox.Mailbox.__setitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__setitem__()</span></tt></a> を使ったかのように <em>key</em> に対応するメッセージが
+<em>message</em> になるように更新されます。
+<a class="reference internal" href="#mailbox.Mailbox.__setitem__" title="mailbox.Mailbox.__setitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__setitem__()</span></tt></a> と同様に、
+<em>key</em> は既存のメールボックス中のメッセージに対応しているものでなければならず、そうでなければ <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> が送出されます。ですから、一般的には <em>arg</em> に <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスを渡すのは間違いです。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">辞書と違い、キーワード引数はサポートされていません。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.flush">
+<tt class="descname">flush</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.flush" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>保留されている変更をファイルシステムに書き込みます。
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のサブクラスによっては変更はいつも直ちにファイルに書き込まれ
+<a class="reference internal" href="#mailbox.Mailbox.flush" title="mailbox.Mailbox.flush"><tt class="xref py py-meth docutils literal"><span class="pre">flush()</span></tt></a> は何もしないということもありますが、それでもこのメソッドを呼ぶように習慣付けておきましょう。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.lock">
+<tt class="descname">lock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.lock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスの排他的アドバイザリロックを取得し、他のプロセスが変更しないようにします。ロックが取得できない場合 <a class="reference internal" href="#mailbox.ExternalClashError" title="mailbox.ExternalClashError"><tt class="xref py py-exc docutils literal"><span class="pre">ExternalClashError</span></tt></a> が送出されます。ロック機構はメールボックス形式によって変わります。メールボックスの内容に変更を加えるときは <em>いつも</em> ロックを掛けるべきです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.unlock">
+<tt class="descname">unlock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.unlock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスのロックを、もしあれば、解放します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Mailbox.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Mailbox.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスをフラッシュし、必要ならばアンロックし、開いているファイルを閉じます。
+<a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> サブクラスによっては何もしないこともあります。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="maildir">
+<span id="mailbox-maildir"></span><h3>18.4.1.1. <a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a><a class="headerlink" href="#maildir" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.Maildir">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">Maildir</tt><big>(</big><em>dirname</em><span class="optional">[</span>, <em>factory=rfc822.Message</em><span class="optional">[</span>, <em>create=True</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.Maildir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Maildir 形式のメールボックスのための <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のサブクラス。パラメータ <em>factory</em> は呼び出し可能オブジェクトで
+(バイナリモードで開かれているかのように振る舞う)ファイル風メッセージ表現を受け付けて好みの表現を返すものです。 <em>factory</em> が
+<tt class="docutils literal"><span class="pre">None</span></tt> ならば、 <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> がデフォルトのメッセージ表現として使われます。 <em>create</em> が <tt class="docutils literal"><span class="pre">True</span></tt>
+ならばメールボックスが存在しないときには作成します。</p>
+<p><em>factory</em> のデフォルトが <a class="reference internal" href="rfc822.html#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">rfc822.Message</span></tt></a> であったり、 <em>path</em> ではなく <em>dirname</em>
+という名前であったりというのは歴史的理由によるものです。 <a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> インスタンスが他の <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a>
+サブクラスと同じように振る舞わせるためには、 <em>factory</em> に <tt class="docutils literal"><span class="pre">None</span></tt> をセットしてください。</p>
+<p>Maildir はディレクトリ型のメールボックス形式でメール転送エージェント qmail
+用に発明され、現在では多くの他のプログラムでもサポートされているものです。
+Maildir メールボックス中のメッセージは共通のディレクトリ構造の下で個別のファイルに保存されます。このデザインにより、Maildir メールボックスは複数の無関係のプログラムからデータを失うことなくアクセスしたり変更したりできます。そのためロックは不要です。</p>
+<p>Maildir メールボックスには三つのサブディレクトリ
+<tt class="file docutils literal"><span class="pre">tmp</span></tt>, <tt class="file docutils literal"><span class="pre">new</span></tt>, <tt class="file docutils literal"><span class="pre">cur</span></tt> があります。メッセージはまず <tt class="file docutils literal"><span class="pre">tmp</span></tt> サブディレクトリに瞬間的に作られた後、
+<tt class="file docutils literal"><span class="pre">new</span></tt> サブディレクトリに移動されて配送を完了します。メールユーザエージェントが引き続いて <tt class="file docutils literal"><span class="pre">cur</span></tt> サブディレクトリにメッセージを移動しメッセージの状態についての情報をファイル名に追加される特別な
+&#8220;info&#8221; セクションに保存することができます。</p>
+<p>Courier メール転送エージェントによって導入されたスタイルのフォルダもサポートされます。主たるメールボックスのサブディレクトリは <tt class="docutils literal"><span class="pre">'.'</span></tt>
+がファイル名の先頭であればフォルダと見なされます。フォルダ名は <a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> によって先頭の <tt class="docutils literal"><span class="pre">'.'</span></tt>
+を除いて表現されます。各フォルダはまた Maildir メールボックスですがさらにフォルダを含むことはできません。その代わり、論理的包含関係は例えば
+&#8220;Archived.2005.07&#8221; のような <tt class="docutils literal"><span class="pre">'.'</span></tt> を使ったレベル分けで表わされます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p>本来の Maildir 仕様ではある種のメッセージのファイル名にコロン (<tt class="docutils literal"><span class="pre">':'</span></tt>)
+を使う必要があります。しかしながら、オペレーティングシステムによってはこの文字をファイル名に含めることができないことがあります。そういった環境で Maildir のような形式を使いたい場合、代わりに使われる文字を指定する必要があります。感嘆符 (<tt class="docutils literal"><span class="pre">'!'</span></tt>) を使うのが一般的な選択です。以下の例を見てください。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">mailbox</span>
+<span class="n">mailbox</span><span class="o">.</span><span class="n">Maildir</span><span class="o">.</span><span class="n">colon</span> <span class="o">=</span> <span class="s">&#39;!&#39;</span>
+</pre></div>
+</div>
+<p class="last"><tt class="xref py py-attr docutils literal"><span class="pre">colon</span></tt> 属性はインスタンスごとにセットしても構いません。</p>
+</div>
+<p><a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> インスタンスには <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> の全てのメソッドに加え以下のメソッドもあります。</p>
+<dl class="method">
+<dt id="mailbox.Maildir.list_folders">
+<tt class="descname">list_folders</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Maildir.list_folders" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全てのフォルダ名のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.get_folder">
+<tt class="descname">get_folder</tt><big>(</big><em>folder</em><big>)</big><a class="headerlink" href="#mailbox.Maildir.get_folder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前が <em>folder</em> であるフォルダを表わす <a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> インスタンスを返します。そのようなフォルダが存在しなければ
+<a class="reference internal" href="#mailbox.NoSuchMailboxError" title="mailbox.NoSuchMailboxError"><tt class="xref py py-exc docutils literal"><span class="pre">NoSuchMailboxError</span></tt></a> 例外が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.add_folder">
+<tt class="descname">add_folder</tt><big>(</big><em>folder</em><big>)</big><a class="headerlink" href="#mailbox.Maildir.add_folder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前が <em>folder</em> であるフォルダを作り、それを表わす <a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a>
+インスタンスを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.remove_folder">
+<tt class="descname">remove_folder</tt><big>(</big><em>folder</em><big>)</big><a class="headerlink" href="#mailbox.Maildir.remove_folder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前が <em>folder</em> であるフォルダを削除します。もしフォルダに一つでもメッセージが含まれていれば <a class="reference internal" href="#mailbox.NotEmptyError" title="mailbox.NotEmptyError"><tt class="xref py py-exc docutils literal"><span class="pre">NotEmptyError</span></tt></a>
+例外が送出されフォルダは削除されません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.clean">
+<tt class="descname">clean</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Maildir.clean" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>過去36時間以内にアクセスされなかったメールボックス内の一時ファイルを削除します。
+Maildir 仕様はメールを読むプログラムはときどきこの作業をすべきだとしています。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> で実装された <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のいくつかのメソッドには特別な注意が必要です。</p>
+<dl class="method">
+<dt id="mailbox.Maildir.add">
+<tt class="descname">add</tt><big>(</big><em>message</em><big>)</big><a class="headerlink" href="#mailbox.Maildir.add" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Maildir.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>message</em><big>)</big><a class="headerlink" href="#mailbox.Maildir.__setitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Maildir.update">
+<tt class="descname">update</tt><big>(</big><em>arg</em><big>)</big><a class="headerlink" href="#mailbox.Maildir.update" title="この定義へのパーマリンク">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">これらのメソッドは一意的なファイル名をプロセスIDに基づいて生成します。複数のスレッドを使う場合は、同じメールボックスを同時に操作しないようにスレッド間で調整しておかないと検知されない名前の衝突が起こりメールボックスを壊すかもしれません。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.flush">
+<tt class="descname">flush</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Maildir.flush" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Maildir メールボックスへの変更は即時に適用されるので、このメソッドは何もしません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.lock">
+<tt class="descname">lock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Maildir.lock" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Maildir.unlock">
+<tt class="descname">unlock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Maildir.unlock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Maildir メールボックスはロックをサポート(または要求)しないので、このメソッドは何もしません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Maildir.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> インスタンスは開いたファイルを保持しませんしメールボックスはロックをサポートしませんので、このメソッドは何もしません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Maildir.get_file">
+<tt class="descname">get_file</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Maildir.get_file" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ホストのプラットフォームによっては、返されたファイルが開いている間、元になったメッセージを変更したり削除したりできない場合があります。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.qmail.org/man/man5/maildir.html">qmail の maildir man  ページ</a></dt>
+<dd>Maildir 形式のオリジナルの仕様</dd>
+<dt><a class="reference external" href="http://cr.yp.to/proto/maildir.html">Using maildir format</a></dt>
+<dd>Maildir 形式の発明者による注意書き。更新された名前生成規則と &#8220;info&#8221; の解釈についても含まれます。</dd>
+<dt><a class="reference external" href="http://www.courier-mta.org/maildir.html">Courier の maildir man ページ</a></dt>
+<dd>Maildir 形式のもう一つの仕様。フォルダをサポートする一般的な拡張について記述されています。</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="mbox">
+<span id="mailbox-mbox"></span><h3>18.4.1.2. <a class="reference internal" href="#mailbox.mbox" title="mailbox.mbox"><tt class="xref py py-class docutils literal"><span class="pre">mbox</span></tt></a><a class="headerlink" href="#mbox" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.mbox">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">mbox</tt><big>(</big><em>path</em><span class="optional">[</span>, <em>factory=None</em><span class="optional">[</span>, <em>create=True</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.mbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>mbox 形式のメールボックスのための <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のサブクラス。パラメータ <em>factory</em> は呼び出し可能オブジェクトで
+(バイナリモードで開かれているかのように振る舞う)ファイル風メッセージ表現を受け付けて好みの表現を返すものです。 <em>factory</em> が
+<tt class="docutils literal"><span class="pre">None</span></tt> ならば、 <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> がデフォルトのメッセージ表現として使われます。 <em>create</em> が <tt class="docutils literal"><span class="pre">True</span></tt>
+ならばメールボックスが存在しないときには作成します。</p>
+<p>mbox 形式は Unixシステム上でメールを保存する古くからある形式です。
+mbox メールボックスでは全てのメッセージが一つのファイルに保存されておりそれぞれのメッセージは &#8220;From &#8221; という5文字で始まる行を先頭に付けられています。</p>
+<p>mbox 形式には幾つかのバリエーションがあり、それぞれオリジナルの形式にあった欠点を克服すると主張しています。互換性のために、 <a class="reference internal" href="#mailbox.mbox" title="mailbox.mbox"><tt class="xref py py-class docutils literal"><span class="pre">mbox</span></tt></a>
+はオリジナルの(時に <em class="dfn">mboxo</em> と呼ばれる) 形式を実装しています。すなわち、 <em class="mailheader">Content-Length</em>
+ヘッダはもしあっても無視され、メッセージのボディにある行頭の
+&#8220;From &#8221; はメッセージを保存する際に &#8220;&gt;From &#8221; に変換されますが、この
+&#8220;&gt;From &#8221; は読み出し時にも &#8220;From &#8221; に変換されません。</p>
+<p><a class="reference internal" href="#mailbox.mbox" title="mailbox.mbox"><tt class="xref py py-class docutils literal"><span class="pre">mbox</span></tt></a> で実装された <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のいくつかのメソッドには特別な注意が必要です。</p>
+<dl class="method">
+<dt id="mailbox.mbox.get_file">
+<tt class="descname">get_file</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.mbox.get_file" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#mailbox.mbox" title="mailbox.mbox"><tt class="xref py py-class docutils literal"><span class="pre">mbox</span></tt></a> インスタンスに対し <tt class="xref py py-meth docutils literal"><span class="pre">flush()</span></tt> や <tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt> を呼び出した後でファイルを使用すると予期しない結果を引き起こしたり例外が送出されたりすることがあります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.mbox.lock">
+<tt class="descname">lock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.mbox.lock" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.mbox.unlock">
+<tt class="descname">unlock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.mbox.unlock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>3種類のロック機構が使われます &#8212; ドットロッキングと、もし使用可能ならば
+<tt class="xref c c-func docutils literal"><span class="pre">flock()</span></tt> と <tt class="xref c c-func docutils literal"><span class="pre">lockf()</span></tt> システムコールです。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.qmail.org/man/man5/mbox.html">qmail の mbox man ページ</a></dt>
+<dd>mbox 形式の仕様および種々のバリエーション</dd>
+<dt><a class="reference external" href="http://www.tin.org/bin/man.cgi?section=5&amp;topic=mbox">tin の mbox man ページ</a></dt>
+<dd>もう一つの mbox 形式の仕様でロックについての詳細を含む</dd>
+<dt><a class="reference external" href="http://www.jwz.org/doc/content-length.html">Configuring Netscape Mail on Unix: Why The Content-Length Format is Bad</a></dt>
+<dd>バリエーションの一つではなくオリジナルの mbox を使う理由</dd>
+<dt><a class="reference external" href="http://homepages.tesco.net./~J.deBoynePollard/FGA/mail-mbox-formats.html">&#8220;mbox&#8221; is a family of several mutually incompatible mailbox formats</a></dt>
+<dd>mbox バリエーションの歴史</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="mh">
+<span id="mailbox-mh"></span><h3>18.4.1.3. <a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a><a class="headerlink" href="#mh" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.MH">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">MH</tt><big>(</big><em>path</em><span class="optional">[</span>, <em>factory=None</em><span class="optional">[</span>, <em>create=True</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.MH" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>MH 形式のメールボックスのための <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のサブクラス。パラメータ <em>factory</em> は呼び出し可能オブジェクトで
+(バイナリモードで開かれているかのように振る舞う)ファイル風メッセージ表現を受け付けて好みの表現を返すものです。 <em>factory</em> が
+<tt class="docutils literal"><span class="pre">None</span></tt> ならば、 <a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> がデフォルトのメッセージ表現として使われます。 <em>create</em> が <tt class="docutils literal"><span class="pre">True</span></tt>
+ならばメールボックスが存在しないときには作成します。</p>
+<p>MH はディレクトリに基づいたメールボックス形式で MH Message Handling System
+というメールユーザエージェントのために発明されました。
+MH メールボックス中のそれぞれのメッセージは一つのファイルとして収められています。
+MH メールボックスにはメッセージの他に別の MH メールボックス
+(<em class="dfn">フォルダ</em> と呼ばれます)を含んでもかまいません。フォルダは無限にネストできます。
+MH メールボックスにはもう一つ <em class="dfn">シーケンス</em> という名前付きのリストでメッセージをサブフォルダに移動することなく論理的に分類するものがサポートされています。シーケンスは各フォルダの <tt class="file docutils literal"><span class="pre">.mh_sequences</span></tt> というファイルで定義されます。</p>
+<p><a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a> クラスは MH メールボックスを操作しますが、
+<strong class="program">mh</strong> の動作の全てを模倣しようとはしていません。特に、 <strong class="program">mh</strong> が状態と設定を保存する <tt class="file docutils literal"><span class="pre">context</span></tt> や
+<tt class="file docutils literal"><span class="pre">.mh_profile</span></tt> といったファイルは書き換えませんし影響も受けません。</p>
+<p><a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a> インスタンスには <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> の全てのメソッドの他に次のメソッドがあります。</p>
+<dl class="method">
+<dt id="mailbox.MH.list_folders">
+<tt class="descname">list_folders</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MH.list_folders" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全てのフォルダの名前のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.get_folder">
+<tt class="descname">get_folder</tt><big>(</big><em>folder</em><big>)</big><a class="headerlink" href="#mailbox.MH.get_folder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>folder</em> という名前のフォルダを表わす <a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a> インスタンスを返します。もしフォルダが存在しなければ
+<a class="reference internal" href="#mailbox.NoSuchMailboxError" title="mailbox.NoSuchMailboxError"><tt class="xref py py-exc docutils literal"><span class="pre">NoSuchMailboxError</span></tt></a> 例外が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.add_folder">
+<tt class="descname">add_folder</tt><big>(</big><em>folder</em><big>)</big><a class="headerlink" href="#mailbox.MH.add_folder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>folder</em> という名前のフォルダを作成し、それを表わす <a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a>
+インスタンスを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.remove_folder">
+<tt class="descname">remove_folder</tt><big>(</big><em>folder</em><big>)</big><a class="headerlink" href="#mailbox.MH.remove_folder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>folder</em> という名前のフォルダを削除します。フォルダにメッセージが一つでも残っていれば、 <a class="reference internal" href="#mailbox.NotEmptyError" title="mailbox.NotEmptyError"><tt class="xref py py-exc docutils literal"><span class="pre">NotEmptyError</span></tt></a>
+例外が送出されフォルダは削除されません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.get_sequences">
+<tt class="descname">get_sequences</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MH.get_sequences" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シーケンス名をキーのリストに対応付ける辞書を返します。シーケンスが一つもなければ空の辞書を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.set_sequences">
+<tt class="descname">set_sequences</tt><big>(</big><em>sequences</em><big>)</big><a class="headerlink" href="#mailbox.MH.set_sequences" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックス中のシーケンスを <a class="reference internal" href="#mailbox.MH.get_sequences" title="mailbox.MH.get_sequences"><tt class="xref py py-meth docutils literal"><span class="pre">get_sequences()</span></tt></a>
+で返されるような名前とキーのリストを対応付ける辞書 <em>sequences</em>
+に基づいて再定義します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.pack">
+<tt class="descname">pack</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MH.pack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>番号付けの間隔を詰める必要に応じてメールボックス中のメッセージの名前を付け替えます。シーケンスのリストのエントリもそれに応じて更新されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">既に発行されたキーはこの操作によって無効になるのでそれ以降使ってはなりません。</p>
+</div>
+</dd></dl>
+
+<p><a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a> で実装された <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のいくつかのメソッドには特別な注意が必要です。</p>
+<dl class="method">
+<dt id="mailbox.MH.remove">
+<tt class="descname">remove</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.MH.remove" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.MH.__delitem__">
+<tt class="descname">__delitem__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.MH.__delitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.MH.discard">
+<tt class="descname">discard</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.MH.discard" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これらのメソッドはメッセージを直ちに削除します。名前の前にコンマを付加してメッセージに削除の印を付けるという MH の規約は使いません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.lock">
+<tt class="descname">lock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MH.lock" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.MH.unlock">
+<tt class="descname">unlock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MH.unlock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>3種類のロック機構が使われます &#8212; ドットロッキングと、もし使用可能ならば
+<tt class="xref c c-func docutils literal"><span class="pre">flock()</span></tt> と <tt class="xref c c-func docutils literal"><span class="pre">lockf()</span></tt> システムコールです。
+MH メールボックスに対するロックとは <tt class="file docutils literal"><span class="pre">.mh_sequences</span></tt> のロックと、それが影響を与える操作中だけの個々のメッセージファイルに対するロックを意味します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.get_file">
+<tt class="descname">get_file</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.MH.get_file" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ホストのプラットフォームによっては、返されたファイルが開いている間、元になったメッセージを変更したり削除したりできない場合があります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.flush">
+<tt class="descname">flush</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MH.flush" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>MH メールボックスへの変更は即時に適用されますのでこのメソッドは何もしません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MH.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MH.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a> インスタンスは開いたファイルを保持しませんのでこのメソッドは <a class="reference internal" href="#mailbox.MH.unlock" title="mailbox.MH.unlock"><tt class="xref py py-meth docutils literal"><span class="pre">unlock()</span></tt></a> と同じです。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.nongnu.org/nmh/">nmh - Message Handling System</a></dt>
+<dd><strong class="program">mh</strong> の改良版である <strong class="program">nmh</strong> のホームページ</dd>
+<dt><a class="reference external" href="http://rand-mh.sourceforge.net/book/">MH &amp; nmh:  Email for Users &amp; Programmers</a></dt>
+<dd>GPLライセンスの <strong class="program">mh</strong> および <strong class="program">nmh</strong> の本で、このメールボックス形式についての情報があります</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="babyl">
+<span id="mailbox-babyl"></span><h3>18.4.1.4. <a class="reference internal" href="#mailbox.Babyl" title="mailbox.Babyl"><tt class="xref py py-class docutils literal"><span class="pre">Babyl</span></tt></a><a class="headerlink" href="#babyl" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.Babyl">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">Babyl</tt><big>(</big><em>path</em><span class="optional">[</span>, <em>factory=None</em><span class="optional">[</span>, <em>create=True</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.Babyl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Babyl 形式のメールボックスのための <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のサブクラス。パラメータ <em>factory</em> は呼び出し可能オブジェクトで
+(バイナリモードで開かれているかのように振る舞う)ファイル風メッセージ表現を受け付けて好みの表現を返すものです。 <em>factory</em> が
+<tt class="docutils literal"><span class="pre">None</span></tt> ならば、 <a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> がデフォルトのメッセージ表現として使われます。 <em>create</em> が <tt class="docutils literal"><span class="pre">True</span></tt>
+ならばメールボックスが存在しないときには作成します。</p>
+<p>Babyl は単一ファイルのメールボックス形式で Emacs に付属している
+Rmail メールユーザエージェントで使われているものです。メッセージの開始は Control-Underscore (<tt class="docutils literal"><span class="pre">'\\037'</span></tt>) および
+Control-L (<tt class="docutils literal"><span class="pre">'\\014'</span></tt>) の二文字を含む行で示されます。メッセージの終了は次のメッセージの開始または最後のメッセージの場合には
+Control-Underscore を含む行で示されます。</p>
+<p>Babyl メールボックス中のメッセージには二つのヘッダのセット、オリジナルヘッダといわゆる可視ヘッダ、があります。可視ヘッダは典型的にはオリジナルヘッダの一部を分り易いように再整形したり短くしたりしたものです。
+Babyl メールボックス中のそれぞれのメッセージには <em class="dfn">ラベル</em>
+というそのメッセージについての追加情報を記録する短い文字列のリストを伴い、メールボックス中に見出されるユーザが定義した全てのラベルのリストは Babyl
+オプションセクションに保持されます。</p>
+<p><a class="reference internal" href="#mailbox.Babyl" title="mailbox.Babyl"><tt class="xref py py-class docutils literal"><span class="pre">Babyl</span></tt></a> インスタンスには <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> の全てのメソッドの他に次のメソッドがあります。</p>
+<dl class="method">
+<dt id="mailbox.Babyl.get_labels">
+<tt class="descname">get_labels</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Babyl.get_labels" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスで使われているユーザが定義した全てのラベルのリストを返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">メールボックスにどのようなラベルが存在するかを決めるのに、
+Babyl オプションセクションのリストを参考にせず、実際のメッセージを捜索しますが、
+Babyl セクションもメールボックスが変更されたときにはいつでも更新されます。</p>
+</div>
+</dd></dl>
+
+<p><a class="reference internal" href="#mailbox.Babyl" title="mailbox.Babyl"><tt class="xref py py-class docutils literal"><span class="pre">Babyl</span></tt></a> で実装された <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のいくつかのメソッドには特別な注意が必要です。</p>
+<dl class="method">
+<dt id="mailbox.Babyl.get_file">
+<tt class="descname">get_file</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.Babyl.get_file" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Babyl メールボックスにおいて、メッセージのヘッダはボディと繋がって格納されていません。ファイル風の表現を生成するために、ヘッダとボディが
+(<a class="reference internal" href="stringio.html#module-StringIO" title="StringIO: ファイルのように文字列を読み書きする。"><tt class="xref py py-mod docutils literal"><span class="pre">StringIO</span></tt></a> モジュールの) ファイルと同じ API を持つ
+<a class="reference internal" href="stringio.html#module-StringIO" title="StringIO: ファイルのように文字列を読み書きする。"><tt class="xref py py-class docutils literal"><span class="pre">StringIO</span></tt></a> インスタンスに一緒にコピーされます。その結果、ファイル風オブジェクトは本当に元にしているメールボックスとは独立していますが、文字列表現と比べてメモリーを節約することにもなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.Babyl.lock">
+<tt class="descname">lock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Babyl.lock" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.Babyl.unlock">
+<tt class="descname">unlock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.Babyl.unlock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>3種類のロック機構が使われます &#8212; ドットロッキングと、もし使用可能ならば
+<tt class="xref c c-func docutils literal"><span class="pre">flock()</span></tt> と <tt class="xref c c-func docutils literal"><span class="pre">lockf()</span></tt> システムコールです。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://quimby.gnus.org/notes/BABYL">Format of Version 5 Babyl Files</a></dt>
+<dd>Babyl 形式の仕様</dd>
+<dt><a class="reference external" href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html">Reading Mail with Rmail</a></dt>
+<dd>Rmail のマニュアルで Babyl のセマンティクスについての情報も少しある</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="mmdf">
+<span id="mailbox-mmdf"></span><h3>18.4.1.5. <a class="reference internal" href="#mailbox.MMDF" title="mailbox.MMDF"><tt class="xref py py-class docutils literal"><span class="pre">MMDF</span></tt></a><a class="headerlink" href="#mmdf" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.MMDF">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">MMDF</tt><big>(</big><em>path</em><span class="optional">[</span>, <em>factory=None</em><span class="optional">[</span>, <em>create=True</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.MMDF" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>MMDF 形式のメールボックスのための <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のサブクラス。パラメータ <em>factory</em> は呼び出し可能オブジェクトで
+(バイナリモードで開かれているかのように振る舞う)ファイル風メッセージ表現を受け付けて好みの表現を返すものです。 <em>factory</em> が
+<tt class="docutils literal"><span class="pre">None</span></tt> ならば、 <a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> がデフォルトのメッセージ表現として使われます。 <em>create</em> が <tt class="docutils literal"><span class="pre">True</span></tt>
+ならばメールボックスが存在しないときには作成します。</p>
+<p>MMDF は単一ファイルのメールボックス形式で
+Multichannel Memorandum Distribution Facility
+というメール転送エージェント用に発明されたものです。各メッセージは mbox と同様の形式で収められますが、前後を4つの Control-A
+(<tt class="docutils literal"><span class="pre">'\\001'</span></tt>) を含む行で挟んであります。
+mbox 形式と同じようにそれぞれのメッセージの開始は &#8220;From &#8221; の5文字を含む行で示されますが、それ以外の場所での &#8220;From &#8221; は格納の際 &#8220;&gt;From &#8221; には変えられません。それは追加されたメッセージ区切りによって新たなメッセージの開始と見間違うことが避けられるからです。</p>
+<p><a class="reference internal" href="#mailbox.MMDF" title="mailbox.MMDF"><tt class="xref py py-class docutils literal"><span class="pre">MMDF</span></tt></a> で実装された <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> のいくつかのメソッドには特別な注意が必要です。</p>
+<dl class="method">
+<dt id="mailbox.MMDF.get_file">
+<tt class="descname">get_file</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#mailbox.MMDF.get_file" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#mailbox.MMDF" title="mailbox.MMDF"><tt class="xref py py-class docutils literal"><span class="pre">MMDF</span></tt></a> インスタンスに対し <tt class="xref py py-meth docutils literal"><span class="pre">flush()</span></tt> や <tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt> を呼び出した後でファイルを使用すると予期しない結果を引き起こしたり例外が送出されたりすることがあります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MMDF.lock">
+<tt class="descname">lock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MMDF.lock" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="mailbox.MMDF.unlock">
+<tt class="descname">unlock</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MMDF.unlock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>3種類のロック機構が使われます &#8212; ドットロッキングと、もし使用可能ならば
+<tt class="xref c c-func docutils literal"><span class="pre">flock()</span></tt> と <tt class="xref c c-func docutils literal"><span class="pre">lockf()</span></tt> システムコールです。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.tin.org/bin/man.cgi?section=5&amp;topic=mmdf">tin の  mmdf man page</a></dt>
+<dd>ニュースリーダ tin のドキュメント中の MMDF 形式仕様</dd>
+<dt><a class="reference external" href="http://en.wikipedia.org/wiki/MMDF">MMDF</a></dt>
+<dd>Multichannel Memorandum Distribution Facility についてのウィキペディアの記事</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="message-objects">
+<span id="mailbox-message-objects"></span><h2>18.4.2. <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> objects<a class="headerlink" href="#message-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="mailbox.Message">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">Message</tt><big>(</big><span class="optional">[</span><em>message</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.Message" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-mod docutils literal"><span class="pre">email.Message</span></tt> モジュールの <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> のサブクラス。 <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">mailbox.Message</span></tt></a>
+のサブクラスはメールボックス形式ごとの状態と動作を追加します。</p>
+<p><em>message</em> が省略された場合、新しいインスタンスはデフォルトの空の状態で生成されます。 <em>message</em> が
+<tt class="xref py py-class docutils literal"><span class="pre">email.Message.Message</span></tt> インスタンスならばその内容がコピーされます。さらに、 <em>message</em> が
+<a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスならば、形式固有の情報も可能な限り変換されます。 <em>message</em> が文字列またはファイルならば、読まれ解析されるべき <span class="target" id="index-0"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> 準拠のメッセージを含んでいなければなりません</p>
+<p>サブクラスにより提供される形式ごとの状態と動作は様々ですが、一般に或るメールボックスに固有のものでないプロパティだけがサポートされます(おそらくプロパティのセットはメールボックス形式ごとに固有でしょうが)。例えば、単一ファイルメールボックス形式におけるファイルオフセットやディレクトリ式メールボックス形式におけるファイル名は保持されません、というのもそれらは元々のメールボックスにしか適用できないからです。しかし、メッセージがユーザに読まれたかどうかあるいは重要だとマークされたかどうかという状態は保持されます、というのはそれらはメッセージ自体に適用されるからです。</p>
+<p><a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスを使って取得したメッセージを表現するのに
+<a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスが使われなければいけないとは要求していません。ある種の状況では <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> による表現を生成するのに必要な時間やメモリーが受け入れられないこともあります。そういった状況では <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a> インスタンスは文字列やファイル風オブジェクトの表現も提供できますし、 <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a>
+インスタンスを初期化する際にメッセージファクトリーを指定することもできます。</p>
+</dd></dl>
+
+<div class="section" id="maildirmessage">
+<span id="mailbox-maildirmessage"></span><h3>18.4.2.1. <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a><a class="headerlink" href="#maildirmessage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.MaildirMessage">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">MaildirMessage</tt><big>(</big><span class="optional">[</span><em>message</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Maildir 固有の動作をするメッセージ。引数 <em>message</em> は <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> のコンストラクタと同じ意味を持ちます。</p>
+<p>通常、メールユーザエージェントは <tt class="file docutils literal"><span class="pre">new</span></tt> サブディレクトリにある全てのメッセージをユーザが最初にメールボックスを開くか閉じるかした後で
+<tt class="file docutils literal"><span class="pre">cur</span></tt> サブディレクトリに移動し、メッセージが実際に読まれたかどうかを記録します。
+<tt class="file docutils literal"><span class="pre">cur</span></tt> にある各メッセージには状態情報を保存するファイル名に付け加えられた
+&#8220;info&#8221; セクションがあります。(メールリーダの中には &#8220;info&#8221; セクションを
+<tt class="file docutils literal"><span class="pre">new</span></tt> にあるメッセージに付けることもあります。)
+&#8220;info&#8221; セクションには二つの形式があります。一つは &#8220;2,&#8221;
+の後に標準化されたフラグのリストを付けたもの (たとえば &#8220;2,FR&#8221;)、もう一つは &#8220;1,&#8221;
+の後にいわゆる実験的情報を付け加えるものです。 Maildir
+の標準的なフラグは以下の通りです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="38%" />
+<col width="47%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">フラグ</th>
+<th class="head">意味</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>D</td>
+<td>ドラフト(Draft)</td>
+<td>作成中</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>フラグ付き(Flagged)</td>
+<td>重要とされたもの</td>
+</tr>
+<tr class="row-even"><td>P</td>
+<td>通過(Passed)</td>
+<td>転送、再送またはバウンス</td>
+</tr>
+<tr class="row-odd"><td>R</td>
+<td>返答済み(Replied)</td>
+<td>返答されたもの</td>
+</tr>
+<tr class="row-even"><td>S</td>
+<td>既読(Seen)</td>
+<td>読んだもの</td>
+</tr>
+<tr class="row-odd"><td>T</td>
+<td>ごみ(Trashed)</td>
+<td>削除予定とされたもの</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスは以下のメソッドを提供します。</p>
+<dl class="method">
+<dt id="mailbox.MaildirMessage.get_subdir">
+<tt class="descname">get_subdir</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.get_subdir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;new&#8221; (メッセージが <tt class="file docutils literal"><span class="pre">new</span></tt> サブディレクトリに保存されるべき場合)
+または &#8220;cur&#8221; (メッセージが <tt class="file docutils literal"><span class="pre">cur</span></tt>
+サブディレクトリに保存されるべき場合)のどちらかを返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">メッセージは通常メールボックスがアクセスされた後、メッセージが読まれたかどうかに関わらず <tt class="file docutils literal"><span class="pre">new</span></tt> から <tt class="file docutils literal"><span class="pre">cur</span></tt>
+に移動されます。メッセージ <tt class="docutils literal"><span class="pre">msg</span></tt> は <tt class="docutils literal"><span class="pre">&quot;S&quot;</span> <span class="pre">not</span> <span class="pre">in</span> <span class="pre">msg.get_flags()</span></tt> が <tt class="docutils literal"><span class="pre">True</span></tt>
+ならば読まれています。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.set_subdir">
+<tt class="descname">set_subdir</tt><big>(</big><em>subdir</em><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.set_subdir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージが保存されるべきサブディレクトリをセットします。パラメータ <em>subdir</em> は &#8220;new&#8221; または &#8220;cur&#8221; のいずれかでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.get_flags">
+<tt class="descname">get_flags</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.get_flags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在セットされているフラグを特定する文字列を返します。メッセージが標準 Maildir 形式に準拠しているならば、結果はアルファベット順に並べられたゼロまたは1回の <tt class="docutils literal"><span class="pre">'D'</span></tt> 、
+<tt class="docutils literal"><span class="pre">'F'</span></tt> 、 <tt class="docutils literal"><span class="pre">'P'</span></tt> 、 <tt class="docutils literal"><span class="pre">'R'</span></tt> 、 <tt class="docutils literal"><span class="pre">'S'</span></tt> 、 <tt class="docutils literal"><span class="pre">'T'</span></tt> をつなげたものです。空文字列が返されるのはフラグが一つもない場合、または
+&#8220;info&#8221; が実験的セマンティクスを使っている場合です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.set_flags">
+<tt class="descname">set_flags</tt><big>(</big><em>flags</em><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.set_flags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグをセットし、他のフラグは下ろします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.add_flag">
+<tt class="descname">add_flag</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.add_flag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグをセットしますが他のフラグは変えません。一度に二つ以上のフラグをセットすることは、 <em>flag</em> に2文字以上の文字列を指定すればできます。現在の &#8220;info&#8221; はフラグの代わりに実験的情報を使っていても上書きされます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.remove_flag">
+<tt class="descname">remove_flag</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.remove_flag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグを下ろしますが他のフラグは変えません。一度に二つ以上のフラグを取り除くことは、 <em>flag</em> に2文字以上の文字列を指定すればできます。
+&#8220;info&#8221; がフラグの代わりに実験的情報を使っている場合は現在の
+&#8220;info&#8221; は書き換えられません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.get_date">
+<tt class="descname">get_date</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.get_date" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージの配送日時をエポックからの秒数を表わす浮動小数点数で返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.set_date">
+<tt class="descname">set_date</tt><big>(</big><em>date</em><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.set_date" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージの配送日時を <em>date</em> にセットします。
+<em>date</em> はエポックからの秒数を表わす浮動小数点数です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.get_info">
+<tt class="descname">get_info</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.get_info" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージの &#8220;info&#8221; を含む文字列を返します。このメソッドは実験的 (即ちフラグのリストでない) &#8220;info&#8221;
+にアクセスし、また変更するのに役立ちます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MaildirMessage.set_info">
+<tt class="descname">set_info</tt><big>(</big><em>info</em><big>)</big><a class="headerlink" href="#mailbox.MaildirMessage.set_info" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;info&#8221; に文字列 <em>info</em> をセットします。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> や <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a>
+のインスタンスに基づいて生成されるとき、 <em class="mailheader">Status</em> および <em class="mailheader">X-Status</em>
+ヘッダは省かれ以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="32%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> または <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a>
+の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;cur&#8221; サブディレクトリ</td>
+<td>O フラグ</td>
+</tr>
+<tr class="row-odd"><td>F フラグ</td>
+<td>F フラグ</td>
+</tr>
+<tr class="row-even"><td>R フラグ</td>
+<td>A フラグ</td>
+</tr>
+<tr class="row-odd"><td>S フラグ</td>
+<td>R フラグ</td>
+</tr>
+<tr class="row-even"><td>T フラグ</td>
+<td>D フラグ</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="59%" />
+<col width="41%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;cur&#8221; サブディレクトリ</td>
+<td>&#8220;unseen&#8221; シーケンス</td>
+</tr>
+<tr class="row-odd"><td>&#8220;cur&#8221; サブディレクトリおよび S フラグ</td>
+<td>&#8220;unseen&#8221; シーケンス無し</td>
+</tr>
+<tr class="row-even"><td>F フラグ</td>
+<td>&#8220;flagged&#8221; シーケンス</td>
+</tr>
+<tr class="row-odd"><td>R フラグ</td>
+<td>&#8220;replied&#8221; シーケンス</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="52%" />
+<col width="48%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;cur&#8221; サブディレクトリ</td>
+<td>&#8220;unseen&#8221; ラベル</td>
+</tr>
+<tr class="row-odd"><td>&#8220;cur&#8221; サブディレクトリおよび S フラグ</td>
+<td>&#8220;unseen&#8221; ラベル無し</td>
+</tr>
+<tr class="row-even"><td>P フラグ</td>
+<td>&#8220;forwarded&#8221; または &#8220;resent&#8221; ラベル</td>
+</tr>
+<tr class="row-odd"><td>R フラグ</td>
+<td>&#8220;answered&#8221; ラベル</td>
+</tr>
+<tr class="row-even"><td>T フラグ</td>
+<td>&#8220;deleted&#8221; ラベル</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mboxmessage">
+<span id="mailbox-mboxmessage"></span><h3>18.4.2.2. <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a><a class="headerlink" href="#mboxmessage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.mboxMessage">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">mboxMessage</tt><big>(</big><span class="optional">[</span><em>message</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.mboxMessage" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>mbox 固有の動作をするメッセージ。引数 <em>message</em> は <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> のコンストラクタと同じ意味を持ちます。</p>
+<p>mbox メールボックス中のメッセージは単一ファイルにまとめて格納されています。送り主のエンベロープアドレスおよび配送日時は通常メッセージの開始を示す
+&#8220;From &#8221; から始まる行に記録されますが、正確なフォーマットに関しては mbox の実装ごとに大きな違いがあります。メッセージの状態を示すフラグ、たとえば読んだかどうかあるいは重要だとマークを付けられているかどうかといったようなもの、は典型的には
+<em class="mailheader">Status</em> および <em class="mailheader">X-Status</em> に収められます。</p>
+<p>規定されている mbox メッセージのフラグは以下の通りです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="39%" />
+<col width="46%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">フラグ</th>
+<th class="head">意味</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R</td>
+<td>既読(Read)</td>
+<td>読んだ</td>
+</tr>
+<tr class="row-odd"><td>O</td>
+<td>古い(Old)</td>
+<td>以前に MUA に発見された</td>
+</tr>
+<tr class="row-even"><td>D</td>
+<td>削除(Deleted)</td>
+<td>削除予定</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>フラグ付き(Flagged)</td>
+<td>重要だとマークされた</td>
+</tr>
+<tr class="row-even"><td>A</td>
+<td>返答済み(Answered)</td>
+<td>返答した</td>
+</tr>
+</tbody>
+</table>
+<p>&#8220;R&#8221; および &#8220;O&#8221; フラグは <em class="mailheader">Status</em> ヘッダに記録され、
+&#8220;D&#8221;、&#8221;F&#8221;、&#8221;A&#8221; フラグは <em class="mailheader">X-Status</em> ヘッダに記録されます。フラグとヘッダは通常記述された順番に出現します。</p>
+<p><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> インスタンスは以下のメソッドを提供します:</p>
+<dl class="method">
+<dt id="mailbox.mboxMessage.get_from">
+<tt class="descname">get_from</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.mboxMessage.get_from" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>mbox メールボックスのメッセージの開始を示す &#8220;From &#8221; 行を表わす文字列を返します。先頭の &#8220;From &#8221; および末尾の改行は含まれません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.mboxMessage.set_from">
+<tt class="descname">set_from</tt><big>(</big><em>from_</em><span class="optional">[</span>, <em>time_=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.mboxMessage.set_from" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;From &#8221; 行を <em>from_</em> にセットします。
+<em>from_</em> は先頭の &#8220;From &#8221; や末尾の改行を含まない形で指定しなければなりません。利便性のために、 <em>time_</em> を指定して適切に整形して <em>from_</em>
+に追加させることができます。
+<em>time_</em> を指定する場合、それは <tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt>
+インスタンス、 <a class="reference internal" href="time.html#time.strftime" title="time.strftime"><tt class="xref py py-meth docutils literal"><span class="pre">time.strftime()</span></tt></a> に渡すのに適したタプル、または
+<tt class="docutils literal"><span class="pre">True</span></tt> (この場合 <a class="reference internal" href="time.html#time.gmtime" title="time.gmtime"><tt class="xref py py-meth docutils literal"><span class="pre">time.gmtime()</span></tt></a> を使います)
+のいずれかでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.mboxMessage.get_flags">
+<tt class="descname">get_flags</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.mboxMessage.get_flags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在セットされているフラグを特定する文字列を返します。メッセージが規定された形式に準拠しているならば、結果は次の順に並べられた
+0回か1回の <tt class="docutils literal"><span class="pre">'R'</span></tt> 、 <tt class="docutils literal"><span class="pre">'O'</span></tt> 、 <tt class="docutils literal"><span class="pre">'D'</span></tt> 、 <tt class="docutils literal"><span class="pre">'F'</span></tt> 、 <tt class="docutils literal"><span class="pre">'A'</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.mboxMessage.set_flags">
+<tt class="descname">set_flags</tt><big>(</big><em>flags</em><big>)</big><a class="headerlink" href="#mailbox.mboxMessage.set_flags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグをセットして、他のフラグは下ろします。
+<em>flags</em> は並べられたゼロまたは1回の <tt class="docutils literal"><span class="pre">'R'</span></tt> 、
+<tt class="docutils literal"><span class="pre">'O'</span></tt> 、 <tt class="docutils literal"><span class="pre">'D'</span></tt> 、 <tt class="docutils literal"><span class="pre">'F'</span></tt> 、 <tt class="docutils literal"><span class="pre">'A'</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.mboxMessage.add_flag">
+<tt class="descname">add_flag</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#mailbox.mboxMessage.add_flag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグをセットしますが他のフラグは変えません。一度に二つ以上のフラグをセットすることは、 <em>flag</em> に2文字以上の文字列を指定すればできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.mboxMessage.remove_flag">
+<tt class="descname">remove_flag</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#mailbox.mboxMessage.remove_flag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグを下ろしますが他のフラグは変えません。一度に二つ以上のフラグを取り除くことは、 <em>flag</em> に2文字以上の文字列を指定すればできます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスに基づいて生成されるとき、 <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスの配送日時に基づいて &#8220;From &#8221; 行が作り出され、次の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグ</td>
+<td>S フラグ</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>&#8220;cur&#8221; サブディレクトリ</td>
+</tr>
+<tr class="row-even"><td>D フラグ</td>
+<td>T フラグ</td>
+</tr>
+<tr class="row-odd"><td>F フラグ</td>
+<td>F フラグ</td>
+</tr>
+<tr class="row-even"><td>A フラグ</td>
+<td>R フラグ</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="51%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> 状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグおよび O フラグ</td>
+<td>&#8220;unseen&#8221; シーケンス無し</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>&#8220;unseen&#8221; シーケンス</td>
+</tr>
+<tr class="row-even"><td>F フラグ</td>
+<td>&#8220;flagged&#8221; シーケンス</td>
+</tr>
+<tr class="row-odd"><td>A フラグ</td>
+<td>&#8220;replied&#8221; シーケンス</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグおよび O フラグ</td>
+<td>&#8220;unseen&#8221; ラベル無し</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>&#8220;unseen&#8221; ラベル</td>
+</tr>
+<tr class="row-even"><td>D フラグ</td>
+<td>&#8220;deleted&#8221; ラベル</td>
+</tr>
+<tr class="row-odd"><td>A フラグ</td>
+<td>&#8220;answered&#8221; ラベル</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a> インスタンスに基づいて生成されるとき、&#8221;From &#8221;
+行はコピーされ全てのフラグは直接対応します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグ</td>
+<td>R フラグ</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>O フラグ</td>
+</tr>
+<tr class="row-even"><td>D フラグ</td>
+<td>D フラグ</td>
+</tr>
+<tr class="row-odd"><td>F フラグ</td>
+<td>F フラグ</td>
+</tr>
+<tr class="row-even"><td>A フラグ</td>
+<td>A フラグ</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mhmessage">
+<span id="mailbox-mhmessage"></span><h3>18.4.2.3. <a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a><a class="headerlink" href="#mhmessage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.MHMessage">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">MHMessage</tt><big>(</big><span class="optional">[</span><em>message</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.MHMessage" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>MH 固有の動作をするメッセージ。引数 <em>message</em> は <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> のコンストラクタと同じ意味を持ちます。</p>
+<p>MH メッセージは伝統的な意味あいにおいてマークやフラグをサポートしません。しかし、MH メッセージにはシーケンスがあり任意のメッセージを論理的にグループ分けできます。いくつかのメールソフト(標準の <strong class="program">mh</strong> や
+<strong class="program">nmh</strong> はそうではありませんが) は他の形式におけるフラグとほぼ同じようにシーケンスを使います。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">シーケンス</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>unseen</td>
+<td>読んではいないが既にMUAに見つけられている</td>
+</tr>
+<tr class="row-odd"><td>replied</td>
+<td>返答した</td>
+</tr>
+<tr class="row-even"><td>flagged</td>
+<td>重要だとマークされた</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスは以下のメソッドを提供します:</p>
+<dl class="method">
+<dt id="mailbox.MHMessage.get_sequences">
+<tt class="descname">get_sequences</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.MHMessage.get_sequences" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメッセージを含むシーケンスの名前のリストを返す。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MHMessage.set_sequences">
+<tt class="descname">set_sequences</tt><big>(</big><em>sequences</em><big>)</big><a class="headerlink" href="#mailbox.MHMessage.set_sequences" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメッセージを含むシーケンスのリストをセットする。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MHMessage.add_sequence">
+<tt class="descname">add_sequence</tt><big>(</big><em>sequence</em><big>)</big><a class="headerlink" href="#mailbox.MHMessage.add_sequence" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>sequence</em> をこのメッセージを含むシーケンスのリストに追加する。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.MHMessage.remove_sequence">
+<tt class="descname">remove_sequence</tt><big>(</big><em>sequence</em><big>)</big><a class="headerlink" href="#mailbox.MHMessage.remove_sequence" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>sequence</em> をこのメッセージを含むシーケンスのリストから除く。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;unseen&#8221; シーケンス</td>
+<td>S フラグ無し</td>
+</tr>
+<tr class="row-odd"><td>&#8220;replied&#8221; シーケンス</td>
+<td>R フラグ</td>
+</tr>
+<tr class="row-even"><td>&#8220;flagged&#8221; シーケンス</td>
+<td>F フラグ</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> や <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a>
+のインスタンスに基づいて生成されるとき、 <em class="mailheader">Status</em> および <em class="mailheader">X-Status</em>
+ヘッダは省かれ以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> または <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a>
+の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;unseen&#8221; シーケンス</td>
+<td>R フラグ無し</td>
+</tr>
+<tr class="row-odd"><td>&#8220;replied&#8221; シーケンス</td>
+<td>A フラグ</td>
+</tr>
+<tr class="row-even"><td>&#8220;flagged&#8221; シーケンス</td>
+<td>F フラグ</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;unseen&#8221; シーケンス</td>
+<td>&#8220;unseen&#8221; ラベル</td>
+</tr>
+<tr class="row-odd"><td>&#8220;replied&#8221; シーケンス</td>
+<td>&#8220;answered&#8221; ラベル</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="babylmessage">
+<span id="mailbox-babylmessage"></span><h3>18.4.2.4. <a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a><a class="headerlink" href="#babylmessage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.BabylMessage">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">BabylMessage</tt><big>(</big><span class="optional">[</span><em>message</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.BabylMessage" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Babyl 固有の動作をするメッセージ。引数 <em>message</em> は <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> のコンストラクタと同じ意味を持ちます。</p>
+<p>ある種のメッセージラベルは <em class="dfn">アトリビュート</em> と呼ばれ、規約により特別な意味が与えられています。アトリビュートは以下の通りです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">ラベル</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>unseen</td>
+<td>読んでいないが既に MUA に見つかっている</td>
+</tr>
+<tr class="row-odd"><td>deleted</td>
+<td>削除予定</td>
+</tr>
+<tr class="row-even"><td>filed</td>
+<td>他のファイルまたはメールボックスにコピーされた</td>
+</tr>
+<tr class="row-odd"><td>answered</td>
+<td>返答済み</td>
+</tr>
+<tr class="row-even"><td>forwarded</td>
+<td>転送された</td>
+</tr>
+<tr class="row-odd"><td>edited</td>
+<td>ユーザによって変更された</td>
+</tr>
+<tr class="row-even"><td>resent</td>
+<td>再送された</td>
+</tr>
+</tbody>
+</table>
+<p>デフォルトでは Rmail は可視ヘッダのみ表示します。
+<a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> クラスはしかし、オリジナルヘッダをより完全だという理由で使います。可視ヘッダは望むならそのように指示してアクセスすることができます。</p>
+<p><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスは以下のメソッドを提供します:</p>
+<dl class="method">
+<dt id="mailbox.BabylMessage.get_labels">
+<tt class="descname">get_labels</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.BabylMessage.get_labels" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージに付いているラベルのリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.BabylMessage.set_labels">
+<tt class="descname">set_labels</tt><big>(</big><em>labels</em><big>)</big><a class="headerlink" href="#mailbox.BabylMessage.set_labels" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージに付いているラベルのリストを <em>labels</em> にセットします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.BabylMessage.add_label">
+<tt class="descname">add_label</tt><big>(</big><em>label</em><big>)</big><a class="headerlink" href="#mailbox.BabylMessage.add_label" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージに付いているラベルのリストに <em>label</em> を追加します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.BabylMessage.remove_label">
+<tt class="descname">remove_label</tt><big>(</big><em>label</em><big>)</big><a class="headerlink" href="#mailbox.BabylMessage.remove_label" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージに付いているラベルのリストから <em>label</em> を削除します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.BabylMessage.get_visible">
+<tt class="descname">get_visible</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.BabylMessage.get_visible" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ヘッダがメッセージの可視ヘッダでありボディが空であるような
+<a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.BabylMessage.set_visible">
+<tt class="descname">set_visible</tt><big>(</big><em>visible</em><big>)</big><a class="headerlink" href="#mailbox.BabylMessage.set_visible" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージの可視ヘッダを <em>visible</em> のヘッダと同じにセットします。引数 <em>visible</em> は <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスまたは
+<tt class="xref py py-class docutils literal"><span class="pre">email.Message.Message</span></tt> インスタンス、文字列、ファイル風オブジェクト(テキストモードで開かれてなければなりません)のいずれかです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.BabylMessage.update_visible">
+<tt class="descname">update_visible</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.BabylMessage.update_visible" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスのオリジナルヘッダが変更されたとき、可視ヘッダは自動的に対応して変更されるわけではありません。このメソッドは可視ヘッダを以下のように更新します。対応するオリジナルヘッダのある可視ヘッダはオリジナルヘッダの値がセットされます。対応するオリジナルヘッダの無い可視ヘッダは除去されます。そして、オリジナルヘッダにあって可視ヘッダに無い <em class="mailheader">Date</em> 、
+<em class="mailheader">From</em> 、 <em class="mailheader">Reply-To</em> 、 <em class="mailheader">To</em> 、
+<em class="mailheader">CC</em> 、 <em class="mailheader">Subject</em> は可視ヘッダに追加されます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="38%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;unseen&#8221; ラベル</td>
+<td>S フラグ無し</td>
+</tr>
+<tr class="row-odd"><td>&#8220;deleted&#8221; ラベル</td>
+<td>T フラグ</td>
+</tr>
+<tr class="row-even"><td>&#8220;answered&#8221; ラベル</td>
+<td>R フラグ</td>
+</tr>
+<tr class="row-odd"><td>&#8220;forwarded&#8221; ラベル</td>
+<td>P フラグ</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> や <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a>
+のインスタンスに基づいて生成されるとき、 <em class="mailheader">Status</em> および <em class="mailheader">X-Status</em>
+ヘッダは省かれ以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> または <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a>
+の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;unseen&#8221; ラベル</td>
+<td>R フラグ無し</td>
+</tr>
+<tr class="row-odd"><td>&#8220;deleted&#8221; ラベル</td>
+<td>D フラグ</td>
+</tr>
+<tr class="row-even"><td>&#8220;answered&#8221; ラベル</td>
+<td>A フラグ</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#8220;unseen&#8221; ラベル</td>
+<td>&#8220;unseen&#8221; シーケンス</td>
+</tr>
+<tr class="row-odd"><td>&#8220;answered&#8221; ラベル</td>
+<td>&#8220;replied&#8221; シーケンス</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mmdfmessage">
+<span id="mailbox-mmdfmessage"></span><h3>18.4.2.5. <a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a><a class="headerlink" href="#mmdfmessage" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="class">
+<dt id="mailbox.MMDFMessage">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">MMDFMessage</tt><big>(</big><span class="optional">[</span><em>message</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.MMDFMessage" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>MMDF 固有の動作をするメッセージ。引数 <em>message</em> は <a class="reference internal" href="#mailbox.Message" title="mailbox.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> のコンストラクタと同じ意味を持ちます。</p>
+<p>mbox メールボックスのメッセージと同様に、MMDF メッセージは送り主のアドレスと配送日時が最初の &#8220;From &#8221; で始まる行に記録されています。同様に、メッセージの状態を示すフラグは通常 <em class="mailheader">Status</em> および
+<em class="mailheader">X-Status</em> ヘッダに収められています。</p>
+</dd></dl>
+
+<p>よく使われる MMDF メッセージのフラグは mbox メッセージのものと同一で以下の通りです:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="39%" />
+<col width="46%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">フラグ</th>
+<th class="head">意味</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R</td>
+<td>既読(Read)</td>
+<td>読んだ</td>
+</tr>
+<tr class="row-odd"><td>O</td>
+<td>古い(Old)</td>
+<td>以前に MUA に発見された</td>
+</tr>
+<tr class="row-even"><td>D</td>
+<td>削除(Deleted)</td>
+<td>削除予定</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>フラグ付き(Flagged)</td>
+<td>重要だとマークされた</td>
+</tr>
+<tr class="row-even"><td>A</td>
+<td>返答済み(Answered)</td>
+<td>返答した</td>
+</tr>
+</tbody>
+</table>
+<p>&#8220;R&#8221; および &#8220;O&#8221; フラグは <em class="mailheader">Status</em> ヘッダに記録され、
+&#8220;D&#8221;、&#8221;F&#8221;、&#8221;A&#8221; フラグは
+<em class="mailheader">X-Status</em> ヘッダに記録されます。フラグとヘッダは通常記述された順番に出現します。</p>
+<p><a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a> インスタンスは <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a>
+インスタンスと同一の以下のメソッドを提供します:</p>
+<dl class="method">
+<dt id="mailbox.get_from">
+<tt class="descclassname">mailbox.</tt><tt class="descname">get_from</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.get_from" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>MMDF メールボックスのメッセージの開始を示す &#8220;From &#8221; 行を表わす文字列を返します。先頭の &#8220;From &#8221; および末尾の改行は含まれません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.set_from">
+<tt class="descclassname">mailbox.</tt><tt class="descname">set_from</tt><big>(</big><em>from_</em><span class="optional">[</span>, <em>time_=None</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.set_from" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;From &#8221; 行を <em>from_</em> にセットします。 <em>from_</em> は先頭の &#8220;From &#8221; や末尾の改行を含まない形で指定しなければなりません。利便性のために、 <em>time_</em> を指定して適切に整形して <em>from_</em>
+に追加させることができます。
+<em>time_</em> を指定する場合、それは <tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt> インスタンス、
+<a class="reference internal" href="time.html#time.strftime" title="time.strftime"><tt class="xref py py-meth docutils literal"><span class="pre">time.strftime()</span></tt></a> に渡すのに適したタプル、または <tt class="docutils literal"><span class="pre">True</span></tt>
+(この場合 <a class="reference internal" href="time.html#time.gmtime" title="time.gmtime"><tt class="xref py py-meth docutils literal"><span class="pre">time.gmtime()</span></tt></a> を使います) のいずれかでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.get_flags">
+<tt class="descclassname">mailbox.</tt><tt class="descname">get_flags</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.get_flags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在セットされているフラグを特定する文字列を返します。メッセージが規定された形式に準拠しているならば、結果は次の順に並べられたゼロまたは1回の <tt class="docutils literal"><span class="pre">'R'</span></tt> 、 <tt class="docutils literal"><span class="pre">'O'</span></tt> 、 <tt class="docutils literal"><span class="pre">'D'</span></tt> 、 <tt class="docutils literal"><span class="pre">'F'</span></tt> 、 <tt class="docutils literal"><span class="pre">'A'</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.set_flags">
+<tt class="descclassname">mailbox.</tt><tt class="descname">set_flags</tt><big>(</big><em>flags</em><big>)</big><a class="headerlink" href="#mailbox.set_flags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグをセットして、他のフラグは下ろします。
+<em>flags</em> は並べられたゼロまたは1回の <tt class="docutils literal"><span class="pre">'R'</span></tt> 、
+<tt class="docutils literal"><span class="pre">'O'</span></tt> 、 <tt class="docutils literal"><span class="pre">'D'</span></tt> 、 <tt class="docutils literal"><span class="pre">'F'</span></tt> 、 <tt class="docutils literal"><span class="pre">'A'</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.add_flag">
+<tt class="descclassname">mailbox.</tt><tt class="descname">add_flag</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#mailbox.add_flag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグをセットしますが他のフラグは変えません。一度に二つ以上のフラグをセットすることは、 <em>flag</em> に2文字以上の文字列を指定すればできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mailbox.remove_flag">
+<tt class="descclassname">mailbox.</tt><tt class="descname">remove_flag</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#mailbox.remove_flag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flags</em> で指定されたフラグを下ろしますが他のフラグは変えません。一度に二つ以上のフラグを取り除くことは、 <em>flag</em> に2文字以上の文字列を指定すればできます。</p>
+</dd></dl>
+
+</div></blockquote>
+<p><a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスに基づいて生成されるとき、 <a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> インスタンスの配送日時に基づいて
+&#8220;From &#8221; 行が作り出され、次の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MaildirMessage" title="mailbox.MaildirMessage"><tt class="xref py py-class docutils literal"><span class="pre">MaildirMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグ</td>
+<td>S フラグ</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>&#8220;cur&#8221; サブディレクトリ</td>
+</tr>
+<tr class="row-even"><td>D フラグ</td>
+<td>T フラグ</td>
+</tr>
+<tr class="row-odd"><td>F フラグ</td>
+<td>F フラグ</td>
+</tr>
+<tr class="row-even"><td>A フラグ</td>
+<td>R フラグ</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="51%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.MHMessage" title="mailbox.MHMessage"><tt class="xref py py-class docutils literal"><span class="pre">MHMessage</span></tt></a> 状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグおよび O フラグ</td>
+<td>&#8220;unseen&#8221; シーケンス無し</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>&#8220;unseen&#8221; シーケンス</td>
+</tr>
+<tr class="row-even"><td>F フラグ</td>
+<td>&#8220;flagged&#8221; シーケンス</td>
+</tr>
+<tr class="row-odd"><td>A フラグ</td>
+<td>&#8220;replied&#8221; シーケンス</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> インスタンスに基づいて生成されるとき、以下の変換が行われます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.BabylMessage" title="mailbox.BabylMessage"><tt class="xref py py-class docutils literal"><span class="pre">BabylMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグおよび O フラグ</td>
+<td>&#8220;unseen&#8221; ラベル無し</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>&#8220;unseen&#8221; ラベル</td>
+</tr>
+<tr class="row-even"><td>D フラグ</td>
+<td>&#8220;deleted&#8221; ラベル</td>
+</tr>
+<tr class="row-odd"><td>A フラグ</td>
+<td>&#8220;answered&#8221; ラベル</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#mailbox.MMDFMessage" title="mailbox.MMDFMessage"><tt class="xref py py-class docutils literal"><span class="pre">MMDFMessage</span></tt></a> インスタンスが <a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> インスタンスに基づいて生成されるとき、&#8221;From &#8221;
+行はコピーされ全てのフラグは直接対応します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">結果の状態</th>
+<th class="head"><a class="reference internal" href="#mailbox.mboxMessage" title="mailbox.mboxMessage"><tt class="xref py py-class docutils literal"><span class="pre">mboxMessage</span></tt></a> の状態</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R フラグ</td>
+<td>R フラグ</td>
+</tr>
+<tr class="row-odd"><td>O フラグ</td>
+<td>O フラグ</td>
+</tr>
+<tr class="row-even"><td>D フラグ</td>
+<td>D フラグ</td>
+</tr>
+<tr class="row-odd"><td>F フラグ</td>
+<td>F フラグ</td>
+</tr>
+<tr class="row-even"><td>A フラグ</td>
+<td>A フラグ</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>18.4.3. 例外<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-mailbox" title="mailbox: 様々な形式のメールボックス操作"><tt class="xref py py-mod docutils literal"><span class="pre">mailbox</span></tt></a> モジュールでは以下の例外クラスが定義されています:</p>
+<dl class="exception">
+<dt id="mailbox.Error">
+<em class="property">exception </em><tt class="descclassname">mailbox.</tt><tt class="descname">Error</tt><a class="headerlink" href="#mailbox.Error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>他の全てのモジュール固有の例外の基底クラス。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="mailbox.NoSuchMailboxError">
+<em class="property">exception </em><tt class="descclassname">mailbox.</tt><tt class="descname">NoSuchMailboxError</tt><a class="headerlink" href="#mailbox.NoSuchMailboxError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスがあると思っていたが見つからなかった場合に送出されます。これはたとえば <a class="reference internal" href="#mailbox.Mailbox" title="mailbox.Mailbox"><tt class="xref py py-class docutils literal"><span class="pre">Mailbox</span></tt></a>
+のサブクラスを存在しないパスでインスタンス化しようとしたとき(かつ <em>create</em> パラメータは <tt class="docutils literal"><span class="pre">False</span></tt> であった場合)、あるいは存在しないフォルダを開こうとした時などに発生します。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="mailbox.NotEmptyError">
+<em class="property">exception </em><tt class="descclassname">mailbox.</tt><tt class="descname">NotEmptyError</tt><a class="headerlink" href="#mailbox.NotEmptyError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスが空であることを期待されているときに空でない場合、たとえばメッセージの残っているフォルダを削除しようとした時などに送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="mailbox.ExternalClashError">
+<em class="property">exception </em><tt class="descclassname">mailbox.</tt><tt class="descname">ExternalClashError</tt><a class="headerlink" href="#mailbox.ExternalClashError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスに関係したある条件がプログラムの制御を外れてそれ以上作業を続けられなくなった場合、たとえば他のプログラムが既に保持しているロックを取得しようとして失敗したとき、あるいは一意的に生成されたファイル名が既に存在していた場合などに送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="mailbox.FormatError">
+<em class="property">exception </em><tt class="descclassname">mailbox.</tt><tt class="descname">FormatError</tt><a class="headerlink" href="#mailbox.FormatError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル中のデータが解析できない場合、たとえば <a class="reference internal" href="#mailbox.MH" title="mailbox.MH"><tt class="xref py py-class docutils literal"><span class="pre">MH</span></tt></a> インスタンスが壊れた <tt class="file docutils literal"><span class="pre">.mh_sequences</span></tt>
+ファイルを読もうと試みた場合などに送出されます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mailbox-deprecated">
+<span id="id4"></span><h2>18.4.4. 撤廃されたクラスとメソッド<a class="headerlink" href="#mailbox-deprecated" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃.</span></p>
+<p>古いバージョンの <a class="reference internal" href="#module-mailbox" title="mailbox: 様々な形式のメールボックス操作"><tt class="xref py py-mod docutils literal"><span class="pre">mailbox</span></tt></a> モジュールはメッセージの追加や削除といったメールボックスの変更をサポートしていませんでした。また形式ごとのメッセージプロパティを表現するクラスも提供していませんでした。後方互換性のために、古いメールボックスクラスもまだ使うことができますが、できるだけ新しいクラスを使うべきです。古いクラスは Python 3.0 で削除されます。</p>
+<p>古いメールボックスオブジェクトは繰り返しと一つの公開メソッドだけを提供していました:</p>
+<dl class="method">
+<dt id="mailbox.oldmailbox.next">
+<tt class="descclassname">oldmailbox.</tt><tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#mailbox.oldmailbox.next" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスオブジェクトのコンストラクタに渡された、オプションの <em>factory</em> 引数を使って、メールボックス中の次のメッセージを生成して返します。標準の設定では、 <em>factory</em> は <a class="reference internal" href="rfc822.html#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">rfc822.Message</span></tt></a> オブジェクトです (<a class="reference internal" href="rfc822.html#module-rfc822" title="rfc822: RFC 2822 形式のメールメッセージを解釈します。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rfc822</span></tt></a>
+モジュールを参照してください)。メールボックスの実装により、このオブジェクトの <em>fp</em> 属性は真のファイルオブジェクトかもしれないし、複数のメールメッセージが単一のファイルに収められているなどの場合に、メッセージ間の境界を注意深く扱うためにファイルオブジェクトをシミュレートするクラスのインスタンスであるかもしれません。次のメッセージがない場合、このメソッドは <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+</dd></dl>
+
+<p>ほとんどの古いメールボックスクラスは現在のメールボックスクラスと違う名前ですが、 <a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> だけは例外です。そのため、新しい方の
+<a class="reference internal" href="#mailbox.Maildir" title="mailbox.Maildir"><tt class="xref py py-class docutils literal"><span class="pre">Maildir</span></tt></a> クラスには <tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt> メソッドが定義され、コンストラクタも他の新しいメールボックスクラスとは少し異なります。</p>
+<p>古いメールボックスのクラスで名前が新しい対応物と同じでないものは以下の通りです:</p>
+<dl class="class">
+<dt id="mailbox.UnixMailbox">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">UnixMailbox</tt><big>(</big><em>fp</em><span class="optional">[</span>, <em>factory</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.UnixMailbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全てのメッセージが単一のファイルに収められ、 <tt class="docutils literal"><span class="pre">From</span></tt>  (<tt class="docutils literal"><span class="pre">From_</span></tt> として知られています) 行によって分割されているような、旧来の
+Unix形式のメールボックスにアクセスします。ファイルオブジェクト <em>fp</em> はメールボックスファイルを指します。オプションの <em>factory</em>
+パラメタは新たなメッセージオブジェクトを生成するような呼び出し可能オブジェクトです。 <em>factory</em> は、メールボックスオブジェクトに対して
+<tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt> メソッドを実行した際に、単一の引数、 <em>fp</em> を伴って呼び出されます。この引数の標準の値は
+<a class="reference internal" href="rfc822.html#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">rfc822.Message</span></tt></a> クラスです (<a class="reference internal" href="rfc822.html#module-rfc822" title="rfc822: RFC 2822 形式のメールメッセージを解釈します。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rfc822</span></tt></a> モジュール &#8211; および以下 &#8211; を参照してください)。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">このモジュールの実装上の理由により、 <em>fp</em> オブジェクトはバイナリモードで開くようにしてください。特にWindows上では注意が必要です。</p>
+</div>
+<p>可搬性を最大限にするために、Unix形式のメールボックス内にあるメッセージは、正確に <tt class="docutils literal"><span class="pre">'From</span> <span class="pre">'</span></tt> (末尾の空白に注意してください)
+で始まる文字列が、直前の正しく二つの改行の後にくるような行で分割されます。現実的には広範なバリエーションがあるため、それ以外の <tt class="docutils literal"><span class="pre">From_</span></tt>
+行について考慮すべきではないのですが、現在の実装では先頭の二つの改行をチェックしていません。これはほとんどのアプリケーションでうまく動作します。</p>
+<p><a class="reference internal" href="#mailbox.UnixMailbox" title="mailbox.UnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">UnixMailbox</span></tt></a> クラスでは、ほぼ正確に <tt class="docutils literal"><span class="pre">From_</span></tt>
+デリミタにマッチするような正規表現を用いることで、より厳密に <tt class="docutils literal"><span class="pre">From_</span></tt>
+行のチェックを行うバージョンを実装しています。
+<a class="reference internal" href="#mailbox.UnixMailbox" title="mailbox.UnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">UnixMailbox</span></tt></a> ではデリミタ行が <tt class="docutils literal"><span class="pre">From</span> <span class="pre">name</span> <span class="pre">time</span></tt>
+の行に分割されるものと考えます。可搬性を最大限にするためには、代わりに <a class="reference internal" href="#mailbox.PortableUnixMailbox" title="mailbox.PortableUnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">PortableUnixMailbox</span></tt></a>
+クラスを使ってください。このクラスは <a class="reference internal" href="#mailbox.UnixMailbox" title="mailbox.UnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">UnixMailbox</span></tt></a> と同じですが、個々のメッセージは <tt class="docutils literal"><span class="pre">From</span></tt>
+行だけで分割されるものとみなします。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mailbox.PortableUnixMailbox">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">PortableUnixMailbox</tt><big>(</big><em>fp</em><span class="optional">[</span>, <em>factory</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.PortableUnixMailbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>厳密性の低い <a class="reference internal" href="#mailbox.UnixMailbox" title="mailbox.UnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">UnixMailbox</span></tt></a> のバージョンで、メッセージを分割する行は <tt class="docutils literal"><span class="pre">From</span></tt>
+のみであると見なします。実際に見られるメールボックスのバリエーションに対応するため、 From 行における &#8220;<em>name</em> <em>time</em>&#8221;
+部分は無視されます。メール処理ソフトウェアはメッセージ中の <tt class="docutils literal"><span class="pre">'From</span> <span class="pre">'</span></tt> で始まる行をクオートするため、この分割はうまく動作します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mailbox.MmdfMailbox">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">MmdfMailbox</tt><big>(</big><em>fp</em><span class="optional">[</span>, <em>factory</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.MmdfMailbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全てのメッセージが単一のファイルに収められ、4 つの control-A 文字によって分割されているような、MMDF 形式のメールボックスにアクセスします。ファイルオブジェクト <em>fp</em> はメールボックスファイルをさします。オプションの <em>factory</em> は <a class="reference internal" href="#mailbox.UnixMailbox" title="mailbox.UnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">UnixMailbox</span></tt></a>
+クラスにおけるのと同様です。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mailbox.MHMailbox">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">MHMailbox</tt><big>(</big><em>dirname</em><span class="optional">[</span>, <em>factory</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.MHMailbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数字で名前のつけられた別々のファイルに個々のメッセージを収めたディレクトリである、MH メールボックスにアクセスします。メールボックスディレクトリの名前は
+<em>dirname</em> で渡します。 <em>factory</em> は <a class="reference internal" href="#mailbox.UnixMailbox" title="mailbox.UnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">UnixMailbox</span></tt></a> クラスにおけるのと同様です。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mailbox.BabylMailbox">
+<em class="property">class </em><tt class="descclassname">mailbox.</tt><tt class="descname">BabylMailbox</tt><big>(</big><em>fp</em><span class="optional">[</span>, <em>factory</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#mailbox.BabylMailbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>MMDF メールボックスと似ている、Babyl メールボックスにアクセスします。
+Babyl 形式では、各メッセージは二つのヘッダからなるセット、
+<em>original</em> ヘッダおよび <em>visible</em> ヘッダを持っています。
+original ヘッダは <tt class="docutils literal"><span class="pre">'***</span> <span class="pre">EOOH</span> <span class="pre">***'</span></tt> (End-Of-Original-Headers)
+だけを含む行の前にあり、visible ヘッダは <tt class="docutils literal"><span class="pre">EOOH</span></tt> 行の後にあります。Babyl
+互換のメールリーダは visible ヘッダのみを表示し、
+<a class="reference internal" href="#mailbox.BabylMailbox" title="mailbox.BabylMailbox"><tt class="xref py py-class docutils literal"><span class="pre">BabylMailbox</span></tt></a> オブジェクトは visible
+ヘッダのみを含むようなメッセージを返します。メールメッセージは EOOH 行で始まり、 <tt class="docutils literal"><span class="pre">'\037\014'</span></tt> だけを含む行で終わります。
+<em>factory</em> は <a class="reference internal" href="#mailbox.UnixMailbox" title="mailbox.UnixMailbox"><tt class="xref py py-class docutils literal"><span class="pre">UnixMailbox</span></tt></a> クラスにおけるのと同様です。</p>
+</dd></dl>
+
+<p>古いメールボックスクラスを撤廃された <a class="reference internal" href="rfc822.html#module-rfc822" title="rfc822: RFC 2822 形式のメールメッセージを解釈します。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rfc822</span></tt></a> モジュールではなく、 <a class="reference internal" href="email.html#module-email" title="email: 電子メールのメッセージを解析、操作および生成を支援するパッケージ。 これには MIME 文書もふくまれる。"><tt class="xref py py-mod docutils literal"><span class="pre">email</span></tt></a>
+モジュールと使いたいならば、以下のようにできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">email</span>
+<span class="kn">import</span> <span class="nn">email.Errors</span>
+<span class="kn">import</span> <span class="nn">mailbox</span>
+
+<span class="k">def</span> <span class="nf">msgfactory</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">email</span><span class="o">.</span><span class="n">message_from_file</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">email</span><span class="o">.</span><span class="n">Errors</span><span class="o">.</span><span class="n">MessageParseError</span><span class="p">:</span>
+        <span class="c"># Don&#39;t return None since that will</span>
+        <span class="c"># stop the mailbox iterator</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span>
+
+<span class="n">mbox</span> <span class="o">=</span> <span class="n">mailbox</span><span class="o">.</span><span class="n">UnixMailbox</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">msgfactory</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>一方、メールボックス内には正しい形式の MIME メッセージしか入っていないと分かっているのなら、単に以下のようにします:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">email</span>
+<span class="kn">import</span> <span class="nn">mailbox</span>
+
+<span class="n">mbox</span> <span class="o">=</span> <span class="n">mailbox</span><span class="o">.</span><span class="n">UnixMailbox</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">email</span><span class="o">.</span><span class="n">message_from_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mailbox-examples">
+<span id="id5"></span><h2>18.4.5. 例<a class="headerlink" href="#mailbox-examples" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>メールボックス中の面白そうなメッセージのサブジェクトを全て印字する簡単な例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">mailbox</span>
+<span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">mailbox</span><span class="o">.</span><span class="n">mbox</span><span class="p">(</span><span class="s">&#39;~/mbox&#39;</span><span class="p">):</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="s">&#39;subject&#39;</span><span class="p">]</span>       <span class="c"># Could possibly be None.</span>
+    <span class="k">if</span> <span class="n">subject</span> <span class="ow">and</span> <span class="s">&#39;python&#39;</span> <span class="ow">in</span> <span class="n">subject</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="k">print</span> <span class="n">subject</span>
+</pre></div>
+</div>
+<p>Babyl メールボックスから MH メールボックスへ全てのメールをコピーし、変換可能な全ての形式固有の情報を変換する:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">mailbox</span>
+<span class="n">destination</span> <span class="o">=</span> <span class="n">mailbox</span><span class="o">.</span><span class="n">MH</span><span class="p">(</span><span class="s">&#39;~/Mail&#39;</span><span class="p">)</span>
+<span class="n">destination</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">mailbox</span><span class="o">.</span><span class="n">Babyl</span><span class="p">(</span><span class="s">&#39;~/RMAIL&#39;</span><span class="p">):</span>
+    <span class="n">destination</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mailbox</span><span class="o">.</span><span class="n">MHMessage</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+<span class="n">destination</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+<span class="n">destination</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>この例は幾つかのメーリングリストのメールをソートするものです。他のプログラムと平行して変更を加えることでメールが破損したり、プログラムを中断することでメールを失ったり、はたまた半端なメッセージがメールボックス中にあることで途中で終了してしまう、といったことを避けるように注意深く扱っています。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">mailbox</span>
+<span class="kn">import</span> <span class="nn">email.Errors</span>
+
+<span class="n">list_names</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;python-list&#39;</span><span class="p">,</span> <span class="s">&#39;python-dev&#39;</span><span class="p">,</span> <span class="s">&#39;python-bugs&#39;</span><span class="p">)</span>
+
+<span class="n">boxes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">mailbox</span><span class="o">.</span><span class="n">mbox</span><span class="p">(</span><span class="s">&#39;~/email/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">))</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">list_names</span><span class="p">)</span>
+<span class="n">inbox</span> <span class="o">=</span> <span class="n">mailbox</span><span class="o">.</span><span class="n">Maildir</span><span class="p">(</span><span class="s">&#39;~/Maildir&#39;</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">inbox</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">inbox</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">except</span> <span class="n">email</span><span class="o">.</span><span class="n">Errors</span><span class="o">.</span><span class="n">MessageParseError</span><span class="p">:</span>
+        <span class="k">continue</span>                <span class="c"># The message is malformed. Just leave it.</span>
+
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">list_names</span><span class="p">:</span>
+        <span class="n">list_id</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="s">&#39;list-id&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">list_id</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">list_id</span><span class="p">:</span>
+            <span class="c"># Get mailbox to use</span>
+            <span class="n">box</span> <span class="o">=</span> <span class="n">boxes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+            <span class="c"># Write copy to disk before removing original.</span>
+            <span class="c"># If there&#39;s a crash, you might duplicate a message, but</span>
+            <span class="c"># that&#39;s better than losing a message completely.</span>
+            <span class="n">box</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="n">box</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="n">box</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="n">box</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+
+            <span class="c"># Remove original message</span>
+            <span class="n">inbox</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="n">inbox</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">inbox</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="n">inbox</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+            <span class="k">break</span>               <span class="c"># Found destination, so stop looking.</span>
+
+<span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="n">boxes</span><span class="o">.</span><span class="n">itervalues</span><span class="p">():</span>
+    <span class="n">box</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="mhlib.html" title="18.5. mhlib — MH のメールボックスへのアクセス機構"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="mailcap.html" title="18.3. mailcap — mailcap ファイルの操作"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="netdata.html" >18. インターネット上のデータの操作</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,384 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>27.10. traceback — スタックトレースの表示または取得 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="27. Python ランタイムサービス" href="python.html" />
+    <link rel="next" title="27.11. __future__ — future 文の定義" href="__future__.html" />
+    <link rel="prev" title="27.9. atexit — 終了ハンドラ" href="atexit.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="__future__.html" title="27.11. __future__ — future 文の定義"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="atexit.html" title="27.9. atexit — 終了ハンドラ"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" accesskey="U">27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">27.10. <tt class="docutils literal"><span class="pre">traceback</span></tt> &#8212; スタックトレースの表示または取得</a><ul>
+<li><a class="reference internal" href="#traceback-example">27.10.1. トレースバックの例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="atexit.html"
+                        title="前の章へ">27.9. <tt class="docutils literal docutils literal docutils literal"><span class="pre">atexit</span></tt> &#8212; 終了ハンドラ</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="__future__.html"
+                        title="次の章へ">27.11. <tt class="docutils literal docutils literal docutils literal"><span class="pre">__future__</span></tt> &#8212; future 文の定義</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/traceback.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-traceback">
+<span id="traceback"></span><h1>27.10. <a class="reference internal" href="#module-traceback" title="traceback: スタックトレースを表示または取得する。"><tt class="xref py py-mod docutils literal"><span class="pre">traceback</span></tt></a> &#8212; スタックトレースの表示または取得<a class="headerlink" href="#module-traceback" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>このモジュールは Python プログラムのスタックトレースを抽出し、書式を整え、表示するための標準インターフェースを提供します。モジュールがスタックトレースを表示するとき、 Python インタープリタの動作を正確に模倣します。インタープリタの&#8221;ラッパー&#8221;の場合のように、プログラムの制御の元でスタックトレースを表示したいと思ったときに役に立ちます。</p>
+<span class="target" id="index-0"></span><p>モジュールは traceback オブジェクトを使います &#8212;
+これは変数 <a class="reference internal" href="sys.html#sys.exc_traceback" title="sys.exc_traceback"><tt class="xref py py-data docutils literal"><span class="pre">sys.exc_traceback</span></tt></a> (非推奨)と <a class="reference internal" href="sys.html#sys.last_traceback" title="sys.last_traceback"><tt class="xref py py-data docutils literal"><span class="pre">sys.last_traceback</span></tt></a> に保存され、
+<a class="reference internal" href="sys.html#sys.exc_info" title="sys.exc_info"><tt class="xref py py-func docutils literal"><span class="pre">sys.exc_info()</span></tt></a> から三番目の項目として返されるオブジェクト型です。</p>
+<p>モジュールは次の関数を定義します:</p>
+<dl class="function">
+<dt id="traceback.print_tb">
+<tt class="descclassname">traceback.</tt><tt class="descname">print_tb</tt><big>(</big><em>traceback</em><span class="optional">[</span>, <em>limit</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.print_tb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>traceback</em> から <em>limit</em> までのスタックトレース項目を出力します。
+<em>limit</em> が省略されるか <tt class="docutils literal"><span class="pre">None</span></tt> の場合は、すべての項目が表示されます。
+<em>file</em> が省略されるか <tt class="docutils literal"><span class="pre">None</span></tt> の場合は、 <tt class="docutils literal"><span class="pre">sys.stderr</span></tt> へ出力されます。それ以外の場合は、出力を受けるためのオープンされたファイルまたはファイル風 (file-like) オブジェクトでなければなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.print_exception">
+<tt class="descclassname">traceback.</tt><tt class="descname">print_exception</tt><big>(</big><em>type</em>, <em>value</em>, <em>traceback</em><span class="optional">[</span>, <em>limit</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.print_exception" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>例外情報と <em>traceback</em> から <em>limit</em> までのスタックトレース項目を <em>file</em> へ出力します。これは以下のような点で <a class="reference internal" href="#traceback.print_tb" title="traceback.print_tb"><tt class="xref py py-func docutils literal"><span class="pre">print_tb()</span></tt></a> とは異なります:
+(1) <em>traceback</em> が <tt class="docutils literal"><span class="pre">None</span></tt> でない場合は、ヘッダ <tt class="docutils literal"><span class="pre">Traceback</span> <span class="pre">(most</span> <span class="pre">recent</span> <span class="pre">call</span> <span class="pre">last):</span></tt> を出力します。
+(2) スタックトレースの後に例外 <em>type</em> と <em>value</em> を出力します。
+(3) <em>type</em> が <a class="reference internal" href="exceptions.html#exceptions.SyntaxError" title="exceptions.SyntaxError"><tt class="xref py py-exc docutils literal"><span class="pre">SyntaxError</span></tt></a> であり、 <em>value</em> が適切な形式の場合は、エラーのおおよその位置を示すカレットを付けて構文エラーが起きた行を出力します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.print_exc">
+<tt class="descclassname">traceback.</tt><tt class="descname">print_exc</tt><big>(</big><span class="optional">[</span><em>limit</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.print_exc" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは <tt class="docutils literal"><span class="pre">print_exception(sys.exc_type,</span> <span class="pre">sys.exc_value,</span> <span class="pre">sys.exc_traceback,</span> <span class="pre">limit,</span> <span class="pre">file)</span></tt> の省略表現です。
+(非推奨の変数を使う代わりにスレッドセーフな方法で同じ情報を引き出すために、実際には <a class="reference internal" href="sys.html#sys.exc_info" title="sys.exc_info"><tt class="xref py py-func docutils literal"><span class="pre">sys.exc_info()</span></tt></a> を使います。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.format_exc">
+<tt class="descclassname">traceback.</tt><tt class="descname">format_exc</tt><big>(</big><span class="optional">[</span><em>limit</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.format_exc" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは、 <tt class="docutils literal"><span class="pre">print_exc(limit)</span></tt> に似ていますが、ファイルに出力する代わりに文字列を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.print_last">
+<tt class="descclassname">traceback.</tt><tt class="descname">print_last</tt><big>(</big><span class="optional">[</span><em>limit</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.print_last" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは <tt class="docutils literal"><span class="pre">print_exception(sys.last_type,</span> <span class="pre">sys.last_value,</span> <span class="pre">sys.last_traceback,</span> <span class="pre">limit,</span> <span class="pre">file)</span></tt> の省略表現です。一般に、例外が対話的なプロンプトに達した後にだけ機能します (<a class="reference internal" href="sys.html#sys.last_type" title="sys.last_type"><tt class="xref py py-data docutils literal"><span class="pre">sys.last_type</span></tt></a> 参照)。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.print_stack">
+<tt class="descclassname">traceback.</tt><tt class="descname">print_stack</tt><big>(</big><span class="optional">[</span><em>f</em><span class="optional">[</span>, <em>limit</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.print_stack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数は呼び出された時点からのスタックトレースを出力します。オプションの <em>f</em> 引数は代わりの最初のスタックフレームを指定するために使えます。オプションの <em>limit</em> と <em>file</em> 引数は <a class="reference internal" href="#traceback.print_exception" title="traceback.print_exception"><tt class="xref py py-func docutils literal"><span class="pre">print_exception()</span></tt></a> と同じ意味を持ちます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.extract_tb">
+<tt class="descclassname">traceback.</tt><tt class="descname">extract_tb</tt><big>(</big><em>traceback</em><span class="optional">[</span>, <em>limit</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.extract_tb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トレースバックオブジェクト <em>traceback</em> から <em>limit</em> まで取り出された&#8221;前処理済み&#8221;スタックトレース項目のリストを返します。スタックトレースの代わりの書式設定を行うために役に立ちます。
+<em>limit</em> が省略されるか <tt class="docutils literal"><span class="pre">None</span></tt> の場合は、すべての項目が取り出されます。
+&#8220;前処理済み&#8221;スタックトレース項目とは4要素のタプル (<em>filename</em>, <em>line number</em>, <em>function name</em>, <em>text</em>) で、スタックトレースに対して通常出力される情報を表しています。
+<em>text</em> は前後の空白を取り除いた文字列です。ソースが利用できない場合は <tt class="docutils literal"><span class="pre">None</span></tt> です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.extract_stack">
+<tt class="descclassname">traceback.</tt><tt class="descname">extract_stack</tt><big>(</big><span class="optional">[</span><em>f</em><span class="optional">[</span>, <em>limit</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.extract_stack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のスタックフレームから生のトレースバックを取り出します。戻り値は <a class="reference internal" href="#traceback.extract_tb" title="traceback.extract_tb"><tt class="xref py py-func docutils literal"><span class="pre">extract_tb()</span></tt></a> と同じ形式です。オプションの <em>f</em> と <em>limit</em> 引数は <a class="reference internal" href="#traceback.print_stack" title="traceback.print_stack"><tt class="xref py py-func docutils literal"><span class="pre">print_stack()</span></tt></a> と同じ意味を持ちます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.format_list">
+<tt class="descclassname">traceback.</tt><tt class="descname">format_list</tt><big>(</big><em>list</em><big>)</big><a class="headerlink" href="#traceback.format_list" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#traceback.extract_tb" title="traceback.extract_tb"><tt class="xref py py-func docutils literal"><span class="pre">extract_tb()</span></tt></a> または <a class="reference internal" href="#traceback.extract_stack" title="traceback.extract_stack"><tt class="xref py py-func docutils literal"><span class="pre">extract_stack()</span></tt></a> が返すタプルのリストが与えられると、出力の準備を整えた文字列のリストを返します。結果として生じるリストの中の各文字列は、引数リストの中の同じインデックスの要素に対応します。各文字列は末尾に改行が付いています。さらに、ソーステキスト行が <tt class="docutils literal"><span class="pre">None</span></tt> でないそれらの要素に対しては、文字列は内部に改行を含んでいるかもしれません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.format_exception_only">
+<tt class="descclassname">traceback.</tt><tt class="descname">format_exception_only</tt><big>(</big><em>type</em>, <em>value</em><big>)</big><a class="headerlink" href="#traceback.format_exception_only" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トレースバックの例外部分を書式化します。引数は <tt class="docutils literal"><span class="pre">sys.last_type</span></tt> と <tt class="docutils literal"><span class="pre">sys.last_value</span></tt>
+のような例外の型と値です。戻り値はそれぞれが改行で終わっている文字列のリストです。通常、リストは一つの文字列を含んでいます。しかし、 <a class="reference internal" href="exceptions.html#exceptions.SyntaxError" title="exceptions.SyntaxError"><tt class="xref py py-exc docutils literal"><span class="pre">SyntaxError</span></tt></a> 例外に対しては、
+(出力されるときに) 構文エラーが起きた場所についての詳細な情報を示す行をいくつか含んでいます。どの例外が起きたのかを示すメッセージは、常にリストの最後の文字列です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.format_exception">
+<tt class="descclassname">traceback.</tt><tt class="descname">format_exception</tt><big>(</big><em>type</em>, <em>value</em>, <em>tb</em><span class="optional">[</span>, <em>limit</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.format_exception" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックトレースと例外情報を書式化します。引数は <a class="reference internal" href="#traceback.print_exception" title="traceback.print_exception"><tt class="xref py py-func docutils literal"><span class="pre">print_exception()</span></tt></a> の対応する引数と同じ意味を持ちます。戻り値は文字列のリストで、それぞれの文字列は改行で終わり、そのいくつかは内部に改行を含みます。これらの行が連結されて出力される場合は、厳密に <a class="reference internal" href="#traceback.print_exception" title="traceback.print_exception"><tt class="xref py py-func docutils literal"><span class="pre">print_exception()</span></tt></a> と同じテキストが出力されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.format_tb">
+<tt class="descclassname">traceback.</tt><tt class="descname">format_tb</tt><big>(</big><em>tb</em><span class="optional">[</span>, <em>limit</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.format_tb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">format_list(extract_tb(tb,</span> <span class="pre">limit))</span></tt> の省略表現。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.format_stack">
+<tt class="descclassname">traceback.</tt><tt class="descname">format_stack</tt><big>(</big><span class="optional">[</span><em>f</em><span class="optional">[</span>, <em>limit</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#traceback.format_stack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">format_list(extract_stack(f,</span> <span class="pre">limit))</span></tt> の省略表現。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="traceback.tb_lineno">
+<tt class="descclassname">traceback.</tt><tt class="descname">tb_lineno</tt><big>(</big><em>tb</em><big>)</big><a class="headerlink" href="#traceback.tb_lineno" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トレースバックオブジェクトに設定された現在の行番号を返します。
+Python 2.3より前のバージョンでは、 <a class="reference internal" href="../using/cmdline.html#cmdoption-O"><em class="xref std std-option">-O</em></a> フラグが渡されたときに
+<tt class="docutils literal"><span class="pre">tb.tb_lineno</span></tt> が正しく更新されなかったため、この関数は必要でした。
+2.3以降のバージョンでは不要です。</p>
+</dd></dl>
+
+<div class="section" id="traceback-example">
+<span id="id1"></span><h2>27.10.1. トレースバックの例<a class="headerlink" href="#traceback-example" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この簡単な例では基本的な read-eval-print ループを実装しています。標準的な Python の対話インタープリタループに似ていますが、 Python のものより便利ではありません。インタープリタループのより完全な実装については、 <a class="reference internal" href="code.html#module-code" title="code: read-eval-print ループを実装するのを助ける"><tt class="xref py py-mod docutils literal"><span class="pre">code</span></tt></a> モジュールを参照してください。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">traceback</span>
+
+<span class="k">def</span> <span class="nf">run_user_code</span><span class="p">(</span><span class="n">envdir</span><span class="p">):</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;&gt;&gt;&gt; &quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">exec</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">envdir</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Exception in user code:&quot;</span>
+        <span class="k">print</span> <span class="s">&#39;-&#39;</span><span class="o">*</span><span class="mi">60</span>
+        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;-&#39;</span><span class="o">*</span><span class="mi">60</span>
+
+<span class="n">envdir</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">run_user_code</span><span class="p">(</span><span class="n">envdir</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>以下の例は、例外とトレースバックに対する print と format の違いをデモします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">traceback</span>
+
+<span class="k">def</span> <span class="nf">lumberjack</span><span class="p">():</span>
+    <span class="n">bright_side_of_death</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">bright_side_of_death</span><span class="p">():</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">lumberjack</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+    <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&quot;*** print_tb:&quot;</span>
+    <span class="n">traceback</span><span class="o">.</span><span class="n">print_tb</span><span class="p">(</span><span class="n">exc_traceback</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;*** print_exception:&quot;</span>
+    <span class="n">traceback</span><span class="o">.</span><span class="n">print_exception</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span><span class="p">,</span>
+                              <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;*** print_exc:&quot;</span>
+    <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&quot;*** format_exc, first and last line:&quot;</span>
+    <span class="n">formatted_lines</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">formatted_lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">print</span> <span class="n">formatted_lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">print</span> <span class="s">&quot;*** format_exception:&quot;</span>
+    <span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span>
+                                          <span class="n">exc_traceback</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;*** extract_tb:&quot;</span>
+    <span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">extract_tb</span><span class="p">(</span><span class="n">exc_traceback</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;*** format_tb:&quot;</span>
+    <span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_tb</span><span class="p">(</span><span class="n">exc_traceback</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&quot;*** tb_lineno:&quot;</span><span class="p">,</span> <span class="n">exc_traceback</span><span class="o">.</span><span class="n">tb_lineno</span>
+</pre></div>
+</div>
+<p>この例の出力は次のようになります。</p>
+<div class="highlight-python"><pre>*** print_tb:
+  File "&lt;doctest...&gt;", line 10, in &lt;module&gt;
+    lumberjack()
+*** print_exception:
+Traceback (most recent call last):
+  File "&lt;doctest...&gt;", line 10, in &lt;module&gt;
+    lumberjack()
+  File "&lt;doctest...&gt;", line 4, in lumberjack
+    bright_side_of_death()
+IndexError: tuple index out of range
+*** print_exc:
+Traceback (most recent call last):
+  File "&lt;doctest...&gt;", line 10, in &lt;module&gt;
+    lumberjack()
+  File "&lt;doctest...&gt;", line 4, in lumberjack
+    bright_side_of_death()
+IndexError: tuple index out of range
+*** format_exc, first and last line:
+Traceback (most recent call last):
+IndexError: tuple index out of range
+*** format_exception:
+['Traceback (most recent call last):\n',
+ '  File "&lt;doctest...&gt;", line 10, in &lt;module&gt;\n    lumberjack()\n',
+ '  File "&lt;doctest...&gt;", line 4, in lumberjack\n    bright_side_of_death()\n',
+ '  File "&lt;doctest...&gt;", line 7, in bright_side_of_death\n    return tuple()[0]\n',
+ 'IndexError: tuple index out of range\n']
+*** extract_tb:
+[('&lt;doctest...&gt;', 10, '&lt;module&gt;', 'lumberjack()'),
+ ('&lt;doctest...&gt;', 4, 'lumberjack', 'bright_side_of_death()'),
+ ('&lt;doctest...&gt;', 7, 'bright_side_of_death', 'return tuple()[0]')]
+*** format_tb:
+['  File "&lt;doctest...&gt;", line 10, in &lt;module&gt;\n    lumberjack()\n',
+ '  File "&lt;doctest...&gt;", line 4, in lumberjack\n    bright_side_of_death()\n',
+ '  File "&lt;doctest...&gt;", line 7, in bright_side_of_death\n    return tuple()[0]\n']
+*** tb_lineno: 10</pre>
+</div>
+<p>次の例は、スタックの print と format の違いを示しています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">traceback</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">another_function</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">lumberstack</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">lumberstack</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">traceback</span><span class="o">.</span><span class="n">print_stack</span><span class="p">()</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">extract_stack</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_stack</span><span class="p">())</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">another_function</span><span class="p">()</span>
+<span class="go">  File &quot;&lt;doctest&gt;&quot;, line 10, in &lt;module&gt;</span>
+<span class="go">    another_function()</span>
+<span class="go">  File &quot;&lt;doctest&gt;&quot;, line 3, in another_function</span>
+<span class="go">    lumberstack()</span>
+<span class="go">  File &quot;&lt;doctest&gt;&quot;, line 6, in lumberstack</span>
+<span class="go">    traceback.print_stack()</span>
+<span class="go">[(&#39;&lt;doctest&gt;&#39;, 10, &#39;&lt;module&gt;&#39;, &#39;another_function()&#39;),</span>
+<span class="go"> (&#39;&lt;doctest&gt;&#39;, 3, &#39;another_function&#39;, &#39;lumberstack()&#39;),</span>
+<span class="go"> (&#39;&lt;doctest&gt;&#39;, 7, &#39;lumberstack&#39;, &#39;print repr(traceback.extract_stack())&#39;)]</span>
+<span class="go">[&#39;  File &quot;&lt;doctest&gt;&quot;, line 10, in &lt;module&gt;\n    another_function()\n&#39;,</span>
+<span class="go"> &#39;  File &quot;&lt;doctest&gt;&quot;, line 3, in another_function\n    lumberstack()\n&#39;,</span>
+<span class="go"> &#39;  File &quot;&lt;doctest&gt;&quot;, line 8, in lumberstack\n    print repr(traceback.format_stack())\n&#39;]</span>
+</pre></div>
+</div>
+<p>最後の例は、残りの幾つかの関数のデモをします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">traceback</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">traceback</span><span class="o">.</span><span class="n">format_list</span><span class="p">([(</span><span class="s">&#39;spam.py&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#39;&lt;module&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;spam.eggs()&#39;</span><span class="p">),</span>
+<span class="gp">... </span>                       <span class="p">(</span><span class="s">&#39;eggs.py&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">,</span> <span class="s">&#39;return &quot;bacon&quot;&#39;</span><span class="p">)])</span>
+<span class="go">[&#39;  File &quot;spam.py&quot;, line 3, in &lt;module&gt;\n    spam.eggs()\n&#39;,</span>
+<span class="go"> &#39;  File &quot;eggs.py&quot;, line 42, in eggs\n    return &quot;bacon&quot;\n&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">an_error</span> <span class="o">=</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;tuple index out of range&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exception_only</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">an_error</span><span class="p">),</span> <span class="n">an_error</span><span class="p">)</span>
+<span class="go">[&#39;IndexError: tuple index out of range\n&#39;]</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="__future__.html" title="27.11. __future__ — future 文の定義"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="atexit.html" title="27.9. atexit — 終了ハンドラ"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" >27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

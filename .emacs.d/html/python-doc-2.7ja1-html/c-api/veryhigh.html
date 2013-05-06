@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>超高レベルレイヤ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python/C API リファレンスマニュアル" href="index.html" />
+    <link rel="next" title="参照カウント" href="refcounting.html" />
+    <link rel="prev" title="はじめに" href="intro.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="refcounting.html" title="参照カウント"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="はじめに"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python/C API リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="intro.html"
+                        title="前の章へ">はじめに</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="refcounting.html"
+                        title="次の章へ">参照カウント</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/veryhigh.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="veryhigh">
+<span id="id1"></span><h1>超高レベルレイヤ<a class="headerlink" href="#veryhigh" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>この章の関数を使うとファイルまたはバッファにあるPythonソースコードを実行できますが、より詳細なやり取りをインタプリタとすることはできないでしょう。</p>
+<p>これらの関数のいくつかは引数として文法の開始記号を受け取ります。使用できる開始記号は <tt class="xref py py-const docutils literal"><span class="pre">Py_eval_input</span></tt> と <tt class="xref py py-const docutils literal"><span class="pre">Py_file_input</span></tt> 、
+<tt class="xref py py-const docutils literal"><span class="pre">Py_single_input</span></tt> です。開始期号の説明はこれらを引数として取る関数の後にあります。</p>
+<p>これらの関数のいくつかが <tt class="xref c c-type docutils literal"><span class="pre">FILE*</span></tt> 引数をとることにも注意してください。注意深く扱う必要がある特別な問題の1つは、異なるCライブラリの <tt class="xref c c-type docutils literal"><span class="pre">FILE</span></tt> 構造体は異なっていて互換性がない可能性があるということです。実際に(少なくとも)Windowsでは、動的リンクされる拡張が異なるライブラリを使うことが可能であり、したがって、 <tt class="xref c c-type docutils literal"><span class="pre">FILE*</span></tt> 引数がPythonランタイムが使っているライブラリと同じライブラリによって作成されたことが確かならば、単にこれらの関数へ渡すだけということに注意すべきです。</p>
+<dl class="function">
+<dt id="Py_Main">
+int <tt class="descname">Py_Main</tt><big>(</big>int<em>&nbsp;argc</em>, char<em>&nbsp;**argv</em><big>)</big><a class="headerlink" href="#Py_Main" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>標準インタプリタのためのメインプログラム。Pythonを組み込むプログラムのためにこれを利用できるようにしています。
+<em>argc</em> と <em>argv</em> 引数をCプログラムの <tt class="xref c c-func docutils literal"><span class="pre">main()</span></tt> 関数へ渡されるものとまったく同じに作成すべきです。引数リストが変更される可能性があるという点に注意することは重要です。
+(しかし、引数リストが指している文字列の内容は変更されません)。戻り値はインタプリタが(例外などではなく)普通に終了した時は <tt class="docutils literal"><span class="pre">0</span></tt> に、例外で終了したときには <tt class="docutils literal"><span class="pre">1</span></tt> に、引数リストが正しい Python コマンドラインが渡されなかったときは <tt class="docutils literal"><span class="pre">2</span></tt> になります。</p>
+<p><tt class="docutils literal"><span class="pre">Py_InspectFlag</span></tt> が設定されていない場合、未処理の <a class="reference internal" href="../library/exceptions.html#exceptions.SystemExit" title="exceptions.SystemExit"><tt class="xref py py-exc docutils literal"><span class="pre">SystemExit</span></tt></a> 例外が発生すると、この関数は <tt class="docutils literal"><span class="pre">1</span></tt> を返すのではなくプロセスを exit することに気をつけてください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_AnyFile">
+int <tt class="descname">PyRun_AnyFile</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em><big>)</big><a class="headerlink" href="#PyRun_AnyFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <a class="reference internal" href="#PyRun_AnyFileExFlags" title="PyRun_AnyFileExFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_AnyFileExFlags()</span></tt></a> の <em>closeit</em> を <tt class="docutils literal"><span class="pre">0</span></tt> に、 <em>flags</em> を
+<em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_AnyFileFlags">
+int <tt class="descname">PyRun_AnyFileFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_AnyFileFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <a class="reference internal" href="#PyRun_AnyFileExFlags" title="PyRun_AnyFileExFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_AnyFileExFlags()</span></tt></a> の <em>closeit</em> を <tt class="docutils literal"><span class="pre">0</span></tt> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_AnyFileEx">
+int <tt class="descname">PyRun_AnyFileEx</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;closeit</em><big>)</big><a class="headerlink" href="#PyRun_AnyFileEx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <a class="reference internal" href="#PyRun_AnyFileExFlags" title="PyRun_AnyFileExFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_AnyFileExFlags()</span></tt></a> の <em>flags</em> を <em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_AnyFileExFlags">
+int <tt class="descname">PyRun_AnyFileExFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;closeit</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_AnyFileExFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>fp</em> が対話的デバイス(コンソールや端末入力あるいはUnix仮想端末)と関連づけられたファイルを参照しているならば、
+<a class="reference internal" href="#PyRun_InteractiveLoop" title="PyRun_InteractiveLoop"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_InteractiveLoop()</span></tt></a> の値を返します。それ以外の場合は、
+<a class="reference internal" href="#PyRun_SimpleFile" title="PyRun_SimpleFile"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleFile()</span></tt></a> の結果を返します。 <em>filename</em> が
+<em>NULL</em> ならば、この関数はファイル名として <tt class="docutils literal"><span class="pre">&quot;???&quot;</span></tt> を使います。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_SimpleString">
+int <tt class="descname">PyRun_SimpleString</tt><big>(</big>const char<em>&nbsp;*command</em><big>)</big><a class="headerlink" href="#PyRun_SimpleString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <a class="reference internal" href="#PyRun_SimpleStringFlags" title="PyRun_SimpleStringFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleStringFlags()</span></tt></a> の <em>PyCompilerFlags*</em> を
+<em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_SimpleStringFlags">
+int <tt class="descname">PyRun_SimpleStringFlags</tt><big>(</big>const char<em>&nbsp;*command</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_SimpleStringFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../library/__main__.html#module-__main__" title="__main__: トップレベルスクリプトが実行される環境。"><tt class="xref py py-mod docutils literal"><span class="pre">__main__</span></tt></a> モジュールの中で <em>flags</em> に従って <em>command</em> に含まれる Python ソースコードを実行します。 <a class="reference internal" href="../library/__main__.html#module-__main__" title="__main__: トップレベルスクリプトが実行される環境。"><tt class="xref py py-mod docutils literal"><span class="pre">__main__</span></tt></a> がまだ存在しない場合は作成されます。正常終了の場合は <tt class="docutils literal"><span class="pre">0</span></tt> を返し、また例外が発生した場合は <tt class="docutils literal"><span class="pre">-1</span></tt> を返します。エラーがあっても、例外情報を得る方法はありません。
+<em>flags</em> の意味については、後述します。</p>
+<p><tt class="docutils literal"><span class="pre">Py_InspectFlag</span></tt> が設定されていない場合、未処理の <a class="reference internal" href="../library/exceptions.html#exceptions.SystemExit" title="exceptions.SystemExit"><tt class="xref py py-exc docutils literal"><span class="pre">SystemExit</span></tt></a> 例外が発生すると、この関数は <tt class="docutils literal"><span class="pre">1</span></tt> を返すのではなくプロセスを exit することに気をつけてください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_SimpleFile">
+int <tt class="descname">PyRun_SimpleFile</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em><big>)</big><a class="headerlink" href="#PyRun_SimpleFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleStringFileExFlags()</span></tt> の <em>closeit</em> を <tt class="docutils literal"><span class="pre">0</span></tt> に、 <em>flags</em> を
+<em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_SimpleFileFlags">
+int <tt class="descname">PyRun_SimpleFileFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_SimpleFileFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleStringFileExFlags()</span></tt> の <em>closeit</em> を <tt class="docutils literal"><span class="pre">0</span></tt>
+にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_SimpleFileEx">
+int <tt class="descname">PyRun_SimpleFileEx</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;closeit</em><big>)</big><a class="headerlink" href="#PyRun_SimpleFileEx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleStringFileExFlags()</span></tt> の <em>flags</em> を <em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_SimpleFileExFlags">
+int <tt class="descname">PyRun_SimpleFileExFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;closeit</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_SimpleFileExFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Similar to <a class="reference internal" href="#PyRun_SimpleStringFlags" title="PyRun_SimpleStringFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleStringFlags()</span></tt></a>, but the Python source
+<a class="reference internal" href="#PyRun_SimpleString" title="PyRun_SimpleString"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleString()</span></tt></a> と似ていますが、Pythonソースコードをメモリ内の文字列ではなく <em>fp</em> から読み込みます。
+<em>filename</em> はそのファイルの名前でなければなりません。 <em>closeit</em> が真ならば、PyRun_SimpleFileExFlags は処理を戻す前にファイルを閉じます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_InteractiveOne">
+int <tt class="descname">PyRun_InteractiveOne</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em><big>)</big><a class="headerlink" href="#PyRun_InteractiveOne" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <a class="reference internal" href="#PyRun_InteractiveOneFlags" title="PyRun_InteractiveOneFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_InteractiveOneFlags()</span></tt></a> の <em>flags</em> を <em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_InteractiveOneFlags">
+int <tt class="descname">PyRun_InteractiveOneFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_InteractiveOneFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>対話的デバイスに関連付けられたファイルから文を一つ読み込み、 <em>flags</em> に従って実行します。
+<tt class="docutils literal"><span class="pre">sys.ps1</span></tt> と <tt class="docutils literal"><span class="pre">sys.ps2</span></tt> を使って、ユーザにプロンプトを表示します。入力が正常に実行されたときは <tt class="docutils literal"><span class="pre">0</span></tt> を返します。例外が発生した場合は
+<tt class="docutils literal"><span class="pre">-1</span></tt> を返します。パースエラーの場合はPythonの一部として配布されている
+<tt class="file docutils literal"><span class="pre">errcode.h</span></tt> インクルードファイルにあるエラーコードを返します。
+(<tt class="file docutils literal"><span class="pre">Python.h</span></tt> は <tt class="file docutils literal"><span class="pre">errcode.h</span></tt> をインクルードしません。したがって、必要ならば特別にインクルードしなければならないことに注意してください。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_InteractiveLoop">
+int <tt class="descname">PyRun_InteractiveLoop</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em><big>)</big><a class="headerlink" href="#PyRun_InteractiveLoop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <a class="reference internal" href="#PyRun_InteractiveLoopFlags" title="PyRun_InteractiveLoopFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_InteractiveLoopFlags()</span></tt></a> の <em>flags</em> を <tt class="docutils literal"><span class="pre">0</span></tt> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_InteractiveLoopFlags">
+int <tt class="descname">PyRun_InteractiveLoopFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_InteractiveLoopFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>対話的デバイスに関連付けられたファイルからEOF に達するまで複数の文を読み込み実行します。使われます。 <tt class="docutils literal"><span class="pre">sys.ps1</span></tt> と <tt class="docutils literal"><span class="pre">sys.ps2</span></tt> を使って、ユーザにプロンプトを表示します。
+EOFに達すると <tt class="docutils literal"><span class="pre">0</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyParser_SimpleParseString">
+struct _node* <tt class="descname">PyParser_SimpleParseString</tt><big>(</big>const char<em>&nbsp;*str</em>, int<em>&nbsp;start</em><big>)</big><a class="headerlink" href="#PyParser_SimpleParseString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleParseStringFlagsFilename()</span></tt> の <em>filename</em> を <em>NULL</em>
+に、 <em>flags</em> を <tt class="docutils literal"><span class="pre">0</span></tt> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyParser_SimpleParseStringFlags">
+struct _node* <tt class="descname">PyParser_SimpleParseStringFlags</tt><big>(</big>const char<em>&nbsp;*str</em>, int<em>&nbsp;start</em>, int<em>&nbsp;flags</em><big>)</big><a class="headerlink" href="#PyParser_SimpleParseStringFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleParseStringFlagsFilename()</span></tt> の <em>filename</em> を <em>NULL</em>
+にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyParser_SimpleParseStringFlagsFilename">
+struct _node* <tt class="descname">PyParser_SimpleParseStringFlagsFilename</tt><big>(</big>const char<em>&nbsp;*str</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em>, int<em>&nbsp;flags</em><big>)</big><a class="headerlink" href="#PyParser_SimpleParseStringFlagsFilename" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>開始トークン <em>start</em> を使って <em>str</em> に含まれる Python ソースコードを <em>flags</em> 引数に従ってパースします。効率的に評価可能なコードオブジェクトを作成するためにその結果を使うことができます。コード断片を何度も評価しなければならない場合に役に立ちます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyParser_SimpleParseFile">
+struct _node* <tt class="descname">PyParser_SimpleParseFile</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em><big>)</big><a class="headerlink" href="#PyParser_SimpleParseFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下記の <tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleParseFileFlags()</span></tt> の <em>flags</em> を <tt class="docutils literal"><span class="pre">0</span></tt> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyParser_SimpleParseFileFlags">
+struct _node* <tt class="descname">PyParser_SimpleParseFileFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em>, int<em>&nbsp;flags</em><big>)</big><a class="headerlink" href="#PyParser_SimpleParseFileFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#PyParser_SimpleParseStringFlagsFilename" title="PyParser_SimpleParseStringFlagsFilename"><tt class="xref c c-func docutils literal"><span class="pre">PyParser_SimpleParseStringFlagsFilename()</span></tt></a> に似ていますが、
+Pythonソースコードをメモリ内の文字列ではなく <em>fp</em> から読み込みます。 <em>filename</em> はそのファイルの名前でなけれななりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_String">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyRun_String</tt><big>(</big>const char<em>&nbsp;*str</em>, int<em>&nbsp;start</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em><big>)</big><a class="headerlink" href="#PyRun_String" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>下記の <a class="reference internal" href="#PyRun_StringFlags" title="PyRun_StringFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_StringFlags()</span></tt></a> の <em>flags</em> を <em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_StringFlags">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyRun_StringFlags</tt><big>(</big>const char<em>&nbsp;*str</em>, int<em>&nbsp;start</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_StringFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>辞書 <em>globals</em> と <em>locals</em> で指定されるコンテキストにおいて、 <em>str</em> に含まれるPythonソースコードをコンパイラフラグ <em>flags</em> のもとで実行します。パラメータ <em>start</em> はソースコードをパースするために使われるべき開始トークンを指定します。</p>
+<p>コードを実行した結果をPythonオブジェクトとして返します。または、例外が発生したならば <em>NULL</em> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_File">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyRun_File</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em><big>)</big><a class="headerlink" href="#PyRun_File" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>下記の <a class="reference internal" href="#PyRun_FileExFlags" title="PyRun_FileExFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_FileExFlags()</span></tt></a> の <em>closeit</em> を <tt class="docutils literal"><span class="pre">0</span></tt> にし、 <em>flags</em>
+を <em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_FileEx">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyRun_FileEx</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em>, int<em>&nbsp;closeit</em><big>)</big><a class="headerlink" href="#PyRun_FileEx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>下記の <a class="reference internal" href="#PyRun_FileExFlags" title="PyRun_FileExFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_FileExFlags()</span></tt></a> の <em>flags</em> を <em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_FileFlags">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyRun_FileFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_FileFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>下記の <a class="reference internal" href="#PyRun_FileExFlags" title="PyRun_FileExFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_FileExFlags()</span></tt></a> の <em>closeit</em> を <tt class="docutils literal"><span class="pre">0</span></tt> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyRun_FileExFlags">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyRun_FileExFlags</tt><big>(</big>FILE<em>&nbsp;*fp</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em>, int<em>&nbsp;closeit</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#PyRun_FileExFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><a class="reference internal" href="#PyRun_String" title="PyRun_String"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_String()</span></tt></a> と似ていますが、Pythonソースコードをメモリ内の文字列ではなく <em>fp</em> から読み込みます。 <em>closeit</em>
+を真にすると、 <a class="reference internal" href="#PyRun_FileExFlags" title="PyRun_FileExFlags"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_FileExFlags()</span></tt></a> から処理を戻す前にファイルを閉じます。
+<em>filename</em> はそのファイルの名前でなければなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Py_CompileString">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">Py_CompileString</tt><big>(</big>const char<em>&nbsp;*str</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em><big>)</big><a class="headerlink" href="#Py_CompileString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>下記の <a class="reference internal" href="#Py_CompileStringFlags" title="Py_CompileStringFlags"><tt class="xref c c-func docutils literal"><span class="pre">Py_CompileStringFlags()</span></tt></a> の <em>flags</em> を <em>NULL</em> にして単純化したインタフェースです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Py_CompileStringFlags">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">Py_CompileStringFlags</tt><big>(</big>const char<em>&nbsp;*str</em>, const char<em>&nbsp;*filename</em>, int<em>&nbsp;start</em>, <a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*flags</em><big>)</big><a class="headerlink" href="#Py_CompileStringFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>str</em> 内のPythonソースコードをパースしてコンパイルし、作られたコードオブジェクトを返します。開始トークンは
+<em>start</em> によって与えられます。これはコンパイル可能なコードを制限するために使うことができ、 <tt class="xref py py-const docutils literal"><span class="pre">Py_eval_input</span></tt> 、
+<tt class="xref py py-const docutils literal"><span class="pre">Py_file_input</span></tt> もしくは <tt class="xref py py-const docutils literal"><span class="pre">Py_single_input</span></tt> であるべきです。
+<em>filename</em> で指定されるファイル名はコードオブジェクトを構築するために使われ、トレースバックあるいは <a class="reference internal" href="../library/exceptions.html#exceptions.SyntaxError" title="exceptions.SyntaxError"><tt class="xref py py-exc docutils literal"><span class="pre">SyntaxError</span></tt></a> 例外メッセージに出てくる可能性があります。コードがパースできなかったりコンパイルできなかったりした場合に、これは <em>NULL</em> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyEval_EvalCode">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyEval_EvalCode</tt><big>(</big><a class="reference internal" href="code.html#PyCodeObject" title="PyCodeObject">PyCodeObject</a><em>&nbsp;*co</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em><big>)</big><a class="headerlink" href="#PyEval_EvalCode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><a class="reference internal" href="#PyEval_EvalCodeEx" title="PyEval_EvalCodeEx"><tt class="xref c c-func docutils literal"><span class="pre">PyEval_EvalCodeEx()</span></tt></a> に対するシンプルなインタフェースで、コードオブジェクトと、グローバル・ローカル変数辞書だけを受け取ります。他の引数には <em>NULL</em> が渡されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyEval_EvalCodeEx">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyEval_EvalCodeEx</tt><big>(</big><a class="reference internal" href="code.html#PyCodeObject" title="PyCodeObject">PyCodeObject</a><em>&nbsp;*co</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*globals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*locals</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;**args</em>, int<em>&nbsp;argcount</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;**kws</em>, int<em>&nbsp;kwcount</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;**defs</em>, int<em>&nbsp;defcount</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*closure</em><big>)</big><a class="headerlink" href="#PyEval_EvalCodeEx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた特定の環境で、コンパイル済みのコードオブジェクトを評価します。環境はグローバルとローカルの辞書、引き数の配列、キーワードとデフォルト値、クロージャーのためのセルのタプルで構成されています。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyEval_EvalFrame">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyEval_EvalFrame</tt><big>(</big>PyFrameObject<em>&nbsp;*f</em><big>)</big><a class="headerlink" href="#PyEval_EvalFrame" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>実行フレームを評価します。これは PyEval_EvalFrameEx に対するシンプルなインタフェースで、後方互換性のためのものです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyEval_EvalFrameEx">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyEval_EvalFrameEx</tt><big>(</big>PyFrameObject<em>&nbsp;*f</em>, int<em>&nbsp;throwflag</em><big>)</big><a class="headerlink" href="#PyEval_EvalFrameEx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python のインタープリタの主要な、直接的な関数です。この関数には 2000 行ほどあります。実行フレーム <em>f</em> に関連付けられたコードオブジェクトを実行します。バイトコードを解釈して、必要に応じて呼び出しを実行します。追加の <em>throwflag</em> 引数はほとんど無視できます。 - もし true なら、すぐに例外を発生させます。これはジェネレータオブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">throw()</span></tt>
+メソッドで利用されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyEval_MergeCompilerFlags">
+int <tt class="descname">PyEval_MergeCompilerFlags</tt><big>(</big><a class="reference internal" href="#PyCompilerFlags" title="PyCompilerFlags">PyCompilerFlags</a><em>&nbsp;*cf</em><big>)</big><a class="headerlink" href="#PyEval_MergeCompilerFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の評価フレームのフラグを変更します。成功したら true を、失敗したら false を返します。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="Py_eval_input">
+int <tt class="descname">Py_eval_input</tt><a class="headerlink" href="#Py_eval_input" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-0">単独の式に対するPython文法の開始記号で、 <a class="reference internal" href="#Py_CompileString" title="Py_CompileString"><tt class="xref c c-func docutils literal"><span class="pre">Py_CompileString()</span></tt></a> と一緒に使います。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="Py_file_input">
+int <tt class="descname">Py_file_input</tt><a class="headerlink" href="#Py_file_input" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-1">ファイルあるいは他のソースから読み込まれた文の並びに対するPython文法の開始記号で、 <a class="reference internal" href="#Py_CompileString" title="Py_CompileString"><tt class="xref c c-func docutils literal"><span class="pre">Py_CompileString()</span></tt></a> と一緒に使います。これは任意の長さのPythonソースコードをコンパイルするときに使う記号です。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="Py_single_input">
+int <tt class="descname">Py_single_input</tt><a class="headerlink" href="#Py_single_input" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-2">単一の文に対するPython文法の開始記号で、 <a class="reference internal" href="#Py_CompileString" title="Py_CompileString"><tt class="xref c c-func docutils literal"><span class="pre">Py_CompileString()</span></tt></a> と一緒に使います。これは対話式のインタプリタループのための記号です。</p>
+</dd></dl>
+
+<dl class="type">
+<dt id="PyCompilerFlags">
+struct <tt class="descname">PyCompilerFlags</tt><a class="headerlink" href="#PyCompilerFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンパイラフラグを収めておくための構造体です。コードをコンパイルするだけの場合、この構造体が <tt class="docutils literal"><span class="pre">int</span> <span class="pre">flags</span></tt> として渡されます。コードを実行する場合には <tt class="docutils literal"><span class="pre">PyCompilerFlags</span> <span class="pre">*flags</span></tt> として渡されます。この場合、 <tt class="docutils literal"><span class="pre">from</span> <span class="pre">__future__</span>&nbsp; <span class="pre">import</span></tt> は
+<em>flags</em> の内容を変更できます。</p>
+<p><tt class="docutils literal"><span class="pre">PyCompilerFlags</span> <span class="pre">*flags</span></tt> が <em>NULL</em> の場合、 <tt class="xref py py-attr docutils literal"><span class="pre">cf_flags</span></tt> は <tt class="docutils literal"><span class="pre">0</span></tt> として扱われ、
+<tt class="docutils literal"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span></tt> による変更は無視されます。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">struct</span> <span class="n">PyCompilerFlags</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">cf_flags</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="var">
+<dt id="CO_FUTURE_DIVISION">
+int <tt class="descname">CO_FUTURE_DIVISION</tt><a class="headerlink" href="#CO_FUTURE_DIVISION" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このビットを <em>flags</em> にセットすると、除算演算子 <tt class="docutils literal"><span class="pre">/</span></tt> は <span class="target" id="index-3"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0238"><strong>PEP 238</strong></a> による「真の除算 (true division)」として扱われます。</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="refcounting.html" title="参照カウント"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="はじめに"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

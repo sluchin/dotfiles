@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>27.12. gc — ガベージコレクタインターフェース &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="27. Python ランタイムサービス" href="python.html" />
+    <link rel="next" title="27.13. inspect — 活動中のオブジェクトの情報を取得する" href="inspect.html" />
+    <link rel="prev" title="27.11. __future__ — future 文の定義" href="__future__.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="inspect.html" title="27.13. inspect — 活動中のオブジェクトの情報を取得する"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="__future__.html" title="27.11. __future__ — future 文の定義"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" accesskey="U">27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="__future__.html"
+                        title="前の章へ">27.11. <tt class="docutils literal docutils literal"><span class="pre">__future__</span></tt> &#8212; future 文の定義</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="inspect.html"
+                        title="次の章へ">27.13. <tt class="docutils literal"><span class="pre">inspect</span></tt> &#8212; 活動中のオブジェクトの情報を取得する</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/gc.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-gc">
+<span id="gc"></span><h1>27.12. <a class="reference internal" href="#module-gc" title="gc: 循環検出ガベージコレクタのインターフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">gc</span></tt></a> &#8212; ガベージコレクタインターフェース<a class="headerlink" href="#module-gc" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>このモジュールは、循環ガベージコレクタの無効化・検出頻度の調整・デバッグオブションの設定などを行うインターフェースを提供します。また、検出した到達不能オブジェクトのうち、解放する事ができないオブジェクトを参照する事もできます。循環ガベージコレクタはPyhonの参照カウントを補うためのものなので、もしプログラム中で循環参照が発生しない事が明らかな場合には検出をする必要はありません。自動検出は、 <tt class="docutils literal"><span class="pre">gc.disable()</span></tt> で停止する事ができます。メモリリークをデバッグするときには、 <tt class="docutils literal"><span class="pre">gc.set_debug(gc.DEBUG_LEAK)</span></tt> とします。これは <tt class="docutils literal"><span class="pre">gc.DEBUG_SAVEALL</span></tt> を含んでいることに注意しましょう。ガベージとして検出されたオブジェクトは、インスペクション用に gc.garbage
+に保存されます。</p>
+<p><a class="reference internal" href="#module-gc" title="gc: 循環検出ガベージコレクタのインターフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">gc</span></tt></a> モジュールは、以下の関数を提供しています。</p>
+<dl class="function">
+<dt id="gc.enable">
+<tt class="descclassname">gc.</tt><tt class="descname">enable</tt><big>(</big><big>)</big><a class="headerlink" href="#gc.enable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>自動ガベージコレクションを有効にします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.disable">
+<tt class="descclassname">gc.</tt><tt class="descname">disable</tt><big>(</big><big>)</big><a class="headerlink" href="#gc.disable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>自動ガベージコレクションを無効にします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.isenabled">
+<tt class="descclassname">gc.</tt><tt class="descname">isenabled</tt><big>(</big><big>)</big><a class="headerlink" href="#gc.isenabled" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>自動ガベージコレクションが有効なら真を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.collect">
+<tt class="descclassname">gc.</tt><tt class="descname">collect</tt><big>(</big><span class="optional">[</span><em>generation</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#gc.collect" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数を指定しない場合は、全ての検出を行います。オプションの引数 <em>generation</em> は、どの世代を検出するかを (0 から 2 までの)
+整数値で指定します。無効な世代番号を指定した場合は <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が発生します。検出した到達不可オブジェクトの数を返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>オプションの引数 <em>generation</em> が追加されました.</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>幾つかの組み込み型のフリーリストは、最高(第二)世代のGC、あるいはフルGCが
+実行されるたびにクリアされます。
+幾つかの型(特に <a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> と <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>)では、実装によっては、
+フリーリスト内の全てのオブジェクトが開放されるとは限りません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.set_debug">
+<tt class="descclassname">gc.</tt><tt class="descname">set_debug</tt><big>(</big><em>flags</em><big>)</big><a class="headerlink" href="#gc.set_debug" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ガベージコレクションのデバッグフラグを設定します。デバッグ情報は <tt class="docutils literal"><span class="pre">sys.stderr</span></tt> に出力されます。デバッグフラグは、下の値の組み合わせを指定する事ができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.get_debug">
+<tt class="descclassname">gc.</tt><tt class="descname">get_debug</tt><big>(</big><big>)</big><a class="headerlink" href="#gc.get_debug" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のデバッグフラグを返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.get_objects">
+<tt class="descclassname">gc.</tt><tt class="descname">get_objects</tt><big>(</big><big>)</big><a class="headerlink" href="#gc.get_objects" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在追跡しているオブジェクトのリストを返します。このリストには、戻り値のリスト自身は含まれていません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.set_threshold">
+<tt class="descclassname">gc.</tt><tt class="descname">set_threshold</tt><big>(</big><em>threshold0</em><span class="optional">[</span>, <em>threshold1</em><span class="optional">[</span>, <em>threshold2</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#gc.set_threshold" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ガベージコレクションの閾値（検出頻度）を指定します。 <em>threshold0</em> を 0 にすると、検出は行われません。</p>
+<p>GCは、オブジェクトを走査された回数に従って3世代に分類します。新しいオブジェクトは最も若い(<tt class="docutils literal"><span class="pre">0</span></tt> 世代)に分類されます。もし、そのオブジェクトがガベージコレクションで削除されなければ、次に古い世代に分類されます。もっとも古い世代は <tt class="docutils literal"><span class="pre">2</span></tt> 世代で、この世代に属するオブジェクトは他の世代に移動しません。ガベージコレクタは、最後に検出を行ってから生成・削除したオブジェクトの数をカウントしており、この数によって検出を開始します。オブジェクトの生成数 - 削除数が <em>threshold0</em> より大きくなると、検出を開始します。最初は <tt class="docutils literal"><span class="pre">0</span></tt> 世代のオブジェクトのみが検査されます。 <tt class="docutils literal"><span class="pre">0</span></tt> 世代の検査が <tt class="docutils literal"><span class="pre">threshold1</span></tt> 回実行されると、
+<tt class="docutils literal"><span class="pre">1</span></tt> 世代のオブジェクトの検査を行います。同様に、 <tt class="docutils literal"><span class="pre">1</span></tt> 世代が <tt class="docutils literal"><span class="pre">threshold2</span></tt> 回検査されると、 <tt class="docutils literal"><span class="pre">2</span></tt> 世代の検査を行います。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.get_count">
+<tt class="descclassname">gc.</tt><tt class="descname">get_count</tt><big>(</big><big>)</big><a class="headerlink" href="#gc.get_count" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の検出数を、 <tt class="docutils literal"><span class="pre">(count0,</span> <span class="pre">count1,</span> <span class="pre">count2)</span></tt> のタプルで返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.get_threshold">
+<tt class="descclassname">gc.</tt><tt class="descname">get_threshold</tt><big>(</big><big>)</big><a class="headerlink" href="#gc.get_threshold" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の検出閾値を、 <tt class="docutils literal"><span class="pre">(threshold0,</span> <span class="pre">threshold1,</span> <span class="pre">threshold2)</span></tt> のタプルで返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.get_referrers">
+<tt class="descclassname">gc.</tt><tt class="descname">get_referrers</tt><big>(</big><em>*objs</em><big>)</big><a class="headerlink" href="#gc.get_referrers" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>objsで指定したオブジェクトのいずれかを参照しているオブジェクトのリストを返します。この関数では、ガベージコレクションをサポートしているコンテナのみを返します。他のオブジェクトを参照していても、ガベージコレクションをサポートしていない拡張型は含まれません。</p>
+<p>尚、戻り値のリストには、すでに参照されなくなっているが、循環参照の一部でまだガベージコレクションで回収されていないオブジェクトも含まれるので注意が必要です。有効なオブジェクトのみを取得する場合、 <a class="reference internal" href="#gc.get_referrers" title="gc.get_referrers"><tt class="xref py py-func docutils literal"><span class="pre">get_referrers()</span></tt></a> の前に <a class="reference internal" href="#gc.collect" title="gc.collect"><tt class="xref py py-func docutils literal"><span class="pre">collect()</span></tt></a> を呼び出してください。</p>
+<p><a class="reference internal" href="#gc.get_referrers" title="gc.get_referrers"><tt class="xref py py-func docutils literal"><span class="pre">get_referrers()</span></tt></a> から返されるオブジェクトは作りかけや利用できない状態である場合があるので、利用する際には注意が必要です。
+<a class="reference internal" href="#gc.get_referrers" title="gc.get_referrers"><tt class="xref py py-func docutils literal"><span class="pre">get_referrers()</span></tt></a> をデバッグ以外の目的で利用するのは避けてください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.get_referents">
+<tt class="descclassname">gc.</tt><tt class="descname">get_referents</tt><big>(</big><em>*objs</em><big>)</big><a class="headerlink" href="#gc.get_referents" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数で指定したオブジェクトのいずれかから参照されている、全てのオブジェクトのリストを返します。参照先のオブジェクトは、引数で指定したオブジェクトの
+Cレベルメソッド <tt class="xref py py-attr docutils literal"><span class="pre">tp_traverse</span></tt> で取得し、全てのオブジェクトが直接到達可能な全てのオブジェクトを返すわけではありません。 <tt class="xref py py-attr docutils literal"><span class="pre">tp_traverse</span></tt> はガベージコレクションをサポートするオブジェクトのみが実装しており、ここで取得できるオブジェクトは循環参照の一部となる可能性のあるオブジェクトのみです。従って、例えば整数オブジェクトが直接到達可能であっても、このオブジェクトは戻り値には含まれません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="gc.is_tracked">
+<tt class="descclassname">gc.</tt><tt class="descname">is_tracked</tt><big>(</big><em>obj</em><big>)</big><a class="headerlink" href="#gc.is_tracked" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">obj</span></tt> がGCに管理されていたら True を返し、それ以外の場合は False を返します。一般的なルールとして、アトミックな(訳注:他のオブジェクトを参照しないで単一で値を表す型。 int や str など)型のインスタンスは管理されず、それ以外の型
+(コンテナ型、ユーザー定義型など) のインスタンスは管理されます。しかし、いくつかの型では専用の最適化を行い、シンプルなインスタンスの場合に
+GCのオーバーヘッドを減らしています。 (例: 全ての key と value がアトミック型の値である dict)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span><span class="o">.</span><span class="n">is_tracked</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span><span class="o">.</span><span class="n">is_tracked</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span><span class="o">.</span><span class="n">is_tracked</span><span class="p">([])</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span><span class="o">.</span><span class="n">is_tracked</span><span class="p">({})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span><span class="o">.</span><span class="n">is_tracked</span><span class="p">({</span><span class="s">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span><span class="o">.</span><span class="n">is_tracked</span><span class="p">({</span><span class="s">&quot;a&quot;</span><span class="p">:</span> <span class="p">[]})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<p>以下の変数は読み込み専用です。(変更することはできますが、再バインドする事はできません。）</p>
+<dl class="data">
+<dt id="gc.garbage">
+<tt class="descclassname">gc.</tt><tt class="descname">garbage</tt><a class="headerlink" href="#gc.garbage" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>到達不能であることが検出されたが、解放する事ができないオブジェクトのリスト（回収不能オブジェクト）。デフォルトでは、 <a class="reference internal" href="../reference/datamodel.html#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドを持つオブジェクトのみが格納されます。  <a class="footnote-reference" href="#id2" id="id1">[1]</a></p>
+<p><a class="reference internal" href="../reference/datamodel.html#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドを持つオブジェクトが循環参照に含まれている場合、その循環参照全体と、循環参照からのみ到達する事ができるオブジェクトは回収不能となります。このような場合には、Pythonは安全に <a class="reference internal" href="../reference/datamodel.html#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a>
+を呼び出す順番を決定する事ができないため、自動的に解放することはできません。もし安全な解放順序がわかるのであれば、 <em>garbage</em> リストを参照して循環参照を破壊する事ができます。循環参照を破壊した後でも、そのオブジェクトは <em>garbage</em> リストから参照されているため、解放されません。解放するためには、循環参照を破壊した後、 <tt class="docutils literal"><span class="pre">del</span> <span class="pre">gc.garbage[:]</span></tt> のように <em>garbage</em> からオブジェクトを削除する必要があります。一般的には
+<a class="reference internal" href="../reference/datamodel.html#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> を持つオブジェクトが循環参照の一部とはならないように配慮し、 <em>garbage</em> はそのような循環参照が発生していない事を確認するために利用する方が良いでしょう。</p>
+<p><a class="reference internal" href="#gc.DEBUG_SAVEALL" title="gc.DEBUG_SAVEALL"><tt class="xref py py-const docutils literal"><span class="pre">DEBUG_SAVEALL</span></tt></a> が設定されている場合、全ての到達不能オブジェクトは解放されずにこのリストに格納されます。</p>
+</dd></dl>
+
+<p>以下は <a class="reference internal" href="#gc.set_debug" title="gc.set_debug"><tt class="xref py py-func docutils literal"><span class="pre">set_debug()</span></tt></a> に指定することのできる定数です。</p>
+<dl class="data">
+<dt id="gc.DEBUG_STATS">
+<tt class="descclassname">gc.</tt><tt class="descname">DEBUG_STATS</tt><a class="headerlink" href="#gc.DEBUG_STATS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>検出中に統計情報を出力します。この情報は、検出頻度を最適化する際に有益です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="gc.DEBUG_COLLECTABLE">
+<tt class="descclassname">gc.</tt><tt class="descname">DEBUG_COLLECTABLE</tt><a class="headerlink" href="#gc.DEBUG_COLLECTABLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>見つかった回収可能オブジェクトの情報を出力します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="gc.DEBUG_UNCOLLECTABLE">
+<tt class="descclassname">gc.</tt><tt class="descname">DEBUG_UNCOLLECTABLE</tt><a class="headerlink" href="#gc.DEBUG_UNCOLLECTABLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>見つかった回収不能オブジェクト（到達不能だが、ガベージコレクションで解放する事ができないオブジェクト）の情報を出力します。回収不能オブジェクトは、 <tt class="docutils literal"><span class="pre">garbade</span></tt> リストに追加されます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="gc.DEBUG_INSTANCES">
+<tt class="descclassname">gc.</tt><tt class="descname">DEBUG_INSTANCES</tt><a class="headerlink" href="#gc.DEBUG_INSTANCES" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#gc.DEBUG_COLLECTABLE" title="gc.DEBUG_COLLECTABLE"><tt class="xref py py-const docutils literal"><span class="pre">DEBUG_COLLECTABLE</span></tt></a> か <a class="reference internal" href="#gc.DEBUG_UNCOLLECTABLE" title="gc.DEBUG_UNCOLLECTABLE"><tt class="xref py py-const docutils literal"><span class="pre">DEBUG_UNCOLLECTABLE</span></tt></a> が設定されている場合、見つかったインスタンスオブジェクトの情報を出力します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="gc.DEBUG_OBJECTS">
+<tt class="descclassname">gc.</tt><tt class="descname">DEBUG_OBJECTS</tt><a class="headerlink" href="#gc.DEBUG_OBJECTS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#gc.DEBUG_COLLECTABLE" title="gc.DEBUG_COLLECTABLE"><tt class="xref py py-const docutils literal"><span class="pre">DEBUG_COLLECTABLE</span></tt></a> か <a class="reference internal" href="#gc.DEBUG_UNCOLLECTABLE" title="gc.DEBUG_UNCOLLECTABLE"><tt class="xref py py-const docutils literal"><span class="pre">DEBUG_UNCOLLECTABLE</span></tt></a> が設定されている場合、見つかったインスタンスオブジェクト以外のオブジェクトの情報を出力します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="gc.DEBUG_SAVEALL">
+<tt class="descclassname">gc.</tt><tt class="descname">DEBUG_SAVEALL</tt><a class="headerlink" href="#gc.DEBUG_SAVEALL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>設定されている場合、全ての到達不能オブジェクトは解放されずに <em>garbage</em> に追加されます。これはプログラムのメモリリークをデバッグするときに便利です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="gc.DEBUG_LEAK">
+<tt class="descclassname">gc.</tt><tt class="descname">DEBUG_LEAK</tt><a class="headerlink" href="#gc.DEBUG_LEAK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プログラムのメモリリークをデバッグするときに指定します。（ <tt class="docutils literal"><span class="pre">DEBUG_COLLECTABLE</span> <span class="pre">|</span> <span class="pre">DEBUG_UNCOLLECTABLE</span> <span class="pre">|</span>
+<span class="pre">DEBUG_INSTANCES</span> <span class="pre">|</span>&nbsp; <span class="pre">DEBUG_OBJECTS</span> <span class="pre">|</span> <span class="pre">DEBUG_SAVEALL</span></tt> と同じ。）</p>
+</dd></dl>
+
+<p class="rubric">注記</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Python 2.2より前のバージョンでは、 <a class="reference internal" href="../reference/datamodel.html#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドを持つオブジェクトだけでなく、全ての到達不能オブジェクトが格納されていた。）</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="inspect.html" title="27.13. inspect — 活動中のオブジェクトの情報を取得する"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="__future__.html" title="27.11. __future__ — future 文の定義"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" >27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

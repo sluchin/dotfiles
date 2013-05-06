@@ -1,0 +1,189 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>31.8. tabnanny — あいまいなインデントの検出 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="31. Python言語サービス" href="language.html" />
+    <link rel="next" title="31.9. pyclbr — Python クラスブラウザサポート" href="pyclbr.html" />
+    <link rel="prev" title="31.7. tokenize — Pythonソースのためのトークナイザ" href="tokenize.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pyclbr.html" title="31.9. pyclbr — Python クラスブラウザサポート"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="tokenize.html" title="31.7. tokenize — Pythonソースのためのトークナイザ"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" accesskey="U">31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="tokenize.html"
+                        title="前の章へ">31.7. <tt class="docutils literal docutils literal"><span class="pre">tokenize</span></tt> &#8212; Pythonソースのためのトークナイザ</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="pyclbr.html"
+                        title="次の章へ">31.9. <tt class="docutils literal docutils literal docutils literal"><span class="pre">pyclbr</span></tt> &#8212; Python クラスブラウザサポート</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/tabnanny.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-tabnanny">
+<span id="tabnanny"></span><h1>31.8. <a class="reference internal" href="#module-tabnanny" title="tabnanny: ディレクトリツリー内の Python のソースファイルで問題となる空白を検出するツール。"><tt class="xref py py-mod docutils literal"><span class="pre">tabnanny</span></tt></a> &#8212; あいまいなインデントの検出<a class="headerlink" href="#module-tabnanny" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>差し当たり、このモジュールはスクリプトとして呼び出すことを意図しています。しかし、IDE 上にインポートして下で説明する関数 <a class="reference internal" href="#tabnanny.check" title="tabnanny.check"><tt class="xref py py-func docutils literal"><span class="pre">check()</span></tt></a> を使うことができます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">このモジュールが提供する API を将来のリリースで変更する確率が高いです。このような変更は後方互換性がないかもしれません。</p>
+</div>
+<dl class="function">
+<dt id="tabnanny.check">
+<tt class="descclassname">tabnanny.</tt><tt class="descname">check</tt><big>(</big><em>file_or_dir</em><big>)</big><a class="headerlink" href="#tabnanny.check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>file_or_dir</em> がディレクトリであってシンボリックリンクでないときに、
+<em>file_or_dir</em> という名前のディレクトリツリーを再帰的に下って行き、この通り道に沿ってすべての <tt class="file docutils literal"><span class="pre">.py</span></tt> ファイルを変更します。
+<em>file_or_dir</em> が通常の Python ソースファイルの場合には、問題のある空白をチェックします。診断メッセージは print 文を使って標準出力に書き込まれます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tabnanny.verbose">
+<tt class="descclassname">tabnanny.</tt><tt class="descname">verbose</tt><a class="headerlink" href="#tabnanny.verbose" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>冗長なメッセージをプリントするかどうかを示すフラグ。スクリプトとして呼び出された場合は、 <tt class="docutils literal"><span class="pre">-v</span></tt> オプションによって増加します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tabnanny.filename_only">
+<tt class="descclassname">tabnanny.</tt><tt class="descname">filename_only</tt><a class="headerlink" href="#tabnanny.filename_only" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>問題のある空白を含むファイルのファイル名のみをプリントするかどうかを示すフラグ。スクリプトとして呼び出された場合は、 <tt class="docutils literal"><span class="pre">-q</span></tt> オプションによって真に設定されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tabnanny.NannyNag">
+<em class="property">exception </em><tt class="descclassname">tabnanny.</tt><tt class="descname">NannyNag</tt><a class="headerlink" href="#tabnanny.NannyNag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>あいまいなインデントを検出した場合に <a class="reference internal" href="#tabnanny.tokeneater" title="tabnanny.tokeneater"><tt class="xref py py-func docutils literal"><span class="pre">tokeneater()</span></tt></a> によって発生させられます。
+<a class="reference internal" href="#tabnanny.check" title="tabnanny.check"><tt class="xref py py-func docutils literal"><span class="pre">check()</span></tt></a> で捕捉され処理されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tabnanny.tokeneater">
+<tt class="descclassname">tabnanny.</tt><tt class="descname">tokeneater</tt><big>(</big><em>type</em>, <em>token</em>, <em>start</em>, <em>end</em>, <em>line</em><big>)</big><a class="headerlink" href="#tabnanny.tokeneater" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数は関数 <a class="reference internal" href="tokenize.html#tokenize.tokenize" title="tokenize.tokenize"><tt class="xref py py-func docutils literal"><span class="pre">tokenize.tokenize()</span></tt></a> へのコールバックパラメータとして
+<a class="reference internal" href="#tabnanny.check" title="tabnanny.check"><tt class="xref py py-func docutils literal"><span class="pre">check()</span></tt></a> によって使われます。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="tokenize.html#module-tokenize" title="tokenize: Pythonソースコードのための字句解析器。"><tt class="xref py py-mod docutils literal"><span class="pre">tokenize</span></tt></a> モジュール</dt>
+<dd>Pythonソースコードの字句解析器。</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pyclbr.html" title="31.9. pyclbr — Python クラスブラウザサポート"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="tokenize.html" title="31.7. tokenize — Pythonソースのためのトークナイザ"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" >31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

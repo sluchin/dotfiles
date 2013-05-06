@@ -1,0 +1,382 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>31.3. symtable — コンパイラの記号表へのアクセス &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="31. Python言語サービス" href="language.html" />
+    <link rel="next" title="31.4. symbol — Python 解析木と共に使われる定数" href="symbol.html" />
+    <link rel="prev" title="31.2. 抽象構文木" href="ast.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="symbol.html" title="31.4. symbol — Python 解析木と共に使われる定数"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="ast.html" title="31.2. 抽象構文木"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" accesskey="U">31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">31.3. <tt class="docutils literal"><span class="pre">symtable</span></tt> &#8212; コンパイラの記号表へのアクセス</a><ul>
+<li><a class="reference internal" href="#id1">31.3.1. 記号表の生成</a></li>
+<li><a class="reference internal" href="#id2">31.3.2. 記号表の検査</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="ast.html"
+                        title="前の章へ">31.2. 抽象構文木</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="symbol.html"
+                        title="次の章へ">31.4. <tt class="docutils literal docutils literal"><span class="pre">symbol</span></tt> &#8212; Python 解析木と共に使われる定数</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/symtable.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-symtable">
+<span id="symtable"></span><h1>31.3. <a class="reference internal" href="#module-symtable" title="symtable: コンパイラ内部の記号表へのインターフェイス。"><tt class="xref py py-mod docutils literal"><span class="pre">symtable</span></tt></a> &#8212; コンパイラの記号表へのアクセス<a class="headerlink" href="#module-symtable" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>記号表(symbol table)は、コンパイラが AST からバイトコードを生成する直前に作られます。記号表はコード中の全ての識別子のスコープの算出に責任を持ちます。
+<a class="reference internal" href="#module-symtable" title="symtable: コンパイラ内部の記号表へのインターフェイス。"><tt class="xref py py-mod docutils literal"><span class="pre">symtable</span></tt></a> はこうした記号表を調べるインターフェイスを提供します。</p>
+<div class="section" id="id1">
+<h2>31.3.1. 記号表の生成<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="symtable.symtable">
+<tt class="descclassname">symtable.</tt><tt class="descname">symtable</tt><big>(</big><em>code</em>, <em>filename</em>, <em>compile_type</em><big>)</big><a class="headerlink" href="#symtable.symtable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python ソース <em>code</em> に対するトップレベルの <a class="reference internal" href="#symtable.SymbolTable" title="symtable.SymbolTable"><tt class="xref py py-class docutils literal"><span class="pre">SymbolTable</span></tt></a>
+を返します。 <em>filename</em> はコードを収めてあるファイルの名前です。
+<em>compile_type</em> は <a class="reference internal" href="functions.html#compile" title="compile"><tt class="xref py py-func docutils literal"><span class="pre">compile()</span></tt></a> の <em>mode</em> 引数のようなものです。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h2>31.3.2. 記号表の検査<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="symtable.SymbolTable">
+<em class="property">class </em><tt class="descclassname">symtable.</tt><tt class="descname">SymbolTable</tt><a class="headerlink" href="#symtable.SymbolTable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックに対する名前空間の記号表。コンストラクタはパブリックではありません。</p>
+<dl class="method">
+<dt id="symtable.SymbolTable.get_type">
+<tt class="descname">get_type</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.get_type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号表の型を返します。有り得る値は <tt class="docutils literal"><span class="pre">'class'</span></tt>, <tt class="docutils literal"><span class="pre">'module'</span></tt>, <tt class="docutils literal"><span class="pre">'function'</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.get_id">
+<tt class="descname">get_id</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.get_id" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号表の識別子を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.get_name" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号表の名前を返します。この名前は記号表がクラスに対するものであればクラス名であり、関数に対するものであれば関数名であり、グローバルな (<a class="reference internal" href="#symtable.SymbolTable.get_type" title="symtable.SymbolTable.get_type"><tt class="xref py py-meth docutils literal"><span class="pre">get_type()</span></tt></a> が
+<tt class="docutils literal"><span class="pre">'module'</span></tt> を返す) 記号表であれば <tt class="docutils literal"><span class="pre">'top'</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.get_lineno">
+<tt class="descname">get_lineno</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.get_lineno" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この記号表に対応するブロックの一行目の行番号を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.is_optimized">
+<tt class="descname">is_optimized</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.is_optimized" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この記号表に含まれるローカル変数が最適化できるならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.is_nested">
+<tt class="descname">is_nested</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.is_nested" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックが入れ子のクラスまたは関数のとき <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.has_children">
+<tt class="descname">has_children</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.has_children" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックが入れ子の名前空間を含んでいるならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。入れ子の名前空間は <a class="reference internal" href="#symtable.SymbolTable.get_children" title="symtable.SymbolTable.get_children"><tt class="xref py py-meth docutils literal"><span class="pre">get_children()</span></tt></a> で得られます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.has_exec">
+<tt class="descname">has_exec</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.has_exec" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックの中で <tt class="docutils literal"><span class="pre">exec</span></tt> が使われているならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.has_import_star">
+<tt class="descname">has_import_star</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.has_import_star" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックの中で * を使った from-import が使われているならば
+<tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.get_identifiers">
+<tt class="descname">get_identifiers</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.get_identifiers" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この記号表にある記号の名前のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.lookup">
+<tt class="descname">lookup</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#symtable.SymbolTable.lookup" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号表から名前 <em>name</em> を見つけ出して <a class="reference internal" href="#symtable.Symbol" title="symtable.Symbol"><tt class="xref py py-class docutils literal"><span class="pre">Symbol</span></tt></a> インスタンスとして返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.get_symbols">
+<tt class="descname">get_symbols</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.get_symbols" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号表中の名前を表す <a class="reference internal" href="#symtable.Symbol" title="symtable.Symbol"><tt class="xref py py-class docutils literal"><span class="pre">Symbol</span></tt></a> インスタンスのリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.SymbolTable.get_children">
+<tt class="descname">get_children</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.SymbolTable.get_children" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>入れ子になった記号表のリストを返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="symtable.Function">
+<em class="property">class </em><tt class="descclassname">symtable.</tt><tt class="descname">Function</tt><a class="headerlink" href="#symtable.Function" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>関数またはメソッドの名前空間。このクラスは <a class="reference internal" href="#symtable.SymbolTable" title="symtable.SymbolTable"><tt class="xref py py-class docutils literal"><span class="pre">SymbolTable</span></tt></a> を継承しています。</p>
+<dl class="method">
+<dt id="symtable.Function.get_parameters">
+<tt class="descname">get_parameters</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Function.get_parameters" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数の引数名からなるタプルを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Function.get_locals">
+<tt class="descname">get_locals</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Function.get_locals" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数のローカル変数の名前からなるタプルを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Function.get_globals">
+<tt class="descname">get_globals</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Function.get_globals" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数のグローバル変数の名前からなるタプルを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Function.get_frees">
+<tt class="descname">get_frees</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Function.get_frees" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数の自由変数の名前からなるタプルを返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="symtable.Class">
+<em class="property">class </em><tt class="descclassname">symtable.</tt><tt class="descname">Class</tt><a class="headerlink" href="#symtable.Class" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>クラスの名前空間。このクラスは <a class="reference internal" href="#symtable.SymbolTable" title="symtable.SymbolTable"><tt class="xref py py-class docutils literal"><span class="pre">SymbolTable</span></tt></a> を継承しています。</p>
+<dl class="method">
+<dt id="symtable.Class.get_methods">
+<tt class="descname">get_methods</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Class.get_methods" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスで宣言されているメソッド名からなるタプルを返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="symtable.Symbol">
+<em class="property">class </em><tt class="descclassname">symtable.</tt><tt class="descname">Symbol</tt><a class="headerlink" href="#symtable.Symbol" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#symtable.SymbolTable" title="symtable.SymbolTable"><tt class="xref py py-class docutils literal"><span class="pre">SymbolTable</span></tt></a> のエントリーでソースの識別子に対応するものです。コンストラクタはパブリックではありません。</p>
+<dl class="method">
+<dt id="symtable.Symbol.get_name">
+<tt class="descname">get_name</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.get_name" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号の名前を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_referenced">
+<tt class="descname">is_referenced</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_referenced" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号がそのブロックの中で使われていれば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_imported">
+<tt class="descname">is_imported</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_imported" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号が import 文で作られたものならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_parameter">
+<tt class="descname">is_parameter</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_parameter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号がパラメータならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_global">
+<tt class="descname">is_global</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_global" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号がグローバルならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_declared_global">
+<tt class="descname">is_declared_global</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_declared_global" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号が global 文によってグローバルであると宣言されているなら <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_local">
+<tt class="descname">is_local</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_local" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号がそのブロックに対してローカルならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_free">
+<tt class="descname">is_free</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_free" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号がそのブロックの中で参照されていて、しかし代入は行われないならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_assigned">
+<tt class="descname">is_assigned</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_assigned" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記号がそのブロックの中で代入されているならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.is_namespace">
+<tt class="descname">is_namespace</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.is_namespace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前の束縛が新たな名前空間を導入するならば <tt class="docutils literal"><span class="pre">True</span></tt> を返します。</p>
+<p>名前が関数または class 文のターゲットとして使われるならば、真です。</p>
+<p>例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">symtable</span><span class="o">.</span><span class="n">symtable</span><span class="p">(</span><span class="s">&quot;def some_func(): pass&quot;</span><span class="p">,</span> <span class="s">&quot;string&quot;</span><span class="p">,</span> <span class="s">&quot;exec&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">table</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="s">&quot;some_func&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_namespace</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>一つの名前が複数のオブジェクトに束縛されうることに注意しましょう。結果が <tt class="docutils literal"><span class="pre">True</span></tt> であったとしても、その名前は他のオブジェクトにも束縛されるかもしれず、それがたとえば整数やリストであれば、そこでは新たな名前空間は導入されません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.get_namespaces">
+<tt class="descname">get_namespaces</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.get_namespaces" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この名前に束縛された名前空間のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="symtable.Symbol.get_namespace">
+<tt class="descname">get_namespace</tt><big>(</big><big>)</big><a class="headerlink" href="#symtable.Symbol.get_namespace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この名前に束縛されたただ一つの名前空間を返します。束縛された名前空間が一つより多くあれば <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="symbol.html" title="31.4. symbol — Python 解析木と共に使われる定数"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="ast.html" title="31.2. 抽象構文木"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" >31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

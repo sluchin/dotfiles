@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>28.2. codeop — Pythonコードをコンパイルする &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="28. カスタム Python インタプリタ" href="custominterp.html" />
+    <link rel="next" title="29. 制限実行 (restricted execution)" href="restricted.html" />
+    <link rel="prev" title="28.1. code — インタプリタ基底クラス" href="code.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="restricted.html" title="29. 制限実行 (restricted execution)"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="28.1. code — インタプリタ基底クラス"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="custominterp.html" accesskey="U">28. カスタム Python インタプリタ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="code.html"
+                        title="前の章へ">28.1. <tt class="docutils literal docutils literal"><span class="pre">code</span></tt> &#8212; インタプリタ基底クラス</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="restricted.html"
+                        title="次の章へ">29. 制限実行 (restricted execution)</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/codeop.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-codeop">
+<span id="codeop-python"></span><h1>28.2. <a class="reference internal" href="#module-codeop" title="codeop: (完全ではないかもしれない)Pythonコードをコンパイルする。"><tt class="xref py py-mod docutils literal"><span class="pre">codeop</span></tt></a> &#8212; Pythonコードをコンパイルする<a class="headerlink" href="#module-codeop" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-codeop" title="codeop: (完全ではないかもしれない)Pythonコードをコンパイルする。"><tt class="xref py py-mod docutils literal"><span class="pre">codeop</span></tt></a> モジュールは、 <a class="reference internal" href="code.html#module-code" title="code: read-eval-print ループを実装するのを助ける"><tt class="xref py py-mod docutils literal"><span class="pre">code</span></tt></a> モジュールで行われているようなPythonの
+read-eval-printループをエミュレートするユーティリティを提供します。そのため、このモジュールを直接利用する場面はあまり無いでしょう。プログラムにこのようなループを含めたい場合は、 <a class="reference internal" href="code.html#module-code" title="code: read-eval-print ループを実装するのを助ける"><tt class="xref py py-mod docutils literal"><span class="pre">code</span></tt></a> モジュールの方が便利です。</p>
+<p>この仕事には二つの部分があります:</p>
+<ol class="arabic simple">
+<li>入力の一行がPythonの文として完全であるかどうかを見分けられること:
+簡単に言えば、次が &#8216;<tt class="docutils literal"><span class="pre">&gt;&gt;&gt;</span></tt>&#8216; か、あるいは &#8216;<tt class="docutils literal"><span class="pre">...</span></tt>&#8216; かどうかを見分けます。</li>
+<li>どのfuture文をユーザが入力したのかを覚えていること。したがって、実質的にそれに続く入力をこれらとともにコンパイルすることができます。</li>
+</ol>
+<p><a class="reference internal" href="#module-codeop" title="codeop: (完全ではないかもしれない)Pythonコードをコンパイルする。"><tt class="xref py py-mod docutils literal"><span class="pre">codeop</span></tt></a> モジュールはこうしたことのそれぞれを行う方法とそれら両方を行う方法を提供します。</p>
+<p>前者は実行するには:</p>
+<dl class="function">
+<dt id="codeop.compile_command">
+<tt class="descclassname">codeop.</tt><tt class="descname">compile_command</tt><big>(</big><em>source</em><span class="optional">[</span>, <em>filename</em><span class="optional">[</span>, <em>symbol</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#codeop.compile_command" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Pythonコードの文字列であるべき <em>source</em> をコンパイルしてみて、
+<em>source</em> が有効なPythonコードの場合はコードオブジェクトを返します。このような場合、コードオブジェクトのファイル名属性は、デフォルトで
+<tt class="docutils literal"><span class="pre">'&lt;input&gt;'</span></tt> である <em>filename</em> でしょう。
+<em>source</em> が有効なPythonコードでは <em>ない</em> が、有効なPythonコードの接頭語である場合には、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+<p><em>source</em> に問題がある場合は、例外を発生させます。無効なPython構文がある場合は、 <a class="reference internal" href="exceptions.html#exceptions.SyntaxError" title="exceptions.SyntaxError"><tt class="xref py py-exc docutils literal"><span class="pre">SyntaxError</span></tt></a> を発生させます。また、無効なリテラルがある場合は、 <a class="reference internal" href="exceptions.html#exceptions.OverflowError" title="exceptions.OverflowError"><tt class="xref py py-exc docutils literal"><span class="pre">OverflowError</span></tt></a> または <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を発生させます。</p>
+<p><em>symbol</em> 引数は <em>source</em> が文としてコンパイルされるか(<tt class="docutils literal"><span class="pre">'single'</span></tt> 、デフォルト)
+、または式としてコンパイルされたかどうかを決定します(<tt class="docutils literal"><span class="pre">'eval'</span></tt>)。他のどんな値も <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を発生させる原因となります。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">ソースの終わりに達する前に、成功した結果をもってパーサは構文解析を止めることがあります。このような場合、後ろに続く記号はエラーとならずに無視されます。例えば、バックスラッシュの後ろに改行が2つあって、その後ろにゴミがあるかもしれません。パーサのAPIがより良くなればすぐに、この挙動は修正されるでしょう。</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="codeop.Compile">
+<em class="property">class </em><tt class="descclassname">codeop.</tt><tt class="descname">Compile</tt><a class="headerlink" href="#codeop.Compile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスのインスタンスは組み込み関数 <a class="reference internal" href="functions.html#compile" title="compile"><tt class="xref py py-func docutils literal"><span class="pre">compile()</span></tt></a> とシグネチャが一致する
+<a class="reference internal" href="../reference/datamodel.html#object.__call__" title="object.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">__call__()</span></tt></a> メソッドを持っていますが、インスタンスが <a class="reference internal" href="__future__.html#module-__future__" title="__future__: future 文の定義"><tt class="xref py py-mod docutils literal"><span class="pre">__future__</span></tt></a>
+文を含むプログラムテキストをコンパイルする場合は、インスタンスは有効なその文とともに続くすべてのプログラムテキストを&#8217;覚えていて&#8217;コンパイルするという違いがあります。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="codeop.CommandCompiler">
+<em class="property">class </em><tt class="descclassname">codeop.</tt><tt class="descname">CommandCompiler</tt><a class="headerlink" href="#codeop.CommandCompiler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスのインスタンスは <a class="reference internal" href="#codeop.compile_command" title="codeop.compile_command"><tt class="xref py py-func docutils literal"><span class="pre">compile_command()</span></tt></a> とシグネチャが一致する
+<a class="reference internal" href="../reference/datamodel.html#object.__call__" title="object.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">__call__()</span></tt></a> メソッドを持っています。インスタンスが <tt class="docutils literal"><span class="pre">__future__</span></tt> 文を含むプログラムテキストをコンパイルする場合に、インスタンスは有効なその文とともにそれに続くすべてのプログラムテキストを&#8217;覚えていて&#8217;コンパイルするという違いがあります。</p>
+</dd></dl>
+
+<p>バージョン間の互換性についての注意: <a class="reference internal" href="#codeop.Compile" title="codeop.Compile"><tt class="xref py py-class docutils literal"><span class="pre">Compile</span></tt></a> と <a class="reference internal" href="#codeop.CommandCompiler" title="codeop.CommandCompiler"><tt class="xref py py-class docutils literal"><span class="pre">CommandCompiler</span></tt></a> はPython
+2.2で導入されました。2.2のfuture-tracking機能を有効にするだけでなく、
+2.1とPythonのより以前のバージョンとの互換性も保ちたい場合は、次のように書くことができます</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">codeop</span> <span class="kn">import</span> <span class="n">CommandCompiler</span>
+    <span class="n">compile_command</span> <span class="o">=</span> <span class="n">CommandCompiler</span><span class="p">()</span>
+    <span class="k">del</span> <span class="n">CommandCompiler</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">codeop</span> <span class="kn">import</span> <span class="n">compile_command</span>
+</pre></div>
+</div>
+<p>これは影響の小さい変更ですが、あなたのプログラムにおそらく望まれないグローバル状態を導入します。または、次のように書くこともできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">codeop</span> <span class="kn">import</span> <span class="n">CommandCompiler</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">CommandCompiler</span><span class="p">():</span>
+        <span class="kn">from</span> <span class="nn">codeop</span> <span class="kn">import</span> <span class="n">compile_command</span>
+        <span class="k">return</span> <span class="n">compile_command</span>
+</pre></div>
+</div>
+<p>そして、新たなコンパイラオブジェクトが必要となるたびに <tt class="docutils literal"><span class="pre">CommandCompiler</span></tt> を呼び出します。</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="restricted.html" title="29. 制限実行 (restricted execution)"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="28.1. code — インタプリタ基底クラス"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="custominterp.html" >28. カスタム Python インタプリタ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

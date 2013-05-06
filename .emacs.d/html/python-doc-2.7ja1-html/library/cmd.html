@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>23.1. cmd — 行指向のコマンドインタープリタのサポート &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="23. プログラムのフレームワーク" href="frameworks.html" />
+    <link rel="next" title="23.2. shlex — 単純な字句解析" href="shlex.html" />
+    <link rel="prev" title="23. プログラムのフレームワーク" href="frameworks.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="shlex.html" title="23.2. shlex — 単純な字句解析"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="frameworks.html" title="23. プログラムのフレームワーク"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="frameworks.html" accesskey="U">23. プログラムのフレームワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">23.1. <tt class="docutils literal"><span class="pre">cmd</span></tt> &#8212; 行指向のコマンドインタープリタのサポート</a><ul>
+<li><a class="reference internal" href="#cmd-objects">23.1.1. Cmdオブジェクト</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="frameworks.html"
+                        title="前の章へ">23. プログラムのフレームワーク</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="shlex.html"
+                        title="次の章へ">23.2. <tt class="docutils literal"><span class="pre">shlex</span></tt> &#8212; 単純な字句解析</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/cmd.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-cmd">
+<span id="cmd"></span><h1>23.1. <a class="reference internal" href="#module-cmd" title="cmd: 行指向のコマンドインタープリタを構築"><tt class="xref py py-mod docutils literal"><span class="pre">cmd</span></tt></a> &#8212; 行指向のコマンドインタープリタのサポート<a class="headerlink" href="#module-cmd" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> クラスでは、行指向のコマンドインタープリタを書くための簡単なフレームワークを提供します。テストハーネスや管理ツール、そして、後により洗練されたインターフェイスでラップするプロトタイプとして、こうしたインタープリタはよく役に立ちます。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/cmd.py?view=markup">cmd モジュールの Python ソースコード</a></p>
+</div>
+<dl class="class">
+<dt id="cmd.Cmd">
+<em class="property">class </em><tt class="descclassname">cmd.</tt><tt class="descname">Cmd</tt><big>(</big><span class="optional">[</span><em>completekey</em><span class="optional">[</span>, <em>stdin</em><span class="optional">[</span>, <em>stdout</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#cmd.Cmd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> インスタンス、あるいはサブクラスのインスタンスは、行指向のインタープリタ・フレームワークです。
+<a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> 自身をインスタンス化することはありません。むしろ、 <a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> のメソッドを継承したり、アクションメソッドをカプセル化するために、あなたが自分で定義するインタープリタクラスのスーパークラスとしての便利です。</p>
+<p>オプション引数 <em>completekey</em> は、補完キーの <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">readline</span></tt></a> 名です。デフォルトは <tt class="kbd docutils literal"><span class="pre">Tab</span></tt> です。 <em>completekey</em> が <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> でなく、
+<a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">readline</span></tt></a> が利用できるならば、コマンド補完は自動的に行われます。</p>
+<p>オプション引数 <em>stdin</em> と <em>stdout</em> には、Cmd またはそのサブクラスのインスタンスが入出力に使用するファイルオブジェクトを指定します。省略時には <a class="reference internal" href="sys.html#sys.stdin" title="sys.stdin"><tt class="xref py py-data docutils literal"><span class="pre">sys.stdin</span></tt></a> と <a class="reference internal" href="sys.html#sys.stdout" title="sys.stdout"><tt class="xref py py-data docutils literal"><span class="pre">sys.stdout</span></tt></a> が使用されます。</p>
+<p>引数に渡した <em>stdin</em> を使いたい場合は、インスタンスの <a class="reference internal" href="#cmd.Cmd.use_rawinput" title="cmd.Cmd.use_rawinput"><tt class="xref py py-attr docutils literal"><span class="pre">use_rawinput</span></tt></a> 属性を
+<tt class="docutils literal"><span class="pre">False</span></tt> にセットしてください。そうしないと <em>stdin</em> は無視されます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>引数 <em>stdin</em> と <em>stdout</em> を追加.</p>
+</dd></dl>
+
+<div class="section" id="cmd-objects">
+<span id="id1"></span><h2>23.1.1. Cmdオブジェクト<a class="headerlink" href="#cmd-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> インスタンスは、次のメソッドを持ちます:</p>
+<dl class="method">
+<dt id="cmd.Cmd.cmdloop">
+<tt class="descclassname">Cmd.</tt><tt class="descname">cmdloop</tt><big>(</big><span class="optional">[</span><em>intro</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#cmd.Cmd.cmdloop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プロンプトを繰り返し出力し、入力を受け取り、受け取った入力から取り去った先頭の語を解析し、その行の残りを引数としてアクションメソッドへディスパッチします。</p>
+<p>オプションの引数は、最初のプロンプトの前に表示されるバナーあるいはイントロ用の文字列です
+(これはクラスメンバ <a class="reference internal" href="#cmd.Cmd.intro" title="cmd.Cmd.intro"><tt class="xref py py-attr docutils literal"><span class="pre">intro</span></tt></a> をオーバーライドします)。</p>
+<p><a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">readline</span></tt></a> モジュールがロードされているなら、入力は自動的に <strong class="program">bash</strong>
+のような履歴リスト編集機能を受け継ぎます(例えば、 <tt class="kbd docutils literal"><span class="pre">Control-P</span></tt>
+は直前のコマンドへのスクロールバック、 <tt class="kbd docutils literal"><span class="pre">Control-N</span></tt> は次のものへ進む、
+<tt class="kbd docutils literal"><span class="pre">Control-F</span></tt> はカーソルを右へ非破壊的に進める、 <tt class="kbd docutils literal"><span class="pre">Control-B</span></tt> はカーソルを非破壊的に左へ移動させる等)。</p>
+<p>入力のファイル終端は、文字列 <tt class="docutils literal"><span class="pre">'EOF'</span></tt> として渡されます。</p>
+<p>メソッド <tt class="xref py py-meth docutils literal"><span class="pre">do_foo()</span></tt> を持っている場合に限って、インタープリタのインスタンスはコマンド名
+<tt class="docutils literal"><span class="pre">foo</span></tt> を認識します。特別な場合として、文字 <tt class="docutils literal"><span class="pre">'?'</span></tt> で始まる行はメソッド <tt class="xref py py-meth docutils literal"><span class="pre">do_help()</span></tt>
+へディスパッチします。他の特別な場合として、文字 <tt class="docutils literal"><span class="pre">'!'</span></tt> で始まる行はメソッド <tt class="xref py py-meth docutils literal"><span class="pre">do_shell()</span></tt>
+へディスパッチします(このようなメソッドが定義されている場合)。</p>
+<p>このメソッドは <a class="reference internal" href="#cmd.Cmd.postcmd" title="cmd.Cmd.postcmd"><tt class="xref py py-meth docutils literal"><span class="pre">postcmd()</span></tt></a> メソッドが真を返したときに return します。
+<a class="reference internal" href="#cmd.Cmd.postcmd" title="cmd.Cmd.postcmd"><tt class="xref py py-meth docutils literal"><span class="pre">postcmd()</span></tt></a> に対する <em>stop</em> 引数は、このコマンドが対応する <tt class="xref py py-meth docutils literal"><span class="pre">do_*()</span></tt> メソッドからの返り値です。</p>
+<p>補完が有効になっているなら、コマンドの補完が自動的に行われます。また、コマンド引数の補完は、引数 <em>text</em>, <em>line</em>, <em>begidx</em>, および <em>endidx</em>
+と共に <tt class="xref py py-meth docutils literal"><span class="pre">complete_foo()</span></tt> を呼び出すことによって行われます。
+<em>text</em> は、マッチしようとしている文字列の先頭の語です。返されるマッチは全てそれで始まっていなければなりません。
+<em>line</em> は始めの空白を除いた現在の入力行です。
+<em>begidx</em> と <em>endidx</em> は先頭のテキストの始まりと終わりのインデックスで、引数の位置に依存した異なる補完を提供するのに使えます。</p>
+<p><a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> のすべてのサブクラスは、定義済みの <tt class="xref py py-meth docutils literal"><span class="pre">do_help()</span></tt> を継承します。このメソッドは、(引数 <tt class="docutils literal"><span class="pre">'bar'</span></tt> と共に呼ばれたとすると)対応するメソッド <tt class="xref py py-meth docutils literal"><span class="pre">help_bar()</span></tt>
+を呼び出します。そのメソッドが存在しない場合、 <tt class="xref py py-meth docutils literal"><span class="pre">do_bar()</span></tt> の docstring があればそれを表示します。引数がなければ、 <tt class="xref py py-meth docutils literal"><span class="pre">do_help()</span></tt> は、すべての利用可能なヘルプ見出し(すなわち、対応する <tt class="xref py py-meth docutils literal"><span class="pre">help_*()</span></tt>
+メソッドを持つすべてのコマンドまたは docstring を持つコマンド)をリストアップします。また、文書化されていないコマンドでも、すべてリストアップします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.onecmd">
+<tt class="descclassname">Cmd.</tt><tt class="descname">onecmd</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#cmd.Cmd.onecmd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プロンプトに答えてタイプしたかのように引数を解釈実行します。これをオーバーライドすることがあるかもしれませんが、通常は必要ないでしょう。便利な実行フックについては、 <a class="reference internal" href="#cmd.Cmd.precmd" title="cmd.Cmd.precmd"><tt class="xref py py-meth docutils literal"><span class="pre">precmd()</span></tt></a> と <a class="reference internal" href="#cmd.Cmd.postcmd" title="cmd.Cmd.postcmd"><tt class="xref py py-meth docutils literal"><span class="pre">postcmd()</span></tt></a> メソッドを参照してください。戻り値は、インタープリタによるコマンドの解釈実行をやめるかどうかを示すフラグです。コマンド <em>str</em> に対応する <tt class="xref py py-meth docutils literal"><span class="pre">do_*()</span></tt> メソッドがある場合、そのメソッドの返り値が返されます。そうでない場合は <a class="reference internal" href="#cmd.Cmd.default" title="cmd.Cmd.default"><tt class="xref py py-meth docutils literal"><span class="pre">default()</span></tt></a> メソッドからの返り値が返されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.emptyline">
+<tt class="descclassname">Cmd.</tt><tt class="descname">emptyline</tt><big>(</big><big>)</big><a class="headerlink" href="#cmd.Cmd.emptyline" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プロンプトに空行が入力されたときに呼び出されるメソッド。このメソッドがオーバーライドされていないなら、最後に入力された空行でないコマンドが繰り返されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.default">
+<tt class="descclassname">Cmd.</tt><tt class="descname">default</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#cmd.Cmd.default" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コマンドの先頭の語が認識されないときに、入力行に対して呼び出されます。このメソッドがオーバーライドされていないなら、エラーメッセージを表示して戻ります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.completedefault">
+<tt class="descclassname">Cmd.</tt><tt class="descname">completedefault</tt><big>(</big><em>text</em>, <em>line</em>, <em>begidx</em>, <em>endidx</em><big>)</big><a class="headerlink" href="#cmd.Cmd.completedefault" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>利用可能なコマンド固有の <tt class="xref py py-meth docutils literal"><span class="pre">complete_*()</span></tt> が存在しないときに、入力行を補完するために呼び出されるメソッド。デフォルトでは、空行を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.precmd">
+<tt class="descclassname">Cmd.</tt><tt class="descname">precmd</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#cmd.Cmd.precmd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コマンド行 <em>line</em> が解釈実行される直前、しかし入力プロンプトが作られ表示された後に実行されるフックメソッド。このメソッドは <a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> 内のスタブであって、サブクラスでオーバーライドされるために存在します。戻り値は <a class="reference internal" href="#cmd.Cmd.onecmd" title="cmd.Cmd.onecmd"><tt class="xref py py-meth docutils literal"><span class="pre">onecmd()</span></tt></a> メソッドが実行するコマンドとして使われます。 <a class="reference internal" href="#cmd.Cmd.precmd" title="cmd.Cmd.precmd"><tt class="xref py py-meth docutils literal"><span class="pre">precmd()</span></tt></a>
+の実装では、コマンドを書き換えるかもしれないし、あるいは単に変更していない <em>line</em> を返すかもしれません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.postcmd">
+<tt class="descclassname">Cmd.</tt><tt class="descname">postcmd</tt><big>(</big><em>stop</em>, <em>line</em><big>)</big><a class="headerlink" href="#cmd.Cmd.postcmd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コマンドディスパッチが終わった直後に実行されるフックメソッド。このメソッドは <a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> 内のスタブで、サブクラスでオーバーライドされるために存在します。
+<em>line</em> は実行されたコマンド行で、 <em>stop</em> は <a class="reference internal" href="#cmd.Cmd.postcmd" title="cmd.Cmd.postcmd"><tt class="xref py py-meth docutils literal"><span class="pre">postcmd()</span></tt></a>
+の呼び出しの後に実行を停止するかどうかを示すフラグです。これは <a class="reference internal" href="#cmd.Cmd.onecmd" title="cmd.Cmd.onecmd"><tt class="xref py py-meth docutils literal"><span class="pre">onecmd()</span></tt></a> メソッドの戻り値です。このメソッドの戻り値は、 <em>stop</em> に対応する内部フラグの新しい値として使われます。偽を返すと、実行を続けます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.preloop">
+<tt class="descclassname">Cmd.</tt><tt class="descname">preloop</tt><big>(</big><big>)</big><a class="headerlink" href="#cmd.Cmd.preloop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#cmd.Cmd.cmdloop" title="cmd.Cmd.cmdloop"><tt class="xref py py-meth docutils literal"><span class="pre">cmdloop()</span></tt></a> が呼び出されたときに一度だけ実行されるフックメソッド。このメソッドは <a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> 内のスタブであって、サブクラスでオーバーライドされるために存在します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cmd.Cmd.postloop">
+<tt class="descclassname">Cmd.</tt><tt class="descname">postloop</tt><big>(</big><big>)</big><a class="headerlink" href="#cmd.Cmd.postloop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#cmd.Cmd.cmdloop" title="cmd.Cmd.cmdloop"><tt class="xref py py-meth docutils literal"><span class="pre">cmdloop()</span></tt></a> が戻る直前に一度だけ実行されるフックメソッド。このメソッドは <a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> 内のスタブであって、サブクラスでオーバーライドされるために存在します。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">Cmd</span></tt></a> のサブクラスのインスタンスは、公開されたインスタンス変数をいくつか持っています:</p>
+<dl class="attribute">
+<dt id="cmd.Cmd.prompt">
+<tt class="descclassname">Cmd.</tt><tt class="descname">prompt</tt><a class="headerlink" href="#cmd.Cmd.prompt" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>入力を求めるために表示されるプロンプト。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.identchars">
+<tt class="descclassname">Cmd.</tt><tt class="descname">identchars</tt><a class="headerlink" href="#cmd.Cmd.identchars" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コマンドの先頭の語として受け入れられる文字の文字列。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.lastcmd">
+<tt class="descclassname">Cmd.</tt><tt class="descname">lastcmd</tt><a class="headerlink" href="#cmd.Cmd.lastcmd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最後の空でないコマンドプリフィックス。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.intro">
+<tt class="descclassname">Cmd.</tt><tt class="descname">intro</tt><a class="headerlink" href="#cmd.Cmd.intro" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>イントロあるいはバナーとして表示される文字列。
+<a class="reference internal" href="#cmd.Cmd.cmdloop" title="cmd.Cmd.cmdloop"><tt class="xref py py-meth docutils literal"><span class="pre">cmdloop()</span></tt></a> メソッドに引数を与えるために、オーバーライドされるかもしれません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.doc_header">
+<tt class="descclassname">Cmd.</tt><tt class="descname">doc_header</tt><a class="headerlink" href="#cmd.Cmd.doc_header" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ヘルプ出力に文書化されたコマンドのセクションがある場合に表示するヘッダ。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.misc_header">
+<tt class="descclassname">Cmd.</tt><tt class="descname">misc_header</tt><a class="headerlink" href="#cmd.Cmd.misc_header" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ヘルプの出力にその他のヘルプ見出しがある(すなわち、 <tt class="xref py py-meth docutils literal"><span class="pre">do_*()</span></tt> メソッドに対応していない <tt class="xref py py-meth docutils literal"><span class="pre">help_*()</span></tt>
+メソッドが存在する)場合に表示するヘッダ。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.undoc_header">
+<tt class="descclassname">Cmd.</tt><tt class="descname">undoc_header</tt><a class="headerlink" href="#cmd.Cmd.undoc_header" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ヘルプ出力に文書化されていないコマンドのセクションがある(すなわち、対応する <tt class="xref py py-meth docutils literal"><span class="pre">help_*()</span></tt>
+メソッドを持たない <tt class="xref py py-meth docutils literal"><span class="pre">do_*()</span></tt> メソッドが存在する)場合に表示するヘッダ。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.ruler">
+<tt class="descclassname">Cmd.</tt><tt class="descname">ruler</tt><a class="headerlink" href="#cmd.Cmd.ruler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ヘルプメッセージのヘッダの下に、区切り行を表示するために使われる文字。空のときは、ルーラ行が表示されません。デフォルトでは、 <tt class="docutils literal"><span class="pre">'='</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cmd.Cmd.use_rawinput">
+<tt class="descclassname">Cmd.</tt><tt class="descname">use_rawinput</tt><a class="headerlink" href="#cmd.Cmd.use_rawinput" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>フラグで、デフォルトでは真です。真ならば、 <a class="reference internal" href="#cmd.Cmd.cmdloop" title="cmd.Cmd.cmdloop"><tt class="xref py py-meth docutils literal"><span class="pre">cmdloop()</span></tt></a> はプロンプトを表示して次のコマンド読み込むために <a class="reference internal" href="functions.html#raw_input" title="raw_input"><tt class="xref py py-func docutils literal"><span class="pre">raw_input()</span></tt></a> を使います。偽ならば、 <tt class="xref py py-meth docutils literal"><span class="pre">sys.stdout.write()</span></tt> と <tt class="xref py py-meth docutils literal"><span class="pre">sys.stdin.readline()</span></tt> が使われます。
+(これが意味するのは、 <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">readline</span></tt></a> を import することによって、それをサポートするシステム上では、インタープリタが自動的に
+<strong class="program">Emacs</strong> 形式の行編集とコマンド履歴のキーストロークをサポートするということです。)</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="shlex.html" title="23.2. shlex — 単純な字句解析"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="frameworks.html" title="23. プログラムのフレームワーク"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="frameworks.html" >23. プログラムのフレームワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

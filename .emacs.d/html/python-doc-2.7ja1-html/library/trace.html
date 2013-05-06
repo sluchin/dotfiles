@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>26.7. trace — Python ステートメント実行のトレースと追跡 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="26. デバッグとプロファイル" href="debug.html" />
+    <link rel="next" title="27. Python ランタイムサービス" href="python.html" />
+    <link rel="prev" title="26.6. timeit — 小さなコード断片の実行時間計測" href="timeit.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="python.html" title="27. Python ランタイムサービス"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="timeit.html" title="26.6. timeit — 小さなコード断片の実行時間計測"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="debug.html" accesskey="U">26. デバッグとプロファイル</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">26.7. <tt class="docutils literal"><span class="pre">trace</span></tt> &#8212; Python ステートメント実行のトレースと追跡</a><ul>
+<li><a class="reference internal" href="#trace-cli">26.7.1. コマンドラインからの利用</a><ul>
+<li><a class="reference internal" href="#id2">26.7.1.1. 主要なオプション</a></li>
+<li><a class="reference internal" href="#id3">26.7.1.2. 修飾的オプション</a></li>
+<li><a class="reference internal" href="#id4">26.7.1.3. フィルターオプション</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trace-api">26.7.2. プログラミングインターフェース</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="timeit.html"
+                        title="前の章へ">26.6. <tt class="docutils literal docutils literal docutils literal"><span class="pre">timeit</span></tt> &#8212; 小さなコード断片の実行時間計測</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="python.html"
+                        title="次の章へ">27. Python ランタイムサービス</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/trace.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-trace">
+<span id="trace-python"></span><h1>26.7. <a class="reference internal" href="#module-trace" title="trace: Python ステートメント実行のトレースと追跡"><tt class="xref py py-mod docutils literal"><span class="pre">trace</span></tt></a> &#8212; Python ステートメント実行のトレースと追跡<a class="headerlink" href="#module-trace" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-trace" title="trace: Python ステートメント実行のトレースと追跡"><tt class="xref py py-mod docutils literal"><span class="pre">trace</span></tt></a> モジュールはプログラム実行のトレースを可能にし、
+generate ステートメントのカバレッジリストを注釈付きで生成して、呼び出し元/呼び出し先の関連やプログラム実行中に実行された関数のリストを出力します。これは別個のプログラム中またはコマンドラインから利用することができます。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/trace.py?view=markup">trace module Python source code</a></p>
+</div>
+<div class="section" id="trace-cli">
+<span id="id1"></span><h2>26.7.1. コマンドラインからの利用<a class="headerlink" href="#trace-cli" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-trace" title="trace: Python ステートメント実行のトレースと追跡"><tt class="xref py py-mod docutils literal"><span class="pre">trace</span></tt></a> モジュールはコマンドラインから起動することができます。これは次のように単純です。</p>
+<div class="highlight-python"><pre>python -m trace --count -C . somefile.py ...</pre>
+</div>
+<p>これで、 <tt class="file docutils literal"><span class="pre">somefile.py</span></tt> の実行中に import された Python
+モジュールの注釈付きリストがカレントディレクトリに生成されます。</p>
+<dl class="cmdoption">
+<dt id="cmdoption-trace--help">
+<tt class="descname">--help</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace--help" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>使い方を表示して終了します。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace--version" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールのバージョンを表示して終了します。</p>
+</dd></dl>
+
+<div class="section" id="id2">
+<h3>26.7.1.1. 主要なオプション<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference internal" href="#module-trace" title="trace: Python ステートメント実行のトレースと追跡"><tt class="xref py py-mod docutils literal"><span class="pre">trace</span></tt></a> を実行する時、以下のオプションのうち少なくとも1つを指定しなければなりません。
+<a class="reference internal" href="#cmdoption-trace-l"><em class="xref std std-option">--listfuncs</em></a> オプションは <a class="reference internal" href="#cmdoption-trace-t"><em class="xref std std-option">--trace</em></a> および
+<a class="reference internal" href="#cmdoption-trace-c"><em class="xref std std-option">--counts</em></a> オプションと互いに排他的です。つまり <a class="reference internal" href="#cmdoption-trace-l"><em class="xref std std-option">--listfuncs</em></a> オプションを指定した場合 <a class="reference internal" href="#cmdoption-trace-t"><em class="xref std std-option">--trace</em></a>
+や <a class="reference internal" href="#cmdoption-trace-c"><em class="xref std std-option">--counts</em></a> は指定できず、逆も然りです。</p>
+<dl class="cmdoption">
+<dt id="cmdoption-trace-c">
+<tt class="descname">-c</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--count</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-c" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プログラム完了時に、それぞれのステートメントが何回実行されたかを示す注釈付きリストのファイルを生成します。下記の <a class="reference internal" href="#cmdoption-trace-C"><em class="xref std std-option">--coverdir</em></a>, <a class="reference internal" href="#cmdoption-trace-f"><em class="xref std std-option">--file</em></a>, <a class="reference internal" href="#cmdoption-trace-R"><em class="xref std std-option">--no-report</em></a> も参照。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-t">
+<tt class="descname">-t</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--trace</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-t" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>実行されるままに行を表示します。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-l">
+<tt class="descname">-l</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--listfuncs</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-l" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プログラム実行の際に実行された関数を表示します。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-r">
+<tt class="descname">-r</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--report</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-r" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#cmdoption-trace-c"><em class="xref std std-option">--count</em></a> と <a class="reference internal" href="#cmdoption-trace-f"><em class="xref std std-option">--file</em></a> 引数を使った、過去のプログラム実行結果から注釈付きリストのファイルを生成します。コードを実行するわけではありません。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-T">
+<tt class="descname">-T</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--trackcalls</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-T" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プログラム実行によって明らかになった呼び出しの関連を表示します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>26.7.1.2. 修飾的オプション<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="cmdoption">
+<dt id="cmdoption-trace-f">
+<tt class="descname">-f</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--file</tt><tt class="descclassname">=&lt;file&gt;</tt><a class="headerlink" href="#cmdoption-trace-f" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>複数回にわたるトレース実行についてカウント(count)を蓄積するファイルに名前をつけます。
+<a class="reference internal" href="#cmdoption-trace-c"><em class="xref std std-option">--count</em></a> オプションと一緒に使って下さい。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-C">
+<tt class="descname">-C</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--coverdir</tt><tt class="descclassname">=&lt;dir&gt;</tt><a class="headerlink" href="#cmdoption-trace-C" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>レポートファイルを保存するディレクトリを指定します。
+<tt class="docutils literal"><span class="pre">package.module</span></tt> についてのカバレッジレポートは
+<tt class="file docutils literal"><em><span class="pre">dir</span></em><span class="pre">/</span><em><span class="pre">package</span></em><span class="pre">/</span><em><span class="pre">module</span></em><span class="pre">.cover</span></tt> に書き込まれます。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-m">
+<tt class="descname">-m</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--missing</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-m" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>注釈付きリストの生成時に、実行されなかった行に <tt class="docutils literal"><span class="pre">&gt;&gt;&gt;&gt;&gt;&gt;</span></tt> の印を付けます。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-s">
+<tt class="descname">-s</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--summary</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-s" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#cmdoption-trace-c"><em class="xref std std-option">--count</em></a> または <a class="reference internal" href="#cmdoption-trace-r"><em class="xref std std-option">--report</em></a> の利用時に、処理されたファイルそれぞれの簡潔なサマリを標準出力(stdout)に書き出します。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-R">
+<tt class="descname">-R</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--no-report</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-R" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>注釈付きリストを生成しません。これは <a class="reference internal" href="#cmdoption-trace-c"><em class="xref std std-option">--count</em></a> を何度か走らせてから最後に単一の注釈付きリストを生成するような場合に便利です。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace-g">
+<tt class="descname">-g</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--timing</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-trace-g" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>各行の先頭にプログラム開始からの時間を付けます。トレース中にだけ使われます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id4">
+<h3>26.7.1.3. フィルターオプション<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>これらのオプションは複数回指定できます。</p>
+<dl class="cmdoption">
+<dt id="cmdoption-trace--ignore-module">
+<tt class="descname">--ignore-module</tt><tt class="descclassname">=&lt;mod&gt;</tt><a class="headerlink" href="#cmdoption-trace--ignore-module" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたモジュールと（パッケージだった場合は）そのサブモジュールを無視します。引数はカンマ区切りのモジュール名リストです。</p>
+</dd></dl>
+
+<dl class="cmdoption">
+<dt id="cmdoption-trace--ignore-dir">
+<tt class="descname">--ignore-dir</tt><tt class="descclassname">=&lt;dir&gt;</tt><a class="headerlink" href="#cmdoption-trace--ignore-dir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたディレクトリとサブディレクトリ中のモジュールとパッケージを全て無視します。引数は <a class="reference internal" href="os.html#os.pathsep" title="os.pathsep"><tt class="xref py py-data docutils literal"><span class="pre">os.pathsep</span></tt></a> で区切られたディレクトリのリストです。</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="trace-api">
+<span id="id5"></span><h2>26.7.2. プログラミングインターフェース<a class="headerlink" href="#trace-api" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="trace.Trace">
+<em class="property">class </em><tt class="descclassname">trace.</tt><tt class="descname">Trace</tt><big>(</big><span class="optional">[</span><em>count=1</em><span class="optional">[</span>, <em>trace=1</em><span class="optional">[</span>, <em>countfuncs=0</em><span class="optional">[</span>, <em>countcallers=0</em><span class="optional">[</span>, <em>ignoremods=()</em><span class="optional">[</span>, <em>ignoredirs=()</em><span class="optional">[</span>, <em>infile=None</em><span class="optional">[</span>, <em>outfile=None</em><span class="optional">[</span>, <em>timing=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#trace.Trace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文(statement)や式(expression)の実行をトレースするオブジェクトを作成します。全てのパラメタがオプションです。
+<em>count</em> は行数を数えます。
+<em>trace</em> は行実行のトレースを行います。
+<em>countfuncs</em> は実行中に呼ばれた関数を列挙します。
+<em>countcallers</em> は呼び出しの関連の追跡を行います。
+<em>ignoremods</em> は無視するモジュールやパッケージのリストです。
+<em>ignoredirs</em> は無視するパッケージやモジュールを含むディレクトリのリストです。
+<em>infile</em> は保存された集計(count)情報を読むファイルの名前です。
+<em>outfile</em> は更新された集計(count)情報を書き出すファイルの名前です。
+<em>timing</em> は、タイムスタンプをトレース開始時点からの相対秒数で表示します。</p>
+<blockquote>
+<div><dl class="method">
+<dt id="trace.Trace.run">
+<tt class="descname">run</tt><big>(</big><em>cmd</em><big>)</big><a class="headerlink" href="#trace.Trace.run" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コマンドを実行して、現在のトレースパラメータに基づいてその実行から統計情報を集めます。
+<em>cmd</em> は、 <tt class="xref py py-func docutils literal"><span class="pre">exec()</span></tt> に渡せるような文字列か code オブジェクトです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="trace.Trace.runctx">
+<tt class="descname">runctx</tt><big>(</big><em>cmd</em><span class="optional">[</span>, <em>globals=None</em><span class="optional">[</span>, <em>locals=None</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#trace.Trace.runctx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定された globals と locals 環境下で、コマンドを実行して、現在のトレースパラメータに基づいてその実行から統計情報を集めます。
+<em>cmd</em> は、 <tt class="xref py py-func docutils literal"><span class="pre">exec()</span></tt> に渡せるような文字列か code オブジェクトです。定義しない場合、 <em>globals</em> と <em>locals</em> はデフォルトで空の辞書となります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="trace.Trace.runfunc">
+<tt class="descname">runfunc</tt><big>(</big><em>func</em>, <em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#trace.Trace.runfunc" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた引数の <em>func</em> を、 <a class="reference internal" href="#trace.Trace" title="trace.Trace"><tt class="xref py py-class docutils literal"><span class="pre">Trace</span></tt></a> オブジェクトのコントロール下で現在のトレースパラメタのもとに呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="trace.Trace.results">
+<tt class="descname">results</tt><big>(</big><big>)</big><a class="headerlink" href="#trace.Trace.results" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた <a class="reference internal" href="#trace.Trace" title="trace.Trace"><tt class="xref py py-class docutils literal"><span class="pre">Trace</span></tt></a> インスタンスの <tt class="docutils literal"><span class="pre">run</span></tt>, <tt class="docutils literal"><span class="pre">runctx</span></tt>, <tt class="docutils literal"><span class="pre">runfunc</span></tt>
+の以前の呼び出しについて集計した結果を納めた <a class="reference internal" href="#trace.CoverageResults" title="trace.CoverageResults"><tt class="xref py py-class docutils literal"><span class="pre">CoverageResults</span></tt></a>
+オブジェクトを返します。蓄積されたトレース結果はリセットしません。</p>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+<dl class="class">
+<dt id="trace.CoverageResults">
+<em class="property">class </em><tt class="descclassname">trace.</tt><tt class="descname">CoverageResults</tt><a class="headerlink" href="#trace.CoverageResults" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カバレッジ結果のコンテナで、 <a class="reference internal" href="#trace.Trace.results" title="trace.Trace.results"><tt class="xref py py-meth docutils literal"><span class="pre">Trace.results()</span></tt></a> で生成されるものです。ユーザーが直接生成するものではありません。</p>
+<blockquote>
+<div><dl class="method">
+<dt id="trace.CoverageResults.update">
+<tt class="descname">update</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#trace.CoverageResults.update" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>別の <a class="reference internal" href="#trace.CoverageResults" title="trace.CoverageResults"><tt class="xref py py-class docutils literal"><span class="pre">CoverageResults</span></tt></a> オブジェクトのデータを統合します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="trace.CoverageResults.write_results">
+<tt class="descname">write_results</tt><big>(</big><span class="optional">[</span><em>show_missing=True</em><span class="optional">[</span>, <em>summary=False</em><span class="optional">[</span>, <em>coverdir=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#trace.CoverageResults.write_results" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カバレッジ結果を書き出します。ヒットしなかった行も出力するには <em>show_missing</em> を指定します。モジュールごとのサマリーを出力に含めるには <em>summary</em> を指定します。
+<em>coverdir</em> に指定するのは結果ファイルを出力するディレクトリです。
+<tt class="docutils literal"><span class="pre">None</span></tt> の場合は各ソースファイルごとの結果がそれぞれのディレクトリに置かれます。</p>
+</dd></dl>
+
+</div></blockquote>
+</dd></dl>
+
+<p>簡単な例でプログラミングインターフェースの使い方を見てみましょう</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">trace</span>
+
+<span class="c"># Trace オブジェクトを、無視するもの、トレースや行カウントのいずれか</span>
+<span class="c"># または両方を行うか否かを指定して作成します。</span>
+<span class="n">tracer</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">Trace</span><span class="p">(</span>
+    <span class="n">ignoredirs</span><span class="o">=</span><span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exec_prefix</span><span class="p">],</span>
+    <span class="n">trace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c"># 与えられたトレーサを使って、コマンドを実行します。</span>
+<span class="n">tracer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s">&#39;main()&#39;</span><span class="p">)</span>
+
+<span class="c"># 出力先を /tmp としてレポートを作成します。</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">tracer</span><span class="o">.</span><span class="n">results</span><span class="p">()</span>
+<span class="n">r</span><span class="o">.</span><span class="n">write_results</span><span class="p">(</span><span class="n">show_missing</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">coverdir</span><span class="o">=</span><span class="s">&quot;/tmp&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="python.html" title="27. Python ランタイムサービス"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="timeit.html" title="26.6. timeit — 小さなコード断片の実行時間計測"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="debug.html" >26. デバッグとプロファイル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

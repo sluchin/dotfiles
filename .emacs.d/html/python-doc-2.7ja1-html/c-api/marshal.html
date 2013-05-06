@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>データ整列化 (data marshalling) のサポート &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="ユーティリティ関数" href="utilities.html" />
+    <link rel="next" title="引数の解釈と値の構築" href="arg.html" />
+    <link rel="prev" title="モジュールの import" href="import.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="arg.html" title="引数の解釈と値の構築"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="import.html" title="モジュールの import"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="utilities.html" accesskey="U">ユーティリティ関数</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="import.html"
+                        title="前の章へ">モジュールの import</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="arg.html"
+                        title="次の章へ">引数の解釈と値の構築</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/marshal.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="data-marshalling">
+<span id="marshalling-utils"></span><h1>データ整列化 (data marshalling) のサポート<a class="headerlink" href="#data-marshalling" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>以下のルーチン群は、 <a class="reference internal" href="../library/marshal.html#module-marshal" title="marshal: Python オブジェクトをバイト列に変換したり、その逆を (異なる制約条件下で) 行います。"><tt class="xref py py-mod docutils literal"><span class="pre">marshal</span></tt></a> モジュールと同じ形式を使った整列化オブジェクトを C コードから使えるようにします。整列化形式でデータを書き出す関数に加えて、データを読み戻す関数もあります。整列化されたデータを記録するファイルはバイナリモードで開かれていなければなりません。</p>
+<p>数値は最小桁が先にくるように記録されます。</p>
+<p>このモジュールでは、3つのバージョンのデータ形式をサポートしています。バージョン 0 は従来のもので、(Python 2.4 で新たに追加された) バージョン
+1  は intern 化された文字列をファイル内で共有し、逆マーシャル化の時にも共有されるようにします。
+(Python 2.5 で新たに追加された) バージョン2は、浮動小数点数に対してバイナリフォーマットを利用します。
+<em>PY_MARSHAL_VERSION</em> は現在のバージョン (バージョン 2) を示します。</p>
+<dl class="function">
+<dt id="PyMarshal_WriteLongToFile">
+void <tt class="descname">PyMarshal_WriteLongToFile</tt><big>(</big>long<em>&nbsp;value</em>, FILE<em>&nbsp;*file</em>, int<em>&nbsp;version</em><big>)</big><a class="headerlink" href="#PyMarshal_WriteLongToFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref c c-type docutils literal"><span class="pre">long</span></tt> 型の整数値 <em>value</em> を <em>file</em> へ整列化します。この関数は <em>value</em> の下桁 32 ビットを書き込むだけです;
+ネイティブの <tt class="xref c c-type docutils literal"><span class="pre">long</span></tt> 型サイズには関知しません。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span>ファイル形式を示す <em>version</em> が追加されました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMarshal_WriteObjectToFile">
+void <tt class="descname">PyMarshal_WriteObjectToFile</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*value</em>, FILE<em>&nbsp;*file</em>, int<em>&nbsp;version</em><big>)</big><a class="headerlink" href="#PyMarshal_WriteObjectToFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python オブジェクト <em>value</em> を <em>file</em> へ整列化します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span>ファイル形式を示す <em>version</em> が追加されました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMarshal_WriteObjectToString">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyMarshal_WriteObjectToString</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*value</em>, int<em>&nbsp;version</em><big>)</big><a class="headerlink" href="#PyMarshal_WriteObjectToString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>value</em> の整列化表現が入った文字列オブジェクトを返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span>ファイル形式を示す <em>version</em> が追加されました.</p>
+</dd></dl>
+
+<p>以下の関数を使うと、整列化された値を読み戻せます。</p>
+<dl class="function">
+<dt id="PyMarshal_ReadLongFromFile">
+long <tt class="descname">PyMarshal_ReadLongFromFile</tt><big>(</big>FILE<em>&nbsp;*file</em><big>)</big><a class="headerlink" href="#PyMarshal_ReadLongFromFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>読み出し用に開かれた <tt class="xref c c-type docutils literal"><span class="pre">FILE*</span></tt> 内のデータストリームから、 C の <tt class="xref c c-type docutils literal"><span class="pre">long</span></tt> 型データを読み出して返します。この関数は、ネイティブの <tt class="xref c c-type docutils literal"><span class="pre">long</span></tt> のサイズに関係なく、 32 ビットの値だけを読み出せます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMarshal_ReadShortFromFile">
+int <tt class="descname">PyMarshal_ReadShortFromFile</tt><big>(</big>FILE<em>&nbsp;*file</em><big>)</big><a class="headerlink" href="#PyMarshal_ReadShortFromFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>読み出し用に開かれた <tt class="xref c c-type docutils literal"><span class="pre">FILE*</span></tt> 内のデータストリームから、 C の <tt class="xref c c-type docutils literal"><span class="pre">short</span></tt> 型データを読み出して返します。この関数は、ネイティブの <tt class="xref c c-type docutils literal"><span class="pre">short</span></tt> のサイズに関係なく、 16 ビットの値だけを読み出せます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMarshal_ReadObjectFromFile">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyMarshal_ReadObjectFromFile</tt><big>(</big>FILE<em>&nbsp;*file</em><big>)</big><a class="headerlink" href="#PyMarshal_ReadObjectFromFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>読み出し用に開かれた <tt class="xref c c-type docutils literal"><span class="pre">FILE*</span></tt> 内のデータストリームから、 Python オブジェクトを読み出して返します。エラーが生じた場合、適切な例外 (<a class="reference internal" href="../library/exceptions.html#exceptions.EOFError" title="exceptions.EOFError"><tt class="xref py py-exc docutils literal"><span class="pre">EOFError</span></tt></a> または <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a>) を送出して <em>NULL</em> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMarshal_ReadLastObjectFromFile">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyMarshal_ReadLastObjectFromFile</tt><big>(</big>FILE<em>&nbsp;*file</em><big>)</big><a class="headerlink" href="#PyMarshal_ReadLastObjectFromFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>読み出し用に開かれた <tt class="xref c c-type docutils literal"><span class="pre">FILE*</span></tt> 内のデータストリームから、 Python オブジェクトを読み出して返します。
+<a class="reference internal" href="#PyMarshal_ReadObjectFromFile" title="PyMarshal_ReadObjectFromFile"><tt class="xref c c-func docutils literal"><span class="pre">PyMarshal_ReadObjectFromFile()</span></tt></a> と違い、この関数はファイル中に後続のオブジェクトが存在しないと仮定し、ファイルからメモリ上にファイルデータを一気にメモリにロードして、逆整列化機構がファイルから一バイトづつ読み出す代わりにメモリ上のデータを操作できるようにします。対象のファイルから他に何も読み出さないと分かっている場合にのみ、この関数を使ってください。エラーが生じた場合、適切な例外
+(<a class="reference internal" href="../library/exceptions.html#exceptions.EOFError" title="exceptions.EOFError"><tt class="xref py py-exc docutils literal"><span class="pre">EOFError</span></tt></a> または <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a>) を送出して <em>NULL</em> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMarshal_ReadObjectFromString">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyMarshal_ReadObjectFromString</tt><big>(</big>char<em>&nbsp;*string</em>, Py_ssize_t<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#PyMarshal_ReadObjectFromString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>string</em> が指している <em>len</em> バイトの文字列バッファに納められたデータストリームから Python オブジェクトを読み出して返します。エラーが生じた場合、適切な例外 (<a class="reference internal" href="../library/exceptions.html#exceptions.EOFError" title="exceptions.EOFError"><tt class="xref py py-exc docutils literal"><span class="pre">EOFError</span></tt></a> または <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a>) を送出して <em>NULL</em> を返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>len</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="arg.html" title="引数の解釈と値の構築"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="import.html" title="モジュールの import"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="utilities.html" >ユーティリティ関数</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

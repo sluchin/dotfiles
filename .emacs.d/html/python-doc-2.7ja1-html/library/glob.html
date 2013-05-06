@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.7. glob — Unix 形式のパス名のパターン展開 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="next" title="10.8. fnmatch — Unix ファイル名のパターンマッチ" href="fnmatch.html" />
+    <link rel="prev" title="10.6. tempfile — 一時的なファイルやディレクトリの生成" href="tempfile.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fnmatch.html" title="10.8. fnmatch — Unix ファイル名のパターンマッチ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="tempfile.html" title="10.6. tempfile — 一時的なファイルやディレクトリの生成"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" accesskey="U">10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="tempfile.html"
+                        title="前の章へ">10.6. <tt class="docutils literal docutils literal"><span class="pre">tempfile</span></tt> &#8212; 一時的なファイルやディレクトリの生成</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="fnmatch.html"
+                        title="次の章へ">10.8. <tt class="docutils literal docutils literal"><span class="pre">fnmatch</span></tt> &#8212; Unix ファイル名のパターンマッチ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/glob.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-glob">
+<span id="glob-unix"></span><h1>10.7. <a class="reference internal" href="#module-glob" title="glob: Unix シェル形式のパス名のパターン展開。"><tt class="xref py py-mod docutils literal"><span class="pre">glob</span></tt></a> &#8212; Unix 形式のパス名のパターン展開<a class="headerlink" href="#module-glob" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0"><a class="reference internal" href="#module-glob" title="glob: Unix シェル形式のパス名のパターン展開。"><tt class="xref py py-mod docutils literal"><span class="pre">glob</span></tt></a> モジュールはUnix シェルで使われているルールに従って指定されたパターンにマッチするすべてのパス名を見つけ出します。チルダ展開は使えませんが、 <tt class="docutils literal"><span class="pre">*</span></tt> 、 <tt class="docutils literal"><span class="pre">?</span></tt> と <tt class="docutils literal"><span class="pre">[]</span></tt> で表される文字範囲には正しくマッチします。これは <a class="reference internal" href="os.html#os.listdir" title="os.listdir"><tt class="xref py py-func docutils literal"><span class="pre">os.listdir()</span></tt></a>
+関数と <a class="reference internal" href="fnmatch.html#fnmatch.fnmatch" title="fnmatch.fnmatch"><tt class="xref py py-func docutils literal"><span class="pre">fnmatch.fnmatch()</span></tt></a> 関数を一緒に使って実行されていて、実際に subshell を呼び出しているわけではありません。(チルダ展開とシェル変数展開を利用したければ、 <a class="reference internal" href="os.path.html#os.path.expanduser" title="os.path.expanduser"><tt class="xref py py-func docutils literal"><span class="pre">os.path.expanduser()</span></tt></a>
+と <a class="reference internal" href="os.path.html#os.path.expandvars" title="os.path.expandvars"><tt class="xref py py-func docutils literal"><span class="pre">os.path.expandvars()</span></tt></a> を使ってください。)</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/glob.py?view=markup">glob モジュールの Python ソースコード</a></p>
+</div>
+<dl class="function">
+<dt id="glob.glob">
+<tt class="descclassname">glob.</tt><tt class="descname">glob</tt><big>(</big><em>pathname</em><big>)</big><a class="headerlink" href="#glob.glob" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>pathname</em> (パスの指定を含んだ文字列でなければいけません。)にマッチする空の可能性のあるパス名のリストを返します。</p>
+<p><em>pathname</em> は( <tt class="file docutils literal"><span class="pre">/usr/src/Python-1.5/Makefile</span></tt> のように)絶対パスでもいいし、(<tt class="file docutils literal"><span class="pre">../../Tools/*/*.gif</span></tt> のように)相対パスでもよくて、シェル形式のワイルドカードを含んでいてもかまいません。結果には(シェルと同じく)壊れたシンボリックリンクも含まれます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="glob.iglob">
+<tt class="descclassname">glob.</tt><tt class="descname">iglob</tt><big>(</big><em>pathname</em><big>)</big><a class="headerlink" href="#glob.iglob" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>実際には一度に全てを格納せずに、 <a class="reference internal" href="#module-glob" title="glob: Unix シェル形式のパス名のパターン展開。"><tt class="xref py py-func docutils literal"><span class="pre">glob()</span></tt></a> と同じ値を順に生成するイテレータを返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<p>たとえば、次の三つのファイルだけがあるディレクトリを考えてください: <tt class="file docutils literal"><span class="pre">1.gif</span></tt> 、 <tt class="file docutils literal"><span class="pre">2.txt</span></tt> 、 <tt class="file docutils literal"><span class="pre">card.gif</span></tt> 。
+<a class="reference internal" href="#module-glob" title="glob: Unix シェル形式のパス名のパターン展開。"><tt class="xref py py-func docutils literal"><span class="pre">glob()</span></tt></a> は次のような結果になります。パスに接頭するどの部分が保たれているかに注意してください。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;./[0-9].*&#39;</span><span class="p">)</span>
+<span class="go">[&#39;./1.gif&#39;, &#39;./2.txt&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*.gif&#39;</span><span class="p">)</span>
+<span class="go">[&#39;1.gif&#39;, &#39;card.gif&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;?.gif&#39;</span><span class="p">)</span>
+<span class="go">[&#39;1.gif&#39;]</span>
+</pre></div>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="fnmatch.html#module-fnmatch" title="fnmatch: Unix シェル形式のファイル名のパターンマッチ。"><tt class="xref py py-mod docutils literal"><span class="pre">fnmatch</span></tt></a></dt>
+<dd>シェル形式の(パスではない)ファイル名展開</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fnmatch.html" title="10.8. fnmatch — Unix ファイル名のパターンマッチ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="tempfile.html" title="10.6. tempfile — 一時的なファイルやディレクトリの生成"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" >10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

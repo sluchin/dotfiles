@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>11.4. shelve — Python オブジェクトの永続化 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="11. データの永続化" href="persistence.html" />
+    <link rel="next" title="11.5. marshal — 内部使用向けの Python オブジェクト整列化" href="marshal.html" />
+    <link rel="prev" title="11.3. copy_reg — pickle サポート関数を登録する" href="copy_reg.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="marshal.html" title="11.5. marshal — 内部使用向けの Python オブジェクト整列化"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="copy_reg.html" title="11.3. copy_reg — pickle サポート関数を登録する"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="persistence.html" accesskey="U">11. データの永続化</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">11.4. <tt class="docutils literal"><span class="pre">shelve</span></tt> &#8212; Python オブジェクトの永続化</a><ul>
+<li><a class="reference internal" href="#id3">11.4.1. 制限事項</a></li>
+<li><a class="reference internal" href="#shelve-example">11.4.2. 使用例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="copy_reg.html"
+                        title="前の章へ">11.3. <tt class="docutils literal docutils literal docutils literal"><span class="pre">copy_reg</span></tt> &#8212; <tt class="docutils literal docutils literal docutils literal"><span class="pre">pickle</span></tt> サポート関数を登録する</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="marshal.html"
+                        title="次の章へ">11.5. <tt class="docutils literal docutils literal docutils literal"><span class="pre">marshal</span></tt> &#8212; 内部使用向けの Python オブジェクト整列化</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/shelve.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-shelve">
+<span id="shelve-python"></span><h1>11.4. <a class="reference internal" href="#module-shelve" title="shelve: Python オブジェクトの永続化。"><tt class="xref py py-mod docutils literal"><span class="pre">shelve</span></tt></a> &#8212; Python オブジェクトの永続化<a class="headerlink" href="#module-shelve" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">&#8220;シェルフ (shelf, 棚)&#8221; は辞書に似た永続性を持つオブジェクトです。 &#8220;dbm&#8221; データベースとの違いは、シェルフの値 (キーではありません！)
+は実質上どんな Python オブジェクトにも &#8212; <a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> モジュールが扱えるなら何でも &#8212;
+できるということです。これにはほとんどのクラスインスタンス、再帰的なデータ型、沢山の共有されたサブオブジェクトを含むオブジェクトが含まれます。キーは通常の文字列です。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/shelve.py?view=markup">shelve モジュールの Python ソースコード</a></p>
+</div>
+<dl class="function">
+<dt id="shelve.open">
+<tt class="descclassname">shelve.</tt><tt class="descname">open</tt><big>(</big><em>filename</em><span class="optional">[</span>, <em>flag='c'</em><span class="optional">[</span>, <em>protocol=None</em><span class="optional">[</span>, <em>writeback=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shelve.open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>永続的な辞書を開きます。指定された <em>filename</em> は、根底にあるデータベースの基本ファイル名となります。副作用として、 <em>filename</em>
+には拡張子がつけられる場合があり、ひとつ以上のファイルが生成される可能性もあります。デフォルトでは、根底にあるデータベースファイルは読み書き可能なように開かれます。オプションの <em>flag</em> パラメタは <a class="reference internal" href="anydbm.html#anydbm.open" title="anydbm.open"><tt class="xref py py-func docutils literal"><span class="pre">anydbm.open()</span></tt></a> における <em>flag</em> パラメタと同様に解釈されます。</p>
+<p>デフォルトでは、値を整列化する際にはバージョン 0 の pickle 化が用いられます。pickle 化プロトコルのバージョンは <em>protocol</em>
+パラメタで指定することができます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span><em>protocol</em> パラメタが追加されました。</p>
+<p>Python の意味論から、シェルフには永続的な辞書の可変エントリに対する変更を知る術がありません。デフォルトでは、変更されたオブジェクトはシェルフに代入されたとき
+<em>だけ</em> 書き込まれます (<a class="reference internal" href="#shelve-example"><em>使用例</em></a> 参照)。オプションの <em>writeback</em> パラメタが  <em>True</em> に設定されていれば、アクセスされたすべてのエントリはメモリ上にキャッシュされ、
+<a class="reference internal" href="#shelve.Shelf.sync" title="shelve.Shelf.sync"><tt class="xref py py-meth docutils literal"><span class="pre">sync()</span></tt></a> および <a class="reference internal" href="#shelve.Shelf.close" title="shelve.Shelf.close"><tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt></a> を呼び出した際に書き戻されます。この機能は永続的な辞書上の可変の要素に対する変更を容易にしますが、多数のエントリがアクセスされた場合、膨大な量のメモリがキャッシュのために消費され、アクセスされた全てのエントリを書き戻す
+(アクセスされたエントリが可変であるか、あるいは実際に変更されたかを決定する方法は存在しないのです)
+ために、ファイルを閉じる操作を非常に低速にしてしまいます。</p>
+</dd></dl>
+
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p>Because the <a class="reference internal" href="#module-shelve" title="shelve: Python オブジェクトの永続化。"><tt class="xref py py-mod docutils literal"><span class="pre">shelve</span></tt></a> module is backed by <a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a>, it is insecure
+to load a shelf from an untrusted source.  Like with pickle, loading a shelf
+can execute arbitrary code.</p>
+<p class="last"><a class="reference internal" href="#module-shelve" title="shelve: Python オブジェクトの永続化。"><tt class="xref py py-mod docutils literal"><span class="pre">shelve</span></tt></a> モジュールは裏で <a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> を使っているので、信頼できないソースから shelf を読み込むのは危険です。
+pickle と同じく、 shelf の読み込みでも任意のコードを実行できるからです。</p>
+</div>
+<p>シェルフオブジェクトは辞書がサポートする全てのメソッドをサポートしています。これにより、辞書ベースのスクリプトから永続的な記憶媒体を必要とするスクリプトに容易に移行できるようになります。</p>
+<p>追加でサポートされるメソッドが二つあります:</p>
+<dl class="method">
+<dt id="shelve.Shelf.sync">
+<tt class="descclassname">Shelf.</tt><tt class="descname">sync</tt><big>(</big><big>)</big><a class="headerlink" href="#shelve.Shelf.sync" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シェルフが <em>writeback</em> を <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> にセットして開かれている場合に、キャッシュ中の全てのエントリを書き戻します。また容易にできるならば、キャッシュを空にしてディスク上の永続的な辞書を同期します。このメソッドはシェルフを <a class="reference internal" href="#shelve.Shelf.close" title="shelve.Shelf.close"><tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt></a> によって閉じるとき自動的に呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shelve.Shelf.close">
+<tt class="descclassname">Shelf.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#shelve.Shelf.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>永続的な <em>辞書</em> オブジェクトを同期して閉じます。既に閉じられているシェルフに対して呼び出すと <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a>
+に終わります。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">通常の辞書に近い速度をもち、いろいろなストレージフォーマットに対応した、
+<a class="reference external" href="http://code.activestate.com/recipes/576642/">永続化辞書のレシピ</a></p>
+</div>
+<div class="section" id="id3">
+<h2>11.4.1. 制限事項<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<blockquote>
+<div></div></blockquote>
+<ul class="simple" id="index-1">
+<li>どのデータベースパッケージが使われるか (例えば <a class="reference internal" href="dbm.html#module-dbm" title="dbm: ndbmを基にした基本的なデータベースインタフェースです。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">dbm</span></tt></a> 、 <a class="reference internal" href="gdbm.html#module-gdbm" title="gdbm: GNU による dbm の再実装。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">gdbm</span></tt></a> 、 <a class="reference internal" href="bsddb.html#module-bsddb" title="bsddb: Berkeley DB ライブラリへのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">bsddb</span></tt></a>) は、どのインタフェースが利用可能かに依存します。従って、データベースを <a class="reference internal" href="dbm.html#module-dbm" title="dbm: ndbmを基にした基本的なデータベースインタフェースです。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">dbm</span></tt></a>  を使って直接開く方法は安全ではありません。データベースはまた、 <a class="reference internal" href="dbm.html#module-dbm" title="dbm: ndbmを基にした基本的なデータベースインタフェースです。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">dbm</span></tt></a>
+が使われた場合 (不幸なことに) その制約に縛られます &#8212; これはデータベースに記録されたオブジェクト (の pickle 化された表現) はかなり小さくなければならず、キー衝突が生じた場合に、稀にデータベースを更新することができなくなるということを意味します。</li>
+<li><a class="reference internal" href="#module-shelve" title="shelve: Python オブジェクトの永続化。"><tt class="xref py py-mod docutils literal"><span class="pre">shelve</span></tt></a> モジュールは、シェルフに置かれたオブジェクトの <em>並列した</em> 読み出し/書き込みアクセスをサポートしません
+(複数の同時読み出しアクセスは安全です)。あるプログラムが書き込みために開かれたシェルフを持っているとき、他のプログラムはそのシェルフを読み書きのために開いてはいけません。この問題を解決するために Unix のファイルロック機構を使うことができますが、この機構は Unix
+のバージョン間で異なり、使われているデータベースの実装について知識が必要となります。</li>
+</ul>
+<dl class="class">
+<dt id="shelve.Shelf">
+<em class="property">class </em><tt class="descclassname">shelve.</tt><tt class="descname">Shelf</tt><big>(</big><em>dict</em><span class="optional">[</span>, <em>protocol=None</em><span class="optional">[</span>, <em>writeback=False</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shelve.Shelf" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="userdict.html#UserDict.DictMixin" title="UserDict.DictMixin"><tt class="xref py py-class docutils literal"><span class="pre">UserDict.DictMixin</span></tt></a> のサブクラスで、pickle 化された値を  <em>dict</em> オブジェクトに保存します。</p>
+<p>デフォルトでは、値を整列化する際にはバージョン 0 の pickle 化が用いられます。pickle 化プロトコルのバージョンは <em>protocol</em>
+パラメタで指定することができます。pickle 化プロトコルについては <a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> のドキュメントを参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span><em>protocol</em> パラメタが追加されました。</p>
+<p><em>writeback</em> パラメタが <em>True</em> に設定されていれば、アクセスされたすべてのエントリはメモリ上にキャッシュされ、ファイルを閉じる際に書き戻されます; この機能により、可変のエントリに対して自然な操作が可能になりますが、さらに多くのメモリを消費し、辞書をファイルと同期して閉じる際に長い時間がかかるようになります。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="shelve.BsdDbShelf">
+<em class="property">class </em><tt class="descclassname">shelve.</tt><tt class="descname">BsdDbShelf</tt><big>(</big><em>dict</em><span class="optional">[</span>, <em>protocol=None</em><span class="optional">[</span>, <em>writeback=False</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shelve.BsdDbShelf" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#shelve.Shelf" title="shelve.Shelf"><tt class="xref py py-class docutils literal"><span class="pre">Shelf</span></tt></a> のサブクラスで、 <tt class="xref py py-meth docutils literal"><span class="pre">first()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">previous()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">last()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">set_location()</span></tt>
+メソッドを公開しています。これらのメソッドは <a class="reference internal" href="bsddb.html#module-bsddb" title="bsddb: Berkeley DB ライブラリへのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">bsddb</span></tt></a>
+モジュールでは利用可能ですが、他のデータベースモジュールでは利用できません。コンストラクタに渡された <em>dict</em> オブジェクトは上記のメソッドをサポートしていなくてはなりません。通常は、 <a class="reference internal" href="bsddb.html#bsddb.hashopen" title="bsddb.hashopen"><tt class="xref py py-func docutils literal"><span class="pre">bsddb.hashopen()</span></tt></a>,
+<a class="reference internal" href="bsddb.html#bsddb.btopen" title="bsddb.btopen"><tt class="xref py py-func docutils literal"><span class="pre">bsddb.btopen()</span></tt></a> または <a class="reference internal" href="bsddb.html#bsddb.rnopen" title="bsddb.rnopen"><tt class="xref py py-func docutils literal"><span class="pre">bsddb.rnopen()</span></tt></a>
+のいずれかを呼び出して得られるオブジェクトが条件を満たしています。オプションの <em>protocol</em> および <em>writeback</em> パラメタは
+<a class="reference internal" href="#shelve.Shelf" title="shelve.Shelf"><tt class="xref py py-class docutils literal"><span class="pre">Shelf</span></tt></a> クラスにおけるパラメタと同様に解釈されます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="shelve.DbfilenameShelf">
+<em class="property">class </em><tt class="descclassname">shelve.</tt><tt class="descname">DbfilenameShelf</tt><big>(</big><em>filename</em><span class="optional">[</span>, <em>flag='c'</em><span class="optional">[</span>, <em>protocol=None</em><span class="optional">[</span>, <em>writeback=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shelve.DbfilenameShelf" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#shelve.Shelf" title="shelve.Shelf"><tt class="xref py py-class docutils literal"><span class="pre">Shelf</span></tt></a> のサブクラスで、辞書様オブジェクトの代わりに
+<em>filename</em> を受理します。根底にあるファイルは
+<a class="reference internal" href="anydbm.html#anydbm.open" title="anydbm.open"><tt class="xref py py-func docutils literal"><span class="pre">anydbm.open()</span></tt></a> を使って開かれます。デフォルトでは、ファイルは読み書き可能な状態で開かれます。オプションの <em>flag</em> パラメタは <a class="reference internal" href="#shelve.open" title="shelve.open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a>
+関数におけるパラメタと同様に解釈されます。オプションの <em>protocol</em> および <em>writeback</em> パラメタは
+<a class="reference internal" href="#shelve.Shelf" title="shelve.Shelf"><tt class="xref py py-class docutils literal"><span class="pre">Shelf</span></tt></a> クラスにおけるパラメタと同様に解釈されます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="shelve-example">
+<span id="id4"></span><h2>11.4.2. 使用例<a class="headerlink" href="#shelve-example" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>インタフェースは以下のコードに集約されています (<tt class="docutils literal"><span class="pre">key</span></tt> は文字列で、 <tt class="docutils literal"><span class="pre">data</span></tt> は任意のオブジェクトです):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">shelve</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">shelve</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="c"># open -- file may get suffix added by low-level</span>
+                          <span class="c"># library</span>
+
+<span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>   <span class="c"># store data at key (overwrites old data if</span>
+                <span class="c"># using an existing key)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>   <span class="c"># retrieve a COPY of data at key (raise KeyError if no</span>
+                <span class="c"># such key)</span>
+<span class="k">del</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>      <span class="c"># delete data stored at key (raises KeyError</span>
+                <span class="c"># if no such key)</span>
+<span class="n">flag</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>   <span class="c"># true if the key exists</span>
+<span class="n">klist</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="c"># a list of all existing keys (slow!)</span>
+
+<span class="c"># as d was opened WITHOUT writeback=True, beware:</span>
+<span class="n">d</span><span class="p">[</span><span class="s">&#39;xx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>  <span class="c"># this works as expected, but...</span>
+<span class="n">d</span><span class="p">[</span><span class="s">&#39;xx&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>   <span class="c"># *this doesn&#39;t!* -- d[&#39;xx&#39;] is STILL range(4)!</span>
+
+<span class="c"># having opened d without writeback=True, you need to code carefully:</span>
+<span class="n">temp</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;xx&#39;</span><span class="p">]</span>      <span class="c"># extracts the copy</span>
+<span class="n">temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>      <span class="c"># mutates the copy</span>
+<span class="n">d</span><span class="p">[</span><span class="s">&#39;xx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>      <span class="c"># stores the copy right back, to persist it</span>
+
+<span class="c"># or, d=shelve.open(filename,writeback=True) would let you just code</span>
+<span class="c"># d[&#39;xx&#39;].append(5) and have it work as expected, BUT it would also</span>
+<span class="c"># consume more memory and make the d.close() operation slower.</span>
+
+<span class="n">d</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>       <span class="c"># close it</span>
+</pre></div>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="anydbm.html#module-anydbm" title="anydbm: DBM 形式のデータベースモジュールに対する汎用インタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">anydbm</span></tt></a></dt>
+<dd><tt class="docutils literal"><span class="pre">dbm</span></tt> スタイルのデータベースに対する汎用インタフェース。</dd>
+<dt>Module <a class="reference internal" href="bsddb.html#module-bsddb" title="bsddb: Berkeley DB ライブラリへのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">bsddb</span></tt></a></dt>
+<dd>BSD <tt class="docutils literal"><span class="pre">db</span></tt> データベースインタフェース。</dd>
+<dt>Module <a class="reference internal" href="dbhash.html#module-dbhash" title="dbhash: BSD データベースライブラリへの DBM 形式のインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">dbhash</span></tt></a></dt>
+<dd><a class="reference internal" href="bsddb.html#module-bsddb" title="bsddb: Berkeley DB ライブラリへのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">bsddb</span></tt></a> をラップする薄いレイヤで、他のデータベースモジュールのように関数 <a class="reference internal" href="dbhash.html#dbhash.open" title="dbhash.open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> を提供しています。</dd>
+<dt>Module <a class="reference internal" href="dbm.html#module-dbm" title="dbm: ndbmを基にした基本的なデータベースインタフェースです。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">dbm</span></tt></a></dt>
+<dd>標準の Unix データベースインタフェース。</dd>
+<dt>Module <a class="reference internal" href="dumbdbm.html#module-dumbdbm" title="dumbdbm: 単純な DBM インタフェースに対する可搬性のある実装。"><tt class="xref py py-mod docutils literal"><span class="pre">dumbdbm</span></tt></a></dt>
+<dd><tt class="docutils literal"><span class="pre">dbm</span></tt> インタフェースの移植性のある実装。</dd>
+<dt>Module <a class="reference internal" href="gdbm.html#module-gdbm" title="gdbm: GNU による dbm の再実装。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">gdbm</span></tt></a></dt>
+<dd><tt class="docutils literal"><span class="pre">dbm</span></tt> インタフェースに基づいた GNU データベースインタフェース。</dd>
+<dt>Module <a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a></dt>
+<dd><a class="reference internal" href="#module-shelve" title="shelve: Python オブジェクトの永続化。"><tt class="xref py py-mod docutils literal"><span class="pre">shelve</span></tt></a> によって使われるオブジェクト整列化機構。</dd>
+<dt>Module <a class="reference internal" href="pickle.html#module-cPickle" title="cPickle: pickle の高速バージョンですが、サブクラスはできません。"><tt class="xref py py-mod docutils literal"><span class="pre">cPickle</span></tt></a></dt>
+<dd><a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> の高速版。</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="marshal.html" title="11.5. marshal — 内部使用向けの Python オブジェクト整列化"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="copy_reg.html" title="11.3. copy_reg — pickle サポート関数を登録する"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="persistence.html" >11. データの永続化</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

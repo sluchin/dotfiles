@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>20.23. xmlrpclib — XML-RPC クライアントアクセス &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="20. インターネットプロトコルとその支援" href="internet.html" />
+    <link rel="next" title="20.24. SimpleXMLRPCServer — 基本的なXML-RPCサーバー" href="simplexmlrpcserver.html" />
+    <link rel="prev" title="20.22. Cookie — HTTPの状態管理" href="cookie.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="simplexmlrpcserver.html" title="20.24. SimpleXMLRPCServer — 基本的なXML-RPCサーバー"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="cookie.html" title="20.22. Cookie — HTTPの状態管理"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" accesskey="U">20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">20.23. <tt class="docutils literal"><span class="pre">xmlrpclib</span></tt> &#8212; XML-RPC クライアントアクセス</a><ul>
+<li><a class="reference internal" href="#serverproxy">20.23.1. ServerProxy オブジェクト</a></li>
+<li><a class="reference internal" href="#boolean">20.23.2. Boolean オブジェクト</a></li>
+<li><a class="reference internal" href="#datetime">20.23.3. DateTime オブジェクト</a></li>
+<li><a class="reference internal" href="#binary">20.23.4. Binary オブジェクト</a></li>
+<li><a class="reference internal" href="#fault">20.23.5. Fault オブジェクト</a></li>
+<li><a class="reference internal" href="#protocolerror">20.23.6. ProtocolError オブジェクト</a></li>
+<li><a class="reference internal" href="#multicall">20.23.7. MultiCall オブジェクト</a></li>
+<li><a class="reference internal" href="#id1">20.23.8. 補助関数</a></li>
+<li><a class="reference internal" href="#xmlrpc-client-example">20.23.9. クライアントのサンプル</a></li>
+<li><a class="reference internal" href="#id3">20.23.10. クライアントとサーバーの利用例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="cookie.html"
+                        title="前の章へ">20.22. <tt class="docutils literal docutils literal docutils literal"><span class="pre">Cookie</span></tt> &#8212; HTTPの状態管理</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="simplexmlrpcserver.html"
+                        title="次の章へ">20.24. <tt class="docutils literal docutils literal docutils literal"><span class="pre">SimpleXMLRPCServer</span></tt> &#8212; 基本的なXML-RPCサーバー</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/xmlrpclib.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-xmlrpclib">
+<span id="xmlrpclib-xml-rpc"></span><h1>20.23. <a class="reference internal" href="#module-xmlrpclib" title="xmlrpclib: XML-RPC client access."><tt class="xref py py-mod docutils literal"><span class="pre">xmlrpclib</span></tt></a> &#8212; XML-RPC クライアントアクセス<a class="headerlink" href="#module-xmlrpclib" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#module-xmlrpclib" title="xmlrpclib: XML-RPC client access."><tt class="xref py py-mod docutils literal"><span class="pre">xmlrpclib</span></tt></a> モジュールは、Python 3では <tt class="xref py py-mod docutils literal"><span class="pre">xmlrpc.client</span></tt> にリネームされました。
+<a class="reference internal" href="../glossary.html#term-to3"><em class="xref std std-term">2to3</em></a> ツールは、自動的にソースコードのimportをPython 3用に修正します。</p>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+<p>XML-RPCはXMLを利用した遠隔手続き呼び出し(Remote Procedure Call)の一種で、HTTPをトランスポートとして使用します。XML-
+RPCでは、クライアントはリモートサーバ(URIで指定されたサーバ)上のメソッドをパラメータを指定して呼び出し、構造化されたデータを取得します。このモジュールは、XML-RPCクライアントの開発をサポートしており、Pythonオブジェクトに適合する転送用XMLの変換の全てを行います。</p>
+<dl class="class">
+<dt id="xmlrpclib.ServerProxy">
+<em class="property">class </em><tt class="descclassname">xmlrpclib.</tt><tt class="descname">ServerProxy</tt><big>(</big><em>uri</em><span class="optional">[</span>, <em>transport</em><span class="optional">[</span>, <em>encoding</em><span class="optional">[</span>, <em>verbose</em><span class="optional">[</span>, <em>allow_none</em><span class="optional">[</span>, <em>use_datetime</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#xmlrpclib.ServerProxy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#xmlrpclib.ServerProxy" title="xmlrpclib.ServerProxy"><tt class="xref py py-class docutils literal"><span class="pre">ServerProxy</span></tt></a> は、リモートのXML-RPCサーバとの通信を管理するオブジェクトです。最初のパラメータはURI(Uniform
+Resource Indicator)で、通常はサーバのURLを指定します。2番目のパラメータにはトランスポート・ファクトリを指定する事ができます。トランスポート・ファクトリを省略した場合、URLが https:
+ならモジュール内部の <tt class="xref py py-class docutils literal"><span class="pre">SafeTransport</span></tt> インスタンスを使用し、それ以外の場合にはモジュール内部の
+<tt class="xref py py-class docutils literal"><span class="pre">Transport</span></tt> インスタンスを使用します。オプションの 3 番目の引数はエンコード方法で、デフォルトでは
+UTF-8 です。オプションの 4 番目の引数はデバッグフラグです。 <em>allow_none</em> が真の場合、Python の定数 <tt class="docutils literal"><span class="pre">None</span></tt> は XML
+に翻訳されます; デフォルトの動作は <tt class="docutils literal"><span class="pre">None</span></tt> に対して <a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。この仕様は XML-RPC
+仕様でよく用いられている拡張ですが、全てのクライアントやサーバでサポートされているわけではありません; 詳細記述については
+<a class="reference external" href="http://ontosys.com/xml-rpc/extensions.html">http://ontosys.com/xml-rpc/extensions.html</a> を参照してください。
+<em>use_datetime</em> フラグは <a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a> のオブジェクトとして日付/時刻を表現する時に使用し、デフォルトでは
+false に設定されています。呼び出しに <a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a> のオブジェクトを渡すことができます。</p>
+<p>HTTP及びHTTPS通信の両方で、 <tt class="docutils literal"><span class="pre">http://user:pass&#64;host:port/path</span></tt> のようなHTTP基本認証のための拡張URL構文をサポートしています。 <tt class="docutils literal"><span class="pre">user:pass</span></tt> はbase64でエンコードしてHTTPの&#8217;Authorization
+&#8216;ヘッダとなり、XML-RPCメソッド呼び出し時に接続処理の一部としてリモートサーバに送信されます。リモートサーバが基本認証を要求する場合のみ、この機能を利用する必要があります。</p>
+<p>生成されるインスタンスはリモートサーバへのプロクシオブジェクトで、RPC呼び出しを行う為のメソッドを持ちます。リモートサーバがイントロスペクション
+APIをサポートしている場合は、リモートサーバのサポートするメソッドを検索 (サービス検索)やサーバのメタデータの取得なども行えます。</p>
+<p><a class="reference internal" href="#xmlrpclib.ServerProxy" title="xmlrpclib.ServerProxy"><tt class="xref py py-class docutils literal"><span class="pre">ServerProxy</span></tt></a> インスタンスのメソッドは引数としてPythonの基礎型とオブジェクトを受け取り、戻り値としてPythonの基礎型かオブジェクトを返します。以下の型をXMLに変換(XMLを通じてマーシャルする)する事ができます
+(特別な指定がない限り、逆変換でも同じ型として変換されます):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">名前</th>
+<th class="head">意味</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>boolean</td>
+<td>定数 <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> と <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td>整数</td>
+<td>そのまま</td>
+</tr>
+<tr class="row-even"><td>浮動小数点</td>
+<td>そのまま</td>
+</tr>
+<tr class="row-odd"><td>文字列</td>
+<td>そのまま</td>
+</tr>
+<tr class="row-even"><td>配列</td>
+<td>変換可能な要素を含むPythonシーケンス。戻り値はリスト。</td>
+</tr>
+<tr class="row-odd"><td>構造体</td>
+<td>Pythonの辞書。キーは文字列のみ。全ての値は変換可能でなくてはならない。ユーザー定義型を渡すこともできます。 <em>__dict__</em>
+の属性のみ転送されます。</td>
+</tr>
+<tr class="row-even"><td>日付</td>
+<td>エポックからの経過秒数(<tt class="xref py py-class docutils literal"><span class="pre">DateTime</span></tt> クラスのインスタンスとして渡す) もしくは、 <a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a> のインスタンス</td>
+</tr>
+<tr class="row-odd"><td>バイナリ</td>
+<td><tt class="xref py py-class docutils literal"><span class="pre">Binary</span></tt> ラッパクラスのインスタンス</td>
+</tr>
+</tbody>
+</table>
+<p>上記のXML-RPCでサポートする全データ型を使用することができます。メソッド呼び出し時、XML-
+RPCサーバエラーが発生すると <tt class="xref py py-exc docutils literal"><span class="pre">Fault</span></tt> インスタンスを送出し、HTTP/HTTPSトランスポート層でエラーが発生した場合には
+<tt class="xref py py-exc docutils literal"><span class="pre">ProtocolError</span></tt> を送出します。 <tt class="xref py py-exc docutils literal"><span class="pre">Error</span></tt> をベースとする
+<tt class="xref py py-exc docutils literal"><span class="pre">Fault</span></tt> と <tt class="xref py py-exc docutils literal"><span class="pre">ProtocolError</span></tt> の両方が発生します。 Python 2.2以降では組み込み型のサブクラスを作成する事ができますが、現在のところxmlrpclibではそのようなサブクラスのインスタンスをマーシャルすることはできません。</p>
+<p>文字列を渡す場合、 <tt class="docutils literal"><span class="pre">&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&amp;</span></tt> などのXMLで特殊な意味を持つ文字は自動的にエスケープされます。しかし、ASCII値0〜31の制御文字(もちろん、タブ&#8217;TAB&#8217;,改行&#8217;LF&#8217;,リターン&#8217;CR&#8217;は除く)などのXMLで使用することのできない文字を使用することはできず、使用するとそのXML-RPCリクエストはwell-formedなXMLとはなりません。そのような文字列を渡す必要がある場合は、後述の <tt class="xref py py-class docutils literal"><span class="pre">Binary</span></tt> ラッパクラスを使用してください。</p>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Server</span></tt> は、上位互換性の為に <a class="reference internal" href="#xmlrpclib.ServerProxy" title="xmlrpclib.ServerProxy"><tt class="xref py py-class docutils literal"><span class="pre">ServerProxy</span></tt></a> の別名として残されています。新しいコードでは <a class="reference internal" href="#xmlrpclib.ServerProxy" title="xmlrpclib.ServerProxy"><tt class="xref py py-class docutils literal"><span class="pre">ServerProxy</span></tt></a> を使用してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><em>use_datetime</em> フラグが追加されました</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>ニュースタイルクラス(<a class="reference internal" href="../glossary.html#term-new-style-class"><em class="xref std std-term">new-style class</em></a>)も、
+<em>__dict__</em> 属性を持っていて、特別な方法でマーシャルされている親クラスを
+持っていなければ、渡すことができます。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.tldp.org/HOWTO/XML-RPC-HOWTO/index.html">XML-RPC HOWTO</a></dt>
+<dd>週種類のプログラミング言語で記述された XML-RPCの操作とクライアントソフトウェアの素晴らしい説明が掲載されています。
+XML- RPCクライアントの開発者が知っておくべきことがほとんど全て記載されています。</dd>
+<dt><a class="reference external" href="http://xmlrpc-c.sourceforge.net/hacks.php">XML-RPC-Hacks page</a></dt>
+<dd>イントロスペクションとマルチコールをサポートしているオープンソースの拡張ライブラリについて説明しています。</dd>
+<dt><a class="reference external" href="http://xmlrpc-c.sourceforge.net/introspection.html">XML-RPC Introspection</a></dt>
+<dd>インストロペクションをサポートする、 XML-RPC プロトコルの拡張を解説しています。</dd>
+<dt><a class="reference external" href="http://www.xmlrpc.com/spec">XML-RPC Specification</a></dt>
+<dd>公式の仕様</dd>
+<dt><a class="reference external" href="http://effbot.org/zone/xmlrpc-errata.htm">Unofficial XML-RPC Errata</a></dt>
+<dd>Fredrik Lundh による &#8220;unofficial errata, intended to clarify certain
+details in the XML-RPC specification, as well as hint at
+&#8216;best practices&#8217; to use when designing your own XML-RPC
+implementations.&#8221;</dd>
+</dl>
+</div>
+<div class="section" id="serverproxy">
+<span id="serverproxy-objects"></span><h2>20.23.1. ServerProxy オブジェクト<a class="headerlink" href="#serverproxy" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#xmlrpclib.ServerProxy" title="xmlrpclib.ServerProxy"><tt class="xref py py-class docutils literal"><span class="pre">ServerProxy</span></tt></a> インスタンスの各メソッドはそれぞれXML-RPCサーバの遠隔手続き呼び出しに対応しており、メソッドが呼び出されると名前と引数をシグネチャとしてRPCを実行します(同じ名前のメソッドでも、異なる引数シグネチャによってオーバロードされます)。RPC実行後、変換された値を返すか、または
+<tt class="xref py py-class docutils literal"><span class="pre">Fault</span></tt> オブジェクトもしくは <tt class="xref py py-class docutils literal"><span class="pre">ProtocolError</span></tt> オブジェクトでエラーを通知します。</p>
+<p>予約メンバ <tt class="xref py py-attr docutils literal"><span class="pre">system</span></tt> から、XMLイントロスペクションAPIの一般的なメソッドを利用する事ができます。</p>
+<dl class="method">
+<dt id="xmlrpclib.ServerProxy.system.listMethods">
+<tt class="descclassname">ServerProxy.system.</tt><tt class="descname">listMethods</tt><big>(</big><big>)</big><a class="headerlink" href="#xmlrpclib.ServerProxy.system.listMethods" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>XML-RPCサーバがサポートするメソッド名(system以外)を格納する文字列のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmlrpclib.ServerProxy.system.methodSignature">
+<tt class="descclassname">ServerProxy.system.</tt><tt class="descname">methodSignature</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#xmlrpclib.ServerProxy.system.methodSignature" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>XML-RPCサーバで実装されているメソッドの名前を指定し、利用可能なシグネチャの配列を取得します。シグネチャは型のリストで、先頭の型は戻り値の型を示し、以降はパラメータの型を示します。</p>
+<p>XML-RPCでは複数のシグネチャ(オーバロード)を使用することができるので、単独のシグネチャではなく、シグネチャのリストを返します。</p>
+<p>シグネチャは、メソッドが使用する最上位のパラメータにのみ適用されます。例えばあるメソッドのパラメータが構造体の配列で戻り値が文字列の場合、シグネチャは単に&#8221;文字列, 配列&#8221; となります。パラメータが三つの整数で戻り値が文字列の場合は&#8221;文字列, 整数, 整数, 整数&#8221;となります。</p>
+<p>メソッドにシグネチャが定義されていない場合、配列以外の値が返ります。 Pythonでは、この値はlist以外の値となります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmlrpclib.ServerProxy.system.methodHelp">
+<tt class="descclassname">ServerProxy.system.</tt><tt class="descname">methodHelp</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#xmlrpclib.ServerProxy.system.methodHelp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>XML-RPCサーバで実装されているメソッドの名前を指定し、そのメソッドを解説する文書文字列を取得します。文書文字列を取得できない場合は空文字列を返します。文書文字列にはHTMLマークアップが含まれます</p>
+</dd></dl>
+
+</div>
+<div class="section" id="boolean">
+<span id="boolean-objects"></span><h2>20.23.2. Boolean オブジェクト<a class="headerlink" href="#boolean" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このクラスは全てのPythonの値で初期化することができ、生成されるインスタンスは指定した値の真偽値によってのみ決まります。Booleanという名前から想像される通りに各種のPython演算子を実装しており、 <a class="reference internal" href="../reference/datamodel.html#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a>, <a class="reference internal" href="../reference/datamodel.html#object.__repr__" title="object.__repr__"><tt class="xref py py-meth docutils literal"><span class="pre">__repr__()</span></tt></a>, <a class="reference internal" href="../reference/datamodel.html#object.__int__" title="object.__int__"><tt class="xref py py-meth docutils literal"><span class="pre">__int__()</span></tt></a>,
+<a class="reference internal" href="../reference/datamodel.html#object.__nonzero__" title="object.__nonzero__"><tt class="xref py py-meth docutils literal"><span class="pre">__nonzero__()</span></tt></a> で定義される演算子を使用することができます。</p>
+<p>以下のメソッドは、主に内部的にアンマーシャル時に使用されます:</p>
+<dl class="method">
+<dt id="xmlrpclib.Boolean.encode">
+<tt class="descclassname">Boolean.</tt><tt class="descname">encode</tt><big>(</big><em>out</em><big>)</big><a class="headerlink" href="#xmlrpclib.Boolean.encode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>出力ストリームオブジェクト <tt class="docutils literal"><span class="pre">out</span></tt> に、XML-RPCエンコーディングのBoolean値を出力します。</p>
+</dd></dl>
+
+<p>動作する例です。サーバー側:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+<span class="kn">from</span> <span class="nn">SimpleXMLRPCServer</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCServer</span>
+
+<span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">SimpleXMLRPCServer</span><span class="p">((</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">&quot;Listening on port 8000...&quot;</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">is_even</span><span class="p">,</span> <span class="s">&quot;is_even&quot;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>上記のサーバーに対するクライアント側:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+
+<span class="n">proxy</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">ServerProxy</span><span class="p">(</span><span class="s">&quot;http://localhost:8000/&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;3 is even: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">&quot;100 is even: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">is_even</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="datetime">
+<span id="datetime-objects"></span><h2>20.23.3. DateTime オブジェクト<a class="headerlink" href="#datetime" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このクラスは、エポックからの秒数、タプルで表現された時刻、ISO 8601形式の時間/日付文字列、
+<a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a>,
+のインスタンスのいずれかで初期化することができます。このクラスには以下のメソッドがあり、主にコードをマーシャル/アンマーシャルするための内部処理を行います。</p>
+<dl class="method">
+<dt id="xmlrpclib.DateTime.decode">
+<tt class="descclassname">DateTime.</tt><tt class="descname">decode</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#xmlrpclib.DateTime.decode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列をインスタンスの新しい時間を示す値として指定します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmlrpclib.DateTime.encode">
+<tt class="descclassname">DateTime.</tt><tt class="descname">encode</tt><big>(</big><em>out</em><big>)</big><a class="headerlink" href="#xmlrpclib.DateTime.encode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>出力ストリームオブジェクト <tt class="docutils literal"><span class="pre">out</span></tt> に、XML-RPCエンコーディングの <tt class="xref py py-class docutils literal"><span class="pre">DateTime</span></tt> 値を出力します。</p>
+</dd></dl>
+
+<p>また、 <a class="reference internal" href="../reference/datamodel.html#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> と <a class="reference internal" href="../reference/datamodel.html#object.__repr__" title="object.__repr__"><tt class="xref py py-meth docutils literal"><span class="pre">__repr__()</span></tt></a> で定義される演算子を使用することができます。</p>
+</div>
+<div class="section" id="binary">
+<span id="binary-objects"></span><h2>20.23.4. Binary オブジェクト<a class="headerlink" href="#binary" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このクラスは、文字列(NULを含む)で初期化することができます。 <tt class="xref py py-class docutils literal"><span class="pre">Binary</span></tt> の内容は、属性で参照します。</p>
+<dl class="attribute">
+<dt id="xmlrpclib.Binary.data">
+<tt class="descclassname">Binary.</tt><tt class="descname">data</tt><a class="headerlink" href="#xmlrpclib.Binary.data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-class docutils literal"><span class="pre">Binary</span></tt> インスタンスがカプセル化しているバイナリデータ。このデータは8bitクリーンです。</p>
+</dd></dl>
+
+<p>以下のメソッドは、主に内部的にマーシャル/アンマーシャル時に使用されます:</p>
+<dl class="method">
+<dt id="xmlrpclib.Binary.decode">
+<tt class="descclassname">Binary.</tt><tt class="descname">decode</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#xmlrpclib.Binary.decode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたbase64文字列をデコードし、インスタンスのデータとします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xmlrpclib.Binary.encode">
+<tt class="descclassname">Binary.</tt><tt class="descname">encode</tt><big>(</big><em>out</em><big>)</big><a class="headerlink" href="#xmlrpclib.Binary.encode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バイナリ値をbase64でエンコードし、出力ストリームオブジェクト <tt class="docutils literal"><span class="pre">out</span></tt> に出力します。</p>
+<p>エンコードされたデータは、
+<a class="reference external" href="http://tools.ietf.org/html/rfc2045#section-6.8">RFC 2045 section 6.8</a>
+にある通り、76文字ごとに改行されます。これは、XMC-RPC仕様が作成された時のデ・ファクト・スタンダードのbase64です。</p>
+</dd></dl>
+
+<p>また、 <a class="reference internal" href="../reference/datamodel.html#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> で定義される演算子を使用することができます。</p>
+<p>バイナリオブジェクトの使用例です。
+XML-RPCごしに画像を転送します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">SimpleXMLRPCServer</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCServer</span>
+<span class="kn">import</span> <span class="nn">xmlrpclib</span>
+
+<span class="k">def</span> <span class="nf">python_logo</span><span class="p">():</span>
+     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&quot;python_logo.jpg&quot;</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+         <span class="k">return</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Binary</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">SimpleXMLRPCServer</span><span class="p">((</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">&quot;Listening on port 8000...&quot;</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">python_logo</span><span class="p">,</span> <span class="s">&#39;python_logo&#39;</span><span class="p">)</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>クライアント側は画像を取得して、ファイルに保存します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+
+<span class="n">proxy</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">ServerProxy</span><span class="p">(</span><span class="s">&quot;http://localhost:8000/&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&quot;fetched_python_logo.jpg&quot;</span><span class="p">,</span> <span class="s">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">python_logo</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fault">
+<span id="fault-objects"></span><h2>20.23.5. Fault オブジェクト<a class="headerlink" href="#fault" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Fault</span></tt> オブジェクトは、XML-RPCのfaultタグの内容をカプセル化しており、以下のメンバを持ちます:</p>
+<dl class="attribute">
+<dt id="xmlrpclib.Fault.faultCode">
+<tt class="descclassname">Fault.</tt><tt class="descname">faultCode</tt><a class="headerlink" href="#xmlrpclib.Fault.faultCode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>失敗のタイプを示す文字列。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmlrpclib.Fault.faultString">
+<tt class="descclassname">Fault.</tt><tt class="descname">faultString</tt><a class="headerlink" href="#xmlrpclib.Fault.faultString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>失敗の診断メッセージを含む文字列。</p>
+</dd></dl>
+
+<p>以下のサンプルでは、複素数型のオブジェクトを返そうとして、故意に <tt class="xref py py-exc docutils literal"><span class="pre">Fault</span></tt> を起こしています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">SimpleXMLRPCServer</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCServer</span>
+
+<span class="c"># A marshalling error is going to occur because we&#39;re returning a</span>
+<span class="c"># complex number</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="o">+</span><span class="mi">0</span><span class="n">j</span>
+
+<span class="n">server</span> <span class="o">=</span> <span class="n">SimpleXMLRPCServer</span><span class="p">((</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">&quot;Listening on port 8000...&quot;</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="s">&#39;add&#39;</span><span class="p">)</span>
+
+<span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>上記のサーバーに対するクライアント側のコード:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+
+<span class="n">proxy</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">ServerProxy</span><span class="p">(</span><span class="s">&quot;http://localhost:8000/&quot;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">proxy</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Fault</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;A fault occurred&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;Fault code: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">faultCode</span>
+    <span class="k">print</span> <span class="s">&quot;Fault string: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">faultString</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="protocolerror">
+<span id="protocol-error-objects"></span><h2>20.23.6. ProtocolError オブジェクト<a class="headerlink" href="#protocolerror" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="xref py py-class docutils literal"><span class="pre">ProtocolError</span></tt> オブジェクトはトランスポート層で発生したエラー(URI で指定したサーバが見つからなかった場合に発生する404
+&#8216;not found&#8217;など)の内容を示し、以下のメンバを持ちます:</p>
+<dl class="attribute">
+<dt id="xmlrpclib.ProtocolError.url">
+<tt class="descclassname">ProtocolError.</tt><tt class="descname">url</tt><a class="headerlink" href="#xmlrpclib.ProtocolError.url" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エラーの原因となったURIまたはURL。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmlrpclib.ProtocolError.errcode">
+<tt class="descclassname">ProtocolError.</tt><tt class="descname">errcode</tt><a class="headerlink" href="#xmlrpclib.ProtocolError.errcode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エラーコード。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmlrpclib.ProtocolError.errmsg">
+<tt class="descclassname">ProtocolError.</tt><tt class="descname">errmsg</tt><a class="headerlink" href="#xmlrpclib.ProtocolError.errmsg" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エラーメッセージまたは診断文字列。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xmlrpclib.ProtocolError.headers">
+<tt class="descclassname">ProtocolError.</tt><tt class="descname">headers</tt><a class="headerlink" href="#xmlrpclib.ProtocolError.headers" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エラーの原因となったHTTP/HTTPSリクエストを含む文字列。</p>
+</dd></dl>
+
+<p>次の例では、XMLRPC サーバを指していない URI を利用して、故意に <tt class="xref py py-exc docutils literal"><span class="pre">ProtocolError</span></tt> を発生させています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+
+<span class="c"># create a ServerProxy with an URI that doesn&#39;t respond to XMLRPC requests</span>
+<span class="n">proxy</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">ServerProxy</span><span class="p">(</span><span class="s">&quot;http://www.google.com/&quot;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">proxy</span><span class="o">.</span><span class="n">some_method</span><span class="p">()</span>
+<span class="k">except</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">ProtocolError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;A protocol error occurred&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;URL: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">url</span>
+    <span class="k">print</span> <span class="s">&quot;HTTP/HTTPS headers: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">headers</span>
+    <span class="k">print</span> <span class="s">&quot;Error code: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">errcode</span>
+    <span class="k">print</span> <span class="s">&quot;Error message: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">errmsg</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="multicall">
+<h2>20.23.7. MultiCall オブジェクト<a class="headerlink" href="#multicall" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+<p>遠隔のサーバに対する複数の呼び出しをひとつのリクエストにカプセル化する方法は、http://www.xmlrpc.com/discuss/msgReader%241208 で示されています。</p>
+<dl class="class">
+<dt id="xmlrpclib.MultiCall">
+<em class="property">class </em><tt class="descclassname">xmlrpclib.</tt><tt class="descname">MultiCall</tt><big>(</big><em>server</em><big>)</big><a class="headerlink" href="#xmlrpclib.MultiCall" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>巨大な (boxcar) メソッド呼び出しに使えるオブジェクトを作成します。 <em>server</em> には最終的に呼び出しを行う対象を指定します。作成した
+MultiCall オブジェクトを使って呼び出しを行うと、即座に <tt class="docutils literal"><span class="pre">None</span></tt> を返し、呼び出したい手続き名とパラメタに保存するだけに留まります。オブジェクト自体を呼び出すと、それまでに保存しておいたすべての呼び出しを単一の <tt class="docutils literal"><span class="pre">system.multicall</span></tt> リクエストの形で伝送します。呼び出し結果はジェネレータ(<a class="reference internal" href="../glossary.html#term-generator"><em class="xref std std-term">generator</em></a>)になります。このジェネレータにわたってイテレーションを行うと、個々の呼び出し結果を返します。</p>
+</dd></dl>
+
+<p>以下にこのクラスの使い方を示します。</p>
+<p>このクラスの使用例です。サーバー側のコード:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">SimpleXMLRPCServer</span> <span class="kn">import</span> <span class="n">SimpleXMLRPCServer</span>
+
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">subtract</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">-</span><span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">/</span><span class="n">y</span>
+
+<span class="c"># A simple server with simple arithmetic functions</span>
+<span class="n">server</span> <span class="o">=</span> <span class="n">SimpleXMLRPCServer</span><span class="p">((</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">&quot;Listening on port 8000...&quot;</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_multicall_functions</span><span class="p">()</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="s">&#39;add&#39;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">subtract</span><span class="p">,</span> <span class="s">&#39;subtract&#39;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">multiply</span><span class="p">,</span> <span class="s">&#39;multiply&#39;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">register_function</span><span class="p">(</span><span class="n">divide</span><span class="p">,</span> <span class="s">&#39;divide&#39;</span><span class="p">)</span>
+<span class="n">server</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>このサーバーに対する、クライアント側のコード:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span>
+
+<span class="n">proxy</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">ServerProxy</span><span class="p">(</span><span class="s">&quot;http://localhost:8000/&quot;</span><span class="p">)</span>
+<span class="n">multicall</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">MultiCall</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span>
+<span class="n">multicall</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">multicall</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">multicall</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">multicall</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">multicall</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&quot;7+3=</span><span class="si">%d</span><span class="s">, 7-3=</span><span class="si">%d</span><span class="s">, 7*3=</span><span class="si">%d</span><span class="s">, 7/3=</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>20.23.8. 補助関数<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="xmlrpclib.boolean">
+<tt class="descclassname">xmlrpclib.</tt><tt class="descname">boolean</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#xmlrpclib.boolean" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Pythonの値を、XML-RPCのBoolean定数 <tt class="docutils literal"><span class="pre">True</span></tt> または <tt class="docutils literal"><span class="pre">False</span></tt> に変換します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmlrpclib.dumps">
+<tt class="descclassname">xmlrpclib.</tt><tt class="descname">dumps</tt><big>(</big><em>params</em><span class="optional">[</span>, <em>methodname</em><span class="optional">[</span>, <em>methodresponse</em><span class="optional">[</span>, <em>encoding</em><span class="optional">[</span>, <em>allow_none</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#xmlrpclib.dumps" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>params</em> を XML-RPC リクエストの形式に変換します。 <em>methodresponse</em> が真の場合、XML-RPC
+レスポンスの形式に変換します。 <em>params</em> に指定できるのは、引数からなるタプルか <tt class="xref py py-exc docutils literal"><span class="pre">Fault</span></tt> 例外クラスのインスタンスです。
+<em>methodresponse</em> が真の場合、単一の値だけを返します。従って、 <em>params</em> の長さも 1 でなければなりません。 <em>encoding</em>
+を指定した場合、生成される XML のエンコード方式になります。デフォルトは UTF-8 です。 Python の <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> は標準の
+XML-RPC には利用できません。 <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を使えるようにするには、 <em>allow_none</em> を真にして、拡張機能つきにしてください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xmlrpclib.loads">
+<tt class="descclassname">xmlrpclib.</tt><tt class="descname">loads</tt><big>(</big><em>data</em><span class="optional">[</span>, <em>use_datetime</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#xmlrpclib.loads" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>XML-RPC リクエストまたはレスポンスを <tt class="docutils literal"><span class="pre">(params,</span> <span class="pre">methodname)</span></tt> の形式をとる Python オブジェクトにします。
+<em>params</em> は引数のタプルです。 <em>methodname</em> は文字列で、パケット中にメソッド名がない場合には <tt class="docutils literal"><span class="pre">None</span></tt> になります。例外条件を示す XML-RPC パケットの場合には、 <tt class="xref py py-exc docutils literal"><span class="pre">Fault</span></tt> 例外を送出します。
+<em>use_datetime</em> フラグは <a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a> のオブジェクトとして日付/時刻を表現する時に使用し、デフォルトでは
+false に設定されています。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><em>use_datetime</em> フラグを追加.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="xmlrpc-client-example">
+<span id="id2"></span><h2>20.23.9. クライアントのサンプル<a class="headerlink" href="#xmlrpc-client-example" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># simple test program (from the XML-RPC specification)</span>
+<span class="kn">from</span> <span class="nn">xmlrpclib</span> <span class="kn">import</span> <span class="n">ServerProxy</span><span class="p">,</span> <span class="n">Error</span>
+
+<span class="c"># server = ServerProxy(&quot;http://localhost:8000&quot;) # local server</span>
+<span class="n">server</span> <span class="o">=</span> <span class="n">ServerProxy</span><span class="p">(</span><span class="s">&quot;http://betty.userland.com&quot;</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">server</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">server</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">getStateName</span><span class="p">(</span><span class="mi">41</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">Error</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;ERROR&quot;</span><span class="p">,</span> <span class="n">v</span>
+</pre></div>
+</div>
+<p>XML-RPCサーバにプロキシを経由して接続する場合、カスタムトランスポートを定義する必要があります。以下に例を示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">xmlrpclib</span><span class="o">,</span> <span class="nn">httplib</span>
+
+<span class="k">class</span> <span class="nc">ProxiedTransport</span><span class="p">(</span><span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Transport</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_proxy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proxy</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">proxy</span>
+    <span class="k">def</span> <span class="nf">make_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">realhost</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">httplib</span><span class="o">.</span><span class="n">HTTP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">h</span>
+    <span class="k">def</span> <span class="nf">send_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">request_body</span><span class="p">):</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">putrequest</span><span class="p">(</span><span class="s">&quot;POST&quot;</span><span class="p">,</span> <span class="s">&#39;http://</span><span class="si">%s%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">realhost</span><span class="p">,</span> <span class="n">handler</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">send_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">putheader</span><span class="p">(</span><span class="s">&#39;Host&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">realhost</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">ProxiedTransport</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">set_proxy</span><span class="p">(</span><span class="s">&#39;proxy-server:8080&#39;</span><span class="p">)</span>
+<span class="n">server</span> <span class="o">=</span> <span class="n">xmlrpclib</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="s">&#39;http://time.xmlrpc.com/RPC2&#39;</span><span class="p">,</span> <span class="n">transport</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">server</span><span class="o">.</span><span class="n">currentTime</span><span class="o">.</span><span class="n">getCurrentTime</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>20.23.10. クライアントとサーバーの利用例<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="simplexmlrpcserver.html#simplexmlrpcserver-example"><em>SimpleXMLRPCServer の例</em></a> を参照してください。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="simplexmlrpcserver.html" title="20.24. SimpleXMLRPCServer — 基本的なXML-RPCサーバー"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="cookie.html" title="20.22. Cookie — HTTPの状態管理"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" >20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

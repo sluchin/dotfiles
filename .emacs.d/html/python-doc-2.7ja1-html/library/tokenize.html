@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>31.7. tokenize — Pythonソースのためのトークナイザ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="31. Python言語サービス" href="language.html" />
+    <link rel="next" title="31.8. tabnanny — あいまいなインデントの検出" href="tabnanny.html" />
+    <link rel="prev" title="31.6. keyword — Python キーワードチェック" href="keyword.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tabnanny.html" title="31.8. tabnanny — あいまいなインデントの検出"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="keyword.html" title="31.6. keyword — Python キーワードチェック"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" accesskey="U">31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="keyword.html"
+                        title="前の章へ">31.6. <tt class="docutils literal docutils literal docutils literal"><span class="pre">keyword</span></tt> &#8212; Python キーワードチェック</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tabnanny.html"
+                        title="次の章へ">31.8. <tt class="docutils literal docutils literal docutils literal"><span class="pre">tabnanny</span></tt> &#8212; あいまいなインデントの検出</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/tokenize.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-tokenize">
+<span id="tokenize-python"></span><h1>31.7. <a class="reference internal" href="#module-tokenize" title="tokenize: Pythonソースコードのための字句解析器。"><tt class="xref py py-mod docutils literal"><span class="pre">tokenize</span></tt></a> &#8212; Pythonソースのためのトークナイザ<a class="headerlink" href="#module-tokenize" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-tokenize" title="tokenize: Pythonソースコードのための字句解析器。"><tt class="xref py py-mod docutils literal"><span class="pre">tokenize</span></tt></a> モジュールでは、Python で実装された Python ソースコードの字句解析器を提供します。さらに、このモジュールの字句解析器はコメントもトークンとして返します。このため、このモジュールはスクリーン上で表示する際の色付け機能 (colorizers) を含む
+&#8220;清書出力器 (pretty-printer)&#8221; を実装する上で便利です。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/tokenize.py?view=markup">tokenize module Python ソースコード</a></p>
+</div>
+<p>第一のエントリポイントはジェネレータ(<a class="reference internal" href="../glossary.html#term-generator"><em class="xref std std-term">generator</em></a>)です:</p>
+<dl class="function">
+<dt id="tokenize.generate_tokens">
+<tt class="descclassname">tokenize.</tt><tt class="descname">generate_tokens</tt><big>(</big><em>readline</em><big>)</big><a class="headerlink" href="#tokenize.generate_tokens" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tokenize.generate_tokens" title="tokenize.generate_tokens"><tt class="xref py py-func docutils literal"><span class="pre">generate_tokens()</span></tt></a> ジェネレータは一つの引数 <em>readline</em>
+を必要とします。この引数は呼び出し可能オブジェクトで、組み込みファイルオブジェクトにおける <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a> メソッドと同じインタフェースを提供していなければなりません ( <a class="reference internal" href="stdtypes.html#bltin-file-objects"><em>ファイルオブジェクト</em></a> 節を参照してください)。この関数は呼び出しのたびに入力内の一行を文字列で返さなければなりません。</p>
+<p>ジェネレータは 5 要素のタプルを返し、タプルは以下のメンバ: トークン型; トークン文字列; ソースコード中でトークンが始まる行と列を示す整数の2要素のタプル <tt class="docutils literal"><span class="pre">(srow,</span> <span class="pre">scol)</span></tt> ; ソースコード中でトークンが終わる行と列を示す整数の2要素のタプル  <tt class="docutils literal"><span class="pre">(srow,</span> <span class="pre">scol)</span></tt> ;
+そして、トークンが見つかった行、からなります。渡される行は <em>論理</em> 行です; 連続する行は一行に含められます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<p>後方互換性のために古いエントリポイントが残されています:</p>
+<dl class="function">
+<dt id="tokenize.tokenize">
+<tt class="descclassname">tokenize.</tt><tt class="descname">tokenize</tt><big>(</big><em>readline</em><span class="optional">[</span>, <em>tokeneater</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#tokenize.tokenize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-tokenize" title="tokenize: Pythonソースコードのための字句解析器。"><tt class="xref py py-func docutils literal"><span class="pre">tokenize()</span></tt></a> 関数は二つのパラメータを取ります:
+一つは入力ストリームを表し、もう一つは <a class="reference internal" href="#module-tokenize" title="tokenize: Pythonソースコードのための字句解析器。"><tt class="xref py py-func docutils literal"><span class="pre">tokenize()</span></tt></a> のための出力メカニズムを与えます。</p>
+<p>最初のパラメータ、 <em>readline</em> は、組み込みファイルオブジェクトの
+<a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a> メソッドと同じインタフェイスを提供する呼び出し可能オブジェクトでなければなりません ( <a class="reference internal" href="stdtypes.html#bltin-file-objects"><em>ファイルオブジェクト</em></a> 節を参照)。この関数は呼び出しのたびに入力内の一行を文字列で返さなければなりません。もしくは、 <em>readline</em> を呼び出し可能オブジェクトで
+<a class="reference internal" href="exceptions.html#exceptions.StopIteration" title="exceptions.StopIteration"><tt class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></tt></a> を送出することで補完を知らせるものとすることもできます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><a class="reference internal" href="exceptions.html#exceptions.StopIteration" title="exceptions.StopIteration"><tt class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></tt></a> サポートの追加.</p>
+<p>二番目のパラメータ <em>tokeneater</em> も呼び出し可能オブジェクトでなければなりません。この関数は各トークンに対して一度だけ呼び出され、
+<a class="reference internal" href="#tokenize.generate_tokens" title="tokenize.generate_tokens"><tt class="xref py py-func docutils literal"><span class="pre">generate_tokens()</span></tt></a> が生成するタプルに対応する 5 つの引数をとります。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="token.html#module-token" title="token: 解析木の終端ノードを表す定数。"><tt class="xref py py-mod docutils literal"><span class="pre">token</span></tt></a> モジュールの全ての定数は <a class="reference internal" href="#module-tokenize" title="tokenize: Pythonソースコードのための字句解析器。"><tt class="xref py py-mod docutils literal"><span class="pre">tokenize</span></tt></a> でも公開されており、これに加え、以下の二つのトークン値が
+<a class="reference internal" href="#module-tokenize" title="tokenize: Pythonソースコードのための字句解析器。"><tt class="xref py py-func docutils literal"><span class="pre">tokenize()</span></tt></a> の <em>tokeneater</em> 関数に渡される可能性があります:</p>
+<dl class="data">
+<dt id="tokenize.COMMENT">
+<tt class="descclassname">tokenize.</tt><tt class="descname">COMMENT</tt><a class="headerlink" href="#tokenize.COMMENT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コメントであることを表すために使われるトークン値です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tokenize.NL">
+<tt class="descclassname">tokenize.</tt><tt class="descname">NL</tt><a class="headerlink" href="#tokenize.NL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>終わりではない改行を表すために使われるトークン値。
+NEWLINE トークンは Pythonコードの論理行の終わりを表します。
+NLトークンはコードの論理行が複数の物理行にわたって続いているときに作られます。</p>
+</dd></dl>
+
+<p>もう一つの関数がトークン化プロセスを逆転するために提供されています。これは、スクリプトを字句解析し、トークンのストリームに変更を加え、変更されたスクリプトを書き戻すようなツールを作成する際に便利です。</p>
+<dl class="function">
+<dt id="tokenize.untokenize">
+<tt class="descclassname">tokenize.</tt><tt class="descname">untokenize</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#tokenize.untokenize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トークンの列を Python ソースコードに変換します。 <em>iterable</em> は少なくとも二つの要素、トークン型およびトークン文字列、からなるシーケンスを返します。その他のシーケンスの要素は無視されます。</p>
+<p>再構築されたスクリプトは一つの文字列として返されます。得られる結果はもう一度字句解析すると入力と一致することが保証されるので、変換がロスレスでありラウンドトリップできることは間違いありません。この保証はトークン型およびトークン文字列に対してのものでトークン間のスペース
+(コラム位置)のようなものは変わることがあり得ます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<p>スクリプト書き換えの例で、浮動小数点数リテラルを Decimal オブジェクトに変換します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">decistmt</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Substitute Decimals for floats in a string of statements.</span>
+
+<span class="sd">    &gt;&gt;&gt; from decimal import Decimal</span>
+<span class="sd">    &gt;&gt;&gt; s = &#39;print +21.3e-5*-.1234/81.7&#39;</span>
+<span class="sd">    &gt;&gt;&gt; decistmt(s)</span>
+<span class="sd">    &quot;print +Decimal (&#39;21.3e-5&#39;)*-Decimal (&#39;.1234&#39;)/Decimal (&#39;81.7&#39;)&quot;</span>
+
+<span class="sd">    &gt;&gt;&gt; exec(s)</span>
+<span class="sd">    -3.21716034272e-007</span>
+<span class="sd">    &gt;&gt;&gt; exec(decistmt(s))</span>
+<span class="sd">    -3.217160342717258261933904529E-7</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">generate_tokens</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">)</span>   <span class="c"># tokenize the string</span>
+    <span class="k">for</span> <span class="n">toknum</span><span class="p">,</span> <span class="n">tokval</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span>  <span class="ow">in</span> <span class="n">g</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">toknum</span> <span class="o">==</span> <span class="n">NUMBER</span> <span class="ow">and</span> <span class="s">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">tokval</span><span class="p">:</span>  <span class="c"># replace NUMBER tokens</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="p">(</span><span class="n">NAME</span><span class="p">,</span> <span class="s">&#39;Decimal&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">OP</span><span class="p">,</span> <span class="s">&#39;(&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">STRING</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">tokval</span><span class="p">)),</span>
+                <span class="p">(</span><span class="n">OP</span><span class="p">,</span> <span class="s">&#39;)&#39;</span><span class="p">)</span>
+            <span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">toknum</span><span class="p">,</span> <span class="n">tokval</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">untokenize</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tabnanny.html" title="31.8. tabnanny — あいまいなインデントの検出"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="keyword.html" title="31.6. keyword — Python キーワードチェック"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" >31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

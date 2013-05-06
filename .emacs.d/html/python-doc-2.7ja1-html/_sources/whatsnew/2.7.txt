@@ -1,0 +1,2425 @@
+***************************
+  What's New in Python 2.7 
+***************************
+
+:Author: A.M. Kuchling (amk at amk.ca)
+:Release: |release|
+:Date: |today|
+
+..  hyperlink all the methods & functions.
+
+.. T_STRING_INPLACE not described in main docs
+
+.. $Id$
+   Rules for maintenance:
+
+   * Anyone can add text to this document.  Do not spend very much time
+   on the wording of your changes, because your text will probably
+   get rewritten to some degree.
+
+   * The maintainer will go through Misc/NEWS periodically and add
+   changes; it's therefore more important to add your changes to
+   Misc/NEWS than to this file.
+
+   * This is not a complete list of every single change; completeness
+   is the purpose of Misc/NEWS.  Some changes I consider too small
+   or esoteric to include.  If such a change is added to the text,
+   I'll just remove it.  (This is another reason you shouldn't spend
+   too much time on writing your addition.)
+
+   * If you want to draw your new text to the attention of the
+   maintainer, add 'XXX' to the beginning of the paragraph or
+   section.
+
+   * It's OK to just add a fragmentary note about a change.  For
+   example: "XXX Describe the transmogrify() function added to the
+   socket module."  The maintainer will research the change and
+   write the necessary text.
+
+   * You can comment out your additions if you like, but it's not
+   necessary (especially when a final release is some months away).
+
+   * Credit the author of a patch or bugfix.  Just the name is
+   sufficient; the e-mail address isn't necessary.
+
+   * It's helpful to add the bug/patch number in a parenthetical comment.
+
+   XXX Describe the transmogrify() function added to the socket
+   module.
+   (Contributed by P.Y. Developer; :issue:`12345`.)
+
+   This saves the maintainer some effort going through the SVN logs
+   when researching a change.
+
+この文書は Python 2.7 の新機能について解説します。
+Python 2.7 は 2010 年 7 月 3 日にリリースされました。
+
+数値周りの扱いが、浮動小数点数でも :class:`~decimal.Decimal` クラスでも
+いろいろな点で改良されました、
+標準ライブラリにいくつかの有用な追加が行われました。 :mod:`unittest`
+モジュールが大幅に改良され、コマンドラインオプション解析の :mod:`argpase`
+モジュールが追加され、 :mod:`collections` モジュールに便利な
+:class:`~collections.OrderedDict` と :class:`~collections.Counter`
+が追加され、他にもたくさんの改良が行われています。
+
+Python 2.7 は 2.x の最終リリースになることが予定されているので、
+私たちはこのリリースを長期にわたって良いものになるように努力してきました。
+Python 3 への移植を助けるため、いくつかの新機能が Python 3.x から
+Python 2.7 に取り込まれています。
+
+このドキュメントは新機能の完全な詳細を提供するのではなくて、
+簡易な概要を提供することを目的にしています。
+完全な詳細が知りたければ、 http://docs.python.org の Python 2.7 の
+ドキュメントを参照してください。設計と実装の根拠を理解したい場合は、
+新機能に関する PEP を参照するか、 http://bugs.python.org に議論したい
+機能について登録してください。
+可能な限り、 "What's New in Python" は各変更の bug や patch に対して
+リンクしています。
+
+
+.. _whatsnew27-python31:
+
+.. The Future for Python 2.x
+
+Python 2.x の今後
+=========================
+
+Python 2.7 は 2.x シリーズの最後のメジャーリリースになります。
+Python のメンテナは今後は Python 3.x シリーズの開発に集中する予定です。
+
+これは、 2.7 が長期間残り続け、 Python 3.x への対応がされないプロダクション
+サービスを動かし続けることを意味します。
+2.7 が長期的に重要なリリースになるので、2つの結論があります:
+
+* これまでの 2.x バージョンに比べて長期間のメンテナンスが行われます。
+  Python 2.7 は 3.x への移行が行われている間はメンテナンスされ続けます。
+  Python 開発者はさらにそこから2年のバグフィックスリリースをする予定です。
+
+* 開発者向けの警告を抑止するポリシーが取られました。
+  :exc:`DeprecationWarning` とそれを継承した警告は、指定されない限りは
+  無視され、アプリケーションのユーザーがその警告を見ないですむように
+  なりました。この変更は Python 3.2 ブランチにも適用されています。
+  (stdlib-sig で討議され、 :issue:`7319` になりました)
+
+  以前のリリースでは、 :exc:`DeprecationWarning` メッセージはデフォルトで
+  有効になっており、 Python 開発者に、将来のバージョンの Python で
+  そのコードのどこが動かなくなるかを明確に知らせていました。
+
+  しかし、 Python で開発されたアプリケーションの利用者であって開発には
+  携わっていない人がどんどん増えてきました。 :exc:`DeprecationWarning`
+  メッセージはそれらのユーザーには無関係で、彼らをアプリケーションが
+  本当に正しく動いているのか不安にさせ、ユーザーの質問に応えるための
+  開発者の負担も増やしていました。
+
+  :exc:`DeprecationWarning` メッセージの表示を有効にするには、
+  :option:`-Wdefault <-W>` (短い形式: :option:`-Wd <-W>`) スイッチか、
+  Python を実行する前に :envvar:`PYTHONWARNINGS` 環境変数を ``"default"``
+  (か、 ``"d"``)に設定します。 Python コードから有効にする場合は
+  ``warnings.simplefilter('default')`` とします。
+
+
+.. Python 3.1 Features
+
+Python 3.1 の機能
+=======================
+
+Python 2.6 は Python 3.0 から多くの機能を取り込み、 Python 2.7
+は Python 3.1 の新しい機能のいくつかを取り込みました。
+2.x シリーズは 3.x シリーズへの移行のためのツールを提供し続けています。
+
+Python 2.7 に取り込まれた 3.1 の機能の不完全なリスト:
+
+* 集合のリテラル文法 (``{1,2,3}`` は mutable set になります)
+* 辞書と集合の内包表記 (``{i: i*2 for i in range(3)}``).
+* 1つの :keyword:`with` 文で複数のコンテキストマネージャを扱えるように。
+* :mod:`io` ライブラリの新バージョン。パフォーマンスのためにC言語で描き直されています。
+* :ref:`pep-0372` で解説されている順序付き辞書
+* :ref:`pep-0378` で解説されている新しい ``","`` フォーマット指定子
+* :class:`memoryview` オブジェクト
+* :mod:`importlib` モジュールの小さいサブセット。 `下に説明があります <#importlib-section>`__
+* float ``x`` の :func:`repr` が多くの場合に短くなりました。これは
+  ``x`` に戻せることが保証される最小の10進文字列です。以前のバージョンの
+  Python では、 ``float(repr(x))`` が ``x`` になることだけが保証されていました。
+* float から文字列、文字列から float への変換が正しく丸められるようになりました。
+  :func:`round` 関数も正しく丸めるようになりました。
+* 拡張モジュールが C API を提供するための、 :c:type:`PyCapsule` 型
+* :c:func:`PyLong_AsLongAndOverflow` C API 関数
+
+新しい Python3 モード Warning:
+
+* :func:`operator.isCallable` と :func:`operator.sequenceIncludes`
+  は 3.x ではサポートされず、 warning になります。
+* :option:`-3` オプションは自動的に :option:`-Qwarn <-Q>` スイッチを有効にして、
+  整数や長整数に対する古い形式の除算が警告を出すようになります。
+
+
+
+.. ========================================================================
+.. Large, PEP-level features and changes should be described here.
+.. ========================================================================
+
+.. _pep-0372:
+
+PEP 372: collections に順序付き辞書を追加
+====================================================
+
+通常の Python 辞書は、 key/value ペアを不定の順序でイテレートします。
+何年にもわたり、いろいろな人が key の挿入順を保存する辞書の別実装を書いてきました。
+その経験に基づき、 2.7 は :mod:`collections` モジュールに新しい
+:class:`~collections.OrderedDict` クラスを追加しました。
+
+
+:class:`~collections.OrderedDict` API は通常の辞書と同じインタフェースを提供していますが、
+key/value をイテレートするときに key が最初に挿入された順番になることが保証されています。 ::
+
+    >>> from collections import OrderedDict
+    >>> d = OrderedDict([('first', 1),
+    ...                  ('second', 2),
+    ...                  ('third', 3)])
+    >>> d.items()
+    [('first', 1), ('second', 2), ('third', 3)]
+
+新しいエントリが既存のエントリを上書きした場合は、元の挿入順序が保持されます。 ::
+
+    >>> d['second'] = 4
+    >>> d.items()
+    [('first', 1), ('second', 4), ('third', 3)]
+
+エントリを削除して再挿入すると、順序は一番最後に移動します。 ::
+
+    >>> del d['second']
+    >>> d['second'] = 5
+    >>> d.items()
+    [('first', 1), ('third', 3), ('second', 5)]
+
+:meth:`~collections.OrderedDict.popitem` メソッドは、オプションの *last*
+引数を持ち、でフォルトで True になっています。
+*last* が True の場合、一番最近に追加された key が返され、削除されます。
+False の場合、最も古い key が選ばれます。 ::
+
+    >>> od = OrderedDict([(x,0) for x in range(20)])
+    >>> od.popitem()
+    (19, 0)
+    >>> od.popitem()
+    (18, 0)
+    >>> od.popitem(last=False)
+    (0, 0)
+    >>> od.popitem(last=False)
+    (1, 0)
+
+2つの順序付き辞書を比較するときは、 key/value だけでなく、挿入順も
+比較されます。 ::
+
+    >>> od1 = OrderedDict([('first', 1),
+    ...                    ('second', 2),
+    ...                    ('third', 3)])
+    >>> od2 = OrderedDict([('third', 3),
+    ...                    ('first', 1),
+    ...                    ('second', 2)])
+    >>> od1 == od2
+    False
+    >>> # Move 'third' key to the end
+    >>> del od2['third']; od2['third'] = 3
+    >>> od1 == od2
+    True
+
+:class:`~collections.OrderedDict` を通常の辞書と比較すると、
+挿入順は無視されて単に key/value だけが比較されます。
+
+:class:`~collections.OrderedDict` の実装はこうなっています。
+key の2重リンクリストを管理し、新しい key が挿入されるときにリストに新しい
+key を追加します。2つ目の辞書が key を対応するリストノードにマップします。
+なので、削除時にリンクリストを操作する必要はなく、コストは O(1) に保たれています。
+
+標準ライブラリのいくつかのモジュールで、順序付き辞書の利用がサポートされています。
+
+* :mod:`ConfigParser` モジュールはデフォルトで順序付き辞書を使います。
+  設定ファイルを読み込み、編集した後、元の順序で書きなおすことができます。
+
+* :func:`collections.namedtuple` の :meth:`~collections.somenamedtuple._asdict()`
+  メソッドは、タプルの順序と同じ順序の順序付き辞書を返すようになりました。
+
+* :mod:`json` モジュールのデコーダーが :class:`OrderedDict` をビルド
+  するのをサポートするために、 :class:`~json.JSONDecoder` クラスの
+  コンストラクタに *object_pairs_hook* 引数が追加されました。
+  `PyYAML <http://pyyaml.org/>`_ などの外部のライブラリでもサポートされています。
+
+.. seealso::
+
+   :pep:`372` - Adding an ordered dictionary to collections
+     PEP written by Armin Ronacher and Raymond Hettinger;
+     implemented by Raymond Hettinger.
+
+.. _pep-0378:
+
+PEP 378: 1000区切りのための書式指定子
+=======================================
+
+大きい数値に区切り文字を追加して、 18446744073709551616 の代わりに
+18,446,744,073,709,551,616 と出力すると、プログラムの出力を読みやすくできます。
+
+これを行う一般的な方法は :mod:`locale` モジュールを使うことで、
+複数の区切り文字 (北米では "," で、ヨーロッパでは ".")
+を使ったり、複数のグループの大きさを使うことができます。
+しかし、 :mod:`locale` の利用方法は複雑ですし、スレッドごとに異なるロケールの
+出力を行うプログラムでは利用することができません。
+
+そのため、シンプルなカンマによるグループ化機構が :meth:`str.format`
+メソッドのミニ言語に追加されました。浮動小数点数をフォーマットする場合、
+シンプルにカンマを幅と精度の間に置きます。
+
+   >>> '{:20,.2f}'.format(18446744073709551616.0)
+   '18,446,744,073,709,551,616.00'
+
+整数をフォーマットする場合は、幅の後にカンマを追加します。
+
+   >>> '{:20,d}'.format(18446744073709551616)
+   '18,446,744,073,709,551,616'
+
+この機構は全く柔軟性を持っていません。区切り文字は常にカンマですし、
+グループは常に数字3つになります。
+カンマ書式機構は :mod:`locale` ほど汎用ではありませんが、手軽に使うことができます。
+
+.. seealso::
+
+   :pep:`378` - Format Specifier for Thousands Separator
+     PEP written by Raymond Hettinger; implemented by Eric Smith.
+
+
+.. PEP 389: The argparse Module for Parsing Command Lines
+
+PEP 389: コマンドライン解析のための argparse モジュール
+========================================================
+
+コマンドライン引数の解析のための :mod:`argparse` モジュールが、
+:mod:`optparse` モジュールのより協力な代替として追加されました。
+
+これにより、 Python はコマンドライン引数の解析のために3つの異なる
+モジュール、 :mod:`getopt`, :mod:`optparse`, :mod:`argparse` を
+持つことになります。
+:mod:`getopt` モジュールは C言語用ライブラリの :c:func:`getopt` 関数に似せてあるので、
+あとで C 言語で書き直すかもしれないプログラムのプロトタイプを Python で書く場合に
+役に立ちます。
+:mod:`optparse` は冗長になってしまいましたが、まだたくさんのスクリプトが利用していて、
+それらのスクリプトを自動的に更新する手段が無いので、削除される予定はありません。
+(:mod:`argparse` API を :mod:`optparse` のインタフェースに適合させる方法も
+検討されましたが、多くの複雑さと難点のために却下されました)
+
+古いバージョンの Python との互換性を気にすること無く新しいスクリプトを書く時は、
+:mod:`optparse` の代わりに :mod:`argparse` を使ってください。
+
+例::
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Command-line example.')
+
+    # Add optional switches
+    parser.add_argument('-v', action='store_true', dest='is_verbose',
+                        help='produce verbose output')
+    parser.add_argument('-o', action='store', dest='output',
+                        metavar='FILE',
+                        help='direct output to FILE instead of stdout')
+    parser.add_argument('-C', action='store', type=int, dest='context',
+                        metavar='NUM', default=0,
+                        help='display NUM lines of added context')
+
+    # Allow any number of additional arguments.
+    parser.add_argument(nargs='*', action='store', dest='inputs',
+                        help='input filenames (default is stdin)')
+
+    args = parser.parse_args()
+    print args.__dict__
+
+オーバーライドしない限り、 :option:`-h` と :option:`--help` スイッチが
+自動的に追加され、綺麗にフォーマットした出力を生成します。 ::
+
+    -> ./python.exe argparse-example.py --help
+    usage: argparse-example.py [-h] [-v] [-o FILE] [-C NUM] [inputs [inputs ...]]
+
+    Command-line example.
+
+    positional arguments:
+      inputs      input filenames (default is stdin)
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      -v          produce verbose output
+      -o FILE     direct output to FILE instead of stdout
+      -C NUM      display NUM lines of added context
+
+:mod:`optparse` と同じく、コマンドラインスイッチと引数は、 *dest* 引数の
+名前の属性をもったオブジェクトとして返されます。 ::
+
+    -> ./python.exe argparse-example.py -v
+    {'output': None,
+     'is_verbose': True,
+     'context': 0,
+     'inputs': []}
+
+    -> ./python.exe argparse-example.py -v -o /tmp/output -C 4 file1 file2
+    {'output': '/tmp/output',
+     'is_verbose': True,
+     'context': 4,
+     'inputs': ['file1', 'file2']}
+
+:mod:`argparse` は :mod:`optparse` よりも多くの便利なバリデーションを持っています。
+引数の正確な数を整数で指定したり、 ``'*'`` で0以上の数を指定したり、
+``'+'`` で1以上の数を指定したり、 ``'?'`` でオプションにしたりできます。
+トップレベルのパーサーはサブパーサーを持つことができ、 ``svn commit``,
+``svn update`` のように異なるオプションを持ったサブコマンドを定義できます。
+引数のタイプに :class:`~argparse.FileType` を指定することで、
+自動でファイルを開き、 ``'-'`` が指定されたときに標準入出力だと判断することができます。
+
+.. seealso::
+
+   :mod:`argparse` のドキュメント
+     argparse モジュールのドキュメント
+
+   :ref:`argparse-from-optparse`
+     :mod:`optparse` を使うコードを変換する方法を説明した Python のドキュメントの一部
+
+   :pep:`389` - argparse - New Command Line Parsing Module
+     PEP written and implemented by Steven Bethard.
+
+
+.. PEP 391: Dictionary-Based Configuration For Logging
+
+PEP 391: logging の辞書ベースの設定
+====================================================
+
+:mod:`logging` モジュールは非常に柔軟です。アプリケーションは logging
+のサブシステムのツリーを定義できます。このツリーの各ロガーはいくつかの
+メッセージをフィルターし、異なるフォーマットを行い、メッセージを
+沢山の種類のハンドラーに渡します。
+
+この柔軟性は、多くの設定を必要とします。
+オブジェクトを生成してプロパティを設定する Python コードを書くこともできますが、
+複雑なセットアップをしようとすると退屈なコードを書かないといけなくなります。
+:mod:`logging` は設定ファイルのパースを行う :func:`~logging.fileConfig`
+関数を提供していますが、このファイルフォーマットはフィルターの設定をサポート
+していませんし、プログラムで生成するのはさらに面倒になります。
+
+Python 2.7 は logging の設定のために辞書を使う :func:`~logging.dictConfig`
+関数を追加しました。いろいろな入力から辞書を作成する方法があります。
+コードで作ったり、 JSON ファイルをパースしたり、YAMLのパーサーを
+インストールしてあればそれを使うことができます。
+詳しい情報は :ref:`logging-config-api` を参照してください。
+
+次の例は2つのロガー、 root logger と "network" という名前の logger
+root logger に送られたメッセージは syslog プロトコルを利用してシステムに
+送られ、 "network" logger に送られたメッセージは1MBごとにローテートされる
+:file:`network.log` ファイルに書きこまれます。
+
+::
+
+    import logging
+    import logging.config
+
+    configdict = {
+     'version': 1,    # Configuration schema in use; must be 1 for now
+     'formatters': {
+         'standard': {
+             'format': ('%(asctime)s %(name)-15s '
+                        '%(levelname)-8s %(message)s')}},
+
+     'handlers': {'netlog': {'backupCount': 10,
+                         'class': 'logging.handlers.RotatingFileHandler',
+                         'filename': '/logs/network.log',
+                         'formatter': 'standard',
+                         'level': 'INFO',
+                         'maxBytes': 1000000},
+                  'syslog': {'class': 'logging.handlers.SysLogHandler',
+                             'formatter': 'standard',
+                             'level': 'ERROR'}},
+
+     # Specify all the subordinate loggers
+     'loggers': {
+                 'network': {
+                             'handlers': ['netlog']
+                 }
+     },
+     # Specify properties of the root logger
+     'root': {
+              'handlers': ['syslog']
+     },
+    }
+
+    # Set up configuration
+    logging.config.dictConfig(configdict)
+
+    # As an example, log two error messages
+    logger = logging.getLogger('/')
+    logger.error('Database not found')
+
+    netlogger = logging.getLogger('network')
+    netlogger.error('Connection failed')
+
+他にも、 :mod:`logging` モジュールには Vinary Sajip によって実装された
+3 つの改良があります。
+
+.. rev79293
+
+* :class:`~logging.handlers.SysLogHandler` クラスは TCP 経由の syslog
+  をサポートします。コンストラクタの *socktype* 引数は使用するソケットの
+  種類として、 UDP を使う :const:`socket.SOCK_DGRAM` と TCP を使う
+  :const:`socket.SOCK_STREAM` のどちらかを取ります。デフォルトはUDPのままです。
+
+* :class:`~logging.Logger` インスタンスに :meth:`~logging.Logger.getChild`
+  メソッドが追加されました。これは、相対パスで下位の logger を返します。
+  例えば、 ``log = getLogger('app')`` として logger を取得した後、
+  ``log.getChild('network.listen')`` は ``getLogger('app.network.listen')``
+  と同じになります。
+
+* :class:`~logging.LoggerAdapter` クラスに :meth:`~logging.LoggerAdapter.isEnabledFor`
+  メソッドが追加されました。 *level* を引数に取り、ベースの logger がその重要度
+  レベルのメッセージを処理するかどうかを返します。
+
+.. XXX: Logger objects don't have a class declaration so the link don't work
+
+.. seealso::
+
+   :pep:`391` - Dictionary-Based Configuration For Logging
+     PEP written and implemented by Vinay Sajip.
+
+.. PEP 3106: Dictionary Views
+
+PEP 3106: 辞書 View
+====================================================
+
+辞書の :meth:`~dict.keys`, :meth:`~dict.values`, :meth:`~dict.items`
+メソッドは Python 3.x では動作が代わり、完全に実体化されたリストの代わりに、
+:dfn:`view` と呼ばれるオブジェクトを返すようになりました。
+
+Python 2.7 では、 :meth:`~dict.keys`, :meth:`~dict.values`, :meth:`~dict.items`
+の動作を変えてしまうと、既存の大量のコードが動かなくなってしまうので、
+Python 3.x と同じ動作に合わせることはできません。
+なので、 Python 3.x のメソッドと同じ動作をするメソッドを、別の
+:meth:`~dict.viewkeys`, :meth:`~dict.viewvalues`, :meth:`~dict.viewitems`
+という名前で追加しました。
+
+::
+
+    >>> d = dict((i*10, chr(65+i)) for i in range(26))
+    >>> d
+    {0: 'A', 130: 'N', 10: 'B', 140: 'O', 20: ..., 250: 'Z'}
+    >>> d.viewkeys()
+    dict_keys([0, 130, 10, 140, 20, 150, 30, ..., 250])
+
+View はイテレートするだけでなく、 set と似た利用をすることもできます。
+``&`` 演算子で共通部分集合を、 ``|`` 演算子で話集合を取ることができます。
+
+::
+
+    >>> d1 = dict((i*10, chr(65+i)) for i in range(26))
+    >>> d2 = dict((i**.5, i) for i in range(1000))
+    >>> d1.viewkeys() & d2.viewkeys()
+    set([0.0, 10.0, 20.0, 30.0])
+    >>> d1.viewkeys() | range(0, 30)
+    set([0, 1, 130, 3, 4, 5, 6, ..., 120, 250])
+
+view は辞書とその辞書の変化に追随しています。 ::
+
+    >>> vk = d.viewkeys()
+    >>> vk
+    dict_keys([0, 130, 10, ..., 250])
+    >>> d[260] = '&'
+    >>> vk
+    dict_keys([0, 130, 260, 10, ..., 250])
+
+ただし、 view をイテレートしている間に key の追加や削除ができないことに
+気を付けてください。 ::
+
+    >>> for k in vk:
+    ...     d[k*2] = k
+    ...
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    RuntimeError: dictionary changed size during iteration
+
+Python 2.x で view メソッドを利用すると、 2to3 が自動的にそれを
+通常の :meth:`~dict.keys`, :meth:`~dict.values`, :meth:`~dict.items`
+メソッドに書き換えてくれます。
+
+.. seealso::
+
+   :pep:`3106` - Revamping dict.keys(), .values() and .items()
+     PEP written by Guido van Rossum.
+     Backported to 2.7 by Alexandre Vassalotti; :issue:`1967`.
+
+
+.. PEP 3137: The memoryview Object
+
+PEP 3137: memoryview オブジェクト
+====================================================
+
+:class:`memoryview` オブジェクトは、他のオブジェクトのメモリの内容に対する
+:class:`bytes` 型のインタフェースに合わせた view を提供します。
+
+    >>> import string
+    >>> m = memoryview(string.letters)
+    >>> m
+    <memory at 0x37f850>
+    >>> len(m)           # Returns length of underlying object
+    52
+    >>> m[0], m[25], m[26]   # Indexing returns one byte
+    ('a', 'z', 'A')
+    >>> m2 = m[0:26]         # Slicing returns another memoryview
+    >>> m2
+    <memory at 0x37f080>
+
+view の内容は bytes 型の文字列か整数のリストに変換することができます。
+
+    >>> m2.tobytes()
+    'abcdefghijklmnopqrstuvwxyz'
+    >>> m2.tolist()
+    [97, 98, 99, 100, 101, 102, 103, ... 121, 122]
+    >>>
+
+:class:`memoryview` オブジェクトは、対象となる背後のオブジェクトが変更可能
+(mutable) な場合は、その変更を許可しています。
+
+    >>> m2[0] = 75
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: cannot modify read-only memory
+    >>> b = bytearray(string.letters)  # Creating a mutable object
+    >>> b
+    bytearray(b'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    >>> mb = memoryview(b)
+    >>> mb[0] = '*'         # Assign to view, changing the bytearray.
+    >>> b[0:5]              # The bytearray has been changed.
+    bytearray(b'*bcde')
+    >>>
+
+.. seealso::
+
+   :pep:`3137` - Immutable Bytes and Mutable Buffer
+     PEP written by Guido van Rossum.
+     Implemented by Travis Oliphant, Antoine Pitrou and others.
+     Backported to 2.7 by Antoine Pitrou; :issue:`2396`.
+
+.. x* magic code for vim highlighting.
+
+.. Other Language Changes
+
+その他の言語の変更
+======================
+
+Python 言語コアにいくつかの小さな変更が加えられました。
+
+* set リテラルのためのシンタックスが Python 3.x からバックポートされました。
+  内容を波括弧で囲うと mutable set になります。 dict リテラルとの区別は、
+  コロンと value が存在しないことで行われます。なので、 ``{}`` は引き続き
+  空の dict になります。空の set を作るときには ``set()`` を使ってください。
+
+    >>> {1, 2, 3, 4, 5}
+    set([1, 2, 3, 4, 5])
+    >>> set() # empty set
+    set([])
+    >>> {}    # empty dict
+    {}
+
+  Backported by Alexandre Vassalotti; :issue:`2335`.
+
+* dict と set の内包表記も Python 3.x からバックポートされました。
+  list と generator の内包表記を set と dict にも使えるように一般化させています。
+
+    >>> {x: x*x for x in range(6)}
+    {0: 0, 1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+    >>> {('a'*x) for x in range(6)}
+    set(['', 'a', 'aa', 'aaa', 'aaaa', 'aaaaa'])
+
+.. x* magic code for vim highlighting.
+
+  Backported by Alexandre Vassalotti; :issue:`2333`.
+
+* :keyword:`with` 文が1つの文で複数のコンテキストマネージャーを使えるようになりました。
+  コンテキストマネージャーは左から右へ処理され、それぞれが新しい :keyword:`with`
+  文の開始となるように扱われます。つまり::
+
+   with A() as a, B() as b:
+       ... suite of statements ...
+
+  このコードは、次のコードと等しくなります::
+
+   with A() as a:
+       with B() as b:
+           ... suite of statements ...
+
+  :func:`contextlib.nested` 関数は非常に似た機能を提供していたので、
+  もう必要なくなり廃止予定となりました。
+
+  (Proposed in http://codereview.appspot.com/53094; implemented by
+  Georg Brandl.)
+
+* 浮動小数点数と文字列の間の変換がほとんどのプラットフォームで正しく丸め
+  られるようになりました。この変換はいろいろな場面で発生します:
+  float 型や complex 型に対する :func:`str` 関数の適用、
+  数値フォーマット、 :mod:`marshal`, :mod:`pickle`, :mod:`json`
+  モジュールを使ってのシリアライズとデシリアライズ、
+  Python コード中の float や imaginary リテラルの解析、
+  :class:`~decimal.Decimal` から float への変換などです。
+
+  これに関連して、 浮動小数点数 *x* の :func:`repr` は、 (round-half-to-even
+  丸めモードで)正しく丸め処理をした場合に元の *x* に戻せる最小の
+  10進文字列になりました。以前は *x* を17桁の10進文字列に丸めていました。
+
+  .. maybe add an example?
+
+  丸めライブラリが、この改善が Windows や gcc, icc, suncc を使った
+  Unix 環境で動かす役目をおっています。このライブラリの正確な動作が
+  保証できない少しの環境があるので、そういったシステムではこのライブラリは
+  利用されません。 :data:`sys.float_repr_style` が ``short``
+  なら新しいコードが利用されていて、 ``legacy`` なら利用されていません。
+
+  Implemented by Eric Smith and Mark Dickinson, using David Gay's
+  :file:`dtoa.c` library; :issue:`7117`.
+
+* 多倍長整数や通常の整数から浮動小数点への変換でも丸め処理が変更され、
+  元の数に一番近い浮動小数点値が返されるようになりました。
+  これは浮動小数点へ完全に変換できる小さい整数では問題になりませんが、
+  桁数に対して精度がどうしても足りない場合に関係します。
+  Python 2.7 はより正確に近似するようになりました。例えば、 Python 2.6
+  では次のように計算されていました::
+
+    >>> n = 295147905179352891391
+    >>> float(n)
+    2.9514790517935283e+20
+    >>> n - long(float(n))
+    65535L
+
+  Python 2.7 の浮動小数点への変換結果は元の数値より大きくなりますが、
+  元の値により近くなっています::
+
+    >>> n = 295147905179352891391
+    >>> float(n)
+    2.9514790517935289e+20
+    >>> n - long(float(n))
+    -1L
+
+  (Implemented by Mark Dickinson; :issue:`3166`.)
+
+  この丸めの動作により、整数同士の true division (``from __future__ import division``)
+  の結果もより正確になりました。
+  (Also implemented by Mark Dickinson; :issue:`1811`.)
+
+* 複素数に対する暗黙の型強制は削除されました。インタプリタは complex オブジェクトに対して
+  :meth:`__coerce__` メソッドを呼び出そうとしません。
+  (Removed by Meador Inge and Mark Dickinson; :issue:`5211`.)
+
+* :meth:`str.format` メソッドは置換フィールドに対する自動ナンバリングをサポートするようになりました。
+  これにより :meth:`str.format` をより ``%s`` と同じように使えるようになりました。 ::
+
+    >>> '{}:{}:{}'.format(2009, 04, 'Sunday')
+    '2009:4:Sunday'
+    >>> '{}:{}:{day}'.format(2009, 4, day='Sunday')
+    '2009:4:Sunday'
+
+  自動ナンバリングは左のフィールドから右のフィールドへと行われるので、
+  最初の ``{...}`` 指定は :meth:`str.format` メソッドの最初の引数を利用し、
+  次の指定は次の引数を利用します。
+  自動ナンバリングと明示的なナンバリングを混ぜて使うことはできず、全ての置換指定に
+  手動でナンバリングするか、全てを自動ナンバリングに任せなければなりません。
+  ただし、上の例の2つめのように、自動ナンバリングと名前フィールドを混ぜて使うことは可能です。
+  (Contributed by Eric Smith; :issue:`5237`.)
+
+  複素数が :func:`format` をサポートするようになりました。デフォルトでは右寄せになります。
+  精度やカンマ区切りの指定は、実部と虚部のそれぞれに対して適用されます。
+  アラインの指定は ``1.5+3j`` のような複素数全体に対して適用されます。
+  (Contributed by Eric Smith; :issue:`1588` and :issue:`7988`.)
+
+  'F' 書式符号は常に大文字を使って出力するようになり、
+  'INF' や 'NAN' が出力されるようになりました。
+  (Contributed by Eric Smith; :issue:`3382`.)
+
+  低レベルな変更: :meth:`object.__format__` メソッドは :exc:`PendingDeprecationWarning`
+  を発生させるようになりました。 :class:`object` に対する :meth:`__format__`
+  メソッドはオブジェクトを文字列表現に変換してそれをフォーマットするからです。
+  以前は、このメソッドは書式文字列を受け取り文字列表現を返していましたが、
+  この仕様は Python コードのミスを隠してしまう可能性がありました。
+  アライメントや精度のようなフォーマット指定情報を渡した時、
+  そのなにかそのオブジェクトに合ったフォーマットがあることを期待している
+  はずなのに、 :meth:`object.__format__` メソッドはそれを無視します。
+  (Fixed by Eric Smith; :issue:`7994`.)
+
+
+* :func:`int` と :func:`long` 型に ``bit_length`` メソッドが追加されました。
+  このメソッドはその値を2進数で表現したときに何ビット必要になるかを返します::
+
+      >>> n = 37
+      >>> bin(n)
+      '0b100101'
+      >>> n.bit_length()
+      6
+      >>> n = 2**123-1
+      >>> n.bit_length()
+      123
+      >>> (n+1).bit_length()
+      124
+
+  (Contributed by Fredrik Johansson and Victor Stinner; :issue:`3439`.)
+
+* :keyword:`import` 文が、絶対インポート (例: ``from .os import sep``) が
+  失敗したときに相対インポートを試さなくなりました。
+  これはバグ修正ですが、いままでたまたま動いていただけの :keyword:`import`
+  文を動かなくしてしまう可能性があります。(Fixed by Meador Inge;
+  :issue:`7902`.)
+
+* ビルトインの :class:`unicode` 型のサブクラスが :meth:`__unicode__` メソッドを
+  オーバーライドできるようになりました。(Implemented by
+  Victor Stinner; :issue:`1583863`.)
+
+* :class:`bytearray` 型の :meth:`~bytearray.translate` メソッドが第一引数に
+  ``None`` を受け入れるようになりました。 (Fixed by Georg Brandl;
+  :issue:`4759`.)
+
+  .. XXX bytearray doesn't seem to be documented
+
+* ``@classmethod`` や ``@staticmethod`` を使ってクラスメソッドや
+  スタティックメソッドを作成した時、そのラッパーオブジェクトが
+  ラップ対象となる関数を :attr:`__func__` 属性で公開するように
+  なりました。(Contributed by Amaury Forgeot d'Arc, after a suggestion by
+  George Sakkis; :issue:`5982`.)
+
+* ``__slots__`` を利用して属性を制限した場合に、設定されていない属性を
+  del したときに :exc:`AttributeError` にならなかったのを修正しました。
+  (Fixed by Benjamin Peterson; :issue:`7604`.)
+
+* 2つの新しいエンコーディングが追加されました: "cp720" は主にアラビア文字に
+  使われます。 "cp858" は cp850 の一種ですが、ユーロ記号を追加しています。
+  (CP720 contributed by Alexander Belchenko and Amaury
+  Forgeot d'Arc in :issue:`1616979`; CP858 contributed by Tim Hatch in
+  :issue:`8016`.)
+
+* :class:`file` オブジェクトは、POSIX環境に置いてディレクトリを開こうとした
+  時に発生する :exc:`IOError` 例外に :attr:`filename` 属性を設定するようになりました。
+  (noted by Jan Kaliszewski; :issue:`4764`)
+  また、読み取りのみのファイルに対する書き込みを、Cライブラリ側のエラー
+  検出・報告に頼るのではなく、明示的にチェックするようになりました。
+  (fixed by Stefan Krah; :issue:`5677`).
+
+* Python の字句解析機は改行をそれ自身に変換するようになりました。
+  それにより、組み込みの :func:`compile` 関数がどの改行コードを利用した
+  コードでも受け付けるようになりました。また、コードの終端の改行も
+  不要になりました。
+
+* 関数宣言中の余分な丸括弧は Python 3.x では不正になりました。
+  つまり、 ``def f((x)): pass`` はsyntax errorになります。
+  Python3 警告モードでは、 Python 2.7 はこの利用方法について警告を出すようになりました。
+  (Noted by James Lingard; :issue:`7362`.)
+
+* 古いスタイルのクラスのオブジェクトに対して弱参照を作れるようになりました。
+  新スタイルクラスには以前から弱参照を利用できます。(Fixed
+  by Antoine Pitrou; :issue:`8268`.)
+
+* モジュールオブジェクトがGCされたとき、モジュールの辞書は、他にその辞書への
+  参照を持っているものがない場合にのみクリアされるようになりました。(:issue:`7140`).
+
+.. ======================================================================
+
+.. _new-27-interpreter:
+
+.. Interpreter Changes
+
+インタプリタの変更
+-------------------------------
+
+新しい環境変数 :envvar:`PYTHONWARNINGS` を使って警告を制御できるようになりました。
+この環境変数には、 :option:`-W` スイッチに使われる警告の設定を、カンマ区切りの
+文字列として指定します。
+(Contributed by Brian Curtin; :issue:`7301`.)
+
+
+例えば、以下の設定は警告が発生するたびにそれを表示しますが、
+:mod:`Cookie` モジュールからの警告はエラーにします。
+(環境変数を設定するための文法はOSとシェルに依存します)
+
+::
+
+  export PYTHONWARNINGS=all,error:::Cookie:0
+
+.. ======================================================================
+
+
+.. Optimizations
+
+最適化
+-------------
+
+.. Several performance enhancements have been added:
+
+いくつかの場面でパフォーマンスが向上しています。
+
+* :keyword:`with` 文の初期セットアップを行うための新しいオペコードが追加されました。
+  :meth:`__enter__` と :meth:`__exit__` メソッドの検索を行います。
+  (Contributed by Benjamin Peterson.)
+
+* たくさんのオブジェクトを開放せずに確保していくという、よくある使い方の
+  1つにおいて、GCのパフォーマンスが向上しました。
+  以前はこの場合にGCにかかる時間はオブジェクトの数の2乗に比例していました。
+  現在はフルGCの数は増えたヒープ上のオブジェクトの数に比例しています。
+  新しい方式では、3世代中2世代目に対するGCが10回実行されたうえで、
+  2世代目から3世代目に移ったオブジェクトの数が3世代目のオブジェクトの数の
+  10%を超えたときにフルGCが発生します。(Suggested by Martin
+  von Löwis and implemented by Antoine Pitrou; :issue:`4074`.)
+
+* GCが循環参照になりえないシンプルなコンテナ型の追跡を避けるようになりました。
+  Python 2.7 では、アトミックな型(整数、文字列など)のみを含むタプルと辞書は
+  追跡されません。推移的に、アトミックな型のみを含むタプルを含む辞書も、
+  同じく追跡されません。
+  これにより、GCによって巡回されチェックされるオブジェクトの数が減るので、
+  GCのコストを減らすことができます。
+  (Contributed by Antoine Pitrou; :issue:`4688`.)
+
+* 多倍長整数の内部格納方式が、 2**15 ベースと 2**30 ベースのどちらかを
+  ビルド時に選択するようになりました。
+  以前は常に 2**15 ベースで格納していました。
+  2**30 ベースにすると 64bit マシンに置いては確実にパフォーマンスが向上しますが、
+  32bit マシンではパフォーマンスが向上する場合も低下する場合もあります。
+  なので、デフォルトでは 64bit マシンでは 2**30 ベースで、 32bit マシンでは
+  2**15 ベースになるようになります。
+  Unix では新しい configure オプションとして :option:`--enable-big-digis`
+  が追加され、このデフォルトの選択をオーバーライドできるようになっています。
+
+  この変更はパフォーマンスの向上以外の形ではユーザーに見えないはずですが、
+  1つだけ例外があります。テストとデバッグを目的として、 :data:`sys.long_info`
+  というデータが追加され、内部フォーマットとして digit あたりの
+  ビット数と、それに使うCのデータ型のバイト数の情報を提供します::
+
+     >>> import sys
+     >>> sys.long_info
+     sys.long_info(bits_per_digit=30, sizeof_digit=4)
+
+  (Contributed by Mark Dickinson; :issue:`4258`.)
+
+  その他の変更により、多倍長整数オブジェクトのサイズは数バイト小さくなりました。
+  32bit システムでは 2byte, 64bit システムでは 6byte 小さくなりました。
+  (Contributed by Mark Dickinson; :issue:`5260`.)
+
+* 多倍長整数の除算アルゴリズムが、内部のループの軽量化や乗算からシフト演算への
+  置き換え、不要なイテレーションの削除により高速化されました。
+  いくつかのベンチマークによると、多倍長整数の剰余演算は 50% から 150% 高速化されています。
+  (Contributed by Mark Dickinson; :issue:`5512`.)
+  ビット演算も高速化されています。(initial patch by
+  Gregory Smith; :issue:`1087418`)
+
+* ``%`` の実装が、左側のオペランドが文字列型かどうかをチェックして
+  その場合の処理を特殊化しました。これにより文字列に対して ``%`` を頻繁に使う、
+  テンプレートライブラリなどのアプリケーションのパフォーマンスが1-3%向上します。
+  (Implemented by Collin Winter; :issue:`5176`.)
+
+* ``if`` 条件付きのリスト内包表記がより高速なバイトコードにコンパイル
+  されるようになりました。(Patch by Antoine Pitrou, back-ported to 2.7
+  by Jeffrey Yasskin; :issue:`4715`.)
+
+* 整数や多倍長整数から10進文字列への変換を、任意の基数をサポートした
+  汎用の変換関数を使う代わりに10進数に特殊化した処理を行うことで
+  高速化しました。
+  (Patch by Gawain Bolton; :issue:`6713`.)
+
+* 文字列等(str, unicode, :class:`bytearray`) の
+  :meth:`split`, :meth:`replace`, :meth:`rindex`, :meth:`rpartition`,
+  :meth:`rsplit` メソッドが、1文字ずつのスキャンの代わりに高速な逆方向
+  スキャンアルゴリズムを使うようになりました。
+  これにより、場合によっては10倍レベルの高速化になります。(Added by
+  Florent Xicluna; :issue:`7462` and :issue:`7622`.)
+
+* :mod:`pickle` と :mod:`cPickle` モジュールが、属性名に使われている
+  文字列を自動的にインターンするようになりました。これにより unpickle 後の
+  オブジェクトのメモリ使用量が減ります。(Contributed by Jake
+  McGuire; :issue:`5084`.)
+
+* :mod:`cPickle` モジュールが辞書に対する特殊化を行い、 pickle にかかる
+  時間をおよそ半分に減らしました。
+  (Contributed by Collin Winter; :issue:`5670`.)
+
+.. ======================================================================
+
+.. New and Improved Modules
+
+新しいモジュールと改良されたモジュール
+========================================
+
+全てのリリースに置いて、 Python の標準ライブラリはたくさんの改良とバグ修正が
+されてきました。ここでは一部の注目に値する変更を、
+モジュール名で辞書順ソートしてリストアップしています。
+可燃な変更が見たければ、ソースツリー内の :file:`Misc/NEWS` ファイルか、
+全ての完全な詳細が入っている Subversion のログを参照してください。
+
+* :mod:`bdb` モジュールの基底デバッガクラス :class:`~bdb.Bdb` に、
+  モジュールをスキップする機能が追加されました。コンストラクタは
+  ``django.*`` のような glob スタイルのパターンをもった iterable を
+  引数として受け取ります。デバッガはパターンのどれかにマッチする
+  スタックフレームにステップインしません。
+  (Contributed by Maru Newby after a suggestion by
+  Senthil Kumaran; :issue:`5142`.)
+
+* :mod:`binascii` モジュールが buffer API をサポートするようになり、
+  :class:`memoryview` インスタンスやその他のバッファオブジェクトともに
+  利用できるようになりました。
+  (Backported from 3.x by Florent Xicluna; :issue:`7703`.)
+
+* :mod:`bsddb` モジュールが
+  `the pybsddb package <http://www.jcea.es/programacion/pybsddb.htm>`__
+  の 4.7.2devel9 から 4.8.4 に更新されました。
+  新しいバージョンはより Python 3.x との互換性がよくなり、いくつかのバグ修正と、
+  いくつかの新しい BerkeleyDB のフラグとメソッドが追加されています。
+  (Updated by Jesús Cea Avión; :issue:`8156`.  The pybsddb
+  changelog can be read at http://hg.jcea.es/pybsddb/file/tip/ChangeLog.)
+
+* :mod:`bz2` モジュールの :class:`~bz2.BZ2File` がコンテキストマネージャー
+  プロトコルをサポートするようになりました。これにより、
+  ``with bz2.BZ2File(...) as f:`` といった書き方ができます。
+  (Contributed by Hagen Fürstenau; :issue:`3860`.)
+
+* :mod:`collections` モジュールの新しい :class:`~collections.Counter` クラスは、
+  データの数え上げをするときに便利です。
+  :class:`~collections.Counter` インスタンスは辞書のように振る舞いますが、
+  キーが存在しなかったときに :exc:`KeyError` 例外を発生させる代わりに 0 を返します。
+
+  .. doctest::
+     :options: +NORMALIZE_WHITESPACE
+
+     >>> from collections import Counter
+     >>> c = Counter()
+     >>> for letter in 'here is a sample of english text':
+     ...   c[letter] += 1
+     ...
+     >>> c
+     Counter({' ': 6, 'e': 5, 's': 3, 'a': 2, 'i': 2, 'h': 2,
+     'l': 2, 't': 2, 'g': 1, 'f': 1, 'm': 1, 'o': 1, 'n': 1,
+     'p': 1, 'r': 1, 'x': 1})
+     >>> c['e']
+     5
+     >>> c['z']
+     0
+
+.. xxx
+
+  :class:`~collections.Counter` には追加の3つのメソッドがあります。
+  :meth:`~collections.Counter.most_common` はカウントが最も多い N
+  要素とそのカウントを返します。 :meth:`~collections.Counter.elements`
+  はカウントしている要素を、そのカウント数だけ繰り返すイテレータを
+  返します。
+  :meth:`~collections.Counter.subtract` はイテレート可能型を受け取り、
+  その各要素を足すのではなく引いて行きます。引数が他の辞書か Counter
+  だった場合は、そのカウントが引かれます。 ::
+
+    >>> c.most_common(5)
+    [(' ', 6), ('e', 5), ('s', 3), ('a', 2), ('i', 2)]
+    >>> c.elements() ->
+       'a', 'a', ' ', ' ', ' ', ' ', ' ', ' ',
+       'e', 'e', 'e', 'e', 'e', 'g', 'f', 'i', 'i',
+       'h', 'h', 'm', 'l', 'l', 'o', 'n', 'p', 's',
+       's', 's', 'r', 't', 't', 'x'
+    >>> c['e']
+    5
+    >>> c.subtract('very heavy on the letter e')
+    >>> c['e']    # Count is now lower
+    -1
+
+  Contributed by Raymond Hettinger; :issue:`1696199`.
+
+  .. revision 79660
+
+  新しいクラス :class:`~collections.OrderedDict` はすでに :ref:`pep-0372`
+  で紹介しました。
+
+  メソッドが追加されました。引数で指定された *x* と等しい要素が何個入っているかを
+  返します。
+  :meth:`~collections.deque.reverses` メソッドは deque 内の要素をインプレースで
+  逆順にします。 :class:`~collections.deque` はまた、最大長を返す読み込み専用の
+  属性 :attr:`~collections.deque.maxlen` を持ちます。
+  (Both features added by Raymond Hettinger.)
+
+  :class:`~collections.namedtuple` クラスにオプションの *rename* 引数が追加されました。
+  *rename* が真のとき、複数回現れたり Python の識別子として許可されないために無効な
+  フィールド名があったとき、フィールドのリスト内での場所に基づく有効なフィールド名に
+  置き換えられます。 ::
+
+     >>> from collections import namedtuple
+     >>> T = namedtuple('T', ['field1', '$illegal', 'for', 'field2'], rename=True)
+     >>> T._fields
+     ('field1', '_1', '_2', 'field2')
+
+  (Added by Raymond Hettinger; :issue:`1818`.)
+
+  :class:`~collections.Mapping` 抽象基底クラスが、他の :class:`Mapping`
+  でない型と比較されたときに :const:`NotImplemented` を返すようになりました。
+  (Fixed by Daniel Stutzbach; :issue:`8729`.)
+
+* :mod:`ConfigParser` モジュールのパーサークラスのコンストラクタが
+  *allow_no_value* 引数を受け取るようになりました。これはデフォルトでは False です。
+  真の場合、値のないオプションが利用できるようになります。例えば::
+
+    >>> import ConfigParser, StringIO
+    >>> sample_config = """
+    ... [mysqld]
+    ... user = mysql
+    ... pid-file = /var/run/mysqld/mysqld.pid
+    ... skip-bdb
+    ... """
+    >>> config = ConfigParser.RawConfigParser(allow_no_value=True)
+    >>> config.readfp(StringIO.StringIO(sample_config))
+    >>> config.get('mysqld', 'user')
+    'mysql'
+    >>> print config.get('mysqld', 'skip-bdb')
+    None
+    >>> print config.get('mysqld', 'unknown')
+    Traceback (most recent call last):
+      ...
+    NoOptionError: No option 'unknown' in section: 'mysqld'
+
+  (Contributed by Mats Kindahl; :issue:`7005`.)
+
+* :func:`contextlib.nested` 関数が廃止予定になりました。これは1つの :keyword:`with`
+  文で1つ以上のコンテキストマネージャーを扱うためのものでしたが、 :keyword:`with`
+  文が複数のコンテキストマネージャーをサポートするようになりました。
+
+* :mod:`cookielib` モジュールが不正な、値が整数値ではないバージョンフィールドを
+  持つ cookie を無視するようになりました。(Fixed by
+  John J. Lee; :issue:`3924`.)
+
+* :mod:`copy` モジュールの :func:`~copy.deepcopy` 関数が、束縛ずみ
+  インスタンスメソッドを正しくコピーするようになりました。(Implemented by
+  Robert Collins; :issue:`1515`.)
+
+* :mod:`ctypes` モジュールが、ポインタとして宣言された引数に対して ``None``
+  が渡された場合常に C の NULL ポインタに変換するようになりました。(Changed by Thomas
+  Heller; :issue:`4606`.) 基盤となっている `libffi ライブラリ
+  <http://sourceware.org/libffi/>`__ が 3.0.9 にアップデートされ、いくつかの
+  プラットフォームにおけるいろいろな問題が修正されました。(Updated
+  by Matthias Klose; :issue:`8142`.)
+
+* 新しいメソッド: :mod:`datetime` モジュールの :class:`~datetime.timedelta` クラスに
+  :meth:`~datetime.timedelta.total_seconds` メソッドが追加されました。
+  これはその期間の秒数を返します。(Contributed by Brian Quinlan; :issue:`5788`.)
+
+* 新しいメソッド: :class:`~decimal.Decimal` クラスに、浮動小数点数から
+  :class:`~decimal.Decimal` への正確な変換を行う :meth:`~decimal.Decimal.from_float`
+  クラスメソッドが追加されました。
+  この正確な変換は、浮動小数点数が示す値に一番近い近似となる10進数を求めます。
+  なので、このメソッドを使ったとしてもある程度の誤差は残ります。
+  例えば、 ``Decimal.from_float(0.1)`` は
+  ``Decimal('0.1000000000000000055511151231257827021181583404541015625')``
+  を返します。
+  (Implemented by Raymond Hettinger; :issue:`4796`.)
+
+  :class:`~decimal.Decimal` のインスタンスと浮動小数点数の比較は、
+  オペランドの値に応じた賢い結果を返すようになりました。
+  以前はこの比較は Python のデフォルトのオブジェクト比較にフォールバックし、
+  オペランドの型に応じて不定な結果が返されていました。
+  ただし、 :class:`Decimal` と浮動小数点数を加算などの他の演算で組み合わせることは
+  いまでも許可されていません。浮動小数点数と :class:`~decimal.Decimal` の間の
+  変換方法を明示的に指定するべきです。(Fixed by Mark Dickinson; :issue:`2531`.)
+
+  :class:`~decimal.Decimal` のコンストラクタが浮動小数点数を受け入れるようになりました。
+  (added by Raymond Hettinger; :issue:`8257`)
+  また、アラビア・インド数字などの、ヨーロッパ以外の Unicode 文字も受け入れるようになりました。
+  (contributed by Mark Dickinson; :issue:`6595`).
+
+  :class:`~decimal.Context` クラスのほとんどのメソッドが :class:`~decimal.Decimal`
+  インスタンスと同じく整数を受け入れるようになりました。
+  例外は :meth:`~decimal.Context.caonical` と :meth:`~decimal.Context.is_canonical`
+  メソッドだけです。 (Patch by Juan José Conti; :issue:`7633`.)
+
+  :class:`~decimal.Decimal` インスタンスを文字列の :meth:`~str.format`
+  メソッドで利用した場合、デフォルトのアライメントが左揃えから、数値型に
+  適した右揃えに変更されました。  (Changed by Mark Dickinson; :issue:`6857`.)
+
+  signaling NaN (あるいは ``sNAN``) との比較は、暗黙に比較演算に応じて
+  真偽値を返すのではなく、 :const:`InvalidOperation` 例外を発生させる
+  ようになりました。 Quiet NaN (あるいは ``NAN``) はハッシュ可能になりました。
+  (Fixed by Mark Dickinson; :issue:`7279`.)
+
+* :mod:`difflib` モジュールの出力が、ファイル名を含むヘッダのセパレータに
+  スペースではなくタブ文字を使うようになり、最近の :command:`diff`/:command:`patch`
+  ツールとの互換性が高くなりました。(Fixed by Anatoly
+  Techtonik; :issue:`7585`.)
+
+* Distutils ``sdist`` コマンドが、 :file:`MANIFEST.in` や :file:`setup.py`
+  ファイルが変更されていなくても、ユーザーが作成したかもしれない新しい
+  ファイルが含まれるようにするために、毎回 :file:`MANIFEST` ファイルを再生成
+  するようになりました。
+  (Fixed by Tarek Ziadé; :issue:`8688`.)
+
+* :mod:`doctest` モジュールの :const:`IGNORE_EXCEPTION_DETAIL` フラグが、
+  テストされている例外を含むモジュールの名前を無視するようになりました。
+  (Patch by Lennart Regebro; :issue:`7490`.)
+
+* :mod:`email` モジュールの :class:`~email.message.Message` クラスが
+  Uniode値のペイロードを受け入れるようになり、自動的に :attr:`output_charset`
+  で指定されたエンコーディングに変換するようになりました。
+  (Added by R. David Murray; :issue:`1368247`.)
+
+* :class:`~fractions.Fraction` クラスが、コンストラクタの引数として、
+  1つの float 値、 :class:`~decimal.Decimal` インスタンス、
+  2つの有理数を受け入れるようになりました。(Implemented by Mark Dickinson;
+  rationals added in :issue:`5812`, and float/decimal in
+  :issue:`8294`.)
+
+  fraction と complex 数の間の順序比較演算 (``<``, ``<=``, ``>``, ``>=``)
+  が :exc:`TypeError` 例外を発生させるようになりました。
+  これは過失を修正し、 :class:`~fractions.Fraction` を他の数値型と
+  マッチさせます。
+
+
+  .. revision 79455
+
+* 新しいクラス: :class:`~ftplib.FTP_TLS` が :mod:`ftplib` に追加されました。
+  認証とその後の制御・データ転送をTLSカプセル化することでセキュアなFTP接続を
+  提供します。
+  (Contributed by Giampaolo Rodola; :issue:`2054`.)
+
+  バイナリデータのアップロードを行う :meth:`~ftplib.FTP.storbinary` に *rest*
+  引数が追加され、アップロードのリスタートができるようになりました。
+  (patch by Pablo Mouzo; :issue:`6845`.)
+
+
+* 新しいクラスデコレータ: :mod:`functools` モジュールに :func:`~functools.total_ordering`
+  が追加されました。 :meth:`__eq__` と、 :meth:`__lt__`, :meth:`__le__`, :meth:`__gt__`,
+  :meth:`__ge__` のいづれか1つを定義したクラスを受け取り、残りの比較メソッドを生成します。
+  :meth:`__cmp__` メソッドが Python 3.x では廃止されたので、順序のある
+  クラスを定義するのを簡単にするためにこのデコレータがあります。
+  (Added by Raymond Hettinger; :issue:`5479`.)
+
+  新しい関数: :func:`~functools.cmp_to_key` 関数は、古いスタイルの2引数を受け取る
+  比較関数を受け取り、 :func:`sorted`, :func:`min`, :func:`max` などの
+  *key* 引数に利用できる呼び出し可能オブジェクトを返します。
+  この関数の主な目的は、古いコードを Python 3.x へ対応させるのを手助けすることです。
+  (Added by Raymond Hettinger.)
+
+* 新しい関数: :mod:`gc` モジュールに :func:`~gc.is_tracked` 関数が追加されました。
+  渡されたオブジェクトがGCに追跡されている場合に True を、そうでない場合に
+  False を返します。 (Contributed by Antoine Pitrou; :issue:`4688`.)
+
+* :mod:`gzip` モジュールの :class:`~gzip.GzipFile` がコンテキストマネージャー
+  プロトコルをサポートしました。 ``with gzip.GzipFile(...) as f:`` と書くことが
+  できます。(contributed by Hagen Fürstenau; :issue:`3860`
+  また、 :class:`io.BufferedIOBase` ABC を実装しています。なので、より高速な
+  処理のために :class:`io.BufferedReader` でラップすることができます。
+  (contributed by Nir Aides; :issue:`7471`).
+  さらに、コンストラクタにオプションのタイムスタンプを指定することで、
+  gzip ファイル内の変更時間レコードをオーバーライドすることができるように
+  なりました。  (Contributed by Jacques Frechet; :issue:`4272`.)
+
+  gzip ファイルフォーマットのファイルは最後にゼロバイトによるパディングが
+  できるようになりました。 :mod:`gzip` モジュールは末尾のゼロバイトを
+  消費します。(Fixed by Tadek Pietraszek and Brian Curtin; :issue:`2846`.)
+
+* 新しい属性: :mod:`hashlib` モジュールに :attr:`~hashlib.hashlib.algorithms`
+  属性が追加されました。これはサポートしているアルゴリズムを含むタプルです。
+  Python 2.7 では、 ``hashlib.algorithms`` は
+  ``('md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512')`` が含まれています。
+  (Contributed by Carl Chenet; :issue:`7418`.)
+
+* :mod:`httplib` モジュールで使われているデフォルトの :class:`~httplib.HTTPResponse`
+  クラスがバッファリングをサポートし、HTTPレスポンスをより高速に読み込めるようになりました。
+  (Contributed by Kristján Valur Jónsson; :issue:`4879`.)
+
+  :class:`~httplib.HTTPConnection` と :class:`~httplib.HTTPSConnection` クラスが
+  *source_address* 引数として ``(host, port)`` の2要素タプルを受け取るようになりました。
+  これは接続のソースアドレスとして利用されます。
+  (Contributed by Eldon Ziegler; :issue:`3972`.)
+
+* :mod:`ihooks` モジュールが相対 import をサポートしました。
+  :mod:`ihooks` import をカスタマイズするための古いモジュールで、
+  Python 2.0 で追加された :mod:`imputil` モジュールに取って変わられて
+  いることに注意してください。
+  (Relative import support added by Neil Schemenauer.)
+
+  .. revision 75423
+
+* :mod:`imaplib` モジュールが IPv6 アドレスをサポートするようになりました。
+  (Contributed by Derek Morr; :issue:`1655`.)
+
+* :mod:`inspect` モジュールに :func:`~inspect.getcallargs` 関数が追加されました。
+  callable とその位置引数、キーワード引数を受け取り、
+  callable のどの仮引数がどの実引数を受け取るかを計算し、
+  引数名から値へマップする辞書を返します。例えば::
+
+    >>> from inspect import getcallargs
+    >>> def f(a, b=1, *pos, **named):
+    ...     pass
+    >>> getcallargs(f, 1, 2, 3)
+    {'a': 1, 'b': 2, 'pos': (3,), 'named': {}}
+    >>> getcallargs(f, a=2, x=4)
+    {'a': 2, 'b': 1, 'pos': (), 'named': {'x': 4}}
+    >>> getcallargs(f)
+    Traceback (most recent call last):
+    ...
+    TypeError: f() takes at least 1 argument (0 given)
+
+  Contributed by George Sakkis; :issue:`3135`.
+
+* 更新されたモジュール: :mod:`io` ライブラリが、Python 3.1 に
+  同梱されるバージョンに更新されました。
+  3.1 では、I/O ライブラリは完全に C で書き直され、処理されるタスクに依って
+  2 から 20 倍速くなりました。元の Python バージョンは :mod:`_pyio`
+  モジュールに改名されました。
+
+  結果の軽微な変更: :class:`io.TextIOBase` クラスは、エンコーディングや
+  デコーディングのエラーに使われるエラー設定 (``'strict'``, ``'replace'``,
+  ``'ignore'`` のいずれか) を与える :attr:`errors` 
+  属性を持つようになりました。
+
+  :class:`io.FileIO` クラスは、無効なファイルディスクリプタを渡されたときに
+  :exc:`OSError` を送出するようになりました。(Implemented by Benjamin Peterson;
+  :issue:`4991`.) :meth:`~io.IOBase.truncate` メソッドは、ファイル位置を
+  保存するようになりました。以前は、ファイル位置を新しいファイルの
+  末尾に変更しました。(Fixed by Pascal Chambon; :issue:`6939`.)
+
+* 新しい関数: ``itertools.compress(data, selectors)`` は、2 つの
+  イテレータを取ります。 *data* の要素は、 *selectors* の対応する値が
+  真であれば返されます::
+
+    itertools.compress('ABCDEF', [1,0,1,0,1,1]) =>
+      A, C, E, F
+
+  .. maybe here is better to use >>> list(itertools.compress(...)) instead
+
+  新しい関数: ``itertools.combinations_with_replacement(iter, r)`` は、
+  *iter* から、すべての可能な長さ *r* の要素の組合せを返します。
+  :func:`~itertools.combinations` とは異なり、生成された組合せに個別の要素が
+  繰り返し出現できます::
+
+    itertools.combinations_with_replacement('abc', 2) =>
+      ('a', 'a'), ('a', 'b'), ('a', 'c'),
+      ('b', 'b'), ('b', 'c'), ('c', 'c')
+
+  なお要素は、実際の値ではなく、その入力内での位置に依って
+  一意であるとみなされます。
+
+  :func:`itertools.count` 関数は、1 以外の値を増分できるように、 *step* 引数を
+  追加しました。 :func:`~itertools.count` はまた、キーワード引数に対応し、
+  さらに浮動小数点数や :class:`~decimal.Decimal` インスタンスのような、
+  非整数の値を使えるようになりました。(Implemented by Raymond
+  Hettinger; :issue:`5032`.)
+
+  :func:`itertools.combinations` および :func:`itertools.product` は、以前は
+  入力のイテレート可能オブジェクトより大きい *r* に :exc:`ValueError` を
+  返していました。これは仕様エラーと認められ、空のイテレータを返すように
+  なりました。(Fixed by Raymond Hettinger; :issue:`4816`.)
+
+* 更新されたモジュール: :mod:`json` モジュールが、エンコーディングや
+  デコーディングを高速化する C 拡張を含んだ、 simplejson パッケージの
+  バージョン 2.0.9 にアップグレードされました。
+  (Contributed by Bob Ippolito; :issue:`4136`.)
+
+  新しい :class:`collections.OrderedDict` 型をサポートするために、
+  :func:`json.load` はオプションとして、任意のオブジェクトリテラルに対して
+  呼び出され、ペアのリストにデコードする *object_pairs_hook* パラメタを
+  追加しました。(Contributed by Raymond Hettinger; :issue:`5381`.)
+
+* :mod:`mailbox` モジュールの :class:`~mailbox.Maildir` クラスは、
+  読み込むディレクトリのタイムスタンプを記録し、その後に更新時刻が
+  変わった場合にのみ再読み込みするようになりました。
+  これは不必要なディレクトリ走査を避けることでパフォーマンスを向上させます。
+  A.M. Kuchling and Antoine Pitrou; :issue:`1607951`, :issue:`6896`.)
+
+* 新しい関数: :mod:`math` モジュールは、誤差関数と相補誤差関数
+  :func:`~math.erf` および :func:`~math.erfc` 、
+  ``e**x - 1`` を :func:`~math.exp` から 1 を引くのよりも高い精度で計算する
+  :func:`~math.expm1` 、ガンマ関数 :func:`~math.gamma` 、そしてガンマ関数の
+  自然対数 :func:`~math.lgamma` を追加しました。
+  (Contributed by Mark Dickinson and nirinA raseliarison; :issue:`3366`.)
+
+* :mod:`multiprocessing` モジュールの :class:`Manager*` クラスに、
+  サブプロセスの開始時に呼び出される呼び出し可能オブジェクトと、
+  それに渡される引数群を渡すことができるようになりました。
+  (Contributed by lekma; :issue:`5585`.)
+
+  ワーカプロセスのプールを制御する :class:`~multiprocessing.Pool` クラスに、
+  オプションの *maxtasksperchild* パラメタが追加されました。
+  ワーカプロセスはこれで指定された数のタスクを処理したら、退出して
+  :class:`~multiprocessing.Pool` に新しいワーカーを開始させます。
+  これは、タスクがメモリその他のリソースをリークし得るときや、
+  ワーカをとても大きくしてしまうようなタスクがあるときに便利です。
+  (Contributed by Charles Cazabon; :issue:`6963`.)
+
+* :mod:`nntplib` モジュールは、IPv6 アドレスをサポートするようになりました。
+  (Contributed by Derek Morr; :issue:`1664`.)
+
+* 新しい関数: :mod:`os` モジュールは、以下の POSIX システムコールを
+  ラップします: real, effective, および saved GID と UID を返す、
+  :func:`~os.getresgid` と :func:`~os.getresuid` 、
+  real, effective, および saved GID と UID を新しく設定する、
+  :func:`~os.setresgid` と :func:`~os.setresuid` 、
+  現在のプロセスにグループアクセスリストを初期化する :func:`~os.initgroups`  。
+  (GID/UID functions contributed by Travis H.; :issue:`6508`.
+  Support for initgroups added by Jean-Paul Calderone; :issue:`7333`.)
+
+  :func:`os.fork` 関数は、子プロセス中で import ロックを再初期化するように
+  なりました。これは、Solaris における :func:`~os.fork` がスレッドから
+  呼び出された時の問題を修正します。(Fixed by Zsolt Cserna; :issue:`7242`.)
+
+* :mod:`os.path` モジュールの、 :func:`~os.path.normpath` および
+  :func:`~os.path.abspath` 関数は、Unicode を保存するようになりました。
+  入力パスが Unicode なら、戻り値も Unicode 文字列になります。
+  (:meth:`~os.path.normpath` fixed by Matt Giuca in :issue:`5827`;
+  :meth:`~os.path.abspath` fixed by Ezio Melotti in :issue:`3426`.)
+
+* :mod:`pydoc` モジュールは、Python が使う様々なシンボルのヘルプを
+  追加しました。例えば、 ``help('<<')`` や ``help('@')`` とできるように
+  なりました。(Contributed by David Laban; :issue:`4739`.)
+
+* :mod:`re` モジュールの :func:`~re.split`, :func:`~re.sub`, および
+  :func:`~re.subn` は、モジュールの他の関数との一貫性のため、
+  オプションの *flags* 引数を受け付けるようになりました。
+  (Added by Gregory P. Smith.)
+
+* 新しい関数: :mod:`runpy` モジュールの :func:`~runpy.run_path` は、
+  与えられた *path* 引数のコードを実行します。 *path* は Python
+  ソースファイルのパス (:file:`example.py`)、コンパイル済み
+  バイトコードファイル (:file:`example.pyc`)、ディレクトリ
+  (:file:`./package/`)、または zip アーカイブ (:file:`example.zip`) に
+  できます。ディレクトリか zip パスが与えられると、それが ``sys.path``
+  の最初に加えられ、モジュール :mod:`__main__` が import されます。
+  これは、ディレクトリや zip が :file:`__main__.py` を含むことを期待します。
+  なければ、他の :file:`__main__.py` が ``sys.path`` の後の部分から
+  import されることがあります。これにより、Python のコマンドラインが
+  明示的なパス名を処理する方法を真似たいような
+  スクリプトに、 :mod:`runpy` のより多くの機構が利用できるようになります。
+  (Added by Nick Coghlan; :issue:`6816`.)
+
+* 新しい関数: :mod:`shutil` モジュールの :func:`~shutil.make_archive`
+  は、ファイル名、アーカイブ型 (zip または tar-format)、および
+  ディレクトリパスを取って、そのディレクトリの内容を含むアーカイブを
+  生成します。(Added by Tarek Ziadé.)
+
+  :mod:`shutil`'s の :func:`~shutil.copyfile` および :func:`~shutil.copytree`
+  関数は、名前付きパイプのコピーを求められたときに
+  :exc:`~shutil.SpecialFileError` 例外を送出する様になりました。
+  以前は、コードは、名前付きパイプを、通常のファイルのように読み込み用に
+  開いて扱い、いつまでもブロックしていました。
+  (Fixed by Antoine Pitrou; :issue:`3002`.)
+
+* :mod:`signal` モジュールは、シグナルハンドラを本当に必要でない限り
+  再インストールしなくなりました。これで、EINTR シグナルを強く捕えられない
+  バグが修正されました。(Fixed by Charles-Francois Natali; :issue:`8354`.)
+
+* 新しい関数: :mod:`site` モジュールの、新しい関数群は様々なサイトおよび
+  ユーザに特有のパスを返します。
+  :func:`~site.getsitepackages` は、全てのグローバル site-packages
+  ディレクトリを含むリストを返します。
+  :func:`~site.getusersitepackages` は、ユーザの site-packages
+  ディレクトリのパスを返します。そして、
+  :func:`~site.getuserbase` は、データの保存に使えるディレクトリへのパスを
+  与える、 :envvar:`USER_BASE` 環境変数の値を返します。
+  (Contributed by Tarek Ziadé; :issue:`6693`.)
+
+  :mod:`site` モジュールは :mod:`sitecustomize` モジュールが import され
+  たときに例外を報告するようになり、 :exc:`KeyboardInterrupt` 例外が
+  捕捉されて飲み込まれることはなくなりました。
+  (Fixed by Victor Stinner; :issue:`3137`.)
+
+* :func:`~socket.create_connection` 関数は、接続に使われるソースアドレスを
+  与える ``(host, port)`` の 2-タプル、 *source_address* パラメタを
+  追加しました。
+  (Contributed by Eldon Ziegler; :issue:`3972`.)
+
+  :meth:`~socket.socket.recv_into` および :meth:`~socket.socket.recvfrom_into`
+  メソッドは、バッファ API をサポートするオブジェクト、最も便利なのは
+  :class:`bytearray` や :class:`memoryview` 、に書きこむようになりました。
+  (Implemented by Antoine Pitrou; :issue:`8104`.)
+
+* :mod:`SocketServer` モジュールの :class:`~SocketServer.TCPServer` クラスは、
+  ソケットタイムアウトと Nagle アルゴリズムの無効化をサポートするように
+  なりました。 :attr:`~SocketServer.TCPServer.disable_nagle_algorithm`
+  クラス属性は、デフォルトで False です。上書きされて True になると、
+  新しいリクエスト接続は、TCP_NODELAY オプションを設定され、一つの
+  TCP パケットにたくさんの小さな送信がバッファリングされることを防ぎます。
+  :attr:`~SocketServer.BaseServer.timeout` クラス属性は、
+  リクエストソケットに適用されるタイムアウトを秒で保持できます。
+  その時間内にリクエストが受け付けられなければ、
+  :meth:`~SocketServer.BaseServer.handle_timeout` が呼び出され、
+  :meth:`~SocketServer.BaseServer.handle_request` が返されます。
+  (Contributed by Kristján Valur Jónsson; :issue:`6192` and :issue:`6267`.)
+
+* 更新されたモジュール: :mod:`sqlite3` モジュールが
+  `pysqlite package <http://code.google.com/p/pysqlite/>`__ のバージョン
+  2.6.0 にアップデートされました。バージョン 2.6.0 はいくつかのバグ修正を
+  含み、共有ライブラリから SQLite 拡張をロードできるようになりました。
+  拡張を有効にするには ``enable_load_extension(True)`` メソッドを呼び出し、
+  そして特定の共有ライブラリをロードするには ``enable_load_extension(True)`` を
+  呼び出してください。
+  (Updated by Gerhard Häring.)
+
+* :mod:`ssl` モジュールの :class:`~ssl.SSLSocket` オブジェクトは、バッファ API
+  をサポートするようになりました。これは、テストスイートの障害を
+  修正します (fix by Antoine Pitrou; :issue:`7133`)。
+  また、OpenSSL の :c:macro:`SSL_MODE_AUTO_RETRY` を自動的に設定することで、
+  :meth:`recv` 演算によって SSL 再ネゴシエーションを引き起こす
+  エラーコードが返されるのを防ぎます (fix by Antoine Pitrou; :issue:`8222`)。
+
+  :func:`ssl.wrap_socket` コンストラクタ関数は、許可される暗号化アルゴリズムを
+  列挙する文字列である *ciphers* 引数を取るようになりました。
+  この文字列の書式は、 `OpenSSL ドキュメントで
+  <http://www.openssl.org/docs/apps/ciphers.html#CIPHER_LIST_FORMAT>`__.
+  解説されています。
+  (Added by Antoine Pitrou; :issue:`8322`.)
+
+  その他の変更により、拡張はOpenSSL の全ての暗号をロードし、
+  それらすべてが利用できるようアルゴリズムを消化します。SSL 暗号化の中には
+  検証できないものもあり、"unknown algorithm" エラーを報告します。
+  (Reported by Beda Kosata, and fixed by Antoine Pitrou; :issue:`8484`.)
+
+  OpenSSL の、使われるバージョンは、モジュール属性 :data:`ssl.OPENSSL_VERSION`
+  (文字列)、 :data:`ssl.OPENSSL_VERSION_INFO` (5-タプル)、および
+  :data:`ssl.OPENSSL_VERSION_NUMBER` (整数) として利用できるようになりました。
+  (Added by Antoin Pitrou; :issue:`8321`.)
+
+* :mod:`struct` モジュールは、値が特定の整数フォーマットコード
+  (``bBhHiIlLqQ`` のいずれか) に対して大きすぎるときに、
+  オーバーフローエラーを静かに無視しなくなりました。これは必ず
+  :exc:`struct.error` 例外を送出するようになりました。
+  (Changed by Mark Dickinson; :issue:`1523`.)
+  :func:`~struct.pack` 関数は、非整数を変換してパックするのに、
+  :meth:`__int__` メソッドを試したりエラーを報告したりする前に、
+  :meth:`__index__` の使用も試すようになりました。
+  (Changed by Mark Dickinson; :issue:`8300`.)
+
+* 新しい関数: :mod:`subprocess` モジュールの :func:`~subprocess.check_output`
+  は、指定された引数群でコマンドを実行し、コマンドがエラーを起こさずに実行したら
+  コマンドの出力を文字列として返し、そうでなければ
+  :exc:`~subprocess.CalledProcessError` 例外を送出します。
+
+  ::
+
+    >>> subprocess.check_output(['df', '-h', '.'])
+    'Filesystem     Size   Used  Avail Capacity  Mounted on\n
+    /dev/disk0s2    52G    49G   3.0G    94%    /\n'
+
+    >>> subprocess.check_output(['df', '-h', '/bogus'])
+      ...
+    subprocess.CalledProcessError: Command '['df', '-h', '/bogus']' returned non-zero exit status 1
+
+  (Contributed by Gregory P. Smith.)
+
+  :mod:`subprocess` モジュールは、 :const:`EINTR` シグナルを受け取り次第
+  内部システムコールを最施行するようになりました。(Reported by several people;
+  final patch by Gregory P. Smith in :issue:`1068268`.)
+
+* 新しい関数: :mod:`symtable` モジュールの
+  :func:`~symtable.Symbol.is_declared_global` は、明示的に global と宣言された
+  引数には真、暗示的に global である引数には偽を返します。
+  (Contributed by Jeremy Hylton.)
+
+* :mod:`syslog` モジュールは、識別子として、以前デフォルトであった
+  ``'python'`` の値ではなく、 ``sys.argv[0]`` の値を使うようになりました。
+  (Changed by Sean Reifschneider; :issue:`8451`.)
+
+* ``sys.version_info`` の値は、属性名 :attr:`major`, :attr:`minor`,
+  :attr:`micro`, :attr:`releaselevel`, および :attr:`serial` を持つ
+  名前付きタプルになりました。
+
+  :func:`sys.getwindowsversion` もまた、属性名 :attr:`major`, :attr:`minor`,
+  :attr:`build`, :attr:`platform`, :attr:`service_pack`,
+  :attr:`service_pack_major`, :attr:`service_pack_minor`,
+  :attr:`suite_mask`, および :attr:`product_type` を持つ名前付きタプルを
+  返します。(Contributed by Brian Curtin; :issue:`7766`.)
+
+* :mod:`tarfile` モジュールのデフォルトエラー処理が変更され、致命的な
+  エラーを抑制しないようになりました。デフォルトのエラーレベルは
+  以前は 0 で、エラーはメッセージとしてデバッグログに書き込まれるだけでしたが、
+  デバッグログはデフォルトでは活性化されていないため、エラーは
+  顧みられませんでした。デフォルトのエラーレベルは 1 になり、
+  エラーがあれば例外が送出されます。
+  (Changed by Lars Gustäbel; :issue:`7357`.)
+
+  :mod:`tarfile` は、tar ファイルに追加される :class:`~tarfile.TarInfo` 
+  オブジェクトのフィルタリングをサポートするようになりました。
+  :meth:`~tarfile.TarFile.add` を呼び出したとき、オプションの呼び出し
+  可能オブジェクトである *filter* 引数を与えることができます。
+  *filter* オブジェクトには、ファイルが追加される度に :class:`~tarfile.TarInfo` 
+  を渡され、これを変形して返せます。このオブジェクトが ``None`` を返したら、
+  そのファイルは結果のアーカイブから除かれます。これは既存の *exclude*
+  引数より強力で、それゆえこれは非推奨となります。
+  (Added by Lars Gustäbel; :issue:`6856`.)
+  :class:`~tarfile.TarFile` クラスはまた、コンテキストマネージャプロトコル
+  もサポートするようになりました。
+  (Added by Lars Gustäbel; :issue:`7232`.)
+
+* :class:`threading.Event` クラスの :meth:`~threading.Event.wait` メソッドは、
+  終了時に内部フラグを返すようになりました。 :meth:`~threading.Event.wait`
+  は内部フラグが真になるまでブロックすることを想定されているため、この関数は
+  通常真を返すことになります。この戻り値は、タイムアウトが与えられ、
+  オペレーションがタイムアウトした時のみ偽になります。
+  (Contributed by Tim Lesher; :issue:`1674032`.)
+
+* :mod:`unicodedata` モジュールに提供される Unicode データベースは、
+  どの文字が数字や空白文字か、または改行を表すかを決定するために、
+  内部で使われるようになりました。このデータベースはまた、
+  :file:`Unihan.txt` データファイルからの情報も含みます (patch
+  by Anders Chrigström and Amaury Forgeot d'Arc; :issue:`1571184`)。
+  また、バージョン 5.2.0 にアップデートされました (updated by
+  Florent Xicluna; :issue:`8024`)。
+
+* :mod:`urlparse` モジュールの :func:`~urlparse.urlsplit` は、
+  未知の URL スキームを :rfc:`3986` に応じた方法で処理します。
+  URL が ``"<something>://..."`` の形式なら、 ``://`` の前のテキストを、
+  それがモジュールの知らない作り物のスキームであってさえ、
+  スキームとして扱います。
+  この変更は、古い働きを使って動作していたコードを破壊することがあります。
+  例えば、Python 2.6.4 や 2.5 は以下を返します:
+
+    >>> import urlparse
+    >>> urlparse.urlsplit('invented://host/filename?query')
+    ('invented', '', '//host/filename?query', '', '')
+
+  Python 2.7 (や Python 2.6.5) は以下を返します:
+
+    >>> import urlparse
+    >>> urlparse.urlsplit('invented://host/filename?query')
+    ('invented', 'host', '/filename?query', '', '')
+
+  (Python 2.7 では、これは普通のタプルではなく名前付きタプルを返すので、
+  実際は微妙に異なる出力をします。)
+
+  :mod:`urlparse` モジュールは、 :rfc:`2732` で定義された IPv6
+  リテラルアドレスもサポートします
+  (contributed by Senthil Kumaran; :issue:`2987`)。::
+
+    >>> urlparse.urlparse('http://[1080::8:800:200C:417A]/foo')
+    ParseResult(scheme='http', netloc='[1080::8:800:200C:417A]',
+                path='/foo', params='', query='', fragment='')
+
+* 新しいクラス: :mod:`weakref` モジュールの :class:`~weakref.WeakSet`
+  クラスは、その要素の弱参照だけを保持する集合です。
+  要素は、それを指す参照がなくなり次第除去されます。
+  (Originally implemented in Python 3.x by Raymond Hettinger, and backported
+  to 2.7 by Michael Foord.)
+
+* エレメントツリーライブラリ、 :mod:`xml.etree` は、
+  (``<?xml-stylesheet href="#style1"?>`` のような) 命令や
+  (``<!-- comment -->`` のような) コメントを
+  処理する XML を出力するとき、アンパサンドや
+  山括弧をエスケープしなくなりました。
+  (Patch by Neil Muller; :issue:`2746`.)
+
+* :mod:`xmlrpclib` と :mod:`SimpleXMLRPCServer` によって提供される
+  XML-RPC クライアントおよびサーバは、HTTP/1.1 keep-alive をサポートし、
+  場合によっては gzip エンコーディングを使って XML の送受を圧縮することで、
+  パフォーマンスが向上しました。gzip 圧縮は
+  :class:`SimpleXMLRPCRequestHandler` の :attr:`encode_threshold` 属性に
+  よって制御されます。これはバイト数で、これより大きな応答は圧縮されます。
+  (Contributed by Kristján Valur Jónsson; :issue:`6267`.)
+
+* :mod:`zipfile` モジュールの :class:`~zipfile.ZipFile` は、コンテキスト
+  マネジメントプロトコルをサポートし、 ``with zipfile.ZipFile(...) as f:``
+  と書けるようになりました。
+  (Contributed by Brian Curtin; :issue:`5511`.)
+
+  :mod:`zipfile` は、空のディレクトリのアーカイブ化をサポートするようになり、
+  これを正しく解凍します。(Fixed by Kuba Wieczorek; :issue:`4710`.)
+  アーカイブ内のファイルの読み込みが速くなり、 :meth:`~zipfile.ZipFile.read`
+  および :meth:`~zipfile.ZipFile.readline` の割り込みが正しく働くように
+  なりました。(Fixed by Kuba Wieczorek; :issue:`4710`.)
+
+  :func:`~zipfile.is_zipfile` 関数は、以前受け付けられていたパス名に加え、
+  ファイルオブジェクトも受け付けるようになりました。
+  (Contributed by Gabriel Genellina; :issue:`4756`.)
+
+  :meth:`~zipfile.ZipFile.writestr` メソッドは、 :class:`~zipfile.ZipFile`
+  コンストラクタで指定されたデフォルトの圧縮メソッドをオーバライドする、
+  オプションの *compress_type* パラメタを追加しました。
+  (Contributed by Ronald Oussoren; :issue:`6003`.)
+
+
+.. ======================================================================
+.. whole new modules get described in subsections here
+
+
+.. _importlib-section:
+
+新しいモジュール: importlib
+------------------------------
+
+Python 3.1 は、根底の Python の :keyword:`import` 文のロジックの
+最実装である :mod:`importlib` パッケージを含みます。
+:mod:`importlib` は、Python インタプリタの実装者や、import プロセスに関与する
+新しいインポータを書きたいと願うユーザにとって便利です。
+Python 2.7 は :mod:`importlib` パッケージを完全には含みませんが、
+代わりに 1 つの関数 :func:`~importlib.import_module` を含む小さな
+サブセットがあります。
+
+``import_module(name, package=None)`` はモジュールを import します。
+*name* はモジュールまたはパッケージの名前を含む文字列です。
+``..utils.errors`` のように ``.`` 文字で始まる文字列を与えることで、
+相対 import も可能です。相対 import では、 *package* 引数は必ず
+与えられなければならず、相対 import のアンカーとして使われるパッケージの
+名前でなければなりません。 :func:`~importlib.import_module` は、
+import されたモジュールを ``sys.modules`` に挿入し、モジュールオブジェクトを
+返すこともします。
+
+ここに例があります::
+
+    >>> from importlib import import_module
+    >>> anydbm = import_module('anydbm')  # Standard absolute import
+    >>> anydbm
+    <module 'anydbm' from '/p/python/Lib/anydbm.py'>
+    >>> # Relative import
+    >>> file_util = import_module('..file_util', 'distutils.command')
+    >>> file_util
+    <module 'distutils.file_util' from '/python/Lib/distutils/file_util.pyc'>
+
+:mod:`importlib` は、Brett Cannon によって実装され、 Python 3.1 に
+導入されました。
+
+
+新しいモジュール: sysconfig
+---------------------------------
+
+:mod:`sysconfig` モジュールが Distutils パッケージから引き抜かれ、
+新しいトップレベルモジュールになりました。
+:mod:`sysconfig` は、Python のビルドプロセスについての以下の情報を得るための
+関数群を提供しています。コンパイラスイッチ、インストレーションパス、
+プラットフォーム名、そして Python がソースディレクトリから
+実行されているかどうかです。
+
+モジュールの関数のいくつかを紹介すると:
+
+* :func:`~sysconfig.get_config_var` は、Python の Makefile と
+  :file:`pyconfig.h` ファイルから変数を返します。
+* :func:`~sysconfig.get_config_vars` は、すべての環境設定変数を含む辞書を
+  返します。
+* :func:`~sysconfig.get_path` は、特定のタイプのモジュール、つまり
+  標準ライブラリ、サイト特有のモジュール、プラットフォーム特有の
+  ライブフラリなど、への設定されたパスを返します。
+* :func:`~sysconfig.is_python_build` は、Python ソースツリーからバイナリを
+  起動していれば真を、そうでなければ偽を返します。
+
+詳細と関数の完全な一覧は :mod:`sysconfig` ドキュメントを参照してください。
+
+Distutils パッケージと :mod:`sysconfig` は Tarek Ziadé によって
+メンテナンスされていて、彼は Distutils の新世代版を開発するために
+Distutils2 パッケージ (source repository at http://hg.python.org/distutils2/)
+も開始しました。
+
+
+ttk: Tk のテーマ付きウィジェット
+--------------------------------
+
+Tcl/Tk 8.5 は、基本的な Tk ウィジェットを最実装しながらより自由な外観の
+カスタマイズが広がり、よりネイティブなプラットフォームのウィジェットに似た
+テーマ付きウィジェット群を含みます。このウィジェット群は、
+元は Tile と呼ばれていましたが、Tcl/Tck リリース 8.5 への追加の際に
+("themed Tk" を略して) Ttk に改名されました。
+
+詳しく知るには、 :mod:`ttk` モジュールのドキュメントをお読みください。
+http://www.tcl.tk/man/tcl8.5/TkCmd/ttk_intro.htm にある、Ttk テーマエンジンを
+解説した Tcl/Tk マニュアルページを読むのもいいでしょう。
+Python/Ttk コードを動かしているスクリーンショットは
+http://code.google.com/p/python-ttk/wiki/Screenshots にあります。
+
+:mod:`ttk` モジュールは Guilherme Polo によって書かれ、 :issue:`2983` に
+追加されました。 ``Tile.py`` と呼ばれる別バージョン ``Tile.py`` は、
+Martin Franklin によって書かれ、Kevin Walzer によってメンテナンス
+されているもので、組み込みが :issue:`2618` で提案されましたが、
+著者は Guilherme Polo の作品のほうがより包括的であると主張しました。
+
+
+.. _unittest-section:
+
+更新されたモジュール: unittest
+---------------------------------
+
+:mod:`unittest` モジュールが大幅に改善されました。
+多くの新機能が追加されました。それらの機能のほとんどは、特に注釈のない限り、
+Michael Foord によって実装されました。このモジュールの改善された版は、
+Python バージョン 2.4 から 2.6 で使うために、
+http://pypi.python.org/pypi/unittest2 から :mod:`unittest2` パッケージとして
+別にダウンロードできます。
+
+コマンドラインから使われるとき、このモジュールはテストを自動的に発見します。
+これは `py.test <http://pytest.org>`__ や
+`nose <http://code.google.com/p/python-nose/>`__ ほど派手ではありませんが、
+テストをパッケージディレクトリに保持されたテストを簡潔に実行する方法を
+提供します。例えば、以下のコマンドは :file:`test/` サブディレクトリから
+``test*.py`` という名前の import できるテストファイル検索します::
+
+   python -m unittest discover -s test
+
+詳細は、 :mod:`unittest` モジュールのドキュメントを参照してください。
+(Developed in :issue:`6001`.)
+
+:func:`~unittest.main` 関数は、その他幾つかの新しいオプションを提供します:
+
+* :option:`-b` や :option:`--buffer` は、標準出力や標準エラーストリームを
+  それぞれのテストの間バッファに入れます。テストが通れば、
+  結果の出力は全て捨てられます。失敗したら、バッファに入れられた
+  出力が表示されます。
+
+* :option:`-c` や :option:`--catch` は、control-C による中断をより
+  上品にします。テストプロセスを即座に中断するのではなく、現在実行中のテストは
+  完了させ、中断までの部分的な結果は報告されます。
+  待ちきれなければ、control-C をもう一度押せば、即座に中断されます。
+
+  この control-C ハンドラは、コードがテストされているときや、実行されている
+  テストが独自のシグナルハンドラを定義したとき、シグナルハンドラがすでに
+  設定されていてそして呼び出されたということを知らせることで、
+  問題を起こさないようにします。これがまずいなら、
+  :func:`~unittest.removeHandler` デコレータを使って、テストが control-C
+  ハンドリングを無効にするべきであると示せます。
+
+* :option:`-f` や :option:`--failfast` は、テストが失敗したとき、
+  他のテストを続けるのではなく、テストの実行を即座に停止します。
+  (Suggested by Cliff Dyer and implemented by Michael Foord; :issue:`8074`.)
+
+進捗メッセージは、verbose モードで実行したとき、期待された失敗に 'x' を、
+期待されない成功に 'u' を表示するようになりました。
+(Contributed by Benjamin Peterson.)
+
+テストケースは、テストをスキップするために :exc:`~unittest.SkipTest`
+例外を送出します。(:issue:`1034053`).
+
+:meth:`~unittest.TestCase.assertEqual`, :meth:`~unittest.TestCase.assertTrue`,
+および :meth:`~unittest.TestCase.assertFalse` 失敗のメッセージは、
+提供する情報量が増えました。 :class:`~unittest.TestCase` クラスの
+:attr:`~unittest.TestCase.longMessage` 属性を True に設定すると、
+失敗時に、標準のエラーメッセージと追加して提供したメッセージの両方が
+表示されます。(Added by Michael Foord; :issue:`5663`.)
+
+:meth:`~unittest.TestCase.assertRaises` メソッドは、実行する
+呼び出し可能オブジェクトを与えずに呼び出されたとき、コンテキストハンドラを
+返すようになりました。例えば、こう書くことができます::
+
+  with self.assertRaises(KeyError):
+      {}['foo']
+
+(Implemented by Antoine Pitrou; :issue:`4444`.)
+
+.. rev 78774
+
+モジュールレベルおよびクラスレベルの設定と、ティアダウンフィクスチャが
+サポートされました。モジュールは、 :func:`~unittest.setUpModule` および
+:func:`~unittest.tearDownModule` 関数を含むことができます。クラスは
+:meth:`~unittest.TestCase.setUpClass` および
+:meth:`~unittest.TestCase.tearDownClass` メソッドを含むことができ、
+これらは (``@classmethod`` や透過なものを使って) クラスメソッドとして
+定義しなければなりません。これらの関数とメソッドは、テストランナーが別の
+モジュールやクラスのテストケースに切り替えるときに呼び出されます。
+
+メソッド :meth:`~unittest.TestCase.addCleanup` および
+:meth:`~unittest.TestCase.doCleanups` が追加されました。
+:meth:`~unittest.TestCase.addCleanup` で、無条件に呼び出される
+クリーンアップ関数を (:meth:`~unittest.TestCase.setUp` が失敗したら
+:meth:`~unittest.TestCase.setUp` の後に、そうでなければ
+:meth:`~unittest.TestCase.tearDown` の後に) 追加できるようにします。
+これにより、テスト中のリソースの配置と開放が簡潔になります。(:issue:`5679`).
+
+
+より特化したテストを提供するメソッドがいくつか追加されました。
+これらのメソッドの多くは、Google のエンジニアたちによって
+そのテストスイートのために書かれました。Gregory P. Smith, Michael Foord, and
+GvR が、これを :mod:`unittest` の Python 版にマージしました。
+
+* :meth:`~unittest.TestCase.assertIsNone` および
+  :meth:`~unittest.TestCase.assertIsNotNone` はひとつの式を取り、その結果が
+  ``NONE`` であるか、またはないかを確かめます。
+
+* :meth:`~unittest.TestCase.assertIs` および
+  :meth:`~unittest.TestCase.assertIsNot` は、2 つの値を取り、
+  その評価が同一のオブジェクトであるか、またはないかを確かめます。
+  (Added by Michael Foord; :issue:`2578`.)
+
+* :meth:`~unittest.TestCase.assertIsInstance` および
+  :meth:`~unittest.TestCase.assertNotIsInstance` は、結果のオブジェクトが
+  特定のクラス、またはタプルにあるクラスのいずれかのインスタンスであるかを
+  調べます。(Added by Georg Brandl; :issue:`7031`.)
+
+* :meth:`~unittest.TestCase.assertGreater`, :meth:`~unittest.TestCase.assertGreaterEqual`,
+  :meth:`~unittest.TestCase.assertLess`, および
+  :meth:`~unittest.TestCase.assertLessEqual` は、二つの量を比較します。
+
+* :meth:`~unittest.TestCase.assertMultiLineEqual` は 2 つの文字列を比較し、
+  等しくなければ、2 文字列の差分をハイライトする有益な比較を表示します。
+  この比較は、Unicode 文字列が :meth:`~unittest.TestCase.assertEqual`
+  で比較されるときのデフォルトに使われるようになりました。
+
+* :meth:`~unittest.TestCase.assertRegexpMatches` および
+  :meth:`~unittest.TestCase.assertNotRegexpMatches` は、第一引数が
+  第二引数として与えられた正規表現にマッチする、またはしない文字列で
+  あるかどうかを調べます。
+
+* :meth:`~unittest.TestCase.assertRaisesRegexp` は、特定の式が送出されるかを
+  調べ、そしてまたその式の文字列表現が与えられた正規表現にマッチするかを
+  調べます。
+
+* :meth:`~unittest.TestCase.assertIn` および :meth:`~unittest.TestCase.assertNotIn`
+  は、 *first* が *second* に属するか、または属さないかを調べます。
+
+* :meth:`~unittest.TestCase.assertItemsEqual` は、2 つの与えられたシーケンスが
+  同じ要素を含むかを調べます。
+
+* :meth:`~unittest.TestCase.assertSetEqual` は、2 つの集合が等しいか比較し、
+  エラーの場合のみ、集合間の差分を報告します。
+
+* 同様に、 :meth:`~unittest.TestCase.assertListEqual` および :meth:`~unittest.TestCase.assertTupleEqual`
+  は、指定された型を比較し、差分を説明しますが、完全な値を表示するとは
+  かぎりません。これらのメソッドは、リストやタプルを
+  :meth:`~unittest.TestCase.assertEqual` で比較するときにデフォルトで
+  使われるようになりました。より一般的には、
+  :meth:`~unittest.TestCase.assertSequenceEqual` は 2 つのシーケンスを比較し、
+  必要なら両方のシーケンスが特定の型であるかを調べます。
+
+* :meth:`~unittest.TestCase.assertDictEqual` は、二つの辞書を比較し、
+  差分を報告します。これは、辞書を :meth:`~unittest.TestCase.assertEqual`
+  で比較するときにデフォルトで使われるようになりました。
+  :meth:`~unittest.TestCase.assertDictContainsSubset` は、
+  *first* に属するキー/値の対の全てが *second* に現れるかを調べます。
+
+* :meth:`~unittest.TestCase.assertAlmostEqual` および
+  :meth:`~unittest.TestCase.assertNotAlmostEqual` は、 *first* と *second*
+  がほぼ等しいかを判定します。このメソッドは、オプションで指定された
+  *places* (デフォルトは 7) の数に差を丸めてそれをゼロと比べるか、
+  差が与えられた *delta* の値より小さいことを要求します。
+
+* :meth:`~unittest.TestLoader.loadTestsFromName` は、
+  :class:`~unittest.TestLoader` の :attr:`~unittest.TestLoader.suiteClass`
+  属性を適切に受け入れます。(Fixed by Mark Roddy; :issue:`6866`.)
+
+* 新しいフックにより、 :meth:`~unittest.TestCase.assertEqual` メソッドを
+  拡張して新しいデータ型を扱わせられます。
+  :meth:`~unittest.TestCase.addTypeEqualityFunc` メソッドは型オブジェクトと
+  関数を取ります。この関数は、比較される両方のオブジェクトが特定の型である
+  ときに使われます。この関数は、2 つのオブジェクトを比較し、
+  マッチしなければ例外を送出するべきです。この関数が、新しい
+  シーケンス比較メソッドがするように、2 つのオブジェクトが
+  なぜマッチしないのかについて追加の情報を提供するのがいいアイデアです。
+
+:func:`unittest.main` はオプションの ``exit`` 引数を取るようになりました。
+False なら、 :func:`~unittest.main` は :func:`sys.exit` を呼び出さず、
+これにより対話型インタプリタから :func:`~unittest.main` が使えるようになります。
+(Contributed by J. Pablo Fernández; :issue:`3379`.)
+
+:class:`~unittest.TestResult` に、テストランの直前と直後に呼び出される
+:meth:`~unittest.TestResult.startTestRun` および
+:meth:`~unittest.TestResult.stopTestRun` が追加されました。
+(Contributed by Robert Collins; :issue:`5728`.)
+
+これら一連の変更により、 :file:`unittest.py` は無様に大きくなったので、
+モジュールはパッケージとなり、コードは複数のファイルに分割されました
+(by Benjamin Peterson)。これは、モジュールをインポートして使う方法には
+影響しません。
+
+.. seealso::
+
+  http://www.voidspace.org.uk/python/articles/unittest2.shtml
+    Describes the new features, how to use them, and the
+    rationale for various design decisions.  (By Michael Foord.)
+
+.. _elementtree-section:
+
+更新されたモジュール: ElementTree 1.3
+--------------------------------------
+
+Python に同梱される ElementTree ライブラリのバージョンが、
+バージョン 1.3 にアップデートされました。新機能の一部は:
+
+* 様々な解析関数が、使われる :class:`XMLParser` インスタンスを与える
+  *parser* キーワード引数を取るようになりました。これにより、
+  ファイルの内部エンコーディングをオーバーライドできるようになりました::
+
+    p = ET.XMLParser(encoding='utf-8')
+    t = ET.XML("""<root/>""", parser=p)
+
+  XML を解析するときのエラーは、 :exc:`ParseError` 例外を送出するように
+  なりました。この例外のインスタンスは、問題の位置を与える (*line*, *column*)
+  タプルを含む :attr:`position` 属性を持ちます。
+
+* ツリーを文字列に変換する ElementTree のコードが大幅に改善され、
+  多くの場合でおおよそ 2 倍速くなりました。 :class:`ElementTree` :meth:`write`
+  および :class:`Element` :meth:`write` メソッドは、 *method* パラメタを
+  追加し、これは "xml" (デフォルト), "html", または "text" にできます。
+  HTML モードは、空の要素を ``<empty/>`` ではなく ``<empty></empty>`` として
+  出力し、text モードは要素を無視し、テキストのチャンクのみ出力します。
+  要素の :attr:`tag` 属性を ``None`` に設定してその子はそのままにすると、
+  ツリーが書き出されるとき、その要素は省かれるので、それ以上再編成することなく
+  要素を一つ取り除けます。
+
+  名前空間の操作も改善されました。すべての ``xmlns:<whatever>`` 宣言は、
+  結果の XML に散らばるのではなく、ルート要素に出力されます。
+  :attr:`default_namespace` 属性を設定することでデフォルトの名前空間を
+  設定でき、 :meth:`register_namespace` で新しい接頭辞を登録できます。
+  XML モードでは、XML 宣言を抑制するために真/偽の *xml_declaration*
+  パラメタを使えます。
+
+* 新しい :class:`Element` メソッド: :meth:`extend` はシーケンスから項目の子に
+  要素を追加します。要素それ自体はシーケンスのように振る舞うので、
+  子をある要素から別の要素に移すのが簡単です::
+
+    from xml.etree import ElementTree as ET
+
+    t = ET.XML("""<list>
+      <item>1</item> <item>2</item>  <item>3</item>
+    </list>""")
+    new = ET.XML('<root/>')
+    new.extend(t)
+
+    # Outputs <root><item>1</item>...</root>
+    print ET.tostring(new)
+
+* 新しい :class:`Element` メソッド: :meth:`iter` は、要素の子をジェネレータ
+  として与えます。また、 ``for child in elem:`` と書いて要素の子に渡って
+  ループできます。既存のメソッド :meth:`getiterator` と、
+  子のリストを構成して返す :meth:`getchildren` は、非推奨になりました。
+
+* 新しい :class:`Element` メソッド: :meth:`itertext` は、その要素の
+  子孫であるテキストのチャンクを全て与えます。例えば::
+
+    t = ET.XML("""<list>
+      <item>1</item> <item>2</item>  <item>3</item>
+    </list>""")
+
+    # Outputs ['\n  ', '1', ' ', '2', '  ', '3', '\n']
+    print list(t.itertext())
+
+* 非推奨: 要素をブール値として使う (すなわち、 ``if elem:``) と、
+  要素が子を持てば真を、子を持たなければ偽を返します。
+  この振る舞いは紛らわしいです -- ですから、 :exc:`FutureWarning` を
+  引き起こすようになりました。コードでは、明示するべきです。
+  子の数に興味があるなら ``len(elem) != 0`` と、または ``elem is not None``
+  と書いてください。
+
+Fredrik Lundh は ElementTree を開発し、1.3 バージョンを作成しました。
+1.3 を解説した彼の記事を
+http://effbot.org/zone/elementtree-13-intro.htm で読めます。
+Florent Xicluna は、python-dev および :issue:`6472` での議論の後、
+Python に含まれるバージョンをアップデートしました。
+
+.. ======================================================================
+
+
+ビルドと C API の変更
+=======================
+
+パイソンのビルド過程と C API に以下のような変更がなされました:
+
+* GNU デバッガ、GDB 7、の最新のリリースは `Python を使って書けます
+  <http://sourceware.org/gdb/current/onlinedocs/gdb/Python.html>`__
+  実行可能なプログラム P のデバッグを始めるとき、GDB は ``P-gdb.py`` という
+  名前のファイルをロックし、それを自動的に読み込みます。Dave Malcolm は
+  Python 自体をデバッグするときに便利ないくつかのコマンドを加える
+  :file:`python-gdb.py` に貢献しました。例えば、 ``py-up`` および
+  ``py-down`` は、通常いくつかの C スタックフレームに対応する、
+  Python のスタックフレームを上がったり下がったりします。
+  ``py-print`` は、Python 変数の値を表示し、 ``py-bt`` は、
+  Python スタックトレースを表示します。(Added as a result of :issue:`8032`.)
+
+* Python に備え付けの :file:`.gdbinit` ファイルを使うと、デバッグされている
+  スレッドが GIL をほじしていないとき、2.7 バージョンの
+  "pyo" マクロが正常に動くようになりました。このマクロは、表示の前にこれを
+  取得するようになりました。
+  (Contributed by Victor Stinner; :issue:`3632`.)
+
+* :c:func:`Py_AddPendingCall` はスレッドセーフになり、
+  ワーカスレッドがメイン Python スレッドに通知を投入することが
+  できるようになりました。これは特に、非同時性の IO 処理に便利です。
+  (Contributed by Kristján Valur Jónsson; :issue:`4293`.)
+
+* 新しい関数: :c:func:`PyCode_NewEmpty` は、空のコードオブジェクトを
+  生成します。要求されるのは、ファイル名、関数名、そして最初の行番号だけです。
+  これは、より便利なトレースバックスタックを構成しようとする
+  拡張モジュールに便利です。以前は、このような拡張はより多くの引数を必要とする
+  :c:func:`PyCode_New` を呼び出す必要がありました。(Added by Jeffrey Yasskin.)
+
+* 新しい関数: :c:func:`PyErr_NewExceptionWithDoc` は、
+  既存の :c:func:`PyErr_NewException` と同じように新しい例外クラスを
+  生成しますが、新しい例外クラスの docstring を含む、追加の ``char *`` 引数を
+  取ります。(Added by 'lekma' on the Python bug tracker; :issue:`7033`.)
+
+* 新しい関数: :c:func:`PyFrame_GetLineNumber` はフレームオブジェクトを取り、
+  そのフレームが現在実行している行番号を返します。以前は、コードは
+  現在実行しているバイトコード命令のインデクスを得て、
+  それからそのアドレスに対応する行番号を探索する必要がありました。
+  (Added by Jeffrey Yasskin.)
+
+* 新しい関数: :c:func:`PyLong_AsLongAndOverflow` および
+  :c:func:`PyLong_AsLongLongAndOverflow` は、C の :c:type:`long` や
+  :c:type:`long long` のような Python の長整数に近いです。
+  この数が出力型に適合するには大きすぎるなら、 *overflow* フラグが設定され、
+  呼び出し元に返されます。
+  (Contributed by Case Van Horsen; :issue:`7528` and :issue:`7767`.)
+
+* 新しい関数: 文字列から浮動小数点数への変換から由来する、新しい
+  :c:func:`PyOS_string_to_double` 関数が追加されました。
+  古い :c:func:`PyOS_ascii_strtod` および :c:func:`PyOS_ascii_atof` は、
+  非推奨となりました。
+
+* 新しい関数: :c:func:`PySys_SetArgvEx` は、 ``sys.argv`` の値を設定し、
+  *updatepath* に依ってオプションで ``sys.path`` を更新して
+  ``sys.argv[0]`` で指名されたスクリプトを含むディレクトリを
+  含めることができます。
+
+  この関数は、Python を埋め込んだアプリケーションのセキュリティホールを
+  塞ぐために追加されました。古い関数 :c:func:`PySys_SetArgv` は、必ず
+  ``sys.path`` を更新し、これはカレントディレクトリを追加することがあります。
+  これにより、Python を埋め込んだアプリケーションを別の誰かが制御する
+  ディレクトリで実行すると、攻撃者がディレクトリにトロイの木馬モジュール
+  (例えば、 :file:`os.py` という名前のファイル) を仕込み、インポートさせ
+  実行させる事ができました。
+
+  Python を埋め込んだアプリケーションを保守しているなら、
+  :c:func:`PySys_SetArgv` を呼び出していないか調べ、 *updatepath* を偽に設定した
+  :c:func:`PySys_SetArgvEx` を使うべきかよく考えてください。
+
+  :issue:`5753` で `CVE-2008-5983
+  <http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2008-5983>`_
+  として報告され、Antoine Pitrou によって修正されたたセキュリティ問題です。
+
+* 新しいマクロ: Python ヘッダファイルは、以下のマクロを定義しました:
+  :c:macro:`Py_ISALNUM`,
+  :c:macro:`Py_ISALPHA`,
+  :c:macro:`Py_ISDIGIT`,
+  :c:macro:`Py_ISLOWER`,
+  :c:macro:`Py_ISSPACE`,
+  :c:macro:`Py_ISUPPER`,
+  :c:macro:`Py_ISXDIGIT`,
+  :c:macro:`Py_TOLOWER`, および :c:macro:`Py_TOUPPER` 。
+  これらすべての関数は、文字を分類する C の標準マクロと類似ですが、
+  Python は文字をロケールに依らず文字を分析したいときがあるため、
+  現在のロケール設定を無視します。(Added by Eric Smith; :issue:`5793`.)
+
+  .. XXX these macros don't seem to be described in the c-api docs.
+
+* 取り除かれた関数: :c:macro:`PyEval_CallObject` は、マクロとしてのみ
+  利用できるようになりました。関数版は、ABI リンク互換性を保つために
+  残されましたが、それは 1997 年のことです。今となっては削除するべきです。
+  (Removed by Antoine Pitrou; :issue:`8276`.)
+
+* 新しいフォーマットコード: :c:func:`PyFormat_FromString`,
+  :c:func:`PyFormat_FromStringV`, および :c:func:`PyErr_Format` 関数は、
+  C の :c:type:`long long` 型を表示する ``%lld`` および ``%llu`` フォーマットを
+  受け付けるようになりました。
+  (Contributed by Mark Dickinson; :issue:`7228`.)
+
+* スレッドとプロセスのフォークの間の複雑な相互関係が変更されました。
+  以前は、 :func:`os.fork` によって生成された子プロセスは失敗していました。
+  これは、子は動作しているスレッド 1 つだけで生成され、そのスレッドが
+  :func:`os.fork` を処理するからです。他のスレッドが、Python の
+  インポートロックのような、ロックを保持していたら、
+  フォークが実行されたとき、ロックは新しいプロセスでも "held" として
+  マークされたままです。しかし、子プロセスでは、他のスレッドは
+  複製されないため、ロックを開放するものは何もないので、
+  子プロセスは import の実行を続けることができません。
+
+  Python 2.7 は、 :func:`os.fork` を実行する前に import ロックを取得し、また
+  :mod:`threading` モジュールを使って生成された全てのロックをクリーンアップ
+  します。内部ロックを持っていたり、自身で :c:func:`fork()` を呼び出したりする
+  ような C 拡張モジュールは、このクリーンアップの恩恵を受けません。
+
+  (Fixed by Thomas Wouters; :issue:`1590864`.)
+
+* :c:func:`Py_Finalize` 関数は、内部の :func:`threading._shutdown`
+  関数を呼び出します。これにより、インタプリタがシャトダウンするときに
+  送出が防がれる例外があります。
+  (Patch by Adam Olsen; :issue:`1722344`.)
+
+* :c:type:`PyMemberDef` 構造を使って型の属性を定義するとき、それ以上
+  :const:`T_STRING_INPLACE` 属性を削除または設定できなくなります。
+
+  .. rev 79644
+
+* :mod:`ctypes` によって定義されたグローバルシンボルには、 ``Py`` または
+  ``_ctypes`` が接頭されるようになりました。(Implemented by Thomas
+  Heller; :issue:`3102`.)
+
+* 新しい設定オプション: :option:`--with-system-expat` スイッチにより、
+  :mod:`pyexpat` モジュールをビルドして、システム Expat ライブラリを
+  使えます。
+  (Contributed by Arfrever Frehtes Taifersar Arahesis; :issue:`7609`.)
+
+* 新しい設定オプション: :option:`--with-valgrind` オプションは、
+  Valgrind メモリエラー検出器が正しく分析するのが難しい pymalloc アロケータを
+  無効にするようになりました。
+  ですから Valgrind は、メモリリークやオーバーランをより検出できます。
+  (Contributed by James Henstridge; :issue:`2422`.)
+
+* 新しい設定オプション: :option:`--with-dbmliborder=` に空の文字列を与えて
+  様々な DBM モジュールを全て無効にできます。
+  (Added by Arfrever Frehtes Taifersar Arahesis; :issue:`6491`.)
+
+* :program:`configure` スクリプトは、ある種の 32-bit Intel チップ上の
+  浮動小数点丸めバグを調べ、 :c:macro:`X87_DOUBLE_ROUNDING` プリプロセッサ定義を
+  定義します。現在この定義を使うコードはありませんが、使うことを望む人が
+  いたら使えます。(Added by Mark Dickinson; :issue:`2937`.)
+
+  :program:`configure` はまた、C++ リンクをサポートする
+  :envvar:`LDCXXSHARED` Makefile を設定するようになりました。
+  (Contributed by Arfrever Frehtes Taifersar Arahesis; :issue:`1222585`.)
+
+* ビルドプロセスは、pkg-config サポートに必要なファイルを
+  生成するようになりました。(Contributed by Clinton Roy; :issue:`3585`.)
+
+* ビルドプロセスは、Subversion 1.7 をサポートするようになりました。
+  (Contributed by Arfrever Frehtes Taifersar Arahesis; :issue:`6094`.)
+
+
+.. _whatsnew27-capsules:
+
+カプセル
+-------------------
+
+Python 3.1 は、拡張モジュールに C API を提供する新しい C データ型
+:c:type:`PyCapsule` を追加しました。カプセルは、本質的には C の ``void *``
+ポインタのホルダであり、モジュール属性として利用できるようになります。
+例えば、 :mod:`socket` モジュールの API は ``socket.CAPI`` として
+公開されていて、 :mod:`unicodedata` は ``ucnhash_CAPI`` を公開しています。
+その他の拡張はモジュールを import し、辞書にアクセスして
+カプセルオブジェクトを取得し、そしてモジュールの様々な API 関数へのポインタの
+配列を指す ``void *`` ポインタを取得できます。
+
+これに使われる既存のデータ型 :c:type:`PyCObject` がありますが、これは
+型安全性を提供しません。pure Python で書かれた邪悪なコードは、
+:c:type:`PyCObject` をモジュール A から取り、どうにかしてそれをモジュール B の
+:c:type:`PyCObject` で代えることで、セグメンテーション違反を起こし得ます。
+カプセルは自身の名前を知っていて、ポインタを得るには名前を
+提供しなければなりません::
+
+   void *vtable;
+
+   if (!PyCapsule_IsValid(capsule, "mymodule.CAPI") {
+           PyErr_SetString(PyExc_ValueError, "argument type invalid");
+           return NULL;
+   }
+
+   vtable = PyCapsule_GetPointer(capsule, "mymodule.CAPI");
+
+``vtable`` が期待どおりのものを指すことが保証されます。
+異なるカプセルが渡されたら、 :c:func:`PyCapsule_IsValid` は不適合な
+名前を検知し、偽を返します。これらのオブジェクトの使用について、
+より詳しい情報は、 :ref:`using-capsules` を参照してください。
+
+Python 2.7 は、様々な拡張モジュール API を提供するためにカプセルを
+内部的に使うようになりましたが、カプセルを処理するために
+:c:func:`PyCObject_AsVoidPtr` が変更され、 :c:type:`CObject` インタフェースとの
+コンパイル時互換性は保たれます。 :c:func:`PyCObject_AsVoidPtr` を使うと
+:exc:`PendingDeprecationWarning` が合図されますが、デフォルトでは
+言及されません。
+
+Implemented in Python 3.1 and backported to 2.7 by Larry Hastings;
+discussed in :issue:`5630`.
+
+
+.. ======================================================================
+
+ポート特有の変更: Windows
+-----------------------------------
+
+* :mod:`msvcrt` モジュールは、 :file:`crtassem.h` からのいくつかの定数を
+  追加しました。
+  :data:`CRT_ASSEMBLY_VERSION`,
+  :data:`VC_ASSEMBLY_PUBLICKEYTOKEN`,
+  および :data:`LIBRARIES_ASSEMBLY_NAME_PREFIX`.
+  (Contributed by David Cournapeau; :issue:`4365`.)
+
+* レジストリへのアクセスのための :mod:`_winreg` モジュールは、
+  以前サポートされていた関数群の引数を増やした拡張版である
+  :func:`~_winreg.CreateKeyEx` および :func:`~_winreg.DeleteKeyEx` を
+  実装しました。 :func:`~_winreg.DisableReflectionKey`,
+  :func:`~_winreg.EnableReflectionKey`, および
+  :func:`~_winreg.QueryReflectionKey` もテストされ、ドキュメント化されました。
+  (Implemented by Brian Curtin: :issue:`7347`.)
+
+* 新しい :c:func:`_beginthreadex` API がスレッドの開始に使われ、
+  ネイティブのスレッドローカルストレージ間数が使われるようになりました。
+  (Contributed by Kristján Valur Jónsson; :issue:`3582`.)
+
+* :func:`os.kill` 関数が Windows で働くようになりました。このシグナル値は
+  定数 :const:`CTRL_C_EVENT`, :const:`CTRL_BREAK_EVENT`, その他の整数に
+  できます。最初の 2 定数は Control-C および Control-Break 打鍵イベントを
+  サブプロセスに送ります。その他の値は、 :c:func:`TerminateProcess` API を
+  使います。(Contributed by Miki Tebeka; :issue:`1220212`.)
+
+* :func:`os.listdir` 関数は、空のパスに対してちゃんと失敗するようになりました。
+  (Fixed by Hirokazu Yamamoto; :issue:`5913`.)
+
+* :mod:`mimelib` モジュールは、初期化の際に Windows レジストリから
+  MIME データベースを正しく読みこむようになりました。
+  (Patch by Gabriel Genellina; :issue:`4969`.)
+
+.. ======================================================================
+
+ポート特有の変更: Mac OS X
+-----------------------------------
+
+* 追加されたパッケージを、システムインストレーションとユーザがインストールした
+  同じバージョンのコピーで共有するために、 ``sys.path`` に
+  ``/Library/Python/2.7/site-packages`` が追加されました。
+  (Changed by Ronald Oussoren; :issue:`4865`.)
+
+ポート特有の変更: FreeBSD
+-----------------------------------
+
+* FreeBSD 7.1 の、他のルーティングテーブルを選択するための
+  :func:`~socket.getsockopt`/:func:`~socket.setsockopt` で使われている
+  :const:`SO_SETFIB` 定数が、 :mod:`socket` モジュールで使えるように
+  なりました。(Added by Kyle VanderBeek; :issue:`8235`.)
+
+その他の変更と修正
+=======================
+
+* ベンチマークスクリプトの 2 つ、 :file:`iobench` および :file:`ccbench`, が
+  :file:`Tools` ディレクトリに追加されました。 :file:`iobench` は、
+  様々な演算を実行している間 :func:`open` によって返された
+  組み込みファイル I/O オブジェクトの速度を計測し、 :file:`ccbench` は、
+  変化する数のスレッドを使っていくつかのタスクを処理するときの
+  計算スループット、スレッド切り替えレイテンシ、IO 処理バンド幅の計測を
+  試みる同時実行ベンチマークです。
+
+* :file:`Tools/i18n/msgfmt.py` スクリプトは、複数の形式の :file:`.po`
+  ファイルを理解できるようになりました。(Fixed by Martin von Löwis;
+  :issue:`5464`.)
+
+* 既存の対応する :file:`.py` が存在する :file:`.pyc` または :file:`.pyo`
+  ファイルからモジュールを import するとき、結果のコードオブジェクトの
+  :attr:`co_filename` 属性は、元のファイル名が廃止されたとき、上書きされます。
+  これは、ファイルがリネーム、移動、異なるパスを通したアクセスを
+  されたときに起こりえます。(Patch by
+  Ziga Seilnacht and Jean-Paul Calderone; :issue:`1180193`.)
+
+* :file:`regrtest.py` スクリプトは、テストを乱順に実行する
+  :option:`-r` オプションの、ランダムシードに使われる整数を取る
+  :option:`--randseed=` スイッチを取るようになりました。
+  :option:`-r` オプションは、使われたシードも報告します。
+  (Added by Collin Winter.)
+
+* もう一つの :file:`regrtest.py` スイッチは :option:`-j` で、
+  いくつのテストを並行して実行するかを指定する整数です。
+  これにより、マルチコア機での合計実行時間を短縮できます。
+  このオプションは、実行時間を長くすることで知られている
+  :option:`-R` スイッチなど、いくつかの他のオプションと互換です。
+  (Added by Antoine Pitrou, :issue:`6152`.)
+  これはまた、選ばれたテストを失敗するまでループして実行する :option:`-F`
+  スイッチとも同時に使えます。(Added by Antoine Pitrou; :issue:`7312`.)
+
+* スクリプトとして実行されるとき、 :file:`py_compile.py` モジュールは
+  標準入力を読み込んでコンパイルするファイル名のリストとする
+  ``'-'`` を引数として受け付けるようになりました。(Contributed by Piotr
+  Ożarowski; :issue:`8233`.)
+
+.. ======================================================================
+
+Python 2.7 への移植
+=====================
+
+この説では、先に説明した変更その他のバグ修正の中で、コードの変更を
+必要とするかもしれないものを列挙します:
+
+* :func:`range` 関数は、引数をより一貫して処理するようになりました。
+  浮動小数点数でもなく整数でもない引数が与えられたら、その
+  :meth:`__int__` を呼び出すようになりました。(Fixed by Alexander
+  Belopolsky; :issue:`1533`.)
+
+* 文字列 :meth:`format` メソッドは浮動小数点数および複素数に使われる
+  デフォルトの精度を、 :func:`str` で使われる精度に合わせ、
+  小数第 6 位から 12 位に変更しました。
+  (Changed by Eric Smith; :issue:`5920`.)
+
+* :keyword:`with` 文の最適化のため、特殊メソッド :meth:`__enter__` および
+  :meth:`__exit__` はオブジェクトの型に属さなければならず、オブジェクトの
+  インスタンスには直接取り付けられません。これは
+  (:class:`object` から導出された) 新スタイルクラスと C 拡張型に影響します。
+  (:issue:`6101`.)
+
+* Python 2.6 におけるバグのため、 :meth:`__exit__` の *exc_value* パラメタは
+  はよく、例外のインスタンスではなく文字列表現になっていました。これは
+  2.7 では修正され、 *exc_value* は期待通りインスタンスになります。
+  (Fixed by Florent Xicluna; :issue:`7853`.)
+
+* ``__slots__`` を使って属性の制限が設定されたとき、設定されていない
+  属性を削除しても :exc:`AttributeError` が送出されないように修正されました。
+  (Fixed by Benjamin Peterson; :issue:`7604`.)
+
+標準ライブラリでは:
+
+* 年がサポートされている範囲外にはみ出るような
+  :class:`~datetime.datetime` インスタンスの演算が、 :exc:`OverflowError` を
+  送出しないことがありました。このようなエラーはより注意深く調べられ、
+  例外を送出するようになりました。(Reported by Mark Leander, patch
+  by Anand B. Pillai and Alexander Belopolsky; :issue:`7150`.)
+
+* :class:`~decimal.Decimal` インスタンスを文字列の :meth:`format` メソッドに
+  使うとき、デフォルトの揃えは以前は左揃えでした。これは右揃えに変更され、
+  プログラムの出力が変わるかもしれません。
+  (Changed by Mark Dickinson; :issue:`6857`.)
+
+  signaling NaN 値 (または ``sNAN``) を含む比較は、比較演算子に依って
+  静かに真や偽となるのではなく、 :const:`~decimal.InvalidOperation` を
+  合図するようになりました。quiet NaN 値 (または ``NaN``) は
+  ハッシュ可能になりました。(Fixed by Mark Dickinson; :issue:`7279`.)
+
+* ElementTree ライブラリ :mod:`xml.etree` は、
+  (`<?xml-stylesheet href="#style1"?>` のような) 命令や
+  (`<!-- comment -->` のような) コメントを処理する XML を
+  出力するときにアンパサンドおよび角括弧をエスケープしなくなりました。
+  (Patch by Neil Muller; :issue:`2746`.)
+
+* :class:`~StringIO.StringIO` オブジェクトの :meth:`~StringIO.StringIO.readline`
+  メソッドは、ファイル風のオブジェクトのように、負の長さが要求されたとき、
+  何もしなくなりました。(:issue:`7348`)
+
+* :mod:`syslog` モジュールは、識別子として以前のデフォルト値である ``'python'``
+  ではなく、 ``sys.argv[0]`` の値を使うようになりました。
+  (Changed by Sean Reifschneider; :issue:`8451`.)
+
+* :mod:`tarfile` モジュールのデフォルトエラー処理が変更され、致命的な
+  エラーを抑制しないようになりました。デフォルトのエラーレベルは
+  以前は 0 で、エラーはメッセージとしてデバッグログに書き込まれるだけでしたが、
+  デバッグログはデフォルトでは活性化されていないため、エラーは
+  顧みられませんでした。デフォルトのエラーレベルは 1 になり、
+  エラーがあれば例外が送出されます。
+  (Changed by Lars Gustäbel; :issue:`7357`.)
+
+* :mod:`urlparse` モジュールの :func:`~urlparse.urlsplit` は、
+  未知の URL スキームを :rfc:`3986` に応じた方法で処理します。
+  URL が ``"<something>://..."`` の形式なら、 ``://`` の前のテキストを、
+  それがモジュールの知らない作り物のスキームであってさえ、
+  スキームとして扱います。
+  この変更は、古い働きを使って動作していたコードを破壊することがあります。
+  例えば、Python 2.6.4 や 2.5 は以下を返します:
+
+    >>> import urlparse
+    >>> urlparse.urlsplit('invented://host/filename?query')
+    ('invented', '', '//host/filename?query', '', '')
+
+  Python 2.7 (や Python 2.6.5) は以下を返します:
+
+    >>> import urlparse
+    >>> urlparse.urlsplit('invented://host/filename?query')
+    ('invented', 'host', '/filename?query', '', '')
+
+  (Python 2.7 では、これは普通のタプルではなく名前付きタプルを返すので、
+  実際は微妙に異なる出力をします。)
+
+C 拡張では:
+
+* ``PyArg_Parse*`` 系統の関数で整数フォーマットコードを使う C 拡張は、
+  :exc:`DeprecationWarning` を引き起こすのではなく、 :exc:`TypeError`
+  例外を送出するようになりました。(:issue:`5080`)
+
+* 非推奨となった古い :c:func:`PyOS_ascii_strtod` および
+  :c:func:`PyOS_ascii_atof` 関数の代わりに、新しい
+  :c:func:`PyOS_string_to_double` 関数を使ってください。
+  
+
+Python を埋め込んだアプリケーションでは:
+
+* :c:func:`PySys_SetArgvEx` 関数が追加され、既存の :c:func:`PySys_SetArgv`
+  関数が使われた時のセキュリティホールをを塞ぐことができるようになりました。
+  :c:func:`PySys_SetArgv` を呼び出していないか調べ、 *updatepath* を偽に設定した
+  :c:func:`PySys_SetArgvEx` を使うべきかよく考えてください。
+
+.. ======================================================================
+
+
+.. _acks27:
+
+謝辞
+================
+
+著者は、以下の方々がこの記事の多くの草稿に提案、修正、そして助力を
+差し伸べてくださったことに感謝の意を表したいと思います: Nick Coghlan,
+Philip Jenvey, Ryan Lovett, R. David Murray, Hugh Secker-Walker.

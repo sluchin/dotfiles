@@ -1,0 +1,1078 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>19.6. xml.dom — 文書オブジェクトモデル (DOM) API &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="19. 構造化マークアップツール" href="markup.html" />
+    <link rel="next" title="19.7. xml.dom.minidom — 軽量な DOM 実装" href="xml.dom.minidom.html" />
+    <link rel="prev" title="19.5. xml.parsers.expat — Expat を使った高速な XML 解析" href="pyexpat.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="xml.dom.minidom.html" title="19.7. xml.dom.minidom — 軽量な DOM 実装"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="pyexpat.html" title="19.5. xml.parsers.expat — Expat を使った高速な XML 解析"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="markup.html" accesskey="U">19. 構造化マークアップツール</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">19.6. <tt class="docutils literal"><span class="pre">xml.dom</span></tt> &#8212; 文書オブジェクトモデル (DOM) API</a><ul>
+<li><a class="reference internal" href="#id1">19.6.1. モジュールの内容</a></li>
+<li><a class="reference internal" href="#dom">19.6.2. DOM 内のオブジェクト</a><ul>
+<li><a class="reference internal" href="#domimplementation">19.6.2.1. DOMImplementation オブジェクト</a></li>
+<li><a class="reference internal" href="#node">19.6.2.2. Node オブジェクト</a></li>
+<li><a class="reference internal" href="#nodelist">19.6.2.3. NodeList オブジェクト</a></li>
+<li><a class="reference internal" href="#documenttype">19.6.2.4. DocumentType オブジェクト</a></li>
+<li><a class="reference internal" href="#document">19.6.2.5. Document オブジェクト</a></li>
+<li><a class="reference internal" href="#element">19.6.2.6. Element オブジェクト</a></li>
+<li><a class="reference internal" href="#attr">19.6.2.7. Attr オブジェクト</a></li>
+<li><a class="reference internal" href="#namednodemap-objects">19.6.2.8. NamedNodeMap Objects</a></li>
+<li><a class="reference internal" href="#comment">19.6.2.9. Comment オブジェクト</a></li>
+<li><a class="reference internal" href="#text-cdatasection">19.6.2.10. Text オブジェクトおよび CDATASection オブジェクト</a></li>
+<li><a class="reference internal" href="#processinginstruction">19.6.2.11. ProcessingInstruction オブジェクト</a></li>
+<li><a class="reference internal" href="#dom-exceptions">19.6.2.12. 例外</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dom-conformance">19.6.3. 適合性</a><ul>
+<li><a class="reference internal" href="#dom-type-mapping">19.6.3.1. 型の対応付け</a></li>
+<li><a class="reference internal" href="#dom-accessor-methods">19.6.3.2. アクセサメソッド</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="pyexpat.html"
+                        title="前の章へ">19.5. <tt class="docutils literal docutils literal docutils literal"><span class="pre">xml.parsers.expat</span></tt> &#8212; Expat を使った高速な XML 解析</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="xml.dom.minidom.html"
+                        title="次の章へ">19.7. <tt class="docutils literal"><span class="pre">xml.dom.minidom</span></tt> &#8212; 軽量な DOM 実装</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/xml.dom.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-xml.dom">
+<span id="xml-dom-dom-api"></span><h1>19.6. <a class="reference internal" href="#module-xml.dom" title="xml.dom: Python のための文書オブジェクトモデル API。"><tt class="xref py py-mod docutils literal"><span class="pre">xml.dom</span></tt></a> &#8212; 文書オブジェクトモデル (DOM) API<a class="headerlink" href="#module-xml.dom" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+<p>文書オブジェクトモデル、または &#8220;DOM&#8221; は、ワールドワイドウェブコンソーシアム (World Wide Web Consortium, W3C)
+による、XML ドキュメントにアクセスしたり変更を加えたりするための、プログラミング言語間共通の API です。DOM 実装によって、XML ドキュメントはツリー構造として表現されます。また、クライアントコード側でツリー構造をゼロから構築できるようになります。さらに、前述の構造に対して、よく知られたインタフェースをもつ一連のオブジェクトを通したアクセス手段も提供します。</p>
+<p>DOM はランダムアクセスを行うアプリケーションで非常に有用です。 SAX では、一度に閲覧することができるのはドキュメントのほんの一部分です。ある SAX
+要素に注目している際には、別の要素をアクセスすることはできません。またテキストノードに注目しているときには、その中に入っている要素をアクセスすることができません。 SAX によるアプリケーションを書くときには、プログラムがドキュメント内のどこを処理しているのかを追跡するよう、コードのどこかに記述する必要があります。SAX 自体がその作業を行ってくれることはありません。さらに、XML
+ドキュメントに対する先読み (look ahead) が必要だとすると不運なことになります。</p>
+<p>アプリケーションによっては、ツリーにアクセスできなければイベント駆動モデルを実現できません。もちろん、何らかのツリーを SAX
+イベントに応じて自分で構築することもできるでしょうが、 DOM ではそのようなコードを書かなくてもよくなります。 DOM は XML
+データに対する標準的なツリー表現なのです。</p>
+<p>文書オブジェクトモデルは、W3C によっていくつかの段階、W3C の用語で言えば &#8220;レベル (level)&#8221; で定義されています。 Python においては、
+DOM API への対応付けは実質的には DOM レベル 2 勧告に基づいています。</p>
+<p>DOM アプリケーションは、普通は XML を DOM に解析するところから始まります。どのようにして解析を行うかについては DOM レベル 1 では全くカバーしておらず、レベル 2 では限定的な改良だけが行われました: レベル 2 では <tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> を生成するメソッドを提供する
+<tt class="xref py py-class docutils literal"><span class="pre">DOMImplementation</span></tt> オブジェクトクラスがありますが、実装に依存しない方法で XML
+リーダ(reader)/パーザ(parser)/文書ビルダ (Document builder) にアクセスする方法はありません。また、既存の
+<tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> オブジェクトなしにこれらのメソッドにアクセスするような、よく定義された方法もありません。 Python では、各々の
+DOM 実装で <a class="reference internal" href="#xml.dom.getDOMImplementation" title="xml.dom.getDOMImplementation"><tt class="xref py py-func docutils literal"><span class="pre">getDOMImplementation()</span></tt></a> が定義されているはずです。 DOM レベル 3
+ではロード(Load)/ストア(Store) 仕様が追加され、リーダのインタフェースにを定義していますが、Python 標準ライブラリではまだ利用することができません。</p>
+<p>DOM 文書オブジェクトを生成したら、そのプロパティとメソッドを使って XML 文書の一部にアクセスできます。これらのプロパティは DOM
+仕様で定義されています; 本リファレンスマニュアルでは、 Python において DOM 仕様がどのように解釈されているかを記述しています。</p>
+<p>W3C から提供されている仕様は、 DOM API を Java、ECMAScript、および OMG IDL で定義しています。ここで定義されている
+Python での対応づけは、大部分がこの仕様の IDL 版に基づいていますが、厳密な準拠は必要とされていません (実装で IDL
+の厳密な対応付けをサポートするのは自由ですが)。API への対応付けに関する詳細な議論は <a class="reference internal" href="#dom-conformance"><em>適合性</em></a> を参照してください。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.w3.org/TR/DOM-Level-2-Core/">Document Object Model (DOM) Level 2 Specification</a></dt>
+<dd>Python DOM API が準拠している W3C 勧告。</dd>
+<dt><a class="reference external" href="http://www.w3.org/TR/REC-DOM-Level-1/">Document Object Model (DOM) Level 1 Specification</a></dt>
+<dd><a class="reference internal" href="xml.dom.minidom.html#module-xml.dom.minidom" title="xml.dom.minidom: 軽量な文書オブジェクトモデルの実装。"><tt class="xref py py-mod docutils literal"><span class="pre">xml.dom.minidom</span></tt></a> でサポートされている W3C の DOM に関する勧告。</dd>
+<dt><a class="reference external" href="http://www.omg.org/spec/PYTH/1.2/PDF">Python Language Mapping Specification</a></dt>
+<dd>このドキュメントでは OMG IDL から Python への対応付けを記述しています。</dd>
+</dl>
+</div>
+<div class="section" id="id1">
+<h2>19.6.1. モジュールの内容<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-xml.dom" title="xml.dom: Python のための文書オブジェクトモデル API。"><tt class="xref py py-mod docutils literal"><span class="pre">xml.dom</span></tt></a> には、以下の関数が収められています:</p>
+<dl class="function">
+<dt id="xml.dom.registerDOMImplementation">
+<tt class="descclassname">xml.dom.</tt><tt class="descname">registerDOMImplementation</tt><big>(</big><em>name</em>, <em>factory</em><big>)</big><a class="headerlink" href="#xml.dom.registerDOMImplementation" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファクトリ関数 (factory function) <em>factory</em> を名前 <em>name</em> で登録します。ファクトリ関数は
+<tt class="xref py py-class docutils literal"><span class="pre">DOMImplementation</span></tt> インタフェースを実装するオブジェクトを返さなければなりません。ファクトリ関数は毎回同じオブジェクトを返すこともでき、呼び出されるたびに、特定の実装 (例えば実装が何らかのカスタマイズをサポートしている場合) における、適切な新たなオブジェクトを返すこともできます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xml.dom.getDOMImplementation">
+<tt class="descclassname">xml.dom.</tt><tt class="descname">getDOMImplementation</tt><big>(</big><span class="optional">[</span><em>name</em><span class="optional">[</span>, <em>features</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#xml.dom.getDOMImplementation" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>適切な DOM 実装を返します <em>name</em> は、よく知られた DOM 実装のモジュール名か、 <tt class="docutils literal"><span class="pre">None</span></tt> になります。 <tt class="docutils literal"><span class="pre">None</span></tt> でない場合、対応するモジュールを import して、import が成功した場合 <tt class="xref py py-class docutils literal"><span class="pre">DOMImplementation</span></tt>
+オブジェクトを返します。 <em>name</em> が与えられておらず、環境変数 <span class="target" id="index-0"></span><tt class="xref std std-envvar docutils literal"><span class="pre">PYTHON_DOM</span></tt> が設定されていた場合、 DOM
+実装を見つけるのに環境変数が使われます。</p>
+<p><em>name</em> が与えられない場合、利用可能な実装を調べて、指定された機能 (feature) セットを持つものを探します。実装が見つからなければ
+<a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> を送出します。 <em>features</em> のリストは <tt class="docutils literal"><span class="pre">(feature,</span> <span class="pre">version)</span></tt> のペアからなるシーケンスで、利用可能な <tt class="xref py py-class docutils literal"><span class="pre">DOMImplementation</span></tt> オブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">hasFeature()</span></tt>
+メソッドに渡されます。</p>
+</dd></dl>
+
+<p>いくつかの便利な定数も提供されています:</p>
+<dl class="data">
+<dt id="xml.dom.EMPTY_NAMESPACE">
+<tt class="descclassname">xml.dom.</tt><tt class="descname">EMPTY_NAMESPACE</tt><a class="headerlink" href="#xml.dom.EMPTY_NAMESPACE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>DOM 内のノードに名前空間が何も関連づけられていないことを示すために使われる値です。この値は通常、ノードの <tt class="xref py py-attr docutils literal"><span class="pre">namespaceURI</span></tt> の値として見つかったり、名前空間特有のメソッドに対する <em>namespaceURI</em> パラメタとして使われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="xml.dom.XML_NAMESPACE">
+<tt class="descclassname">xml.dom.</tt><tt class="descname">XML_NAMESPACE</tt><a class="headerlink" href="#xml.dom.XML_NAMESPACE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference external" href="http://www.w3.org/TR/REC-xml-names/">Namespaces in XML</a> (4 節)
+で定義されている、予約済みプレフィクス (reserved prefix) <tt class="docutils literal"><span class="pre">xml</span></tt> に関連付けられた名前空間 URI です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="xml.dom.XMLNS_NAMESPACE">
+<tt class="descclassname">xml.dom.</tt><tt class="descname">XMLNS_NAMESPACE</tt><a class="headerlink" href="#xml.dom.XMLNS_NAMESPACE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference external" href="http://www.w3.org/TR/DOM-Level-2-Core/core.html">Document Object Model (DOM) Level 2 Core Specification</a> (1.1.8 節)
+で定義されている、名前空間宣言への名前空間 URI です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="xml.dom.XHTML_NAMESPACE">
+<tt class="descclassname">xml.dom.</tt><tt class="descname">XHTML_NAMESPACE</tt><a class="headerlink" href="#xml.dom.XHTML_NAMESPACE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference external" href="http://www.w3.org/TR/xhtml1/">XHTML 1.0: The Extensible HyperText Markup Language</a> (3.1.1 節) で定義されている、XHTML 名前空間 URI です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<p>加えて、 <a class="reference internal" href="#module-xml.dom" title="xml.dom: Python のための文書オブジェクトモデル API。"><tt class="xref py py-mod docutils literal"><span class="pre">xml.dom</span></tt></a> には基底となる <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> クラスと DOM
+例外クラスが収められています。このモジュールで提供されている <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> クラスは DOM 仕様で定義されているメソッドや属性は何ら実装していません; これらは具体的な DOM 実装において提供しなければなりません。このモジュールの一部として提供されている <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt>
+クラスでは、具体的な <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> オブジェクトの <tt class="xref py py-attr docutils literal"><span class="pre">nodeType</span></tt> 属性として使う定数を提供しています; これらの定数は、DOM 仕様に適合するため、クラスではなくモジュールのレベルに配置されています。</p>
+</div>
+<div class="section" id="dom">
+<span id="dom-objects"></span><h2>19.6.2. DOM 内のオブジェクト<a class="headerlink" href="#dom" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>DOM について最も明確に限定しているドキュメントは W3C による DOM 仕様です。</p>
+<p>DOM 属性は単純な文字列としてだけではなく、ノードとして操作されるかもしれないので注意してください。とはいえ、そうしなければならない場合はかなり稀なので、今のところ記述されていません。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="26%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">インタフェース</th>
+<th class="head">節</th>
+<th class="head">目的</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-class docutils literal"><span class="pre">DOMImplementation</span></tt></td>
+<td><a class="reference internal" href="#dom-implementation-objects"><em>DOMImplementation オブジェクト</em></a></td>
+<td>根底にある実装へのインタフェース。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt></td>
+<td><a class="reference internal" href="#dom-node-objects"><em>Node オブジェクト</em></a></td>
+<td>ドキュメント内の大部分のオブジェクトのに対する基底インタフェース。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt></td>
+<td><a class="reference internal" href="#dom-nodelist-objects"><em>NodeList オブジェクト</em></a></td>
+<td>ノードの列に対するインタフェース。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-class docutils literal"><span class="pre">DocumentType</span></tt></td>
+<td><a class="reference internal" href="#dom-documenttype-objects"><em>DocumentType オブジェクト</em></a></td>
+<td>ドキュメントを処理するために必要な宣言についての情報。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt></td>
+<td><a class="reference internal" href="#dom-document-objects"><em>Document オブジェクト</em></a></td>
+<td>ドキュメント全体を表現するオブジェクト。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt></td>
+<td><a class="reference internal" href="#dom-element-objects"><em>Element オブジェクト</em></a></td>
+<td>ドキュメント階層内の要素ノード。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-class docutils literal"><span class="pre">Attr</span></tt></td>
+<td><a class="reference internal" href="#dom-attr-objects"><em>Attr オブジェクト</em></a></td>
+<td>階層ノード上の属性値。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-class docutils literal"><span class="pre">Comment</span></tt></td>
+<td><a class="reference internal" href="#dom-comment-objects"><em>Comment オブジェクト</em></a></td>
+<td>ソースドキュメント内のコメント表現。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-class docutils literal"><span class="pre">Text</span></tt></td>
+<td><a class="reference internal" href="#dom-text-objects"><em>Text オブジェクトおよび CDATASection オブジェクト</em></a></td>
+<td>ドキュメント内のテキスト記述を含むノード。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-class docutils literal"><span class="pre">ProcessingInstruction</span></tt></td>
+<td><a class="reference internal" href="#dom-pi-objects"><em>ProcessingInstruction オブジェクト</em></a></td>
+<td>処理命令 (processing instruction)
+表現。</td>
+</tr>
+</tbody>
+</table>
+<p>さらに追加の節として、 Python で DOM を利用するために定義されている例外について記述しています。</p>
+<div class="section" id="domimplementation">
+<span id="dom-implementation-objects"></span><h3>19.6.2.1. DOMImplementation オブジェクト<a class="headerlink" href="#domimplementation" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">DOMImplementation</span></tt> インタフェースは、利用している DOM 実装において特定の機能が利用可能かどうかを決定するための方法をアプリケーションに提供します。DOM レベル 2 では、 <tt class="xref py py-class docutils literal"><span class="pre">DOMImplementation</span></tt> を使って新たな <tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt>
+オブジェクトや <tt class="xref py py-class docutils literal"><span class="pre">DocumentType</span></tt> オブジェクトを生成する機能も追加しています。</p>
+<dl class="method">
+<dt id="xml.dom.DOMImplementation.hasFeature">
+<tt class="descclassname">DOMImplementation.</tt><tt class="descname">hasFeature</tt><big>(</big><em>feature</em>, <em>version</em><big>)</big><a class="headerlink" href="#xml.dom.DOMImplementation.hasFeature" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>機能名 <em>feature</em> とバージョン番号 <em>version</em> で識別される機能（feature）が実装されていればtrueを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.DOMImplementation.createDocument">
+<tt class="descclassname">DOMImplementation.</tt><tt class="descname">createDocument</tt><big>(</big><em>namespaceUri</em>, <em>qualifiedName</em>, <em>doctype</em><big>)</big><a class="headerlink" href="#xml.dom.DOMImplementation.createDocument" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たな(DOMのスーパークラスである) <tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> クラスのオブジェクトを返します。このクラスは <em>namespaceUri</em> と <em>qualifiedName</em> が設定された子クラス <tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt> のオブジェクトを所有しています。
+<em>doctype</em> は <a class="reference internal" href="#xml.dom.DOMImplementation.createDocumentType" title="xml.dom.DOMImplementation.createDocumentType"><tt class="xref py py-meth docutils literal"><span class="pre">createDocumentType()</span></tt></a> によって生成された <tt class="xref py py-class docutils literal"><span class="pre">DocumentType</span></tt> クラスのオブジェクト、または <tt class="docutils literal"><span class="pre">None</span></tt> である必要があります。 Python DOM APIでは、子クラスである <tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt> を作成しないことを示すために、はじめの２つの引数を <tt class="docutils literal"><span class="pre">None</span></tt> に設定することができます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.DOMImplementation.createDocumentType">
+<tt class="descclassname">DOMImplementation.</tt><tt class="descname">createDocumentType</tt><big>(</big><em>qualifiedName</em>, <em>publicId</em>, <em>systemId</em><big>)</big><a class="headerlink" href="#xml.dom.DOMImplementation.createDocumentType" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たな <tt class="xref py py-class docutils literal"><span class="pre">DocumentType</span></tt> クラスのオブジェクトを返します。このオブジェクトは <em>qualifiedName</em> 、 <em>publicId</em> 、そして
+<em>systemId</em> 文字列をふくんでおり、XML文書の形式情報を表現しています。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="node">
+<span id="dom-node-objects"></span><h3>19.6.2.2. Node オブジェクト<a class="headerlink" href="#node" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>XML 文書の全ての構成要素は <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> のサブクラスです。</p>
+<dl class="attribute">
+<dt id="xml.dom.Node.nodeType">
+<tt class="descclassname">Node.</tt><tt class="descname">nodeType</tt><a class="headerlink" href="#xml.dom.Node.nodeType" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ノード (node) の型を表現する整数値です。型に対応する以下のシンボル定数: <tt class="xref py py-const docutils literal"><span class="pre">ELEMENT_NODE</span></tt> 、
+<tt class="xref py py-const docutils literal"><span class="pre">ATTRIBUTE_NODE</span></tt> 、 <tt class="xref py py-const docutils literal"><span class="pre">TEXT_NODE</span></tt> 、 <tt class="xref py py-const docutils literal"><span class="pre">CDATA_SECTION_NODE</span></tt> 、
+<tt class="xref py py-const docutils literal"><span class="pre">ENTITY_NODE</span></tt> 、 <tt class="xref py py-const docutils literal"><span class="pre">PROCESSING_INSTRUCTION_NODE</span></tt> 、
+<tt class="xref py py-const docutils literal"><span class="pre">COMMENT_NODE</span></tt> 、 <tt class="xref py py-const docutils literal"><span class="pre">DOCUMENT_NODE</span></tt> 、 <tt class="xref py py-const docutils literal"><span class="pre">DOCUMENT_TYPE_NODE</span></tt> 、
+<tt class="xref py py-const docutils literal"><span class="pre">NOTATION_NODE</span></tt> 、が <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> オブジェクトで定義されています。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.parentNode">
+<tt class="descclassname">Node.</tt><tt class="descname">parentNode</tt><a class="headerlink" href="#xml.dom.Node.parentNode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のノードの親ノードか、文書ノードの場合には <tt class="docutils literal"><span class="pre">None</span></tt> になります。この値は常に <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> オブジェクトか <tt class="docutils literal"><span class="pre">None</span></tt>
+になります。 <tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt> ノードの場合、この値はルート要素 (root element) の場合を除き親要素 (parent
+element) となり、ルート要素の場合には <tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> オブジェクトとなります。 <tt class="xref py py-class docutils literal"><span class="pre">Attr</span></tt>
+ノードの場合、この値は常に <tt class="docutils literal"><span class="pre">None</span></tt> となります。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.attributes">
+<tt class="descclassname">Node.</tt><tt class="descname">attributes</tt><a class="headerlink" href="#xml.dom.Node.attributes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>属性オブジェクトの <tt class="xref py py-class docutils literal"><span class="pre">NamedNodeMap</span></tt> です。要素だけがこの属性に実際の値を持ちます; その他のオブジェクトでは、この属性を
+<tt class="docutils literal"><span class="pre">None</span></tt> にします。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.previousSibling">
+<tt class="descclassname">Node.</tt><tt class="descname">previousSibling</tt><a class="headerlink" href="#xml.dom.Node.previousSibling" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このノードと同じ親ノードを持ち、直前にくるノードです。例えば、 <em>self</em> 要素のの開始タグの直前にくる終了タグを持つ要素です。もちろん、XML
+文書は要素だけで構成されているだけではないので、直前にくる兄弟関係にある要素 (sibling) はテキストやコメント、その他になる可能性があります。このノードが親ノードにおける先頭の子ノードである場合、属性値は <tt class="docutils literal"><span class="pre">None</span></tt> になります。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.nextSibling">
+<tt class="descclassname">Node.</tt><tt class="descname">nextSibling</tt><a class="headerlink" href="#xml.dom.Node.nextSibling" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このノードと同じ親ノードを持ち、直後にくるノードです。例えば、 <a class="reference internal" href="#xml.dom.Node.previousSibling" title="xml.dom.Node.previousSibling"><tt class="xref py py-attr docutils literal"><span class="pre">previousSibling</span></tt></a> も参照してください。このノードが親ノードにおける末尾頭の子ノードである場合、属性値は <tt class="docutils literal"><span class="pre">None</span></tt> になります。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.childNodes">
+<tt class="descclassname">Node.</tt><tt class="descname">childNodes</tt><a class="headerlink" href="#xml.dom.Node.childNodes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このノード内に収められているノードからなるリストです。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.firstChild">
+<tt class="descclassname">Node.</tt><tt class="descname">firstChild</tt><a class="headerlink" href="#xml.dom.Node.firstChild" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このノードに子ノードがある場合、その先頭のノードです。そうでない場合 <tt class="docutils literal"><span class="pre">None</span></tt> になります。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.lastChild">
+<tt class="descclassname">Node.</tt><tt class="descname">lastChild</tt><a class="headerlink" href="#xml.dom.Node.lastChild" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このノードに子ノードがある場合、その末尾のノードです。そうでない場合 <tt class="docutils literal"><span class="pre">None</span></tt> になります。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.localName">
+<tt class="descclassname">Node.</tt><tt class="descname">localName</tt><a class="headerlink" href="#xml.dom.Node.localName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-attr docutils literal"><span class="pre">tagName</span></tt> にコロンがあれば、コロン以降の部分に、なければ <tt class="xref py py-attr docutils literal"><span class="pre">tagName</span></tt> 全体になります。値は文字列です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.prefix">
+<tt class="descclassname">Node.</tt><tt class="descname">prefix</tt><a class="headerlink" href="#xml.dom.Node.prefix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-attr docutils literal"><span class="pre">tagName</span></tt> のコロンがあれば、コロン以前の部分に、なければ空文字列になります。値は文字列か、 <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.namespaceURI">
+<tt class="descclassname">Node.</tt><tt class="descname">namespaceURI</tt><a class="headerlink" href="#xml.dom.Node.namespaceURI" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要素名に関連付けられた名前空間です。文字列か <tt class="docutils literal"><span class="pre">None</span></tt> になります。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.nodeName">
+<tt class="descclassname">Node.</tt><tt class="descname">nodeName</tt><a class="headerlink" href="#xml.dom.Node.nodeName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この属性はノード型ごとに異なる意味を持ちます; 詳しくは DOM 仕様を参照してください。この属性で得られることになる情報は、全てのノード型では
+<tt class="xref py py-attr docutils literal"><span class="pre">tagName</span></tt> 、属性では <tt class="xref py py-attr docutils literal"><span class="pre">name</span></tt> プロパティといったように、常に他のプロパティで得ることができます。全てのノード型で、この属性の値は文字列か <tt class="docutils literal"><span class="pre">None</span></tt> になります。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Node.nodeValue">
+<tt class="descclassname">Node.</tt><tt class="descname">nodeValue</tt><a class="headerlink" href="#xml.dom.Node.nodeValue" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この属性はノード型ごとに異なる意味を持ちます; 詳しくは DOM 仕様を参照してください。その序今日は <a class="reference internal" href="#xml.dom.Node.nodeName" title="xml.dom.Node.nodeName"><tt class="xref py py-attr docutils literal"><span class="pre">nodeName</span></tt></a> と似ています。この属性の値は文字列か <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.hasAttributes">
+<tt class="descclassname">Node.</tt><tt class="descname">hasAttributes</tt><big>(</big><big>)</big><a class="headerlink" href="#xml.dom.Node.hasAttributes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ノードが何らかの属性を持っている場合に真を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.hasChildNodes">
+<tt class="descclassname">Node.</tt><tt class="descname">hasChildNodes</tt><big>(</big><big>)</big><a class="headerlink" href="#xml.dom.Node.hasChildNodes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ノードが何らかの子ノードを持っている場合に真を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.isSameNode">
+<tt class="descclassname">Node.</tt><tt class="descname">isSameNode</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#xml.dom.Node.isSameNode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>other</em> がこのノードと同じノードを参照している場合に真を返します。このメソッドは、何らかのプロキシ (proxy) 機構を利用するような DOM
+実装で特に便利です (一つ以上のオブジェクトが同じノードを参照するかもしれないからです)。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">このメソッドは DOM レベル 3 API で提案されており、まだ &#8220;ワーキングドラフト(working draft)&#8221; の段階です。しかし、このインタフェースだけは議論にはならないと考えられます。 W3C による変更は必ずしも Python DOM インタフェースにおけるこのメソッドに影響するとは限りません (ただしこのメソッドに対する何らかの新たな W3C API もサポートされるかもしれません)。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.appendChild">
+<tt class="descclassname">Node.</tt><tt class="descname">appendChild</tt><big>(</big><em>newChild</em><big>)</big><a class="headerlink" href="#xml.dom.Node.appendChild" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のノードの子ノードリストの末尾に新たな子ノードを追加し、 <em>newChild</em> を返します。もしノードが既にツリーにあれば、最初に削除されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.insertBefore">
+<tt class="descclassname">Node.</tt><tt class="descname">insertBefore</tt><big>(</big><em>newChild</em>, <em>refChild</em><big>)</big><a class="headerlink" href="#xml.dom.Node.insertBefore" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たな子ノードを既存の子ノードの前に挿入します。 <em>refChild</em> は現在のノードの子ノードである場合に限られます; そうでない場合、
+<a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が送出されます。 <em>newChild</em> が返されます。もし <em>refChild</em> が <tt class="docutils literal"><span class="pre">None</span></tt> なら、 <em>newChild</em> を子ノードリストの最後に挿入します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.removeChild">
+<tt class="descclassname">Node.</tt><tt class="descname">removeChild</tt><big>(</big><em>oldChild</em><big>)</big><a class="headerlink" href="#xml.dom.Node.removeChild" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子ノードを削除します。 <em>oldChild</em> はこのノードの子ノードでなければなりません。そうでない場合、 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が送出されます。成功した場合 <em>oldChild</em> が返されます。 <em>oldChild</em> をそれ以降使わない場合、 <tt class="xref py py-meth docutils literal"><span class="pre">unlink()</span></tt> メソッドを呼び出さなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.replaceChild">
+<tt class="descclassname">Node.</tt><tt class="descname">replaceChild</tt><big>(</big><em>newChild</em>, <em>oldChild</em><big>)</big><a class="headerlink" href="#xml.dom.Node.replaceChild" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>既存のノードと新たなノードを置き換えます。この操作は <em>oldChild</em> が現在のノードの子ノードである場合に限られます; そうでない場合、
+<a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.normalize">
+<tt class="descclassname">Node.</tt><tt class="descname">normalize</tt><big>(</big><big>)</big><a class="headerlink" href="#xml.dom.Node.normalize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>一続きのテキスト全体を一個の <tt class="xref py py-class docutils literal"><span class="pre">Text</span></tt> インスタンスとして保存するために隣接するテキストノードを結合します。これにより、多くのアプリケーションで DOM ツリーからのテキスト処理が簡単になります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.1 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Node.cloneNode">
+<tt class="descclassname">Node.</tt><tt class="descname">cloneNode</tt><big>(</big><em>deep</em><big>)</big><a class="headerlink" href="#xml.dom.Node.cloneNode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このノードを複製 (clone) します。 <em>deep</em> を設定すると、子ノードも同様に複製することを意味します。複製されたノードを返します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="nodelist">
+<span id="dom-nodelist-objects"></span><h3>19.6.2.3. NodeList オブジェクト<a class="headerlink" href="#nodelist" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt> は、ノードからなるシーケンスを表現します。これらのオブジェクトは DOM コア勧告 (DOM Core
+recommendation) において、二通りに使われています: <tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt> オブジェクトでは、子ノードのリストを提供するのに
+<tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt> を利用します。また、このインタフェースにおける <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> の
+<tt class="xref py py-meth docutils literal"><span class="pre">getElementsByTagName()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">getElementsByTagNameNS()</span></tt> メソッドは、クエリに対する結果を表現するのに <tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt> を利用します。</p>
+<p>DOM レベル 2 勧告では、これらのオブジェクトに対し、メソッドと属性を一つづつ定義しています:</p>
+<dl class="method">
+<dt id="xml.dom.NodeList.item">
+<tt class="descclassname">NodeList.</tt><tt class="descname">item</tt><big>(</big><em>i</em><big>)</big><a class="headerlink" href="#xml.dom.NodeList.item" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シーケンスに <em>i</em> 番目の要素がある場合にはその要素を、そうでない場合には <tt class="docutils literal"><span class="pre">None</span></tt> を返します。 <em>i</em> はゼロよりも小さくてはならず、シーケンスの長さ以上であってはなりません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.NodeList.length">
+<tt class="descclassname">NodeList.</tt><tt class="descname">length</tt><a class="headerlink" href="#xml.dom.NodeList.length" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シーケンス中のノードの数です。</p>
+</dd></dl>
+
+<p>この他に、Python の DOM インタフェースでは、 <tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt> オブジェクトを Python
+のシーケンスとして使えるようにするサポートが追加されていることが必要です。 <tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt> の実装では、全て <a class="reference internal" href="../reference/datamodel.html#object.__len__" title="object.__len__"><tt class="xref py py-meth docutils literal"><span class="pre">__len__()</span></tt></a>
+と <a class="reference internal" href="../reference/datamodel.html#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> をサポートしなければなりません; このサポートにより、 <a class="reference internal" href="../reference/compound_stmts.html#for"><tt class="xref std std-keyword docutils literal"><span class="pre">for</span></tt></a> 文内で
+<tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt> にわたる繰り返しと、組み込み関数 <a class="reference internal" href="functions.html#len" title="len"><tt class="xref py py-func docutils literal"><span class="pre">len()</span></tt></a> の適切なサポートができるようになります。</p>
+<p>DOM 実装が文書の変更をサポートしている場合、 <tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt> の実装でも <a class="reference internal" href="../reference/datamodel.html#object.__setitem__" title="object.__setitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__setitem__()</span></tt></a> および
+<a class="reference internal" href="../reference/datamodel.html#object.__delitem__" title="object.__delitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__delitem__()</span></tt></a> メソッドをサポートしなければなりません。</p>
+</div>
+<div class="section" id="documenttype">
+<span id="dom-documenttype-objects"></span><h3>19.6.2.4. DocumentType オブジェクト<a class="headerlink" href="#documenttype" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>文書で宣言されている記法 (notation) やエンティティ (entity) に関する (外部サブセット(external subset)
+がパーザから利用でき、情報を提供できる場合にはそれも含めた) 情報は、 <tt class="xref py py-class docutils literal"><span class="pre">DocumentType</span></tt>
+オブジェクトから手に入れることができます。文書の <tt class="xref py py-class docutils literal"><span class="pre">DocumentType</span></tt> は、 <tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> オブジェクトの
+<tt class="xref py py-attr docutils literal"><span class="pre">doctype</span></tt> 属性で入手することができます; 文書の <tt class="docutils literal"><span class="pre">DOCTYPE</span></tt> 宣言がない場合、文書の <tt class="xref py py-attr docutils literal"><span class="pre">doctype</span></tt>
+属性は、このインタフェースを持つインスタンスの代わりに <tt class="docutils literal"><span class="pre">None</span></tt> に設定されます。</p>
+<p><tt class="xref py py-class docutils literal"><span class="pre">DocumentType</span></tt> は <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> を特殊化したもので、以下の属性を加えています:</p>
+<dl class="attribute">
+<dt id="xml.dom.DocumentType.publicId">
+<tt class="descclassname">DocumentType.</tt><tt class="descname">publicId</tt><a class="headerlink" href="#xml.dom.DocumentType.publicId" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文書型定義 (document type definition) の外部サブセットに対する公開識別子 (public identifier)
+です。文字列または <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.DocumentType.systemId">
+<tt class="descclassname">DocumentType.</tt><tt class="descname">systemId</tt><a class="headerlink" href="#xml.dom.DocumentType.systemId" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文書型定義 (document type definition) の外部サブセットに対するシステム識別子 (system identifier)
+です。文字列の URI または <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.DocumentType.internalSubset">
+<tt class="descclassname">DocumentType.</tt><tt class="descname">internalSubset</tt><a class="headerlink" href="#xml.dom.DocumentType.internalSubset" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ドキュメントの完全な内部サブセットを与える文字列です。サブセットを囲むブラケットは含みません。ドキュメントが内部サブセットを持たない場合、この値は
+<tt class="docutils literal"><span class="pre">None</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.DocumentType.name">
+<tt class="descclassname">DocumentType.</tt><tt class="descname">name</tt><a class="headerlink" href="#xml.dom.DocumentType.name" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">DOCTYPE</span></tt> 宣言でルート要素の名前が与えられている場合、その値になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.DocumentType.entities">
+<tt class="descclassname">DocumentType.</tt><tt class="descname">entities</tt><a class="headerlink" href="#xml.dom.DocumentType.entities" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>外部エンティティの定義を与える <tt class="xref py py-class docutils literal"><span class="pre">NamedNodeMap</span></tt> です。複数回定義されているエンティティに対しては、最初の定義だけが提供されます
+(その他は XML 勧告での要求仕様によって無視されます)。パーザによって情報が提供されないか、エンティティが定義されていない場合には、この値は
+<tt class="docutils literal"><span class="pre">None</span></tt> になることがあります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.DocumentType.notations">
+<tt class="descclassname">DocumentType.</tt><tt class="descname">notations</tt><a class="headerlink" href="#xml.dom.DocumentType.notations" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>記法の定義を与える <tt class="xref py py-class docutils literal"><span class="pre">NamedNodeMap</span></tt> です。複数回定義されている記法名に対しては、最初の定義だけが提供されます (その他は XML
+勧告での要求仕様によって無視されます)。パーザによって情報が提供されないか、エンティティが定義されていない場合には、この値は <tt class="docutils literal"><span class="pre">None</span></tt>
+になることがあります。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="document">
+<span id="dom-document-objects"></span><h3>19.6.2.5. Document オブジェクト<a class="headerlink" href="#document" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> は XML ドキュメント全体を表現し、その構成要素である要素、属性、処理命令、コメント等が入っています。
+<tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> は <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> からプロパティを継承していることを思い出してください。</p>
+<dl class="attribute">
+<dt id="xml.dom.Document.documentElement">
+<tt class="descclassname">Document.</tt><tt class="descname">documentElement</tt><a class="headerlink" href="#xml.dom.Document.documentElement" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ドキュメントの唯一無二のルート要素です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.createElement">
+<tt class="descclassname">Document.</tt><tt class="descname">createElement</tt><big>(</big><em>tagName</em><big>)</big><a class="headerlink" href="#xml.dom.Document.createElement" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たな要素ノードを生成して返します。要素は、生成された時点ではドキュメント内に挿入されません。 <tt class="xref py py-meth docutils literal"><span class="pre">insertBefore()</span></tt> や
+<tt class="xref py py-meth docutils literal"><span class="pre">appendChild()</span></tt> のような他のメソッドの一つを使って明示的に挿入を行う必要があります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.createElementNS">
+<tt class="descclassname">Document.</tt><tt class="descname">createElementNS</tt><big>(</big><em>namespaceURI</em>, <em>tagName</em><big>)</big><a class="headerlink" href="#xml.dom.Document.createElementNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前空間を伴う新たな要素ノードを生成して返します。 <em>tagName</em> にはプレフィクス (prefix) があってもかまいません。要素は、生成された時点では文書内に挿入されません。 <tt class="xref py py-meth docutils literal"><span class="pre">insertBefore()</span></tt> や <tt class="xref py py-meth docutils literal"><span class="pre">appendChild()</span></tt> のような他のメソッドの一つを使って明示的に挿入を行う必要があります。 <tt class="xref py py-meth docutils literal"><span class="pre">appendChild()</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.createTextNode">
+<tt class="descclassname">Document.</tt><tt class="descname">createTextNode</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#xml.dom.Document.createTextNode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パラメタで渡されたデータの入ったテキストノードを生成して返します。他の生成 (create) メソッドと同じく、このメソッドは生成されたノードをツリーに挿入しません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.createComment">
+<tt class="descclassname">Document.</tt><tt class="descname">createComment</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#xml.dom.Document.createComment" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パラメタで渡されたデータの入ったコメントノードを生成して返します。他の生成 (create) メソッドと同じく、このメソッドは生成されたノードをツリーに挿入しません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.createProcessingInstruction">
+<tt class="descclassname">Document.</tt><tt class="descname">createProcessingInstruction</tt><big>(</big><em>target</em>, <em>data</em><big>)</big><a class="headerlink" href="#xml.dom.Document.createProcessingInstruction" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パラメタで渡された <em>target</em> および <em>data</em> の入った処理命令ノードを生成して返します。他の生成 (create) メソッドと同じく、このメソッドは生成されたノードをツリーに挿入しません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.createAttribute">
+<tt class="descclassname">Document.</tt><tt class="descname">createAttribute</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#xml.dom.Document.createAttribute" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>属性ノードを生成して返します。このメソッドは属性ノードを特定の要素に関連づけることはしません。新たに生成された属性インスタンスを使うには、適切な
+<tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt> オブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">setAttributeNode()</span></tt> を使わなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.createAttributeNS">
+<tt class="descclassname">Document.</tt><tt class="descname">createAttributeNS</tt><big>(</big><em>namespaceURI</em>, <em>qualifiedName</em><big>)</big><a class="headerlink" href="#xml.dom.Document.createAttributeNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前空間を伴う新たな属性ノードを生成して返します。 <em>tagName</em> にはプレフィクス (prefix) があってもかまいません。このメソッドは属性ノードを特定の要素に関連づけることはしません。新たに生成された属性インスタンスを使うには、適切な <tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt>
+オブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">setAttributeNode()</span></tt> を使わなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.getElementsByTagName">
+<tt class="descclassname">Document.</tt><tt class="descname">getElementsByTagName</tt><big>(</big><em>tagName</em><big>)</big><a class="headerlink" href="#xml.dom.Document.getElementsByTagName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての下位要素 (直接の子要素、子要素の子要素、等) から、特定の要素型名を持つものを検索します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Document.getElementsByTagNameNS">
+<tt class="descclassname">Document.</tt><tt class="descname">getElementsByTagNameNS</tt><big>(</big><em>namespaceURI</em>, <em>localName</em><big>)</big><a class="headerlink" href="#xml.dom.Document.getElementsByTagNameNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての下位要素 (直接の子要素、子要素の子要素、等) から、特定の名前空間 URI とローカル名 (local name) を持つものを検索します。ローカル名は名前空間におけるプレフィクス以降の部分です。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="element">
+<span id="dom-element-objects"></span><h3>19.6.2.6. Element オブジェクト<a class="headerlink" href="#element" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt> は <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> のサブクラスです。このため <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> クラスの全ての属性を継承します。</p>
+<dl class="attribute">
+<dt id="xml.dom.Element.tagName">
+<tt class="descclassname">Element.</tt><tt class="descname">tagName</tt><a class="headerlink" href="#xml.dom.Element.tagName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要素型名です。名前空間使用の文書では、要素型名中にコロンがあるかもしれません。値は文字列です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.getElementsByTagName">
+<tt class="descclassname">Element.</tt><tt class="descname">getElementsByTagName</tt><big>(</big><em>tagName</em><big>)</big><a class="headerlink" href="#xml.dom.Element.getElementsByTagName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> クラス内における同名のメソッドと同じです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.getElementsByTagNameNS">
+<tt class="descclassname">Element.</tt><tt class="descname">getElementsByTagNameNS</tt><big>(</big><em>namespaceURI</em>, <em>localName</em><big>)</big><a class="headerlink" href="#xml.dom.Element.getElementsByTagNameNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-class docutils literal"><span class="pre">Document</span></tt> クラス内における同名のメソッドと同じです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.hasAttribute">
+<tt class="descclassname">Element.</tt><tt class="descname">hasAttribute</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#xml.dom.Element.hasAttribute" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定要素に <em>name</em> で渡した名前の属性が存在していれば true を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.hasAttributeNS">
+<tt class="descclassname">Element.</tt><tt class="descname">hasAttributeNS</tt><big>(</big><em>namespaceURI</em>, <em>localName</em><big>)</big><a class="headerlink" href="#xml.dom.Element.hasAttributeNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定要素に <em>namespaceURI</em> と <em>localName</em> で指定した名前の属性が存在していれば true を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.getAttribute">
+<tt class="descclassname">Element.</tt><tt class="descname">getAttribute</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#xml.dom.Element.getAttribute" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> で指定した属性の値を文字列として返します。もし、属性が存在しない、もしくは属性に値が設定されていない場合、空の文字列が返されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.getAttributeNode">
+<tt class="descclassname">Element.</tt><tt class="descname">getAttributeNode</tt><big>(</big><em>attrname</em><big>)</big><a class="headerlink" href="#xml.dom.Element.getAttributeNode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>attrname</em> で指定された属性の <tt class="xref py py-class docutils literal"><span class="pre">Attr</span></tt> ノードを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.getAttributeNS">
+<tt class="descclassname">Element.</tt><tt class="descname">getAttributeNS</tt><big>(</big><em>namespaceURI</em>, <em>localName</em><big>)</big><a class="headerlink" href="#xml.dom.Element.getAttributeNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>namespaceURI</em> と <em>localName</em> によって指定した属性の値を文字列として返します。もし、属性が存在しない、もしくは属性に値が設定されていない場合、空の文字列が返されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.getAttributeNodeNS">
+<tt class="descclassname">Element.</tt><tt class="descname">getAttributeNodeNS</tt><big>(</big><em>namespaceURI</em>, <em>localName</em><big>)</big><a class="headerlink" href="#xml.dom.Element.getAttributeNodeNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定した <em>namespaceURI</em> および <em>localName</em> を持つ属性値をノードとして返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.removeAttribute">
+<tt class="descclassname">Element.</tt><tt class="descname">removeAttribute</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#xml.dom.Element.removeAttribute" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前で指定された属性を削除します。該当する属性がなければ、
+<a class="reference internal" href="#xml.dom.NotFoundErr" title="xml.dom.NotFoundErr"><tt class="xref py py-exc docutils literal"><span class="pre">NotFoundErr</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.removeAttributeNode">
+<tt class="descclassname">Element.</tt><tt class="descname">removeAttributeNode</tt><big>(</big><em>oldAttr</em><big>)</big><a class="headerlink" href="#xml.dom.Element.removeAttributeNode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>oldAttr</em> が属性リストにある場合、削除して返します。 <em>oldAttr</em> が存在しない場合、 <a class="reference internal" href="#xml.dom.NotFoundErr" title="xml.dom.NotFoundErr"><tt class="xref py py-exc docutils literal"><span class="pre">NotFoundErr</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.removeAttributeNS">
+<tt class="descclassname">Element.</tt><tt class="descname">removeAttributeNS</tt><big>(</big><em>namespaceURI</em>, <em>localName</em><big>)</big><a class="headerlink" href="#xml.dom.Element.removeAttributeNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前で指定された属性を削除します。このメソッドは <em>qname</em> ではなく <em>localName</em> を使うので注意してください。該当する属性がなくても例外は送出されません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.setAttribute">
+<tt class="descclassname">Element.</tt><tt class="descname">setAttribute</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#xml.dom.Element.setAttribute" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列を使って属性値を設定します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.setAttributeNode">
+<tt class="descclassname">Element.</tt><tt class="descname">setAttributeNode</tt><big>(</big><em>newAttr</em><big>)</big><a class="headerlink" href="#xml.dom.Element.setAttributeNode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たな属性ノードを要素に追加します。 <tt class="xref py py-attr docutils literal"><span class="pre">name</span></tt> 属性が既存の属性に一致した場合、必要に応じて属性を置き換えます。置換が生じると、古い属性ノードが返されます。 <em>newAttr</em> がすでに使われていれば、 <a class="reference internal" href="#xml.dom.InuseAttributeErr" title="xml.dom.InuseAttributeErr"><tt class="xref py py-exc docutils literal"><span class="pre">InuseAttributeErr</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.setAttributeNodeNS">
+<tt class="descclassname">Element.</tt><tt class="descname">setAttributeNodeNS</tt><big>(</big><em>newAttr</em><big>)</big><a class="headerlink" href="#xml.dom.Element.setAttributeNodeNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たな属性ノードを要素に追加します。 <tt class="xref py py-attr docutils literal"><span class="pre">namespaceURI</span></tt> および <tt class="xref py py-attr docutils literal"><span class="pre">localName</span></tt>
+属性が既存の属性に一致した場合、必要に応じて属性を置き換えます。置換が生じると、古い属性ノードが返されます。 <em>newAttr</em> がすでに使われていれば、
+<a class="reference internal" href="#xml.dom.InuseAttributeErr" title="xml.dom.InuseAttributeErr"><tt class="xref py py-exc docutils literal"><span class="pre">InuseAttributeErr</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.Element.setAttributeNS">
+<tt class="descclassname">Element.</tt><tt class="descname">setAttributeNS</tt><big>(</big><em>namespaceURI</em>, <em>qname</em>, <em>value</em><big>)</big><a class="headerlink" href="#xml.dom.Element.setAttributeNS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定された <em>namespaceURI</em> および <em>qname</em> で与えられた属性の値を文字列で設定します。qname は属性の完全な名前であり、この点が上記のメソッドと違うので注意してください。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="attr">
+<span id="dom-attr-objects"></span><h3>19.6.2.7. Attr オブジェクト<a class="headerlink" href="#attr" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Attr</span></tt> は <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> を継承しており、全ての属性を受け継いでいます。</p>
+<dl class="attribute">
+<dt id="xml.dom.Attr.name">
+<tt class="descclassname">Attr.</tt><tt class="descname">name</tt><a class="headerlink" href="#xml.dom.Attr.name" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要素型名です。名前空間使用の文書では、要素型名中にコロンが含まれるかもしれません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Attr.localName">
+<tt class="descclassname">Attr.</tt><tt class="descname">localName</tt><a class="headerlink" href="#xml.dom.Attr.localName" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前にコロンがあればコロン以降の部分に、なければ名前全体になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Attr.prefix">
+<tt class="descclassname">Attr.</tt><tt class="descname">prefix</tt><a class="headerlink" href="#xml.dom.Attr.prefix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前にコロンがあればコロン以前の部分に、なければ空文字列になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.Attr.value">
+<tt class="descclassname">Attr.</tt><tt class="descname">value</tt><a class="headerlink" href="#xml.dom.Attr.value" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>その要素の text value.
+これは <tt class="xref py py-attr docutils literal"><span class="pre">nodeValue</span></tt> 属性の別名です。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="namednodemap-objects">
+<span id="dom-attributelist-objects"></span><h3>19.6.2.8. NamedNodeMap Objects<a class="headerlink" href="#namednodemap-objects" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">NamedNodeMap</span></tt> は <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> を継承して <em>いません</em> 。</p>
+<dl class="attribute">
+<dt id="xml.dom.NamedNodeMap.length">
+<tt class="descclassname">NamedNodeMap.</tt><tt class="descname">length</tt><a class="headerlink" href="#xml.dom.NamedNodeMap.length" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>属性リストの長さです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="xml.dom.NamedNodeMap.item">
+<tt class="descclassname">NamedNodeMap.</tt><tt class="descname">item</tt><big>(</big><em>index</em><big>)</big><a class="headerlink" href="#xml.dom.NamedNodeMap.item" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>特定のインデクスを持つ属性を返します。属性の並び方は任意ですが、 DOM 文書が生成されている間は一定になります。各要素は属性ノードです。属性値はノードの
+<tt class="xref py py-attr docutils literal"><span class="pre">value</span></tt> 属性で取得してください。</p>
+</dd></dl>
+
+<p>このクラスをよりマップ型的な動作ができるようにする実験的なメソッドもあります。そうしたメソッドを使うこともできますし、 <tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt>
+オブジェクトに対して、標準化された <tt class="xref py py-meth docutils literal"><span class="pre">getAttribute*()</span></tt> ファミリのメソッドを使うこともできます。</p>
+</div>
+<div class="section" id="comment">
+<span id="dom-comment-objects"></span><h3>19.6.2.9. Comment オブジェクト<a class="headerlink" href="#comment" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Comment</span></tt> は XML 文書中のコメントを表現します。 <tt class="xref py py-class docutils literal"><span class="pre">Comment</span></tt> は <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt>
+のサブクラスですが、子ノードを持つことはありません。</p>
+<dl class="attribute">
+<dt id="xml.dom.Comment.data">
+<tt class="descclassname">Comment.</tt><tt class="descname">data</tt><a class="headerlink" href="#xml.dom.Comment.data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列によるコメントの内容です。この属性には、コメントの先頭にある <tt class="docutils literal"><span class="pre">&lt;!-</span></tt> <tt class="docutils literal"><span class="pre">-</span></tt> と末尾にある <tt class="docutils literal"><span class="pre">-</span></tt> <tt class="docutils literal"><span class="pre">-&gt;</span></tt> 間の全ての文字が入っていますが、 <tt class="docutils literal"><span class="pre">&lt;!-</span></tt> <tt class="docutils literal"><span class="pre">-</span></tt> と <tt class="docutils literal"><span class="pre">-</span></tt> <tt class="docutils literal"><span class="pre">-&gt;</span></tt> 自体は含みません。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="text-cdatasection">
+<span id="dom-text-objects"></span><h3>19.6.2.10. Text オブジェクトおよび CDATASection オブジェクト<a class="headerlink" href="#text-cdatasection" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Text</span></tt> インタフェースは XML 文書内のテキストを表現します。パーザおよび DOM 実装が DOM の XML
+拡張をサポートしている場合、 CDATA でマークされた区域 (section) に入れられている部分テキストは <tt class="xref py py-class docutils literal"><span class="pre">CDATASection</span></tt>
+オブジェクトに記憶されます。これら二つのインタフェースは同一のものですが、 <tt class="xref py py-attr docutils literal"><span class="pre">nodeType</span></tt> 属性が異なります。</p>
+<p>これらのインタフェースは <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> インタフェースを拡張したものです。しかし子ノードを持つことはできません。</p>
+<dl class="attribute">
+<dt id="xml.dom.Text.data">
+<tt class="descclassname">Text.</tt><tt class="descname">data</tt><a class="headerlink" href="#xml.dom.Text.data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列によるテキストノードの内容です。</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="xref py py-class docutils literal"><span class="pre">CDATASection</span></tt> ノードの利用は、ノードが完全な CDATA マーク区域を表現するという意味ではなく、ノードの内容が CDATA
+区域の一部であるということを意味するだけです。単一の CDATA セクションは文書ツリー内で複数のノードとして表現されることがあります。二つの隣接する
+<tt class="xref py py-class docutils literal"><span class="pre">CDATASection</span></tt> ノードが、異なる CDATA マーク区域かどうかを決定する方法はありません。</p>
+</div>
+</div>
+<div class="section" id="processinginstruction">
+<span id="dom-pi-objects"></span><h3>19.6.2.11. ProcessingInstruction オブジェクト<a class="headerlink" href="#processinginstruction" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>XML 文書内の処理命令を表現します; <tt class="xref py py-class docutils literal"><span class="pre">Node</span></tt> インタフェースを継承していますが、子ノードを持つことはできません。</p>
+<dl class="attribute">
+<dt id="xml.dom.ProcessingInstruction.target">
+<tt class="descclassname">ProcessingInstruction.</tt><tt class="descname">target</tt><a class="headerlink" href="#xml.dom.ProcessingInstruction.target" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最初の空白文字までの処理命令の内容です。読み出し専用の属性です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="xml.dom.ProcessingInstruction.data">
+<tt class="descclassname">ProcessingInstruction.</tt><tt class="descname">data</tt><a class="headerlink" href="#xml.dom.ProcessingInstruction.data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最初の空白文字以降の処理命令の内容です。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="dom-exceptions">
+<span id="id2"></span><h3>19.6.2.12. 例外<a class="headerlink" href="#dom-exceptions" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.1 で追加.</span></p>
+<p>DOM レベル 2 勧告では、単一の例外 <a class="reference internal" href="#xml.dom.DOMException" title="xml.dom.DOMException"><tt class="xref py py-exc docutils literal"><span class="pre">DOMException</span></tt></a> と、どの種のエラーが発生したかをアプリケーションが決定できるようにする多くの定数を定義しています。 <a class="reference internal" href="#xml.dom.DOMException" title="xml.dom.DOMException"><tt class="xref py py-exc docutils literal"><span class="pre">DOMException</span></tt></a> インスタンスは、特定の例外に関する適切な値を提供する <a class="reference internal" href="code.html#module-code" title="code: read-eval-print ループを実装するのを助ける"><tt class="xref py py-attr docutils literal"><span class="pre">code</span></tt></a>
+属性を伴っています。</p>
+<p>Python DOM インタフェースでは、上記の定数を提供していますが、同時に一連の例外を拡張して、DOM で定義されている各例外コードに対して特定の例外が存在するようにしています。 DOM の実装では、適切な特定の例外を送出しなければならず、各例外は <a class="reference internal" href="code.html#module-code" title="code: read-eval-print ループを実装するのを助ける"><tt class="xref py py-attr docutils literal"><span class="pre">code</span></tt></a>
+属性に対応する適切な値を伴わなければなりません。</p>
+<dl class="exception">
+<dt id="xml.dom.DOMException">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">DOMException</tt><a class="headerlink" href="#xml.dom.DOMException" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての特定の DOM 例外で使われている基底例外クラスです。この例外クラスは直接インスタンス化することができません。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.DomstringSizeErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">DomstringSizeErr</tt><a class="headerlink" href="#xml.dom.DomstringSizeErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定された範囲のテキストが文字列に収まらない場合に送出されます。この例外は Python の DOM 実装で使われるかどうかは判っていませんが、 Python
+で書かれていない DOM 実装から送出される場合があります。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.HierarchyRequestErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">HierarchyRequestErr</tt><a class="headerlink" href="#xml.dom.HierarchyRequestErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>挿入できない型のノードを挿入しようと試みたときに送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.IndexSizeErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">IndexSizeErr</tt><a class="headerlink" href="#xml.dom.IndexSizeErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メソッドに与えたインデクスやサイズパラメタが負の値や許容範囲の値を超えた際に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.InuseAttributeErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">InuseAttributeErr</tt><a class="headerlink" href="#xml.dom.InuseAttributeErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文書中にすでに存在する <tt class="xref py py-class docutils literal"><span class="pre">Attr</span></tt> ノードを挿入しようと試みた際に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.InvalidAccessErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">InvalidAccessErr</tt><a class="headerlink" href="#xml.dom.InvalidAccessErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パラメタまたは操作が根底にあるオブジェクトでサポートされていない場合に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.InvalidCharacterErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">InvalidCharacterErr</tt><a class="headerlink" href="#xml.dom.InvalidCharacterErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この例外は、文字列パラメタが、現在使われているコンテキストで XML 1.0 勧告によって許可されていない場合に送出されます。例えば、要素型に空白の入った
+<tt class="xref py py-class docutils literal"><span class="pre">Element</span></tt> ノードを生成しようとすると、このエラーが送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.InvalidModificationErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">InvalidModificationErr</tt><a class="headerlink" href="#xml.dom.InvalidModificationErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ノードの型を変更しようと試みた際に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.InvalidStateErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">InvalidStateErr</tt><a class="headerlink" href="#xml.dom.InvalidStateErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>定義されていないオブジェクトや、もはや利用できなくなったオブジェクトを使おうと試みた際に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.NamespaceErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">NamespaceErr</tt><a class="headerlink" href="#xml.dom.NamespaceErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference external" href="http://www.w3.org/TR/REC-xml-names/">Namespaces in XML</a>
+に照らして許可されていない方法でオブジェクトを変更しようと試みた場合、この例外が送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.NotFoundErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">NotFoundErr</tt><a class="headerlink" href="#xml.dom.NotFoundErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>参照しているコンテキスト中に目的のノードが存在しない場合に送出される例外です。例えば、 <tt class="xref py py-meth docutils literal"><span class="pre">NamedNodeMap.removeNamedItem()</span></tt>
+は渡されたノードがノードマップ中に存在しない場合にこの例外を送出します。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.NotSupportedErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">NotSupportedErr</tt><a class="headerlink" href="#xml.dom.NotSupportedErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要求された方のオブジェクトや操作が実装でサポートされていない場合に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.NoDataAllowedErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">NoDataAllowedErr</tt><a class="headerlink" href="#xml.dom.NoDataAllowedErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>データ属性をサポートしないノードにデータを指定した際に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.NoModificationAllowedErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">NoModificationAllowedErr</tt><a class="headerlink" href="#xml.dom.NoModificationAllowedErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オブジェクトに対して (読み出し専用ノードに対する修正のように) 許可されていない修正を行おうと試みた際に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.SyntaxErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">SyntaxErr</tt><a class="headerlink" href="#xml.dom.SyntaxErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>無効または不正な文字列が指定された際に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="xml.dom.WrongDocumentErr">
+<em class="property">exception </em><tt class="descclassname">xml.dom.</tt><tt class="descname">WrongDocumentErr</tt><a class="headerlink" href="#xml.dom.WrongDocumentErr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ノードが現在属している文書と異なる文書に挿入され、かつある文書から別の文書へのノードの移行が実装でサポートされていない場合に送出されます。</p>
+</dd></dl>
+
+<p>DOM 勧告で定義されている例外コードは、以下のテーブルに従って上記の例外と対応付けられます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="54%" />
+<col width="46%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">定数</th>
+<th class="head">例外</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">DOMSTRING_SIZE_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.DomstringSizeErr" title="xml.dom.DomstringSizeErr"><tt class="xref py py-exc docutils literal"><span class="pre">DomstringSizeErr</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">HIERARCHY_REQUEST_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.HierarchyRequestErr" title="xml.dom.HierarchyRequestErr"><tt class="xref py py-exc docutils literal"><span class="pre">HierarchyRequestErr</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">INDEX_SIZE_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.IndexSizeErr" title="xml.dom.IndexSizeErr"><tt class="xref py py-exc docutils literal"><span class="pre">IndexSizeErr</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">INUSE_ATTRIBUTE_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.InuseAttributeErr" title="xml.dom.InuseAttributeErr"><tt class="xref py py-exc docutils literal"><span class="pre">InuseAttributeErr</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">INVALID_ACCESS_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.InvalidAccessErr" title="xml.dom.InvalidAccessErr"><tt class="xref py py-exc docutils literal"><span class="pre">InvalidAccessErr</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">INVALID_CHARACTER_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.InvalidCharacterErr" title="xml.dom.InvalidCharacterErr"><tt class="xref py py-exc docutils literal"><span class="pre">InvalidCharacterErr</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">INVALID_MODIFICATION_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.InvalidModificationErr" title="xml.dom.InvalidModificationErr"><tt class="xref py py-exc docutils literal"><span class="pre">InvalidModificationErr</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">INVALID_STATE_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.InvalidStateErr" title="xml.dom.InvalidStateErr"><tt class="xref py py-exc docutils literal"><span class="pre">InvalidStateErr</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">NAMESPACE_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.NamespaceErr" title="xml.dom.NamespaceErr"><tt class="xref py py-exc docutils literal"><span class="pre">NamespaceErr</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">NOT_FOUND_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.NotFoundErr" title="xml.dom.NotFoundErr"><tt class="xref py py-exc docutils literal"><span class="pre">NotFoundErr</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">NOT_SUPPORTED_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.NotSupportedErr" title="xml.dom.NotSupportedErr"><tt class="xref py py-exc docutils literal"><span class="pre">NotSupportedErr</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">NO_DATA_ALLOWED_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.NoDataAllowedErr" title="xml.dom.NoDataAllowedErr"><tt class="xref py py-exc docutils literal"><span class="pre">NoDataAllowedErr</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">NO_MODIFICATION_ALLOWED_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.NoModificationAllowedErr" title="xml.dom.NoModificationAllowedErr"><tt class="xref py py-exc docutils literal"><span class="pre">NoModificationAllowedErr</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">SYNTAX_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.SyntaxErr" title="xml.dom.SyntaxErr"><tt class="xref py py-exc docutils literal"><span class="pre">SyntaxErr</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">WRONG_DOCUMENT_ERR</span></tt></td>
+<td><a class="reference internal" href="#xml.dom.WrongDocumentErr" title="xml.dom.WrongDocumentErr"><tt class="xref py py-exc docutils literal"><span class="pre">WrongDocumentErr</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="dom-conformance">
+<span id="id4"></span><h2>19.6.3. 適合性<a class="headerlink" href="#dom-conformance" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この節では適合性に関する要求と、Python DOM API、W3C DOM 勧告、および OMG IDL の Python API
+への対応付けとの間の関係について述べます。</p>
+<div class="section" id="dom-type-mapping">
+<span id="id5"></span><h3>19.6.3.1. 型の対応付け<a class="headerlink" href="#dom-type-mapping" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>DOM 仕様で使われている基本的な IDL 型は、以下のテーブルに従って Python の型に対応付けられています。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">IDL 型</th>
+<th class="head">Python 型</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">IntegerType</span></tt> (値 <tt class="docutils literal"><span class="pre">0</span></tt> または <tt class="docutils literal"><span class="pre">1</span></tt>) による</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">int</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">IntegerType</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">long</span> <span class="pre">int</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">IntegerType</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">unsigned</span> <span class="pre">int</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">IntegerType</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>さらに、勧告で定義されている <tt class="xref py py-class docutils literal"><span class="pre">DOMString</span></tt> は、Python 文字列または Unicode
+文字列に対応付けられます。アプリケーションでは、 DOM から文字列が返される際には常に Unicode を扱えなければなりません。</p>
+<p>IDL の <cite>null</cite> 値は <tt class="docutils literal"><span class="pre">None</span></tt> に対応付けられており、 API で <cite>null</cite>
+の使用が許されている場所では常に受理されるか、あるいは実装によって提供されるはずです。</p>
+</div>
+<div class="section" id="dom-accessor-methods">
+<span id="id6"></span><h3>19.6.3.2. アクセサメソッド<a class="headerlink" href="#dom-accessor-methods" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>OMG IDL から Python への対応付けは、 IDL <cite>attribute</cite> 宣言へのアクセサ関数の定義を、Java
+による対応付けが行うのとほとんど同じように行います。</p>
+<p>IDL 宣言の対応付け</p>
+<div class="highlight-python"><pre>readonly attribute string someValue;
+         attribute string anotherValue;</pre>
+</div>
+<p>は、三つのアクセサ関数: <tt class="xref py py-attr docutils literal"><span class="pre">someValue</span></tt> に対する &#8220;get&#8221; メソッド
+(<tt class="xref py py-meth docutils literal"><span class="pre">_get_someValue()</span></tt>)、そして <tt class="xref py py-attr docutils literal"><span class="pre">anotherValue</span></tt> に対する &#8220;get&#8221; および &#8220;set&#8221; メソッド
+(<tt class="xref py py-meth docutils literal"><span class="pre">_get_anotherValue()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">_set_anotherValue()</span></tt>) を生み出します。とりわけ、対応付けでは、IDL 属性が通常の Python 属性としてアクセス可能であることは必須ではありません: <tt class="docutils literal"><span class="pre">object.someValue</span></tt>
+が動作することは必須 <em>ではなく</em> 、 <a class="reference internal" href="exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a> を送出してもかまいません。</p>
+<p>しかしながら、Python DOM API では、通常の属性アクセスが動作することが必須です。これは、Python IDL
+コンパイラによって生成された典型的なサロゲーションはまず動作することはなく、DOM オブジェクトが CORBA
+を解してアクセスされる場合には、クライアント上でラッパオブジェクトが必要であることを意味します。 CORBA DOM
+クライアントでは他にもいくつか考慮すべきことがある一方で、 CORBA を介して DOM を使った経験を持つ実装者はこのことを問題視していません。 <cite>readonly</cite> であると宣言された属性は、全ての DOM 実装で書き込みアクセスを制限しているとは限りません。</p>
+<p>Python DOM API では、アクセサ関数は必須ではありません。アクセサ関数が提供された場合、 Python IDL
+対応付けによって定義された形式をとらなければなりませんが、属性は Python から直接アクセスすることができるので、それらのメソッドは必須ではないと考えられます。 <cite>readonly</cite> であると宣言された属性に対しては、 &#8220;set&#8221; アクセサを提供してはなりません。</p>
+<p>このIDLでの定義はW3C DOM APIの全ての要件を実装しているわけではありません。例えば、一部のオブジェクトの概念や
+<tt class="xref py py-meth docutils literal"><span class="pre">getElementsByTagName()</span></tt> が&#8221;live&#8221;であることなどです。 Python DOM API
+はこれらの要件を実装することを強制しません。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="xml.dom.minidom.html" title="19.7. xml.dom.minidom — 軽量な DOM 実装"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="pyexpat.html" title="19.5. xml.parsers.expat — Expat を使った高速な XML 解析"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="markup.html" >19. 構造化マークアップツール</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

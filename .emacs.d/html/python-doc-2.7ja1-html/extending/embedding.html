@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5. 他のアプリケーションへの Python の埋め込み &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python インタプリタの拡張と埋め込み" href="index.html" />
+    <link rel="next" title="6. このドキュメントについて" href="jptranslation.html" />
+    <link rel="prev" title="4. Windows 上での C および C++ 拡張モジュールのビルド" href="windows.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="jptranslation.html" title="6. このドキュメントについて"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="windows.html" title="4. Windows 上での C および C++ 拡張モジュールのビルド"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python インタプリタの拡張と埋め込み</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. 他のアプリケーションへの Python の埋め込み</a><ul>
+<li><a class="reference internal" href="#high-level-embedding">5.1. 高水準の埋め込み</a></li>
+<li><a class="reference internal" href="#lower-level-embedding">5.2. 超高水準の埋め込みから踏み出す: 概要</a></li>
+<li><a class="reference internal" href="#pure-embedding">5.3. 純粋な埋め込み</a></li>
+<li><a class="reference internal" href="#extending-with-embedding">5.4. 埋め込まれた Python の拡張</a></li>
+<li><a class="reference internal" href="#c-python">5.5. C++による Python の埋め込み</a></li>
+<li><a class="reference internal" href="#link-reqs">5.6. リンクに関する要件</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="windows.html"
+                        title="前の章へ">4. Windows 上での C および C++ 拡張モジュールのビルド</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="jptranslation.html"
+                        title="次の章へ">6. このドキュメントについて</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/extending/embedding.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="python">
+<span id="embedding"></span><h1>5. 他のアプリケーションへの Python の埋め込み<a class="headerlink" href="#python" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>前章では、 Python を拡張する方法、すなわち C 関数のライブラリを Python に結びつけて機能を拡張する方法について述べました。同じようなことを別の方法でも実行できます: それは、自分の C/C++ アプリケーションに Python を埋め込んで機能を強化する、というものです。埋め込みを行うことで、アプリケーションの何らかの機能を C や C++ の代わりに Python で実装できるようになります。埋め込みは多くの用途で利用できます; ユーザが Python でスクリプトを書き、アプリケーションを自分好みに仕立てられるようにする、というのがその一例です。プログラマが、特定の機能を Python でより楽に書ける場合に自分自身のために埋め込みを行うこともできます。</p>
+<p>Python の埋め込みは Python の拡張と似ていますが、全く同じというわけではありません。その違いは、Python を拡張した場合にはアプリケーションのメインプログラムは依然として Python インタプリタである一方、 Python を組み込みんだ場合には、メインプログラムには
+Python が関係しない &#8212; その代わりに、アプリケーションのある一部分が時折 Python インタプリタを呼び出して何らかの Python コードを実行させる &#8212; かもしれない、ということです。</p>
+<p>従って、 Python の埋め込みを行う場合、自作のメインプログラムを提供しなければなりません。メインプログラムがやらなければならないことの一つに、
+Python インタプリタの初期化があります。とにかく少なくとも関数 <a class="reference internal" href="../c-api/init.html#Py_Initialize" title="Py_Initialize"><tt class="xref c c-func docutils literal"><span class="pre">Py_Initialize()</span></tt></a>
+を呼び出さねばなりません。オプションとして、Python
+側にコマンドライン引数を渡すために関数呼び出しを行います。その後、アプリケーションのどこでもインタプリタを呼び出せるようになります。</p>
+<p>インタプリタを呼び出すには、異なるいくつかの方法があります: Python 文が入った文字列を <a class="reference internal" href="../c-api/veryhigh.html#PyRun_SimpleString" title="PyRun_SimpleString"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleString()</span></tt></a> に渡す、
+stdio ファイルポインタとファイル名 (これはエラーメッセージ内でコードを識別するためだけのものです) を
+<a class="reference internal" href="../c-api/veryhigh.html#PyRun_SimpleFile" title="PyRun_SimpleFile"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleFile()</span></tt></a> に渡す、といった具合です。これまでの各章で説明した低水準の操作を呼び出して、Python オブジェクトを構築したり使用したりもできます。</p>
+<p>Python の埋め込みを行っている簡単なデモは、ソース配布物の <tt class="file docutils literal"><span class="pre">Demo/embed/</span></tt> ディレクトリにあります。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="../c-api/index.html#c-api-index"><em>Python/C API リファレンスマニュアル</em></a></dt>
+<dd>Python  C インタフェースの詳細はこのマニュアルに書かれています。必要な情報の大部分はここにあるはずです。</dd>
+</dl>
+</div>
+<div class="section" id="high-level-embedding">
+<span id="id1"></span><h2>5.1. 高水準の埋め込み<a class="headerlink" href="#high-level-embedding" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python の埋め込みの最も簡単な形式は、超高水準インタフェースの利用です。このインタフェースは、アプリケーションとやり取りする必要がない Python
+スクリプトを実行するためのものです。例えばこれは、一つのファイル上で何らかの操作を実現するのに利用できます。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="cp">#include &lt;Python.h&gt;</span>
+
+<span class="kt">int</span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+  <span class="n">Py_Initialize</span><span class="p">();</span>
+  <span class="n">PyRun_SimpleString</span><span class="p">(</span><span class="s">&quot;from time import time,ctime</span><span class="se">\n</span><span class="s">&quot;</span>
+                     <span class="s">&quot;print &#39;Today is&#39;,ctime(time())</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+  <span class="n">Py_Finalize</span><span class="p">();</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>上のコードでは、まず Python インタプリタを <a class="reference internal" href="../c-api/init.html#Py_Initialize" title="Py_Initialize"><tt class="xref c c-func docutils literal"><span class="pre">Py_Initialize()</span></tt></a> で起動し、続いてハードコードされた Python
+スクリプトで日付と時間の出力を実行します。その後、 <a class="reference internal" href="../c-api/init.html#Py_Finalize" title="Py_Finalize"><tt class="xref c c-func docutils literal"><span class="pre">Py_Finalize()</span></tt></a> の呼び出しでインタプリタを終了し, プログラムの終了に続きます。実際のプログラムでは、Python スクリプトを他のソース、おそらくテキストエディタルーチンやファイル、データベースから取り出したいと考えるかもしれません。Python コードをファイルから取り出すには、 <a class="reference internal" href="../c-api/veryhigh.html#PyRun_SimpleFile" title="PyRun_SimpleFile"><tt class="xref c c-func docutils literal"><span class="pre">PyRun_SimpleFile()</span></tt></a> 関数を使うのがよいでしょう。この関数はメモリを確保して、ファイルの内容をロードする手間を省いてくれます。</p>
+</div>
+<div class="section" id="lower-level-embedding">
+<span id="id2"></span><h2>5.2. 超高水準の埋め込みから踏み出す: 概要<a class="headerlink" href="#lower-level-embedding" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>高水準インタフェースは、断片的な Python コードをアプリケーションから実行できるようにしてくれますが、アプリケーションと Python コードの間でのデータのやり取りは、控えめに言っても煩わしいものです。データのやり取りをしたいなら、より低水準のインタフェース呼び出しを利用しなくてはなりません。より多く C コードを書かねばならない代わりに、ほぼ何でもできるようになります。</p>
+<p>Python の拡張と埋め込みは、趣旨こそ違え、同じ作業であるということに注意せねばなりません。これまでの章で議論してきたトピックのほとんどが埋め込みでもあてはまります。これを示すために、 Python から C への拡張を行うコードが実際には何をするか考えてみましょう:</p>
+<ol class="arabic simple">
+<li>データ値を Python から C に変換する。</li>
+<li>変換された値を使って C ルーチンの関数呼び出しを行い、</li>
+<li>呼び出しで得られたデータ値 C から Python に変換する。</li>
+</ol>
+<p>Python を埋め込む場合には、インタフェースコードが行う作業は以下のようになります:</p>
+<ol class="arabic simple">
+<li>データ値を C から Python に変換する。</li>
+<li>変換された値を使って Python インタフェースルーチンの関数呼び出しを行い、</li>
+<li>呼び出しで得られたデータ値 Python から C に変換する。</li>
+</ol>
+<p>一見して分かるように、データ変換のステップは、言語間でデータを転送する方向が変わったのに合わせて単に入れ替えただけです。唯一の相違点は、データ変換の間にあるルーチンです。拡張を行う際には C ルーチンを呼び出しますが、埋め込みの際には Python ルーチンを呼び出します。</p>
+<p>この章では、Python から C へ、そしてその逆へとデータを変換する方法については議論しません。また、正しい参照の使い方やエラーの扱い方についてすでに理解しているものと仮定します。これらの側面についてはインタプリタの拡張と何ら変わるところがないので、必要な情報については以前の章を参照できます。</p>
+</div>
+<div class="section" id="pure-embedding">
+<span id="id3"></span><h2>5.3. 純粋な埋め込み<a class="headerlink" href="#pure-embedding" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>最初に例示するプログラムは、Python スクリプト内の関数を実行するためのものです。超高水準インタフェースに関する節で挙げた例と同様に、Python
+インタプリタはアプリケーションと直接やりとりはしません (が、次の節でやりとりするよう変更します)。</p>
+<p>Python スクリプト内で定義されている関数を実行するためのコードは以下のようになります:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="cp">#include &lt;Python.h&gt;</span>
+
+<span class="kt">int</span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">pName</span><span class="p">,</span> <span class="o">*</span><span class="n">pModule</span><span class="p">,</span> <span class="o">*</span><span class="n">pDict</span><span class="p">,</span> <span class="o">*</span><span class="n">pFunc</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">pArgs</span><span class="p">,</span> <span class="o">*</span><span class="n">pValue</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="s">&quot;Usage: call pythonfile funcname [args]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">Py_Initialize</span><span class="p">();</span>
+    <span class="n">pName</span> <span class="o">=</span> <span class="n">PyString_FromString</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="cm">/* Error checking of pName left out */</span>
+
+    <span class="n">pModule</span> <span class="o">=</span> <span class="n">PyImport_Import</span><span class="p">(</span><span class="n">pName</span><span class="p">);</span>
+    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pName</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">pModule</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">pFunc</span> <span class="o">=</span> <span class="n">PyObject_GetAttrString</span><span class="p">(</span><span class="n">pModule</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+        <span class="cm">/* pFunc is a new reference */</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">pFunc</span> <span class="o">&amp;&amp;</span> <span class="n">PyCallable_Check</span><span class="p">(</span><span class="n">pFunc</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">pArgs</span> <span class="o">=</span> <span class="n">PyTuple_New</span><span class="p">(</span><span class="n">argc</span> <span class="o">-</span> <span class="mi">3</span><span class="p">);</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">argc</span> <span class="o">-</span> <span class="mi">3</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">pValue</span> <span class="o">=</span> <span class="n">PyInt_FromLong</span><span class="p">(</span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]));</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">pValue</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pArgs</span><span class="p">);</span>
+                    <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span>
+                    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Cannot convert argument</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+                    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="cm">/* pValue reference stolen here: */</span>
+                <span class="n">PyTuple_SetItem</span><span class="p">(</span><span class="n">pArgs</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">pValue</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="n">pValue</span> <span class="o">=</span> <span class="n">PyObject_CallObject</span><span class="p">(</span><span class="n">pFunc</span><span class="p">,</span> <span class="n">pArgs</span><span class="p">);</span>
+            <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pArgs</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pValue</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Result of call: %ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">PyInt_AsLong</span><span class="p">(</span><span class="n">pValue</span><span class="p">));</span>
+                <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pValue</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="k">else</span> <span class="p">{</span>
+                <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pFunc</span><span class="p">);</span>
+                <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span>
+                <span class="n">PyErr_Print</span><span class="p">();</span>
+                <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="s">&quot;Call failed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">PyErr_Occurred</span><span class="p">())</span>
+                <span class="n">PyErr_Print</span><span class="p">();</span>
+            <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Cannot find function </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">pFunc</span><span class="p">);</span>
+        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">pModule</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">PyErr_Print</span><span class="p">();</span>
+        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Failed to load </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">Py_Finalize</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>このコードは <tt class="docutils literal"><span class="pre">argv[1]</span></tt> を使って Python スクリプトをロードし、 <tt class="docutils literal"><span class="pre">argv[2]</span></tt> 内に指定された名前の関数を呼び出します。関数の整数引数は <tt class="docutils literal"><span class="pre">argv</span></tt> 配列中の他の値になります。このプログラムをコンパイルしてリンクし (できた実行可能形式を <strong class="program">call</strong>
+と呼びましょう)、以下のような Python スクリプトを実行することにします:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">def</span> <span class="n">multiply</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span><span class="o">:</span>
+    <span class="n">print</span> <span class="s">&quot;Will compute&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="s">&quot;times&quot;</span><span class="p">,</span> <span class="n">b</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="n">in</span> <span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="k">return</span> <span class="n">c</span>
+</pre></div>
+</div>
+<p>実行結果は以下のようになるはずです:</p>
+<div class="highlight-c"><pre>$ call multiply multiply 3 2
+Will compute 3 times 2
+Result of call: 6</pre>
+</div>
+<p>この程度の機能を実現するにはプログラムがいささか大きすぎますが、ほとんどは Python から C へのデータ変換やエラー報告のためのコードです。Python の埋め込みという観点から最も興味深い部分は以下のコード、</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">Py_Initialize</span><span class="p">();</span>
+<span class="n">pName</span> <span class="o">=</span> <span class="n">PyString_FromString</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="cm">/* pName のエラーチェックは省略している */</span>
+<span class="n">pModule</span> <span class="o">=</span> <span class="n">PyImport_Import</span><span class="p">(</span><span class="n">pName</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>から始まる部分です。</p>
+<p>インタプリタの初期化後、スクリプトは <a class="reference internal" href="../c-api/import.html#PyImport_Import" title="PyImport_Import"><tt class="xref c c-func docutils literal"><span class="pre">PyImport_Import()</span></tt></a> を使って読み込まれます。このルーチンは Python
+文字列を引数に取る必要があり、データ変換ルーチン <a class="reference internal" href="../c-api/string.html#PyString_FromString" title="PyString_FromString"><tt class="xref c c-func docutils literal"><span class="pre">PyString_FromString()</span></tt></a> で構築します。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">pFunc</span> <span class="o">=</span> <span class="n">PyObject_GetAttrString</span><span class="p">(</span><span class="n">pModule</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+<span class="cm">/* pFunc は新たな参照 */</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">pFunc</span> <span class="o">&amp;&amp;</span> <span class="n">PyCallable_Check</span><span class="p">(</span><span class="n">pFunc</span><span class="p">))</span> <span class="p">{</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+<span class="n">Py_XDECREF</span><span class="p">(</span><span class="n">pFunc</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>ひとたびスクリプトが読み込まれると、 <a class="reference internal" href="../c-api/object.html#PyObject_GetAttrString" title="PyObject_GetAttrString"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_GetAttrString()</span></tt></a> を使って必要な名前を取得できます。名前がスクリプト中に存在し、取得したオブジェクトが呼び出し可能オブジェクトであれば、このオブジェクトが関数であると考えて差し支えないでしょう。そこでプログラムは定石どおりに引数のタプル構築に進みます。その後、Python 関数を以下のコードで呼び出します:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">pValue</span> <span class="o">=</span> <span class="n">PyObject_CallObject</span><span class="p">(</span><span class="n">pFunc</span><span class="p">,</span> <span class="n">pArgs</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>関数が処理を戻す際、 <tt class="docutils literal"><span class="pre">pValue</span></tt> は <em>NULL</em> になるか、関数の戻り値への参照が入っています。値を調べた後には忘れずに参照を解放してください。</p>
+</div>
+<div class="section" id="extending-with-embedding">
+<span id="id4"></span><h2>5.4. 埋め込まれた Python の拡張<a class="headerlink" href="#extending-with-embedding" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ここまでは、埋め込み Python インタプリタはアプリケーション本体の機能にアクセスする手段がありませんでした。 Python API
+を使うと、埋め込みインタプリタを拡張することでアプリケーション本体へのアクセスを可能にします。つまり、アプリケーションで提供されているルーチンを使って、埋め込みインタプリタを拡張するのです。複雑なことのように思えますが、それほどひどいわけではありません。さしあたって、アプリケーションが Python
+インタプリタを起動したということをちょっと忘れてみてください。その代わり、アプリケーションがサブルーチンの集まりで、あたかも普通の Python
+拡張モジュールを書くかのように、Python から各ルーチンにアクセスできるようにするグルー(glue, 糊)
+コードを書くと考えてください。例えば以下のようにです:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">static</span> <span class="kt">int</span> <span class="n">numargs</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* アプリケーションのコマンドライン引数の個数を返す */</span>
+<span class="k">static</span> <span class="n">PyObject</span><span class="o">*</span>
+<span class="nf">emb_numargs</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;:numargs&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">Py_BuildValue</span><span class="p">(</span><span class="s">&quot;i&quot;</span><span class="p">,</span> <span class="n">numargs</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">EmbMethods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="s">&quot;numargs&quot;</span><span class="p">,</span> <span class="n">emb_numargs</span><span class="p">,</span> <span class="n">METH_VARARGS</span><span class="p">,</span>
+     <span class="s">&quot;Return the number of arguments received by the process.&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>上のコードを <tt class="xref c c-func docutils literal"><span class="pre">main()</span></tt> 関数のすぐ上に挿入します。また、以下の二つの文を <a class="reference internal" href="../c-api/init.html#Py_Initialize" title="Py_Initialize"><tt class="xref c c-func docutils literal"><span class="pre">Py_Initialize()</span></tt></a> の直後に挿入します:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">numargs</span> <span class="o">=</span> <span class="n">argc</span><span class="p">;</span>
+<span class="n">Py_InitModule</span><span class="p">(</span><span class="s">&quot;emb&quot;</span><span class="p">,</span> <span class="n">EmbMethods</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>これら二つの行は <tt class="docutils literal"><span class="pre">numargs</span></tt> 変数を初期化し、埋め込み Python インタプリタから <tt class="xref py py-func docutils literal"><span class="pre">emb.numargs()</span></tt> 関数にアクセスできるようにします。これらの拡張モジュール関数を使うと、 Python スクリプトは</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">import</span> <span class="n">emb</span>
+<span class="n">print</span> <span class="s">&quot;Number of arguments&quot;</span><span class="p">,</span> <span class="n">emb</span><span class="p">.</span><span class="n">numargs</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>のようなことができます。</p>
+<p>実際のアプリケーションでは、こうしたメソッドでアプリケーション内の API を Python に公開することになります。</p>
+</div>
+<div class="section" id="c-python">
+<span id="embeddingincplusplus"></span><h2>5.5. C++による Python の埋め込み<a class="headerlink" href="#c-python" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>C++ プログラム中にも Python を埋め込めます; 厳密に言うと、どうやって埋め込むかは使っているC++ 処理系の詳細に依存します;
+一般的には、メインプログラムをC++で書き、C++ コンパイラを使ってプログラムをコンパイル・リンクする必要があるでしょう。 Python 自体を
+C++でコンパイルしなおす必要はありません。</p>
+</div>
+<div class="section" id="link-reqs">
+<span id="id5"></span><h2>5.6. リンクに関する要件<a class="headerlink" href="#link-reqs" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python ソースと一緒についてくる <strong class="program">configure</strong> スクリプトは動的にリンクされる拡張モジュールが必要とするシンボルを公開するようただしく Python をビルドしますが、この機能は Python ライブラリを静的に埋め込むようなアプリケーションには継承されません。少なくとも Unix
+ではそうです。これは、アプリケーションが静的な実行時ライブラリ (<tt class="file docutils literal"><span class="pre">libpython.a</span></tt>) にリンクされていて、かつ (<tt class="file docutils literal"><span class="pre">.so</span></tt>
+ファイルとして実装されている)  動的ロードされるような拡張モジュールをロードする必要がある場合に起きる問題です。</p>
+<p>問題になるのは、拡張モジュールが使うあるエントリポイントが Python ランタイムだけで定義されているという状況です。埋め込みを行うアプリケーション側がこうしたエントリポイントを全く使わない場合、リンカによってはエントリポイントを最終的に生成される実行可能形式のシンボルテーブル内に含めません。こうした場合、リンカに追加のオプションを与えて、これらのシンボルを除去しないよう教える必要があります。</p>
+<p>プラットフォームごとに正しいオプションを決めるのはかなり困難です、とはいえ、幸運なことに、オプションは Python のビルド設定内にすでにあります。インストール済みの Python インタプリタからオプションを取り出すには、対話インタプリタを起動して、以下のような短いセッションを実行します:</p>
+<div class="highlight-c"><pre>&gt;&gt;&gt; import distutils.sysconfig
+&gt;&gt;&gt; distutils.sysconfig.get_config_var('LINKFORSHARED')
+'-Xlinker -export-dynamic'</pre>
+</div>
+<p id="index-0">表示された文字列の内容が、ビルド時に使うべきオプションです。文字列が空であれば、特に追加すべきオプションはありません。
+<tt class="xref py py-const docutils literal"><span class="pre">LINKFORSHARED</span></tt> の定義内容は、 Python のトップレベル <tt class="file docutils literal"><span class="pre">Makefile</span></tt> 内の同名の変数に対応しています。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="jptranslation.html" title="6. このドキュメントについて"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="windows.html" title="4. Windows 上での C および C++ 拡張モジュールのビルド"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python インタプリタの拡張と埋め込み</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

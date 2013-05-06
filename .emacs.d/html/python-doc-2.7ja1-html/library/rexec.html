@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>29.1. rexec — 制限実行のフレームワーク &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="29. 制限実行 (restricted execution)" href="restricted.html" />
+    <link rel="next" title="29.2. Bastion — オブジェクトに対するアクセスの制限" href="bastion.html" />
+    <link rel="prev" title="29. 制限実行 (restricted execution)" href="restricted.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="bastion.html" title="29.2. Bastion — オブジェクトに対するアクセスの制限"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="restricted.html" title="29. 制限実行 (restricted execution)"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="restricted.html" accesskey="U">29. 制限実行 (restricted execution)</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">29.1. <tt class="docutils literal"><span class="pre">rexec</span></tt> &#8212; 制限実行のフレームワーク</a><ul>
+<li><a class="reference internal" href="#rexec-objects">29.1.1. RExec オブジェクト</a></li>
+<li><a class="reference internal" href="#rexec-extension">29.1.2. 制限された環境を定義する</a></li>
+<li><a class="reference internal" href="#id3">29.1.3. 例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="restricted.html"
+                        title="前の章へ">29. 制限実行 (restricted execution)</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="bastion.html"
+                        title="次の章へ">29.2. <tt class="docutils literal docutils literal docutils literal"><span class="pre">Bastion</span></tt> &#8212; オブジェクトに対するアクセスの制限</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/rexec.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-rexec">
+<span id="rexec"></span><h1>29.1. <a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> &#8212; 制限実行のフレームワーク<a class="headerlink" href="#module-rexec" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃: </span><a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> モジュールは Python 3.0 で削除されました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>Disabled module.</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">このドキュメントは、 <a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> モジュールを使用している古いコードを読む際の参照用として残されています。</p>
+</div>
+<p>このモジュールには <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> クラスが含まれています。このクラスは、 <tt class="xref py py-meth docutils literal"><span class="pre">r_eval()</span></tt> 、 <tt class="xref py py-meth docutils literal"><span class="pre">r_execfile()</span></tt> 、
+<tt class="xref py py-meth docutils literal"><span class="pre">r_exec()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">r_import()</span></tt> メソッドをサポートし、これらは標準の Python 関数 <a class="reference internal" href="functions.html#eval" title="eval"><tt class="xref py py-meth docutils literal"><span class="pre">eval()</span></tt></a> 、
+<a class="reference internal" href="functions.html#execfile" title="execfile"><tt class="xref py py-meth docutils literal"><span class="pre">execfile()</span></tt></a> および <a class="reference internal" href="../reference/simple_stmts.html#exec"><tt class="xref std std-keyword docutils literal"><span class="pre">exec</span></tt></a> と <a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> 文の制限されたバージョンです。この制限された環境で実行されるコードは、安全であると見なされたモジュールや関数だけにアクセスします; <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> をサブクラス化すれば、望むように能力を追加および削除できます。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last"><a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> モジュールは、下記のように動作するべく設計されてはいますが、注意深く書かれたコードなら利用できてしまうかもしれない、既知の脆弱性がいくつかあります。従って、&#8221;製品レベル&#8221; のセキュリティを要する状況では、 <a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> の動作をあてにするべきではありません。製品レベルのセキュリティを求めるなら、サブプロセスを介した実行や、あるいは処理するコードとデータの両方に対する非常に注意深い  &#8220;浄化&#8221;
+が必要でしょう。上記の代わりに、 <a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> の既知の脆弱性に対するパッチ当ての手伝いも歓迎します。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> クラスは、プログラムコードによるディスクファイルの読み書きや TCP/IP ソケットの利用といった、安全でない操作の実行を防ぐことができます。しかし、プログラムコードよる非常に大量のメモリや処理時間の消費に対して防御することはできません。</p>
+</div>
+<dl class="class">
+<dt id="rexec.RExec">
+<em class="property">class </em><tt class="descclassname">rexec.</tt><tt class="descname">RExec</tt><big>(</big><span class="optional">[</span><em>hooks</em><span class="optional">[</span>, <em>verbose</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#rexec.RExec" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> クラスのインスタンスを返します。</p>
+<p><em>hooks</em> は、 <tt class="xref py py-class docutils literal"><span class="pre">RHooks</span></tt> クラスあるいはそのサブクラスのインスタンスです。 <em>hooks</em> が省略されているか <tt class="docutils literal"><span class="pre">None</span></tt>
+であれば、デフォルトの <tt class="xref py py-class docutils literal"><span class="pre">RHooks</span></tt> クラスがインスタンス化されます。 <a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> モジュールが (組み込みモジュールを含む)
+あるモジュールを探したり、あるモジュールのコードを読んだりする時は常に、 <a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> がじかにファイルシステムに出て行くことはありません。その代わり、あらかじめ <tt class="xref py py-class docutils literal"><span class="pre">RHooks</span></tt> クラスに渡しておいたり、コンストラクタで生成された <tt class="xref py py-class docutils literal"><span class="pre">RHooks</span></tt>
+インスタンスのメソッドを呼び出します。</p>
+<p>(実際には、 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> オブジェクトはこれらを呼び出しません &#8212;  呼び出しは、 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a>
+オブジェクトの一部であるモジュールローダオブジェクトによって行われます。これによって別のレベルの柔軟性が実現されます。この柔軟性は、制限された環境内で <a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> 機構を変更する時に役に立ちます。 )</p>
+<p>代替の <tt class="xref py py-class docutils literal"><span class="pre">RHooks</span></tt> オブジェクトを提供することで、モジュールをインポートする際に行われるファイルシステムへのアクセスを制御することができます。このとき、各々のアクセスが行われる順番を制御する実際のアルゴリズムは変更されません。例えば、 <tt class="xref py py-class docutils literal"><span class="pre">RHooks</span></tt>
+オブジェクトを置き換えて、ILU のようなある種の RPC メカニズムを介することで、全てのファイルシステムの要求をどこかにあるファイルサーバに渡すことができます。 Grail のアプレットローダは、アプレットを URL からディレクトリ上に import
+する際にこの機構を使っています。</p>
+<p>もし <em>verbose</em> が true であれば、追加のデバッグ出力が標準出力に送られます。</p>
+</dd></dl>
+
+<p>制限された環境で実行するコードも、やはり <a class="reference internal" href="sys.html#sys.exit" title="sys.exit"><tt class="xref py py-func docutils literal"><span class="pre">sys.exit()</span></tt></a> 関数を呼ぶことができることを知っておくことは大事なことです。制限されたコードがインタプリタから抜けだすことを許さないためには、いつでも、制限されたコードが、 <a class="reference internal" href="exceptions.html#exceptions.SystemExit" title="exceptions.SystemExit"><tt class="xref py py-exc docutils literal"><span class="pre">SystemExit</span></tt></a> 例外をキャッチする
+<a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> / <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 文とともに実行するように、呼び出しを防御します。制限された環境から
+<a class="reference internal" href="sys.html#sys.exit" title="sys.exit"><tt class="xref py py-func docutils literal"><span class="pre">sys.exit()</span></tt></a> 関数を除去するだけでは不十分です &#8211; 制限されたコードは、やはり <tt class="docutils literal"><span class="pre">raise</span> <span class="pre">SystemExit</span></tt>
+を使うことができてしまいます。 <a class="reference internal" href="exceptions.html#exceptions.SystemExit" title="exceptions.SystemExit"><tt class="xref py py-exc docutils literal"><span class="pre">SystemExit</span></tt></a> を取り除くことも、合理的なオプションではありません;
+いくつかのライブラリコードはこれを使っていますし、これが利用できなくなると中断してしまうでしょう。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://grail.sourceforge.net/">Grail のホームページ</a></dt>
+<dd>Grail はすべて Python で書かれた Web ブラウザです。これは、 <a class="reference internal" href="#module-rexec" title="rexec: 基本的な制限実行フレームワーク。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rexec</span></tt></a> モジュールを、Python
+アプレットをサポートするのに使っていて、このモジュールの使用例として使うことができます。</dd>
+</dl>
+</div>
+<div class="section" id="rexec-objects">
+<span id="id1"></span><h2>29.1.1. RExec オブジェクト<a class="headerlink" href="#rexec-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> インスタンスは以下のメソッドをサポートします:</p>
+<dl class="method">
+<dt id="rexec.RExec.r_eval">
+<tt class="descclassname">RExec.</tt><tt class="descname">r_eval</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#rexec.RExec.r_eval" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>code</em> は、Python の式を含む文字列か、あるいはコンパイルされたコードオブジェクトのどちらかでなければなりません。そしてこれらは制限された環境の
+<a class="reference internal" href="__main__.html#module-__main__" title="__main__: トップレベルスクリプトが実行される環境。"><tt class="xref py py-mod docutils literal"><span class="pre">__main__</span></tt></a> モジュールで評価されます。式あるいはコードオブジェクトの値が返されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.r_exec">
+<tt class="descclassname">RExec.</tt><tt class="descname">r_exec</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#rexec.RExec.r_exec" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>code</em> は、1行以上の Python コードを含む文字列か、コンパイルされたコードオブジェクトのどちらかでなければなりません。そしてこれらは、制限された環境の <a class="reference internal" href="__main__.html#module-__main__" title="__main__: トップレベルスクリプトが実行される環境。"><tt class="xref py py-mod docutils literal"><span class="pre">__main__</span></tt></a> モジュールで実行されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.r_execfile">
+<tt class="descclassname">RExec.</tt><tt class="descname">r_execfile</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#rexec.RExec.r_execfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル <em>filename</em> 内の Python コードを、制限された環境の <a class="reference internal" href="__main__.html#module-__main__" title="__main__: トップレベルスクリプトが実行される環境。"><tt class="xref py py-mod docutils literal"><span class="pre">__main__</span></tt></a> モジュールで実行します。</p>
+</dd></dl>
+
+<p>名前が <tt class="docutils literal"><span class="pre">s_</span></tt> で始まるメソッドは、 <tt class="docutils literal"><span class="pre">r_</span></tt> で始まる関数と同様ですが、そのコードは、標準 I/O ストリーム <tt class="docutils literal"><span class="pre">sys.stdin</span></tt> 、
+<tt class="docutils literal"><span class="pre">sys.stderr</span></tt> および  <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> の制限されたバージョンへのアクセスが許されています。</p>
+<dl class="method">
+<dt id="rexec.RExec.s_eval">
+<tt class="descclassname">RExec.</tt><tt class="descname">s_eval</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#rexec.RExec.s_eval" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>code</em> は、Python 式を含む文字列でなければなりません。そして制限された環境で評価されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.s_exec">
+<tt class="descclassname">RExec.</tt><tt class="descname">s_exec</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#rexec.RExec.s_exec" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>code</em> は、1行以上のPython コードを含む文字列でなければなりません。そして制限された環境で実行されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.s_execfile">
+<tt class="descclassname">RExec.</tt><tt class="descname">s_execfile</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#rexec.RExec.s_execfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル <em>filename</em> に含まれた Python コードを制限された環境で実行します。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> オブジェクトは、制限された環境で実行されるコードによって暗黙のうちに呼ばれる、さまざまなメソッドもサポートしなければなりません。これらのメソッドをサブクラス内でオーバライドすることによって、制限された環境が強制するポリシを変更します。</p>
+<dl class="method">
+<dt id="rexec.RExec.r_import">
+<tt class="descclassname">RExec.</tt><tt class="descname">r_import</tt><big>(</big><em>modulename</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">[</span>, <em>fromlist</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#rexec.RExec.r_import" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュール <em>modulename</em> をインポートし、もしそのモジュールが安全でないとみなされるなら、 <a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> 例外を発生します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.r_open">
+<tt class="descclassname">RExec.</tt><tt class="descname">r_open</tt><big>(</big><em>filename</em><span class="optional">[</span>, <em>mode</em><span class="optional">[</span>, <em>bufsize</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#rexec.RExec.r_open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> が制限された環境で呼ばれるとき、呼ばれるメソッドです。引数は <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> のものと同じであり、ファイルオブジェクト
+(あるいはファイルオブジェクトと互換性のあるクラスインスタンス)が返されます。 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> のデフォルトの動作は、任意のファイルを読み取り用にオープンすることを許可しますが、ファイルに書き込もうとすることは許しません。より制限の少ない <a class="reference internal" href="#rexec.RExec.r_open" title="rexec.RExec.r_open"><tt class="xref py py-meth docutils literal"><span class="pre">r_open()</span></tt></a> の実装については、以下の例を見て下さい。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.r_reload">
+<tt class="descclassname">RExec.</tt><tt class="descname">r_reload</tt><big>(</big><em>module</em><big>)</big><a class="headerlink" href="#rexec.RExec.r_reload" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールオブジェクト <em>module</em> を再ロードして、それを再解析し再初期化します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.r_unload">
+<tt class="descclassname">RExec.</tt><tt class="descname">r_unload</tt><big>(</big><em>module</em><big>)</big><a class="headerlink" href="#rexec.RExec.r_unload" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールオブジェクト <em>module</em> をアンロードします (それを制限された環境の <tt class="docutils literal"><span class="pre">sys.modules</span></tt> 辞書から取りのぞきます)。</p>
+</dd></dl>
+
+<p>および制限された標準 I/O ストリームへのアクセスが可能な同等のもの:</p>
+<dl class="method">
+<dt id="rexec.RExec.s_import">
+<tt class="descclassname">RExec.</tt><tt class="descname">s_import</tt><big>(</big><em>modulename</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">[</span>, <em>fromlist</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#rexec.RExec.s_import" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュール <em>modulename</em> をインポートし、もしそのモジュールが安全でないとみなされるなら、 <a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> 例外を発生します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.s_reload">
+<tt class="descclassname">RExec.</tt><tt class="descname">s_reload</tt><big>(</big><em>module</em><big>)</big><a class="headerlink" href="#rexec.RExec.s_reload" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールオブジェクト <em>module</em> を再ロードして、それを再解析し再初期化します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rexec.RExec.s_unload">
+<tt class="descclassname">RExec.</tt><tt class="descname">s_unload</tt><big>(</big><em>module</em><big>)</big><a class="headerlink" href="#rexec.RExec.s_unload" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールオブジェクト <em>module</em> をアンロードします。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="rexec-extension">
+<span id="id2"></span><h2>29.1.2. 制限された環境を定義する<a class="headerlink" href="#rexec-extension" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> クラスには以下のクラス属性があります。それらは、 <a class="reference internal" href="../reference/datamodel.html#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> メソッドが使います。それらを既存のインスタンス上で変更しても何の効果もありません; そうする代わりに、 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> のサブクラスを作成して、そのクラス定義でそれらに新しい値を割り当てます。そうすると、新しいクラスのインスタンスは、これらの新しい値を使用します。これらの属性のすべては、文字列のタプルです。</p>
+<dl class="attribute">
+<dt id="rexec.RExec.nok_builtin_names">
+<tt class="descclassname">RExec.</tt><tt class="descname">nok_builtin_names</tt><a class="headerlink" href="#rexec.RExec.nok_builtin_names" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>制限された環境で実行するプログラムでは利用でき <em>ない</em> であろう、組み込み関数の名前を格納しています。 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> に対する値は、
+<tt class="docutils literal"><span class="pre">('open',</span> <span class="pre">'reload',</span> <span class="pre">'__import__')</span></tt> です。 (これは例外です。というのは、組み込み関数のほとんど大多数は無害だからです。この変数をオーバライドしたいサブクラスは、基本クラスからの値から始めて、追加した許されない関数を連結していかなければなりません &#8211;
+危険な関数が新しく Python に追加された時は、それらも、このモジュールに追加します。)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rexec.RExec.ok_builtin_modules">
+<tt class="descclassname">RExec.</tt><tt class="descname">ok_builtin_modules</tt><a class="headerlink" href="#rexec.RExec.ok_builtin_modules" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>安全にインポートできる組み込みモジュールの名前を格納しています。 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> に対する値は、 <tt class="docutils literal"><span class="pre">('audioop',</span> <span class="pre">'array',</span>
+<span class="pre">'binascii',</span> <span class="pre">'cmath',</span> <span class="pre">'errno',</span> <span class="pre">'imageop',</span> <span class="pre">'marshal',</span> <span class="pre">'math',</span> <span class="pre">'md5',</span> <span class="pre">'operator',</span>
+<span class="pre">'parser',</span> <span class="pre">'regex',</span> <span class="pre">'select',</span> <span class="pre">'sha',</span> <span class="pre">'_sre',</span> <span class="pre">'strop',</span> <span class="pre">'struct',</span> <span class="pre">'time')</span></tt>
+です。この変数をオーバーライドする場合も、同様な注意が適用されます &#8211; 基本クラスからの値を使って始めます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rexec.RExec.ok_path">
+<tt class="descclassname">RExec.</tt><tt class="descname">ok_path</tt><a class="headerlink" href="#rexec.RExec.ok_path" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> が制限された環境で実行される時に検索されるディレクトリーを格納しています。
+<a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> に対する値は、(モジュールがロードされた時は) 制限されないコードの <tt class="docutils literal"><span class="pre">sys.path</span></tt> と同一です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rexec.RExec.ok_posix_names">
+<tt class="descclassname">RExec.</tt><tt class="descname">ok_posix_names</tt><a class="headerlink" href="#rexec.RExec.ok_posix_names" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>制限された環境で実行するプログラムで利用できる、 <a class="reference internal" href="os.html#module-os" title="os: 雑多なオペレーティングシステムインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">os</span></tt></a> モジュール内の関数の名前を格納しています。 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> に対する値は、
+<tt class="docutils literal"><span class="pre">('error',</span> <span class="pre">'fstat',</span> <span class="pre">'listdir',</span> <span class="pre">'lstat',</span> <span class="pre">'readlink',</span> <span class="pre">'stat',</span> <span class="pre">'times',</span> <span class="pre">'uname',</span>
+<span class="pre">'getpid',</span> <span class="pre">'getppid',</span> <span class="pre">'getcwd',</span> <span class="pre">'getuid',</span> <span class="pre">'getgid',</span> <span class="pre">'geteuid',</span> <span class="pre">'getegid')</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rexec.RExec.ok_sys_names">
+<tt class="descclassname">RExec.</tt><tt class="descname">ok_sys_names</tt><a class="headerlink" href="#rexec.RExec.ok_sys_names" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>制限された環境で実行するプログラムで利用できる、 <a class="reference internal" href="sys.html#module-sys" title="sys: システムパラメータと関数へのアクセス"><tt class="xref py py-mod docutils literal"><span class="pre">sys</span></tt></a> モジュール内の関数名と変数名を格納しています。
+<a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> に対する値は、 <tt class="docutils literal"><span class="pre">('ps1',</span> <span class="pre">'ps2',</span> <span class="pre">'copyright',</span> <span class="pre">'version',</span> <span class="pre">'platform',</span>
+<span class="pre">'exit',</span> <span class="pre">'maxint')</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rexec.RExec.ok_file_types">
+<tt class="descclassname">RExec.</tt><tt class="descname">ok_file_types</tt><a class="headerlink" href="#rexec.RExec.ok_file_types" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールがロードすることを許されているファイルタイプを格納しています。各ファイルタイプは、 <a class="reference internal" href="imp.html#module-imp" title="imp: import文の実装へアクセスする。"><tt class="xref py py-mod docutils literal"><span class="pre">imp</span></tt></a> モジュールで定義された整数定数です。意味のある値は、 <tt class="xref py py-const docutils literal"><span class="pre">PY_SOURCE</span></tt> 、 <tt class="xref py py-const docutils literal"><span class="pre">PY_COMPILED</span></tt> および <tt class="xref py py-const docutils literal"><span class="pre">C_EXTENSION</span></tt>
+です。 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> に対する値は、 <tt class="docutils literal"><span class="pre">(C_EXTENSION,</span> <span class="pre">PY_SOURCE)</span></tt> です。サブクラスで
+<tt class="xref py py-const docutils literal"><span class="pre">PY_COMPILED</span></tt> を追加することは推奨されません; 攻撃者が、バイトコンパイルしたでっちあげのファイル(<tt class="file docutils literal"><span class="pre">.pyc</span></tt>)を、例えば、あなたの公開 FTP サーバの <tt class="file docutils literal"><span class="pre">/tmp</span></tt> に書いたり、 <tt class="file docutils literal"><span class="pre">/incoming</span></tt>
+にアップロードしたりして、とにかくあなたのファイルシステム内に置くことで、制限された実行モードから抜け出ることができるかもしれないからです。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h2>29.1.3. 例<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>標準の <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> クラスよりも、若干、もっと緩めたポリシを望んでいるとしましょう。例えば、もし <tt class="file docutils literal"><span class="pre">/tmp</span></tt>
+内のファイルへの書き込みを喜んで許すならば、 <a class="reference internal" href="#rexec.RExec" title="rexec.RExec"><tt class="xref py py-class docutils literal"><span class="pre">RExec</span></tt></a> クラスを次のようにサブクラス化できます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">TmpWriterRExec</span><span class="p">(</span><span class="n">rexec</span><span class="o">.</span><span class="n">RExec</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">r_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="n">buf</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;r&#39;</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;ab&#39;</span><span class="p">):</span>
+            <span class="c"># ファイル名をチェックします :  /tmp/ で始まらなければなりません</span>
+            <span class="k">if</span> <span class="nb">file</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">!=</span><span class="s">&#39;/tmp/&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot; /tmp 以外へは書き込みできません&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s">&#39;/../&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">or</span>
+                 <span class="nb">file</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;../&#39;</span> <span class="ow">or</span> <span class="nb">file</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s">&#39;/..&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;ファイル名の &#39;..&#39; は禁じられています&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;open() モードが正しくありません&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>上のコードは、完全に正しいファイル名でも、時には禁止する場合があることに注意して下さい; 例えば、制限された環境でのコードでは、 <tt class="file docutils literal"><span class="pre">/tmp/foo/../bar</span></tt>
+というファイルはオープンできないかもしれません。これを修正するには、 <tt class="xref py py-meth docutils literal"><span class="pre">r_open()</span></tt> メソッドが、そのファイル名を
+<tt class="file docutils literal"><span class="pre">/tmp/bar</span></tt> に単純化しなければなりません。そのためには、ファイル名を分割して、それにさまざまな操作を行う必要があります。セキュリティが重大な場合には、より複雑で微妙なセキュリティホールを抱え込むかもしれない一般性のあるコードよりも、制限が余りにあり過ぎるとしても単純なコードを書く方が、望ましいでしょう。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="bastion.html" title="29.2. Bastion — オブジェクトに対するアクセスの制限"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="restricted.html" title="29. 制限実行 (restricted execution)"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="restricted.html" >29. 制限実行 (restricted execution)</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ソケットプログラミング HOWTO &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python HOWTO" href="index.html" />
+    <link rel="next" title="ソート HOW TO" href="sorting.html" />
+    <link rel="prev" title="正規表現 HOWTO" href="regex.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="sorting.html" title="ソート HOW TO"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="regex.html" title="正規表現 HOWTO"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ソケットプログラミング HOWTO</a><ul>
+<li><a class="reference internal" href="#id1">ソケット</a><ul>
+<li><a class="reference internal" href="#id2">歴史</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">ソケットの作成</a><ul>
+<li><a class="reference internal" href="#ipc">IPC</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">ソケットの利用</a><ul>
+<li><a class="reference internal" href="#id5">バイナリデータ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">切断</a><ul>
+<li><a class="reference internal" href="#id7">ソケットが死ぬと</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">ノンブロッキングソケット</a><ul>
+<li><a class="reference internal" href="#id9">性能</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="regex.html"
+                        title="前の章へ">正規表現 HOWTO</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="sorting.html"
+                        title="次の章へ">ソート HOW TO</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/sockets.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="howto">
+<h1>ソケットプログラミング HOWTO<a class="headerlink" href="#howto" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Gordon McMillan</td>
+</tr>
+</tbody>
+</table>
+<div class="topic">
+<p class="topic-title first">概要</p>
+<p>ソケットはそこかしこで使われているが、最大級に誤解されている技術でもある。この文書はソケットの全体像を俯瞰しており、チュートリアルとしてはあまり役に立たない。実際に動くモノを完成させるには、他にもやらなければいけないことがあるからだ。この文書はソケットの微妙なところ (たくさんある) まではカバーしていないが、恥ずかしくない使い方ができるようになる程度の情報は得られるはずだ。</p>
+</div>
+<div class="section" id="id1">
+<h2>ソケット<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ソケットはそこかしこで使われているが、最大級に誤解されている技術でもある。この文書はソケットの全体像を俯瞰しており、チュートリアルとしてはあまり役に立たない。実際に動くモノを完成させるには、他にもやらなければいけないことがあるからだ。この文書はソケットの微妙なところ (たくさんある) まではカバーしていないが、恥ずかしくない使い方ができるようになる程度の情報は得られるはずだ。</p>
+<p>INET ソケットのことしか語らないつもりだが、利用率でいうとソケットの 99% 以上はこれだ。さらに中でも STREAM ソケットに話題を絞ろうと思う - 自分が何をしているのか分かっているのでない限り
+(分かってるならこの HOWTO なんて要らないだろ!)、
+STREAM ソケットが一番分かりやすく、一番性能が出るのだ。そうやって謎に包まれたソケットの正体を明らかにしてゆくと共に、ブロッキングおよびノンブロッキングなソケットの扱いに関するいくつかのヒントを提示しよう。だが、まずはブロッキングソケットから始めることにする。ノンブロッキングを扱うより先に、ブロッキングの仕組みを知っておかなくてはならないのだ。</p>
+<p>話を理解しにくくしている要因として、「ソケット」という言葉が文脈によって微妙に違うものを指すことが挙げられる。そこでまず、「クライアント」ソケット - 対話の両端 - と「サーバ」ソケット - 電話交換手みたいなもの - の区別を付けておこう。クライアント側アプリケーション (たとえばブラウザ) は「クライアント」ソケットだけを使うが、話し相手のウェブサーバは「サーバ」ソケットと「クライアント」ソケットの両方を使う。</p>
+<div class="section" id="id2">
+<h3>歴史<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>各種 <abbr>IPC (Inter Process Communication</abbr> (プロセス間通信) の中でも、ソケットは群を抜いて人気がある。どのプラットフォームにも、ソケットより速い IPC はあるだろう。だが、プラットフォームをまたぐ通信はソケットの独擅場だ。</p>
+<p>ソケットは BSD Unix の一部としてバークレイで発明され、インターネットの普及と共に野火のごとく広まった。それももっともなことで、ソケットと INET のコンビによって世界中どんなマシンとも、信じられないほど簡単 (少なくとも他のスキームと比べて) に通信できるようになったのだ。</p>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>ソケットの作成<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>あなたがリンクをクリックしてこのページに来たとき、ブラウザは大雑把に言って次のようなことをしたのである:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#INET の STREAM ソケットを作る</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span>
+    <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+<span class="c">#ここでウェブサーバに 80 番 (http の標準) ポートで接続</span>
+<span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="s">&quot;www.mcmillan-inc.com&quot;</span><span class="p">,</span> <span class="mi">80</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>この <tt class="docutils literal"><span class="pre">connect</span></tt> が完了すると、ソケット <tt class="docutils literal"><span class="pre">s</span></tt> を使ってこのページ文章への要求を送ることができるようになる。その同じソケットが返答を読み、そして破壊される。そう、破壊される。クライアントソケットは通常、一回 (か少数の) やり取りで使い捨てになるのだ。</p>
+<p>ウェブサーバで起こる事柄はもう少し複雑だ。まず「サーバソケット」を作る:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#INET の STREAM ソケットを作る</span>
+<span class="n">serversocket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span>
+    <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+<span class="c">#そのソケットを公開ホストのウェルノウンポートにつなぐ</span>
+<span class="n">serversocket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="mi">80</span><span class="p">))</span>
+<span class="c">#サーバソケットになる</span>
+<span class="n">serversocket</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ここで注意すべき点がいくつかある:
+今回はソケットが外界に見えるよう、 <tt class="docutils literal"><span class="pre">socket.gethostname()</span></tt> を使った。
+<tt class="docutils literal"><span class="pre">s.bind(('',</span> <span class="pre">80))</span></tt> や <tt class="docutils literal"><span class="pre">s.bind(('localhost',</span> <span class="pre">80))</span></tt> でも「サーバ」ソケットにはなるが、それだと同じマシン内にしか見えないものになってしまう。</p>
+<p>ふたつめ: 小さな番号のポートは大抵、「ウェルノウン (有名)」なサービス (HTTP, SNMP 等々) のために取ってある。お遊びで使うのなら適当に大きな数 (4桁) を使おう。</p>
+<p>最後に: <tt class="docutils literal"><span class="pre">listen</span></tt> の引数はソケットライブラリに、接続要求を 5 個 (通常の最大値) まで順番待ちさせるように命じている。これ以降の外部接続は拒否するのだが、コードが適切に書かれていれば、それで十分すぎるほどだ。</p>
+<p>よし、「サーバーソケット」ができて、80 番ポートで耳を澄ましているところまで来た。では、ウェブサーバのメインループに入ろう:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="c">#外からの接続を受け入れる</span>
+    <span class="p">(</span><span class="n">clientsocket</span><span class="p">,</span> <span class="n">address</span><span class="p">)</span> <span class="o">=</span> <span class="n">serversocket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="c">#ここで clientsocket に何かをする。</span>
+    <span class="c">#今回はスレッド化サーバということにしよう</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">client_thread</span><span class="p">(</span><span class="n">clientsocket</span><span class="p">)</span>
+    <span class="n">ct</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>このループには実際のところ、3 通りの一般的な動作方法がある -
+<tt class="docutils literal"><span class="pre">clientsocket</span></tt> を扱うようにスレッドを割り当てたり、
+<tt class="docutils literal"><span class="pre">clientsocket</span></tt> を扱う新しいプロセスを作ったり、あるいはノンブロッキングソケットを使うようにアプリを作り直して <tt class="docutils literal"><span class="pre">select</span></tt> で「サーバ」ソケットとアクティブな <tt class="docutils literal"><span class="pre">clientsocket</span></tt> の間を多重化したりするのだ。最後のについてはまた後にしよう。ここで理解しておくべき要点はこれだ:
+以上が「サーバ」ソケットの仕事の <em>すべて</em> である。データは一切送信しないし、受信しない。「クライアント」ソケットを生み出すだけ。我々のバインドされているホストとポートに <tt class="docutils literal"><span class="pre">connect()</span></tt> してくる <em>他の</em>
+「クライアント」ソケットに応える形で <tt class="docutils literal"><span class="pre">clientsocket</span></tt> を作り、作るや否や、さらなる接続を聞きに戻っていくのだ。このふたつの「クライアント」は、あとは勝手に喋っていればいい -
+使うポートは動的に割り当てられ、会話が終わればリサイクルに廻される。</p>
+<div class="section" id="ipc">
+<h3>IPC<a class="headerlink" href="#ipc" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>同一マシンのプロセス間で高速な IPC が必要なのであれば、そのプラットフォームが提供している何らかの共有メモリに目を向けるべきだ。共有メモリとロックやセマフォに基づいた簡素なプロトコルが断然一番速い。</p>
+<p>ソケットを使うことにしたのであれば、「サーバ」ソケットは
+<tt class="docutils literal"><span class="pre">'localhost'</span></tt> にバインドすることだ。こうすると、ほとんどのプラットフォームではネットワーク関連コードを何層かスキップすることになり、かなり速くなる。</p>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>ソケットの利用<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>はじめに憶えておくべきなのは、ウェブブラウザの「クライアント」ソケットとウェブサーバの「クライアント」ソケットがまったく同じ種族だということだ。つまり、これは「ピア・トゥ・ピア」(1 対 1) の会話である。別の言い方をすると、
+<em>設計者として自分で会話のエチケット規則を決めなくてはいけない</em> ということでもある。通常は、 <tt class="docutils literal"><span class="pre">connect</span></tt> してくるソケットが要求あるいは宣言をして会話を始める。だが、それはそう設計しただけのことだ - ソケットの規則ではない。</p>
+<p>さて、コミュニケーションに使う動詞は二組ある。 <tt class="docutils literal"><span class="pre">send</span></tt> と <tt class="docutils literal"><span class="pre">recv</span></tt> を使うこともできるし、クライアントソケットをファイルっぽい種族に変形して <tt class="docutils literal"><span class="pre">read</span></tt> と <tt class="docutils literal"><span class="pre">write</span></tt> を使っても良い。後者は Java のソケットの表現方法だ。ここで詳しく語るつもりはないが、その場合はソケットも <tt class="docutils literal"><span class="pre">flush</span></tt> しなければいけない、とだけ言っておく。これはバッファリングした「ファイル」なので、何かを
+<tt class="docutils literal"><span class="pre">write</span></tt> してすぐに返答を <tt class="docutils literal"><span class="pre">read</span></tt> するというのはよくある間違いだ。間に <tt class="docutils literal"><span class="pre">flush</span></tt> を入れないと、要求がまだ出力バッファにあって永遠に返事が来ない、という可能性がある。</p>
+<p>さあ、ソケットの主要な難関に進もう -
+<tt class="docutils literal"><span class="pre">send</span></tt> と <tt class="docutils literal"><span class="pre">recv</span></tt> はネットワークバッファに働きかけるものだ。だから、手渡したもの (や返してもらいたいもの) を 1 バイトも残さず実際に処理してくれているとは限らない。一般的に言って、 <tt class="docutils literal"><span class="pre">send</span></tt> はバッファが埋まったとき、
+<tt class="docutils literal"><span class="pre">recv</span></tt> はバッファが空になったときに実際の処理をして、そのバイト数を返す。メッセージが完全に処理されるまでコールを繰り返すのは <em>自分の</em> 責任なのだ。</p>
+<p><tt class="docutils literal"><span class="pre">recv</span></tt> が 0 バイトを返したときは、向こう側が接続を閉じてしまった (または閉じようとしている途中) という意味だ。もうこの接続でデータを受け取ることはない。永遠にだ。ただ、データ送信は成功するかもしれない; これについては次のページで語ることにしよう。</p>
+<p>HTTP のようなプロトコルでは、ひとつのソケットを1回の転送にしか使わない。クライアントは要求を送り、返答を受ける。以上だ。これでソケットは破棄される。だからこの場合、クライアントは受信 0 バイトの時点で返答の末尾を検出することができる。</p>
+<p>だが、以降の転送にもそのソケットを使い回すつもりなら、ソケットに &#8220;EOT&#8221; (End of Transfer) など <em>存在しない</em> ことを認識する必要がある。もう一度言おう: ソケットの <tt class="docutils literal"><span class="pre">send</span></tt> や <tt class="docutils literal"><span class="pre">recv</span></tt> が 0 バイト処理で返ってきたなら、その接続は終わっている。終わって <em>いない</em> なら、いつまで <tt class="docutils literal"><span class="pre">recv</span></tt> を待てばいいかは分からない。ソケットは「もう読むものが (今のところ) ないぜ」などと <em>言わない</em> のだから。このことを少し考えれば、ソケットの真実を悟ることになるだろう:
+<em>メッセージは必ず固定長か</em> (うげぇ) <em>区切り文字を使うか</em> (やれやれ)
+<em>長さ標識を付けておくか</em> (かなりマシ)
+<em>接続を閉じて終わらせるかのいずれかでなければいけない</em> のだ。選ぶ権利と責任はまったくもって自分にある (が、正しさの程度に違いはある)。</p>
+<p>毎回接続を終わらせるのはイヤだとして、最も単純な解決策は固定長メッセージだろう:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">mysocket</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;demonstration class only</span>
+<span class="sd">      - coded for clarity, not efficiency</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sock</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+         <span class="k">if</span> <span class="n">sock</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span>
+                 <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+         <span class="k">else</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">sock</span> <span class="o">=</span> <span class="n">sock</span>
+
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">mysend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+         <span class="n">totalsent</span> <span class="o">=</span> <span class="mi">0</span>
+         <span class="k">while</span> <span class="n">totalsent</span> <span class="o">&lt;</span> <span class="n">MSGLEN</span><span class="p">:</span>
+             <span class="n">sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">totalsent</span><span class="p">:])</span>
+             <span class="k">if</span> <span class="n">sent</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;socket connection broken&quot;</span><span class="p">)</span>
+             <span class="n">totalsent</span> <span class="o">=</span> <span class="n">totalsent</span> <span class="o">+</span> <span class="n">sent</span>
+
+    <span class="k">def</span> <span class="nf">myreceive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">MSGLEN</span><span class="p">:</span>
+             <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">MSGLEN</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+             <span class="k">if</span> <span class="n">chunk</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;socket connection broken&quot;</span><span class="p">)</span>
+             <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">+</span> <span class="n">chunk</span>
+         <span class="k">return</span> <span class="n">msg</span>
+</pre></div>
+</div>
+<p>この送信コードは、ほぼあらゆるメッセージ通信スキームで使える -
+文字列を送るとき、Python なら長さを <tt class="docutils literal"><span class="pre">len()</span></tt> で見極めることができる
+(中に <tt class="docutils literal"><span class="pre">\0</span></tt> が埋め込まれていても大丈夫)。難しくしているのは、おもに受信コードである。
+(なお、C でも事態はあまり悪くならないが、メッセージに <tt class="docutils literal"><span class="pre">\0</span></tt> が埋め込まれていると
+<tt class="docutils literal"><span class="pre">strlen</span></tt> が使えないのは面倒だ。)</p>
+<p>最も簡単な改良法は、メッセージの最初の一文字をタイプ標識にして、そのタイプで長さを決定するというものだ。この場合ふたつの <tt class="docutils literal"><span class="pre">recv</span></tt> があることになる -
+一番目でその一文字 (だけじゃなくても可) を取って長さを調べ、二番目でループして残りを取るのだ。あるいはもし区切り方式の道を行くのであれば、任意のサイズ
+(4096 か 8192 がネットワークバッファには最適なことが多い) で受信して区切り文字を走査していくことになる。</p>
+<p>心に留めておくべき面倒な点がひとつ: 複数メッセージが次々に (何らかの返事を待たずに)
+返ってくることのある会話プロトコルなら、そして任意のサイズを
+<tt class="docutils literal"><span class="pre">recv</span></tt> に渡しているなら、次のメッセージの冒頭部分まで読んでしまうことがあるかもしれない。そのときは、必要になるまで脇によけて、大切に保管しておく必要がある。</p>
+<p>メッセージ冒頭に長さを (たとえば 5 桁の数字で) 付けるのは、それよりもさらに複雑になる。というのも、(信じられないかもしれないが)
+一回の <tt class="docutils literal"><span class="pre">recv</span></tt> で 5 文字を全部受け取ることができるとは限らないからだ。お遊びでやっている間はごまかせても、高負荷ネットワークのもとでは、
+<tt class="docutils literal"><span class="pre">recv</span></tt> ループをふたつ使わないコードは、あっと言う間にダメになってしまう -
+一番目は長さを見定める用で、二番目はデータ部分を受け取る用だ。うーむ、いやらしい。さらにこのとき、 <tt class="docutils literal"><span class="pre">send</span></tt> も一発で全部を出し切れるとは限らないことに気付くだろう。なお、今こうやって読んでいても、いつか誰もが痛い目を見るのである!</p>
+<p>紙面の都合および教育的配慮 (と著者の地位確保)
+のため、こうした改良は練習問題として残しておく。さあ片付けてしまおう。</p>
+<div class="section" id="id5">
+<h3>バイナリデータ<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>バイナリデータはまったく問題なくソケットに乗せられる。問題は、すべてのマシンで同じ形式を使っているわけではないことにある。たとえば Motorola のチップなら 16 ビット整数の 1 という値をふたつの
+16 進バイト列 00 01 で表現するが、Intel や DEC は逆バイトだ -
+同じ 1 が 01 00 になるのだ。ソケットライブラリは 16 ビットや
+32 ビット整数の変換用コールを持っている - <tt class="docutils literal"><span class="pre">ntohl,</span> <span class="pre">htonl,</span>
+<span class="pre">ntohs,</span> <span class="pre">htons</span></tt> である。&#8221;n&#8221; は <em>network</em>、 &#8220;h&#8221; は <em>host</em> を意味する。
+&#8220;s&#8221; は <em>short</em> で &#8220;l&#8221; は <em>long</em> だ。これらのコールは、「ネットワーク並び = ホスト並び」なら何もしないが、マシンが逆バイトならそれに合わせてぐるっと交換してくれる。</p>
+<p>この 32 ビット時代、バイナリデータは ASCII 表現のほうが小さくなることが多い。というのも、long なのに値が 0 ばっかりでたまに 1 だとかいうことは驚くほど多いからだ。文字列なら &#8220;0&#8221; は 2 バイトなのに、バイナリは 4 バイトも喰う。もちろんこれは固定長メッセージには合わないが。さあ、どうする、どうする。</p>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>切断<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>厳密には、ソケットを <tt class="docutils literal"><span class="pre">close</span></tt> する前には <tt class="docutils literal"><span class="pre">shutdown</span></tt> することになっている。 <tt class="docutils literal"><span class="pre">shutdown</span></tt> は相手ソケットに対する報告であり、渡す引数によって「これ以上こっちからは送らないけど、まだ聞いてるぜ」という意味になったり、「もう聞かない。せいせいした!」だったりする。しかしほとんどのソケットライブラリは、このエチケットを怠るプログラマに慣れてしまって、通常 <tt class="docutils literal"><span class="pre">close</span></tt> だけで
+<tt class="docutils literal"><span class="pre">shutdown();</span> <span class="pre">close()</span></tt> と同じことになる。だから大抵はわざわざ
+<tt class="docutils literal"><span class="pre">shutdown</span></tt> しなくてもいい。</p>
+<p><tt class="docutils literal"><span class="pre">shutdown</span></tt> の効果的な使い方のひとつは、HTTP 風のやりとりだ。クライアントは要求を出してすぐに <tt class="docutils literal"><span class="pre">shutdown(1)</span></tt> する。これでサーバに、「クライアントは送信完了ですが、まだ受信可能です」と伝わる。サーバは 0 バイト受信で &#8220;EOF&#8221; を検出することができる。要求を残さず受け取ったことにして良いのだ。対してサーバは返答を送る。その <tt class="docutils literal"><span class="pre">send</span></tt> が成功したなら、クライアントは実際にまだ受信していたことになる。</p>
+<p>Python はこの自動 shutdown をもう一歩進めて、ソケットが GC
+されるときに必要なら自動で <tt class="docutils literal"><span class="pre">close</span></tt> してくれると言っている。しかしこれに頼るクセをつけてはいけない。もしソケットが <tt class="docutils literal"><span class="pre">close</span></tt> せずに姿を消せば、相手ソケットはこちらが遅いだけだと思ってハングしてしまうかもしれない。
+<em>お願いだから</em> 終わったらちゃんと <tt class="docutils literal"><span class="pre">close</span></tt> してくれ。</p>
+<div class="section" id="id7">
+<h3>ソケットが死ぬと<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>ブロッキングソケットを使っていて一番いやなのは多分、相手側が意地悪く (<tt class="docutils literal"><span class="pre">close</span></tt> せずに) ダウンするときに起こる事柄だ。自分側のソケットは高確率でハングするだろう。SOCKSTREAM は信頼性の高いプロトコルなので、ずっとずっと待ち続けて、なかなか見捨てないのだ。スレッドを使っているのであれば、そのスレッド全体が根本から死んだ状態になる。こうなると、もう手の施しようがない。まあ、ブロッキング読み出しの間ロックし続けるといった馬鹿げたことをしていない限り、リソースの点ではたいして消費にならない。だから <em>ぜったいに</em> そのスレッドを殺そうとしてはいけない - プロセスよりスレッドが効率的である理由のひとつは、自動リソース回収にまつわるオーバヘッドを避けられるという点にあるのだ。つまり別の言い方をすると、どうにかしてそのスレッドを殺したなら、プロセス全体がぐちゃぐちゃになってしまうだろうということだ。</p>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>ノンブロッキングソケット<a class="headerlink" href="#id8" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ここまで理解してきたなら、もうソケットの仕組みについて必要なことはほとんど知っていることになる。これからも同じコールを、ほぼ同じように使っていくだけ、それだけだ。これをちゃんとやっていれば、そのアプリはだいたい完璧であろう。</p>
+<p>Python の場合、ノンブロッキングにするには <tt class="docutils literal"><span class="pre">socket.setblocking(0)</span></tt> を使う。
+C ならもっと複雑だ (一例を挙げると、BSD 方式の <tt class="docutils literal"><span class="pre">O_NONBLOCK</span></tt> およびほぼ違いのない
+POSIX 方式 <tt class="docutils literal"><span class="pre">O_NDELAY</span></tt> のどちらを選ぶか決めなくてはならなくて、後者は
+<tt class="docutils literal"><span class="pre">TCP_NODELAY</span></tt> とは全然別物だったりする) が、考え方はまったく一緒だ。</p>
+<p>構造上の大きな違いは、 <tt class="docutils literal"><span class="pre">send</span></tt>, <tt class="docutils literal"><span class="pre">recv</span></tt>, <tt class="docutils literal"><span class="pre">connect</span></tt>, <tt class="docutils literal"><span class="pre">accept</span></tt>
+が何もしないで戻ってくるかもしれないという点である。選択肢は (当然ながら) いくつかある。返り値とエラーコードをチェックするという方法もある。が、発狂すること請け合いだ。信じないなら、いつかやってみるといい。アプリは肥大化し、バグが増え、CPU を喰い尽くすだろう。だからそんな愚かな解法は飛ばして、正解に進もう。</p>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> を使え。</p>
+<p>C において <tt class="docutils literal"><span class="pre">select</span></tt> でコードを書くのはかなり面倒だが、Python
+なら造作もない。しかし Python で <tt class="docutils literal"><span class="pre">select</span></tt> を理解しておけば
+C でもほとんど問題なく書ける、という程度には似ている:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">readable</span><span class="p">,</span> <span class="n">writable</span><span class="p">,</span> <span class="n">in_error</span> <span class="o">=</span> \
+               <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                  <span class="n">potential_readers</span><span class="p">,</span>
+                  <span class="n">potential_writers</span><span class="p">,</span>
+                  <span class="n">potential_errs</span><span class="p">,</span>
+                  <span class="n">timeout</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> に三つのリストを渡しているが、一番目にはあとで読みたくなるかもしれないソケットすべて、二番目には書き込みたくなるかもしれないソケットすべて、最後に (通常は空のままだが) エラーをチェックしたいソケットが入っている。ひとつのソケットが複数にまたがってリストされても構わないことを憶えておくと良い。なお、 <tt class="docutils literal"><span class="pre">select</span></tt> コールはブロックするが、時間制限を与えることができる。これは、やっておいて損はない - 特に理由がなければ、かなり長い (たとえば 1 分とかの) 時間制限を付けておくことだ。</p>
+<p>戻り値として、三つのリストが手に入る。それぞれには、実際に読めるソケット、書けるソケット、エラー中のソケットが入っていて、渡したリストの部分集合 (空集合かもしれない) になっている。</p>
+<p>出力のうち、readable リストにあるソケットについては、
+<tt class="docutils literal"><span class="pre">recv</span></tt> がとりあえず <em>何か</em> を返すであろう、ということは史上最高度に確信できる。
+writable リストも考え方は同じで、 <em>何か</em> は送れる。送りたいもの全体は無理かもしれないが、 <em>何も</em> ないよりはマシだろう。
+(実のところ、ふつうに健康なソケットなら writable で返ってくることができる -
+それは外向きネットワークバッファに空きがあるというだけの意味しかないのだから)</p>
+<p>「サーバ」ソケットは potential_readers リストに入れておこう。それが readable リストに入って出てきたら、 <tt class="docutils literal"><span class="pre">accept</span></tt> は (ほぼ) 確実に成功するはずだ。どこかへ <tt class="docutils literal"><span class="pre">connect</span></tt> するために作った新しいソケットは potential_writers リストに入れる。それが writable リストに現れたら、接続が成功している可能性は高いと言える。</p>
+<p><tt class="docutils literal"><span class="pre">select</span></tt> の実にいやらしい問題がひとつ:
+突然死したソケットが入力側リストのどこかにあれば、 <tt class="docutils literal"><span class="pre">select</span></tt> は失敗してしまう。そうなると、見つけるまですべてのリストでループしてソケットをひとつひとつ
+<tt class="docutils literal"><span class="pre">select([sock],[],[],0)</span></tt> していく必要がある。時間制限を 0 にしてあるので長くはかからないが、これは美しくない。</p>
+<p>じつは <tt class="docutils literal"><span class="pre">select</span></tt> はブロッキングソケットにも便利に使える。それはブロックするかどうかを見極める方法のひとつである -
+バッファに何かがあれば readable として返ってくるのだ。しかしこれも、相手の用事がもう済んでいるのか、それとも単に他のことで忙しいだけなのかを見極める役には立たない。</p>
+<p><strong>非互換警報</strong>: Unix ではソケットにもファイルにも <tt class="docutils literal"><span class="pre">select</span></tt> が使える。これを Windows でやろうとしてはいけない。Windows で <tt class="docutils literal"><span class="pre">select</span></tt> はソケットにしか使えない。また C の場合、高度なソケットオプションの多くは、やり方が Windows では違っている。実際、Windows なら著者は通常、ソケットにスレッドを使っている (これは実に、実にうまくいく)。認めたくないが、何らかの性能を求めるなら Windows のコードは
+Unix のコードとはかなり異なるものになってしまうだろう。</p>
+<div class="section" id="id9">
+<h3>性能<a class="headerlink" href="#id9" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>最速のソケットコードはノンブロッキングソケットを使って
+select で多重化するものだということに疑問の余地はない。
+CPU に負荷をかけることなく LAN 接続を使いきるアプリは作れる。問題は、そうやって書かれたものはあまり他のことができなくなるということだ -
+いつでもデータをあちらこちらへ廻せるようにしている必要があるのだ。</p>
+<p>もっと他にやることがあるアプリなのだとすれば、スレッドが最適解だ
+(さらにノンブロッキングソケットを使えばブロッキングより速い)。しかし残念ながら、各種 Unix のスレッド対応は API も品質もバラバラである。そのため Unix の一般解は、それぞれの接続を取り扱う子プロセスをフォークするというものだ。このオーバヘッドは甚大 (Windows ではプロセス生成のオーバヘッドが洒落にならないので無理) だ。それに、子プロセスがお互い完全に独立しているのでない限り、親子のプロセス間で通信するために他の IPC, たとえばパイプとか、共有メモリとセマフォだとかを使う必要が出てくる。</p>
+<p>最後に、これを憶えておいてほしい。ブロッキングソケットはノンブロッキングよりも幾分遅いとはいえ、多くの場合そちらが「正解」である。結局のところ、ソケットから受け取るデータに基づいて動くアプリなら、
+<tt class="docutils literal"><span class="pre">recv</span></tt> のかわりに <tt class="docutils literal"><span class="pre">select</span></tt> で待てるようにするためだけにロジックを複雑化する意味はあまりない。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="sorting.html" title="ソート HOW TO"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="regex.html" title="正規表現 HOWTO"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

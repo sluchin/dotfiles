@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>30.4. zipimport — Zip アーカイブからモジュールを import する &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="30. モジュールのインポート" href="modules.html" />
+    <link rel="next" title="30.5. pkgutil — パッケージ拡張ユーティリティ" href="pkgutil.html" />
+    <link rel="prev" title="30.3. imputil — Import ユーティリティ" href="imputil.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pkgutil.html" title="30.5. pkgutil — パッケージ拡張ユーティリティ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="imputil.html" title="30.3. imputil — Import ユーティリティ"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">30. モジュールのインポート</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">30.4. <tt class="docutils literal"><span class="pre">zipimport</span></tt> &#8212; Zip アーカイブからモジュールを import する</a><ul>
+<li><a class="reference internal" href="#zipimporter">30.4.1. zipimporter オブジェクト</a></li>
+<li><a class="reference internal" href="#zipimport-examples">30.4.2. 使用例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="imputil.html"
+                        title="前の章へ">30.3. <tt class="docutils literal docutils literal docutils literal"><span class="pre">imputil</span></tt> &#8212; Import ユーティリティ</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="pkgutil.html"
+                        title="次の章へ">30.5. <tt class="docutils literal docutils literal docutils literal"><span class="pre">pkgutil</span></tt> &#8212; パッケージ拡張ユーティリティ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/zipimport.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-zipimport">
+<span id="zipimport-zip-import"></span><h1>30.4. <a class="reference internal" href="#module-zipimport" title="zipimport: Python モジュールを ZIP アーカイブから import する機能のサポート"><tt class="xref py py-mod docutils literal"><span class="pre">zipimport</span></tt></a> &#8212; Zip アーカイブからモジュールを import する<a class="headerlink" href="#module-zipimport" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p>このモジュールは、 Python モジュール (<tt class="file docutils literal"><span class="pre">*.py</span></tt>, <tt class="file docutils literal"><span class="pre">*.py[co]</span></tt>) やパッケージを ZIP 形式のアーカイブから
+import できるようにします。通常、 <a class="reference internal" href="#module-zipimport" title="zipimport: Python モジュールを ZIP アーカイブから import する機能のサポート"><tt class="xref py py-mod docutils literal"><span class="pre">zipimport</span></tt></a> を明示的に使う必要はありません; 組み込みの <a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a>
+は、 <tt class="docutils literal"><span class="pre">sys.path</span></tt> の要素が ZIP  アーカイブへのパスを指している場合にこのモジュールを自動的に使います。</p>
+<p>普通、 <tt class="docutils literal"><span class="pre">sys.path</span></tt> はディレクトリ名の文字列からなるリストです。このモジュールを使うと、 <tt class="docutils literal"><span class="pre">sys.path</span></tt> の要素に ZIP ファイルアーカイブを示す文字列を使えるようになります。ZIP アーカイブにはサブディレクトリ構造を含めることができ、パッケージの import をサポートさせしたり、アーカイブ内のパスを指定してサブディレクトリ下から import を行わせたりできます。例えば、
+<tt class="file docutils literal"><span class="pre">/tmp/example.zip/lib/</span></tt> のように指定すると、アーカイブ中の <tt class="file docutils literal"><span class="pre">lib/</span></tt> サブディレクトリ下だけから
+import を行います。</p>
+<p>ZIP アーカイブ内にはどんなファイルを置いてもかまいませんが、 import できるのは <tt class="file docutils literal"><span class="pre">.py</span></tt> および <tt class="file docutils literal"><span class="pre">.py[co]</span></tt>
+だけです。動的モジュール (<tt class="file docutils literal"><span class="pre">.pyd</span></tt>, <tt class="file docutils literal"><span class="pre">.so</span></tt>) の ZIP import は行えません。アーカイブ内に
+<tt class="file docutils literal"><span class="pre">.py</span></tt> ファイルしか入っていない場合、 Python がアーカイブを変更して、 <tt class="file docutils literal"><span class="pre">.py</span></tt> ファイルに対応する
+<tt class="file docutils literal"><span class="pre">.pyc</span></tt> や <tt class="file docutils literal"><span class="pre">.pyo</span></tt> ファイルを追加したりはしません。つまり、ZIP アーカイブ中に <tt class="file docutils literal"><span class="pre">.pyc</span></tt> が入っていない場合、 import はやや低速になるかもしれないので注意してください。</p>
+<p>ZIP アーカイブからロードしたモジュールに対して組み込み関数 <a class="reference internal" href="functions.html#reload" title="reload"><tt class="xref py py-func docutils literal"><span class="pre">reload()</span></tt></a> を呼び出すと失敗します; <a class="reference internal" href="functions.html#reload" title="reload"><tt class="xref py py-func docutils literal"><span class="pre">reload()</span></tt></a> が必要になるということは、実行時に ZIP ファイルが置き換えられてしまうことになり、あまり起こりそうにない状況だからです。</p>
+<p>アーカイブコメント付きの ZIP アーカイブは現在のところ未サポートです。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">PKZIP Application Note</a></dt>
+<dd>ZIP ファイル形式の作者であり、ZIP で使われているアルゴリズムの作者でもある
+Phil Katz による、ZIP ファイル形式についてのドキュメントです。</dd>
+<dt><span class="target" id="index-0"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0273"><strong>PEP 273</strong></a> - Import Modules from Zip Archives</dt>
+<dd>このモジュールの実装も行った、James C. Ahlstrom による PEP です。 Python 2.3 は PEP 273 の仕様に従っていますが、
+Just van Rossum の書いた import フックによる実装を使っています。 import フックは PEP 302 で解説されています。</dd>
+<dt><span class="target" id="index-1"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0302"><strong>PEP 302</strong></a> - New Import Hooks</dt>
+<dd>このモジュールを動作させる助けになっている import フックの追加を提案している PEP です。</dd>
+</dl>
+</div>
+<p>このモジュールでは例外を一つ定義しています:</p>
+<dl class="exception">
+<dt id="zipimport.ZipImporterError">
+<em class="property">exception </em><tt class="descclassname">zipimport.</tt><tt class="descname">ZipImporterError</tt><a class="headerlink" href="#zipimport.ZipImporterError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>zipimporter オブジェクトが送出する例外です。
+<a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> のサブクラスなので、 <a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> としても捕捉できます。</p>
+</dd></dl>
+
+<div class="section" id="zipimporter">
+<span id="zipimporter-objects"></span><h2>30.4.1. zipimporter オブジェクト<a class="headerlink" href="#zipimporter" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#zipimport.zipimporter" title="zipimport.zipimporter"><tt class="xref py py-class docutils literal"><span class="pre">zipimporter</span></tt></a> は ZIP ファイルを import するためのクラスです。</p>
+<dl class="class">
+<dt id="zipimport.zipimporter">
+<em class="property">class </em><tt class="descclassname">zipimport.</tt><tt class="descname">zipimporter</tt><big>(</big><em>archivepath</em><big>)</big><a class="headerlink" href="#zipimport.zipimporter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たな zipimporter インスタンスを生成します。
+<em>archivepath</em> は ZIP ファイルへのパスかまたは
+ZIP ファイル中の特定のパスへのパスでなければなりません。たとえば、 <tt class="file docutils literal"><span class="pre">foo/bar.zip/lib</span></tt> という <em>archivepath</em> の場合、
+<tt class="file docutils literal"><span class="pre">foo/bar.zip</span></tt> という ZIP ファイル(が存在するものとして)の中の
+<tt class="file docutils literal"><span class="pre">lib</span></tt> ディレクトリにあるモジュールを探しに行きます。
+<em>archivepath</em> が有効な ZIP アーカイブを指していない場合、
+<tt class="xref py py-exc docutils literal"><span class="pre">ZipImportError</span></tt> を送出します。</p>
+<dl class="method">
+<dt id="zipimport.zipimporter.find_module">
+<tt class="descname">find_module</tt><big>(</big><em>fullname</em><span class="optional">[</span>, <em>path</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipimport.zipimporter.find_module" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>fullname</em> に指定したモジュールを検索します。
+<em>fullname</em> は完全指定の (ドット表記の) モジュール名でなければなりません。モジュールが見つかった場合には zipimporter インスタンス自体を返し、そうでない場合には <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返します。
+<em>path</em> 引数は無視されます &#8212;
+この引数は importer プロトコルとの互換性を保つためのものです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipimport.zipimporter.get_code">
+<tt class="descname">get_code</tt><big>(</big><em>fullname</em><big>)</big><a class="headerlink" href="#zipimport.zipimporter.get_code" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>fullname</em> に指定したモジュールのコードオブジェクトを返します。モジュールがない場合には <tt class="xref py py-class docutils literal"><span class="pre">ZipImportError</span></tt> を送出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipimport.zipimporter.get_data">
+<tt class="descname">get_data</tt><big>(</big><em>pathname</em><big>)</big><a class="headerlink" href="#zipimport.zipimporter.get_data" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>pathname</em> に関連付けられたデータを返します。該当するファイルが見つからなかった場合には <a class="reference internal" href="exceptions.html#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipimport.zipimporter.get_filename">
+<tt class="descname">get_filename</tt><big>(</big><em>fullname</em><big>)</big><a class="headerlink" href="#zipimport.zipimporter.get_filename" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたモジュールが import さた場合、そのモジュールに設定した
+<tt class="docutils literal"><span class="pre">__file__</span></tt> の値を返します。モジュールが見つからなかった場合は <tt class="xref py py-exc docutils literal"><span class="pre">ZipImportError</span></tt> 例外を発生させます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipimport.zipimporter.get_source">
+<tt class="descname">get_source</tt><big>(</big><em>fullname</em><big>)</big><a class="headerlink" href="#zipimport.zipimporter.get_source" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>fullname</em> に指定したモジュールのソースコードを返します。モジュールが見つからなかった場合には <tt class="xref py py-exc docutils literal"><span class="pre">ZipImportError</span></tt> を送出します。モジュールは存在するが、ソースコードがない場合には <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipimport.zipimporter.is_package">
+<tt class="descname">is_package</tt><big>(</big><em>fullname</em><big>)</big><a class="headerlink" href="#zipimport.zipimporter.is_package" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>fullname</em> で指定されたモジュールがパッケージの場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。モジュールが見つからなかった場合には <tt class="xref py py-exc docutils literal"><span class="pre">ZipImportError</span></tt> を送出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipimport.zipimporter.load_module">
+<tt class="descname">load_module</tt><big>(</big><em>fullname</em><big>)</big><a class="headerlink" href="#zipimport.zipimporter.load_module" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>fullname</em> に指定したモジュールをロードします。
+<em>fullname</em> は完全指定の (ドット表記の) モジュール名でなくてはなりません。
+import 済みのモジュールを返します。モジュールがない場合には <tt class="xref py py-exc docutils literal"><span class="pre">ZipImportError</span></tt> を送出します。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipimport.zipimporter.archive">
+<tt class="descname">archive</tt><a class="headerlink" href="#zipimport.zipimporter.archive" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>importer に紐付けられた ZIP ファイルのファイル名で、サブパスは含まれません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipimport.zipimporter.prefix">
+<tt class="descname">prefix</tt><a class="headerlink" href="#zipimport.zipimporter.prefix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ZIP ファイル中のモジュールを検索するサブパスです。この文字列は ZIP ファイルの根を指している zipimporter オブジェクトでは空です。</p>
+</dd></dl>
+
+<p>アトリビュート <a class="reference internal" href="#zipimport.zipimporter.archive" title="zipimport.zipimporter.archive"><tt class="xref py py-attr docutils literal"><span class="pre">archive</span></tt></a> と <a class="reference internal" href="#zipimport.zipimporter.prefix" title="zipimport.zipimporter.prefix"><tt class="xref py py-attr docutils literal"><span class="pre">prefix</span></tt></a> とは、スラッシュでつなげると、
+<a class="reference internal" href="#zipimport.zipimporter" title="zipimport.zipimporter"><tt class="xref py py-class docutils literal"><span class="pre">zipimporter</span></tt></a> コンストラクタに渡された元々の <em>archivepath</em>
+引数と等しくなります。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="zipimport-examples">
+<span id="id1"></span><h2>30.4.2. 使用例<a class="headerlink" href="#zipimport-examples" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>モジュールを ZIP アーカイブから import する例を以下に示します -
+<a class="reference internal" href="#module-zipimport" title="zipimport: Python モジュールを ZIP アーカイブから import する機能のサポート"><tt class="xref py py-mod docutils literal"><span class="pre">zipimport</span></tt></a> モジュールが明示的に使われていないことに注意してください。</p>
+<div class="highlight-python"><pre>$ unzip -l /tmp/example.zip
+Archive:  /tmp/example.zip
+  Length     Date   Time    Name
+ --------    ----   ----    ----
+     8467  11-26-02 22:30   jwzthreading.py
+ --------                   -------
+     8467                   1 file
+$ ./python
+Python 2.3 (#1, Aug 1 2003, 19:54:32)
+&gt;&gt;&gt; import sys
+&gt;&gt;&gt; sys.path.insert(0, '/tmp/example.zip')  # パス先頭に .zip ファイル追加
+&gt;&gt;&gt; import jwzthreading
+&gt;&gt;&gt; jwzthreading.__file__
+'/tmp/example.zip/jwzthreading.py'</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pkgutil.html" title="30.5. pkgutil — パッケージ拡張ユーティリティ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="imputil.html" title="30.3. imputil — Import ユーティリティ"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="modules.html" >30. モジュールのインポート</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

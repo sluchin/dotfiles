@@ -1,0 +1,420 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.10. shutil — 高レベルなファイル操作 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="next" title="10.11. dircache — キャッシュされたディレクトリ一覧の生成" href="dircache.html" />
+    <link rel="prev" title="10.9. linecache — テキストラインにランダムアクセスする" href="linecache.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="dircache.html" title="10.11. dircache — キャッシュされたディレクトリ一覧の生成"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="linecache.html" title="10.9. linecache — テキストラインにランダムアクセスする"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" accesskey="U">10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">10.10. <tt class="docutils literal"><span class="pre">shutil</span></tt> &#8212; 高レベルなファイル操作</a><ul>
+<li><a class="reference internal" href="#id1">10.10.1. ディレクトリとファイルの操作</a><ul>
+<li><a class="reference internal" href="#copytree">10.10.1.1. copytree の例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">10.10.2. アーカイブの操作</a><ul>
+<li><a class="reference internal" href="#id3">10.10.2.1. アーカイブ化の例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="linecache.html"
+                        title="前の章へ">10.9. <tt class="docutils literal docutils literal docutils literal"><span class="pre">linecache</span></tt> &#8212; テキストラインにランダムアクセスする</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="dircache.html"
+                        title="次の章へ">10.11. <tt class="docutils literal docutils literal docutils literal"><span class="pre">dircache</span></tt> &#8212; キャッシュされたディレクトリ一覧の生成</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/shutil.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-shutil">
+<span id="shutil"></span><h1>10.10. <a class="reference internal" href="#module-shutil" title="shutil: コピーを含む高レベルなファイル操作。"><tt class="xref py py-mod docutils literal"><span class="pre">shutil</span></tt></a> &#8212; 高レベルなファイル操作<a class="headerlink" href="#module-shutil" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-shutil" title="shutil: コピーを含む高レベルなファイル操作。"><tt class="xref py py-mod docutils literal"><span class="pre">shutil</span></tt></a> モジュールはファイルやファイルの収集に関する多くの高レベルな操作方法を提供します。特にファイルのコピーや削除のための関数が用意されています。個別のファイルに対する操作については、 <a class="reference internal" href="os.html#module-os" title="os: 雑多なオペレーティングシステムインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">os</span></tt></a> モジュールを参照してください。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">Latest version of the <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/shutil.py?view=markup">shutil module Python source code</a></p>
+</div>
+<div class="admonition warning" id="index-0">
+<p class="first admonition-title">警告</p>
+<p>高レベルなファイルコピー関数(<a class="reference internal" href="copy.html#module-copy" title="copy: 浅いコピーおよび深いコピー操作。"><tt class="xref py py-func docutils literal"><span class="pre">copy()</span></tt></a>, <a class="reference internal" href="#shutil.copy2" title="shutil.copy2"><tt class="xref py py-func docutils literal"><span class="pre">copy2()</span></tt></a>)でも、全てのファイルのメタデータをコピーできるわけではありません。</p>
+<p class="last">POSIXプラットフォームでは、これはACLやファイルのオーナー、グループが失われることを意味しています。
+Mac OSでは、リソースフォーク(resource fork)やその他のメタデータが利用されません。これは、リソースが失われ、ファイルタイプや生成者コード(creator code)が正しくなくなることを意味しています。
+Windowsでは、ファイルオーナー、ACL、代替データストリームがコピーされません。</p>
+</div>
+<div class="section" id="id1">
+<h2>10.10.1. ディレクトリとファイルの操作<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="shutil.copyfileobj">
+<tt class="descclassname">shutil.</tt><tt class="descname">copyfileobj</tt><big>(</big><em>fsrc</em>, <em>fdst</em><span class="optional">[</span>, <em>length</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#shutil.copyfileobj" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル形式のオブジェクト <em>fsrc</em> の内容を <em>fdst</em> へコピーします。整数値 <em>length</em> はバッファサイズを表します。特に負の <em>length</em> はチャンク内のソースデータを繰り返し操作することなくコピーします。つまり標準ではデータは制御不能なメモリ消費を避けるためにチャンク内に読み込まれます。
+<em>fsrc</em> オブジェクトのファイルポジションが0でない場合、現在のポジションから後ろの部分だけがコピーされることに注意してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.copyfile">
+<tt class="descclassname">shutil.</tt><tt class="descname">copyfile</tt><big>(</big><em>src</em>, <em>dst</em><big>)</big><a class="headerlink" href="#shutil.copyfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>src</em> で指定されたファイルの内容を <em>dst</em> で指定されたファイルへとコピーします。(メタデータはコピーされません)
+<em>dst</em> は完全なターゲットファイル名である必要があります。コピー先にディレクトリ名を使用したい場合は、 <a class="reference internal" href="copy.html#module-copy" title="copy: 浅いコピーおよび深いコピー操作。"><tt class="xref py py-func docutils literal"><span class="pre">copy()</span></tt></a> を参照してください。もし、 <em>src</em> と <em>dst</em> が同じファイルであれば、 <a class="reference internal" href="#shutil.Error" title="shutil.Error"><tt class="xref py py-exc docutils literal"><span class="pre">Error</span></tt></a> 例外が発生します。</p>
+<p>コピー先は書き込み可能である必要があります。そうでなければ
+<a class="reference internal" href="exceptions.html#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> を発生します。もし <em>dst</em> が存在したら、置き換えられます。キャラクタやブロックデバイス、パイプ等の特別なファイルはこの関数ではコピーできません。
+<em>src</em> と <em>dst</em> にはパス名を文字列で与えられます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.copymode">
+<tt class="descclassname">shutil.</tt><tt class="descname">copymode</tt><big>(</big><em>src</em>, <em>dst</em><big>)</big><a class="headerlink" href="#shutil.copymode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>src</em> から <em>dst</em> へパーミッションをコピーします。ファイル内容や所有者、グループは影響を受けません。
+<em>src</em> と <em>dst</em> には文字列としてパス名を与えられます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.copystat">
+<tt class="descclassname">shutil.</tt><tt class="descname">copystat</tt><big>(</big><em>src</em>, <em>dst</em><big>)</big><a class="headerlink" href="#shutil.copystat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>src</em> から <em>dst</em> へ、パーミッション、最終アクセス時間、最終更新時間、フラグをコピーします。ファイル内容や所有者、グループは影響を受けません。
+<em>src</em> と <em>dst</em> には文字列としてパス名を与えられます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.copy">
+<tt class="descclassname">shutil.</tt><tt class="descname">copy</tt><big>(</big><em>src</em>, <em>dst</em><big>)</big><a class="headerlink" href="#shutil.copy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル <em>src</em> をファイルまたはディレクトリ <em>dist</em> へコピーします。もし、 <em>dst</em> がディレクトリであればファイル名は <em>src</em> と同じものが指定されたディレクトリ内に作成（または上書き）されます。パーミッションはコピーされます。 <em>src</em> と <em>dst</em> には文字列としてパス名を与えられます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.copy2">
+<tt class="descclassname">shutil.</tt><tt class="descname">copy2</tt><big>(</big><em>src</em>, <em>dst</em><big>)</big><a class="headerlink" href="#shutil.copy2" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="copy.html#module-copy" title="copy: 浅いコピーおよび深いコピー操作。"><tt class="xref py py-func docutils literal"><span class="pre">copy()</span></tt></a> と類似していますが、メタデータも同様にコピーされます。実際のところ、この関数は <a class="reference internal" href="copy.html#module-copy" title="copy: 浅いコピーおよび深いコピー操作。"><tt class="xref py py-func docutils literal"><span class="pre">copy()</span></tt></a> の後に <a class="reference internal" href="#shutil.copystat" title="shutil.copystat"><tt class="xref py py-func docutils literal"><span class="pre">copystat()</span></tt></a> しています。
+Unix コマンドの <strong class="program">cp -p</strong> と同様の働きをします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.ignore_patterns">
+<tt class="descclassname">shutil.</tt><tt class="descname">ignore_patterns</tt><big>(</big><em>*patterns</em><big>)</big><a class="headerlink" href="#shutil.ignore_patterns" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このファクトリ関数は、 <a class="reference internal" href="#shutil.copytree" title="shutil.copytree"><tt class="xref py py-func docutils literal"><span class="pre">copytree()</span></tt></a> 関数の <em>ignore</em> 引数に渡すための呼び出し可能オブジェクトを作成します。
+glob形式の <em>patterns</em> にマッチするファイルやディレクトリが無視されます。下の例を参照してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.copytree">
+<tt class="descclassname">shutil.</tt><tt class="descname">copytree</tt><big>(</big><em>src</em>, <em>dst</em><span class="optional">[</span>, <em>symlinks</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#shutil.copytree" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>src</em> を起点としたディレクトリツリーをコピーします。
+<em>dst</em> で指定されたターゲットディレクトリは、既存のもので無い必要があります。存在しない親ディレクトリも含めて作成されます。パーミッションと時刻は
+<a class="reference internal" href="#shutil.copystat" title="shutil.copystat"><tt class="xref py py-func docutils literal"><span class="pre">copystat()</span></tt></a> 関数でコピーされます。個々のファイルは <a class="reference internal" href="#shutil.copy2" title="shutil.copy2"><tt class="xref py py-func docutils literal"><span class="pre">copy2()</span></tt></a> によってコピーされます。</p>
+<p><em>symlinks</em> が真であれば、元のディレクトリ内のシンボリックリンクはコピー先のディレクトリ内へシンボリックリンクとしてコピーされます。偽が与えられたり省略された場合は元のディレクトリ内のリンクの対象となっているファイルがコピー先のディレクトリ内へコピーされます。</p>
+<p><em>ignore</em> 引数を利用する場合、その呼び出し可能オブジェクトは、引数として、
+<a class="reference internal" href="#shutil.copytree" title="shutil.copytree"><tt class="xref py py-func docutils literal"><span class="pre">copytree()</span></tt></a> が走査するディレクトリと、 <a class="reference internal" href="os.html#os.listdir" title="os.listdir"><tt class="xref py py-func docutils literal"><span class="pre">os.listdir()</span></tt></a> が返すそのディレクトリの内容を受け取ります。
+<a class="reference internal" href="#shutil.copytree" title="shutil.copytree"><tt class="xref py py-func docutils literal"><span class="pre">copytree()</span></tt></a> は再帰的に呼び出されるので、 <em>ignore</em> はコピーされる各ディレクトリ毎に呼び出されます。 <em>ignore</em> の戻り値は、ファイルやディレクトリに対するカレントディレクトリからの相対パスのシーケンスである必要があります。
+(例えば、第二引数のサブセット)
+返された名前は、無視され、コピーされません。
+<a class="reference internal" href="#shutil.ignore_patterns" title="shutil.ignore_patterns"><tt class="xref py py-func docutils literal"><span class="pre">ignore_patterns()</span></tt></a> を使って、glob形式のパターンからこの引数のための呼び出し可能オブジェクトを作成することができます。</p>
+<p>エラーが発生したときはエラー理由のリストを持った <a class="reference internal" href="#shutil.Error" title="shutil.Error"><tt class="xref py py-exc docutils literal"><span class="pre">Error</span></tt></a> を起こします。</p>
+<p>この関数は、究極の道具としてではなく、ソースコードが利用例になっていると捉えるべきでしょう。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>コピー中にエラーが発生した場合、メッセージを出力するのではなく <a class="reference internal" href="#shutil.Error" title="shutil.Error"><tt class="xref py py-exc docutils literal"><span class="pre">Error</span></tt></a> を起こす。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><em>dst</em> を作成する際に中間のディレクトリ作成が必要な場合、エラーを起こすのではなく作成する。ディレクトリのパーミッションと時刻を
+<a class="reference internal" href="#shutil.copystat" title="shutil.copystat"><tt class="xref py py-func docutils literal"><span class="pre">copystat()</span></tt></a> を利用してコピーする。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>何がコピーされるかを制御するための <em>ignore</em> 引数</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.rmtree">
+<tt class="descclassname">shutil.</tt><tt class="descname">rmtree</tt><big>(</big><em>path</em><span class="optional">[</span>, <em>ignore_errors</em><span class="optional">[</span>, <em>onerror</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shutil.rmtree" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-1">ディレクトリツリー全体を削除します。
+<em>path</em> はディレクトリを指している必要があります。（ディレクトリに対するシンボリックリンクではいけません）もし <em>ignore_errors</em> が真であれば削除に失敗したことによるエラーは無視されます。偽が与えられたり省略された場合はこれらのエラーは <em>onerror</em> で与えられたハンドラを呼び出して処理され、<em>onerror</em> が省略された場合は例外を引き起こします。</p>
+<p><em>onerror</em> が与えられた場合、それは3つのパラメータ <em>function</em>, <em>path</em> および <em>excinfo</em> を受け入れて呼び出し可能のものでなくてはなりません。最初のパラメータ <em>function</em> は例外を引き起こした関数で
+<a class="reference internal" href="os.html#os.listdir" title="os.listdir"><tt class="xref py py-func docutils literal"><span class="pre">os.listdir()</span></tt></a>, <a class="reference internal" href="os.html#os.remove" title="os.remove"><tt class="xref py py-func docutils literal"><span class="pre">os.remove()</span></tt></a>, <a class="reference internal" href="os.html#os.rmdir" title="os.rmdir"><tt class="xref py py-func docutils literal"><span class="pre">os.rmdir()</span></tt></a> のいずれかでしょう。
+2番目のパラメータ <em>path</em> は <em>function</em> へ渡されたパス名です。
+3番目のパラメータ <em>excinfo</em> は <a class="reference internal" href="sys.html#sys.exc_info" title="sys.exc_info"><tt class="xref py py-func docutils literal"><span class="pre">sys.exc_info()</span></tt></a> で返されるような例外情報になるでしょう。 <em>onerror</em> が引き起こす例外はキャッチできません。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>path</em> を明示的にチェックして、シンボリックリンクだった場合は <a class="reference internal" href="exceptions.html#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a>
+を返すようになりました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.move">
+<tt class="descclassname">shutil.</tt><tt class="descname">move</tt><big>(</big><em>src</em>, <em>dst</em><big>)</big><a class="headerlink" href="#shutil.move" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>再帰的にファイルやディレクトリを別の場所へ移動します。</p>
+<p>もし移動先が現在のファイルシステム上であれば単純に名前を変更します。そうでない場合は(<a class="reference internal" href="#shutil.copy2" title="shutil.copy2"><tt class="xref py py-func docutils literal"><span class="pre">copy2()</span></tt></a> で)コピーを行い、その後コピー元は削除されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="shutil.Error">
+<em class="property">exception </em><tt class="descclassname">shutil.</tt><tt class="descname">Error</tt><a class="headerlink" href="#shutil.Error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この例外は複数ファイルの操作を行っているときに生じる例外をまとめたものです。 <a class="reference internal" href="#shutil.copytree" title="shutil.copytree"><tt class="xref py py-func docutils literal"><span class="pre">copytree()</span></tt></a> に対しては例外の引数は3つのタプル(<em>srcname</em>, <em>dstname</em>,
+<em>exception</em>)からなるリストです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<div class="section" id="copytree">
+<span id="shutil-example"></span><h3>10.10.1.1. copytree の例<a class="headerlink" href="#copytree" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>以下は前述の <a class="reference internal" href="#shutil.copytree" title="shutil.copytree"><tt class="xref py py-func docutils literal"><span class="pre">copytree()</span></tt></a> 関数のドキュメント文字列を省略した実装例です。本モジュールで提供される他の関数の使い方を示しています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">copytree</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">symlinks</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ignore</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">ignored_names</span> <span class="o">=</span> <span class="n">ignore</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ignored_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ignored_names</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">srcname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">dstname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">symlinks</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">srcname</span><span class="p">):</span>
+                <span class="n">linkto</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">readlink</span><span class="p">(</span><span class="n">srcname</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">linkto</span><span class="p">,</span> <span class="n">dstname</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">srcname</span><span class="p">):</span>
+                <span class="n">copytree</span><span class="p">(</span><span class="n">srcname</span><span class="p">,</span> <span class="n">dstname</span><span class="p">,</span> <span class="n">symlinks</span><span class="p">,</span> <span class="n">ignore</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">copy2</span><span class="p">(</span><span class="n">srcname</span><span class="p">,</span> <span class="n">dstname</span><span class="p">)</span>
+            <span class="c"># XXX What about devices, sockets etc.?</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">error</span><span class="p">),</span> <span class="n">why</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">srcname</span><span class="p">,</span> <span class="n">dstname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">why</span><span class="p">)))</span>
+        <span class="c"># catch the Error from the recursive copytree so that we can</span>
+        <span class="c"># continue with other files</span>
+        <span class="k">except</span> <span class="n">Error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">copystat</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">WindowsError</span><span class="p">:</span>
+        <span class="c"># can&#39;t copy file access times on Windows</span>
+        <span class="k">pass</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">,</span> <span class="n">why</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">why</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#shutil.ignore_patterns" title="shutil.ignore_patterns"><tt class="xref py py-func docutils literal"><span class="pre">ignore_patterns()</span></tt></a> ヘルパ関数を利用する、もう1つの例です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copytree</span><span class="p">,</span> <span class="n">ignore_patterns</span>
+
+<span class="n">copytree</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="n">ignore_patterns</span><span class="p">(</span><span class="s">&#39;*.pyc&#39;</span><span class="p">,</span> <span class="s">&#39;tmp*&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>この例では、 <tt class="docutils literal"><span class="pre">.pyc</span></tt> ファイルと、 <tt class="docutils literal"><span class="pre">tmp</span></tt> で始まる全てのファイルやディレクトリを除いて、全てをコピーします。</p>
+<p><em>ignore</em> 引数にロギングさせる別の例です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copytree</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="k">def</span> <span class="nf">_logpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Working in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[]</span>   <span class="c"># nothing will be ignored</span>
+
+<span class="n">copytree</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="n">_logpath</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>10.10.2. アーカイブの操作<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="shutil.make_archive">
+<tt class="descclassname">shutil.</tt><tt class="descname">make_archive</tt><big>(</big><em>base_name</em>, <em>format</em><span class="optional">[</span>, <em>root_dir</em><span class="optional">[</span>, <em>base_dir</em><span class="optional">[</span>, <em>verbose</em><span class="optional">[</span>, <em>dry_run</em><span class="optional">[</span>, <em>owner</em><span class="optional">[</span>, <em>group</em><span class="optional">[</span>, <em>logger</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shutil.make_archive" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブファイル (zip や tar など) を作成し、その名前を返します。</p>
+<p><em>base_name</em> は作成するファイルの名前で、パスを含み、フォーマット特有の拡張子はすべて除きます。 <em>format</em> はアーカイブフォーマットで、
+&#8220;zip&#8221;, &#8220;tar&#8221;, &#8220;bztar&#8221; または &#8220;gztar&#8221; のいずれかです。</p>
+<p><em>root_dir</em> は、アーカイブのルートディレクトリとなるディレクトリです。すなわち、一般的には、アーカイブを作成する前に <em>root_dir</em> をカレントディレクトリにします。</p>
+<p><em>base_dir</em> は、アーカイブを開始するディレクトリです。すなわち、 <em>base_dir</em> は、アーカイブのすべてのファイルとディレクトリに共通する接頭辞になります。</p>
+<p><em>root_dir</em> と <em>base_dir</em> のどちらも、デフォルトはカレントディレクトリです。</p>
+<p><em>owner</em> と <em>group</em> は、tar アーカイブを作成するときに使われます。デフォルトでは、カレントのオーナとグループを使います。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.get_archive_formats">
+<tt class="descclassname">shutil.</tt><tt class="descname">get_archive_formats</tt><big>(</big><big>)</big><a class="headerlink" href="#shutil.get_archive_formats" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブ化をサポートしているフォーマットのリストを返します。返されるシーケンスのそれぞれの要素は、タプル <tt class="docutils literal"><span class="pre">(name,</span> <span class="pre">description)</span></tt> です。</p>
+<p>デフォルトでは、 <a class="reference internal" href="#module-shutil" title="shutil: コピーを含む高レベルなファイル操作。"><tt class="xref py py-mod docutils literal"><span class="pre">shutil</span></tt></a> はこれらのフォーマットを提供しています:</p>
+<ul class="simple">
+<li><em>gztar</em>: gzip された tar ファイル</li>
+<li><em>bztar</em>: bzip2 された tar ファイル</li>
+<li><em>tar</em>: 圧縮されていない tar ファイル</li>
+<li><em>zip</em>: ZIP ファイル</li>
+</ul>
+<p><a class="reference internal" href="#shutil.register_archive_format" title="shutil.register_archive_format"><tt class="xref py py-func docutils literal"><span class="pre">register_archive_format()</span></tt></a> を使って、新しいフォーマットを登録したり、既存のフォーマットに独自のアーカイバを提供したりできます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.register_archive_format">
+<tt class="descclassname">shutil.</tt><tt class="descname">register_archive_format</tt><big>(</big><em>name</em>, <em>function</em><span class="optional">[</span>, <em>extra_args</em><span class="optional">[</span>, <em>description</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#shutil.register_archive_format" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>フォーマット <em>name</em> のアーカイバを登録します。 <em>function</em> は、アーカイバを呼び出すのに使われる呼び出し可能オブジェクトです。</p>
+<p><em>extra_args</em> は、与えられるなら <tt class="docutils literal"><span class="pre">(name,</span> <span class="pre">value)</span></tt> のシーケンスで、アーカイバ呼び出し可能オブジェクトが使われるときの追加キーワード引数に使われます。</p>
+<p><em>description</em> は、アーカイバのリストを返す <a class="reference internal" href="#shutil.get_archive_formats" title="shutil.get_archive_formats"><tt class="xref py py-func docutils literal"><span class="pre">get_archive_formats()</span></tt></a>
+で使われます。デフォルトでは、空のリストです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="shutil.unregister_archive_format">
+<tt class="descclassname">shutil.</tt><tt class="descname">unregister_archive_format</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#shutil.unregister_archive_format" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブフォーマット <em>name</em> を、サポートされているフォーマットのリストから取り除きます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<div class="section" id="id3">
+<h3>10.10.2.1. アーカイブ化の例<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>この例では、ユーザの <tt class="file docutils literal"><span class="pre">.ssh</span></tt> ディレクトリにあるすべてのファイルを含む、
+gzip された tar ファイルアーカイブを作成します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">make_archive</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">archive_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;~&#39;</span><span class="p">,</span> <span class="s">&#39;myarchive&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">root_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;~&#39;</span><span class="p">,</span> <span class="s">&#39;.ssh&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">make_archive</span><span class="p">(</span><span class="n">archive_name</span><span class="p">,</span> <span class="s">&#39;gztar&#39;</span><span class="p">,</span> <span class="n">root_dir</span><span class="p">)</span>
+<span class="go">&#39;/Users/tarek/myarchive.tar.gz&#39;</span>
+</pre></div>
+</div>
+<p>結果のアーカイブは、以下のものを含みます:</p>
+<div class="highlight-python"><pre>$ tar -tzvf /Users/tarek/myarchive.tar.gz
+drwx------ tarek/staff       0 2010-02-01 16:23:40 ./
+-rw-r--r-- tarek/staff     609 2008-06-09 13:26:54 ./authorized_keys
+-rwxr-xr-x tarek/staff      65 2008-06-09 13:26:54 ./config
+-rwx------ tarek/staff     668 2008-06-09 13:26:54 ./id_dsa
+-rwxr-xr-x tarek/staff     609 2008-06-09 13:26:54 ./id_dsa.pub
+-rw------- tarek/staff    1675 2008-06-09 13:26:54 ./id_rsa
+-rw-r--r-- tarek/staff     397 2008-06-09 13:26:54 ./id_rsa.pub
+-rw-r--r-- tarek/staff   37192 2010-02-06 18:23:10 ./known_hosts</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="dircache.html" title="10.11. dircache — キャッシュされたディレクトリ一覧の生成"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="linecache.html" title="10.9. linecache — テキストラインにランダムアクセスする"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" >10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

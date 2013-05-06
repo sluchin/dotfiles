@@ -1,0 +1,527 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.3. stat — stat() の返す内容を解釈する &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="next" title="10.4. statvfs — os.statvfs() で使われる定数群" href="statvfs.html" />
+    <link rel="prev" title="10.2. fileinput — 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。" href="fileinput.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="statvfs.html" title="10.4. statvfs — os.statvfs() で使われる定数群"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="fileinput.html" title="10.2. fileinput — 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" accesskey="U">10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="fileinput.html"
+                        title="前の章へ">10.2. <tt class="docutils literal docutils literal docutils literal"><span class="pre">fileinput</span></tt> &#8212; 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="statvfs.html"
+                        title="次の章へ">10.4. <tt class="docutils literal docutils literal"><span class="pre">statvfs</span></tt> &#8212; <tt class="docutils literal docutils literal"><span class="pre">os.statvfs()</span></tt> で使われる定数群</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/stat.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-stat">
+<span id="stat-stat"></span><h1>10.3. <a class="reference internal" href="#module-stat" title="stat: os.stat()、os.lstat() および os.fstat() の返す内容を解釈するためのユーティリティ群。"><tt class="xref py py-mod docutils literal"><span class="pre">stat</span></tt></a> &#8212; <a class="reference internal" href="#module-stat" title="stat: os.stat()、os.lstat() および os.fstat() の返す内容を解釈するためのユーティリティ群。"><tt class="xref py py-func docutils literal"><span class="pre">stat()</span></tt></a> の返す内容を解釈する<a class="headerlink" href="#module-stat" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-stat" title="stat: os.stat()、os.lstat() および os.fstat() の返す内容を解釈するためのユーティリティ群。"><tt class="xref py py-mod docutils literal"><span class="pre">stat</span></tt></a> モジュールでは、 <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> 、 <a class="reference internal" href="os.html#os.lstat" title="os.lstat"><tt class="xref py py-func docutils literal"><span class="pre">os.lstat()</span></tt></a> および <a class="reference internal" href="os.html#os.fstat" title="os.fstat"><tt class="xref py py-func docutils literal"><span class="pre">os.fstat()</span></tt></a>
+(存在すれば) の返す内容を解釈するための定数や関数を定義しています。
+<tt class="xref c c-func docutils literal"><span class="pre">stat()</span></tt> 、 <tt class="xref c c-func docutils literal"><span class="pre">fstat()</span></tt> 、および <tt class="xref c c-func docutils literal"><span class="pre">lstat()</span></tt>
+の関数呼び出しについての完全な記述はシステムのドキュメントを参照してください。</p>
+<p><a class="reference internal" href="#module-stat" title="stat: os.stat()、os.lstat() および os.fstat() の返す内容を解釈するためのユーティリティ群。"><tt class="xref py py-mod docutils literal"><span class="pre">stat</span></tt></a> モジュールでは、特殊なファイル型を判別するための以下の関数を定義しています:</p>
+<dl class="function">
+<dt id="stat.S_ISDIR">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISDIR</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_ISDIR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルのモードがディレクトリの場合にゼロでない値を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stat.S_ISCHR">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISCHR</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_ISCHR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルのモードがキャラクタ型の特殊デバイスファイルの場合にゼロでない値を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stat.S_ISBLK">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISBLK</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_ISBLK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルのモードがブロック型の特殊デバイスファイルの場合にゼロでない値を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stat.S_ISREG">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISREG</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_ISREG" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルのモードが通常ファイルの場合にゼロでない値を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stat.S_ISFIFO">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISFIFO</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_ISFIFO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルのモードが FIFO (名前つきパイプ) の場合にゼロでない値を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stat.S_ISLNK">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISLNK</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_ISLNK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルのモードがシンボリックリンクの場合にゼロでない値を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stat.S_ISSOCK">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISSOCK</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_ISSOCK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルのモードがソケットの場合にゼロでない値を返します。</p>
+</dd></dl>
+
+<p>より一般的なファイルのモードを操作するための二つの関数が定義されています:</p>
+<dl class="function">
+<dt id="stat.S_IMODE">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IMODE</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_IMODE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="os.html#os.chmod" title="os.chmod"><tt class="xref py py-func docutils literal"><span class="pre">os.chmod()</span></tt></a> で設定することのできる一部のファイルモード &#8212;
+すなわち、ファイルの許可ビット (permission bits) に加え、 (サポートされているシステムでは)
+スティッキービット (sticky bit)、実行グループ ID 設定 (set-group-id) および実行ユーザ ID 設定  (set-user-id) ビット &#8212; を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="stat.S_IFMT">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFMT</tt><big>(</big><em>mode</em><big>)</big><a class="headerlink" href="#stat.S_IFMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルの形式を記述しているファイルモードの一部 (上記の  <tt class="xref py py-func docutils literal"><span class="pre">S_IS*()</span></tt> 関数で使われます) を返します。</p>
+</dd></dl>
+
+<p>通常、ファイルの形式を調べる場合には <tt class="xref py py-func docutils literal"><span class="pre">os.path.is*()</span></tt> 関数を使うことになります; ここで挙げた関数は同じファイルに対して複数のテストを同時に行いたいが、 <tt class="xref c c-func docutils literal"><span class="pre">stat()</span></tt> システムコールを何度も呼び出してオーバヘッドが生じるのを避けたい場合に便利です。これらはまた、ブロック型およびキャラクタ型デバイスに対するテストのように、 <a class="reference internal" href="os.path.html#module-os.path" title="os.path: Operations on pathnames."><tt class="xref py py-mod docutils literal"><span class="pre">os.path</span></tt></a> で扱うことのできないファイルの情報を調べる際にも便利です。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">stat</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">def</span> <span class="nf">walktree</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;recursively descend the directory tree rooted at top,</span>
+<span class="sd">       calling the callback function for each regular file&#39;&#39;&#39;</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">top</span><span class="p">):</span>
+        <span class="n">pathname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">pathname</span><span class="p">)[</span><span class="n">ST_MODE</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">S_ISDIR</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="c"># It&#39;s a directory, recurse into it</span>
+            <span class="n">walktree</span><span class="p">(</span><span class="n">pathname</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">S_ISREG</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="c"># It&#39;s a file, call the callback function</span>
+            <span class="n">callback</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># Unknown file type, print a message</span>
+            <span class="k">print</span> <span class="s">&#39;Skipping </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">pathname</span>
+
+<span class="k">def</span> <span class="nf">visitfile</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39;visiting&#39;</span><span class="p">,</span> <span class="nb">file</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">walktree</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">visitfile</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>以下の全ての変数は、 <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> 、 <a class="reference internal" href="os.html#os.fstat" title="os.fstat"><tt class="xref py py-func docutils literal"><span class="pre">os.fstat()</span></tt></a> 、または <a class="reference internal" href="os.html#os.lstat" title="os.lstat"><tt class="xref py py-func docutils literal"><span class="pre">os.lstat()</span></tt></a> が返す 10
+要素のタプルにおけるインデクスを単にシンボル定数化したものです。</p>
+<dl class="data">
+<dt id="stat.ST_MODE">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_MODE</tt><a class="headerlink" href="#stat.ST_MODE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Iノードの保護モード。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_INO">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_INO</tt><a class="headerlink" href="#stat.ST_INO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Iノード番号。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_DEV">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_DEV</tt><a class="headerlink" href="#stat.ST_DEV" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Iノードが存在するデバイス。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_NLINK">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_NLINK</tt><a class="headerlink" href="#stat.ST_NLINK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>該当する Iノードへのリンク数。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_UID">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_UID</tt><a class="headerlink" href="#stat.ST_UID" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルの所持者のユーザ ID。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_GID">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_GID</tt><a class="headerlink" href="#stat.ST_GID" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルの所持者のグループ ID。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_SIZE">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_SIZE</tt><a class="headerlink" href="#stat.ST_SIZE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>通常ファイルではバイトサイズ; いくつかの特殊ファイルでは処理待ちのデータ量。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_ATIME">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_ATIME</tt><a class="headerlink" href="#stat.ST_ATIME" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最後にアクセスした時刻。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_MTIME">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_MTIME</tt><a class="headerlink" href="#stat.ST_MTIME" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最後に変更された時刻。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.ST_CTIME">
+<tt class="descclassname">stat.</tt><tt class="descname">ST_CTIME</tt><a class="headerlink" href="#stat.ST_CTIME" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オペレーティングシステムから返される&#8221;ctime&#8221;。あるOS(Unixなど)では最後にメタデータが更新された時間となり、別のOS(Windowsなど)では作成時間となります(詳細については各プラットフォームのドキュメントを参照してください)。</p>
+</dd></dl>
+
+<p>&#8220;ファイルサイズ&#8221; の解釈はファイルの型によって異なります。通常のファイルの場合、サイズはファイルの大きさをバイトで表したものです。ほとんどの Unix 系
+(特に Linux) における FIFO やソケットの場合、&#8221;サイズ&#8221; は <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> 、 <a class="reference internal" href="os.html#os.fstat" title="os.fstat"><tt class="xref py py-func docutils literal"><span class="pre">os.fstat()</span></tt></a> 、あるいは
+<a class="reference internal" href="os.html#os.lstat" title="os.lstat"><tt class="xref py py-func docutils literal"><span class="pre">os.lstat()</span></tt></a> を呼び出した時点で読み出し待ちであったデータのバイト数になります; この値は時に有用で、特に上記の特殊なファイルを非ブロックモードで開いた後にポーリングを行いたいといった場合に便利です。他のキャラクタ型およびブロック型デバイスにおけるサイズフィールドの意味はさらに異なっていて、背後のシステムコールの実装によります。</p>
+<p>以下の変数は、 <a class="reference internal" href="#stat.ST_MODE" title="stat.ST_MODE"><tt class="xref py py-data docutils literal"><span class="pre">ST_MODE</span></tt></a> フィールドで使用されるフラグを定義しています。</p>
+<p>最初に挙げる、以下のフラグを使うよりは、上記の関数を使うほうがポータブルです:</p>
+<dl class="data">
+<dt>
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFMT</tt></dt>
+<dd><p>ファイルタイプのビットフィールド用のビットマスク</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IFSOCK">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFSOCK</tt><a class="headerlink" href="#stat.S_IFSOCK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ソケット</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IFLNK">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFLNK</tt><a class="headerlink" href="#stat.S_IFLNK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シンボリックリンク</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IFREG">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFREG</tt><a class="headerlink" href="#stat.S_IFREG" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>通常のファイル</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IFBLK">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFBLK</tt><a class="headerlink" href="#stat.S_IFBLK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックデバイス</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IFDIR">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFDIR</tt><a class="headerlink" href="#stat.S_IFDIR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ディレクトリ</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IFCHR">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFCHR</tt><a class="headerlink" href="#stat.S_IFCHR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>キャラクターデバイス</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IFIFO">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IFIFO</tt><a class="headerlink" href="#stat.S_IFIFO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>FIFO.</p>
+</dd></dl>
+
+<p>以下のフラグは、 <a class="reference internal" href="os.html#os.chmod" title="os.chmod"><tt class="xref py py-func docutils literal"><span class="pre">os.chmod()</span></tt></a> の <em>mode</em> 引数に使うこともできます:</p>
+<dl class="data">
+<dt id="stat.S_ISUID">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISUID</tt><a class="headerlink" href="#stat.S_ISUID" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>UID ビットを設定する</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_ISGID">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISGID</tt><a class="headerlink" href="#stat.S_ISGID" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>グループIDビットを設定する。このビットには幾つかの特殊ケースがあります。ディレクトリに対して設定されていた場合、 BSD のセマンティクスが利用される事を示しています。すなわち、そこに作成されるファイルは、作成したプロセスの有効グループID (effective group ID) ではなくそのディレクトリのグループIDを継承し、そこに作成されるディレクトリにも <a class="reference internal" href="#stat.S_ISGID" title="stat.S_ISGID"><tt class="xref py py-data docutils literal"><span class="pre">S_ISGID</span></tt></a> ビットが設定されます。グループ実行ビット (<a class="reference internal" href="#stat.S_IXGRP" title="stat.S_IXGRP"><tt class="xref py py-data docutils literal"><span class="pre">S_IXGRP</span></tt></a>) が設定されていないファイルに対してこのビットが設定されていた場合、強制ファイル/レコードロックを意味します。
+(<a class="reference internal" href="#stat.S_ENFMT" title="stat.S_ENFMT"><tt class="xref py py-data docutils literal"><span class="pre">S_ENFMT</span></tt></a> も参照してください。)</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_ISVTX">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ISVTX</tt><a class="headerlink" href="#stat.S_ISVTX" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スティッキービット。このビットがディレクトリに対して設定されているとき、そのディレクトリ内のファイルは、そのファイルのオーナー、あるいはそのディレクトリのオーナーか特権プロセスのみが、リネームや削除をすることが出来ることを意味しています。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IRWXU">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IRWXU</tt><a class="headerlink" href="#stat.S_IRWXU" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルオーナーの権限に対するマスク</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IRUSR">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IRUSR</tt><a class="headerlink" href="#stat.S_IRUSR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オーナーがリード権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IWUSR">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IWUSR</tt><a class="headerlink" href="#stat.S_IWUSR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オーナーがライト権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IXUSR">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IXUSR</tt><a class="headerlink" href="#stat.S_IXUSR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オーナーが実行権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IRWXG">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IRWXG</tt><a class="headerlink" href="#stat.S_IRWXG" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>グループの権限に対するマスク</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IRGRP">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IRGRP</tt><a class="headerlink" href="#stat.S_IRGRP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>グループがリード権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IWGRP">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IWGRP</tt><a class="headerlink" href="#stat.S_IWGRP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>グループがライト権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IXGRP">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IXGRP</tt><a class="headerlink" href="#stat.S_IXGRP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>グループが実行権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IRWXO">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IRWXO</tt><a class="headerlink" href="#stat.S_IRWXO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>その他 (グループ外) の権限に対するマスク</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IROTH">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IROTH</tt><a class="headerlink" href="#stat.S_IROTH" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>その他はリード権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IWOTH">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IWOTH</tt><a class="headerlink" href="#stat.S_IWOTH" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>その他はライト権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IXOTH">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IXOTH</tt><a class="headerlink" href="#stat.S_IXOTH" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>その他は実行権限を持っている</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_ENFMT">
+<tt class="descclassname">stat.</tt><tt class="descname">S_ENFMT</tt><a class="headerlink" href="#stat.S_ENFMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>System V ファイルロック強制。このフラグは <a class="reference internal" href="#stat.S_ISGID" title="stat.S_ISGID"><tt class="xref py py-data docutils literal"><span class="pre">S_ISGID</span></tt></a> と共有されています。グループ実行ビット (<a class="reference internal" href="#stat.S_IXGRP" title="stat.S_IXGRP"><tt class="xref py py-data docutils literal"><span class="pre">S_IXGRP</span></tt></a>) が設定されていないファイルでは、ファイル/レコードのロックが強制されます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IREAD">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IREAD</tt><a class="headerlink" href="#stat.S_IREAD" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#stat.S_IRUSR" title="stat.S_IRUSR"><tt class="xref py py-data docutils literal"><span class="pre">S_IRUSR</span></tt></a> の、 Unix V7 のシノニム</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IWRITE">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IWRITE</tt><a class="headerlink" href="#stat.S_IWRITE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#stat.S_IWUSR" title="stat.S_IWUSR"><tt class="xref py py-data docutils literal"><span class="pre">S_IWUSR</span></tt></a> の、 Unix V7 のシノニム</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.S_IEXEC">
+<tt class="descclassname">stat.</tt><tt class="descname">S_IEXEC</tt><a class="headerlink" href="#stat.S_IEXEC" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#stat.S_IXUSR" title="stat.S_IXUSR"><tt class="xref py py-data docutils literal"><span class="pre">S_IXUSR</span></tt></a> の、 Unix V7 のシノニム</p>
+</dd></dl>
+
+<p>以下のフラグを <a class="reference internal" href="os.html#os.chflags" title="os.chflags"><tt class="xref py py-func docutils literal"><span class="pre">os.chflags()</span></tt></a> の <em>flags</em> 引数として利用できます:</p>
+<dl class="data">
+<dt id="stat.UF_NODUMP">
+<tt class="descclassname">stat.</tt><tt class="descname">UF_NODUMP</tt><a class="headerlink" href="#stat.UF_NODUMP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルをダンプしない</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.UF_IMMUTABLE">
+<tt class="descclassname">stat.</tt><tt class="descname">UF_IMMUTABLE</tt><a class="headerlink" href="#stat.UF_IMMUTABLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルは変更されない</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.UF_APPEND">
+<tt class="descclassname">stat.</tt><tt class="descname">UF_APPEND</tt><a class="headerlink" href="#stat.UF_APPEND" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルは追記しかされない。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.UF_OPAQUE">
+<tt class="descclassname">stat.</tt><tt class="descname">UF_OPAQUE</tt><a class="headerlink" href="#stat.UF_OPAQUE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユニオンファイルシステムのスタックを通したとき、このディレクトリは不透明です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.UF_NOUNLINK">
+<tt class="descclassname">stat.</tt><tt class="descname">UF_NOUNLINK</tt><a class="headerlink" href="#stat.UF_NOUNLINK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルはリネームや削除されない。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.SF_ARCHIVED">
+<tt class="descclassname">stat.</tt><tt class="descname">SF_ARCHIVED</tt><a class="headerlink" href="#stat.SF_ARCHIVED" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルはアーカイブされているかもしれません。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.SF_IMMUTABLE">
+<tt class="descclassname">stat.</tt><tt class="descname">SF_IMMUTABLE</tt><a class="headerlink" href="#stat.SF_IMMUTABLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルは変更されないかもしれません。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.SF_APPEND">
+<tt class="descclassname">stat.</tt><tt class="descname">SF_APPEND</tt><a class="headerlink" href="#stat.SF_APPEND" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルは追記しかされないかもしれません。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.SF_NOUNLINK">
+<tt class="descclassname">stat.</tt><tt class="descname">SF_NOUNLINK</tt><a class="headerlink" href="#stat.SF_NOUNLINK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルはリネームされたり削除されたりしないかもしれません。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="stat.SF_SNAPSHOT">
+<tt class="descclassname">stat.</tt><tt class="descname">SF_SNAPSHOT</tt><a class="headerlink" href="#stat.SF_SNAPSHOT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このファイルはスナップショットファイルです。</p>
+</dd></dl>
+
+<p>詳しい情報は *BSD か Mac OS システムの man page <em class="manpage">chflags(2)</em> を参照してください。</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="statvfs.html" title="10.4. statvfs — os.statvfs() で使われる定数群"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="fileinput.html" title="10.2. fileinput — 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" >10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

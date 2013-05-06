@@ -1,0 +1,1175 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.3. collections — 高性能なコンテナ・データ型 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="8. データ型" href="datatypes.html" />
+    <link rel="next" title="8.4. heapq — ヒープキューアルゴリズム" href="heapq.html" />
+    <link rel="prev" title="8.2. calendar — 一般的なカレンダーに関する関数群" href="calendar.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="heapq.html" title="8.4. heapq — ヒープキューアルゴリズム"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="calendar.html" title="8.2. calendar — 一般的なカレンダーに関する関数群"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" accesskey="U">8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.3. <tt class="docutils literal"><span class="pre">collections</span></tt> &#8212; 高性能なコンテナ・データ型</a><ul>
+<li><a class="reference internal" href="#counter">8.3.1. <tt class="docutils literal"><span class="pre">Counter</span></tt> オブジェクト</a></li>
+<li><a class="reference internal" href="#deque">8.3.2. <tt class="docutils literal"><span class="pre">deque</span></tt> オブジェクト</a></li>
+<li><a class="reference internal" href="#id1">8.3.3. <tt class="docutils literal"><span class="pre">deque</span></tt> のレシピ</a></li>
+<li><a class="reference internal" href="#defaultdict">8.3.4. <tt class="docutils literal"><span class="pre">defaultdict</span></tt> オブジェクト</a><ul>
+<li><a class="reference internal" href="#id2">8.3.4.1. <tt class="docutils literal"><span class="pre">defaultdict</span></tt> の使用例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#namedtuple">8.3.5. <tt class="docutils literal"><span class="pre">namedtuple()</span></tt> 名前付きフィールドを持つタプルのファクトリ関数</a></li>
+<li><a class="reference internal" href="#ordereddict">8.3.6. <tt class="docutils literal"><span class="pre">OrderedDict</span></tt> オブジェクト</a><ul>
+<li><a class="reference internal" href="#id3">8.3.6.1. <tt class="docutils literal"><span class="pre">OrderedDict</span></tt> の例とレシピ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#abcs-abstract-base-classes">8.3.7. ABCs - abstract base classes</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="calendar.html"
+                        title="前の章へ">8.2. <tt class="docutils literal docutils literal"><span class="pre">calendar</span></tt> &#8212; 一般的なカレンダーに関する関数群</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="heapq.html"
+                        title="次の章へ">8.4. <tt class="docutils literal docutils literal"><span class="pre">heapq</span></tt> &#8212; ヒープキューアルゴリズム</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/collections.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-collections">
+<span id="collections"></span><h1>8.3. <a class="reference internal" href="#module-collections" title="collections: High-performance container datatypes"><tt class="xref py py-mod docutils literal"><span class="pre">collections</span></tt></a> &#8212; 高性能なコンテナ・データ型<a class="headerlink" href="#module-collections" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+<p>このモジュールは、汎用の Python 組み込みコンテナ <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a>, <a class="reference internal" href="functions.html#list" title="list"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a>,
+<a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a>, および <a class="reference internal" href="functions.html#tuple" title="tuple"><tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></a> に代わる、特殊なコンテナデータ型を実装しています。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="58%" />
+<col width="24%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#collections.namedtuple" title="collections.namedtuple"><tt class="xref py py-func docutils literal"><span class="pre">namedtuple()</span></tt></a></td>
+<td>名前付きフィールドを持つタプルのサブクラスを作成するファクトリ関数</td>
+<td><p class="first last versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.deque" title="collections.deque"><tt class="xref py py-class docutils literal"><span class="pre">deque</span></tt></a></td>
+<td>両端における append や pop を高速に行えるリスト風のコンテナ</td>
+<td><p class="first last versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a></td>
+<td>ハッシュ可能なオブジェクトを数え上げる辞書のサブクラス</td>
+<td><p class="first last versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a></td>
+<td>項目が追加された順序を記憶する辞書のサブクラス</td>
+<td><p class="first last versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a></td>
+<td>ファクトリ関数を呼び出して存在しない値を供給する辞書のサブクラス</td>
+<td><p class="first last versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>コンテナ型の作成に加えて、 collections モジュールは幾つかの ABC (abstract base
+classes = 抽象基底クラス) を提供しています。
+ABC はクラスが特定のインタフェース持っているかどうか、たとえばハッシュ可能であるかやマッピングであるかを判定するのに利用します。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">Latest version of the <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/collections.py?view=markup">collections module Python source code</a></p>
+</div>
+<div class="section" id="counter">
+<h2>8.3.1. <a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> オブジェクト<a class="headerlink" href="#counter" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>便利で迅速な検数をサポートするカウンタツールが提供されています。例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># リストに現れる単語の検数</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cnt</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="n">cnt</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cnt</span>
+<span class="go">Counter({&#39;blue&#39;: 3, &#39;red&#39;: 2, &#39;green&#39;: 1})</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Hamlet で最も多い 10 単語の発見</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">re</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">words</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;\w+&#39;</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;hamlet.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Counter</span><span class="p">(</span><span class="n">words</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">[(&#39;the&#39;, 1143), (&#39;and&#39;, 966), (&#39;to&#39;, 762), (&#39;of&#39;, 669), (&#39;i&#39;, 631),</span>
+<span class="go"> (&#39;you&#39;, 554),  (&#39;a&#39;, 546), (&#39;my&#39;, 514), (&#39;hamlet&#39;, 471), (&#39;in&#39;, 451)]</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="collections.Counter">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Counter</tt><big>(</big><span class="optional">[</span><em>iterable-or-mapping</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.Counter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> はハッシュ可能なオブジェクトをカウントする <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> のサブクラスです。これは、要素を辞書のキーとして保存し、そのカウントを辞書の値として保存する、順序付けされていないコレクションです。カウントは、0 や負のカウントを含む整数値をとれます。
+<a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> クラスは、他の言語のバッグや多重集合のようなものです。</p>
+<p>要素は、 <em>iterable</em> から数え上げられたり、他の <em>mapping</em> (やカウンタ)
+から初期化されます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>                           <span class="c"># 新しい空のカウンタ</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="s">&#39;gallahad&#39;</span><span class="p">)</span>                 <span class="c"># イテラブルからの新しいカウンタ</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">({</span><span class="s">&#39;red&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>      <span class="c"># マッピングからの新しいカウンタ</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">cats</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dogs</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>             <span class="c"># キーワード引数からの新しいカウンタ</span>
+</pre></div>
+</div>
+<p>カウンタオブジェクトは辞書のインタフェースを持ちますが、存在しない要素に対して <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を送出する代わりに 0 を返すという違いがあります:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="s">&#39;eggs&#39;</span><span class="p">,</span> <span class="s">&#39;ham&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="p">[</span><span class="s">&#39;bacon&#39;</span><span class="p">]</span>                              <span class="c"># 存在しない要素のカウントは 0</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p>カウントを 0 に設定しても、要素はカウンタから取り除かれません。完全に取り除くには、 <tt class="docutils literal"><span class="pre">del</span></tt> を使ってください:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="p">[</span><span class="s">&#39;sausage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>                        <span class="c"># カウントが 0 のカウンタの項目</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;sausage&#39;</span><span class="p">]</span>                        <span class="c"># del は項目を実際に取り除く</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+<p>カウンタオブジェクトは、すべての辞書に利用できるものに加え、
+3 つのメソッドをサポートしています:</p>
+<dl class="method">
+<dt id="collections.Counter.elements">
+<tt class="descname">elements</tt><big>(</big><big>)</big><a class="headerlink" href="#collections.Counter.elements" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>それぞれの要素を、そのカウント分の回数だけ繰り返すイテレータを返します。要素は任意の順序で返されます。ある要素のカウントが 1 未満なら、
+<a class="reference internal" href="#collections.Counter.elements" title="collections.Counter.elements"><tt class="xref py py-meth docutils literal"><span class="pre">elements()</span></tt></a> はそれを無視します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">d</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">elements</span><span class="p">())</span>
+<span class="go">[&#39;a&#39;, &#39;a&#39;, &#39;a&#39;, &#39;a&#39;, &#39;b&#39;, &#39;b&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.Counter.most_common">
+<tt class="descname">most_common</tt><big>(</big><span class="optional">[</span><em>n</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.Counter.most_common" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最も多い <em>n</em> 要素を、カウントが多いものから少ないものまで順に並べたリストを返します。 <em>n</em> が指定されなければ、 <a class="reference internal" href="#collections.Counter.most_common" title="collections.Counter.most_common"><tt class="xref py py-func docutils literal"><span class="pre">most_common()</span></tt></a> はカウンタの <em>すべての</em> 要素を返します。等しいカウントの要素は任意に並べられます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Counter</span><span class="p">(</span><span class="s">&#39;abracadabra&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">[(&#39;a&#39;, 5), (&#39;r&#39;, 2), (&#39;b&#39;, 2)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.Counter.subtract">
+<tt class="descname">subtract</tt><big>(</big><span class="optional">[</span><em>iterable-or-mapping</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.Counter.subtract" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要素から <em>iterable</em> の要素または <em>mapping</em> の要素が引かれます。
+<a class="reference internal" href="stdtypes.html#dict.update" title="dict.update"><tt class="xref py py-meth docutils literal"><span class="pre">dict.update()</span></tt></a> に似ていますが、カウントを置き換えるのではなく引きます。入力も出力も、 0 や負になりえます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">d</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="go">Counter({&#39;a&#39;: 3, &#39;b&#39;: 0, &#39;c&#39;: -3, &#39;d&#39;: -6})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>普通の辞書のメソッドは、以下の 2 つのメソッドがカウンタに対して異なる振る舞いをするのを除き、 <a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> オブジェクトにも利用できます。</p>
+<dl class="method">
+<dt id="collections.Counter.fromkeys">
+<tt class="descname">fromkeys</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#collections.Counter.fromkeys" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスメソッドは <a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> オブジェクトには実装されていません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.Counter.update">
+<tt class="descname">update</tt><big>(</big><span class="optional">[</span><em>iterable-or-mapping</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.Counter.update" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要素が <em>iterable</em> からカウントされるか、別の <em>mapping</em> (やカウンタ)
+が追加されます。 <a class="reference internal" href="stdtypes.html#dict.update" title="dict.update"><tt class="xref py py-meth docutils literal"><span class="pre">dict.update()</span></tt></a> に似ていますが、カウントを置き換えるのではなく追加します。また、 <em>iterable</em> には <tt class="docutils literal"><span class="pre">(key,</span> <span class="pre">value)</span></tt>
+対のシーケンスではなく、要素のシーケンスが求められます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> オブジェクトを使ったよくあるパターン:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>                 <span class="c"># すべてのカウントの合計</span>
+<span class="n">c</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>                       <span class="c"># すべてのカウントをリセット</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                         <span class="c"># 単一の要素として列挙</span>
+<span class="nb">set</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                          <span class="c"># 集合に変換</span>
+<span class="nb">dict</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                         <span class="c"># 普通の辞書に変換</span>
+<span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>                       <span class="c"># (elem, cnt) 対のリストに変換</span>
+<span class="n">Counter</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">list_of_pairs</span><span class="p">))</span>    <span class="c"># (elem, cnt) 対のリストから変換</span>
+<span class="n">c</span><span class="o">.</span><span class="n">most_common</span><span class="p">()[:</span><span class="o">-</span><span class="n">n</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>         <span class="c"># 最も少ない n 要素</span>
+<span class="n">c</span> <span class="o">+=</span> <span class="n">Counter</span><span class="p">()</span>                  <span class="c"># 0 と負の要素を取り除く</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> オブジェクトを組み合わせて多重集合 (1 以上のカウントをもつカウンタ) を作るために、いくつかの数学演算が提供されています。足し算と引き算は、対応する要素を足したり引いたりすることによってカウンタを組み合わせます。共通部分と合併集合は、対応するカウントの最大値と最小値を返します。それぞれの演算はカウントに符号がついた入力を受け付けますが、カウントが 0 以下である結果は出力から除かれます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">+</span> <span class="n">d</span>                       <span class="c"># 2 つのカウンタを足し合わせる:  c[x] + d[x]</span>
+<span class="go">Counter({&#39;a&#39;: 4, &#39;b&#39;: 3})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">-</span> <span class="n">d</span>                       <span class="c"># 引く (正のカウンタだけを残す)</span>
+<span class="go">Counter({&#39;a&#39;: 2})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">&amp;</span> <span class="n">d</span>                       <span class="c"># 共通部分:  min(c[x], d[x])</span>
+<span class="go">Counter({&#39;a&#39;: 1, &#39;b&#39;: 1})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">|</span> <span class="n">d</span>                       <span class="c"># 合併集合:  max(c[x], d[x])</span>
+<span class="go">Counter({&#39;a&#39;: 3, &#39;b&#39;: 2})</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p>カウンタはもともと、推移するカウントを正の整数で表すために設計されました。しかし、他の型や負の値を必要とするユースケースを不必要に排除することがないように配慮されています。このようなユースケースの助けになるように、この節で最低限の範囲と型の制限について記述します。</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> クラス自体は辞書のサブクラスで、キーと値に制限はありません。値はカウントを表す数であることを意図していますが、値フィールドに任意のものを保存 <em>できます</em>。</li>
+<li><tt class="xref py py-meth docutils literal"><span class="pre">most_common()</span></tt> メソッドが要求するのは、値が順序付け可能なことだけです。</li>
+<li><tt class="docutils literal"><span class="pre">c[key]</span> <span class="pre">+=</span> <span class="pre">1</span></tt> のようなインプレース演算では、値の型に必要なのは足し算と引き算ができることだけです。よって分数、浮動小数点数、小数も使え、負の値がサポートされています。これと同じことが、負や 0 の値を入力と出力に許す <tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt> と <tt class="xref py py-meth docutils literal"><span class="pre">subtract()</span></tt> メソッドにも言えます。</li>
+<li>多重集合メソッドは正の値を扱うユースケースに対してのみ設計されています。入力は負や 0 に出来ますが、正の値の出力のみが生成されます。型の制限はありませんが、値の型は足し算、引き算、比較をサポートしている必要があります。</li>
+<li><tt class="xref py py-meth docutils literal"><span class="pre">elements()</span></tt> メソッドは整数のカウントを要求します。これは 0 と負のカウントを無視します。</li>
+</ul>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<ul class="last">
+<li><p class="first">Python 2.5 に適応する <a class="reference external" href="http://code.activestate.com/recipes/576611/">Counter class</a>
+と Python 2.4 のための早期の <a class="reference external" href="http://code.activestate.com/recipes/259174/">Bag recipe</a>。</p>
+</li>
+<li><p class="first">Smalltalk の <a class="reference external" href="http://www.gnu.org/software/smalltalk/manual-base/html_node/Bag.html">Bag class</a></p>
+</li>
+<li><p class="first">Wikipedia の <a class="reference external" href="http://en.wikipedia.org/wiki/Multiset">Multisets</a> の項目。</p>
+</li>
+<li><p class="first"><a class="reference external" href="http://www.demo2s.com/Tutorial/Cpp/0380__set-multiset/Catalog0380__set-multiset.htm">C++ multisets</a>
+の例を交えたチュートリアル。</p>
+</li>
+<li><p class="first">数学的な多重集合の演算とそのユースケースは、
+<em>Knuth, Donald. The Art of Computer Programming Volume II,
+Section 4.6.3, Exercise 19</em> を参照してください。</p>
+</li>
+<li><p class="first">与えられた要素の集まりから与えられた大きさの別個の多重集合をすべて数え上げるには、 <a class="reference internal" href="itertools.html#itertools.combinations_with_replacement" title="itertools.combinations_with_replacement"><tt class="xref py py-func docutils literal"><span class="pre">itertools.combinations_with_replacement()</span></tt></a>
+を参照してください。</p>
+<blockquote>
+<div><p>map(Counter, combinations_with_replacement(&#8216;ABC&#8217;, 2)) &#8211;&gt; AA AB AC BB BC CC</p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="deque">
+<h2>8.3.2. <a class="reference internal" href="#collections.deque" title="collections.deque"><tt class="xref py py-class docutils literal"><span class="pre">deque</span></tt></a> オブジェクト<a class="headerlink" href="#deque" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="collections.deque">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">deque</tt><big>(</big><span class="optional">[</span><em>iterable</em><span class="optional">[</span>, <em>maxlen</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.deque" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>iterable</em> で与えられるデータから、新しい deque オブジェクトを (<a class="reference internal" href="#collections.deque.append" title="collections.deque.append"><tt class="xref py py-meth docutils literal"><span class="pre">append()</span></tt></a> をつかって)
+左から右に初期化して返します。
+<em>iterable</em> が指定されない場合、新しい deque オブジェクトは空になります。</p>
+<p>Deque とは、スタックとキューを一般化したものです (この名前は「デック」と発音され、これは「double-ended
+queue」の省略形です)。Deque はどちらの側からも append と pop が可能で、スレッドセーフでメモリ効率がよく、どちらの方向からもおよそ <tt class="docutils literal"><span class="pre">O(1)</span></tt> のパフォーマンスで実行できます。</p>
+<p><a class="reference internal" href="functions.html#list" title="list"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> オブジェクトでも同様の操作を実現できますが、これは高速な固定長の操作に特化されており、内部のデータ表現形式のサイズと位置を両方変えるような
+<tt class="docutils literal"><span class="pre">pop(0)</span></tt> や <tt class="docutils literal"><span class="pre">insert(0,</span> <span class="pre">v)</span></tt> などの操作ではメモリ移動のために <tt class="docutils literal"><span class="pre">O(n)</span></tt>
+のコストを必要とします。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+<p><em>maxlen</em> が指定され無かったり <em>None</em> だった場合、 deque は不定のサイズまで大きくなります。それ以外の場合、 deque は指定された最大長に制限されます。長さが制限された deque がいっぱいになると、新しい要素を追加するときに追加した要素数分だけ追加した逆側から要素が捨てられます。長さが制限された deque は Unix における <tt class="docutils literal"><span class="pre">tail</span></tt> フィルタと似た機能を提供します。トランザクションの tracking や最近使った要素だけを残したいデータプール (pool of data) などにも便利です。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>maxlen</em> パラメータを追加しました。</p>
+<p>Deque オブジェクトは以下のようなメソッドをサポートしています:</p>
+<dl class="method">
+<dt id="collections.deque.append">
+<tt class="descname">append</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#collections.deque.append" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> を deque の右側につけ加えます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.appendleft">
+<tt class="descname">appendleft</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#collections.deque.appendleft" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> を deque の左側につけ加えます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#collections.deque.clear" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>deque からすべての要素を削除し、長さを 0 にします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.count">
+<tt class="descname">count</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#collections.deque.count" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> に等しい deque の要素を数え上げます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.extend">
+<tt class="descname">extend</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#collections.deque.extend" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>イテレータ化可能な引数 iterable から得られる要素を deque の右側に追加し拡張します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.extendleft">
+<tt class="descname">extendleft</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#collections.deque.extendleft" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>イテレータ化可能な引数 iterable から得られる要素を deque の左側に追加し拡張します。注意: 左から追加した結果は、イテレータ引数の順序とは逆になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.pop">
+<tt class="descname">pop</tt><big>(</big><big>)</big><a class="headerlink" href="#collections.deque.pop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>deque の右側から要素をひとつ削除し、その要素を返します。要素がひとつも存在しない場合は <a class="reference internal" href="exceptions.html#exceptions.IndexError" title="exceptions.IndexError"><tt class="xref py py-exc docutils literal"><span class="pre">IndexError</span></tt></a> を発生させます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.popleft">
+<tt class="descname">popleft</tt><big>(</big><big>)</big><a class="headerlink" href="#collections.deque.popleft" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>deque の左側から要素をひとつ削除し、その要素を返します。要素がひとつも存在しない場合は <a class="reference internal" href="exceptions.html#exceptions.IndexError" title="exceptions.IndexError"><tt class="xref py py-exc docutils literal"><span class="pre">IndexError</span></tt></a> を発生させます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.remove">
+<tt class="descname">remove</tt><big>(</big><em>value</em><big>)</big><a class="headerlink" href="#collections.deque.remove" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最初に現れる value を削除します。要素がみつからないない場合は <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を発生させます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.reverse">
+<tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#collections.deque.reverse" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>deque の要素をインプレースに逆転し、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.deque.rotate">
+<tt class="descname">rotate</tt><big>(</big><em>n</em><big>)</big><a class="headerlink" href="#collections.deque.rotate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>deque の要素を全体で <em>n</em> ステップだけ右にローテートします。
+<em>n</em> が負の値の場合は、左にローテートします。Deque をひとつ右にローテートすることは <tt class="docutils literal"><span class="pre">d.appendleft(d.pop())</span></tt> と同じです。</p>
+</dd></dl>
+
+<p>deque オブジェクトは読み取り専用属性も 1 つ提供しています。</p>
+<dl class="attribute">
+<dt id="collections.deque.maxlen">
+<tt class="descname">maxlen</tt><a class="headerlink" href="#collections.deque.maxlen" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>deque の最大長で、制限されていなければ <em>None</em> です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+<p>上記の操作のほかにも、deque は次のような操作をサポートしています: イテレータ化、pickle、 <tt class="docutils literal"><span class="pre">len(d)</span></tt>, <tt class="docutils literal"><span class="pre">reversed(d)</span></tt>,
+<tt class="docutils literal"><span class="pre">copy.copy(d)</span></tt>, <tt class="docutils literal"><span class="pre">copy.deepcopy(d)</span></tt>, <a class="reference internal" href="../reference/expressions.html#in"><tt class="xref std std-keyword docutils literal"><span class="pre">in</span></tt></a> 演算子による包含検査、そして <tt class="docutils literal"><span class="pre">d[-1]</span></tt>
+などの添え字による参照。両端についてインデックスアクセスは O(1) ですが、中央部分については O(n) の遅さです。高速なランダムアクセスが必要ならリストを使ってください。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="s">&#39;ghi&#39;</span><span class="p">)</span>                 <span class="c"># 3つの要素からなる新しい deque をつくる。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>                   <span class="c"># deque の要素をひとつずつたどる。</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">elem</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+<span class="go">G</span>
+<span class="go">H</span>
+<span class="go">I</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;j&#39;</span><span class="p">)</span>                    <span class="c"># 新しい要素を右側につけたす。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">appendleft</span><span class="p">(</span><span class="s">&#39;f&#39;</span><span class="p">)</span>                <span class="c"># 新しい要素を左側につけたす。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>                                <span class="c"># deque の表現形式。</span>
+<span class="go">deque([&#39;f&#39;, &#39;g&#39;, &#39;h&#39;, &#39;i&#39;, &#39;j&#39;])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>                          <span class="c"># いちばん右側の要素を削除し返す。</span>
+<span class="go">&#39;j&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>                      <span class="c"># いちばん左側の要素を削除し返す。</span>
+<span class="go">&#39;f&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>                          <span class="c"># deque の内容をリストにする。</span>
+<span class="go">[&#39;g&#39;, &#39;h&#39;, &#39;i&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>                             <span class="c"># いちばん左側の要素をのぞく。</span>
+<span class="go">&#39;g&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>                            <span class="c"># いちばん右側の要素をのぞく。</span>
+<span class="go">&#39;i&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>                <span class="c"># deque の内容を逆順でリストにする。</span>
+<span class="go">[&#39;i&#39;, &#39;h&#39;, &#39;g&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s">&#39;h&#39;</span> <span class="ow">in</span> <span class="n">d</span>                         <span class="c"># deque を検索。</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="s">&#39;jkl&#39;</span><span class="p">)</span>                  <span class="c"># 複数の要素を一度に追加する。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">deque([&#39;g&#39;, &#39;h&#39;, &#39;i&#39;, &#39;j&#39;, &#39;k&#39;, &#39;l&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                      <span class="c"># 右ローテート</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">deque([&#39;l&#39;, &#39;g&#39;, &#39;h&#39;, &#39;i&#39;, &#39;j&#39;, &#39;k&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>                     <span class="c"># 左ローテート</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">deque([&#39;g&#39;, &#39;h&#39;, &#39;i&#39;, &#39;j&#39;, &#39;k&#39;, &#39;l&#39;])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deque</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>               <span class="c"># 新しい deque を逆順でつくる。</span>
+<span class="go">deque([&#39;l&#39;, &#39;k&#39;, &#39;j&#39;, &#39;i&#39;, &#39;h&#39;, &#39;g&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>                        <span class="c"># deque を空にする。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>                          <span class="c"># 空の deque からは pop できない。</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;pyshell#6&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">-toplevel-</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="nc">IndexError</span>: <span class="n-Identifier">pop from an empty deque</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">extendleft</span><span class="p">(</span><span class="s">&#39;abc&#39;</span><span class="p">)</span>              <span class="c"># extendleft() は入力を逆順にする。</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">deque([&#39;c&#39;, &#39;b&#39;, &#39;a&#39;])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>8.3.3. <a class="reference internal" href="#collections.deque" title="collections.deque"><tt class="xref py py-class docutils literal"><span class="pre">deque</span></tt></a> のレシピ<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この節では deque をつかったさまざまなアプローチを紹介します。</p>
+<p>長さが制限された deque は Unix における <tt class="docutils literal"><span class="pre">tail</span></tt> フィルタに相当する機能を提供します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">tail</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="s">&#39;ファイルの最後の n 行を返す.&#39;</span>
+    <span class="k">return</span> <span class="n">deque</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>別のアプローチとして deque を右に append して左に pop して使うことで追加した要素を維持するのに使えます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">moving_average</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="c"># moving_average([40, 30, 50, 46, 39, 44]) --&gt; 40.0 42.0 45.0 43.0</span>
+    <span class="c"># http://en.wikipedia.org/wiki/Moving_average</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">appendleft</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">it</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">elem</span> <span class="o">-</span> <span class="n">d</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">s</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">rotate()</span></tt> メソッドのおかげで、 <a class="reference internal" href="#collections.deque" title="collections.deque"><tt class="xref py py-class docutils literal"><span class="pre">deque</span></tt></a> の一部を切り出したり削除したりできることになります。たとえば <tt class="docutils literal"><span class="pre">del</span>
+<span class="pre">d[n]</span></tt> の純粋な Python 実装では pop したい要素まで <tt class="xref py py-meth docutils literal"><span class="pre">rotate()</span></tt> します</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">delete_nth</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#collections.deque" title="collections.deque"><tt class="xref py py-class docutils literal"><span class="pre">deque</span></tt></a> の切り出しを実装するのにも、同様のアプローチを使います。まず対象となる要素を <tt class="xref py py-meth docutils literal"><span class="pre">rotate()</span></tt> によって deque
+の左端までもってきてから、 <tt class="xref py py-meth docutils literal"><span class="pre">popleft()</span></tt> をつかって古い要素を消します。そして、 <tt class="xref py py-meth docutils literal"><span class="pre">extend()</span></tt>
+で新しい要素を追加したのち、逆のローテートでもとに戻せばよいのです。このアプローチをやや変えたものとして、Forth スタイルのスタック操作、つまり <tt class="docutils literal"><span class="pre">dup</span></tt>, <tt class="docutils literal"><span class="pre">drop</span></tt>, <tt class="docutils literal"><span class="pre">swap</span></tt>, <tt class="docutils literal"><span class="pre">over</span></tt>,
+<tt class="docutils literal"><span class="pre">pick</span></tt>, <tt class="docutils literal"><span class="pre">rot</span></tt>, および <tt class="docutils literal"><span class="pre">roll</span></tt> を実装するのも簡単です。</p>
+</div>
+<div class="section" id="defaultdict">
+<h2>8.3.4. <a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a> オブジェクト<a class="headerlink" href="#defaultdict" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="collections.defaultdict">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">defaultdict</tt><big>(</big><span class="optional">[</span><em>default_factory</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.defaultdict" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しいディクショナリ状のオブジェクトを返します。 <a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a> は組込みの
+<a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> のサブクラスです。メソッドをオーバーライドし、書き込み可能なインスタンス変数を1つ追加している以外は
+<a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> クラスと同じです。同じ部分については以下では省略されています。</p>
+<p>1つめの引数は <a class="reference internal" href="#collections.defaultdict.default_factory" title="collections.defaultdict.default_factory"><tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt></a> 属性の初期値です。デフォルトは
+<tt class="docutils literal"><span class="pre">None</span></tt> です。残りの引数はキーワード引数もふくめ、 <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> のコンストラクタにあたえられた場合と同様に扱われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<p><a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a> オブジェクトは標準の <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> に加えて、以下のメソッドを実装しています:</p>
+<dl class="method">
+<dt id="collections.defaultdict.__missing__">
+<tt class="descname">__missing__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#collections.defaultdict.__missing__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>もし <a class="reference internal" href="#collections.defaultdict.default_factory" title="collections.defaultdict.default_factory"><tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt></a> 属性が <tt class="docutils literal"><span class="pre">None</span></tt> であれば、このメソッドは
+<a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> 例外を、 <em>key</em> を引数として発生させます。</p>
+<p>もし <a class="reference internal" href="#collections.defaultdict.default_factory" title="collections.defaultdict.default_factory"><tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt></a> 属性が <tt class="docutils literal"><span class="pre">None</span></tt> でなければ、このメソッドは
+<a class="reference internal" href="#collections.defaultdict.default_factory" title="collections.defaultdict.default_factory"><tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt></a> を引数なしで呼び出し、あたえられた <em>key</em> に対応するデフォルト値を作ります。そしてこの値を <em>key</em>
+に対応する値を辞書に登録して返ります。</p>
+<p>もし <a class="reference internal" href="#collections.defaultdict.default_factory" title="collections.defaultdict.default_factory"><tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt></a> の呼出が例外を発生させた場合には、変更せずそのまま例外を投げます。</p>
+<p>このメソッドは <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> クラスの <a class="reference internal" href="../reference/datamodel.html#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> メソッドで、キーが存在しなかった場合によびだされます。値を返すか例外を発生させるのどちらにしても、 <a class="reference internal" href="../reference/datamodel.html#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> からもそのまま値が返るか例外が発生します。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a> オブジェクトは以下のインスタンス変数をサポートしています:</p>
+<dl class="attribute">
+<dt id="collections.defaultdict.default_factory">
+<tt class="descname">default_factory</tt><a class="headerlink" href="#collections.defaultdict.default_factory" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この属性は <a class="reference internal" href="#collections.defaultdict.__missing__" title="collections.defaultdict.__missing__"><tt class="xref py py-meth docutils literal"><span class="pre">__missing__()</span></tt></a> メソッドによって使われます。これは存在すればコンストラクタの第1引数によって初期化され、そうでなければ
+<tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="id2">
+<h3>8.3.4.1. <a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a> の使用例<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference internal" href="functions.html#list" title="list"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> を <tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt> とすることで、キー=値ペアのシーケンスをリストの辞書へ簡単にグループ化できます。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;yellow&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;yellow&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="go">[(&#39;blue&#39;, [2, 4]), (&#39;red&#39;, [1]), (&#39;yellow&#39;, [1, 3])]</span>
+</pre></div>
+</div>
+<p>それぞれのキーが最初に登場したとき、マッピングにはまだ存在しません。そのためエントリは <tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt> 関数が返す空の <a class="reference internal" href="functions.html#list" title="list"><tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></a> を使って自動的に作成されます。
+<tt class="xref py py-meth docutils literal"><span class="pre">list.append()</span></tt> 操作は新しいリストに紐付けられます。キーが再度出現下場合には、通常の参照動作が行われます(そのキーに対応するリストが返ります)。そして <tt class="xref py py-meth docutils literal"><span class="pre">list.append()</span></tt> 操作で別の値をリストに追加します。このテクニックは <a class="reference internal" href="stdtypes.html#dict.setdefault" title="dict.setdefault"><tt class="xref py py-meth docutils literal"><span class="pre">dict.setdefault()</span></tt></a> を使った等価なものよりシンプルで速いです:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">d</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="go">[(&#39;blue&#39;, [2, 4]), (&#39;red&#39;, [1]), (&#39;yellow&#39;, [1, 3])]</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt> を <a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> にすると、 <a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a> を(他の言語の bag や
+multisetのように)要素の数え上げに便利に使うことができます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="s">&#39;mississippi&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="go">[(&#39;i&#39;, 4), (&#39;p&#39;, 2), (&#39;s&#39;, 4), (&#39;m&#39;, 1)]</span>
+</pre></div>
+</div>
+<p>最初に文字が出現したときは、マッピングが存在しないので <tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt> 関数が <a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-func docutils literal"><span class="pre">int()</span></tt></a> を呼んでデフォルトのカウント0を生成します。インクリメント操作が各文字を数え上げます。</p>
+<p>常に0を返す <a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-func docutils literal"><span class="pre">int()</span></tt></a> は特殊な関数でした。定数を生成するより速くて柔軟な方法は、
+0に限らず何でも定数を生成する <a class="reference internal" href="itertools.html#itertools.repeat" title="itertools.repeat"><tt class="xref py py-func docutils literal"><span class="pre">itertools.repeat()</span></tt></a> を使うことです。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">constant_factory</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">itertools</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">next</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">constant_factory</span><span class="p">(</span><span class="s">&#39;&lt;missing&gt;&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;ran&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s">&#39;</span><span class="si">%(name)s</span><span class="s"> </span><span class="si">%(action)s</span><span class="s"> to </span><span class="si">%(object)s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">d</span>
+<span class="go">&#39;John ran to &lt;missing&gt;&#39;</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-attr docutils literal"><span class="pre">default_factory</span></tt> を <a class="reference internal" href="stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> に設定することで、
+<a class="reference internal" href="#collections.defaultdict" title="collections.defaultdict"><tt class="xref py py-class docutils literal"><span class="pre">defaultdict</span></tt></a> をセットの辞書を作るために利用することができます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="go">[(&#39;blue&#39;, set([2, 4])), (&#39;red&#39;, set([1, 3]))]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="namedtuple">
+<h2>8.3.5. <a class="reference internal" href="#collections.namedtuple" title="collections.namedtuple"><tt class="xref py py-func docutils literal"><span class="pre">namedtuple()</span></tt></a> 名前付きフィールドを持つタプルのファクトリ関数<a class="headerlink" href="#namedtuple" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>名前付きタプルはタプルの中の場所に意味を割り当てて、より読みやすく自己解説的なコードを書けるようにします。通常のタプルが利用されていた場所で利用でき、場所に対するインデックスの代わりに名前を使ってフィールドにアクセスできます。</p>
+<dl class="function">
+<dt id="collections.namedtuple">
+<tt class="descclassname">collections.</tt><tt class="descname">namedtuple</tt><big>(</big><em>typename</em>, <em>field_names</em><span class="optional">[</span>, <em>verbose=False</em><span class="optional">]</span><span class="optional">[</span>, <em>rename=False</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.namedtuple" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>typename</em> という名前の tuple の新しいサブクラスを返します。新しいサブクラスは、
+tuple に似ているけれどもインデックスやイテレータだけでなく属性名によるアクセスもできるオブジェクトを作るのに使います。このサブクラスのインスタンスは、わかりやすい
+docstring (型名と属性名が入っています) や、 tuple の内容を <tt class="docutils literal"><span class="pre">name=value</span></tt> という形のリストで返す使いやすい <a class="reference internal" href="../reference/datamodel.html#object.__repr__" title="object.__repr__"><tt class="xref py py-meth docutils literal"><span class="pre">__repr__()</span></tt></a> も持っています。</p>
+<p><em>field_names</em> は <tt class="docutils literal"><span class="pre">['x',</span> <span class="pre">'y']</span></tt> のような文字列のシーケンスです。
+<em>field_names</em> には、代わりに各属性名を空白文字 (whitespace) および/またはカンマ (,) で区切った文字列を渡すこともできます。例えば、 <tt class="docutils literal"><span class="pre">'x</span> <span class="pre">y'</span></tt> や <tt class="docutils literal"><span class="pre">'x,</span> <span class="pre">y'</span></tt> です。</p>
+<p>アンダースコア (_) で始まる名前を除いて、 Python の正しい識別子 (identifier)
+ならなんでも属性名として使うことができます。正しい識別子とはアルファベット(letters),
+数字(digits), アンダースコア(_) を含みますが、数字やアンダースコアで始まる名前や、
+<em>class</em>, <em>for</em>, <em>return</em>, <em>global</em>, <em>pass</em>, <em>print</em>, <em>raise</em> などといった
+<a class="reference internal" href="keyword.html#module-keyword" title="keyword: 文字列が Python のキーワードか否かを調べます。"><tt class="xref py py-mod docutils literal"><span class="pre">keyword</span></tt></a> は使えません。</p>
+<p><em>rename</em> が真なら、不適切なフィールド名は自動的に位置引数に置き換えられます。例えば <tt class="docutils literal"><span class="pre">['abc',</span> <span class="pre">'def',</span> <span class="pre">'ghi',</span> <span class="pre">'abc']</span></tt> は、予約語 <tt class="docutils literal"><span class="pre">def</span></tt> と重複しているフィールド名 <tt class="docutils literal"><span class="pre">abc</span></tt> が除去され、 <tt class="docutils literal"><span class="pre">['abc',</span> <span class="pre">'_1',</span> <span class="pre">'ghi',</span> <span class="pre">'_3']</span></tt>
+に変換されます。</p>
+<p><em>verbose</em> が真なら、クラスを作る直前にクラス定義が表示されます。</p>
+<p>名前付きタプルのインスタンスはインスタンスごとの辞書を持たないので、軽量で、普通のタプル以上のメモリを使用しません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span><em>rename</em> のサポートを追加しました。</p>
+</dd></dl>
+
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Point</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Point&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">class Point(tuple):</span>
+<span class="go">        &#39;Point(x, y)&#39;</span>
+
+<span class="go">        __slots__ = ()</span>
+
+<span class="go">        _fields = (&#39;x&#39;, &#39;y&#39;)</span>
+
+<span class="go">        def __new__(_cls, x, y):</span>
+<span class="go">            &#39;Create a new instance of Point(x, y)&#39;</span>
+<span class="go">            return _tuple.__new__(cls, (x, y))</span>
+
+<span class="go">        @classmethod</span>
+<span class="go">        def _make(cls, iterable, new=tuple.__new__, len=len):</span>
+<span class="go">            &#39;Make a new Point object from a sequence or iterable&#39;</span>
+<span class="go">            result = new(cls, iterable)</span>
+<span class="go">            if len(result) != 2:</span>
+<span class="go">                raise TypeError(&#39;Expected 2 arguments, got %d&#39; % len(result))</span>
+<span class="go">            return result</span>
+
+<span class="go">        def __repr__(self):</span>
+<span class="go">            &#39;Return a nicely formatted representation string&#39;</span>
+<span class="go">            return &#39;Point(x=%r, y=%r)&#39; % self</span>
+
+<span class="go">        def _asdict(self):</span>
+<span class="go">            &#39;Return a new OrderedDict which maps field names to their values&#39;</span>
+<span class="go">            return OrderedDict(zip(self._fields, self))</span>
+
+<span class="go">        def _replace(_self, **kwds):</span>
+<span class="go">            &#39;Return a new Point object replacing specified fields with new values&#39;</span>
+<span class="go">            result = _self._make(map(kwds.pop, (&#39;x&#39;, &#39;y&#39;), _self))</span>
+<span class="go">            if kwds:</span>
+<span class="go">                raise ValueError(&#39;Got unexpected field names: %r&#39; % kwds.keys())</span>
+<span class="go">            return result</span>
+
+<span class="go">        def __getnewargs__(self):</span>
+<span class="go">            &#39;Return self as a plain tuple.   Used by copy and pickle.&#39;</span>
+<span class="go">            return tuple(self)</span>
+
+<span class="go">        x = _property(_itemgetter(0), doc=&#39;Alias for field number 0&#39;)</span>
+<span class="go">        y = _property(_itemgetter(1), doc=&#39;Alias for field number 1&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Point</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Point&#39;</span><span class="p">,</span> <span class="s">&#39;x y&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>     <span class="c"># 順序による引数やキーワード引数を使ってインスタンス化</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>             <span class="c"># 通常の tuple (11, 22) と同じようにインデックスアクセス</span>
+<span class="go">33</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">p</span>                <span class="c"># 通常の tuple と同じようにアンパック</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+<span class="go">(11, 22)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span>               <span class="c"># 名前でフィールドにアクセス</span>
+<span class="go">33</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span>                       <span class="c"># name=value スタイルの読みやすい __repr__</span>
+<span class="go">Point(x=11, y=22)</span>
+</pre></div>
+</div>
+<p>名前付きタプルは <a class="reference internal" href="csv.html#module-csv" title="csv: デリミタで区切られた形式のファイルに対するテーブル状データ読み書き。"><tt class="xref py py-mod docutils literal"><span class="pre">csv</span></tt></a> や <a class="reference internal" href="sqlite3.html#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールが返すタプルのフィールドに名前を付けるときにとても便利です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">EmployeeRecord</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;EmployeeRecord&#39;</span><span class="p">,</span> <span class="s">&#39;name, age, title, department, paygrade&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="k">for</span> <span class="n">emp</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">EmployeeRecord</span><span class="o">.</span><span class="n">_make</span><span class="p">,</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">&quot;employees.csv&quot;</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">))):</span>
+    <span class="k">print</span> <span class="n">emp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">emp</span><span class="o">.</span><span class="n">title</span>
+
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;/companydata&#39;</span><span class="p">)</span>
+<span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;SELECT name, age, title, department, paygrade FROM employees&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">emp</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">EmployeeRecord</span><span class="o">.</span><span class="n">_make</span><span class="p">,</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()):</span>
+    <span class="k">print</span> <span class="n">emp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">emp</span><span class="o">.</span><span class="n">title</span>
+</pre></div>
+</div>
+<p>タプルから継承したメソッドに加えて、名前付きタプルは3つの追加メソッドと一つの属性をサポートしています。フィールド名との衝突を避けるためにメソッド名と属性名はアンダースコアで始まります。</p>
+<dl class="classmethod">
+<dt id="collections.somenamedtuple._make">
+<em class="property">classmethod </em><tt class="descclassname">somenamedtuple.</tt><tt class="descname">_make</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#collections.somenamedtuple._make" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>既存の sequence や Iterable から新しいインスタンスを作るクラスメソッド.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">22</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Point</span><span class="o">.</span><span class="n">_make</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="go">Point(x=11, y=22)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.somenamedtuple._asdict">
+<tt class="descclassname">somenamedtuple.</tt><tt class="descname">_asdict</tt><big>(</big><big>)</big><a class="headerlink" href="#collections.somenamedtuple._asdict" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>フィールド名を対応する値にマッピングする新しい順序付き辞書
+(<a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a>) を返します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>
+<span class="go">OrderedDict([(&#39;x&#39;, 11), (&#39;y&#39;, 22)])</span>
+</pre></div>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>通常の <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> の代わりに <a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> を返すようになりました。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.somenamedtuple._replace">
+<tt class="descclassname">somenamedtuple.</tt><tt class="descname">_replace</tt><big>(</big><em>kwargs</em><big>)</big><a class="headerlink" href="#collections.somenamedtuple._replace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたフィールドを新しい値で置き換えた、新しい名前付きタプルを作って返します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">33</span><span class="p">)</span>
+<span class="go">Point(x=33, y=22)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">partnum</span><span class="p">,</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">inventory</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="go">        inventory[partnum] = record._replace(price=newprices[partnum], timestamp=time.now())</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="collections.somenamedtuple._fields">
+<tt class="descclassname">somenamedtuple.</tt><tt class="descname">_fields</tt><a class="headerlink" href="#collections.somenamedtuple._fields" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>フィールド名をリストにしたタプル. 内省 (introspection) したり、既存の名前付きタプルをもとに新しい名前つきタプルを作成する時に便利です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">_fields</span>            <span class="c"># view the field names</span>
+<span class="go">(&#39;x&#39;, &#39;y&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Color</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Color&#39;</span><span class="p">,</span> <span class="s">&#39;red green blue&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Pixel</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Pixel&#39;</span><span class="p">,</span> <span class="n">Point</span><span class="o">.</span><span class="n">_fields</span> <span class="o">+</span> <span class="n">Color</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Pixel</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">Pixel(x=11, y=22, red=128, green=255, blue=0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>文字列に格納された名前を使って名前つきタプルから値を取得するには <a class="reference internal" href="functions.html#getattr" title="getattr"><tt class="xref py py-func docutils literal"><span class="pre">getattr()</span></tt></a>
+関数を使います:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s">&#39;x&#39;</span><span class="p">)</span>
+<span class="go">11</span>
+</pre></div>
+</div>
+<p>辞書を名前付きタプルに変換するには、 <tt class="docutils literal"><span class="pre">**</span></tt> 演算子 (double-star-operator,
+<a class="reference internal" href="../tutorial/controlflow.html#tut-unpacking-arguments"><em>引数リストのアンパック</em></a> で説明しています) を使います。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;x&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Point</span><span class="p">(</span><span class="o">**</span><span class="n">d</span><span class="p">)</span>
+<span class="go">Point(x=11, y=22)</span>
+</pre></div>
+</div>
+<p>名前付きタプルは通常の Python クラスなので、継承して機能を追加したり変更するのは容易です。次の例では計算済みフィールドと固定幅の print format を追加しています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Point&#39;</span><span class="p">,</span> <span class="s">&#39;x y&#39;</span><span class="p">)):</span>
+<span class="go">        __slots__ = ()</span>
+<span class="go">        @property</span>
+<span class="go">        def hypot(self):</span>
+<span class="go">            return (self.x ** 2 + self.y ** 2) ** 0.5</span>
+<span class="go">        def __str__(self):</span>
+<span class="go">            return &#39;Point: x=%6.3f  y=%6.3f  hypot=%6.3f&#39; % (self.x, self.y, self.hypot)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Point</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="o">/</span><span class="mf">7.</span><span class="p">):</span>
+<span class="go">        print p</span>
+<span class="go">Point: x= 3.000  y= 4.000  hypot= 5.000</span>
+<span class="go">Point: x=14.000  y= 0.714  hypot=14.018</span>
+</pre></div>
+</div>
+<p>このサブクラスは <tt class="docutils literal"><span class="pre">__slots__</span></tt> に空のタプルをセットしています。これにより、インスタンス辞書の作成を抑制してメモリ使用量を低く保つのに役立ちます。</p>
+<p>サブクラス化は新しいフィールドを追加するのには適していません。代わりに、新しい名前付きタプルを <tt class="xref py py-attr docutils literal"><span class="pre">_fields</span></tt> 属性を元に作成してください:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Point3D</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Point3D&#39;</span><span class="p">,</span> <span class="n">Point</span><span class="o">.</span><span class="n">_fields</span> <span class="o">+</span> <span class="p">(</span><span class="s">&#39;z&#39;</span><span class="p">,))</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">_replace()</span></tt> でプロトタイプのインスタンスをカスタマイズする方法で、デフォルト値を実現できます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Account</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Account&#39;</span><span class="p">,</span> <span class="s">&#39;owner balance transaction_count&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_account</span> <span class="o">=</span> <span class="n">Account</span><span class="p">(</span><span class="s">&#39;&lt;owner name&gt;&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">johns_account</span> <span class="o">=</span> <span class="n">default_account</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="s">&#39;John&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>列挙型定数は名前付きタプルでも実装できますが、クラス定義を利用した方がシンプルで効率的です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Status</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Status&#39;</span><span class="p">,</span> <span class="s">&#39;open pending closed&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">_make</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Status</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">Status</span><span class="o">.</span><span class="n">pending</span><span class="p">,</span> <span class="n">Status</span><span class="o">.</span><span class="n">closed</span>
+<span class="go">(0, 1, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Status</span><span class="p">:</span>
+<span class="go">        open, pending, closed = range(3)</span>
+</pre></div>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last"><a class="reference external" href="http://code.activestate.com/recipes/500261/">Named tuple recipe</a>
+は Python 2.4 で使えます。</p>
+</div>
+</div>
+<div class="section" id="ordereddict">
+<h2>8.3.6. <a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> オブジェクト<a class="headerlink" href="#ordereddict" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>順序付き辞書 (ordered dictionary) は、ちょうど普通の辞書と同じようなものですが、項目が挿入された順序を記憶します。順序付き辞書に渡ってイテレートするとき、項目はそのキーが最初に追加された順序で返されます。</p>
+<dl class="class">
+<dt id="collections.OrderedDict">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">OrderedDict</tt><big>(</big><span class="optional">[</span><em>items</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#collections.OrderedDict" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>通常の <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> メソッドをサポートする、辞書のサブクラスのインスタンスを返します。 <em>OrderedDict</em> は、キーが最初に追加された順序を記憶します。新しい項目が既存の項目を上書きしても、元の挿入位置は変わらないままです。項目を削除して再挿入するとそれが最後に移動します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="collections.OrderedDict.popitem">
+<tt class="descclassname">OrderedDict.</tt><tt class="descname">popitem</tt><big>(</big><em>last=True</em><big>)</big><a class="headerlink" href="#collections.OrderedDict.popitem" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>順序付き辞書の <a class="reference internal" href="#collections.OrderedDict.popitem" title="collections.OrderedDict.popitem"><tt class="xref py py-meth docutils literal"><span class="pre">popitem()</span></tt></a> メソッドは、(key, value) 対を返して消去します。この対は <em>last</em> が真なら後入先出で、偽なら先入先出で返されます。</p>
+</dd></dl>
+
+<p>通常のマッピングのメソッドに加え、順序付き辞書は <a class="reference internal" href="functions.html#reversed" title="reversed"><tt class="xref py py-func docutils literal"><span class="pre">reversed()</span></tt></a> による逆順の反復もサポートしています。</p>
+<p><a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> 間の等価判定は順序に影響され、
+<tt class="docutils literal"><span class="pre">list(od1.items())==list(od2.items())</span></tt> として実装されます。
+<a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> オブジェクトと他のマッピング (<a class="reference internal" href="#collections.Mapping" title="collections.Mapping"><tt class="xref py py-class docutils literal"><span class="pre">Mapping</span></tt></a>)
+オブジェクトの等価判定は、順序に影響されず、通常の辞書と同様です。これによって、 <a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> オブジェクトは通常の辞書が使われるところならどこでも代用できます。</p>
+<p><a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> コンストラクタと <tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt> メソッドは、どちらもキーワード引数を受け付けますが、その順序は失われます。これは、Python の関数呼び出しの意味づけにおいて、キーワード引数は順序付けされていない辞書を用いて渡されるからです。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last"><a class="reference external" href="http://code.activestate.com/recipes/576693/">Equivalent OrderedDict recipe</a>
+that runs on Python 2.4 or later.</p>
+</div>
+<div class="section" id="id3">
+<h3>8.3.6.1. <a class="reference internal" href="#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></tt></a> の例とレシピ<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>順序付き辞書は挿入順序を記憶するので、ソートと組み合わせて使うことで、ソートされた辞書を作れます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># regular unsorted dictionary</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;banana&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#39;apple&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="s">&#39;pear&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;orange&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># dictionary sorted by key</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="go">OrderedDict([(&#39;apple&#39;, 4), (&#39;banana&#39;, 3), (&#39;orange&#39;, 2), (&#39;pear&#39;, 1)])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># dictionary sorted by value</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="go">OrderedDict([(&#39;pear&#39;, 1), (&#39;orange&#39;, 2), (&#39;banana&#39;, 3), (&#39;apple&#39;, 4)])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># dictionary sorted by length of the key string</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<span class="go">OrderedDict([(&#39;pear&#39;, 1), (&#39;apple&#39;, 4), (&#39;orange&#39;, 2), (&#39;banana&#39;, 3)])</span>
+</pre></div>
+</div>
+<p>この新しい順序付き辞書は、項目が削除されてもソートされた順序を保持します。しかし、キーが追加されるとき、そのキーは最後に追加され、ソートは保持されません。</p>
+<p>キーが <em>最後に</em> 挿入された順序を記憶するような、順序付き辞書の変種を作るのも簡単です。新しい項目が既存の項目を上書きしたら、元の挿入位置は最後に移動します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">LastUpdatedOrderedDict</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">):</span>
+
+    <span class="s">&#39;Store items in the order the keys were last added&#39;</span>
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">OrderedDict</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>順序付き辞書は、 <a class="reference internal" href="#collections.Counter" title="collections.Counter"><tt class="xref py py-class docutils literal"><span class="pre">Counter</span></tt></a> クラスと組み合わせてカウンタに要素が最初に現れた順序を記憶させられます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">OrderedCounter</span><span class="p">(</span><span class="n">Counter</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">):</span>
+     <span class="s">&#39;Counter that remembers the order elements are first encountered&#39;</span>
+
+     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">(</span><span class="si">%r</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+     <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="p">(</span><span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="p">),)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="abcs-abstract-base-classes">
+<span id="abstract-base-classes"></span><h2>8.3.7. ABCs - abstract base classes<a class="headerlink" href="#abcs-abstract-base-classes" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>collections モジュールは以下の <a class="reference internal" href="../glossary.html#term-abstract-base-class"><em class="xref std std-term">ABC (抽象基底クラス)</em></a> を提供します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="18%" />
+<col width="18%" />
+<col width="43%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">ABC</th>
+<th class="head">継承しているクラス</th>
+<th class="head">抽象メソッド</th>
+<th class="head">mixin メソッド</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="#collections.Container" title="collections.Container"><tt class="xref py py-class docutils literal"><span class="pre">Container</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__contains__</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.Hashable" title="collections.Hashable"><tt class="xref py py-class docutils literal"><span class="pre">Hashable</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__hash__</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.Iterable" title="collections.Iterable"><tt class="xref py py-class docutils literal"><span class="pre">Iterable</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__iter__</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.Iterator" title="collections.Iterator"><tt class="xref py py-class docutils literal"><span class="pre">Iterator</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Iterable" title="collections.Iterable"><tt class="xref py py-class docutils literal"><span class="pre">Iterable</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">next</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">__iter__</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.Sized" title="collections.Sized"><tt class="xref py py-class docutils literal"><span class="pre">Sized</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__len__</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.Callable" title="collections.Callable"><tt class="xref py py-class docutils literal"><span class="pre">Callable</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__call__</span></tt></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.Sequence" title="collections.Sequence"><tt class="xref py py-class docutils literal"><span class="pre">Sequence</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Sized" title="collections.Sized"><tt class="xref py py-class docutils literal"><span class="pre">Sized</span></tt></a>,
+<a class="reference internal" href="#collections.Iterable" title="collections.Iterable"><tt class="xref py py-class docutils literal"><span class="pre">Iterable</span></tt></a>,
+<a class="reference internal" href="#collections.Container" title="collections.Container"><tt class="xref py py-class docutils literal"><span class="pre">Container</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">__getitem__</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">__contains__</span></tt>. <tt class="docutils literal"><span class="pre">__iter__</span></tt>, <tt class="docutils literal"><span class="pre">__reversed__</span></tt>.
+<tt class="docutils literal"><span class="pre">index</span></tt>, <tt class="docutils literal"><span class="pre">count</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.MutableSequence" title="collections.MutableSequence"><tt class="xref py py-class docutils literal"><span class="pre">MutableSequence</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Sequence" title="collections.Sequence"><tt class="xref py py-class docutils literal"><span class="pre">Sequence</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">__setitem__</span></tt>
+<tt class="docutils literal"><span class="pre">__delitem__</span></tt>,
+<tt class="docutils literal"><span class="pre">insert</span></tt>,</td>
+<td>Sequence から継承したメソッドと、
+<tt class="docutils literal"><span class="pre">append</span></tt>, <tt class="docutils literal"><span class="pre">reverse</span></tt>, <tt class="docutils literal"><span class="pre">extend</span></tt>, <tt class="docutils literal"><span class="pre">pop</span></tt>,
+<tt class="docutils literal"><span class="pre">remove</span></tt>, <tt class="docutils literal"><span class="pre">__iadd__</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Sized" title="collections.Sized"><tt class="xref py py-class docutils literal"><span class="pre">Sized</span></tt></a>,
+<a class="reference internal" href="#collections.Iterable" title="collections.Iterable"><tt class="xref py py-class docutils literal"><span class="pre">Iterable</span></tt></a>,
+<a class="reference internal" href="#collections.Container" title="collections.Container"><tt class="xref py py-class docutils literal"><span class="pre">Container</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__le__</span></tt>, <tt class="docutils literal"><span class="pre">__lt__</span></tt>, <tt class="docutils literal"><span class="pre">__eq__</span></tt>, <tt class="docutils literal"><span class="pre">__ne__</span></tt>,
+<tt class="docutils literal"><span class="pre">__gt__</span></tt>, <tt class="docutils literal"><span class="pre">__ge__</span></tt>, <tt class="docutils literal"><span class="pre">__and__</span></tt>, <tt class="docutils literal"><span class="pre">__or__</span></tt>
+<tt class="docutils literal"><span class="pre">__sub__</span></tt>, <tt class="docutils literal"><span class="pre">__xor__</span></tt>, and <tt class="docutils literal"><span class="pre">isdisjoint</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.MutableSet" title="collections.MutableSet"><tt class="xref py py-class docutils literal"><span class="pre">MutableSet</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">add</span></tt>,
+<tt class="docutils literal"><span class="pre">discard</span></tt></td>
+<td>Set から継承したメソッドと、
+<tt class="docutils literal"><span class="pre">clear</span></tt>, <tt class="docutils literal"><span class="pre">pop</span></tt>, <tt class="docutils literal"><span class="pre">remove</span></tt>, <tt class="docutils literal"><span class="pre">__ior__</span></tt>,
+<tt class="docutils literal"><span class="pre">__iand__</span></tt>, <tt class="docutils literal"><span class="pre">__ixor__</span></tt>, <tt class="docutils literal"><span class="pre">__isub__</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.Mapping" title="collections.Mapping"><tt class="xref py py-class docutils literal"><span class="pre">Mapping</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Sized" title="collections.Sized"><tt class="xref py py-class docutils literal"><span class="pre">Sized</span></tt></a>,
+<a class="reference internal" href="#collections.Iterable" title="collections.Iterable"><tt class="xref py py-class docutils literal"><span class="pre">Iterable</span></tt></a>,
+<a class="reference internal" href="#collections.Container" title="collections.Container"><tt class="xref py py-class docutils literal"><span class="pre">Container</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">__getitem__</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">__contains__</span></tt>, <tt class="docutils literal"><span class="pre">keys</span></tt>, <tt class="docutils literal"><span class="pre">items</span></tt>, <tt class="docutils literal"><span class="pre">values</span></tt>,
+<tt class="docutils literal"><span class="pre">get</span></tt>, <tt class="docutils literal"><span class="pre">__eq__</span></tt>, <tt class="docutils literal"><span class="pre">__ne__</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.MutableMapping" title="collections.MutableMapping"><tt class="xref py py-class docutils literal"><span class="pre">MutableMapping</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Mapping" title="collections.Mapping"><tt class="xref py py-class docutils literal"><span class="pre">Mapping</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">__setitem__</span></tt>
+<tt class="docutils literal"><span class="pre">__detitem__</span></tt>,</td>
+<td>Mapping から継承したメソッドと、
+<tt class="docutils literal"><span class="pre">pop</span></tt>, <tt class="docutils literal"><span class="pre">popitem</span></tt>, <tt class="docutils literal"><span class="pre">clear</span></tt>, <tt class="docutils literal"><span class="pre">update</span></tt>,
+<tt class="docutils literal"><span class="pre">setdefault</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.MappingView" title="collections.MappingView"><tt class="xref py py-class docutils literal"><span class="pre">MappingView</span></tt></a></td>
+<td><a class="reference internal" href="#collections.Sized" title="collections.Sized"><tt class="xref py py-class docutils literal"><span class="pre">Sized</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__len__</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.KeysView" title="collections.KeysView"><tt class="xref py py-class docutils literal"><span class="pre">KeysView</span></tt></a></td>
+<td><a class="reference internal" href="#collections.MappingView" title="collections.MappingView"><tt class="xref py py-class docutils literal"><span class="pre">MappingView</span></tt></a>,
+<a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__contains__</span></tt>,
+<tt class="docutils literal"><span class="pre">__iter__</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#collections.ItemsView" title="collections.ItemsView"><tt class="xref py py-class docutils literal"><span class="pre">ItemsView</span></tt></a></td>
+<td><a class="reference internal" href="#collections.MappingView" title="collections.MappingView"><tt class="xref py py-class docutils literal"><span class="pre">MappingView</span></tt></a>,
+<a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__contains__</span></tt>,
+<tt class="docutils literal"><span class="pre">__iter__</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#collections.ValuesView" title="collections.ValuesView"><tt class="xref py py-class docutils literal"><span class="pre">ValuesView</span></tt></a></td>
+<td><a class="reference internal" href="#collections.MappingView" title="collections.MappingView"><tt class="xref py py-class docutils literal"><span class="pre">MappingView</span></tt></a></td>
+<td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">__contains__</span></tt>, <tt class="docutils literal"><span class="pre">__iter__</span></tt></td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="collections.Container">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Container</tt><a class="headerlink" href="#collections.Container" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.Hashable">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Hashable</tt><a class="headerlink" href="#collections.Hashable" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.Sized">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Sized</tt><a class="headerlink" href="#collections.Sized" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.Callable">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Callable</tt><a class="headerlink" href="#collections.Callable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>それぞれメソッド <a class="reference internal" href="../reference/datamodel.html#object.__contains__" title="object.__contains__"><tt class="xref py py-meth docutils literal"><span class="pre">__contains__()</span></tt></a>, <a class="reference internal" href="../reference/datamodel.html#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a>,
+<a class="reference internal" href="../reference/datamodel.html#object.__len__" title="object.__len__"><tt class="xref py py-meth docutils literal"><span class="pre">__len__()</span></tt></a>, and <a class="reference internal" href="../reference/datamodel.html#object.__call__" title="object.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">__call__()</span></tt></a> を提供するクラスの ABC です。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="collections.Iterable">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Iterable</tt><a class="headerlink" href="#collections.Iterable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/datamodel.html#object.__iter__" title="object.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a> メソッドを提供するクラスの ABC です。
+<a class="reference internal" href="../glossary.html#term-iterable"><em class="xref std std-term">iterable</em></a> の定義も参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="collections.Iterator">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Iterator</tt><a class="headerlink" href="#collections.Iterator" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/datamodel.html#object.__iter__" title="object.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a> および <a class="reference internal" href="functions.html#next" title="next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a> メソッドを提供するクラスの ABC です。
+<a class="reference internal" href="../glossary.html#term-iterator"><em class="xref std std-term">iterator</em></a> の定義も参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="collections.Sequence">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Sequence</tt><a class="headerlink" href="#collections.Sequence" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.MutableSequence">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">MutableSequence</tt><a class="headerlink" href="#collections.MutableSequence" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>読み込み専用と、ミュータブルな <a class="reference internal" href="../glossary.html#term-sequence"><em class="xref std std-term">シーケンス</em></a> の ABC です。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="collections.Set">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Set</tt><a class="headerlink" href="#collections.Set" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.MutableSet">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">MutableSet</tt><a class="headerlink" href="#collections.MutableSet" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>読み込み専用と、ミュータブルな集合の ABC です。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="collections.Mapping">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">Mapping</tt><a class="headerlink" href="#collections.Mapping" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.MutableMapping">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">MutableMapping</tt><a class="headerlink" href="#collections.MutableMapping" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>読み込み専用と、ミュータブルな <a class="reference internal" href="../glossary.html#term-mapping"><em class="xref std std-term">マッピング</em></a> の ABC です。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="collections.MappingView">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">MappingView</tt><a class="headerlink" href="#collections.MappingView" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.ItemsView">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">ItemsView</tt><a class="headerlink" href="#collections.ItemsView" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.KeysView">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">KeysView</tt><a class="headerlink" href="#collections.KeysView" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="collections.ValuesView">
+<em class="property">class </em><tt class="descclassname">collections.</tt><tt class="descname">ValuesView</tt><a class="headerlink" href="#collections.ValuesView" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>マッピング、要素、キー、値の <a class="reference internal" href="../glossary.html#term-view"><em class="xref std std-term">view</em></a> の ABC です。</p>
+</dd></dl>
+
+<p>これらの ABC はクラスやインスタンスが特定の機能を提供しているかどうかを調べるのに使えます。例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">size</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">myvar</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Sized</span><span class="p">):</span>
+   <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">myvar</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>幾つかの ABC はコンテナ型 API を提供するクラスを開発するのを助ける mixin 型としても使えます。例えば、 <a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> API を提供するクラスを作る場合、3つの基本になる抽象メソッド <a class="reference internal" href="../reference/datamodel.html#object.__contains__" title="object.__contains__"><tt class="xref py py-meth docutils literal"><span class="pre">__contains__()</span></tt></a>, <a class="reference internal" href="../reference/datamodel.html#object.__iter__" title="object.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a>, <a class="reference internal" href="../reference/datamodel.html#object.__len__" title="object.__len__"><tt class="xref py py-meth docutils literal"><span class="pre">__len__()</span></tt></a> だけが必要です。 ABC が残りの <a class="reference internal" href="../reference/datamodel.html#object.__and__" title="object.__and__"><tt class="xref py py-meth docutils literal"><span class="pre">__and__()</span></tt></a> や <tt class="xref py py-meth docutils literal"><span class="pre">isdisjoint()</span></tt> といったメソッドを提供します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ListBasedSet</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">Set</span><span class="p">):</span>
+     <span class="sd">&#39;&#39;&#39; 速度よりもメモリ使用量を重視して、 hashable も提供しない</span>
+<span class="sd">         set の別の実装 &#39;&#39;&#39;</span>
+     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
+         <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">:</span>
+             <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+                 <span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
+     <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+         <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span>
+     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">)</span>
+
+<span class="n">s1</span> <span class="o">=</span> <span class="n">ListBasedSet</span><span class="p">(</span><span class="s">&#39;abcdef&#39;</span><span class="p">)</span>
+<span class="n">s2</span> <span class="o">=</span> <span class="n">ListBasedSet</span><span class="p">(</span><span class="s">&#39;defghi&#39;</span><span class="p">)</span>
+<span class="n">overlap</span> <span class="o">=</span> <span class="n">s1</span> <span class="o">&amp;</span> <span class="n">s2</span>            <span class="c"># __and__() は ABC により自動的に提供される</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> と <a class="reference internal" href="#collections.MutableSet" title="collections.MutableSet"><tt class="xref py py-class docutils literal"><span class="pre">MutableSet</span></tt></a> を mixin型として利用するときの注意点:</p>
+<ol class="arabic simple">
+<li>幾つかの set の操作は新しい set を作るので、デフォルトの mixin メソッドは
+iterable から新しいインスタンスを作成する方法を必要とします。クラスのコンストラクタは <tt class="docutils literal"><span class="pre">ClassName(iterable)</span></tt> の形のシグネチャを持つと仮定されます。内部の <tt class="xref py py-meth docutils literal"><span class="pre">_from_iterable()</span></tt> というクラスメソッドが <tt class="docutils literal"><span class="pre">cls(iterable)</span></tt>
+を呼び出して新しい set を作る部分でこの仮定が使われています。コンストラクタのシグネチャが異なるクラスで <a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> を使う場合は、
+iterable 引数から新しいインスタンスを生成するように <tt class="xref py py-meth docutils literal"><span class="pre">_from_iterable()</span></tt>
+をオーバーライドする必要があります。</li>
+<li>(たぶん意味はそのままに速度を向上する目的で)比較をオーバーライドする場合、
+<a class="reference internal" href="../reference/datamodel.html#object.__le__" title="object.__le__"><tt class="xref py py-meth docutils literal"><span class="pre">__le__()</span></tt></a> だけを再定義すれば、その他の演算は自動的に追随します。</li>
+<li><a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> mixin型は set のハッシュ値を計算する <tt class="xref py py-meth docutils literal"><span class="pre">_hash()</span></tt> メソッドを提供しますが、すべての set が hashable や immutable とは限らないので、
+<a class="reference internal" href="../reference/datamodel.html#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> は提供しません。 mixin を使って hashable な set を作る場合は、
+<a class="reference internal" href="#collections.Set" title="collections.Set"><tt class="xref py py-class docutils literal"><span class="pre">Set</span></tt></a> と <a class="reference internal" href="#collections.Hashable" title="collections.Hashable"><tt class="xref py py-class docutils literal"><span class="pre">Hashable</span></tt></a> の両方を継承して、 <tt class="docutils literal"><span class="pre">__hash__</span> <span class="pre">=</span> <span class="pre">Set._hash</span></tt>
+と定義してください。</li>
+</ol>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<ul class="last simple">
+<li>Latest version of the <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/_abcoll.py?view=markup">Python source code for the collections abstract base classes</a></li>
+<li><a class="reference internal" href="#collections.MutableSet" title="collections.MutableSet"><tt class="xref py py-class docutils literal"><span class="pre">MutableSet</span></tt></a> を使った例として
+<a class="reference external" href="http://code.activestate.com/recipes/576694/">OrderedSet recipe</a></li>
+<li>ABCs についての詳細は、 <a class="reference internal" href="abc.html#module-abc" title="abc: PEP 3119 に基づいた抽象基底クラス"><tt class="xref py py-mod docutils literal"><span class="pre">abc</span></tt></a> モジュールと <span class="target" id="index-0"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-3119"><strong>PEP 3119</strong></a> を参照してください。</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="heapq.html" title="8.4. heapq — ヒープキューアルゴリズム"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="calendar.html" title="8.2. calendar — 一般的なカレンダーに関する関数群"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" >8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

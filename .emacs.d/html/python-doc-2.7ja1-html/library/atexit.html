@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>27.9. atexit — 終了ハンドラ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="27. Python ランタイムサービス" href="python.html" />
+    <link rel="next" title="27.10. traceback — スタックトレースの表示または取得" href="traceback.html" />
+    <link rel="prev" title="27.8. abc — 抽象基底クラス" href="abc.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="traceback.html" title="27.10. traceback — スタックトレースの表示または取得"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="abc.html" title="27.8. abc — 抽象基底クラス"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" accesskey="U">27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">27.9. <tt class="docutils literal"><span class="pre">atexit</span></tt> &#8212; 終了ハンドラ</a><ul>
+<li><a class="reference internal" href="#atexit-example">27.9.1. <tt class="docutils literal"><span class="pre">atexit</span></tt> の例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="abc.html"
+                        title="前の章へ">27.8. <tt class="docutils literal docutils literal"><span class="pre">abc</span></tt> &#8212; 抽象基底クラス</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="traceback.html"
+                        title="次の章へ">27.10. <tt class="docutils literal docutils literal"><span class="pre">traceback</span></tt> &#8212; スタックトレースの表示または取得</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/atexit.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-atexit">
+<span id="atexit"></span><h1>27.9. <a class="reference internal" href="#module-atexit" title="atexit: 後始末関数の登録と実行。"><tt class="xref py py-mod docutils literal"><span class="pre">atexit</span></tt></a> &#8212; 終了ハンドラ<a class="headerlink" href="#module-atexit" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+<p><a class="reference internal" href="#module-atexit" title="atexit: 後始末関数の登録と実行。"><tt class="xref py py-mod docutils literal"><span class="pre">atexit</span></tt></a> モジュールでは、後始末関数を登録するための関数を一つだけ定義しています。この関数を使って登録した後始末関数は、インタプリタが終了するときに自動的に実行されます。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/atexit.py?view=markup">atexit Python ソースコード</a></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">プログラムが Python で処理されないシグナルで停止させられたとき、Python の致命的な内部エラーが検出されたとき、あるいは <a class="reference internal" href="os.html#os._exit" title="os._exit"><tt class="xref py py-func docutils literal"><span class="pre">os._exit()</span></tt></a> が呼び出されたときには、このモジュールを通して登録した関数は呼び出されません。</p>
+</div>
+<p id="index-0">このモジュールは、 <tt class="docutils literal"><span class="pre">sys.exitfunc</span></tt> 変数の提供している機能の代用となるインタフェースです。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="docutils literal"><span class="pre">sys.exitfunc</span></tt> を設定する他のコードとともに使用した場合には、このモジュールは正しく動作しないでしょう。特に、他のコア Python
+モジュールでは、プログラマの意図を知らなくても <a class="reference internal" href="#module-atexit" title="atexit: 後始末関数の登録と実行。"><tt class="xref py py-mod docutils literal"><span class="pre">atexit</span></tt></a> を自由に使えます。 <tt class="docutils literal"><span class="pre">sys.exitfunc</span></tt> を使っている人は、代わりに
+<a class="reference internal" href="#module-atexit" title="atexit: 後始末関数の登録と実行。"><tt class="xref py py-mod docutils literal"><span class="pre">atexit</span></tt></a> を使うコードに変換してください。 <tt class="docutils literal"><span class="pre">sys.exitfunc</span></tt> を設定するコードを変換するには、 <a class="reference internal" href="#module-atexit" title="atexit: 後始末関数の登録と実行。"><tt class="xref py py-mod docutils literal"><span class="pre">atexit</span></tt></a> を
+import し、 <tt class="docutils literal"><span class="pre">sys.exitfunc</span></tt> へ束縛されていた関数を登録するのが最も簡単です。</p>
+</div>
+<dl class="function">
+<dt id="atexit.register">
+<tt class="descclassname">atexit.</tt><tt class="descname">register</tt><big>(</big><em>func</em><span class="optional">[</span>, <em>*args</em><span class="optional">[</span>, <em>**kargs</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#atexit.register" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>終了時に実行される関数として <em>func</em> を登録します。すべての <em>func</em> へ渡すオプションの引数を、
+<a class="reference internal" href="#atexit.register" title="atexit.register"><tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt></a> へ引数としてわたさなければなりません。</p>
+<p>通常のプログラムの終了時、例えば <a class="reference internal" href="sys.html#sys.exit" title="sys.exit"><tt class="xref py py-func docutils literal"><span class="pre">sys.exit()</span></tt></a> が呼び出されるとき、あるいは、メインモジュールの実行が完了したときに、登録された全ての関数を、最後に登録されたものから順に呼び出します。通常、より低レベルのモジュールはより高レベルのモジュールより前に import されるので、後で後始末が行われるという仮定に基づいています。</p>
+<p>終了ハンドラの実行中に例外が発生すると、(<a class="reference internal" href="exceptions.html#exceptions.SystemExit" title="exceptions.SystemExit"><tt class="xref py py-exc docutils literal"><span class="pre">SystemExit</span></tt></a> 以外の場合は)トレースバックを表示して、例外の情報を保存します。全ての終了ハンドラに動作するチャンスを与えた後に、最後に送出された例外を再送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>この関数をデコレータとして利用できるように、 <em>func</em> を返すようになりました。
+以前は <tt class="docutils literal"><span class="pre">None</span></tt> を返していたので、デコレータとして利用しようとすると、関数名の変数に
+<tt class="docutils literal"><span class="pre">None</span></tt> が代入されてしまっていました。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">readline</span></tt></a></dt>
+<dd><a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">readline</span></tt></a> ヒストリファイルを読み書きするための <a class="reference internal" href="#module-atexit" title="atexit: 後始末関数の登録と実行。"><tt class="xref py py-mod docutils literal"><span class="pre">atexit</span></tt></a> の有用な例です。</dd>
+</dl>
+</div>
+<div class="section" id="atexit-example">
+<span id="id1"></span><h2>27.9.1. <a class="reference internal" href="#module-atexit" title="atexit: 後始末関数の登録と実行。"><tt class="xref py py-mod docutils literal"><span class="pre">atexit</span></tt></a> の例<a class="headerlink" href="#atexit-example" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>次の簡単な例では、あるモジュールを import した時にカウンタを初期化しておき、プログラムが終了するときにアプリケーションがこのモジュールを明示的に呼び出さなくてもカウンタが更新されるようにする方法を示しています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="n">_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">&quot;/tmp/counter&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+    <span class="n">_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">incrcounter</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">_count</span>
+    <span class="n">_count</span> <span class="o">=</span> <span class="n">_count</span> <span class="o">+</span> <span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">savecounter</span><span class="p">():</span>
+    <span class="nb">open</span><span class="p">(</span><span class="s">&quot;/tmp/counter&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">_count</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">savecounter</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#atexit.register" title="atexit.register"><tt class="xref py py-func docutils literal"><span class="pre">register()</span></tt></a> に指定した固定引数とキーワードパラメタは登録した関数を呼び出す際に渡されます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">goodbye</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">adjective</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39;Goodbye, </span><span class="si">%s</span><span class="s">, it was </span><span class="si">%s</span><span class="s"> to meet you.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">adjective</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">atexit</span>
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">goodbye</span><span class="p">,</span> <span class="s">&#39;Donny&#39;</span><span class="p">,</span> <span class="s">&#39;nice&#39;</span><span class="p">)</span>
+
+<span class="c"># or:</span>
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">goodbye</span><span class="p">,</span> <span class="n">adjective</span><span class="o">=</span><span class="s">&#39;nice&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;Donny&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>デコレータ(<a class="reference internal" href="../glossary.html#term-decorator"><em class="xref std std-term">decorator</em></a>)として利用する例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">atexit</span>
+
+<span class="nd">@atexit.register</span>
+<span class="k">def</span> <span class="nf">goodbye</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s">&quot;You are now leaving the Python sector.&quot;</span>
+</pre></div>
+</div>
+<p>もちろん、デコレータとして利用できるのは、その関数が引数を受け取らない場合に限られます。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="traceback.html" title="27.10. traceback — スタックトレースの表示または取得"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="abc.html" title="27.8. abc — 抽象基底クラス"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="python.html" >27. Python ランタイムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

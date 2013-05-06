@@ -1,0 +1,615 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>13.2. ConfigParser — 設定ファイルの構文解析器 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="13. ファイルフォーマット" href="fileformats.html" />
+    <link rel="next" title="13.3. robotparser — robots.txt のためのパーザ" href="robotparser.html" />
+    <link rel="prev" title="13.1. csv — CSV ファイルの読み書き" href="csv.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="robotparser.html" title="13.3. robotparser — robots.txt のためのパーザ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="csv.html" title="13.1. csv — CSV ファイルの読み書き"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="fileformats.html" accesskey="U">13. ファイルフォーマット</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">13.2. <tt class="docutils literal"><span class="pre">ConfigParser</span></tt> &#8212; 設定ファイルの構文解析器</a><ul>
+<li><a class="reference internal" href="#rawconfigparser">13.2.1. RawConfigParser オブジェクト</a></li>
+<li><a class="reference internal" href="#configparser-objects">13.2.2. ConfigParser オブジェクト</a></li>
+<li><a class="reference internal" href="#safeconfigparser">13.2.3. SafeConfigParser オブジェクト</a></li>
+<li><a class="reference internal" href="#id2">13.2.4. 例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="csv.html"
+                        title="前の章へ">13.1. <tt class="docutils literal"><span class="pre">csv</span></tt> &#8212; CSV ファイルの読み書き</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="robotparser.html"
+                        title="次の章へ">13.3. <tt class="docutils literal"><span class="pre">robotparser</span></tt> &#8212;  robots.txt のためのパーザ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/configparser.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ConfigParser">
+<span id="configparser"></span><h1>13.2. <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-mod docutils literal"><span class="pre">ConfigParser</span></tt></a> &#8212; 設定ファイルの構文解析器<a class="headerlink" href="#module-ConfigParser" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-mod docutils literal"><span class="pre">ConfigParser</span></tt></a> モジュールは Python 3.0 で <tt class="xref py py-mod docutils literal"><span class="pre">configparser</span></tt> に改名されました。
+<a class="reference internal" href="../glossary.html#term-to3"><em class="xref std std-term">2to3</em></a> ツールが自動的にソース内の import を修正します。</p>
+</div>
+<p id="index-0">このモジュールでは、 <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> クラスを定義しています。 <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a>
+クラスは、Microsoft Windows の INI ファイルに見られるような構造をもつ、基礎的な設定ファイルを実装しています。このモジュールを使って、エンドユーザーが簡単にカスタマイズできるような Python プログラムを書くことができます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">このライブラリでは、Windowsのレジストリ用に拡張された INI 文法はサポート <em>していません</em> 。</p>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>モジュール <a class="reference internal" href="shlex.html#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-mod docutils literal"><span class="pre">shlex</span></tt></a></dt>
+<dd>アプリケーション用の設定ファイルフォーマットとして使える、
+Unix シェルライクなミニ言語の作成を支援します。</dd>
+<dt>モジュール <a class="reference internal" href="json.html#module-json" title="json: JSON 形式のエンコードおよびデコード"><tt class="xref py py-mod docutils literal"><span class="pre">json</span></tt></a></dt>
+<dd>jsom モジュールは、同じ目的に利用できる JavaScript の文法のサブセットを実装しています。</dd>
+</dl>
+</div>
+<p>設定ファイルは 1 つ以上のセクションからなり、セクションは <tt class="docutils literal"><span class="pre">[section]</span></tt> ヘッダとそれに続く
+<span class="target" id="index-1"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc822.html"><strong>RFC 822</strong></a> 形式の <tt class="docutils literal"><span class="pre">name:</span> <span class="pre">value</span></tt> エントリからなっています。(section 3.1.1 &#8220;LONG HEADER FIELDS&#8221; を参照)
+<tt class="docutils literal"><span class="pre">name=value</span></tt> という形式も使えます。値の先頭にある空白文字は削除されるので注意してください。オプションの値には、同じセクションか <tt class="docutils literal"><span class="pre">DEFAULT</span></tt> セクションにある値を参照するような書式化文字列を含めることができます。初期化時や検索時に別のデフォルト値を与えることもできます。 <tt class="docutils literal"><span class="pre">'#'</span></tt> か <tt class="docutils literal"><span class="pre">';'</span></tt> ではじまる行は無視され、コメントを書くために利用できます。</p>
+<p>設定ファイルは、特定の文字 (<tt class="docutils literal"><span class="pre">#</span></tt> と <tt class="docutils literal"><span class="pre">;</span></tt>) で始まるコメントを含んでいることがあります。コメントはある行の中に単独で書かれる場合もありますし、値やセクション名のある行に書かれる場合もあります。後者がコメントとして認識されるためには、その前に空白文字が入っている必要があります。
+(後方互換性のために、 <tt class="docutils literal"><span class="pre">#</span></tt> ではなく <tt class="docutils literal"><span class="pre">;</span></tt> で一行コメントを書いてください。)</p>
+<p>最も高機能なクラス <a class="reference internal" href="#ConfigParser.SafeConfigParser" title="ConfigParser.SafeConfigParser"><tt class="xref py py-class docutils literal"><span class="pre">SafeConfigParser</span></tt></a> は置換機能をサポートします。これは同じセクション内の値や <tt class="docutils literal"><span class="pre">DEFAULT</span></tt> という特別なセクションの値を参照するフォーマット文字列を使うことができるという意味です。さらに初期化のときにデフォルトの値を追加することもできます。</p>
+<p>例:</p>
+<div class="highlight-python"><pre>[My Section]
+foodir: %(dir)s/whatever
+dir=frob
+long: this value continues
+   in the next line</pre>
+</div>
+<p>この場合 <tt class="docutils literal"><span class="pre">%(dir)s</span></tt> は変数 <tt class="docutils literal"><span class="pre">dir</span></tt> (この場合は <tt class="docutils literal"><span class="pre">frob</span></tt>)に展開されます。参照の展開は必要に応じて実行されます。</p>
+<p>デフォルト値は <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> のコンストラクタに辞書として渡すことで設定できます。追加の(他の値をオーバーライドする)デフォルト値は <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> メソッドに渡すことができます。</p>
+<p>セクションは通常、組み込みの辞書型に格納されます。
+<a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> コンストラクタの引数として、代替の辞書型を渡すことができます。例えば、キーをソートするような辞書型が渡された場合、iniファイルに書き戻すときにセクションはソートされます。</p>
+<dl class="class">
+<dt id="ConfigParser.RawConfigParser">
+<em class="property">class </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">RawConfigParser</tt><big>(</big><span class="optional">[</span><em>defaults</em><span class="optional">[</span>, <em>dict_type</em><span class="optional">[</span>, <em>allow_no_value</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>基本的な設定オブジェクトです。 <em>defaults</em> が与えられた場合、オブジェクトに固有のデフォルト値がその値で初期化されます。
+<em>dict_type</em> が与えられた場合、それが、セクションのリストの格納、セクション内のオプションの格納、デフォルト値のために利用されます。</p>
+<p><em>allow_no_value</em> (デフォルト: <tt class="docutils literal"><span class="pre">False</span></tt>) が真の時、値のないオプションが許可されます。この場合の値は <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+<p>このクラスは値の置換をサポートしません。</p>
+<p>全てのオプション名が <a class="reference internal" href="#ConfigParser.RawConfigParser.optionxform" title="ConfigParser.RawConfigParser.optionxform"><tt class="xref py py-meth docutils literal"><span class="pre">optionxform()</span></tt></a> メソッドに渡されます。このメソッドのデフォルトの実装では、オプション名を小文字に変換します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>dict_type</em> が追加されました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>デフォルトの <em>dict_type</em> は <a class="reference internal" href="collections.html#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt></a> です。
+<em>allow_no_value</em> が追加されました。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ConfigParser.ConfigParser">
+<em class="property">class </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">ConfigParser</tt><big>(</big><span class="optional">[</span><em>defaults</em><span class="optional">[</span>, <em>dict_type</em><span class="optional">[</span>, <em>allow_no_value</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ConfigParser.ConfigParser" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#ConfigParser.RawConfigParser" title="ConfigParser.RawConfigParser"><tt class="xref py py-class docutils literal"><span class="pre">RawConfigParser</span></tt></a> の派生クラスで値の置換を実装しており、
+<a class="reference internal" href="#ConfigParser.ConfigParser.get" title="ConfigParser.ConfigParser.get"><tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt></a> メソッドと <a class="reference internal" href="#ConfigParser.ConfigParser.items" title="ConfigParser.ConfigParser.items"><tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt></a> メソッドに省略可能な引数を追加しています。
+<em>defaults</em> に含まれる値は <tt class="docutils literal"><span class="pre">%()s</span></tt> による値の置換に適当なものである必要があります。
+<em>__name__</em> は組み込みのデフォルト値で、セクション名が含まれるので <em>defaults</em> で設定してもオーバーライドされます。</p>
+<p>置換で使われるすべてのオプション名は、ほかのオプション名への参照と同様に
+<tt class="xref py py-meth docutils literal"><span class="pre">optionxform()</span></tt> メソッドを介して渡されます。
+<tt class="xref py py-meth docutils literal"><span class="pre">optionxform()</span></tt> のデフォルト実装を使うと、値 <tt class="docutils literal"><span class="pre">foo</span> <span class="pre">%(bar)s</span></tt> および
+<tt class="docutils literal"><span class="pre">foo</span> <span class="pre">%(BAR)s</span></tt> は同一になります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>dict_type</em> が追加されました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>デフォルトの <em>dict_type</em> は <a class="reference internal" href="collections.html#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt></a> です。
+<em>allow_no_value</em> が追加されました。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ConfigParser.SafeConfigParser">
+<em class="property">class </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">SafeConfigParser</tt><big>(</big><span class="optional">[</span><em>defaults</em><span class="optional">[</span>, <em>dict_type</em><span class="optional">[</span>, <em>allow_no_value</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ConfigParser.SafeConfigParser" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> の派生クラスでより安全な値の置換を実装しています。この実装はより予測可能性が高くなっています。新規に書くアプリケーションでは、古いバージョンのPythonと互換性を持たせる必要がない限り、このバージョンを利用することが望ましいです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>dict_type</em> が追加されました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>デフォルトの <em>dict_type</em> は <a class="reference internal" href="collections.html#collections.OrderedDict" title="collections.OrderedDict"><tt class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></tt></a> です。
+<em>allow_no_value</em> が追加されました。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.Error">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">Error</tt><a class="headerlink" href="#ConfigParser.Error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>他の全ての configparser の例外の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.NoSectionError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">NoSectionError</tt><a class="headerlink" href="#ConfigParser.NoSectionError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定したセクションが見つからなかった時に起きる例外です。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.DuplicateSectionError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">DuplicateSectionError</tt><a class="headerlink" href="#ConfigParser.DuplicateSectionError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>すでに存在するセクション名に対して <tt class="xref py py-meth docutils literal"><span class="pre">add_section()</span></tt> が呼び出された際に起きる例外です。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.NoOptionError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">NoOptionError</tt><a class="headerlink" href="#ConfigParser.NoOptionError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定したオプションが指定したセクションに存在しなかった時に起きる例外です。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.InterpolationError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">InterpolationError</tt><a class="headerlink" href="#ConfigParser.InterpolationError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列の置換中に問題が起きた時に発生する例外の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.InterpolationDepthError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">InterpolationDepthError</tt><a class="headerlink" href="#ConfigParser.InterpolationDepthError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#ConfigParser.InterpolationError" title="ConfigParser.InterpolationError"><tt class="xref py py-exc docutils literal"><span class="pre">InterpolationError</span></tt></a> の派生クラスで、文字列の置換回数が
+<a class="reference internal" href="#ConfigParser.MAX_INTERPOLATION_DEPTH" title="ConfigParser.MAX_INTERPOLATION_DEPTH"><tt class="xref py py-const docutils literal"><span class="pre">MAX_INTERPOLATION_DEPTH</span></tt></a> を越えたために完了しなかった場合に発生する例外です。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.InterpolationMissingOptionError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">InterpolationMissingOptionError</tt><a class="headerlink" href="#ConfigParser.InterpolationMissingOptionError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#ConfigParser.InterpolationError" title="ConfigParser.InterpolationError"><tt class="xref py py-exc docutils literal"><span class="pre">InterpolationError</span></tt></a> の派生クラスで、値が参照しているオプションが見つからない場合に発生する例外です。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.InterpolationSyntaxError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">InterpolationSyntaxError</tt><a class="headerlink" href="#ConfigParser.InterpolationSyntaxError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#ConfigParser.InterpolationError" title="ConfigParser.InterpolationError"><tt class="xref py py-exc docutils literal"><span class="pre">InterpolationError</span></tt></a> の派生クラスで、指定された構文で値を置換することができなかった場合に発生する例外です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.MissingSectionHeaderError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">MissingSectionHeaderError</tt><a class="headerlink" href="#ConfigParser.MissingSectionHeaderError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セクションヘッダを持たないファイルを構文解析しようとした時に起きる例外です。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="ConfigParser.ParsingError">
+<em class="property">exception </em><tt class="descclassname">ConfigParser.</tt><tt class="descname">ParsingError</tt><a class="headerlink" href="#ConfigParser.ParsingError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルの構文解析中にエラーが起きた場合に発生する例外です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ConfigParser.MAX_INTERPOLATION_DEPTH">
+<tt class="descclassname">ConfigParser.</tt><tt class="descname">MAX_INTERPOLATION_DEPTH</tt><a class="headerlink" href="#ConfigParser.MAX_INTERPOLATION_DEPTH" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>raw</em> が偽だった場合の <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> による再帰的な文字列置換の繰り返しの最大値です。 <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> クラスだけに関係します。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="shlex.html#module-shlex" title="shlex: Unix シェル類似の言語に対する単純な字句解析。"><tt class="xref py py-mod docutils literal"><span class="pre">shlex</span></tt></a></dt>
+<dd>Unix のシェルに似た、アプリケーションの設定ファイル用フォーマットとして使えるもう一つの小型言語です。</dd>
+</dl>
+</div>
+<div class="section" id="rawconfigparser">
+<span id="rawconfigparser-objects"></span><h2>13.2.1. RawConfigParser オブジェクト<a class="headerlink" href="#rawconfigparser" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#ConfigParser.RawConfigParser" title="ConfigParser.RawConfigParser"><tt class="xref py py-class docutils literal"><span class="pre">RawConfigParser</span></tt></a> クラスのインスタンスは以下のメソッドを持ちます:</p>
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.defaults">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">defaults</tt><big>(</big><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.defaults" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インスタンス全体で使われるデフォルト値の辞書を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.sections">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">sections</tt><big>(</big><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.sections" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>利用可能なセクションのリストを返します。 <tt class="docutils literal"><span class="pre">DEFAULT</span></tt> はこのリストに含まれません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.add_section">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">add_section</tt><big>(</big><em>section</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.add_section" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>section</em> という名前のセクションをインスタンスに追加します。同名のセクションが存在した場合、 <a class="reference internal" href="#ConfigParser.DuplicateSectionError" title="ConfigParser.DuplicateSectionError"><tt class="xref py py-exc docutils literal"><span class="pre">DuplicateSectionError</span></tt></a> が発生します。
+<tt class="docutils literal"><span class="pre">DEFAULT</span></tt> (もしくは大文字小文字が違うもの)が渡された場合、
+<a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が発生します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.has_section">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">has_section</tt><big>(</big><em>section</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.has_section" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定したセクションがコンフィグレーションファイルに存在するかを返します。 <tt class="docutils literal"><span class="pre">DEFAULT</span></tt> セクションは存在するとみなされません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.options">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">options</tt><big>(</big><em>section</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.options" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>section</em> で指定したセクションで利用できるオプションのリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.has_option">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">has_option</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.has_option" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたセクションが存在してかつオプションが与えられていれば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返し、そうでなければ <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.read">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">read</tt><big>(</big><em>filenames</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.read" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル名のリストを読んで解析をこころみ、うまく解析できたファイル名のリストを返します。もし <em>filenames</em> が文字列かユニコード文字列なら、1つのファイル名として扱われます。 <em>filenames</em> で指定されたファイルが開けない場合、そのファイルは無視されます。この挙動は設定ファイルが置かれる可能性のある場所(例えば、カレントディレクトリ、ホームディレクトリ、システム全体の設定を行うディレクトリ)を設定して、そこに存在する設定ファイルを読むことを想定して設計されています。設定ファイルが存在しなかった場合、 <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> のインスタンスは空のデータセットを持ちます。初期値の設定ファイルを先に読み込んでおく必要があるアプリケーションでは、 <a class="reference internal" href="#ConfigParser.RawConfigParser.readfp" title="ConfigParser.RawConfigParser.readfp"><tt class="xref py py-meth docutils literal"><span class="pre">readfp()</span></tt></a> を
+<a class="reference internal" href="#ConfigParser.RawConfigParser.read" title="ConfigParser.RawConfigParser.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a> の前に呼び出すことでそのような動作を実現できます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ConfigParser</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;defaults.cfg&#39;</span><span class="p">))</span>
+<span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="s">&#39;site.cfg&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s">&#39;~/.myapp.cfg&#39;</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span>うまく解析できたファイル名のリストを返す.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.readfp">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">readfp</tt><big>(</big><em>fp</em><span class="optional">[</span>, <em>filename</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.readfp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>fp</em> で与えられるファイルかファイルのようなオブジェクトを読み込んで構文解析します(<a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a> メソッドだけを使います)。もし
+<em>filename</em> が省略されて <em>fp</em> が <tt class="xref py py-attr docutils literal"><span class="pre">name</span></tt> 属性を持っていれば
+<em>filename</em> の代わりに使われます。ファイル名の初期値は <tt class="docutils literal"><span class="pre">&lt;???&gt;</span></tt> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.get">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">get</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.get" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>section</em> の <em>option</em> 変数を取得します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.getint">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">getint</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.getint" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>section</em> の <em>option</em> を整数として評価する関数です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.getfloat">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">getfloat</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.getfloat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>section</em> の <em>option</em> を浮動小数点数として評価する関数です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.getboolean">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">getboolean</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.getboolean" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定した <em>section</em> の <em>option</em> 値をブール値に型強制する便宜メソッドです。 <em>option</em> として受理できる値は、真 (True)
+としては <tt class="docutils literal"><span class="pre">&quot;1&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;yes&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;true&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;on&quot;</span></tt> 、偽 (False) としては <tt class="docutils literal"><span class="pre">&quot;0&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;no&quot;</span></tt> 、
+<tt class="docutils literal"><span class="pre">&quot;false&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;off&quot;</span></tt> です。これらの文字列値に対しては大文字小文字の区別をしません。その他の値の場合には
+<a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.items">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">items</tt><big>(</big><em>section</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.items" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた <em>section</em> のそれぞれのオプションについて <tt class="docutils literal"><span class="pre">(name,</span> <span class="pre">value)</span></tt> ペアのリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.set">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">set</tt><big>(</big><em>section</em>, <em>option</em>, <em>value</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.set" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたセクションが存在していれば、オプションを指定された値に設定します。セクションが存在しなければ <a class="reference internal" href="#ConfigParser.NoSectionError" title="ConfigParser.NoSectionError"><tt class="xref py py-exc docutils literal"><span class="pre">NoSectionError</span></tt></a>
+を発生させます。 <a class="reference internal" href="#ConfigParser.RawConfigParser" title="ConfigParser.RawConfigParser"><tt class="xref py py-class docutils literal"><span class="pre">RawConfigParser</span></tt></a> (あるいは <em>raw</em> パラメータをセットした <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a>)
+を文字列型でない値の <em>内部的な</em> 格納場所として使うことは可能ですが、すべての機能 (置換やファイルへの出力を含む) がサポートされるのは文字列を値として使った場合だけです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.write">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">write</tt><big>(</big><em>fileobject</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.write" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>設定を文字列表現に変換してファイルオブジェクトに書き出します。この文字列表現は <a class="reference internal" href="#ConfigParser.RawConfigParser.read" title="ConfigParser.RawConfigParser.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a> で読み込むことができます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.remove_option">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">remove_option</tt><big>(</big><em>section</em>, <em>option</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.remove_option" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定された <em>section</em> から指定された <em>option</em> を削除します。セクションが存在しなければ、 <a class="reference internal" href="#ConfigParser.NoSectionError" title="ConfigParser.NoSectionError"><tt class="xref py py-exc docutils literal"><span class="pre">NoSectionError</span></tt></a> を起こします。存在するオプションを削除した時は <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでない時は <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.remove_section">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">remove_section</tt><big>(</big><em>section</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.remove_section" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定された <em>section</em> を設定から削除します。もし指定されたセクションが存在すれば <tt class="docutils literal"><span class="pre">True</span></tt> 、そうでなければ <tt class="docutils literal"><span class="pre">False</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.RawConfigParser.optionxform">
+<tt class="descclassname">RawConfigParser.</tt><tt class="descname">optionxform</tt><big>(</big><em>option</em><big>)</big><a class="headerlink" href="#ConfigParser.RawConfigParser.optionxform" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>入力ファイル中に見つかったオプション名か、クライアントコードから渡されたオプション名 <em>option</em> を、内部で利用する形式に変換します。デフォルトでは <em>option</em> を全て小文字に変換した名前が返されます。サブルクラスではこの関数をオーバーライドすることでこの振舞いを替えることができます。</p>
+<p>振舞いを替えるために ConfigParser を継承して新たにクラスを作る必要はありません、あるインスタンスのメソッドを文字列を引数に取る関数で置き換えることもできます。たとえば、このメソッドを <a class="reference internal" href="functions.html#str" title="str"><tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt></a> に設定することで大小文字の差を区別するように変更することができます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cfgparser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
+<span class="o">...</span>
+<span class="n">cfgparser</span><span class="o">.</span><span class="n">optionxform</span> <span class="o">=</span> <span class="nb">str</span>
+</pre></div>
+</div>
+<p>設定ファイルを読み込むときには、 <a class="reference internal" href="#ConfigParser.RawConfigParser.optionxform" title="ConfigParser.RawConfigParser.optionxform"><tt class="xref py py-meth docutils literal"><span class="pre">optionxform()</span></tt></a> が呼ばれる前にオプション名の前後の空白文字が取り除かれることに注意してください。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="configparser-objects">
+<span id="id1"></span><h2>13.2.2. ConfigParser オブジェクト<a class="headerlink" href="#configparser-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> クラスは <a class="reference internal" href="#ConfigParser.RawConfigParser" title="ConfigParser.RawConfigParser"><tt class="xref py py-class docutils literal"><span class="pre">RawConfigParser</span></tt></a> のインターフェースをいくつかのメソッドについて拡張し、省略可能な引数を追加しています。</p>
+<dl class="method">
+<dt id="ConfigParser.ConfigParser.get">
+<tt class="descclassname">ConfigParser.</tt><tt class="descname">get</tt><big>(</big><em>section</em>, <em>option</em><span class="optional">[</span>, <em>raw</em><span class="optional">[</span>, <em>vars</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ConfigParser.ConfigParser.get" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>section</em> の <em>option</em> 変数を取得します。このメソッドに渡される <em>vars</em> は辞書でなくてはいけません。
+(もし渡されているならば) <em>vars</em> 、 <em>section</em> 、 <em>defaults</em> の順に <em>option</em> が探されます。</p>
+<p><em>raw</em> が真でない時には、全ての <tt class="docutils literal"><span class="pre">'%'</span></tt> 置換は展開されてから返されます。置換後の値はオプションと同じ順序で探されます</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ConfigParser.ConfigParser.items">
+<tt class="descclassname">ConfigParser.</tt><tt class="descname">items</tt><big>(</big><em>section</em><span class="optional">[</span>, <em>raw</em><span class="optional">[</span>, <em>vars</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#ConfigParser.ConfigParser.items" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定した <em>section</em> 内の各オプションに対して、 <tt class="docutils literal"><span class="pre">(name,</span> <span class="pre">value)</span></tt> のペアからなるリストを返します。省略可能な引数は <tt class="docutils literal"><span class="pre">get()</span></tt> メソッドと同じ意味を持ちます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+</div>
+<div class="section" id="safeconfigparser">
+<span id="safeconfigparser-objects"></span><h2>13.2.3. SafeConfigParser オブジェクト<a class="headerlink" href="#safeconfigparser" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#ConfigParser.SafeConfigParser" title="ConfigParser.SafeConfigParser"><tt class="xref py py-class docutils literal"><span class="pre">SafeConfigParser</span></tt></a> は <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> と同様の拡張インターフェイスをもっていますが、以下のような機能が追加されています:</p>
+<dl class="method">
+<dt id="ConfigParser.SafeConfigParser.set">
+<tt class="descclassname">SafeConfigParser.</tt><tt class="descname">set</tt><big>(</big><em>section</em>, <em>option</em>, <em>value</em><big>)</big><a class="headerlink" href="#ConfigParser.SafeConfigParser.set" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>もし与えられたセクションが存在している場合は、指定された値を与えられたオプションに設定します。そうでない場合は <a class="reference internal" href="#ConfigParser.NoSectionError" title="ConfigParser.NoSectionError"><tt class="xref py py-exc docutils literal"><span class="pre">NoSectionError</span></tt></a> を発生させます。  <em>value</em> は文字列  (<a class="reference internal" href="functions.html#str" title="str"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a> または <a class="reference internal" href="functions.html#unicode" title="unicode"><tt class="xref py py-class docutils literal"><span class="pre">unicode</span></tt></a>) でなければならず、そうでない場合には
+<a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> が発生します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h2>13.2.4. 例<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>configurationファイルを書き出す例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ConfigParser</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">()</span>
+
+<span class="c"># When adding sections or items, add them in the reverse order of</span>
+<span class="c"># how you want them to be displayed in the actual file.</span>
+<span class="c"># In addition, please note that using RawConfigParser&#39;s and the raw</span>
+<span class="c"># mode of ConfigParser&#39;s respective set functions, you can assign</span>
+<span class="c"># non-string values to keys internally, but will receive an error</span>
+<span class="c"># when attempting to write to a file or when you get it in non-raw</span>
+<span class="c"># mode. SafeConfigParser does not allow such assignments to take place.</span>
+<span class="n">config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;int&#39;</span><span class="p">,</span> <span class="s">&#39;15&#39;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;bool&#39;</span><span class="p">,</span> <span class="s">&#39;true&#39;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;float&#39;</span><span class="p">,</span> <span class="s">&#39;3.1415&#39;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;baz&#39;</span><span class="p">,</span> <span class="s">&#39;fun&#39;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="s">&#39;Python&#39;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%(bar)s</span><span class="s"> is </span><span class="si">%(baz)s</span><span class="s">!&#39;</span><span class="p">)</span>
+
+<span class="c"># Writing our configuration file to &#39;example.cfg&#39;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;example.cfg&#39;</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">configfile</span><span class="p">:</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">configfile</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>configurationファイルを読み込む例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ConfigParser</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;example.cfg&#39;</span><span class="p">)</span>
+
+<span class="c"># getfloat() raises an exception if the value is not a float</span>
+<span class="c"># getint() and getboolean() also do this for their respective types</span>
+<span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getfloat</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;float&#39;</span><span class="p">)</span>
+<span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;int&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="nb">float</span> <span class="o">+</span> <span class="nb">int</span>
+
+<span class="c"># Notice that the next output does not interpolate &#39;%(bar)s&#39; or &#39;%(baz)s&#39;.</span>
+<span class="c"># This is because we are using a RawConfigParser().</span>
+<span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;bool&#39;</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>置換機能を利用するには、 <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-class docutils literal"><span class="pre">ConfigParser</span></tt></a> か <a class="reference internal" href="#ConfigParser.SafeConfigParser" title="ConfigParser.SafeConfigParser"><tt class="xref py py-class docutils literal"><span class="pre">SafeConfigParser</span></tt></a>
+クラスを利用します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ConfigParser</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;example.cfg&#39;</span><span class="p">)</span>
+
+<span class="c"># Set the third, optional argument of get to 1 if you wish to use raw mode.</span>
+<span class="k">print</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c"># -&gt; &quot;Python is fun!&quot;</span>
+<span class="k">print</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c"># -&gt; &quot;%(bar)s is %(baz)s!&quot;</span>
+
+<span class="c"># The optional fourth argument is a dict with members that will take</span>
+<span class="c"># precedence in interpolation.</span>
+<span class="k">print</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;bar&#39;</span><span class="p">:</span> <span class="s">&#39;Documentation&#39;</span><span class="p">,</span>
+                                        <span class="s">&#39;baz&#39;</span><span class="p">:</span> <span class="s">&#39;evil&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>3種類全てのConfigParserクラスで、デフォルト値を利用できます。別にオプションが指定されていなかった場合、このデフォルト値は置換機能でも利用されます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ConfigParser</span>
+
+<span class="c"># New instance with &#39;bar&#39; and &#39;baz&#39; defaulting to &#39;Life&#39; and &#39;hard&#39; each</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">SafeConfigParser</span><span class="p">({</span><span class="s">&#39;bar&#39;</span><span class="p">:</span> <span class="s">&#39;Life&#39;</span><span class="p">,</span> <span class="s">&#39;baz&#39;</span><span class="p">:</span> <span class="s">&#39;hard&#39;</span><span class="p">})</span>
+<span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;example.cfg&#39;</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span> <span class="c"># -&gt; &quot;Python is fun!&quot;</span>
+<span class="n">config</span><span class="o">.</span><span class="n">remove_option</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;bar&#39;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">remove_option</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;baz&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Section1&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span> <span class="c"># -&gt; &quot;Life is hard!&quot;</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">opt_move</span></tt> 関数は、オプションをセクション間で移動することができます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">opt_move</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">section1</span><span class="p">,</span> <span class="n">section2</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section2</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section1</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">NoSectionError</span><span class="p">:</span>
+        <span class="c"># Create non-existent section</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">section2</span><span class="p">)</span>
+        <span class="n">opt_move</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">section1</span><span class="p">,</span> <span class="n">section2</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">remove_option</span><span class="p">(</span><span class="n">section1</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>いくつかの設定ファイルでは、値のない設定項目がある以外は <a class="reference internal" href="#module-ConfigParser" title="ConfigParser: Configuration file parser."><tt class="xref py py-mod docutils literal"><span class="pre">ConfigParser</span></tt></a> の文法と同じ文法になっています。コンストラクタの <em>allow_no_value</em> 引数で、そのような値を許可することができます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ConfigParser</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">io</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_config</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="s">[mysqld]</span>
+<span class="gp">... </span><span class="s">user = mysql</span>
+<span class="gp">... </span><span class="s">pid-file = /var/run/mysqld/mysqld.pid</span>
+<span class="gp">... </span><span class="s">skip-external-locking</span>
+<span class="gp">... </span><span class="s">old_passwords = 1</span>
+<span class="gp">... </span><span class="s">skip-bdb</span>
+<span class="gp">... </span><span class="s">skip-innodb</span>
+<span class="gp">... </span><span class="s">&quot;&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">(</span><span class="n">allow_no_value</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">sample_config</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Settings with values are treated as before:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;mysqld&quot;</span><span class="p">,</span> <span class="s">&quot;user&quot;</span><span class="p">)</span>
+<span class="go">&#39;mysql&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Settings without values provide None:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;mysqld&quot;</span><span class="p">,</span> <span class="s">&quot;skip-bdb&quot;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># Settings which aren&#39;t specified still raise an error:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;mysqld&quot;</span><span class="p">,</span> <span class="s">&quot;does-not-exist&quot;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  <span class="c">...</span>
+<span class="nc">ConfigParser.NoOptionError: No option &#39;does-not-exist&#39; in section</span>: <span class="n-Identifier">&#39;mysqld&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="robotparser.html" title="13.3. robotparser — robots.txt のためのパーザ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="csv.html" title="13.1. csv — CSV ファイルの読み書き"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="fileformats.html" >13. ファイルフォーマット</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

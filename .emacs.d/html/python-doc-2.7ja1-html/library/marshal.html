@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>11.5. marshal — 内部使用向けの Python オブジェクト整列化 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="11. データの永続化" href="persistence.html" />
+    <link rel="next" title="11.6. anydbm — DBM 形式のデータベースへの汎用アクセスインタフェース" href="anydbm.html" />
+    <link rel="prev" title="11.4. shelve — Python オブジェクトの永続化" href="shelve.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="anydbm.html" title="11.6. anydbm — DBM 形式のデータベースへの汎用アクセスインタフェース"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="shelve.html" title="11.4. shelve — Python オブジェクトの永続化"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="persistence.html" accesskey="U">11. データの永続化</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="shelve.html"
+                        title="前の章へ">11.4. <tt class="docutils literal docutils literal"><span class="pre">shelve</span></tt> &#8212; Python オブジェクトの永続化</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="anydbm.html"
+                        title="次の章へ">11.6. <tt class="docutils literal docutils literal"><span class="pre">anydbm</span></tt> &#8212;  DBM 形式のデータベースへの汎用アクセスインタフェース</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/marshal.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-marshal">
+<span id="marshal-python"></span><h1>11.5. <a class="reference internal" href="#module-marshal" title="marshal: Python オブジェクトをバイト列に変換したり、その逆を (異なる制約条件下で) 行います。"><tt class="xref py py-mod docutils literal"><span class="pre">marshal</span></tt></a> &#8212; 内部使用向けの Python オブジェクト整列化<a class="headerlink" href="#module-marshal" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>このモジュールには Python 値をバイナリ形式で読み書きできるような関数が含まれています。このバイナリ形式は Python 特有のものですが、マシンアーキテクチャ非依存のものです
+(つまり、Python の値を PC 上でファイルに書き込み、Sun に転送し、そこで読み戻すことができます)。バイナリ形式の詳細は意図的にドキュメント化されていません;
+この形式は (稀にしかないことですが) Python のバージョン間で変更される可能性があるからです。 <a class="footnote-reference" href="#id2" id="id1">[1]</a></p>
+<span class="target" id="index-0"></span><p>このモジュールは汎用の &#8220;永続化 (persistence)&#8221; モジュールではありません。汎用的な永続化や、RPC 呼び出しを通じた Python オブジェクトの転送については、モジュール <a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> および <a class="reference internal" href="shelve.html#module-shelve" title="shelve: Python オブジェクトの永続化。"><tt class="xref py py-mod docutils literal"><span class="pre">shelve</span></tt></a> を参照してください。
+<a class="reference internal" href="#module-marshal" title="marshal: Python オブジェクトをバイト列に変換したり、その逆を (異なる制約条件下で) 行います。"><tt class="xref py py-mod docutils literal"><span class="pre">marshal</span></tt></a> モジュールは主に、 &#8220;擬似コンパイルされた (pseudo-compiled)&#8221; コードの
+<tt class="file docutils literal"><span class="pre">.pyc</span></tt> ファイルへの読み書きをサポートするために存在します。したがって、 Python のメンテナは、必要が生じれば marshal 形式を後方互換性のないものに変更する権利を有しています。
+Python オブジェクトを直列化 (シリアライズ) および非直列化 (デシリアライズ) したい場合には、 <a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> モジュールを使ってください。
+<a class="reference internal" href="pickle.html#module-pickle" title="pickle: Python オブジェクトからバイトストリームへの変換、およびその逆。"><tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt></a> は速度は同等で、バージョン間の互換性が保証されていて、 marshal より広範囲のオブジェクトをサポートしています。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last"><a class="reference internal" href="#module-marshal" title="marshal: Python オブジェクトをバイト列に変換したり、その逆を (異なる制約条件下で) 行います。"><tt class="xref py py-mod docutils literal"><span class="pre">marshal</span></tt></a> モジュールは、誤ったデータや悪意を持って作成されたデータに対する安全性を考慮していません。信頼できない、もしくは認証されていない出所からのデータを非整列化してはなりません。</p>
+</div>
+<p>すべての Python オブジェクト型がサポートされているわけではありません;
+一般的には、 Python の特定の実行に依存しないオブジェクトだけがこのモジュールで読み書きできます。以下の型: 真偽値、整数、長整数、浮動小数点数、複素数、文字列、 Unicode オブジェクト、タプル、リスト、 set 、 frozenset 、辞書、コードオブジェクト、がサポートされています。ただし、タプル、リスト、 set 、 frozenset 、辞書は、それらに含まれた値がサポートされている型である限りサポートされると解釈しなければなりません;
+また、再帰的なリストおよび辞書は書き込んではなりません (無限ループを引き起こします)。シングルトンである <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a>、 <a class="reference internal" href="constants.html#Ellipsis" title="Ellipsis"><tt class="xref py py-const docutils literal"><span class="pre">Ellipsis</span></tt></a>、 <a class="reference internal" href="exceptions.html#exceptions.StopIteration" title="exceptions.StopIteration"><tt class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></tt></a> も整列化可能です。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">(DEC Alpha のように) C言語の <tt class="docutils literal"><span class="pre">long</span> <span class="pre">int</span></tt> が 32 ビットよりも長いビット長を持つ場合、
+32 ビットよりも長い Python 整数を作成することが可能です。そのような整数が整列化された後、 C 言語の <tt class="docutils literal"><span class="pre">long</span> <span class="pre">int</span></tt> のビット長が 32 ビットしかないマシン上で読み戻された場合、通常整数の代わりに Python 長整数が返されます。型は異なりますが、数値は同じです。
+(この動作は Python 2.2 で新たに追加されたものです。それ以前のバージョンでは、値のうち最小桁から 32 ビット以外の情報は失われ、警告メッセージが出力されていました。)</p>
+</div>
+<p>文字列を操作する関数と同様に、ファイルの読み書きを行う関数が提供されています。</p>
+<p>このモジュールでは以下の関数を定義しています:</p>
+<dl class="function">
+<dt id="marshal.dump">
+<tt class="descclassname">marshal.</tt><tt class="descname">dump</tt><big>(</big><em>value</em>, <em>file</em><span class="optional">[</span>, <em>version</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#marshal.dump" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>開かれたファイルに値を書き込みます。値はサポートされている型でなくてはなりません。ファイルは <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> か、 <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> や <tt class="xref py py-func docutils literal"><span class="pre">posix.popen()</span></tt> が返すようなファイルオブジェクトでなくてはなりません。またファイルはバイナリモード (<tt class="docutils literal"><span class="pre">'wb'</span></tt> または <tt class="docutils literal"><span class="pre">'w+b'</span></tt>) で開かれていなければなりません。</p>
+<p>値 (または値に含まれるオブジェクト) がサポートされていない型の場合、
+<a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> 例外が送出されます &#8212; しかし、同時にごみのデータがファイルに書き込まれます。このオブジェクトは <a class="reference internal" href="#marshal.load" title="marshal.load"><tt class="xref py py-func docutils literal"><span class="pre">load()</span></tt></a> で適切に読み出されることはありません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加: </span><em>version</em> 引数は <tt class="docutils literal"><span class="pre">dump</span></tt> が利用するデータフォーマットを表します (下記参照)。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="marshal.load">
+<tt class="descclassname">marshal.</tt><tt class="descname">load</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#marshal.load" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>開かれたファイルから値を一つ読んで返します。
+(異なるバージョンの Python の互換性のない marshal フォーマットだったなどの理由で)
+有効な値が読み出せなかった場合、 <a class="reference internal" href="exceptions.html#exceptions.EOFError" title="exceptions.EOFError"><tt class="xref py py-exc docutils literal"><span class="pre">EOFError</span></tt></a>、 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a>、または <a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。
+file はバイナリモード (<tt class="docutils literal"><span class="pre">'rb'</span></tt> または <tt class="docutils literal"><span class="pre">'r+b'</span></tt>) で開かれたファイルオブジェクトでなければなりません.</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">サポートされていない型を含むオブジェクトが <a class="reference internal" href="#marshal.dump" title="marshal.dump"><tt class="xref py py-func docutils literal"><span class="pre">dump()</span></tt></a> で整列化されている場合、 <a class="reference internal" href="#marshal.load" title="marshal.load"><tt class="xref py py-func docutils literal"><span class="pre">load()</span></tt></a> は整列化不能な値を <tt class="docutils literal"><span class="pre">None</span></tt> で置き換えます。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="marshal.dumps">
+<tt class="descclassname">marshal.</tt><tt class="descname">dumps</tt><big>(</big><em>value</em><span class="optional">[</span>, <em>version</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#marshal.dumps" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">dump(value,</span> <span class="pre">file)</span></tt> でファイルに書き込まれるような文字列を返します。値はサポートされている型でなければなりません。値がサポートされていない型のオブジェクト (またはサポートされていない型のオブジェクトを含むようなオブジェクト) の場合、
+<a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> 例外が送出されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加: </span><em>version</em> 引数は <tt class="docutils literal"><span class="pre">dumps</span></tt> が利用するデータフォーマットを表します (下記参照)。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="marshal.loads">
+<tt class="descclassname">marshal.</tt><tt class="descname">loads</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#marshal.loads" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>データ文字列を値に変換します。有効な値が見つからなかった場合、 <a class="reference internal" href="exceptions.html#exceptions.EOFError" title="exceptions.EOFError"><tt class="xref py py-exc docutils literal"><span class="pre">EOFError</span></tt></a>、 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a>、または <a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> が送出されます。文字列中の余分な文字は無視されます。</p>
+</dd></dl>
+
+<p>これに加えて、以下の定数が定義されています:</p>
+<dl class="data">
+<dt id="marshal.version">
+<tt class="descclassname">marshal.</tt><tt class="descname">version</tt><a class="headerlink" href="#marshal.version" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このモジュールが利用するバージョンを表します。バージョン0 は歴史的なフォーマットです。バージョン1 は文字列の再利用をします (Python 2.4で追加されました)。バージョン2 は浮動小数点数にバイナリフォーマットを使用します (Python 2.5で追加されました)。現在のバージョンは2です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<p class="rubric">注記</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>このモジュールの名前は (特に) Modula-3 の設計者の間で使われていた用語の一つに由来しています。彼らはデータを自己充足的な形式で輸送する操作に &#8220;整列化 (marshalling)&#8221; という用語を使いました。厳密に言えば、&#8221;整列させる (to marshal)&#8221; とは、あるデータを (例えば RPC バッファのように)
+内部表現形式から外部表現形式に変換することを意味し、&#8221;非整列化 (unmarshalling)&#8221; とはその逆を意味します。</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="anydbm.html" title="11.6. anydbm — DBM 形式のデータベースへの汎用アクセスインタフェース"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="shelve.html" title="11.4. shelve — Python オブジェクトの永続化"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="persistence.html" >11. データの永続化</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

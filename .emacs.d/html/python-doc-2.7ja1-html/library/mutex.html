@@ -1,0 +1,195 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.9. mutex — 排他制御 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="8. データ型" href="datatypes.html" />
+    <link rel="next" title="8.10. queue — 同期キュークラス" href="queue.html" />
+    <link rel="prev" title="8.8. sched — イベントスケジューラ" href="sched.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="queue.html" title="8.10. queue — 同期キュークラス"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="sched.html" title="8.8. sched — イベントスケジューラ"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" accesskey="U">8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8.9. <tt class="docutils literal"><span class="pre">mutex</span></tt> &#8212; 排他制御</a><ul>
+<li><a class="reference internal" href="#mutex-objects">8.9.1. mutex オブジェクト</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="sched.html"
+                        title="前の章へ">8.8. <tt class="docutils literal"><span class="pre">sched</span></tt> &#8212; イベントスケジューラ</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="queue.html"
+                        title="次の章へ">8.10. <tt class="docutils literal"><span class="pre">queue</span></tt> &#8212; 同期キュークラス</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/mutex.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-mutex">
+<span id="mutex"></span><h1>8.9. <a class="reference internal" href="#module-mutex" title="mutex: 排他制御のためのロックとキュー"><tt class="xref py py-mod docutils literal"><span class="pre">mutex</span></tt></a> &#8212; 排他制御<a class="headerlink" href="#module-mutex" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃: </span><a class="reference internal" href="#module-mutex" title="mutex: 排他制御のためのロックとキュー"><tt class="xref py py-mod docutils literal"><span class="pre">mutex</span></tt></a> モジュールは Python 3.0 で削除されました。</p>
+<p><a class="reference internal" href="#module-mutex" title="mutex: 排他制御のためのロックとキュー"><tt class="xref py py-mod docutils literal"><span class="pre">mutex</span></tt></a> モジュールでは、ロック (lock) の獲得と解除によって排他制御を可能にするクラスを定義しています。排他制御は <a class="reference internal" href="threading.html#module-threading" title="threading: 高水準のスレッドインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">threading</span></tt></a> やマルチタスクを使う上で便利かもしれませんが、このクラスがそうした機能を必要として(いたり、想定して)いるわけではありません。</p>
+<p><a class="reference internal" href="#module-mutex" title="mutex: 排他制御のためのロックとキュー"><tt class="xref py py-mod docutils literal"><span class="pre">mutex</span></tt></a> モジュールでは以下のクラスを定義しています:</p>
+<dl class="class">
+<dt id="mutex.mutex">
+<em class="property">class </em><tt class="descclassname">mutex.</tt><tt class="descname">mutex</tt><a class="headerlink" href="#mutex.mutex" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい (ロックされてない) mutex を作ります。</p>
+<p>mutex には 2 つの状態変数 &#8212; &#8220;ロック&#8221; ビット (locked bit) とキュー (queue) があります。 mutex
+がロックされていなければ、キューは空です。それ以外の場合、キューは空になっているか、 <tt class="docutils literal"><span class="pre">(function,</span> <span class="pre">argument)</span></tt>
+のペアが一つ以上入っています。このペアはロックを獲得しようと待機している関数 (またはメソッド) を表しています。キューが空でないときに mutex
+をロック解除すると、キューの先頭のエントリをキューから除去し、そのエントリのペアに基づいて <tt class="docutils literal"><span class="pre">function(argument)</span></tt> を呼び出します。これによって、先頭にあったエントリが新たなロックを獲得します。</p>
+<p>当然のことながらマルチスレッドの制御には利用できません &#8211; というのも、 <a class="reference internal" href="#mutex.mutex.lock" title="mutex.mutex.lock"><tt class="xref py py-meth docutils literal"><span class="pre">lock()</span></tt></a> が、ロックを獲得したら関数を呼び出すという変なインタフェースだからです。</p>
+</dd></dl>
+
+<div class="section" id="mutex-objects">
+<span id="id1"></span><h2>8.9.1. mutex オブジェクト<a class="headerlink" href="#mutex-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-mutex" title="mutex: 排他制御のためのロックとキュー"><tt class="xref py py-class docutils literal"><span class="pre">mutex</span></tt></a> には以下のメソッドがあります:</p>
+<dl class="method">
+<dt id="mutex.mutex.test">
+<tt class="descclassname">mutex.</tt><tt class="descname">test</tt><big>(</big><big>)</big><a class="headerlink" href="#mutex.mutex.test" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>mutex がロックされているかどうか調べます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mutex.mutex.testandset">
+<tt class="descclassname">mutex.</tt><tt class="descname">testandset</tt><big>(</big><big>)</big><a class="headerlink" href="#mutex.mutex.testandset" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>「原子的 (Atomic)」な Test-and-Set 操作です。ロックがセットされていなければ獲得して <tt class="docutils literal"><span class="pre">True</span></tt> を返します。それ以外の場合には <tt class="docutils literal"><span class="pre">False</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mutex.mutex.lock">
+<tt class="descclassname">mutex.</tt><tt class="descname">lock</tt><big>(</big><em>function</em>, <em>argument</em><big>)</big><a class="headerlink" href="#mutex.mutex.lock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>mutex がロックされていなければ <tt class="docutils literal"><span class="pre">function(argument)</span></tt> を実行します。 mutex
+がロックされている場合、関数とその引数をキューに置きます。キューに置かれた <tt class="docutils literal"><span class="pre">function(argument)</span></tt> がいつ実行されるかについては <a class="reference internal" href="#mutex.mutex.unlock" title="mutex.mutex.unlock"><tt class="xref py py-meth docutils literal"><span class="pre">unlock()</span></tt></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mutex.mutex.unlock">
+<tt class="descclassname">mutex.</tt><tt class="descname">unlock</tt><big>(</big><big>)</big><a class="headerlink" href="#mutex.mutex.unlock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>キューが空ならば mutex をロック解除します。そうでなければ、キューの最初の要素を実行します。</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="queue.html" title="8.10. queue — 同期キュークラス"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="sched.html" title="8.8. sched — イベントスケジューラ"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" >8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>
