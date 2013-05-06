@@ -1,0 +1,1312 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>11.13. sqlite3 — SQLite データベースに対する DB-API 2.0 インタフェース &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="11. データの永続化" href="persistence.html" />
+    <link rel="next" title="12. データ圧縮とアーカイブ" href="archiving.html" />
+    <link rel="prev" title="11.12. dumbdbm — 可搬性のある DBM 実装" href="dumbdbm.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="archiving.html" title="12. データ圧縮とアーカイブ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="dumbdbm.html" title="11.12. dumbdbm — 可搬性のある DBM 実装"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="persistence.html" accesskey="U">11. データの永続化</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">11.13. <tt class="docutils literal"><span class="pre">sqlite3</span></tt> &#8212; SQLite データベースに対する DB-API 2.0 インタフェース</a><ul>
+<li><a class="reference internal" href="#sqlite3-module-contents">11.13.1. モジュールの関数と定数</a></li>
+<li><a class="reference internal" href="#connection">11.13.2. Connection オブジェクト</a></li>
+<li><a class="reference internal" href="#sqlite3-cursor-objects">11.13.3. カーソルオブジェクト</a></li>
+<li><a class="reference internal" href="#row">11.13.4. Row オブジェクト</a></li>
+<li><a class="reference internal" href="#sqlite-python">11.13.5. SQLite と Python の型</a><ul>
+<li><a class="reference internal" href="#id3">11.13.5.1. 入門編</a></li>
+<li><a class="reference internal" href="#python-sqlite">11.13.5.2. 追加された Python の型を SQLite データベースに格納するために適合関数を使う</a><ul>
+<li><a class="reference internal" href="#id4">11.13.5.2.1. オブジェクト自身で適合するようにする</a></li>
+<li><a class="reference internal" href="#id5">11.13.5.2.2. 適合関数を登録する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">11.13.5.3. SQLite の値を好きな Python 型に変換する</a></li>
+<li><a class="reference internal" href="#id7">11.13.5.4. デフォルトの適合関数と変換関数</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqlite3-controlling-transactions">11.13.6. トランザクション制御</a></li>
+<li><a class="reference internal" href="#sqlite3">11.13.7. <tt class="docutils literal"><span class="pre">sqlite3</span></tt> の効率的な使い方</a><ul>
+<li><a class="reference internal" href="#id9">11.13.7.1. ショートカットメソッドを使う</a></li>
+<li><a class="reference internal" href="#id10">11.13.7.2. 位置ではなく名前でカラムにアクセスする</a></li>
+<li><a class="reference internal" href="#id11">11.13.7.3. コネクションをコンテキストマネージャーとして利用する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id12">11.13.8. 既知の問題</a><ul>
+<li><a class="reference internal" href="#id13">11.13.8.1. マルチスレッド</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="dumbdbm.html"
+                        title="前の章へ">11.12. <tt class="docutils literal docutils literal docutils literal"><span class="pre">dumbdbm</span></tt> &#8212; 可搬性のある DBM 実装</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="archiving.html"
+                        title="次の章へ">12. データ圧縮とアーカイブ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/sqlite3.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-sqlite3">
+<span id="sqlite3-sqlite-db-api-2-0"></span><h1>11.13. <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> &#8212; SQLite データベースに対する DB-API 2.0 インタフェース<a class="headerlink" href="#module-sqlite3" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<p>SQLite は、別にサーバプロセスは必要とせずデータベースのアクセスに SQL
+問い合わせ言語の非標準的な一種を使える軽量なディスク上のデータベースを提供する C ライブラリです。ある種のアプリケーションは内部データ保存に
+SQLite を使えます。また、SQLite を使ってアプリケーションのプロトタイプを作りその後そのコードを PostgreSQL や Oracle のような大規模データベースに移植するということも可能です。</p>
+<p>sqlite3 は Gerhard Häring によって書かれ、
+<span class="target" id="index-0"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0249"><strong>PEP 249</strong></a> に記述された DB-API 2.0 仕様に準拠した SQL
+インタフェースを提供するものです。</p>
+<p>このモジュールを使うには、最初にデータベースを表す <a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a>
+オブジェクトを作ります。ここではデータはファイル
+<tt class="file docutils literal"><span class="pre">/tmp/example</span></tt> に格納されているものとします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;/tmp/example&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>特別な名前である <tt class="docutils literal"><span class="pre">:memory:</span></tt> を使うと RAM 上にデータベースを作ることもできます。</p>
+<p><a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a> があれば、 <a class="reference internal" href="#sqlite3.Cursor" title="sqlite3.Cursor"><tt class="xref py py-class docutils literal"><span class="pre">Cursor</span></tt></a> オブジェクトを作りその
+<a class="reference internal" href="#sqlite3.Cursor.execute" title="sqlite3.Cursor.execute"><tt class="xref py py-meth docutils literal"><span class="pre">execute()</span></tt></a> メソッドを呼んで
+SQL コマンドを実行することができます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="c"># Create table</span>
+<span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;create table stocks</span>
+<span class="s">(date text, trans text, symbol text,</span>
+<span class="s"> qty real, price real)&#39;&#39;&#39;</span><span class="p">)</span>
+
+<span class="c"># Insert a row of data</span>
+<span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;insert into stocks</span>
+<span class="s">          values (&#39;2006-01-05&#39;,&#39;BUY&#39;,&#39;RHAT&#39;,100,35.14)&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="c"># Save (commit) the changes</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+<span class="c"># We can also close the cursor if we are done with it</span>
+<span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>たいてい、SQL 操作は Python 変数の値を使う必要があります。この時、クエリーを Python
+の文字列操作を使って構築することは、安全とは言えないので、すべきではありません。そのようなことをするとプログラムが SQL インジェクション攻撃に対し脆弱になりかねません。</p>
+<p>代わりに、DB-API のパラメータ割り当てを使います。 <tt class="docutils literal"><span class="pre">?</span></tt> を変数の値を使いたいところに埋めておきます。その上で、値のタプルをカーソルの
+<a class="reference internal" href="#sqlite3.Cursor.execute" title="sqlite3.Cursor.execute"><tt class="xref py py-meth docutils literal"><span class="pre">execute()</span></tt></a> メソッドの第2引数として引き渡します。(他のデータベースモジュールでは変数の場所を示すのに <tt class="docutils literal"><span class="pre">%s</span></tt> や <tt class="docutils literal"><span class="pre">:1</span></tt>
+などの異なった表記を用いることがあります。) 例を示します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Never do this -- insecure!</span>
+<span class="n">symbol</span> <span class="o">=</span> <span class="s">&#39;IBM&#39;</span>
+<span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;... where symbol = &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">symbol</span><span class="p">)</span>
+
+<span class="c"># Do this instead</span>
+<span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">symbol</span><span class="p">,)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;select * from stocks where symbol=?&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+<span class="c"># Larger example</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[(</span><span class="s">&#39;2006-03-28&#39;</span><span class="p">,</span> <span class="s">&#39;BUY&#39;</span><span class="p">,</span> <span class="s">&#39;IBM&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mf">45.00</span><span class="p">),</span>
+          <span class="p">(</span><span class="s">&#39;2006-04-05&#39;</span><span class="p">,</span> <span class="s">&#39;BUY&#39;</span><span class="p">,</span> <span class="s">&#39;MSOFT&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mf">72.00</span><span class="p">),</span>
+          <span class="p">(</span><span class="s">&#39;2006-04-06&#39;</span><span class="p">,</span> <span class="s">&#39;SELL&#39;</span><span class="p">,</span> <span class="s">&#39;IBM&#39;</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mf">53.00</span><span class="p">),</span>
+         <span class="p">]:</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;insert into stocks values (?,?,?,?,?)&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SELECT 文を実行した後データを取得する方法は3つありどれを使っても構いません。一つはカーソルをイテレータ(<a class="reference internal" href="../glossary.html#term-iterator"><em class="xref std std-term">iterator</em></a>)として扱う、一つはカーソルの
+<a class="reference internal" href="#sqlite3.Cursor.fetchone" title="sqlite3.Cursor.fetchone"><tt class="xref py py-meth docutils literal"><span class="pre">fetchone()</span></tt></a> メソッドを呼んで一致した内の一行を取得する、もう一つは <a class="reference internal" href="#sqlite3.Cursor.fetchall" title="sqlite3.Cursor.fetchall"><tt class="xref py py-meth docutils literal"><span class="pre">fetchall()</span></tt></a>
+メソッドを呼んで一致した全ての行のリストとして受け取る、という3つです。</p>
+<p>以下の例ではイテレータの形を使います。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;select * from stocks order by price&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="k">print</span> <span class="n">row</span>
+<span class="gp">...</span>
+<span class="go">(u&#39;2006-01-05&#39;, u&#39;BUY&#39;, u&#39;RHAT&#39;, 100, 35.14)</span>
+<span class="go">(u&#39;2006-03-28&#39;, u&#39;BUY&#39;, u&#39;IBM&#39;, 1000, 45.0)</span>
+<span class="go">(u&#39;2006-04-06&#39;, u&#39;SELL&#39;, u&#39;IBM&#39;, 500, 53.0)</span>
+<span class="go">(u&#39;2006-04-05&#39;, u&#39;BUY&#39;, u&#39;MSOFT&#39;, 1000, 72.0)</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://code.google.com/p/pysqlite/">http://code.google.com/p/pysqlite/</a></dt>
+<dd>pysqlite のウェブページ &#8211; sqlite3 は「pysqlite」という名の下、外部で開発されています。</dd>
+<dt><a class="reference external" href="http://www.sqlite.org">http://www.sqlite.org</a></dt>
+<dd>SQLite のウェブページ。ここの文書ではサポートされる SQL
+方言の文法と使えるデータ型を説明しています</dd>
+<dt><span class="target" id="index-1"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0249"><strong>PEP 249</strong></a> - Database API Specification 2.0</dt>
+<dd>Marc-Andre Lemburg により書かれた PEP</dd>
+<dt><a class="reference external" href="http://www.python.jp/doc/contrib/peps/pep-0249.txt">http://www.python.jp/doc/contrib/peps/pep-0249.txt</a></dt>
+<dd>訳注: PEP 249 の日本語訳があります</dd>
+</dl>
+</div>
+<div class="section" id="sqlite3-module-contents">
+<span id="id1"></span><h2>11.13.1. モジュールの関数と定数<a class="headerlink" href="#sqlite3-module-contents" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="data">
+<dt id="sqlite3.PARSE_DECLTYPES">
+<tt class="descclassname">sqlite3.</tt><tt class="descname">PARSE_DECLTYPES</tt><a class="headerlink" href="#sqlite3.PARSE_DECLTYPES" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この定数は <a class="reference internal" href="#sqlite3.connect" title="sqlite3.connect"><tt class="xref py py-func docutils literal"><span class="pre">connect()</span></tt></a> 関数の <em>detect_types</em> パラメータとして使われます。</p>
+<p>この定数を設定すると <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールは戻り値のカラムの宣言された型を読み取るようになります。意味を持つのは宣言の最初の単語です。すなわち、&#8221;integer primary key&#8221; においては &#8220;integer&#8221; が読み取られます。また、 &#8220;number(10)&#8221; では、 &#8220;number&#8221; が読み取られます。そして、そのカラムに対して、変換関数の辞書を探してその型に対して登録された関数を使うようにします。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="sqlite3.PARSE_COLNAMES">
+<tt class="descclassname">sqlite3.</tt><tt class="descname">PARSE_COLNAMES</tt><a class="headerlink" href="#sqlite3.PARSE_COLNAMES" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この定数は <a class="reference internal" href="#sqlite3.connect" title="sqlite3.connect"><tt class="xref py py-func docutils literal"><span class="pre">connect()</span></tt></a> 関数の <em>detect_types</em> パラメータとして使われます。</p>
+<p>この定数を設定すると SQLite のインタフェースは戻り値のそれぞれのカラムの名前を読み取るようになります。文字列の中の [mytype]
+といった形の部分を探し、&#8217;mytype&#8217; がそのカラムの名前であると判断します。そして &#8216;mytype&#8217; のエントリを変換関数辞書の中から見つけ、見つかった変換関数を値を返す際に用います。 <a class="reference internal" href="#sqlite3.Cursor.description" title="sqlite3.Cursor.description"><tt class="xref py py-attr docutils literal"><span class="pre">Cursor.description</span></tt></a>
+で見つかるカラム名はその最初の単語だけです。すなわち、もし <tt class="docutils literal"><span class="pre">'as</span> <span class="pre">&quot;x</span> <span class="pre">[datetime]&quot;'</span></tt> のようなものを SQL の中で使っていたとすると、読み取るのはカラム名の中の最初の空白までの全てですので、カラム名として使われるのは単純に &#8220;x&#8221; ということになります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sqlite3.connect">
+<tt class="descclassname">sqlite3.</tt><tt class="descname">connect</tt><big>(</big><em>database</em><span class="optional">[</span>, <em>timeout</em>, <em>detect_types</em>, <em>isolation_level</em>, <em>check_same_thread</em>, <em>factory</em>, <em>cached_statements</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sqlite3.connect" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル <em>database</em> の SQLite データベースへの接続を開きます。 <tt class="docutils literal"><span class="pre">&quot;:memory:&quot;</span></tt> という名前を使うことでディスクの代わりに
+RAM 上のデータベースへの接続を開くこともできます。</p>
+<p>データベースが複数の接続からアクセスされている状況で、その内の一つがデータベースに変更を加えたとき、SQLite データベースはそのトランザクションがコミットされるまでロックされます。 <em>timeout</em> パラメータで、例外を送出するまで接続がロックが解除されるのをどれだけ待つかを決めます。デフォルトは
+5.0 (5秒) です。</p>
+<p><em>isolation_level</em> パラメータについては、 <a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a> オブジェクトの、
+<a class="reference internal" href="#sqlite3.Connection.isolation_level" title="sqlite3.Connection.isolation_level"><tt class="xref py py-attr docutils literal"><span class="pre">Connection.isolation_level</span></tt></a> 属性を参照してください。</p>
+<p>SQLite がネイティブにサポートするのは TEXT, INTEGER, FLOAT, BLOB および NULL
+型だけです。もし他の型を使いたければ、その型のためのサポートを自分で追加しなければなりません。 <em>detect_types</em> パラメータを、モジュールレベルの
+<a class="reference internal" href="#sqlite3.register_converter" title="sqlite3.register_converter"><tt class="xref py py-func docutils literal"><span class="pre">register_converter()</span></tt></a> 関数で登録した自作の <strong>変換関数</strong> と一緒に使えば、簡単にできます。</p>
+<p>パラメータ <em>detect_types</em> のデフォルトは 0 (つまりオフ、型検知無し)です。型検知を有効にするためには、 <a class="reference internal" href="#sqlite3.PARSE_DECLTYPES" title="sqlite3.PARSE_DECLTYPES"><tt class="xref py py-const docutils literal"><span class="pre">PARSE_DECLTYPES</span></tt></a> と <a class="reference internal" href="#sqlite3.PARSE_COLNAMES" title="sqlite3.PARSE_COLNAMES"><tt class="xref py py-const docutils literal"><span class="pre">PARSE_COLNAMES</span></tt></a>
+の適当な組み合わせをこのパラメータにセットします。</p>
+<p>デフォルトでは、 <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールは connect の呼び出しの際にモジュールの <a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a>
+クラスを使います。しかし、 <a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a> クラスを継承したクラスを <em>factory</em> パラメータに渡して
+<a class="reference internal" href="#sqlite3.connect" title="sqlite3.connect"><tt class="xref py py-func docutils literal"><span class="pre">connect()</span></tt></a> にそのクラスを使わせることもできます。詳しくはこのマニュアルの
+<a class="reference internal" href="#sqlite3-types"><em>SQLite と Python の型</em></a> 節を参考にしてください。</p>
+<p><a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールは SQL 解析のオーバーヘッドを避けるために内部で文キャッシュを使っています。接続に対してキャッシュされる文の数を自分で指定したいならば、 <em>cached_statements</em> パラメータに設定してください。現在の実装ではデフォルトでキャッシュされる SQL 文の数を
+100 にしています。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sqlite3.register_converter">
+<tt class="descclassname">sqlite3.</tt><tt class="descname">register_converter</tt><big>(</big><em>typename</em>, <em>callable</em><big>)</big><a class="headerlink" href="#sqlite3.register_converter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>データベースから得られるバイト列を希望する Python の型に変換する呼び出し可能オブジェクト (callable) を登録します。その呼び出し可能オブジェクトは型が <em>typename</em> である全てのデータベース上の値に対して呼び出されます。型検知がどのように働くかについては <a class="reference internal" href="#sqlite3.connect" title="sqlite3.connect"><tt class="xref py py-func docutils literal"><span class="pre">connect()</span></tt></a> 関数の <em>detect_types</em> パラメータの説明も参照してください。注意が必要なのは <em>typename</em> はクエリの中の型名と大文字小文字も一致しなければならないということです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sqlite3.register_adapter">
+<tt class="descclassname">sqlite3.</tt><tt class="descname">register_adapter</tt><big>(</big><em>type</em>, <em>callable</em><big>)</big><a class="headerlink" href="#sqlite3.register_adapter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>自分が使いたい Python の型 <em>type</em> を SQLite がサポートしている型に変換する呼び出し可能オブジェクト (callable)
+を登録します。その呼び出し可能オブジェクト <em>callable</em> はただ一つの引数に Python の値を受け取り、int, long, float,
+(UTF-8 でエンコードされた) str, unicode または buffer のいずれかの型の値を返さなければなりません</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="sqlite3.complete_statement">
+<tt class="descclassname">sqlite3.</tt><tt class="descname">complete_statement</tt><big>(</big><em>sql</em><big>)</big><a class="headerlink" href="#sqlite3.complete_statement" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>もし文字列 <em>sql</em> がセミコロンで終端された一つ以上の完全な SQL 文を含んでいれば、 <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。判定は SQL
+文として文法的に正しいかではなく、閉じられていない文字列リテラルが無いことおよびセミコロンで終端されていることだけで行なわれます。</p>
+<p>この関数は以下の例にあるような SQLite のシェルを作る際に使われます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># A minimal SQLite shell for experiments</span>
+
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">isolation_level</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="nb">buffer</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+<span class="k">print</span> <span class="s">&quot;Enter your SQL commands to execute in sqlite3.&quot;</span>
+<span class="k">print</span> <span class="s">&quot;Enter a blank line to exit.&quot;</span>
+
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="nb">buffer</span> <span class="o">+=</span> <span class="n">line</span>
+    <span class="k">if</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">complete_statement</span><span class="p">(</span><span class="nb">buffer</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">buffer</span> <span class="o">=</span> <span class="nb">buffer</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="nb">buffer</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">buffer</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;SELECT&quot;</span><span class="p">):</span>
+                <span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;An error occurred:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+<span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="sqlite3.enable_callback_tracebacks">
+<tt class="descclassname">sqlite3.</tt><tt class="descname">enable_callback_tracebacks</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#sqlite3.enable_callback_tracebacks" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デフォルトでは、ユーザ定義の関数、集計関数、変換関数、認可コールバックなどはトレースバックを出力しません。デバッグの際にはこの関数を <em>flag</em> に
+<a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を指定して呼び出します。そうした後は先に述べたような関数のトレースバックが <tt class="docutils literal"><span class="pre">sys.stderr</span></tt> に出力されます。元に戻すには <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を使います。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="connection">
+<span id="sqlite3-connection-objects"></span><h2>11.13.2. Connection オブジェクト<a class="headerlink" href="#connection" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="sqlite3.Connection">
+<em class="property">class </em><tt class="descclassname">sqlite3.</tt><tt class="descname">Connection</tt><a class="headerlink" href="#sqlite3.Connection" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>SQLite データベースコネクション。以下の属性やメソッドを持ちます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Connection.isolation_level">
+<tt class="descclassname">Connection.</tt><tt class="descname">isolation_level</tt><a class="headerlink" href="#sqlite3.Connection.isolation_level" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の分離レベルを取得または設定します。
+<a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> で自動コミットモードまたは &#8220;DEFERRED&#8221;, &#8220;IMMEDIATE&#8221;, &#8220;EXLUSIVE&#8221;
+のどれかです。より詳しい説明は <a class="reference internal" href="#sqlite3-controlling-transactions"><em>トランザクション制御</em></a> 節を参照してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.cursor">
+<tt class="descclassname">Connection.</tt><tt class="descname">cursor</tt><big>(</big><span class="optional">[</span><em>cursorClass</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sqlite3.Connection.cursor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>cursor メソッドはオプション引数 <em>cursorClass</em> を受け付けます。これを指定するならば、指定されたクラスは
+<a class="reference internal" href="#sqlite3.Cursor" title="sqlite3.Cursor"><tt class="xref py py-class docutils literal"><span class="pre">sqlite3.Cursor</span></tt></a> を継承したカーソルクラスでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.commit">
+<tt class="descclassname">Connection.</tt><tt class="descname">commit</tt><big>(</big><big>)</big><a class="headerlink" href="#sqlite3.Connection.commit" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは現在のトランザクションをコミットします。このメソッドを呼ばないと、前回 <tt class="docutils literal"><span class="pre">commit()</span></tt> を呼び出してから行ったすべての変更は、他のデータベースコネクションから見ることができません。もし、データベースに書き込んだはずのデータが見えなくて悩んでいる場合は、このメソッドの呼び出しを忘れていないかチェックしてください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.rollback">
+<tt class="descclassname">Connection.</tt><tt class="descname">rollback</tt><big>(</big><big>)</big><a class="headerlink" href="#sqlite3.Connection.rollback" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは最後に行った <a class="reference internal" href="#sqlite3.Connection.commit" title="sqlite3.Connection.commit"><tt class="xref py py-meth docutils literal"><span class="pre">commit()</span></tt></a> 後の全ての変更をロールバックします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.close">
+<tt class="descclassname">Connection.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#sqlite3.Connection.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドはデータベースコネクションを閉じます。このメソッドが自動的に <a class="reference internal" href="#sqlite3.Connection.commit" title="sqlite3.Connection.commit"><tt class="xref py py-meth docutils literal"><span class="pre">commit()</span></tt></a> を呼び出さないことに注意してください。
+<a class="reference internal" href="#sqlite3.Connection.commit" title="sqlite3.Connection.commit"><tt class="xref py py-meth docutils literal"><span class="pre">commit()</span></tt></a> をせずにコネクションを閉じると、変更が消えてしまいます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.execute">
+<tt class="descclassname">Connection.</tt><tt class="descname">execute</tt><big>(</big><em>sql</em><span class="optional">[</span>, <em>parameters</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sqlite3.Connection.execute" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは非標準のショートカットで、cursor メソッドを呼び出して中間的なカーソルオブジェクトを作り、そのカーソルの <a class="reference internal" href="#sqlite3.Cursor.execute" title="sqlite3.Cursor.execute"><tt class="xref py py-meth docutils literal"><span class="pre">execute</span></tt></a>
+メソッドを与えられたパラメータと共に呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.executemany">
+<tt class="descclassname">Connection.</tt><tt class="descname">executemany</tt><big>(</big><em>sql</em><span class="optional">[</span>, <em>parameters</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sqlite3.Connection.executemany" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは非標準のショートカットで、cursor メソッドを呼び出して中間的なカーソルオブジェクトを作り、そのカーソルの
+<a class="reference internal" href="#sqlite3.Cursor.executemany" title="sqlite3.Cursor.executemany"><tt class="xref py py-meth docutils literal"><span class="pre">executemany</span></tt></a> メソッドを与えられたパラメータと共に呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.executescript">
+<tt class="descclassname">Connection.</tt><tt class="descname">executescript</tt><big>(</big><em>sql_script</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.executescript" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは非標準のショートカットで、cursor メソッドを呼び出して中間的なカーソルオブジェクトを作り、そのカーソルの
+<a class="reference internal" href="#sqlite3.Cursor.executescript" title="sqlite3.Cursor.executescript"><tt class="xref py py-meth docutils literal"><span class="pre">executescript</span></tt></a> メソッドを与えられたパラメータと共に呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.create_function">
+<tt class="descclassname">Connection.</tt><tt class="descname">create_function</tt><big>(</big><em>name</em>, <em>num_params</em>, <em>func</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.create_function" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>後から SQL 文中で <em>name</em> という名前の関数として使えるユーザ定義関数を作成します。
+<em>num_params</em> は関数が受け付ける引数の数、
+<em>func</em> は SQL 関数として使われる Python の呼び出し可能オブジェクトです。</p>
+<p>関数は SQLite でサポートされている任意の型を返すことができます。具体的には unicode, str, int, long, float, buffer および None です。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">md5</span>
+
+<span class="k">def</span> <span class="nf">md5sum</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">md5</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s">&quot;md5&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">md5sum</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select md5(?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,))</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.create_aggregate">
+<tt class="descclassname">Connection.</tt><tt class="descname">create_aggregate</tt><big>(</big><em>name</em>, <em>num_params</em>, <em>aggregate_class</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.create_aggregate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザ定義の集計関数を作成します。</p>
+<p>集計クラスにはパラメータ <em>num_params</em> で指定される個数の引数を取る
+<tt class="docutils literal"><span class="pre">step</span></tt> メソッドおよび最終的な集計結果を返す
+<tt class="docutils literal"><span class="pre">finalize</span></tt> メソッドを実装しなければなりません。</p>
+<p><tt class="docutils literal"><span class="pre">finalize</span></tt> メソッドは SQLite でサポートされている任意の型を返すことができます。具体的には unicode, str, int, long, float, buffer および None です。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">class</span> <span class="nc">MySum</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s">&quot;mysum&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MySum</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table test(i)&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into test(i) values (1)&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into test(i) values (2)&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select mysum(i) from test&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.create_collation">
+<tt class="descclassname">Connection.</tt><tt class="descname">create_collation</tt><big>(</big><em>name</em>, <em>callable</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.create_collation" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> と <em>callable</em> で指定される照合順序を作成します。呼び出し可能オブジェクトには二つの文字列が渡されます。一つめのものが二つめのものより低く順序付けられるならば -1 を返し、等しければ 0 を返し、一つめのものが二つめのものより高く順序付けられるならば
+1 を返すようにしなければなりません。この関数はソート(SQL での ORDER BY)をコントロールするもので、比較を行なうことは他の SQL 操作には影響を与えないことに注意しましょう。</p>
+<p>また、呼び出し可能オブジェクトに渡される引数は Python のバイト文字列として渡されますが、それは通常 UTF-8 で符号化されたものになります。</p>
+<p>以下の例は「間違った方法で」ソートする自作の照合順序です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">def</span> <span class="nf">collate_reverse</span><span class="p">(</span><span class="n">string1</span><span class="p">,</span> <span class="n">string2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="o">-</span><span class="nb">cmp</span><span class="p">(</span><span class="n">string1</span><span class="p">,</span> <span class="n">string2</span><span class="p">)</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">create_collation</span><span class="p">(</span><span class="s">&quot;reverse&quot;</span><span class="p">,</span> <span class="n">collate_reverse</span><span class="p">)</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table test(x)&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s">&quot;insert into test(x) values (?)&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="s">&quot;a&quot;</span><span class="p">,),</span> <span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,)])</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select x from test order by x collate reverse&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">row</span>
+<span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>照合順序を取り除くには <tt class="docutils literal"><span class="pre">create_collation</span></tt> を callable として
+None を渡して呼び出します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">con</span><span class="o">.</span><span class="n">create_collation</span><span class="p">(</span><span class="s">&quot;reverse&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.interrupt">
+<tt class="descclassname">Connection.</tt><tt class="descname">interrupt</tt><big>(</big><big>)</big><a class="headerlink" href="#sqlite3.Connection.interrupt" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドを別スレッドから呼び出して接続上で現在実行中であろうクエリを中断させられます。クエリが中断されると呼び出し元は例外を受け取ります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.set_authorizer">
+<tt class="descclassname">Connection.</tt><tt class="descname">set_authorizer</tt><big>(</big><em>authorizer_callback</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.set_authorizer" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このルーチンはコールバックを登録します。コールバックはデータベースのテーブルのカラムにアクセスしようとするたびに呼び出されます。コールバックはアクセスが許可されるならば <tt class="xref py py-const docutils literal"><span class="pre">SQLITE_OK</span></tt> を、SQL 文全体がエラーとともに中断されるべきならば
+<tt class="xref py py-const docutils literal"><span class="pre">SQLITE_DENY</span></tt> を、カラムが NULL 値として扱われるべきなら <tt class="xref py py-const docutils literal"><span class="pre">SQLITE_IGNORE</span></tt> を返さなければなりません。これらの定数は <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールに用意されています。</p>
+<p>コールバックの第一引数はどの種類の操作が許可されるかを決めます。第二第三引数には第一引数に依存して本当に使われる引数か <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> かが渡されます。第四引数はもし適用されるならばデータベースの名前(&#8220;main&#8221;, &#8220;temp&#8221;, etc.)です。第五引数はアクセスを試みる要因となった最も内側のトリガまたはビューの名前、またはアクセスの試みが入力された SQL コードに直接起因するものならば <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> です。</p>
+<p>第一引数に与えることができる値や、その第一引数によって決まる第二第三引数の意味については、SQLite の文書を参考にしてください。必要な定数は全て
+<a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールに用意されています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.set_progress_handler">
+<tt class="descclassname">Connection.</tt><tt class="descname">set_progress_handler</tt><big>(</big><em>handler</em>, <em>n</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.set_progress_handler" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p>このメソッドはコールバックを登録します。コールバックは SQLite 仮想マシン上の <em>n</em> 個の命令を実行するごとに呼び出されます。これは、GUI 更新などのために、長時間かかる処理中に SQLite
+からの呼び出しが欲しい場合に便利です。</p>
+<p>以前登録した progress handler をクリアしたい場合は、このメソッドを、
+<em>handler</em> 引数に <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を渡して呼び出してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.enable_load_extension">
+<tt class="descclassname">Connection.</tt><tt class="descname">enable_load_extension</tt><big>(</big><em>enabled</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.enable_load_extension" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+<p>このメソッドは SQLite エンジンが共有ライブラリから SQLite 拡張を読み込むのを許可したり、禁止したりします。
+SQLite 拡張は新しい関数や集計関数や仮想テーブルの実装を定義できます。
+1つの有名な拡張は SQLite によって頒布されている全テキスト検索拡張です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+
+<span class="c"># enable extension loading</span>
+<span class="n">con</span><span class="o">.</span><span class="n">enable_load_extension</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c"># Load the fulltext search extension</span>
+<span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select load_extension(&#39;./fts3.so&#39;)&quot;</span><span class="p">)</span>
+
+<span class="c"># alternatively you can load the extension using an API call:</span>
+<span class="c"># con.load_extension(&quot;./fts3.so&quot;)</span>
+
+<span class="c"># disable extension laoding again</span>
+<span class="n">con</span><span class="o">.</span><span class="n">enable_load_extension</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c"># example from SQLite wiki</span>
+<span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create virtual table recipe using fts3(name, ingredients)&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">executescript</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">    insert into recipe (name, ingredients) values (&#39;broccoli stew&#39;, &#39;broccoli peppers cheese tomatoes&#39;);</span>
+<span class="s">    insert into recipe (name, ingredients) values (&#39;pumpkin stew&#39;, &#39;pumpkin onions garlic celery&#39;);</span>
+<span class="s">    insert into recipe (name, ingredients) values (&#39;broccoli pie&#39;, &#39;broccoli cheese onions flour&#39;);</span>
+<span class="s">    insert into recipe (name, ingredients) values (&#39;pumpkin pie&#39;, &#39;pumpkin sugar flour butter&#39;);</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select rowid, name, ingredients from recipe where name match &#39;pie&#39;&quot;</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">row</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Connection.load_extension">
+<tt class="descclassname">Connection.</tt><tt class="descname">load_extension</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#sqlite3.Connection.load_extension" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+<p>このメソッドは共有ライブラリから SQLite 拡張を読み込みます。このメソッドを使う前に <a class="reference internal" href="#sqlite3.Connection.enable_load_extension" title="sqlite3.Connection.enable_load_extension"><tt class="xref py py-meth docutils literal"><span class="pre">enable_load_extension()</span></tt></a> で拡張の読み込みを許可しておかなくてはなりません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Connection.row_factory">
+<tt class="descclassname">Connection.</tt><tt class="descname">row_factory</tt><a class="headerlink" href="#sqlite3.Connection.row_factory" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この属性を、カーソルとタプルの形での元の行のデータを受け取り最終的な行を表すオブジェクトを返す呼び出し可能オブジェクトに、変更することができます。これによって、より進んだ結果の返し方を実装することができます。例えば、カラムの名前で各データにアクセスできるようなオブジェクトを返したりできます。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">def</span> <span class="nf">dict_factory</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">):</span>
+        <span class="n">d</span><span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">d</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">dict_factory</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select 1 as a&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="s">&quot;a&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>タプルを返すのでは物足りず、名前に基づいたカラムへのアクセスが行ないたい場合は、高度に最適化された <a class="reference internal" href="#sqlite3.Row" title="sqlite3.Row"><tt class="xref py py-class docutils literal"><span class="pre">sqlite3.Row</span></tt></a> 型を
+<a class="reference internal" href="#sqlite3.Connection.row_factory" title="sqlite3.Connection.row_factory"><tt class="xref py py-attr docutils literal"><span class="pre">row_factory</span></tt></a> にセットすることを考えてはいかがでしょうか。 <a class="reference internal" href="#sqlite3.Row" title="sqlite3.Row"><tt class="xref py py-class docutils literal"><span class="pre">Row</span></tt></a>
+クラスでは添字でも大文字小文字を無視した名前でもカラムにアクセスでき、しかもほとんどメモリーを浪費しません。おそらく、辞書を使うような独自実装のアプローチよりも、もしかすると db の行に基づいた解法よりも良いものかもしれません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Connection.text_factory">
+<tt class="descclassname">Connection.</tt><tt class="descname">text_factory</tt><a class="headerlink" href="#sqlite3.Connection.text_factory" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この属性を使って <tt class="docutils literal"><span class="pre">TEXT</span></tt> データ型をどのオブジェクトで返すかを制御できます。デフォルトではこの属性は <a class="reference internal" href="functions.html#unicode" title="unicode"><tt class="xref py py-class docutils literal"><span class="pre">unicode</span></tt></a> に設定されており、
+<a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールは <tt class="docutils literal"><span class="pre">TEXT</span></tt> を Unicode オブジェクトで返します。もしバイト列で返したいならば、 <a class="reference internal" href="functions.html#str" title="str"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a> に設定してください。</p>
+<p>効率の問題を考えて、非ASCIIデータに限って Unicode オブジェクトを返し、その他の場合にはバイト列を返す方法もあります。これを有効にしたければ、この属性を <tt class="xref py py-const docutils literal"><span class="pre">sqlite3.OptimizedUnicode</span></tt> に設定してください。</p>
+<p>バイト列を受け取って望みの型のオブジェクトを返すような呼び出し可能オブジェクトを何でも設定して構いません。</p>
+<p>以下の説明用のコード例を参照してください:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="c"># Create the table</span>
+<span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table person(lastname, firstname)&quot;</span><span class="p">)</span>
+
+<span class="n">AUSTRIA</span> <span class="o">=</span> <span class="s">u&quot;</span><span class="se">\xd6</span><span class="s">sterreich&quot;</span>
+
+<span class="c"># by default, rows are returned as Unicode</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">AUSTRIA</span><span class="p">,))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">AUSTRIA</span>
+
+<span class="c"># but we can make pysqlite always return bytestrings ...</span>
+<span class="n">con</span><span class="o">.</span><span class="n">text_factory</span> <span class="o">=</span> <span class="nb">str</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">AUSTRIA</span><span class="p">,))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span>
+<span class="c"># the bytestrings will be encoded in UTF-8, unless you stored garbage in the</span>
+<span class="c"># database ...</span>
+<span class="k">assert</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">AUSTRIA</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
+
+<span class="c"># we can also implement a custom text_factory ...</span>
+<span class="c"># here we implement one that will ignore Unicode characters that cannot be</span>
+<span class="c"># decoded from UTF-8</span>
+<span class="n">con</span><span class="o">.</span><span class="n">text_factory</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s">&quot;ignore&quot;</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;this is latin1 and would normally create errors&quot;</span> <span class="o">+</span> <span class="s">u&quot;</span><span class="se">\xe4\xf6\xfc</span><span class="s">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;latin1&quot;</span><span class="p">),))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">unicode</span>
+
+<span class="c"># pysqlite offers a builtin optimized text_factory that will return bytestring</span>
+<span class="c"># objects, if the data is in ASCII only, and otherwise return unicode objects</span>
+<span class="n">con</span><span class="o">.</span><span class="n">text_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">OptimizedUnicode</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">AUSTRIA</span><span class="p">,))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">unicode</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;Germany&quot;</span><span class="p">,))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">str</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Connection.total_changes">
+<tt class="descclassname">Connection.</tt><tt class="descname">total_changes</tt><a class="headerlink" href="#sqlite3.Connection.total_changes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>データベース接続が開始されて以来の行の変更・挿入・削除がなされた行の総数を返します。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Connection.iterdump">
+<tt class="descclassname">Connection.</tt><tt class="descname">iterdump</tt><a class="headerlink" href="#sqlite3.Connection.iterdump" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>データベースをSQL testフォーマットでダンプするためのイテレータを返します。
+in-memory データベースの内容を、後でリストアするための保存する場合に便利です。この関数は <strong class="program">sqlite3</strong> シェルの中の <tt class="kbd docutils literal"><span class="pre">.dump</span></tt> コマンドと同じ機能を持っています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># existing_db.db ファイルを dump.sql ファイルにダンプする</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;existing_db.db&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;dump.sql&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">con</span><span class="o">.</span><span class="n">iterdump</span><span class="p">():</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="sqlite3-cursor-objects">
+<span id="id2"></span><h2>11.13.3. カーソルオブジェクト<a class="headerlink" href="#sqlite3-cursor-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="sqlite3.Cursor">
+<em class="property">class </em><tt class="descclassname">sqlite3.</tt><tt class="descname">Cursor</tt><a class="headerlink" href="#sqlite3.Cursor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#sqlite3.Cursor" title="sqlite3.Cursor"><tt class="xref py py-class docutils literal"><span class="pre">Cursor</span></tt></a> インスタンスは以下の属性やメソッドを持ちます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Cursor.execute">
+<tt class="descclassname">Cursor.</tt><tt class="descname">execute</tt><big>(</big><em>sql</em><span class="optional">[</span>, <em>parameters</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sqlite3.Cursor.execute" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>SQL 文を実行します。SQL 文はパラメータ化できます(すなわち SQL リテラルの代わりの場所確保文字 (placeholder) を入れておけます)。
+<a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールは2種類の場所確保記法をサポートします。一つは疑問符(qmark スタイル)、もう一つは名前(named
+スタイル)です。</p>
+<p>まず最初の例は qmark スタイルのパラメータを使った書き方を示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;mydb&quot;</span><span class="p">)</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">who</span> <span class="o">=</span> <span class="s">&quot;Yeltsin&quot;</span>
+<span class="n">age</span> <span class="o">=</span> <span class="mi">72</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select name_last, age from people where name_last=? and age=?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">who</span><span class="p">,</span> <span class="n">age</span><span class="p">))</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>次の例は named スタイルの使い方です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;mydb&quot;</span><span class="p">)</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">who</span> <span class="o">=</span> <span class="s">&quot;Yeltsin&quot;</span>
+<span class="n">age</span> <span class="o">=</span> <span class="mi">72</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select name_last, age from people where name_last=:who and age=:age&quot;</span><span class="p">,</span>
+    <span class="p">{</span><span class="s">&quot;who&quot;</span><span class="p">:</span> <span class="n">who</span><span class="p">,</span> <span class="s">&quot;age&quot;</span><span class="p">:</span> <span class="n">age</span><span class="p">})</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#sqlite3.Cursor.execute" title="sqlite3.Cursor.execute"><tt class="xref py py-meth docutils literal"><span class="pre">execute()</span></tt></a> は一つの SQL 文しか実行しません。二つ以上の文を実行しようとすると、Warning を発生させます。複数の SQL
+文を一つの呼び出しで実行したい場合は <a class="reference internal" href="#sqlite3.Cursor.executescript" title="sqlite3.Cursor.executescript"><tt class="xref py py-meth docutils literal"><span class="pre">executescript()</span></tt></a> を使ってください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Cursor.executemany">
+<tt class="descclassname">Cursor.</tt><tt class="descname">executemany</tt><big>(</big><em>sql</em>, <em>seq_of_parameters</em><big>)</big><a class="headerlink" href="#sqlite3.Cursor.executemany" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>SQL 文 <em>sql</em> を <em>seq_of_parameters</em> シーケンス(またはマッピング)に含まれる全てのパラメータに対して実行します。
+<a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールでは、シーケンスの代わりにパラメータの組を作り出すイテレータ使うことが許されています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">class</span> <span class="nc">IterChars</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="nb">ord</span><span class="p">(</span><span class="s">&#39;z&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),)</span> <span class="c"># this is a 1-tuple</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table characters(c)&quot;</span><span class="p">)</span>
+
+<span class="n">theIter</span> <span class="o">=</span> <span class="n">IterChars</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s">&quot;insert into characters(c) values (?)&quot;</span><span class="p">,</span> <span class="n">theIter</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select c from characters&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>もう少し短いジェネレータ(<a class="reference internal" href="../glossary.html#term-generator"><em class="xref std std-term">generator</em></a>)を使った例です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">def</span> <span class="nf">char_generator</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">string</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">letters</span><span class="p">[:</span><span class="mi">26</span><span class="p">]:</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">c</span><span class="p">,)</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table characters(c)&quot;</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s">&quot;insert into characters(c) values (?)&quot;</span><span class="p">,</span> <span class="n">char_generator</span><span class="p">())</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select c from characters&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Cursor.executescript">
+<tt class="descclassname">Cursor.</tt><tt class="descname">executescript</tt><big>(</big><em>sql_script</em><big>)</big><a class="headerlink" href="#sqlite3.Cursor.executescript" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは非標準の便宜メソッドで、一度に複数の SQL 文を実行することができます。メソッドは最初に <tt class="docutils literal"><span class="pre">COMMIT</span></tt> 文を発行し、次いで引数として渡された SQLスクリプトを実行します。</p>
+<p><em>sql_script</em> はバイト文字列または Unicode 文字列です。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">executescript</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">    create table person(</span>
+<span class="s">        firstname,</span>
+<span class="s">        lastname,</span>
+<span class="s">        age</span>
+<span class="s">    );</span>
+
+<span class="s">    create table book(</span>
+<span class="s">        title,</span>
+<span class="s">        author,</span>
+<span class="s">        published</span>
+<span class="s">    );</span>
+
+<span class="s">    insert into book(title, author, published)</span>
+<span class="s">    values (</span>
+<span class="s">        &#39;Dirk Gently&#39;&#39;s Holistic Detective Agency&#39;,</span>
+<span class="s">        &#39;Douglas Adams&#39;,</span>
+<span class="s">        1987</span>
+<span class="s">    );</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Cursor.fetchone">
+<tt class="descclassname">Cursor.</tt><tt class="descname">fetchone</tt><big>(</big><big>)</big><a class="headerlink" href="#sqlite3.Cursor.fetchone" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>クエリ結果から次の row をフェッチして、1つのシーケンスを返します。これ以上データがない場合は <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Cursor.fetchmany">
+<tt class="descclassname">Cursor.</tt><tt class="descname">fetchmany</tt><big>(</big><span class="optional">[</span><em>size=cursor.arraysize</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#sqlite3.Cursor.fetchmany" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>クエリ結果から次の幾つかの row をフェッチして、リストを返します。これ以上データがない場合は空のリストを返します。</p>
+<p>一回の呼び出しで返される row の数は、 <em>size</em> 引数で指定できます。この引数が与えられない場合、 cursor の arraysize 属性が利用されます。このメソッドは可能な限り指定された <em>size</em> の数の row を fetch しようとするべきです。もし、指定された数の row が利用可能でない場合、それより少ない数の row が返されます。</p>
+<p><em>size</em> 引数とパフォーマンスの関係についての注意です。パフォーマンスを最適化するためには、大抵、 arraysize 属性を利用するのがベストです。
+<em>size</em> 引数を利用したのであれば、次の <a class="reference internal" href="#sqlite3.Cursor.fetchmany" title="sqlite3.Cursor.fetchmany"><tt class="xref py py-meth docutils literal"><span class="pre">fetchmany()</span></tt></a> の呼び出しでも同じ数を利用するのがベストです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sqlite3.Cursor.fetchall">
+<tt class="descclassname">Cursor.</tt><tt class="descname">fetchall</tt><big>(</big><big>)</big><a class="headerlink" href="#sqlite3.Cursor.fetchall" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての(残りの)クエリ結果の row をフェッチして、リストを返します。
+cursor の arraysize 属性がこの操作のパフォーマンスに影響することに気をつけてください。これ以上の row がない場合は、空のリストが返されます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Cursor.rowcount">
+<tt class="descclassname">Cursor.</tt><tt class="descname">rowcount</tt><a class="headerlink" href="#sqlite3.Cursor.rowcount" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>一応 <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールの <a class="reference internal" href="#sqlite3.Cursor" title="sqlite3.Cursor"><tt class="xref py py-class docutils literal"><span class="pre">Cursor</span></tt></a> クラスはこの属性を実装していますが、データベースエンジン自身の「影響を受けた行」/「選択された行」の決定方法は少し風変わりです。</p>
+<p><tt class="docutils literal"><span class="pre">DELETE</span></tt> 文では、条件を付けずに <tt class="docutils literal"><span class="pre">DELETE</span> <span class="pre">FROM</span> <span class="pre">table</span></tt> とすると SQLite は <a class="reference internal" href="#sqlite3.Cursor.rowcount" title="sqlite3.Cursor.rowcount"><tt class="xref py py-attr docutils literal"><span class="pre">rowcount</span></tt></a> を 0
+と報告します。</p>
+<p><a class="reference internal" href="#sqlite3.Cursor.executemany" title="sqlite3.Cursor.executemany"><tt class="xref py py-meth docutils literal"><span class="pre">executemany()</span></tt></a> では、変更数が <a class="reference internal" href="#sqlite3.Cursor.rowcount" title="sqlite3.Cursor.rowcount"><tt class="xref py py-attr docutils literal"><span class="pre">rowcount</span></tt></a> に合計されます。</p>
+<p>Python DB API 仕様で求められているように、 <a class="reference internal" href="#sqlite3.Cursor.rowcount" title="sqlite3.Cursor.rowcount"><tt class="xref py py-attr docutils literal"><span class="pre">rowcount</span></tt></a> 属性は「現在のカーソルがまだ <tt class="docutils literal"><span class="pre">executeXXX()</span></tt>
+を実行していない場合や、データベースインタフェースから最後に行った操作の結果行数を決定できない場合には、この属性は -1 となります。」</p>
+<p><tt class="docutils literal"><span class="pre">SELECT</span></tt> 文でも、全ての行を取得し終えるまで全部で何行になったか決められないので <a class="reference internal" href="#sqlite3.Cursor.rowcount" title="sqlite3.Cursor.rowcount"><tt class="xref py py-attr docutils literal"><span class="pre">rowcount</span></tt></a> はいつでも -1 です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Cursor.lastrowid">
+<tt class="descclassname">Cursor.</tt><tt class="descname">lastrowid</tt><a class="headerlink" href="#sqlite3.Cursor.lastrowid" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この読み込み専用の属性は、最後に変更した row の rowid を提供します。この属性は、 <a class="reference internal" href="#sqlite3.Cursor.execute" title="sqlite3.Cursor.execute"><tt class="xref py py-meth docutils literal"><span class="pre">execute()</span></tt></a> メソッドを利用して <tt class="docutils literal"><span class="pre">INSERT</span></tt> 文を実行したときのみ設定されます。
+<tt class="docutils literal"><span class="pre">INSERT</span></tt> 以外の操作や、 <a class="reference internal" href="#sqlite3.Cursor.executemany" title="sqlite3.Cursor.executemany"><tt class="xref py py-meth docutils literal"><span class="pre">executemany()</span></tt></a> メソッドを利用した場合は、 <a class="reference internal" href="#sqlite3.Cursor.lastrowid" title="sqlite3.Cursor.lastrowid"><tt class="xref py py-attr docutils literal"><span class="pre">lastrowid</span></tt></a>
+は <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> に設定されます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sqlite3.Cursor.description">
+<tt class="descclassname">Cursor.</tt><tt class="descname">description</tt><a class="headerlink" href="#sqlite3.Cursor.description" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この読み込み専用の属性は、最後のクエリの結果のカラム名を提供します。
+Python DB API との互換性を維持するために、各カラムに対して 7つのタプルを返しますが、タプルの後ろ6つの要素は全て <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> です。</p>
+<p>この属性は <tt class="docutils literal"><span class="pre">SELECT</span></tt> 文にマッチする row が1つもなかった場合でもセットされます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="row">
+<span id="sqlite3-row-objects"></span><h2>11.13.4. Row オブジェクト<a class="headerlink" href="#row" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="sqlite3.Row">
+<em class="property">class </em><tt class="descclassname">sqlite3.</tt><tt class="descname">Row</tt><a class="headerlink" href="#sqlite3.Row" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#sqlite3.Row" title="sqlite3.Row"><tt class="xref py py-class docutils literal"><span class="pre">Row</span></tt></a> インスタンスは、 <a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a> オブジェクトの
+<a class="reference internal" href="#sqlite3.Connection.row_factory" title="sqlite3.Connection.row_factory"><tt class="xref py py-attr docutils literal"><span class="pre">row_factory</span></tt></a> として高度に最適化されています。タプルによく似た機能を持つ row を作成します。</p>
+<p>カラム名とインデックスによる要素へのアクセス, イテレーション,
+repr(), 同値テスト, <a class="reference internal" href="functions.html#len" title="len"><tt class="xref py py-func docutils literal"><span class="pre">len()</span></tt></a> をサポートしています。</p>
+<p>もし、2つの <a class="reference internal" href="#sqlite3.Row" title="sqlite3.Row"><tt class="xref py py-class docutils literal"><span class="pre">Row</span></tt></a> オブジェクトが完全に同じカラムと値を持っていた場合、それらは同値になります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>.. Added iteration and equality (hashability).<p>イテレーションと同値性、ハッシュ可能</p>
+</p>
+<dl class="method">
+<dt id="sqlite3.Row.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#sqlite3.Row.keys" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドはカラム名のタプルを返します。クエリ直後から、これは <a class="reference internal" href="#sqlite3.Cursor.description" title="sqlite3.Cursor.description"><tt class="xref py py-attr docutils literal"><span class="pre">Cursor.description</span></tt></a> の各タプルの最初のメンバになります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+</dd></dl>
+
+<p>Rowの例のために、まずサンプルのテーブルを初期化します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;create table stocks</span>
+<span class="s">(date text, trans text, symbol text,</span>
+<span class="s"> qty real, price real)&#39;&#39;&#39;</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;insert into stocks</span>
+<span class="s">          values (&#39;2006-01-05&#39;,&#39;BUY&#39;,&#39;RHAT&#39;,100,35.14)&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>そして、 <a class="reference internal" href="#sqlite3.Row" title="sqlite3.Row"><tt class="xref py py-class docutils literal"><span class="pre">Row</span></tt></a> を使ってみます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">conn</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;select * from stocks&#39;</span><span class="p">)</span>
+<span class="go">&lt;sqlite3.Cursor object at 0x7f4e7dd8fa80&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">&lt;type &#39;sqlite3.Row&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span>
+<span class="go">(u&#39;2006-01-05&#39;, u&#39;BUY&#39;, u&#39;RHAT&#39;, 100.0, 35.14)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">u&#39;RHAT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">[&#39;date&#39;, &#39;trans&#39;, &#39;symbol&#39;, &#39;qty&#39;, &#39;price&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="p">[</span><span class="s">&#39;qty&#39;</span><span class="p">]</span>
+<span class="go">100.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span> <span class="k">print</span> <span class="n">member</span>
+<span class="gp">...</span>
+<span class="go">2006-01-05</span>
+<span class="go">BUY</span>
+<span class="go">RHAT</span>
+<span class="go">100.0</span>
+<span class="go">35.14</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sqlite-python">
+<span id="sqlite3-types"></span><h2>11.13.5. SQLite と Python の型<a class="headerlink" href="#sqlite-python" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="id3">
+<h3>11.13.5.1. 入門編<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>SQLite が最初からサポートしているのは次の型です。</p>
+<blockquote>
+<div><tt class="docutils literal"><span class="pre">NULL</span></tt>, <tt class="docutils literal"><span class="pre">INTEGER</span></tt>, <tt class="docutils literal"><span class="pre">REAL</span></tt>, <tt class="docutils literal"><span class="pre">TEXT</span></tt>, <tt class="docutils literal"><span class="pre">BLOB</span></tt></div></blockquote>
+<p>したがって、次の Python の型は問題なく SQLite に送り込めます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="69%" />
+<col width="31%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Python の型</th>
+<th class="head">SQLite の型</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">NULL</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">INTEGER</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="functions.html#long" title="long"><tt class="xref py py-class docutils literal"><span class="pre">long</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">INTEGER</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">REAL</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="functions.html#str" title="str"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a> (UTF8-encoded)</td>
+<td><tt class="docutils literal"><span class="pre">TEXT</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="functions.html#unicode" title="unicode"><tt class="xref py py-class docutils literal"><span class="pre">unicode</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">TEXT</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="functions.html#buffer" title="buffer"><tt class="xref py py-class docutils literal"><span class="pre">buffer</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">BLOB</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>SQLite の型から Python の型へのデフォルトでの変換は以下の通りです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">SQLite の型</th>
+<th class="head">Python の型</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">NULL</span></tt></td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">INTEGER</span></tt></td>
+<td><a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> または <a class="reference internal" href="functions.html#long" title="long"><tt class="xref py py-class docutils literal"><span class="pre">long</span></tt></a>,
+(サイズによる)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">REAL</span></tt></td>
+<td><a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">TEXT</span></tt></td>
+<td><a class="reference internal" href="#sqlite3.Connection.text_factory" title="sqlite3.Connection.text_factory"><tt class="xref py py-attr docutils literal"><span class="pre">text_factory</span></tt></a> に依存する。デフォルトでは <a class="reference internal" href="functions.html#unicode" title="unicode"><tt class="xref py py-class docutils literal"><span class="pre">unicode</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">BLOB</span></tt></td>
+<td><a class="reference internal" href="functions.html#buffer" title="buffer"><tt class="xref py py-class docutils literal"><span class="pre">buffer</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールの型システムは二つの方法で拡張できます。一つはオブジェクト適合(adaptation)を通じて追加された Python
+の型を SQLite に格納することです。もう一つは変換関数(converter)を通じて <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールに SQLite
+の型を違った Python の型に変換させることです。</p>
+</div>
+<div class="section" id="python-sqlite">
+<h3>11.13.5.2. 追加された Python の型を SQLite データベースに格納するために適合関数を使う<a class="headerlink" href="#python-sqlite" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>既に述べたように、SQLite が最初からサポートする型は限られたものだけです。それ以外の Python の型を SQLite で使うには、その型を
+<a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールがサポートしている型の一つに <strong>適合</strong> させなくてはなりません。サポートしている型というのは、NoneType,
+int, long, float, str, unicode, buffer です。</p>
+<p><a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールは <span class="target" id="index-2"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0246"><strong>PEP 246</strong></a> に述べられているような Python オブジェクト適合を用います。使われるプロトコルは
+<tt class="xref py py-class docutils literal"><span class="pre">PrepareProtocol</span></tt> です。</p>
+<p><a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールで望みの Python の型をサポートされている型の一つに適合させる方法は二つあります。</p>
+<div class="section" id="id4">
+<h4>11.13.5.2.1. オブジェクト自身で適合するようにする<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>自分でクラスを書いているならばこの方法が良いでしょう。次のようなクラスがあるとします:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>さてこの点を SQLite の一つのカラムに収めたいと考えたとしましょう。最初にしなければならないのはサポートされている型の中から点を表現するのに使えるものを選ぶことです。ここでは単純に文字列を使うことにして、座標を区切るのにはセミコロンを使いましょう。次に必要なのはクラスに変換された値を返す
+<tt class="docutils literal"><span class="pre">__conform__(self,</span> <span class="pre">protocol)</span></tt> メソッドを追加することです。引数 <em>protocol</em> は
+<tt class="xref py py-class docutils literal"><span class="pre">PrepareProtocol</span></tt> になります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+    <span class="k">def</span> <span class="nf">__conform__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">protocol</span> <span class="ow">is</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">PrepareProtocol</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;</span><span class="si">%f</span><span class="s">;</span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.2</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="p">,))</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h4>11.13.5.2.2. 適合関数を登録する<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>もう一つの可能性は型を文字列表現に変換する関数を作り <a class="reference internal" href="#sqlite3.register_adapter" title="sqlite3.register_adapter"><tt class="xref py py-meth docutils literal"><span class="pre">register_adapter()</span></tt></a> でその関数を登録することです。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">適合させる型/クラスは新スタイルクラス(<a class="reference internal" href="../glossary.html#term-new-style-class"><em class="xref std std-term">new-style class</em></a>)でなければなりません。すなわち、 <a class="reference internal" href="functions.html#object" title="object"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a> を基底クラスの一つとしていなければなりません。</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">adapt_point</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;</span><span class="si">%f</span><span class="s">;</span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+<span class="n">sqlite3</span><span class="o">.</span><span class="n">register_adapter</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">adapt_point</span><span class="p">)</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.2</span><span class="p">)</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="p">,))</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールには二つの Python 標準型 <a class="reference internal" href="datetime.html#datetime.date" title="datetime.date"><tt class="xref py py-class docutils literal"><span class="pre">datetime.date</span></tt></a> と
+<a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a> に対するデフォルト適合関数があります。いま <a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a>
+オブジェクトを ISO 表現でなく Unix タイムスタンプとして格納したいとしましょう。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">datetime</span><span class="o">,</span> <span class="nn">time</span>
+
+<span class="k">def</span> <span class="nf">adapt_datetime</span><span class="p">(</span><span class="n">ts</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">mktime</span><span class="p">(</span><span class="n">ts</span><span class="o">.</span><span class="n">timetuple</span><span class="p">())</span>
+
+<span class="n">sqlite3</span><span class="o">.</span><span class="n">register_adapter</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">adapt_datetime</span><span class="p">)</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+
+<span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">now</span><span class="p">,))</span>
+<span class="k">print</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id6">
+<h3>11.13.5.3. SQLite の値を好きな Python 型に変換する<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>適合関数を書くことで好きな Python 型を SQLite に送り込めるようになりました。しかし、本当に使い物になるようにするには Python から
+SQLite さらに Python へという往還(roundtrip)の変換ができる必要があります。</p>
+<p>そこで変換関数(converter)です。</p>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Point</span></tt> クラスの例に戻りましょう。x, y 座標をセミコロンで区切った文字列として SQLite に格納したのでした。</p>
+<p>まず、文字列を引数として取り <tt class="xref py py-class docutils literal"><span class="pre">Point</span></tt> オブジェクトをそれから構築する変換関数を定義します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">変換関数は SQLite に送り込んだデータ型に関係なく <strong>常に</strong> 文字列を渡されます。</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">convert_point</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>次に <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールにデータベースから取得したものが本当に点であることを教えなければなりません。二つの方法があります:</p>
+<ul class="simple">
+<li>宣言された型を通じて暗黙的に</li>
+<li>カラム名を通じて明示的に</li>
+</ul>
+<p>どちらの方法も <a class="reference internal" href="#sqlite3-module-contents"><em>モジュールの関数と定数</em></a> 節の中で説明されています。それぞれ
+<a class="reference internal" href="#sqlite3.PARSE_DECLTYPES" title="sqlite3.PARSE_DECLTYPES"><tt class="xref py py-const docutils literal"><span class="pre">PARSE_DECLTYPES</span></tt></a> 定数と <a class="reference internal" href="#sqlite3.PARSE_COLNAMES" title="sqlite3.PARSE_COLNAMES"><tt class="xref py py-const docutils literal"><span class="pre">PARSE_COLNAMES</span></tt></a> 定数の項目です。</p>
+<p>以下の例で両方のアプローチを紹介します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="k">class</span> <span class="nc">Point</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;(</span><span class="si">%f</span><span class="s">;</span><span class="si">%f</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">adapt_point</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&quot;</span><span class="si">%f</span><span class="s">;</span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">convert_point</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;;&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="c"># Register the adapter</span>
+<span class="n">sqlite3</span><span class="o">.</span><span class="n">register_adapter</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">adapt_point</span><span class="p">)</span>
+
+<span class="c"># Register the converter</span>
+<span class="n">sqlite3</span><span class="o">.</span><span class="n">register_converter</span><span class="p">(</span><span class="s">&quot;point&quot;</span><span class="p">,</span> <span class="n">convert_point</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.2</span><span class="p">)</span>
+
+<span class="c">#########################</span>
+<span class="c"># 1) Using declared types</span>
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">,</span> <span class="n">detect_types</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_DECLTYPES</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table test(p point)&quot;</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into test(p) values (?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="p">,))</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select p from test&quot;</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;with declared types:&quot;</span><span class="p">,</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c">#######################</span>
+<span class="c"># 1) Using column names</span>
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">,</span> <span class="n">detect_types</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_COLNAMES</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table test(p)&quot;</span><span class="p">)</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into test(p) values (?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="p">,))</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;select p as &quot;p [point]&quot; from test&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;with column names:&quot;</span><span class="p">,</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>11.13.5.4. デフォルトの適合関数と変換関数<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>datetime モジュールの date 型および datetime 型のためのデフォルト適合関数があります。これらの型は ISO 日付 / ISO
+タイムスタンプとして SQLite に送られます。</p>
+<p>デフォルトの変換関数は <a class="reference internal" href="datetime.html#datetime.date" title="datetime.date"><tt class="xref py py-class docutils literal"><span class="pre">datetime.date</span></tt></a> 用が &#8220;date&#8221; という名前で、 <a class="reference internal" href="datetime.html#datetime.datetime" title="datetime.datetime"><tt class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></tt></a>
+用が &#8220;timestamp&#8221; という名前で登録されています。</p>
+<p>これにより、多くの場合特別な細工無しに Python の日付 / タイムスタンプを使えます。適合関数の書式は実験的な SQLite の date/time
+関数とも互換性があります。</p>
+<p>以下の例でこのことを確かめます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">,</span> <span class="n">detect_types</span><span class="o">=</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_DECLTYPES</span><span class="o">|</span><span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_COLNAMES</span><span class="p">)</span>
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table test(d date, ts timestamp)&quot;</span><span class="p">)</span>
+
+<span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+<span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into test(d, ts) values (?, ?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">today</span><span class="p">,</span> <span class="n">now</span><span class="p">))</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select d, ts from test&quot;</span><span class="p">)</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">today</span><span class="p">,</span> <span class="s">&quot;=&gt;&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span> <span class="n">now</span><span class="p">,</span> <span class="s">&quot;=&gt;&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;select current_date as &quot;d [date]&quot;, current_timestamp as &quot;ts [timestamp]&quot;&#39;</span><span class="p">)</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;current_date&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span> <span class="s">&quot;current_timestamp&quot;</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="sqlite3-controlling-transactions">
+<span id="id8"></span><h2>11.13.6. トランザクション制御<a class="headerlink" href="#sqlite3-controlling-transactions" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>デフォルトでは、 <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールはデータ変更言語(DML)文(すなわち
+<tt class="docutils literal"><span class="pre">INSERT</span></tt>/<tt class="docutils literal"><span class="pre">UPDATE</span></tt>/<tt class="docutils literal"><span class="pre">DELETE</span></tt>/<tt class="docutils literal"><span class="pre">REPLACE</span></tt>)の前に暗黙のうちにトランザクションを開始し、非DML、非クエリ文(すなわち
+<tt class="docutils literal"><span class="pre">SELECT</span></tt> や上記のいずれでもないもの。)の前にトランザクションをコミットします。</p>
+<p>ですから、もしトランザクション中に <tt class="docutils literal"><span class="pre">CREATE</span> <span class="pre">TABLE</span> <span class="pre">...</span></tt>, <tt class="docutils literal"><span class="pre">VACUUM</span></tt>, <tt class="docutils literal"><span class="pre">PRAGMA</span></tt>
+といったコマンドを発行すると、
+<a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールはそのコマンドの実行前に暗黙のうちにコミットします。このようにする理由は二つあります。第一にこうしたコマンドのうちの幾つかはトランザクション中ではうまく動きません。第二に sqlite3 はトランザクションの状態(トランザクションが掛かっているかどうか)
+を追跡する必要があるからです。</p>
+<p>sqlite3 が暗黙のうちに実行する <tt class="docutils literal"><span class="pre">BEGIN</span></tt> 文の種類(またはそういうものを使わないこと)を
+<a class="reference internal" href="#sqlite3.connect" title="sqlite3.connect"><tt class="xref py py-func docutils literal"><span class="pre">connect()</span></tt></a> 呼び出しの
+<em>isolation_level</em> パラメータを通じて、または接続の <tt class="xref py py-attr docutils literal"><span class="pre">isolation_level</span></tt>
+プロパティを通じて、制御することができます。</p>
+<p>もし <strong>自動コミットモード</strong> が使いたければ、
+<tt class="xref py py-attr docutils literal"><span class="pre">isolation_level</span></tt> は None にしてください。</p>
+<p>そうでなければデフォルトのまま <tt class="docutils literal"><span class="pre">BEGIN</span></tt> 文を使い続けるか、
+SQLite がサポートする分離レベル &#8220;DEFERRED&#8221;, &#8220;IMMEDIATE&#8221; または
+&#8220;EXCLUSIVE&#8221; を設定してください。</p>
+</div>
+<div class="section" id="sqlite3">
+<h2>11.13.7. <a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> の効率的な使い方<a class="headerlink" href="#sqlite3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="id9">
+<h3>11.13.7.1. ショートカットメソッドを使う<a class="headerlink" href="#id9" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a> オブジェクトの非標準的なメソッド <tt class="xref py py-meth docutils literal"><span class="pre">execute()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">executemany()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">executescript()</span></tt> を使うことで、
+(しばしば余計な) <a class="reference internal" href="#sqlite3.Cursor" title="sqlite3.Cursor"><tt class="xref py py-class docutils literal"><span class="pre">Cursor</span></tt></a> オブジェクトをわざわざ作り出さずに済むので、コードをより簡潔に書くことができます。 <a class="reference internal" href="#sqlite3.Cursor" title="sqlite3.Cursor"><tt class="xref py py-class docutils literal"><span class="pre">Cursor</span></tt></a> オブジェクトは暗黙裡に生成されショートカットメソッドの戻り値として受け取ることができます。この方法を使えば、
+<tt class="docutils literal"><span class="pre">SELECT</span></tt> 文を実行してその結果について反復することが、
+<a class="reference internal" href="#sqlite3.Connection" title="sqlite3.Connection"><tt class="xref py py-class docutils literal"><span class="pre">Connection</span></tt></a> オブジェクトに対する呼び出し一つで行なえます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">persons</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s">&quot;Hugo&quot;</span><span class="p">,</span> <span class="s">&quot;Boss&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&quot;Calvin&quot;</span><span class="p">,</span> <span class="s">&quot;Klein&quot;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+
+<span class="c"># Create the table</span>
+<span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table person(firstname, lastname)&quot;</span><span class="p">)</span>
+
+<span class="c"># Fill the table</span>
+<span class="n">con</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s">&quot;insert into person(firstname, lastname) values (?, ?)&quot;</span><span class="p">,</span> <span class="n">persons</span><span class="p">)</span>
+
+<span class="c"># Print the table contents</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select firstname, lastname from person&quot;</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">row</span>
+
+<span class="c"># Using a dummy WHERE clause to not let SQLite take the shortcut table deletes.</span>
+<span class="k">print</span> <span class="s">&quot;I just deleted&quot;</span><span class="p">,</span> <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;delete from person where 1=1&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rowcount</span><span class="p">,</span> <span class="s">&quot;rows&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>11.13.7.2. 位置ではなく名前でカラムにアクセスする<a class="headerlink" href="#id10" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference internal" href="#module-sqlite3" title="sqlite3: A DB-API 2.0 implementation using SQLite 3.x."><tt class="xref py py-mod docutils literal"><span class="pre">sqlite3</span></tt></a> モジュールの有用な機能の一つに、行生成関数として使われるための
+<a class="reference internal" href="#sqlite3.Row" title="sqlite3.Row"><tt class="xref py py-class docutils literal"><span class="pre">sqlite3.Row</span></tt></a> クラスがあります。</p>
+<p>このクラスでラップされた行は、位置インデクス(タプルのような)でも大文字小文字を区別しない名前でもアクセスできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;mydb&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>
+
+<span class="n">cur</span> <span class="o">=</span> <span class="n">con</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;select name_last, age from people&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s">&quot;name_last&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">row</span><span class="p">[</span><span class="s">&quot;name_last&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s">&quot;nAmE_lAsT&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s">&quot;age&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s">&quot;AgE&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id11">
+<h3>11.13.7.3. コネクションをコンテキストマネージャーとして利用する<a class="headerlink" href="#id11" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p>Connection オブジェクトはコンテキストマネージャーとして利用して、トランザクションを自動的にコミットしたりロールバックすることができます。例外が発生したときにトランザクションはロールバックされ、それ以外の場合、トランザクションはコミットされます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&quot;:memory:&quot;</span><span class="p">)</span>
+<span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;create table person (id integer primary key, firstname varchar unique)&quot;</span><span class="p">)</span>
+
+<span class="c"># Successful, con.commit() is called automatically afterwards</span>
+<span class="k">with</span> <span class="n">con</span><span class="p">:</span>
+    <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into person(firstname) values (?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;Joe&quot;</span><span class="p">,))</span>
+
+<span class="c"># con.rollback() is called after the with block finishes with an exception, the</span>
+<span class="c"># exception is still raised and must be catched</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">con</span><span class="p">:</span>
+        <span class="n">con</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;insert into person(firstname) values (?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;Joe&quot;</span><span class="p">,))</span>
+<span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">IntegrityError</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;couldn&#39;t add Joe twice&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id12">
+<h2>11.13.8. 既知の問題<a class="headerlink" href="#id12" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="id13">
+<h3>11.13.8.1. マルチスレッド<a class="headerlink" href="#id13" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>古いバージョンの SQLite はスレッド間でのコネクションの共有に問題がありました。その理由は、Python のモジュールではスレッド間のコネクションとカーソルの共有ができないためです。依然としてそのようなことをしようとすると、実行時に例外を受け取るでしょう。</p>
+<p>唯一の例外は <a class="reference internal" href="#sqlite3.Connection.interrupt" title="sqlite3.Connection.interrupt"><tt class="xref py py-meth docutils literal"><span class="pre">interrupt()</span></tt></a> メソッドで、これだけが異なるスレッドから呼び出せます。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="archiving.html" title="12. データ圧縮とアーカイブ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="dumbdbm.html" title="11.12. dumbdbm — 可搬性のある DBM 実装"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="persistence.html" >11. データの永続化</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

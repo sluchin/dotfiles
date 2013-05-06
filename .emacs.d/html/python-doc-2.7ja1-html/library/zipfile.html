@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>12.4. zipfile — ZIP アーカイブの処理 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="12. データ圧縮とアーカイブ" href="archiving.html" />
+    <link rel="next" title="12.5. tarfile — tar アーカイブファイルを読み書きする" href="tarfile.html" />
+    <link rel="prev" title="12.3. bz2 — bzip2 互換の圧縮ライブラリ" href="bz2.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tarfile.html" title="12.5. tarfile — tar アーカイブファイルを読み書きする"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="bz2.html" title="12.3. bz2 — bzip2 互換の圧縮ライブラリ"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="archiving.html" accesskey="U">12. データ圧縮とアーカイブ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">12.4. <tt class="docutils literal"><span class="pre">zipfile</span></tt> &#8212; ZIP アーカイブの処理</a><ul>
+<li><a class="reference internal" href="#zipfile">12.4.1. ZipFile オブジェクト</a></li>
+<li><a class="reference internal" href="#pyzipfile">12.4.2. PyZipFile オブジェクト</a></li>
+<li><a class="reference internal" href="#zipinfo">12.4.3. ZipInfo オブジェクト</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="bz2.html"
+                        title="前の章へ">12.3. <tt class="docutils literal docutils literal docutils literal"><span class="pre">bz2</span></tt> &#8212; <strong class="program">bzip2</strong> 互換の圧縮ライブラリ</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tarfile.html"
+                        title="次の章へ">12.5. <tt class="docutils literal docutils literal docutils literal"><span class="pre">tarfile</span></tt> &#8212; tar アーカイブファイルを読み書きする</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/zipfile.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-zipfile">
+<span id="zipfile-zip"></span><h1>12.4. <a class="reference internal" href="#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a> &#8212; ZIP アーカイブの処理<a class="headerlink" href="#module-zipfile" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.6 で追加.</span></p>
+<p>ZIP は一般によく知られているアーカイブ（書庫化）および圧縮の標準ファイルフォーマットです。このモジュールでは ZIP
+形式のファイルの作成、読み書き、追記、書庫内のファイル一覧の作成を行うためのツールを提供します。より高度な使い方でこのモジュールを利用したいなら、
+<a class="reference external" href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">PKZIP Application Note</a>. に定義されている
+ZIP ファイルフォーマットを理解することが必要になるでしょう。</p>
+<p>このモジュールは現在のところ、マルチディスク ZIP ファイルを扱うことはできません
+ZIP64 拡張を利用する ZIP ファイル (サイズが 4GB を超えるような ZIP ファイル) は扱えます。このモジュールは暗号化されたアーカイブの復号をサポートしますが、現在のところ、暗号化ファイルを作成することはできません。
+C言語ではなく、Pythonで実装されているため、復号は非常に遅いです。</p>
+<p>他のアーカイブ形式については、 <a class="reference internal" href="bz2.html#module-bz2" title="bz2: bzip2 互換の圧縮／解凍ルーチンへのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">bz2</span></tt></a> 、 <a class="reference internal" href="gzip.html#module-gzip" title="gzip: ファイルオブジェクトを用いた gzip  圧縮および解凍のためのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">gzip</span></tt></a> 、および、 <a class="reference internal" href="tarfile.html#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> モジュールを参照下さい。</p>
+<p>このモジュールでは、以下の項目が定義されています:</p>
+<dl class="exception">
+<dt id="zipfile.BadZipfile">
+<em class="property">exception </em><tt class="descclassname">zipfile.</tt><tt class="descname">BadZipfile</tt><a class="headerlink" href="#zipfile.BadZipfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>不備のある ZIP ファイル操作の際に送出されるエラー (旧名称: <tt class="docutils literal"><span class="pre">zipfile.error</span></tt>)</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="zipfile.LargeZipFile">
+<em class="property">exception </em><tt class="descclassname">zipfile.</tt><tt class="descname">LargeZipFile</tt><a class="headerlink" href="#zipfile.LargeZipFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ZIP ファイルが ZIP64 の機能を必要とするとき、その機能が有効にされていないと送出されるエラー</p>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">zipfile.</tt><tt class="descname">ZipFile</tt></dt>
+<dd><p>ZIP ファイルの読み書きのためのクラスです。コンストラクタの詳細については、 <a class="reference internal" href="#zipfile-objects"><em>ZipFile オブジェクト</em></a> 節)
+を参照してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="zipfile.PyZipFile">
+<em class="property">class </em><tt class="descclassname">zipfile.</tt><tt class="descname">PyZipFile</tt><a class="headerlink" href="#zipfile.PyZipFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python ライブラリを含む ZIP アーカイブを生成するためのクラスです。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="zipfile.ZipInfo">
+<em class="property">class </em><tt class="descclassname">zipfile.</tt><tt class="descname">ZipInfo</tt><big>(</big><span class="optional">[</span><em>filename</em><span class="optional">[</span>, <em>date_time</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipInfo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブ中のメンバに関する情報を提供するために用いられるクラスです。このクラスのインスタンスは
+<a class="reference internal" href="#zipfile.ZipFile" title="zipfile.ZipFile"><tt class="xref py py-class docutils literal"><span class="pre">ZipFile</span></tt></a> オブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">getinfo()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">infolist()</span></tt> メソッドによって返されます。
+<a class="reference internal" href="#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a> モジュールを利用するほとんどのユーザはこのオブジェクトを自ら生成する必要はなく、モジュールが生成して返すオブジェクトを利用するだけでしょう。 <em>filename</em> はアーカイブメンバの完全な名前で、
+<em>date_time</em> はファイルの最終更新時刻を記述する、6つのフィールドからなるタプルでなくてはなりません。各フィールドについては <a class="reference internal" href="#zipinfo-objects"><em>ZipInfo オブジェクト</em></a> 節を参照してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="zipfile.is_zipfile">
+<tt class="descclassname">zipfile.</tt><tt class="descname">is_zipfile</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#zipfile.is_zipfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> が正しいマジックナンバをもつ ZIP ファイルのときに <tt class="docutils literal"><span class="pre">True</span></tt> を返し、そうでない場合 <tt class="docutils literal"><span class="pre">False</span></tt> を返します。
+<em>filename</em> にはファイルやファイルライクオブジェクトを渡すこともできます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>ファイルやファイルライクオブジェクトをサポート</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="zipfile.ZIP_STORED">
+<tt class="descclassname">zipfile.</tt><tt class="descname">ZIP_STORED</tt><a class="headerlink" href="#zipfile.ZIP_STORED" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブメンバが圧縮されていないことを表す数値定数です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="zipfile.ZIP_DEFLATED">
+<tt class="descclassname">zipfile.</tt><tt class="descname">ZIP_DEFLATED</tt><a class="headerlink" href="#zipfile.ZIP_DEFLATED" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>通常の ZIP 圧縮手法を表す数値定数。ZIP 圧縮は zlib モジュールを必要とします。現在のところ他の圧縮手法はサポートされていません。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">PKZIP Application Note</a></dt>
+<dd>ZIP ファイル形式およびアルゴリズムを作成した  Phil Katz によるドキュメント。</dd>
+<dt><a class="reference external" href="http://www.info-zip.org/">Info-ZIP Home Page</a></dt>
+<dd>Info-ZIP プロジェクトによる ZIP アーカイブプログラム及びプログラム開発ライブラリに関する情報。</dd>
+</dl>
+</div>
+<div class="section" id="zipfile">
+<span id="zipfile-objects"></span><h2>12.4.1. ZipFile オブジェクト<a class="headerlink" href="#zipfile" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="zipfile.ZipFile">
+<em class="property">class </em><tt class="descclassname">zipfile.</tt><tt class="descname">ZipFile</tt><big>(</big><em>file</em><span class="optional">[</span>, <em>mode</em><span class="optional">[</span>, <em>compression</em><span class="optional">[</span>, <em>allowZip64</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ZIP ファイルを開きます。 <em>file</em> はファイルへのパス名 (文字列) またはファイルのように振舞うオブジェクトのどちらでもかまいません。 <em>mode</em>
+パラメタは、既存のファイルを読むためには <tt class="docutils literal"><span class="pre">'r'</span></tt> 、既存のファイルを切り詰めたり新しいファイルに書き込むためには <tt class="docutils literal"><span class="pre">'w'</span></tt> 、追記を行うためには <tt class="docutils literal"><span class="pre">'a'</span></tt> でなくてはなりません。 <em>mode</em> が <tt class="docutils literal"><span class="pre">'a'</span></tt> で <em>file</em> が既存の ZIP ファイルを参照している場合、追加するファイルは既存のファイル中の ZIP アーカイブに追加されます。 <em>file</em> が ZIP を参照していない場合、新しい ZIP
+アーカイブが生成され、既存のファイルの末尾に追加されます。このことは、ある ZIP ファイルを他のファイル(例えば <tt class="file docutils literal"><span class="pre">python.exe</span></tt>)に追加することを意味しています。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>mode</em> が <tt class="docutils literal"><span class="pre">'a'</span></tt> でファイルが存在しない場合、ファイルが作られるようになりました。</p>
+<p><em>compression</em> はアーカイブを書き出すときの ZIP 圧縮法で、 <a class="reference internal" href="#zipfile.ZIP_STORED" title="zipfile.ZIP_STORED"><tt class="xref py py-const docutils literal"><span class="pre">ZIP_STORED</span></tt></a>
+または <a class="reference internal" href="#zipfile.ZIP_DEFLATED" title="zipfile.ZIP_DEFLATED"><tt class="xref py py-const docutils literal"><span class="pre">ZIP_DEFLATED</span></tt></a> でなくてはなりません。不正な値を指定すると <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。また、 <a class="reference internal" href="#zipfile.ZIP_DEFLATED" title="zipfile.ZIP_DEFLATED"><tt class="xref py py-const docutils literal"><span class="pre">ZIP_DEFLATED</span></tt></a> 定数が指定されているのに <a class="reference internal" href="zlib.html#module-zlib" title="zlib: gzip 互換の圧縮／解凍ルーチンへの低レベルインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">zlib</span></tt></a> を利用することができない場合も、 <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。デフォルト値は <a class="reference internal" href="#zipfile.ZIP_STORED" title="zipfile.ZIP_STORED"><tt class="xref py py-const docutils literal"><span class="pre">ZIP_STORED</span></tt></a> です。
+<em>allowZip64</em> が <tt class="docutils literal"><span class="pre">True</span></tt> ならば 2GB より大きな ZIP ファイルの作成時に
+ZIP64 拡張を使用します。これが <tt class="docutils literal"><span class="pre">False</span></tt> (デフォルト) ならば、 <a class="reference internal" href="#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a>
+モジュールは ZIP64 拡張が必要になる場面で例外を送出します。
+ZIP64 拡張はデフォルトでは無効にされていますが、これは Unix の <strong class="program">zip</strong> および
+<strong class="program">unzip</strong> (InfoZIP ユーティリティ) コマンドがこの拡張をサポートしていないからです。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7.1 で変更: </span>ファイルが <tt class="docutils literal"><span class="pre">'a'</span></tt> か <tt class="docutils literal"><span class="pre">'w'</span></tt> モードで作成されて、アーカイブに1ファイルも
+追加しないまま <a class="reference internal" href="#zipfile.ZipFile.close" title="zipfile.ZipFile.close"><tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt></a> した場合に、空のアーカイブとして正しいZIPの
+構造がそのファイルに書かれるようになりました。</p>
+<p>ZipFile はコンテキストマネージャーにもなっているので、 <a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文をサポートしています。次の例では、 <em>myzip</em> は <a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文のブロックが終了したときに、
+(たとえ例外が発生したとしても) close されます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="n">ZipFile</span><span class="p">(</span><span class="s">&#39;spam.zip&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myzip</span><span class="p">:</span>
+    <span class="n">myzip</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;eggs.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加: </span><a class="reference internal" href="#zipfile.ZipFile" title="zipfile.ZipFile"><tt class="xref py py-class docutils literal"><span class="pre">ZipFile</span></tt></a> にコンテキストマネージャーの機能を追加しました。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.close">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#zipfile.ZipFile.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブファイルを閉じます。 <a class="reference internal" href="#zipfile.ZipFile.close" title="zipfile.ZipFile.close"><tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt></a> はプログラムを終了する前に必ず呼び出さなければなりません。さもないとアーカイブ上の重要なレコードが書き込まれません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.getinfo">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">getinfo</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#zipfile.ZipFile.getinfo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブメンバ <em>name</em> に関する情報を持つ <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a>  オブジェクトを返します。アーカイブに含まれないファイル名に対して <a class="reference internal" href="#zipfile.ZipFile.getinfo" title="zipfile.ZipFile.getinfo"><tt class="xref py py-meth docutils literal"><span class="pre">getinfo()</span></tt></a> を呼び出すと、 <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.infolist">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">infolist</tt><big>(</big><big>)</big><a class="headerlink" href="#zipfile.ZipFile.infolist" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブに含まれる各メンバの <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> オブジェクトからなるリストを返します。既存のアーカイブファイルを開いている場合、リストの順番は実際の ZIP ファイル中のメンバの順番と同じになります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.namelist">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">namelist</tt><big>(</big><big>)</big><a class="headerlink" href="#zipfile.ZipFile.namelist" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブメンバの名前のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.open">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">open</tt><big>(</big><em>name</em><span class="optional">[</span>, <em>mode</em><span class="optional">[</span>, <em>pwd</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipFile.open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブからメンバーを file-like オブジェクト (ZipExtFile) として展開します。 <em>name</em> はアーカイブに含まれるファイル名、もしくは、 <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> オブジェクトです。 <em>mode</em>
+パラメーターを指定するならば、以下のうちのどれかである必要があります: <tt class="docutils literal"><span class="pre">'r'</span></tt> (デフォルト)、
+<tt class="docutils literal"><span class="pre">'U'</span></tt> 、 <tt class="docutils literal"><span class="pre">'rU'</span></tt>
+<tt class="docutils literal"><span class="pre">'U'</span></tt> か  <tt class="docutils literal"><span class="pre">'rU'</span></tt> を選ぶと、読み出し専用オブジェクトにおいて universal newline
+support が有効化されます。 <em>pwd</em> は、暗号化ファイルで使われるパスワードです。閉じられた ZIP ファイルに対して <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt></a> を呼び出すと、 <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">file-like オブジェクトは読み出し専用で、以下のメソッドを提供します:
+<tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">readlines()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">file-like オブジェクトをコンストラクターの第一引数として、 ZipFile が作成された場合、
+ZipFile のファイルポインターを使った <a class="reference internal" href="#zipfile.ZipFile.open" title="zipfile.ZipFile.open"><tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt></a> メソッドにより、オブジェクトが返されます。この場合、 <a class="reference internal" href="#zipfile.ZipFile.open" title="zipfile.ZipFile.open"><tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt></a> で返されたオブジェクトに対し、 ZipFile オブジェクトに対する追加の操作をしてはいけません。もし、 ZipFile が文字列 (ファイル名) をコンストラクターに対する第一引数として作成されたなら、 <a class="reference internal" href="#zipfile.ZipFile.open" title="zipfile.ZipFile.open"><tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt></a> は、 ZipExtFile に含まれる、ZipFile と独立して操作することができる、ファイルオブジェクトを新規に作成します。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-meth docutils literal"><span class="pre">open()</span></tt></a>, <a class="reference internal" href="#zipfile.ZipFile.read" title="zipfile.ZipFile.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a>, および、 <a class="reference internal" href="#zipfile.ZipFile.extract" title="zipfile.ZipFile.extract"><tt class="xref py py-meth docutils literal"><span class="pre">extract()</span></tt></a> の各メソッドはファイル名、もしくは、 <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> オブジェクトを引数にとれます。これは、名前が重複するメンバーを持つ ZIP ファイルを読み出すときに役に立つでしょう。</p>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.extract">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">extract</tt><big>(</big><em>member</em><span class="optional">[</span>, <em>path</em><span class="optional">[</span>, <em>pwd</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipFile.extract" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メンバーをアーカイブからカレントワーキングディレクトリに展開します。 <em>member</em> は、展開するファイルのフルネーム、もしくは、 <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> オブジェクトでなければなりません。ファイル情報は、可能な限り正確に展開されます。 <em>path</em> は展開先のディレクトリを指定します。
+<em>member</em> はファイル名、もしくは、 <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> オブジェクトです。
+<em>pwd</em> は暗号化ファイルに使われるパスワードです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.extractall">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">extractall</tt><big>(</big><span class="optional">[</span><em>path</em><span class="optional">[</span>, <em>members</em><span class="optional">[</span>, <em>pwd</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipFile.extractall" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>すべてのメンバーをアーカイブからカレントワーキングディレクトリに展開します。 <em>path</em> は、展開先のディレクトリを指定します。 <em>members</em> は、オプションで、
+<a class="reference internal" href="#zipfile.ZipFile.namelist" title="zipfile.ZipFile.namelist"><tt class="xref py py-meth docutils literal"><span class="pre">namelist()</span></tt></a> で返されるリストの部分集合でなければなりません。 <em>pwd</em> は、暗号化ファイルに使われるパスワードです。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">信頼できないソースからきた Zip ファイルを、事前に中身をチェックせずに展開してはいけません。ファイルを <em>path</em> の外側に作成することができるからです。例えば、 <tt class="docutils literal"><span class="pre">&quot;/&quot;</span></tt> で始まる絶対パスを持ったメンバーや、 2 つのドット
+<tt class="docutils literal"><span class="pre">&quot;..&quot;</span></tt> を持つファイル名などの場合です。</p>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.printdir">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">printdir</tt><big>(</big><big>)</big><a class="headerlink" href="#zipfile.ZipFile.printdir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブの目次を <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> に出力します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.setpassword">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">setpassword</tt><big>(</big><em>pwd</em><big>)</big><a class="headerlink" href="#zipfile.ZipFile.setpassword" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>pwd</em> を展開する圧縮ファイルのデフォルトパスワードとして指定します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.read">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">read</tt><big>(</big><em>name</em><span class="optional">[</span>, <em>pwd</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipFile.read" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブ中のファイル名 <em>name</em> の内容をバイト列にして返します。 <em>name</em> はアーカイブに含まれるファイル、もしくは、 <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> オブジェクトの名前です。アーカイブは読み込みまたは追記モードで開かれていなくてはなりません。
+<em>pwd</em> は暗号化されたファイルのパスワードで、指定された場合、 <a class="reference internal" href="#zipfile.ZipFile.setpassword" title="zipfile.ZipFile.setpassword"><tt class="xref py py-meth docutils literal"><span class="pre">setpassword()</span></tt></a> で指定されたデフォルトのパスワードを上書きします。閉じられた ZipFile に対し <a class="reference internal" href="#zipfile.ZipFile.read" title="zipfile.ZipFile.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a> を呼び出すと、 <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>pwd</em> が追加され、 <em>name</em> に <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> オブジェクトを指定できるようになりました。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.testzip">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">testzip</tt><big>(</big><big>)</big><a class="headerlink" href="#zipfile.ZipFile.testzip" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブ中の全てのファイルを読み、CRC チェックサムとヘッダが正常か調べます。最初に見つかった不正なファイルの名前を返します。不正なファイルがなければ <tt class="docutils literal"><span class="pre">None</span></tt> を返します。閉じた ZipFile に対して <a class="reference internal" href="#zipfile.ZipFile.testzip" title="zipfile.ZipFile.testzip"><tt class="xref py py-meth docutils literal"><span class="pre">testzip()</span></tt></a> メソッドを呼び出すと、 <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.write">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">write</tt><big>(</big><em>filename</em><span class="optional">[</span>, <em>arcname</em><span class="optional">[</span>, <em>compress_type</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipFile.write" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> に指定したファイル名を持つファイルを、アーカイブ名を <em>arcname</em> (デフォルトでは <em>filename</em> と同じですがドライブレターと先頭にあるパスセパレータは取り除かれます) にしてアーカイブに収録します。 <em>compress_type</em>
+を指定した場合、コンストラクタを使って新たなアーカイブエントリを生成した際に使った <em>compression</em> パラメタを上書きします。アーカイブのモードは <tt class="docutils literal"><span class="pre">'w'</span></tt> または <tt class="docutils literal"><span class="pre">'a'</span></tt> でなくてはなりません。モードが <tt class="docutils literal"><span class="pre">'r'</span></tt> で作成された ZipFile に対し <a class="reference internal" href="#zipfile.ZipFile.write" title="zipfile.ZipFile.write"><tt class="xref py py-meth docutils literal"><span class="pre">write()</span></tt></a> メソッドを呼び出すと、
+<a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。閉じた ZipFile に対し <a class="reference internal" href="#zipfile.ZipFile.write" title="zipfile.ZipFile.write"><tt class="xref py py-meth docutils literal"><span class="pre">write()</span></tt></a> メソッドを呼び出すと、
+<a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">ZIP ファイル中のファイル名に関する公式なエンコーディング方式はありません。もしユニコードのファイル名が付けられているならば、それを
+<a class="reference internal" href="#zipfile.ZipFile.write" title="zipfile.ZipFile.write"><tt class="xref py py-meth docutils literal"><span class="pre">write()</span></tt></a> に渡す前に望ましいエンコーディングでバイト列に変換しなければなりません。 WinZip は全てのファイル名を DOS Latin
+としても知られる CP437 で解釈します。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">アーカイブ名はアーカイブルートに対する相対的なものでなければなりません。言い換えると、アーカイブ名はパスセパレータで始まってはいけません。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">もし、 <tt class="docutils literal"><span class="pre">arcname</span></tt> (<tt class="docutils literal"><span class="pre">arcname</span></tt> が与えられない場合は、 <tt class="docutils literal"><span class="pre">filename</span></tt>) が null byte を含むなら、アーカイブ中のファイルのファイル名は、 null byte までで、切り詰められます。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="zipfile.ZipFile.writestr">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">writestr</tt><big>(</big><em>zinfo_or_arcname</em>, <em>bytes</em><span class="optional">[</span>, <em>compress_type</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.ZipFile.writestr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列 <em>bytes</em> をアーカイブに書き込みます。
+<em>zinfo_or_arcname</em> はアーカイブ中で指定するファイル名か、または <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> インスタンスを指定します。
+<em>zinfo_or_arcname</em> に <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> インスタンスを指定する場合、 <em>zinfo</em> インスタンスには少なくともファイル名、日付および時刻を指定しなければなりません。ファイル名を指定した場合、日付と時刻には現在の日付と時間が設定されます。アーカイブはモード <tt class="docutils literal"><span class="pre">'w'</span></tt> または <tt class="docutils literal"><span class="pre">'a'</span></tt> で開かれていなければなりません。閉じた ZipFile に対し <a class="reference internal" href="#zipfile.ZipFile.writestr" title="zipfile.ZipFile.writestr"><tt class="xref py py-meth docutils literal"><span class="pre">writestr()</span></tt></a> メソッドを呼び出すと <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> が送出されます。</p>
+<p><em>compressed_type</em> が指定された場合、その値はコンストラクタに与えられた <em>compression</em>
+の値か、 <em>zinfo_or_arcname</em> が <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> のインスタンスだったときはその値をオーバーライドします。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> インスタンスを、引数 <em>zinfo_or_arcname</em> として与えた場合、与えられた <a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> インスタンスのメンバーである、 <em>compress_type</em>
+で指定された圧縮方法が使われます。デフォルトでは、
+<a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> コンストラクターが、このメンバーを <a class="reference internal" href="#zipfile.ZIP_STORED" title="zipfile.ZIP_STORED"><tt class="xref py py-const docutils literal"><span class="pre">ZIP_STORED</span></tt></a> に設定します。</p>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span><em>compression_type</em> 引数</p>
+</dd></dl>
+
+<p>以下のデータ属性も利用することができます。</p>
+<dl class="attribute">
+<dt id="zipfile.ZipFile.debug">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">debug</tt><a class="headerlink" href="#zipfile.ZipFile.debug" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>使用するデバッグ出力レベル。この属性は <tt class="docutils literal"><span class="pre">0</span></tt> (デフォルト、何も出力しない) から <tt class="docutils literal"><span class="pre">3</span></tt>
+(最も多くデバッグ情報を出力する) までの値に設定することができます。デバッグ情報は  <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> に出力されます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipFile.comment">
+<tt class="descclassname">ZipFile.</tt><tt class="descname">comment</tt><a class="headerlink" href="#zipfile.ZipFile.comment" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ZIP ファイルの付けられたコメントです。モードが &#8216;a&#8217;、または、&#8217;w&#8217;で作成された <a class="reference internal" href="#zipfile.ZipFile" title="zipfile.ZipFile"><tt class="xref py py-class docutils literal"><span class="pre">ZipFile</span></tt></a> インスタンスにコメントを付ける場合、コメント 65535 byte 以下の文字列でなければなりません。コメントがそれより長い場合、アーカイブでは、 <a class="reference internal" href="#zipfile.ZipFile.close" title="zipfile.ZipFile.close"><tt class="xref py py-meth docutils literal"><span class="pre">ZipFile.close()</span></tt></a> メソッドが呼び出された時点で切り詰められます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pyzipfile">
+<span id="pyzipfile-objects"></span><h2>12.4.2. PyZipFile オブジェクト<a class="headerlink" href="#pyzipfile" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#zipfile.PyZipFile" title="zipfile.PyZipFile"><tt class="xref py py-class docutils literal"><span class="pre">PyZipFile</span></tt></a> コンストラクタは <a class="reference internal" href="#zipfile.ZipFile" title="zipfile.ZipFile"><tt class="xref py py-class docutils literal"><span class="pre">ZipFile</span></tt></a> コンストラクタと同じパラメタを必要とします。インスタンスは
+<a class="reference internal" href="#zipfile.ZipFile" title="zipfile.ZipFile"><tt class="xref py py-class docutils literal"><span class="pre">ZipFile</span></tt></a> のメソッドの他に、追加のメソッドを一つ持ちます。</p>
+<dl class="method">
+<dt id="zipfile.PyZipFile.writepy">
+<tt class="descclassname">PyZipFile.</tt><tt class="descname">writepy</tt><big>(</big><em>pathname</em><span class="optional">[</span>, <em>basename</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#zipfile.PyZipFile.writepy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="file docutils literal"><span class="pre">*.py</span></tt> ファイルを探し、 <tt class="file docutils literal"><span class="pre">*.py</span></tt> ファイルに対応するファイルをアーカイブに追加します。対応するファイルとは、もしあれば <tt class="file docutils literal"><span class="pre">*.pyo</span></tt> であり、そうでなければ <tt class="file docutils literal"><span class="pre">*.pyc</span></tt> で、必要に応じて <tt class="file docutils literal"><span class="pre">*.py</span></tt> からコンパイルします。もし pathname がファイルなら、ファイル名は <tt class="file docutils literal"><span class="pre">.py</span></tt> で終わっていなければなりません。また、(<tt class="file docutils literal"><span class="pre">*.py</span></tt> に対応する <tt class="file docutils literal"><span class="pre">*.py[co]</span></tt>) ファイルはアーカイブのトップレベルに (パス情報なしで) 追加されます。もし pathname が <tt class="file docutils literal"><span class="pre">.py</span></tt> で終わらないファイル名なら <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> を送出します。もし pathname がディレクトリで、ディレクトリがパッケージディレクトリでないなら、全ての <tt class="file docutils literal"><span class="pre">*.py[co]</span></tt> ファイルはトップレベルに追加されます。もしディレクトリがパッケージディレクトリなら、全ての <tt class="file docutils literal"><span class="pre">*.py[co]</span></tt> ファイルはパッケージ名の名前をもつファイルパスの下に追加されます。サブディレクトリがパッケージディレクトリなら、それらは再帰的に追加されます <em>basename</em> はクラス内部での呼び出しに使用するためのものです。
+<a class="reference internal" href="#zipfile.PyZipFile.writepy" title="zipfile.PyZipFile.writepy"><tt class="xref py py-meth docutils literal"><span class="pre">writepy()</span></tt></a> メソッドは以下のようなファイル名を持ったアーカイブを生成します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">string</span><span class="o">.</span><span class="n">pyc</span>                    <span class="c"># トップレベル名</span>
+<span class="n">test</span><span class="o">/</span><span class="n">__init__</span><span class="o">.</span><span class="n">pyc</span>             <span class="c"># パッケージディレクトリ</span>
+<span class="n">test</span><span class="o">/</span><span class="n">test_support</span><span class="o">.</span><span class="n">pyc</span>         <span class="c"># test.test_suport モジュール</span>
+<span class="n">test</span><span class="o">/</span><span class="n">bogus</span><span class="o">/</span><span class="n">__init__</span><span class="o">.</span><span class="n">pyc</span>       <span class="c"># サブパッケージディレクトリ</span>
+<span class="n">test</span><span class="o">/</span><span class="n">bogus</span><span class="o">/</span><span class="n">myfile</span><span class="o">.</span><span class="n">pyc</span>         <span class="c"># test.bogus.myfile サブモジュール</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="zipinfo">
+<span id="zipinfo-objects"></span><h2>12.4.3. ZipInfo オブジェクト<a class="headerlink" href="#zipinfo" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#zipfile.ZipFile" title="zipfile.ZipFile"><tt class="xref py py-class docutils literal"><span class="pre">ZipFile</span></tt></a> オブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">getinfo()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">infolist()</span></tt> メソッドは
+<a class="reference internal" href="#zipfile.ZipInfo" title="zipfile.ZipInfo"><tt class="xref py py-class docutils literal"><span class="pre">ZipInfo</span></tt></a> クラスのインスタンスを返します。それぞれのインスタンスオブジェクトは ZIP アーカイブの一個のメンバについての情報を保持しています。</p>
+<blockquote>
+<div>インスタンスは以下の属性を持ちます:</div></blockquote>
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.filename">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">filename</tt><a class="headerlink" href="#zipfile.ZipInfo.filename" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブ中のファイルの名前。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.date_time">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">date_time</tt><a class="headerlink" href="#zipfile.ZipInfo.date_time" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブメンバの最終更新日時。この属性は6つの値からなるタプルです。:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Index</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">0</span></tt></td>
+<td>西暦年</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">1</span></tt></td>
+<td>月 (1 から始まる)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">2</span></tt></td>
+<td>日 (1 から始まる)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">3</span></tt></td>
+<td>時 (0 から始まる)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">4</span></tt></td>
+<td>分 (0 から始まる)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">5</span></tt></td>
+<td>秒 (0 から始まる)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.compress_type">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">compress_type</tt><a class="headerlink" href="#zipfile.ZipInfo.compress_type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブメンバの圧縮形式。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.comment">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">comment</tt><a class="headerlink" href="#zipfile.ZipInfo.comment" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>各アーカイブメンバに対するコメント。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.extra">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">extra</tt><a class="headerlink" href="#zipfile.ZipInfo.extra" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>拡張フィールドデータ。この文字列データに含まれているデータの内部構成については、 <a class="reference external" href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">PKZIP Application Note</a>
+でコメントされています。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.create_system">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">create_system</tt><a class="headerlink" href="#zipfile.ZipInfo.create_system" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ZIP アーカイブを作成したシステムを記述する文字列。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.create_version">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">create_version</tt><a class="headerlink" href="#zipfile.ZipInfo.create_version" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このアーカイブを作成した PKZIP のバージョン。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.extract_version">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">extract_version</tt><a class="headerlink" href="#zipfile.ZipInfo.extract_version" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このアーカイブを展開する際に必要な PKZIP のバージョン。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.reserved">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">reserved</tt><a class="headerlink" href="#zipfile.ZipInfo.reserved" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>予約領域。ゼロでなくてはなりません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.flag_bits">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">flag_bits</tt><a class="headerlink" href="#zipfile.ZipInfo.flag_bits" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ZIP フラグビット列。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.volume">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">volume</tt><a class="headerlink" href="#zipfile.ZipInfo.volume" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルヘッダのボリュームナンバ。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.internal_attr">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">internal_attr</tt><a class="headerlink" href="#zipfile.ZipInfo.internal_attr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>内部属性。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.external_attr">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">external_attr</tt><a class="headerlink" href="#zipfile.ZipInfo.external_attr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>外部ファイル属性。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.header_offset">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">header_offset</tt><a class="headerlink" href="#zipfile.ZipInfo.header_offset" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルヘッダへのバイト数で表したオフセット。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.CRC">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">CRC</tt><a class="headerlink" href="#zipfile.ZipInfo.CRC" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>圧縮前のファイルの CRC-32 チェックサム。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.compress_size">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">compress_size</tt><a class="headerlink" href="#zipfile.ZipInfo.compress_size" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>圧縮後のデータのサイズ。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="zipfile.ZipInfo.file_size">
+<tt class="descclassname">ZipInfo.</tt><tt class="descname">file_size</tt><a class="headerlink" href="#zipfile.ZipInfo.file_size" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>圧縮前のファイルのサイズ。</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tarfile.html" title="12.5. tarfile — tar アーカイブファイルを読み書きする"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="bz2.html" title="12.3. bz2 — bzip2 互換の圧縮ライブラリ"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="archiving.html" >12. データ圧縮とアーカイブ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Python で Curses プログラミング &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python HOWTO" href="index.html" />
+    <link rel="next" title="ディスクリプタ HowTo ガイド" href="descriptor.html" />
+    <link rel="prev" title="3.0 への拡張モジュール移植" href="cporting.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="descriptor.html" title="ディスクリプタ HowTo ガイド"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="cporting.html" title="3.0 への拡張モジュール移植"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Python で Curses プログラミング</a><ul>
+<li><a class="reference internal" href="#curses">curses ってなに?</a><ul>
+<li><a class="reference internal" href="#python-curses-module">Python の curses module</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">curses アプリケーションの起動と終了</a></li>
+<li><a class="reference internal" href="#id2">ウィンドウとパッド</a></li>
+<li><a class="reference internal" href="#id3">テキストの表示</a><ul>
+<li><a class="reference internal" href="#id4">属性とカラー</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">ユーザ入力</a></li>
+<li><a class="reference internal" href="#id6">より多くの情報</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="cporting.html"
+                        title="前の章へ">3.0 への拡張モジュール移植</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="descriptor.html"
+                        title="次の章へ">ディスクリプタ HowTo ガイド</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/curses.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="python-curses">
+<span id="curses-howto"></span><h1>Python で Curses プログラミング<a class="headerlink" href="#python-curses" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">A.M. Kuchling, Eric S. Raymond</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Release:</th><td class="field-body">2.03</td>
+</tr>
+</tbody>
+</table>
+<div class="topic">
+<p class="topic-title first">概要</p>
+<p>このドキュメントでは Python 2.x でテキストモードプログラムを表示をコントロールする <a class="reference internal" href="../library/curses.html#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> 拡張モジュールを利用して書く方法について記述します。</p>
+</div>
+<div class="section" id="curses">
+<h2>curses ってなに?<a class="headerlink" href="#curses" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>curses ライブラリは、テキストベースの端末、VT100s や Linux コンソールや
+xterm や rxvt などの X11 プログラムから提供される端末エミュレータなどの端末に依存せずに、スクリーンに描画やキーボード処理する機能を供給します。表示端末は様々な制御コードをサポートしていて、カーソル移動、画面のスクロール、領域の消去などの一般的な操作を実行できます。端末によって大きく異なるコードを使うことがあるので、しばしば独自の癖があります。</p>
+<p>X ディスプレイの世界では、「どうしてこんな面倒なことを?」と疑問に思うかもしれません。確かに文字表示端末は時代遅れな技術ではありますが、ニッチな領域が存在していて、意匠を凝らすことができるため、未だ価値あるものとなっています。その領域は例えば X サーバを持たない、小さな机上用コンピュータや組み込みの Unix です。他のものとしては OS インストーラーやカーネル設定ツールなどで、これらは X が利用できるようになる前に動作する必要があります。</p>
+<p>curses ライブラリは異なる端末の詳細を全て隠蔽し、プログラマに対して、重なり合わない複数のウィンドウを持つ抽象化されたディスプレイを提供します。ウィンドウの内容は様々な方法で変更されます
+&#8211; テキストの追加、消去、外観の変更 &#8211; そして curses ライブラリは送るべき制御コードを自動的に理解し、正しい出力を生成してくれます。</p>
+<p>curses ライブラリは元々 BSD UNIX 向けに書かれました;
+後の AT&amp;T から出た Unix System V バージョンで多くの機能と新機能が追加されました。
+BSD curses はいまやメンテナンスされておらず、これは AT&amp;T インターフェースのオープンソース実装である ncurses にとって置き換えられました。
+Linux や FreeBSD のようなオープンソース Unix を利用している場合は、おそらくシステムは ncurses を利用しています。現在のほとんどの商用 Unix は System V のコードを基にしているため、ここれ述べる全ての関数が利用できるはずです。しかし、古いバージョンの curses を持ついくつかのプロプライエタリ Unix は全てには対応していないでしょう。</p>
+<p>curses モジュールの Windows 移植は作られていません。
+Windows プラットフォーム上では、Fredrik Lundh が書いた Console モジュールを試してみてください。
+Console モジュールはカーソル位置を指定してテキスト出力することができ、マウス、キーボード入力の両方を完全にサポートしていて、
+<a class="reference external" href="http://effbot.org/zone/console-index.htm">http://effbot.org/zone/console-index.htm</a> から入手できます。</p>
+<div class="section" id="python-curses-module">
+<h3>Python の curses module<a class="headerlink" href="#python-curses-module" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Python モジュールは curses が提供する C 関数に対するまったく単純なラッパーです;
+既に C での curses プログラミングに慣れ親しんでいるなら、その知識を Python に持ち込むのは実に簡単です。最大の違いは Python インターフェースが異なる関数 <tt class="xref py py-func docutils literal"><span class="pre">addstr()</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">mvaddstr()</span></tt>, <tt class="xref py py-func docutils literal"><span class="pre">mvwaddstr()</span></tt> を一つのメソッド
+<tt class="xref py py-meth docutils literal"><span class="pre">addstr()</span></tt> メソッドに統合して単純化していることです。このことは後でより詳しく扱います。</p>
+<p>この HOWTO は curses と Python を使ってテキストプログラムを書くための簡単な入門記事です。
+curses API に対する完全な解説をすることは意図していません;
+その目的のためには Python ライブラリガイドの ncurses 節と
+ncurses の C 言語マニュアルページを参照してください。しかし、この文章が基本的な考えを提供してくれるでしょう。</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>curses アプリケーションの起動と終了<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>何をするにもまず、curses を初期化する必要があります。初期化は <tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt> 関数を呼びだすことでできます、この関数は端末のタイプを決定し、必要とされるセットアップコードを端末に送り、様々な内部データ構造を作成します。成功すると、 <tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt> は画面全体を表わすウィンドウオブジェクトを返します;
+これは、 <tt class="docutils literal"><span class="pre">stdscr</span></tt> と呼ばれます、この名前は C での対応する変数にちなんでいます。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">curses</span>
+<span class="n">stdscr</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">initscr</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>通常 curses アプリケーションは画面へのキーエコーを自動的に止めます、これはキーを読みとり特定状況下でのみで表示するためです。これには <tt class="xref py py-func docutils literal"><span class="pre">noecho()</span></tt> 関数を呼び出す必要があります。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curses</span><span class="o">.</span><span class="n">noecho</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>通常アプリケーションはまた、Enter キーを押すことなく、キーに対してすぐに反応する必要があります;
+これは cbreak モードと呼ばれ、通常の入力がバッファされるモードと逆に動作します。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curses</span><span class="o">.</span><span class="n">cbreak</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>端末は通常、カーソルキーや Page Up や Home といった操作キーなどの特別なキーをマルチバイトエスケープシーケンスとして返します。それらのシーケンスを想定して対応する処理を行うアプリケーションを書けるように、
+curses はそれを <tt class="xref py py-const docutils literal"><span class="pre">curses.KEY_LEFT</span></tt> のような特別な値を返して行ってくれます。
+curses にその仕事をさせるには、キーパッドモードを有効にする必要があります。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stdscr</span><span class="o">.</span><span class="n">keypad</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>curses アプリケーションを終了させるのは起動よりも簡単です。
+curses に親和的な端末設定を元に戻すために以下を呼び出す必要があります:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curses</span><span class="o">.</span><span class="n">nocbreak</span><span class="p">();</span> <span class="n">stdscr</span><span class="o">.</span><span class="n">keypad</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="n">curses</span><span class="o">.</span><span class="n">echo</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>そして、 <tt class="xref py py-func docutils literal"><span class="pre">endwin()</span></tt> 関数を呼び出し、端末設定を通常の操作モードに復旧します。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curses</span><span class="o">.</span><span class="n">endwin</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>curses アプリケーションをデバッグするときの一般的な問題は、アプリケーションが端末を以前の状態に復旧することなく異常終了したときに端末がめちゃめちゃになることです。
+Python ではこの問題はコードにバグがあって、捕捉できない例外が発生したときによく起きます。タイプしたキーはもはやエコーされません、例えば、シェルを使うのが難しくなります。</p>
+<p>Python では <a class="reference internal" href="../library/curses.html#module-curses.wrapper" title="curses.wrapper: curses プログラムのための端末設定ラッパ。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.wrapper</span></tt></a> をインポートすることでこの複雑な問題を避け、デバッグを容易にすることができます。それは 呼び出し可能オブジェクトを引数にとることができる
+<tt class="xref py py-func docutils literal"><span class="pre">wrapper()</span></tt> 関数を提供します。これは上に述べた初期化をし、カラーサポートがあればカラーの初期化をします。そして、与えられた呼び出し可能オブジェクトを実行し、最終的に適切に初期化の逆操作 (deinitialization) を行います。呼び出し可能オブジェクトは例外を捕捉する try-catch 節内部で呼び出され、
+curses の初期化操作の逆操作を実行します、そして例外が上に渡されます。そうして端末は例外が発生しても端末はおかしな状態にならずにすみます。</p>
+</div>
+<div class="section" id="id2">
+<h2>ウィンドウとパッド<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ウィンドウは curses での基本的な抽象概念です。ウィンドウオブジェクトは画面の長方形の領域を表わし、テキストの表示、消去、ユーザに文字列入力を許可などの様々なメソッドをサポートしています。</p>
+<p><tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt> 関数によって返される <tt class="docutils literal"><span class="pre">stdscr</span></tt> オブジェクトはウィンドウオブジェクトで画面全体を扱います。多くのプログラムはこのウィンドウだけを必要としますが、画面を小さなウィンドウに分けてそれらを別々に再描画したり消去したいと思うかもしれません。
+<tt class="xref py py-func docutils literal"><span class="pre">newwin()</span></tt> 関数は新しいウィンドウを与えられたサイズで作成し、新しいウィンドウオブジェクトを返します。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">begin_x</span> <span class="o">=</span> <span class="mi">20</span> <span class="p">;</span> <span class="n">begin_y</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">height</span> <span class="o">=</span> <span class="mi">5</span> <span class="p">;</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">win</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newwin</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">begin_y</span><span class="p">,</span> <span class="n">begin_x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>curses で利用されている座標形について、言っておくことがあります:
+座標は常に <em>y,x</em> の順で渡し、ウィンドウの左上の座標を (0,0) とします。これは <em>x</em> 座標が最初にくる一般的な慣習には反しています。これは多くの計算機のアプリケーションにとって不幸な違いですが、
+curses が最初に書かれて以来そうだったので、今から変えるには遅すぎます。</p>
+<p>メソッドを呼びだして、テキストを表示、消去するとき、その効果はディスプレイにすぐには現われません。それは curses が元々 300 ボーの端末接続を念頭にいれていたためですl
+それらの端末では画面の再描画時間を減らすことがとても重要です。このため curses は画面への変更を積み上げ、最も効率良い方法でそれらを表示します。例えば、プログラムがウィンドウにいくつかの文字を表示し、それからウィンドウを消去する場合、元々の文字を送信する必要はありません、それらはもう見られることはないのです。</p>
+<p>従って curses に明示的にウィンドウの再描画を明示的に伝えてやる必要があります、それはウィンドウオブジェクトのメソッド <tt class="xref py py-func docutils literal"><span class="pre">refresh()</span></tt> を使うことでできます。実際には、これは curses を使ったプログラムをそれほど複雑にするものではありません。ほとんどのプログラムはせわしなく動いた後キーを押すなどのユーザからの動作を待ちます。あなたがするべきことはユーザからの入力を待つ前に単に <tt class="docutils literal"><span class="pre">stdscr.refresh()</span></tt> や関連するウィンドウの <tt class="xref py py-func docutils literal"><span class="pre">refresh()</span></tt> メソッドを呼び出して画面を再描画するだけです。</p>
+<p>パッドはウィンドウの特別な場合を指します; それは実際に画面に表示されるものより大きくなることがあり、画面にはその一部だけが表示されます。パッドを作るのに必要なものはパッドの高さと幅だけです、一方でパッドの再描画には、表示される部分を指す画面上の領域の座標を指定する必要があります。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pad</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newpad</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="c">#  These loops fill the pad with letters; this is</span>
+<span class="c"># explained in the next section</span>
+<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span> <span class="n">pad</span><span class="o">.</span><span class="n">addch</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="p">(</span><span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="o">*</span><span class="n">y</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="n">curses</span><span class="o">.</span><span class="n">error</span><span class="p">:</span> <span class="k">pass</span>
+
+<span class="c">#  Displays a section of the pad in the middle of the screen</span>
+<span class="n">pad</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span><span class="mi">75</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-func docutils literal"><span class="pre">refresh()</span></tt> はパッドの一部、画面上の座標 (5,5) から (20,75) に及ぶ長方形領域を表示します;
+表示される一部の左上の角は パッドの座標 (0,0) です。この違いを除けば、パッドは通常のウィンドウと全く同じで、同じメソッドを持ちます。</p>
+<p>複数のウィンドウとパッドが画面上にある場合、より効率的な方法があり、再描画時に画面をちらつかせるのを防いでくれます。各ウィンドウの
+<tt class="xref py py-meth docutils literal"><span class="pre">noutrefresh()</span></tt> メソッドを利用して、画面の望ましい状態を表わすデータ構造をアップデートし、
+<tt class="xref py py-func docutils literal"><span class="pre">doupdate()</span></tt> 関数で望む状態に合った物理的な画面に変更します。通常の <tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt> メソッドは自身の動作時の最後に <tt class="xref py py-func docutils literal"><span class="pre">doupdate()</span></tt> を呼び出します。</p>
+</div>
+<div class="section" id="id3">
+<h2>テキストの表示<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>C 言語のプログラマの視点からすると、curses はしばしば、混乱を招きやすい、微妙に似た関数を持っています。例えば <tt class="xref py py-func docutils literal"><span class="pre">addstr()</span></tt> は <tt class="docutils literal"><span class="pre">stdscr</span></tt> ウィンドウの現在のカーソル位置の文字列を表示し、一方で <tt class="xref py py-func docutils literal"><span class="pre">mvaddstr()</span></tt> は与えられた y,x 座標にまず移動して、文字列を表示します。
+<tt class="xref py py-func docutils literal"><span class="pre">waddstr()</span></tt> はほとんど <tt class="xref py py-func docutils literal"><span class="pre">addstr()</span></tt> に似ていますが、デフォルトの <tt class="docutils literal"><span class="pre">stdscr</span></tt> を使う代わりに使うウィンドウを指定できます。
+<tt class="xref py py-func docutils literal"><span class="pre">mvwaddstr()</span></tt> も同様です。</p>
+<p>幸運にも、Python インターフェースはこれらの詳細を全て隠蔽してくれます;
+<tt class="docutils literal"><span class="pre">stdscr</span></tt> は他のものと同様のウィンドウオブジェクトであり、 <tt class="xref py py-func docutils literal"><span class="pre">addstr()</span></tt> のようなメソッドは複数の引数形式を許容してくれます。通常それらは4つの形式です。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">形式</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><em>str</em> または <em>ch</em></td>
+<td>文字列 <em>str</em> または 文字 <em>ch</em> を現在位置に表示します</td>
+</tr>
+<tr class="row-odd"><td><em>str</em> または <em>ch</em>, <em>attr</em></td>
+<td>文字列 <em>str</em> または 文字 <em>ch</em> を属性 <em>attr</em> を利用して現在位置に表示します</td>
+</tr>
+<tr class="row-even"><td><em>y</em>, <em>x</em>, <em>str</em> または <em>ch</em></td>
+<td>ウィンドウ内の位置 <em>y,x</em> に移動し
+<em>str</em> または <em>ch</em> を表示します</td>
+</tr>
+<tr class="row-odd"><td><em>y</em>, <em>x</em>, <em>str</em> または <em>ch</em>, <em>attr</em></td>
+<td>ウィンドウ内の位置 <em>y,x</em> に移動し属性 <em>attr</em> を利用して
+<em>str</em> または <em>ch</em> を表示します</td>
+</tr>
+</tbody>
+</table>
+<p>属性によって表示するテキストをハイライトすることができます、ボールド体、アンダーライン、反転、カラーなど。より詳しくは次の小節で説明します。</p>
+<p><tt class="xref py py-func docutils literal"><span class="pre">addstr()</span></tt> 関数は Python 文字列を引数にとり、表示します。一方 <tt class="xref py py-func docutils literal"><span class="pre">addch()</span></tt> 関数は文字を引数にとります、引数は長さ1の文字列か整数のどちらでもかまいません。文字列の場合には、表示する文字は 0 から 255 の間に制限されます。
+SVr4 curses は文字拡張のための定数を提供しています; それらの定数は 255 より大きい整数です。例えば <tt class="xref py py-const docutils literal"><span class="pre">ACS_PLMINUS</span></tt> は +/- 記号で
+<tt class="xref py py-const docutils literal"><span class="pre">ACS_ULCORNER</span></tt> はボックスの左上角です (境界を描くのに便利です)。</p>
+<p>ウィンドウは最後の操作の後のカーソル位置を覚えているため、
+<em>y,x</em> 座標をうっかり忘れてしまっても、文字列や文字は最後の操作位置に表示されます。
+<tt class="docutils literal"><span class="pre">move(y,x)</span></tt> メソッドでカーソルを移動させることもできます。常に点滅するカーソルを表示する端末もあるため、カーソルが特定の位置にいることを保証して注意が反れないようにしたいと思うかもしれません;
+ランダムに見える位置でカーソルがちらつくとと面を食らってしまいます。</p>
+<p>アプリケーションがちらつくカーソルを全く必要としない場合、
+<tt class="docutils literal"><span class="pre">curs_set(0)</span></tt> を呼び出してカーソル見えなくすることができます。同じことを、古い curses バージョンに対する互換性を保ちつつ行うために
+<tt class="docutils literal"><span class="pre">leaveok(bool)</span></tt> 関数があります。
+<em>bool</em> が true の場合、curses ライブラリは点滅するカーソルを外に出さなくするので、変な場所に現われるのを心配する必要は無くなります。</p>
+<div class="section" id="id4">
+<h3>属性とカラー<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>文字は様々な方法で表示することができます。テキストベースアプリケーションでのステータスラインは通常反転して表示されます;
+テキストビュアーは特定の単語をハイライトする必要があるかもしれせん。
+curses は属性を画面上の各セルに対して指定することで、それをサポートします。</p>
+<p>属性は整数値で、それぞれのビットが異なる属性を表わします。複数の属性ビットをセットしてテキストの表示を試みることができますが、
+curses は全ての組み合わせが利用可能であるかや視覚的に区別できるかどうかは保証してくれません、それらは利用している端末の能力に依存しているため、最も安全なのは、最も一般的に利用可能な属性を設定する方法です、ここに列挙します</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="37%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">属性</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">A_BLINK</span></tt></td>
+<td>テキストを点滅</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">A_BOLD</span></tt></td>
+<td>高輝度またはボールドテキスト</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">A_DIM</span></tt></td>
+<td>低輝度テキスト</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">A_REVERSE</span></tt></td>
+<td>反転テキスト</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">A_STANDOUT</span></tt></td>
+<td>利用できる最良のハイライトモード</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">A_UNDERLINE</span></tt></td>
+<td>下線付きテキスト</td>
+</tr>
+</tbody>
+</table>
+<p>つまり、反転するステータスラインを画面の最上部に表示するには、コードをこうします:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Current mode: Typing mode&quot;</span><span class="p">,</span>
+         <span class="n">curses</span><span class="o">.</span><span class="n">A_REVERSE</span><span class="p">)</span>
+<span class="n">stdscr</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>curses ライブラリはカラー機能を提供している端末でのカラーもサポートしています、そんな端末の中で最も一般的なものは Linux コンソールで、color xterm もそれに続きます。</p>
+<p>カラーを利用するには、 <tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt> を呼び出したすぐ後に
+<tt class="xref py py-func docutils literal"><span class="pre">start_color()</span></tt> 関数を呼びし、デフォルトカラーセットを初期化しなければいけません
+(<a class="reference internal" href="../library/curses.html#curses.wrapper.wrapper" title="curses.wrapper.wrapper"><tt class="xref py py-func docutils literal"><span class="pre">curses.wrapper.wrapper()</span></tt></a> 関数はこれを自動的に行ないます)。一旦それを行えば、 <tt class="xref py py-func docutils literal"><span class="pre">has_colors()</span></tt> 関数は、端末が実際にカラーを表示できる場合に
+TRUE を返します。
+(ノート: curses はカナダ/イギリスつづりに &#8216;colour&#8217; ではなくアメリカつづりの &#8216;color&#8217; を使います。イギリスつづりを使っている場合には、これらの関数のミススペルを修正する必要があります。)</p>
+<p>curses ライブラリは有限の数の、フォラグラウンド(またはテキスト)カラーとバックグラウンドカラーペアを保持します。カラーペアに対応する属性値は <tt class="xref py py-func docutils literal"><span class="pre">color_pair()</span></tt> 関数で取得できます;
+これは <tt class="xref py py-const docutils literal"><span class="pre">A_REVERSE</span></tt> のような他の属性と OR 論理演算組み合わせることができます、ただし、繰り返しになりますが、組み合わせは全ての端末で保証されていません。</p>
+<p>例として、テキスト行をカラーペア 1 を使って表示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span> <span class="s">&quot;Pretty text&quot;</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">color_pair</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+<span class="n">stdscr</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>前に述べたように、カラーペアはフォアグラウンドカラーとバックグラウンドカラーから構成されています。
+<tt class="xref py py-func docutils literal"><span class="pre">start_color()</span></tt> はカラーモードを有効にした場合 8 の基本カラーを初期化します。基本カラーは: 0:black, 1:red, 2:green, 3:yellow, 4:blue, 5:magenta, 6:cyan, 7:white です。
+curses モジュールは各名前に対する名前付き定数を定義しています:
+<tt class="xref py py-const docutils literal"><span class="pre">curses.COLOR_BLACK</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">curses.COLOR_RED</span></tt>, など。</p>
+<p><tt class="docutils literal"><span class="pre">init_pair(n,</span> <span class="pre">f,</span> <span class="pre">b)</span></tt> 関数はカラーペア <em>n</em> の定義をフォアグラウンド f バックグラウンド b に変更します。カラーペア 0 は黒背景に白で組み込まれていて変更できません。</p>
+<p>やってみましょう。カラー 1 を白背景に赤に変更してみましょう、こうして呼び出します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curses</span><span class="o">.</span><span class="n">init_pair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_WHITE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>カラーペアを変更するときには、既に表示された任意のテキストが利用するカラーペアを新しい色に変更します。新しいテキストをこの色で使うこともできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;RED ALERT!&quot;</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">color_pair</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>凝ったターミナルは実際の色の定義を与えられた RGB 値に変更することができます。これによってふつうは赤であるカラー1を紫や青など好きな色に変更されます。不幸にも Linux コンソールはこれをサポートしていません、そのためこの機能は試すことも例を出すこともできません。
+<tt class="xref py py-func docutils literal"><span class="pre">can_change_color()</span></tt> を呼び出すことで端末が使えるのか調べることができ、対応していれば、TRUE を返します。もしそのような telnet 端末を持つ幸運に巡りあえたなら、より多くの情報の情報を得るためにシステムの man ページを参照することを勧めます。</p>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>ユーザ入力<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>curses ライブラリは自身で単純なインプット機構を備えています。
+Python はテキスト入力ウィジェットを追加して、いくつかの足りない部分を補っています。</p>
+<p>ウィンドウに対する入力を得るための最も一般的な方法はウィンドウの <tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> メソッドを利用することです。
+<tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> はユーザが待機してキーを打つのを待ち、
+<tt class="xref py py-func docutils literal"><span class="pre">echo()</span></tt> が先に呼ばれていれば、それを表示します。オプションとして待機する前にカーソルが移動するべき座標を指定することができます。</p>
+<p>この挙動は <tt class="xref py py-meth docutils literal"><span class="pre">nodelay()</span></tt> メソッドで変更することができます。
+<tt class="docutils literal"><span class="pre">nodelay(1)</span></tt> の後、 ウィンドウに対する <tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> はノンブロッキングになり、入力が準備されていないときには <tt class="docutils literal"><span class="pre">curses.ERR</span></tt> (-1 の値) を返します。
+<tt class="xref py py-func docutils literal"><span class="pre">halfdelay()</span></tt> 関数もあり、(事実上) 各 <tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> に対してタイマーを設定するのに使うことができます;
+指定したディレイの間に(10分の1秒単位で測られます)入力が得られなかった場合
+curses は例外を送出します。</p>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> メソッドは整数を返します; もしそれが 0 から 255 までなら、それは押されたキーの ASCII コードを表わします。
+255 より大きな値は Page Up, Home またはカーソルキーのような特別なキーです。返された値を <tt class="xref py py-const docutils literal"><span class="pre">curses.KEY_PPAGE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">curses.KEY_HOME</span></tt> または
+<tt class="xref py py-const docutils literal"><span class="pre">curses.KEY_LEFT</span></tt> のような定数と比較することが可能です。通常プログラムのメインループはこのようになります:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">stdscr</span><span class="o">.</span><span class="n">getch</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">):</span> <span class="n">PrintDocument</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="nb">ord</span><span class="p">(</span><span class="s">&#39;q&#39;</span><span class="p">):</span> <span class="k">break</span>  <span class="c"># Exit the while()</span>
+    <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="n">curses</span><span class="o">.</span><span class="n">KEY_HOME</span><span class="p">:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../library/curses.ascii.html#module-curses.ascii" title="curses.ascii: ASCII 文字に関する定数および集合帰属関数。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.ascii</span></tt></a> モジュールは ASCII クラスのメンバーシップ関数を提供し、整数と1文字引数のどちらもとることができます;
+これらは独自のコマンドインタプリタに対するより読み易いテストを書くのに便利でしょう。整数と1文字引数のどちらもとることができ、引数と同じ型を返す変換関数も提供します。例えば <a class="reference internal" href="../library/curses.ascii.html#curses.ascii.ctrl" title="curses.ascii.ctrl"><tt class="xref py py-func docutils literal"><span class="pre">curses.ascii.ctrl()</span></tt></a> は引数に応じた型で制御文字を返します。</p>
+<p>文字列全体を取得するメソッド <tt class="xref py py-const docutils literal"><span class="pre">getstr()</span></tt> もあります。これは頻繁に使われるものではありません、なぜならこの機能はとても制限的なものだからです;
+利用可能な編集キーはバックスペースと Enter キーの文字列を終了させるものだけです。オプションとして文字列の長さを固定長に限定することもできます。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">curses</span><span class="o">.</span><span class="n">echo</span><span class="p">()</span>            <span class="c"># Enable echoing of characters</span>
+
+<span class="c"># Get a 15-character string, with the cursor on the top line</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">stdscr</span><span class="o">.</span><span class="n">getstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Python の <a class="reference internal" href="../library/curses.html#module-curses.textpad" title="curses.textpad: curses ウィンドウ内での Emacs ライクな入力編集機能。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.textpad</span></tt></a> モジュールはよりよいものを提供します。これを使うことで、ウィンドウ をEmacs のようなキーバインドをサポートするテキストボックスにすることができます。
+<tt class="xref py py-class docutils literal"><span class="pre">Textbox</span></tt> クラスの様々なメソッドが入力の検証つきの編集をサポートシ前後のスペースつき、または無しで編集結果を収集します。詳しくは <a class="reference internal" href="../library/curses.html#module-curses.textpad" title="curses.textpad: curses ウィンドウ内での Emacs ライクな入力編集機能。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.textpad</span></tt></a> のライブラリドキュメントを参照して下さい。</p>
+</div>
+<div class="section" id="id6">
+<h2>より多くの情報<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この HOWTO ではいくつかの進んだ話題、スクリーンスクレイピングや
+xterm インスタンスからマウスイベントを捉えるなど、については扱っていません。しかし、Python の curses モジュールのライブラリページはいまやかなり充実しています。次はこれを見るべきです。</p>
+<p>ncurses のあらゆるエントリポイントの詳細な挙動について疑問があれば、
+curses 実装が ncurses か、プロプライエタリな Unix ベンダーのものかによらず
+curses 実装のマニュアルページをみることを参照して下さい。マニュアルページにはあらゆる癖がドキュメントにされていて、全ての関数、属性、
+<tt class="xref py py-const docutils literal"><span class="pre">ACS_*</span></tt> 文字の完全なリストが提供されています。</p>
+<p>curses API は巨大なので、Python インターフェースではいくつかの関数はサポートされていません、ですがそれは必要としている人がいまのところいないためです。気兼ねなく、足りないものを追加してパッチを提出して下さい。また、ncurese に関連したメニューやパネルライブラリのサポートも行なわれていません;
+気兼ねなく追加して下さい。</p>
+<p>面白い小さなプログラムを書いたら、新たなデモとして気兼ねなく提出して下さい。私達は常により多くのデモ使うことができます!</p>
+<p>The ncurses FAQ: <a class="reference external" href="http://invisible-island.net/ncurses/ncurses.faq.html">http://invisible-island.net/ncurses/ncurses.faq.html</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="descriptor.html" title="ディスクリプタ HowTo ガイド"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="cporting.html" title="3.0 への拡張モジュール移植"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

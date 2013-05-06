@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.6. tempfile — 一時的なファイルやディレクトリの生成 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="next" title="10.7. glob — Unix 形式のパス名のパターン展開" href="glob.html" />
+    <link rel="prev" title="10.5. filecmp — ファイルおよびディレクトリの比較" href="filecmp.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="glob.html" title="10.7. glob — Unix 形式のパス名のパターン展開"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="filecmp.html" title="10.5. filecmp — ファイルおよびディレクトリの比較"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" accesskey="U">10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="filecmp.html"
+                        title="前の章へ">10.5. <tt class="docutils literal docutils literal docutils literal"><span class="pre">filecmp</span></tt> &#8212; ファイルおよびディレクトリの比較</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="glob.html"
+                        title="次の章へ">10.7. <tt class="docutils literal docutils literal docutils literal"><span class="pre">glob</span></tt> &#8212; Unix 形式のパス名のパターン展開</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/tempfile.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-tempfile">
+<span id="tempfile"></span><h1>10.6. <a class="reference internal" href="#module-tempfile" title="tempfile: 一時的なファイルやディレクトリを生成。"><tt class="xref py py-mod docutils literal"><span class="pre">tempfile</span></tt></a> &#8212; 一時的なファイルやディレクトリの生成<a class="headerlink" href="#module-tempfile" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">このモジュールを使うと、一時的なファイルやディレクトリを生成できます。このモジュールはサポートされている全てのプラットフォームで利用可能です。</p>
+<p>バージョン 2.3 の Python では、このモジュールに対してセキュリティを高める為の見直しが行われました。現在では新たに 3 つの関数、
+<a class="reference internal" href="#tempfile.NamedTemporaryFile" title="tempfile.NamedTemporaryFile"><tt class="xref py py-func docutils literal"><span class="pre">NamedTemporaryFile()</span></tt></a> 、 <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> 、および <a class="reference internal" href="#tempfile.mkdtemp" title="tempfile.mkdtemp"><tt class="xref py py-func docutils literal"><span class="pre">mkdtemp()</span></tt></a> が提供されており、安全でない
+<a class="reference internal" href="#tempfile.mktemp" title="tempfile.mktemp"><tt class="xref py py-func docutils literal"><span class="pre">mktemp()</span></tt></a>  を使いつづける必要をなくしました。このモジュールで生成される一時ファイルはもはやプロセス番号を含みません; その代わり、6
+桁のランダムな文字からなる文字列が使われます。</p>
+<p>また、ユーザから呼び出し可能な関数は全て、一時ファイルの場所や名前を直接操作できるようにするための追加の引数をとるようになりました。もはや変数
+<em>tempdir</em> および <em>template</em> を使う必要はありません。以前のバージョンとの互換性を維持するために、引数の順番は多少変です;
+明確さのためにキーワード引数を使うことをお勧めします。</p>
+<p>このモジュールではユーザから呼び出し可能な以下の関数を定義しています:</p>
+<dl class="function">
+<dt id="tempfile.TemporaryFile">
+<tt class="descclassname">tempfile.</tt><tt class="descname">TemporaryFile</tt><big>(</big><span class="optional">[</span><em>mode='w+b'</em><span class="optional">[</span>, <em>bufsize=-1</em><span class="optional">[</span>, <em>suffix=''</em><span class="optional">[</span>, <em>prefix='tmp'</em><span class="optional">[</span>, <em>dir=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#tempfile.TemporaryFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>一時的な記憶領域として使うことができるファイルライク(file-like)オブジェクトを返します。ファイルは <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> を使って生成されます。このファイルは閉じられると (オブジェクトがガーベジコレクションされた際に、暗黙のうちに閉じられる場合を含みます)
+すぐに消去されます。Unix環境では、ファイルが生成されるとすぐにそのファイルのディレクトリエントリは除去されてしまいます。一方、他のプラットフォームではこの機能はサポートされていません; 従って、コードを書くときには、この関数で作成した一時ファイルをファイルシステム上で見ることができる、あるいはできないということをあてにすべきではありません。</p>
+<p>生成されたファイルを一旦閉じなくてもファイルを読み書きできるようにするために、 <em>mode</em> パラメタは標準で <tt class="docutils literal"><span class="pre">'w+b'</span></tt> に設定されています。ファイルに記録するデータが何であるかに関わらず全てのプラットフォームで一貫性のある動作をさせるために、バイナリモードが使われています。 <em>bufsize</em>
+の値は標準で <tt class="docutils literal"><span class="pre">-1</span></tt> で、これはオペレーティングシステムにおける標準の値を使うことを意味しています。</p>
+<p><em>dir</em> 、 <em>prefix</em> および <em>suffix</em> パラメタは <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> に渡されます。</p>
+<p>返されるオブジェクトは、POSIXプラットフォームでは本物のfileオブジェクトです。それ以外のプラットフォームではファイルライクオブジェクトが返され、
+<tt class="xref py py-attr docutils literal"><span class="pre">file</span></tt> 属性に本物のfileオブジェクトがあります。このファイルライクオブジェクトは、通常のファイルと同じように <a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a>
+文で利用することができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tempfile.NamedTemporaryFile">
+<tt class="descclassname">tempfile.</tt><tt class="descname">NamedTemporaryFile</tt><big>(</big><span class="optional">[</span><em>mode='w+b'</em><span class="optional">[</span>, <em>bufsize=-1</em><span class="optional">[</span>, <em>suffix=''</em><span class="optional">[</span>, <em>prefix='tmp'</em><span class="optional">[</span>, <em>dir=None</em><span class="optional">[</span>, <em>delete=True</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#tempfile.NamedTemporaryFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数はファイルがファイルシステム上で見ることができるよう保証されている点を除き、 <a class="reference internal" href="#tempfile.TemporaryFile" title="tempfile.TemporaryFile"><tt class="xref py py-func docutils literal"><span class="pre">TemporaryFile()</span></tt></a> と全く同じに働きます。
+(Unixでは、ディレクトリエントリはunlinkされません) ファイル名はファイルオブジェクトの <tt class="xref py py-attr docutils literal"><span class="pre">name</span></tt> メンバから取得することができます。このファイル名を使って一時ファイルをもう一度開くとことができるかどうかは、プラットフォームによって異なります。
+(Unixでは可能でしたが、Windows NT以降では開く事ができません。)
+<em>delete</em> がtrue(デフォルト)の場合、ファイルは閉じられるとすぐに削除されます。</p>
+<p>返されるオブジェクトは、常にファイルライクオブジェクトです。このオブジェクトの <tt class="xref py py-attr docutils literal"><span class="pre">file</span></tt> 属性が本物のfileオブジェクトになります。このファイルライクオブジェクトは、通常のファイルと同じように <a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a>
+文を利用することができます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加: </span><em>delete</em> 引数</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tempfile.SpooledTemporaryFile">
+<tt class="descclassname">tempfile.</tt><tt class="descname">SpooledTemporaryFile</tt><big>(</big><span class="optional">[</span><em>max_size=0</em><span class="optional">[</span>, <em>mode='w+b'</em><span class="optional">[</span>, <em>bufsize=-1</em><span class="optional">[</span>, <em>suffix=''</em><span class="optional">[</span>, <em>prefix='tmp'</em><span class="optional">[</span>, <em>dir=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#tempfile.SpooledTemporaryFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数は、ファイルサイズが <em>max_size</em> を超えるか、 <tt class="xref py py-func docutils literal"><span class="pre">fileno()</span></tt>
+メソッドが呼ばれるまでの間メモリ上で処理される以外は、
+<a class="reference internal" href="#tempfile.TemporaryFile" title="tempfile.TemporaryFile"><tt class="xref py py-func docutils literal"><span class="pre">TemporaryFile()</span></tt></a> と同じです。
+<em>max_size</em> を超えるか <tt class="xref py py-func docutils literal"><span class="pre">fileno()</span></tt> が呼ばれたとき、一時ファイルの内容がディスクに書き込まれ、その後の処理は <a class="reference internal" href="#tempfile.TemporaryFile" title="tempfile.TemporaryFile"><tt class="xref py py-func docutils literal"><span class="pre">TemporaryFile()</span></tt></a> で行われます。</p>
+<p>この関数が返すファイルは、追加で1つのメソッド <tt class="xref py py-func docutils literal"><span class="pre">rollover()</span></tt> を持っています。このメソッドが呼ばれると、(サイズに関係なく)メモリからディスクへのロールオーバーが実行されます。</p>
+<p>返されるオブジェクトはファイルライクオブジェクトで、その <tt class="xref py py-attr docutils literal"><span class="pre">_file</span></tt>
+属性は、 <tt class="xref py py-func docutils literal"><span class="pre">rollover()</span></tt> が呼ばれたかどうかによって、 <a class="reference internal" href="stringio.html#module-StringIO" title="StringIO: ファイルのように文字列を読み書きする。"><tt class="xref py py-class docutils literal"><span class="pre">StringIO</span></tt></a>
+オブジェクトか、本物のファイルオブジェクトになります。このファイルライクオブジェクトは、通常のファイルオブジェクトと同じように、
+<a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文で利用することができます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tempfile.mkstemp">
+<tt class="descclassname">tempfile.</tt><tt class="descname">mkstemp</tt><big>(</big><span class="optional">[</span><em>suffix=''</em><span class="optional">[</span>, <em>prefix='tmp'</em><span class="optional">[</span>, <em>dir=None</em><span class="optional">[</span>, <em>text=False</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#tempfile.mkstemp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>可能な限り最も安全な手段で一時ファイルを生成します。使用するプラットフォームで <a class="reference internal" href="os.html#os.open" title="os.open"><tt class="xref py py-func docutils literal"><span class="pre">os.open()</span></tt></a> の <tt class="xref py py-const docutils literal"><span class="pre">O_EXCL</span></tt>
+フラグが正しく実装されている限り、ファイルの生成で競合条件が起こることはありません。このファイルは、ファイルを生成したユーザのユーザ ID
+からのみ読み書き可能です。使用するプラットフォームにおいて、ファイルを実行可能かどうかを示す許可ビットが使われている場合、ファイルは誰からも実行不可なように設定されます。このファイルのファイル記述子は子プロセスに継承されません。</p>
+<p><a class="reference internal" href="#tempfile.TemporaryFile" title="tempfile.TemporaryFile"><tt class="xref py py-func docutils literal"><span class="pre">TemporaryFile()</span></tt></a> と違って、 <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> で生成されたファイルが用済みになったときにファイルを消去するのはユーザの責任です。</p>
+<p><em>suffix</em> が指定された場合、ファイル名は指定されたsuffixで終わります。そうでない場合にはsuffixは付けられません。 <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a>
+はファイル名とsuffixの間にドットを追加しません; 必要なら、 <em>suffix</em> の先頭につけてください。</p>
+<p><em>prefix</em> が指定された場合、ファイル名は指定されたプレフィクス(接頭文字列) で始まります; そうでない場合、標準のプレフィクスが使われます。</p>
+<p><em>dir</em> が指定された場合、一時ファイルは指定されたディレクトリ下に作成されます; そうでない場合、標準のディレクトリが使われます。デフォルトのディレクトリは、プラットフォームごとに異なるリストから選ばれます。しかし、アプリケーションのユーザーは <em>TMPDIR</em>, <em>TEMP</em>, <em>TMP</em> 環境変数を設定することで、その場所を設定することができます。そのため、生成されたファイル名について、クォート無しで <tt class="docutils literal"><span class="pre">os.popen()</span></tt>
+を使って外部コマンドに渡せるかどうかなどの保証はありません。</p>
+<p><em>text</em> が指定された場合、ファイルをバイナリモード (標準の設定)  かテキストモードで開くかを示します。使用するプラットフォームによってはこの値を設定しても変化はありません。</p>
+<p><a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> は開かれたファイルを扱うための OS レベルの値とファイルの絶対パス名が順番に並んだタプルを返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tempfile.mkdtemp">
+<tt class="descclassname">tempfile.</tt><tt class="descname">mkdtemp</tt><big>(</big><span class="optional">[</span><em>suffix</em><span class="optional">[</span>, <em>prefix</em><span class="optional">[</span>, <em>dir</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#tempfile.mkdtemp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>可能な限り安全な方法で一時ディレクトリを作成します。ディレクトリの生成で競合条件は発生しません。ディレクトリを作成したユーザ ID だけが、このディレクトリに対して内容を読み出したり、書き込んだり、検索したりすることができます。</p>
+<p><a class="reference internal" href="#tempfile.mkdtemp" title="tempfile.mkdtemp"><tt class="xref py py-func docutils literal"><span class="pre">mkdtemp()</span></tt></a> によって作られたディレクトリとその内容が用済みになった時、にそれを消去するのはユーザの責任です。</p>
+<p><em>prefix</em> 、 <em>suffix</em> 、および <em>dir</em> 引数は <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> のものと同じです。</p>
+<p><a class="reference internal" href="#tempfile.mkdtemp" title="tempfile.mkdtemp"><tt class="xref py py-func docutils literal"><span class="pre">mkdtemp()</span></tt></a> は新たに生成されたディレクトリの絶対パス名を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">tempfile.</tt><tt class="descname">mkdtemp</tt><big>(</big><span class="optional">[</span><em>suffix=''</em><span class="optional">[</span>, <em>prefix='tmp'</em><span class="optional">[</span>, <em>dir=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big></dt>
+<dd><p>可能な限り最もセキュアな方法で、一時ディレクトリを作成します。ディレクトリの作成時に、競合状態はありません。作成されたディレクトリは、作成したユーザーIDのみで、読み込み可能で、書き込み可能で、検索可能です。</p>
+<p><a class="reference internal" href="#tempfile.mkdtemp" title="tempfile.mkdtemp"><tt class="xref py py-func docutils literal"><span class="pre">mkdtemp()</span></tt></a> 関数のユーザーは、作成された一時ディレクトリとその中身を削除する責任があります。</p>
+<p><em>prefix</em>, <em>suffix</em>, <em>dir</em> 引数は <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> 関数と同じです。</p>
+<p><a class="reference internal" href="#tempfile.mkdtemp" title="tempfile.mkdtemp"><tt class="xref py py-func docutils literal"><span class="pre">mkdtemp()</span></tt></a> は生成したディレクトリの絶対パスを返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tempfile.mktemp">
+<tt class="descclassname">tempfile.</tt><tt class="descname">mktemp</tt><big>(</big><span class="optional">[</span><em>suffix=''</em><span class="optional">[</span>, <em>prefix='tmp'</em><span class="optional">[</span>, <em>dir=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#tempfile.mktemp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="deprecated">
+<span class="versionmodified">バージョン 2.3 で撤廃: </span>代わりに <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> を使って下さい.</p>
+<p>一時ファイルの絶対パス名を返します。このパス名は少なくともこの関数が呼び出された時点ではファイルシステム中に存在しなかったパス名です。
+<em>prefix</em> 、 <em>prefix</em> 、 <em>suffix</em> 、および <em>dir</em> 引数は <a class="reference internal" href="#tempfile.mkstemp" title="tempfile.mkstemp"><tt class="xref py py-func docutils literal"><span class="pre">mkstemp()</span></tt></a> のものと同じです。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p>この関数を使うとプログラムのセキュリティホールになる可能性があります。この関数が返したファイル名を返した後、あなたがそのファイル名を使って次に何かをしようとする段階に至る前に、誰か他の人間があなたにパンチをくらわせてしまうかもしれません。
+<a class="reference internal" href="#tempfile.mktemp" title="tempfile.mktemp"><tt class="xref py py-func docutils literal"><span class="pre">mktemp()</span></tt></a> の利用は、 <a class="reference internal" href="#tempfile.NamedTemporaryFile" title="tempfile.NamedTemporaryFile"><tt class="xref py py-func docutils literal"><span class="pre">NamedTemporaryFile()</span></tt></a> に <tt class="docutils literal"><span class="pre">delete=False</span></tt>
+引数を渡すことで、簡単に置き換えることができます。</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span>
+<span class="go">&lt;open file &#39;&lt;fdopen&gt;&#39;, mode &#39;w+b&#39; at 0x384698&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">name</span>
+<span class="go">&#39;/var/folders/5q/5qTPn6xq2RaWqk+1Ytw3-U+++TI/-Tmp-/tmpG7V1Y0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;Hello World!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<p>このモジュールでは、一時的なファイル名の作成方法を指定する 2 つのグローバル変数を使います。これらの変数は上記のいずれかの関数を最初に呼び出した際に初期化されます。関数呼び出しをおこなうユーザはこれらの値を変更することができますが、これはお勧めできません;
+その代わりに関数に適切な引数を指定してください。</p>
+<dl class="data">
+<dt id="tempfile.tempdir">
+<tt class="descclassname">tempfile.</tt><tt class="descname">tempdir</tt><a class="headerlink" href="#tempfile.tempdir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この値が <tt class="docutils literal"><span class="pre">None</span></tt> 以外に設定された場合、このモジュールで定義されている関数全ての <em>dir</em> 引数に対する標準の設定値となります。</p>
+<p><em>tempdir</em> が設定されていないか <tt class="docutils literal"><span class="pre">None</span></tt> の場合、上記のいずれかの関数を呼び出した際は常に、Python は標準的なディレクトリ候補のリストを検索し、関数を呼び出しているユーザの権限でファイルを作成できる最初のディレクトリ候補を <em>tempdir</em> に設定します。リストは以下のようになっています:</p>
+<ol class="arabic">
+<li><p class="first">環境変数 <span class="target" id="index-1"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TMPDIR</span></tt> で与えられているディレクトリ名。</p>
+</li>
+<li><p class="first">環境変数 <span class="target" id="index-2"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TEMP</span></tt> で与えられているディレクトリ名。</p>
+</li>
+<li><p class="first">環境変数 <span class="target" id="index-3"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TMP</span></tt> で与えられているディレクトリ名。</p>
+</li>
+<li><p class="first">プラットフォーム依存の場所:</p>
+<ul>
+<li><p class="first">RiscOS では環境変数 <span class="target" id="index-4"></span><tt class="xref std std-envvar docutils literal"><span class="pre">Wimp$ScrapDir</span></tt> で与えられているディレクトリ名。</p>
+</li>
+<li><dl class="first docutils">
+<dt>Windows ではディレクトリ <tt class="file docutils literal"><span class="pre">C:\TEMP</span></tt> 、 <tt class="file docutils literal"><span class="pre">C:\TMP</span></tt> 、 <tt class="file docutils literal"><span class="pre">\TEMP</span></tt> 、および</dt>
+<dd><p class="first last"><tt class="file docutils literal"><span class="pre">\TMP</span></tt> の順。</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">その他の全てのプラットフォームでは、 <tt class="file docutils literal"><span class="pre">/tmp</span></tt> 、 <tt class="file docutils literal"><span class="pre">/var/tmp</span></tt> 、および <tt class="file docutils literal"><span class="pre">/usr/tmp</span></tt> の順。</p>
+</li>
+</ul>
+</li>
+<li><p class="first">最後の手段として、現在の作業ディレクトリ。</p>
+</li>
+</ol>
+</dd></dl>
+
+<dl class="function">
+<dt id="tempfile.gettempdir">
+<tt class="descclassname">tempfile.</tt><tt class="descname">gettempdir</tt><big>(</big><big>)</big><a class="headerlink" href="#tempfile.gettempdir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在選択されている、テンポラリファイルを作成するためのディレクトリを返します。
+<a class="reference internal" href="#tempfile.tempdir" title="tempfile.tempdir"><tt class="xref py py-data docutils literal"><span class="pre">tempdir</span></tt></a> が <tt class="docutils literal"><span class="pre">None</span></tt> でない場合、単にその内容を返します;
+そうでない場合には上で記述されている検索が実行され、その結果が返されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tempfile.template">
+<tt class="descclassname">tempfile.</tt><tt class="descname">template</tt><a class="headerlink" href="#tempfile.template" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="deprecated">
+<span class="versionmodified">バージョン 2.0 で撤廃: </span>代わりに <a class="reference internal" href="#tempfile.gettempprefix" title="tempfile.gettempprefix"><tt class="xref py py-func docutils literal"><span class="pre">gettempprefix()</span></tt></a> を使ってください。</p>
+<p>この値に <tt class="docutils literal"><span class="pre">None</span></tt> 以外の値を設定した場合、 <a class="reference internal" href="#tempfile.mktemp" title="tempfile.mktemp"><tt class="xref py py-func docutils literal"><span class="pre">mktemp()</span></tt></a> が返すファイル名のディレクトリ部を含まない先頭部分 (プレフィクス) を定義します。ファイル名を一意にするために、 6 つのランダムな文字および数字がこのプレフィクスの後に追加されます。デフォルトのプレフィックスは <tt class="file docutils literal"><span class="pre">tmp</span></tt> です。</p>
+<p>このモジュールの古いバージョンでは、 <a class="reference internal" href="os.html#os.fork" title="os.fork"><tt class="xref py py-func docutils literal"><span class="pre">os.fork()</span></tt></a> を呼び出した後に <tt class="docutils literal"><span class="pre">template</span></tt> を <tt class="docutils literal"><span class="pre">None</span></tt>
+に設定することが必要でした;  この仕様はバージョン 1.5.2 からは必要なくなりました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tempfile.gettempprefix">
+<tt class="descclassname">tempfile.</tt><tt class="descname">gettempprefix</tt><big>(</big><big>)</big><a class="headerlink" href="#tempfile.gettempprefix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>一時ファイルを生成する際に使われるファイル名の先頭部分を返します。この先頭部分にはディレクトリ部は含まれません。変数 <em>template</em>
+を直接読み出すよりもこの関数を使うことを勧めます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="glob.html" title="10.7. glob — Unix 形式のパス名のパターン展開"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="filecmp.html" title="10.5. filecmp — ファイルおよびディレクトリの比較"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" >10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

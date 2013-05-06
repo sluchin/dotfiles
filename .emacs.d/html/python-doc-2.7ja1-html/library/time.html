@@ -1,0 +1,665 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>15.3. time — 時刻データへのアクセスと変換 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="15. 汎用オペレーティングシステムサービス" href="allos.html" />
+    <link rel="next" title="15.4. argparse — コマンドラインオプション、引数、サブコマンドのパーサー" href="argparse.html" />
+    <link rel="prev" title="15.2. io — ストリームを扱うコアツール" href="io.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="argparse.html" title="15.4. argparse — コマンドラインオプション、引数、サブコマンドのパーサー"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="io.html" title="15.2. io — ストリームを扱うコアツール"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="allos.html" accesskey="U">15. 汎用オペレーティングシステムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="io.html"
+                        title="前の章へ">15.2. <tt class="docutils literal docutils literal docutils literal"><span class="pre">io</span></tt> &#8212; ストリームを扱うコアツール</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="argparse.html"
+                        title="次の章へ">15.4. <tt class="docutils literal docutils literal docutils literal"><span class="pre">argparse</span></tt> &#8212; コマンドラインオプション、引数、サブコマンドのパーサー</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/time.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-time">
+<span id="time"></span><h1>15.3. <a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-mod docutils literal"><span class="pre">time</span></tt></a> &#8212; 時刻データへのアクセスと変換<a class="headerlink" href="#module-time" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>このモジュールでは、時刻に関するさまざまな関数を提供します。関連した機能について、 <a class="reference internal" href="datetime.html#module-datetime" title="datetime: 基本的な日付型および時間型。"><tt class="xref py py-mod docutils literal"><span class="pre">datetime</span></tt></a>, <a class="reference internal" href="calendar.html#module-calendar" title="calendar: Unix の cal プログラム相当の機能を含んだカレンダーに関する関数群"><tt class="xref py py-mod docutils literal"><span class="pre">calendar</span></tt></a> モジュールも参照してください。</p>
+<p>このモジュールは常に利用可能ですが、全ての関数が全てのプラットフォームで利用可能なわけではありません。このモジュールで定義されているほとんどの関数は、プラットフォーム上の同名の C
+ライブラリ関数を呼び出します。これらの関数に対する意味付けはプラットフォーム間で異なるため、プラットフォーム提供のドキュメントを読んでおくと便利でしょう。</p>
+<p>まずいくつかの用語の説明と慣習について整理します。</p>
+<ul class="simple" id="index-0">
+<li><em class="dfn">エポック</em> (<em class="dfn">epoch</em>) は、時刻の計測がはじまった時点のことです。その年の 1 月 1 日の午前 0 時に
+&#8220;エポックからの経過時間&#8221; が 0 になるように設定されます。Unixではエポックは 1970 年です。エポックがどうなっているかを知るには、
+<tt class="docutils literal"><span class="pre">gmtime(0)</span></tt> の値を見るとよいでしょう。</li>
+</ul>
+<ul class="simple" id="index-1">
+<li>このモジュールの中の関数は、エポック以前あるいは遠い未来の日付や時刻を扱うことができません。将来カットオフ（関数が正しく日付や時刻を扱えなくなる）が起きる時点は、C ライブラリによって決まります。 Unixではカットオフは通常 2038  です。</li>
+</ul>
+<ul class="simple" id="time-y2kissues">
+<span id="index-2"></span><li><strong>2000年問題 (Y2K)</strong>: Python はプラットフォームの C ライブラリに依存しています。C
+ライブラリは日付および時刻をエポックからの経過秒で表現するので、一般的に 2000 年問題を持ちません。時刻を表現する <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> （下記を参照してください）を入力として受け取る関数は一般的に 4
+桁表記の西暦年を要求します。以前のバージョンとの互換性のために、モジュール変数 <tt class="docutils literal"><span class="pre">accept2dyear</span></tt> がゼロでない整数の場合、 2
+桁の西暦年をサポートします。この変数の初期値は環境変数 <span class="target" id="index-3"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONY2K"><tt class="xref std std-envvar docutils literal"><span class="pre">PYTHONY2K</span></tt></a> が空文字列のとき <tt class="docutils literal"><span class="pre">1</span></tt> に設定されます。空文字列でない文字列が設定されている場合、 <tt class="docutils literal"><span class="pre">0</span></tt> に設定されます。こうして、 <span class="target" id="index-4"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONY2K"><tt class="xref std std-envvar docutils literal"><span class="pre">PYTHONY2K</span></tt></a>
+を空文字列でない文字列に設定することで、西暦年の入力がすべて 4 桁の西暦年でなければならないようにすることができます。
+2桁の西暦年が入力された場合には、POSIX または X/Open 標準に従って変換されます: 69-99 の西暦年は 1969-1999 となり、0&#8211;68
+の西暦年は 2000&#8211;2068 になります。100-1899 は常に不正な値になります。この仕様は  Python 1.5.2(a2)
+から新たに追加された機能であることに注意してください; それ以前のバージョン、すなわち Python 1.5.1 および 1.5.2a1 では、1900
+以下の年に対して 1900 を足します。</li>
+</ul>
+<ul class="simple" id="index-5">
+<li>UTC は協定世界時 (Coordinated Universal Time) のことです   (以前はグリニッジ標準時  または
+GMTとして知られていました)。 UTC の頭文字の並びは誤りではなく、英仏の妥協によるものです。</li>
+</ul>
+<ul id="index-6">
+<li><p class="first">DST は夏時間 (Daylight Saving Time)   のことで、一年のうち部分的に 1 時間タイムゾーンを修正することです。DST
+のルールは不可思議で (局所的な法律で定められています)、年ごとに変わることもあります。 C ライブラリはローカルルールを記したテーブルを持っており
+(柔軟に対応するため、たいていはシステムファイルから読み込まれます)、この点に関しては唯一の真実の知識の源です。</p>
+</li>
+<li><p class="first">多くの現時刻を返す関数 (real-time functions) の精度は、値や引数を表現するのに使う単位から想像されるよりも低いかも知れません。例えば、ほとんどの Unix システムで、クロックの一刹那 (ticks) の精度は 1 秒の 50 から 100 分の 1 に過ぎません。</p>
+</li>
+<li><p class="first">反対に、 <a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-func docutils literal"><span class="pre">time()</span></tt></a> および <a class="reference internal" href="#time.sleep" title="time.sleep"><tt class="xref py py-func docutils literal"><span class="pre">sleep()</span></tt></a> は Unix の同等の関数よりましな精度を持っています: 時刻は浮動小数点で表され、
+<a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-func docutils literal"><span class="pre">time()</span></tt></a> は可能なかぎり最も正確な時刻を (Unix の <tt class="xref c c-func docutils literal"><span class="pre">gettimeofday()</span></tt> があればそれを使って) 返します。また
+<a class="reference internal" href="#time.sleep" title="time.sleep"><tt class="xref py py-func docutils literal"><span class="pre">sleep()</span></tt></a> にはゼロでない端数を与えることができます (Unix の <tt class="xref c c-func docutils literal"><span class="pre">select()</span></tt> があれば、それを使って実装しています)。</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a>, <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a>, <a class="reference internal" href="#time.strptime" title="time.strptime"><tt class="xref py py-func docutils literal"><span class="pre">strptime()</span></tt></a> が返す時刻値、および
+<a class="reference internal" href="#time.asctime" title="time.asctime"><tt class="xref py py-func docutils literal"><span class="pre">asctime()</span></tt></a>, <a class="reference internal" href="#time.mktime" title="time.mktime"><tt class="xref py py-func docutils literal"><span class="pre">mktime()</span></tt></a>, <a class="reference internal" href="#time.strftime" title="time.strftime"><tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt></a> に与える時刻値はどちらも 9 つの整数からなるシーケンスです。
+<a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a>, <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a>, <a class="reference internal" href="#time.strptime" title="time.strptime"><tt class="xref py py-func docutils literal"><span class="pre">strptime()</span></tt></a> の戻り値は属性名でアクセスすることもできます。</p>
+<p>これらのオブジェクトについての解説は <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> を参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.2 で変更: </span>時刻値の配列はタプルから <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> に変更され、それぞれのフィールドに属性名がつけられました。</p>
+</li>
+</ul>
+<ul>
+<li><p class="first">時間の表現を変換するためには、以下の関数を利用してください。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">From</p>
+</th>
+<th class="head"><p class="first last">To</p>
+</th>
+<th class="head"><p class="first last">Use</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">epochからの秒数</p>
+</td>
+<td><p class="first last"><a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> in
+UTC</p>
+</td>
+<td><p class="first last"><a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a></p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last">epochからの秒数</p>
+</td>
+<td><p class="first last"><a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> in
+local time</p>
+</td>
+<td><p class="first last"><a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a></p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first last"><a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> in
+UTC</p>
+</td>
+<td><p class="first last">epochからの秒数</p>
+</td>
+<td><p class="first last"><a class="reference internal" href="calendar.html#calendar.timegm" title="calendar.timegm"><tt class="xref py py-func docutils literal"><span class="pre">calendar.timegm()</span></tt></a></p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last"><a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> in
+local time</p>
+</td>
+<td><p class="first last">epochからの秒数</p>
+</td>
+<td><p class="first last"><a class="reference internal" href="#time.mktime" title="time.mktime"><tt class="xref py py-func docutils literal"><span class="pre">mktime()</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<p>このモジュールでは以下の関数とデータ型を定義します:</p>
+<dl class="data">
+<dt id="time.accept2dyear">
+<tt class="descclassname">time.</tt><tt class="descname">accept2dyear</tt><a class="headerlink" href="#time.accept2dyear" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>2 桁の西暦年を使えるかを指定するブール型の値です。標準では真ですが、環境変数 <span class="target" id="index-7"></span><a class="reference internal" href="../using/cmdline.html#envvar-PYTHONY2K"><tt class="xref std std-envvar docutils literal"><span class="pre">PYTHONY2K</span></tt></a>
+が空文字列でない値に設定されている場合には偽になります。実行時に変更することもできます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="time.altzone">
+<tt class="descclassname">time.</tt><tt class="descname">altzone</tt><a class="headerlink" href="#time.altzone" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ローカルの夏時間タイムゾーンにおける UTC からの時刻オフセットで、西に行くほど増加する秒で表した値です (ほとんどの西ヨーロッパでは負になり、アメリカでは正、イギリスではゼロになります) 。 <tt class="docutils literal"><span class="pre">daylight</span></tt> がゼロでないときのみ使用してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.asctime">
+<tt class="descclassname">time.</tt><tt class="descname">asctime</tt><big>(</big><span class="optional">[</span><em>t</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#time.asctime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a> や <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a> が返す時刻を表現するタプル又は <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> を、 <tt class="docutils literal"><span class="pre">'Sun</span>
+<span class="pre">Jun</span> <span class="pre">20</span> <span class="pre">23:21:05</span> <span class="pre">1993'</span></tt>  といった書式の 24 文字の文字列に変換します。 <em>t</em> が与えられていない場合には、
+<a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a> が返す現在の時刻が使われます。 <a class="reference internal" href="#time.asctime" title="time.asctime"><tt class="xref py py-func docutils literal"><span class="pre">asctime()</span></tt></a> はロケール情報を使いません。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">同名の C の関数と違って、末尾には改行文字はありません。</p>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.1 で変更: </span><em>tuple</em> を省略できるようになりました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.clock">
+<tt class="descclassname">time.</tt><tt class="descname">clock</tt><big>(</big><big>)</big><a class="headerlink" href="#time.clock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-8">Unixでは、現在のプロセッサ時間秒を浮動小数点数で返します。時刻の精度および &#8220;プロセッサ時間 (processor time)&#8221;   の定義そのものは同じ名前の C 関数に依存します。いずれにせよ、この関数は Python のベンチマークや計時アルゴリズムに使われています。</p>
+<p>Windows では、最初にこの関数が呼び出されてからの経過時間を wall-clock 秒で返します。この関数は Win32 関数
+<tt class="xref c c-func docutils literal"><span class="pre">QueryPerformanceCounter()</span></tt> に基づいていて、その精度は通常 1 マイクロ秒以下です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.ctime">
+<tt class="descclassname">time.</tt><tt class="descname">ctime</tt><big>(</big><span class="optional">[</span><em>secs</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#time.ctime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エポックからの経過秒数で表現された時刻を、ローカルの時刻を表現する文字列に変換します。 <em>secs</em> を指定しない、または <tt class="docutils literal"><span class="pre">None</span></tt>
+を指定した場合、 <a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-func docutils literal"><span class="pre">time()</span></tt></a> が返す値を現在の時刻として使います。 <tt class="docutils literal"><span class="pre">ctime(secs)</span></tt> は
+<tt class="docutils literal"><span class="pre">asctime(localtime(secs))</span></tt> と同じです。 <a class="reference internal" href="#time.ctime" title="time.ctime"><tt class="xref py py-func docutils literal"><span class="pre">ctime()</span></tt></a> はロケール情報を使いません。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.1 で変更: </span><em>secs</em> を省略できるようになりました.</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span><em>secs</em> が <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> の場合に現在時刻を使うようになりました.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="time.daylight">
+<tt class="descclassname">time.</tt><tt class="descname">daylight</tt><a class="headerlink" href="#time.daylight" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>DST タイムゾーンが定義されている場合ゼロでない値になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.gmtime">
+<tt class="descclassname">time.</tt><tt class="descname">gmtime</tt><big>(</big><span class="optional">[</span><em>secs</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#time.gmtime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エポックからの経過時間で表現された時刻を、UTC における <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> に変換します。このとき dst
+フラグは常にゼロとして扱われます。 <em>secs</em> を指定しない、または <tt class="docutils literal"><span class="pre">None</span></tt> を指定した場合、 <a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-func docutils literal"><span class="pre">time()</span></tt></a>
+が返す値を現在の時刻として使います。秒の端数は無視されます。 <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> のレイアウトについては上を参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.1 で変更: </span><em>secs</em> を省略できるようになりました.</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span><em>secs</em> が <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> の場合に現在時刻を使うようになりました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.localtime">
+<tt class="descclassname">time.</tt><tt class="descname">localtime</tt><big>(</big><span class="optional">[</span><em>secs</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#time.localtime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a> に似ていますが、ローカルタイムに変換します。 <em>secs</em> を指定しない、または <tt class="docutils literal"><span class="pre">None</span></tt> を指定した場合、
+<a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-func docutils literal"><span class="pre">time()</span></tt></a> が返す値を現在の時刻として使います。現在の時刻に DST が適用される場合、 dst フラグは <tt class="docutils literal"><span class="pre">1</span></tt> に設定されます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.1 で変更: </span><em>secs</em> を省略できるようになりました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span><em>secs</em> が <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> の場合に現在時刻を使うようになりました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.mktime">
+<tt class="descclassname">time.</tt><tt class="descname">mktime</tt><big>(</big><em>t</em><big>)</big><a class="headerlink" href="#time.mktime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a> の逆を行う関数です。引数は <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> か完全な 9 つの要素全てに値の入ったタプル
+(dst フラグも必要です; 現在の時刻に DST が適用されるか不明の場合には <tt class="docutils literal"><span class="pre">-1</span></tt> を使ってください) で、 UTC ではなく <em>ローカルの</em>
+時刻を指定します。 <a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-func docutils literal"><span class="pre">time()</span></tt></a> との互換性のために浮動小数点数の値を返します。入力の値が正しい時刻で表現できない場合、例外 <a class="reference internal" href="exceptions.html#exceptions.OverflowError" title="exceptions.OverflowError"><tt class="xref py py-exc docutils literal"><span class="pre">OverflowError</span></tt></a> または <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が送出されます
+(どちらが送出されるかは Python およびその下にある C ライブラリのどちらにとって無効な値が入力されたかで決まります)
+。この関数で生成できる最も昔の時刻値はプラットフォームに依存します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.sleep">
+<tt class="descclassname">time.</tt><tt class="descname">sleep</tt><big>(</big><em>secs</em><big>)</big><a class="headerlink" href="#time.sleep" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた秒数の間実行を停止します。より精度の高い実行停止時間を指定するために、引数は浮動小数点にしてもかまいません。何らかのシステムシグナルがキャッチされた場合、それに続いてシグナル処理ルーチンが実行され、 <a class="reference internal" href="#time.sleep" title="time.sleep"><tt class="xref py py-func docutils literal"><span class="pre">sleep()</span></tt></a> を停止してしまいます。従って実際の実行停止時間は要求した時間よりも短くなるかもしれません。また、システムが他の処理をスケジューリングするために、実行停止時間が要求した時間よりも多少長い時間になることもあります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.strftime">
+<tt class="descclassname">time.</tt><tt class="descname">strftime</tt><big>(</big><em>format</em><span class="optional">[</span>, <em>t</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#time.strftime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a> や <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a> が返す時刻値タプル又は <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> を、 <em>format</em>
+で指定した文字列形式に変換します。 <em>t</em> が与えられていない場合、 <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a> が返す現在の時刻が使われます。 <em>format</em>
+は文字列でなくてはなりません。 <em>t</em> のいずれかのフィールドが許容範囲外の数値であった場合、 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.1 で変更: </span><em>t</em> を省略できるようになりました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span><em>t</em> のフィールド値が許容範囲外の値の場合に <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出するようになりました.</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>0 は時刻値タプルのどこでも使用可能になりました。もし不正な値の場合には正常な値に修正されます。</p>
+<p><em>format</em> 文字列には以下の指示語 (directive) を埋め込むことができます。これらはフィールド長や精度のオプションを付けずに表され、
+<a class="reference internal" href="#time.strftime" title="time.strftime"><tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt></a> の結果の対応する文字列と入れ替えられます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="77%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Directive</th>
+<th class="head">Meaning</th>
+<th class="head">Notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%a</span></tt></td>
+<td>ロケールにおける省略形の曜日名。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%A</span></tt></td>
+<td>ロケールにおける省略なしの曜日名。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%b</span></tt></td>
+<td>ロケールにおける省略形の月名。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%B</span></tt></td>
+<td>ロケールにおける省略なしの月名。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%c</span></tt></td>
+<td>ロケールにおける適切な日付および時刻表現。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%d</span></tt></td>
+<td>月の始めから何日目かを表す 10 進数 [01,31]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%H</span></tt></td>
+<td>(24 時間計での) 時を表す 10 進数 [00,23]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%I</span></tt></td>
+<td>(12 時間計での) 時を表す 10 進数 [01,12]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%j</span></tt></td>
+<td>年の初めから何日目かを表す 10 進数 [001,366]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%m</span></tt></td>
+<td>月を表す 10 進数 [01,12]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%M</span></tt></td>
+<td>分を表す 10 進数 [00,59]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%p</span></tt></td>
+<td>ロケールにおける AM または PM に対応する文字列。</td>
+<td>(1)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%S</span></tt></td>
+<td>秒を表す 10 進数 [00,61]。</td>
+<td>(2)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%U</span></tt></td>
+<td>年の初めから何週目か (日曜を週の始まりとします)を表す
+10 進数
+[00,53]。年が明けてから最初の日曜日までの全ての曜日は 0 週目に属すると見なされます。</td>
+<td>(3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%w</span></tt></td>
+<td>曜日を表す 10 進数 [0(日曜日),6]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%W</span></tt></td>
+<td>年の初めから何週目か (日曜を週の始まりとします)を表す
+10 進数
+[00,53]。年が明けてから最初の月曜日までの全ての曜日は 0 週目に属すると見なされます。</td>
+<td>(3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%x</span></tt></td>
+<td>ロケールにおける適切な日付の表現。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%X</span></tt></td>
+<td>ロケールにおける適切な時刻の表現。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%y</span></tt></td>
+<td>上 2 桁なしの西暦年を表す 10 進数 [00,99]。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%Y</span></tt></td>
+<td>上 2 桁付きの西暦年を表す 10 進数。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">%Z</span></tt></td>
+<td>タイムゾーンの名前 (タイムゾーンがない場合には空文字列)。</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">%%</span></tt></td>
+<td>文字 <tt class="docutils literal"><span class="pre">'%'</span></tt> 自体の表現。</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>注意:</p>
+<ol class="arabic simple">
+<li><a class="reference internal" href="#time.strptime" title="time.strptime"><tt class="xref py py-func docutils literal"><span class="pre">strptime()</span></tt></a> 関数で使う場合、 <tt class="docutils literal"><span class="pre">%p</span></tt> ディレクティブが出力結果の時刻フィールドに影響を及ぼすのは、時刻を解釈するために <tt class="docutils literal"><span class="pre">%I</span></tt>
+を使ったときのみです。</li>
+<li>値の幅は間違いなく <tt class="docutils literal"><span class="pre">0</span></tt> to <tt class="docutils literal"><span class="pre">61</span></tt> です; これはうるう秒と、（ごく稀ですが）2 重のうるう秒のためのものです。</li>
+<li><a class="reference internal" href="#time.strptime" title="time.strptime"><tt class="xref py py-func docutils literal"><span class="pre">strptime()</span></tt></a> 関数で使う場合、 <tt class="docutils literal"><span class="pre">%U</span></tt> および <tt class="docutils literal"><span class="pre">%W</span></tt> を計算に使うのは曜日と年を指定したときだけです。</li>
+</ol>
+<p>以下に <span class="target" id="index-9"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> インターネット電子メール標準で定義されている日付表現と互換の書式の例を示します。  <a class="footnote-reference" href="#id2" id="id1">[1]</a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%a, </span><span class="si">%d</span><span class="s"> %b %Y %H:%M:%S +0000&quot;</span><span class="p">,</span> <span class="n">gmtime</span><span class="p">())</span>
+<span class="go">&#39;Thu, 28 Jun 2001 14:17:15 +0000&#39;</span>
+</pre></div>
+</div>
+<p>いくつかのプラットフォームではさらにいくつかの指示語がサポートされていますが、標準 ANSI C で意味のある値はここで列挙したものだけです。</p>
+<p>いくつかのプラットフォームでは、フィールドの幅や精度を指定するオプションが以下のように指示語の先頭の文字 <tt class="docutils literal"><span class="pre">'%'</span></tt> の直後に付けられるようになっていました; この機能も移植性はありません。フィールドの幅は通常 2 ですが、 <tt class="docutils literal"><span class="pre">%j</span></tt> は例外で 3 です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.strptime">
+<tt class="descclassname">time.</tt><tt class="descname">strptime</tt><big>(</big><em>string</em><span class="optional">[</span>, <em>format</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#time.strptime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>時刻を表現する文字列をフォーマットに従って解釈します。返される値は <a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a> や <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a>
+が返すような <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> です。</p>
+<p><em>format</em> パラメタは <a class="reference internal" href="#time.strftime" title="time.strftime"><tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt></a> で使うものと同じ指示語を使います;
+このパラメタの値はデフォルトでは <tt class="docutils literal"><span class="pre">&quot;%a</span> <span class="pre">%b</span> <span class="pre">%d</span> <span class="pre">%H:%M:%S</span> <span class="pre">%Y&quot;</span></tt> で、 <a class="reference internal" href="#time.ctime" title="time.ctime"><tt class="xref py py-func docutils literal"><span class="pre">ctime()</span></tt></a> が返すフォーマットに一致します。
+<em>string</em> が <em>format</em> に従って解釈できなかった場合、例外 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が送出されます。解析しようとする <em>string</em> が解析後に余分なデータを持っていた場合、 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a>
+が送出されます。欠落したデータについて、適切な値を推測できない場合はデフォルトの値で埋められ、その値は <tt class="docutils literal"><span class="pre">(1900,</span> <span class="pre">1,</span> <span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0,</span>
+<span class="pre">1,</span> <span class="pre">-1)</span></tt> です。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s">&quot;30 Nov 00&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s"> %b %y&quot;</span><span class="p">)</span>   <span class="c"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="go">time.struct_time(tm_year=2000, tm_mon=11, tm_mday=30, tm_hour=0, tm_min=0,</span>
+<span class="go">                 tm_sec=0, tm_wday=3, tm_yday=335, tm_isdst=-1)</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">%Z</span></tt> 指示語へのサポートは <tt class="docutils literal"><span class="pre">tzname</span></tt> に収められている値と <tt class="docutils literal"><span class="pre">daylight</span></tt> が真かどうかで決められます。このため、常に既知の
+(かつ夏時間でないと考えられている) UTC や GMT を認識する時以外はプラットフォーム固有の動作になります。</p>
+<p>ドキュメント内で説明されているディレクティブだけがサポートされています。
+<tt class="docutils literal"><span class="pre">strftime()</span></tt> はプラットフォームによって実装されているので、説明されていないディレクティブも利用できるかもしれません。しかし、 <tt class="docutils literal"><span class="pre">strptime()</span></tt> はプラットフォーム非依存なので、サポートされているディレクティブ以外は利用できないかもしれません。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="time.struct_time">
+<em class="property">class </em><tt class="descclassname">time.</tt><tt class="descname">struct_time</tt><a class="headerlink" href="#time.struct_time" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a>, <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a> および <a class="reference internal" href="#time.strptime" title="time.strptime"><tt class="xref py py-func docutils literal"><span class="pre">strptime()</span></tt></a> が返す時刻値シーケンスのタイプです。これは名前付きタプル(<a class="reference internal" href="../glossary.html#term-named-tuple"><em class="xref std std-term">named tuple</em></a>)のインタフェースをもったオブジェクトです。値はインデックスでも属性名でもアクセス可能です。以下の値があります。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="28%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Index</th>
+<th class="head">Attribute</th>
+<th class="head">Values</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_year</span></tt></td>
+<td>(例えば 1993)</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_mon</span></tt></td>
+<td>[1,12] の間の数</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_mday</span></tt></td>
+<td>[1,31] の間の数</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_hour</span></tt></td>
+<td>[0,23] の間の数</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_min</span></tt></td>
+<td>[0,59] の間の数</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_sec</span></tt></td>
+<td>[0,61] の間の数 <a class="reference internal" href="#time.strftime" title="time.strftime"><tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt></a>
+の説明にある <strong>(1)</strong> を読んで下さい</td>
+</tr>
+<tr class="row-even"><td>6</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_wday</span></tt></td>
+<td>[0,6] の間の数、月曜が 0 になります</td>
+</tr>
+<tr class="row-odd"><td>7</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_yday</span></tt></td>
+<td>[1,366] の間の数</td>
+</tr>
+<tr class="row-even"><td>8</td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">tm_isdst</span></tt></td>
+<td>0, 1 または -1; 以下を参照してください</td>
+</tr>
+</tbody>
+</table>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+<p>C の構造体と違って、月の値が 0-11 でなく 1-12 であることに注意してください。西暦年の値は上の <a class="reference internal" href="#time-y2kissues"><em>2000年問題 (Y2K)</em></a> で述べたように扱われます。夏時間フラグを <tt class="docutils literal"><span class="pre">-1</span></tt> にして <a class="reference internal" href="#time.mktime" title="time.mktime"><tt class="xref py py-func docutils literal"><span class="pre">mktime()</span></tt></a> に渡すと、たいていは正確な夏時間の状態を実現します。</p>
+<p><a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> を引数とする関数に正しくない長さの <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> や要素の型が正しくない <a class="reference internal" href="#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">struct_time</span></tt></a> を与えた場合には、 <a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> が送出されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.time">
+<tt class="descclassname">time.</tt><tt class="descname">time</tt><big>(</big><big>)</big><a class="headerlink" href="#time.time" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>時刻を浮動小数点数で返します。単位は UTC におけるエポックからの秒数です。時刻は常に浮動小数点で返されますが、全てのシステムが 1 秒より高い精度で時刻を提供するとは限らないので注意してください。この関数が返す値は通常減少していくことはありませんが、この関数を 2 回呼び出し、呼び出しの間にシステムクロックの時刻を巻き戻して設定した場合には、以前の呼び出しよりも低い値が返ることもあります。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="time.timezone">
+<tt class="descclassname">time.</tt><tt class="descname">timezone</tt><a class="headerlink" href="#time.timezone" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>(DST でない) ローカルタイムゾーンの UTC からの時刻オフセットで、西に行くほど増加する秒で表した値です (ほとんどの西ヨーロッパでは負になり、アメリカでは正、イギリスではゼロになります) 。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="time.tzname">
+<tt class="descclassname">time.</tt><tt class="descname">tzname</tt><a class="headerlink" href="#time.tzname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの文字列からなるタプルです。最初の要素は DST でないローカルのタイムゾーン名です。ふたつめの要素は DST のタイムゾーンです。 DST
+のタイムゾーンが定義されていない場合。二つ目の文字列を使うべきではありません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time.tzset">
+<tt class="descclassname">time.</tt><tt class="descname">tzset</tt><big>(</big><big>)</big><a class="headerlink" href="#time.tzset" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ライブラリで使われている時刻変換規則をリセットします。どのように行われるかは、環境変数 <span class="target" id="index-10"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TZ</span></tt> で指定されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p>利用できるシステム: Unix。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p>多くの場合、環境変数 <span class="target" id="index-11"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TZ</span></tt> を変更すると、 <a class="reference internal" href="#time.tzset" title="time.tzset"><tt class="xref py py-func docutils literal"><span class="pre">tzset()</span></tt></a> を呼ばない限り <a class="reference internal" href="#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">localtime()</span></tt></a>
+のような関数の出力に影響を及ぼすため、値が信頼できなくなってしまいます。</p>
+<p class="last"><span class="target" id="index-12"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TZ</span></tt> 環境変数には空白文字を含めてはなりません。</p>
+</div>
+<p>環境変数 <span class="target" id="index-13"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TZ</span></tt> の標準的な書式は以下です (分かりやすいように空白を入れています):</p>
+<div class="highlight-python"><pre>std offset [dst [offset [,start[/time], end[/time]]]]</pre>
+</div>
+<p>各値は以下のようになっています:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">std</span></tt> と <tt class="docutils literal"><span class="pre">dst</span></tt></dt>
+<dd>三文字またはそれ以上の英数字で、タイムゾーンの略称を与えます。この値は time.tzname になります。</dd>
+<dt><tt class="docutils literal"><span class="pre">offset</span></tt></dt>
+<dd>オフセットは形式: ± hh[:mm[:ss]] をとります。この表現は、UTC 時刻にするためにローカルな時間に加算する必要のある時間値を示します。&#8217;-&#8216;
+が先頭につく場合、そのタイムゾーンは本子午線 (Prime Meridian) より東側にあります; それ以外の場合は本子午線の西側です。オフセットが
+dst の後ろに続かない場合、夏時間は標準時より一時間先行しているものと仮定します。</dd>
+<dt><tt class="docutils literal"><span class="pre">start[/time],</span> <span class="pre">end[/time]</span></tt></dt>
+<dd><p class="first">いつ DST に移動し、DST から戻ってくるかを示します。開始および終了日時の形式は以下のいずれかです:</p>
+<dl class="docutils">
+<dt><tt class="samp docutils literal"><span class="pre">J</span><em><span class="pre">n</span></em></tt></dt>
+<dd>ユリウス日 (Julian day) <em>n</em> (1 &lt;= <em>n</em> &lt;= 365) を表します。うるう日は計算に含められないため、2 月 28 日は常に 59
+で、 3 月 1 日は 60 になります。</dd>
+<dt><tt class="samp docutils literal"><em><span class="pre">n</span></em></tt></dt>
+<dd>ゼロから始まるユリウス日 (0 &lt;= <em>n</em> &lt;= 365) です。うるう日は計算に含められるため、2 月 29 日を参照することができます。</dd>
+<dt><tt class="samp docutils literal"><span class="pre">M</span><em><span class="pre">m</span></em><span class="pre">.</span><em><span class="pre">n</span></em><span class="pre">.</span><em><span class="pre">d</span></em></tt></dt>
+<dd><em>m</em> 月の第 <em>n</em> 週における <em>d</em> 番目の日 (0 &lt;= <em>d</em> &lt;= 6, 1 &lt;= <em>n</em> &lt;= 5,  1 &lt;= <em>m</em> &lt;= 12)
+を表します。週 5 は月における最終週の <em>d</em> 番目の日を表し、第 4 週か第 5 週のどちらかになります。週 1 は日 <em>d</em> が最初に現れる日を指します。日 0 は日曜日です。</dd>
+</dl>
+<p class="last"><tt class="docutils literal"><span class="pre">time</span></tt> は <tt class="docutils literal"><span class="pre">offset</span></tt> とほぼ同じで、先頭に符号 (&#8216;-&#8216; や &#8216;+&#8217;) を付けてはいけないところだけが違います。時刻が指定されていなければ、デフォルトの値 02:00:00 になります。</p>
+</dd>
+</dl>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;TZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;EST+05EDT,M4.1.0,M10.5.0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">tzset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%X</span><span class="s"> </span><span class="si">%x</span><span class="s"> %Z&#39;</span><span class="p">)</span>
+<span class="go">&#39;02:07:36 05/08/03 EDT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;TZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;AEST-10AEDT-11,M10.5.0,M3.5.0&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">tzset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%X</span><span class="s"> </span><span class="si">%x</span><span class="s"> %Z&#39;</span><span class="p">)</span>
+<span class="go">&#39;16:08:12 05/08/03 AEST&#39;</span>
+</pre></div>
+</div>
+<p>多くの Unix システム (*BSD, Linux, Solaris, および Darwin を含む) では、システムの zoneinfo
+(<em class="manpage">tzfile(5)</em>) データベースを使ったほうが、タイムゾーンごとの規則を指定する上で便利です。これを行うには、必要なタイムゾーンデータファイルへのパスをシステムの &#8216;zoneinfo&#8217; タイムゾーンデータベースからの相対で表した値を環境変数
+<span class="target" id="index-14"></span><tt class="xref std std-envvar docutils literal"><span class="pre">TZ</span></tt> に設定します。システムの &#8216;zoneinfo&#8217; は通常 <tt class="file docutils literal"><span class="pre">/usr/share/zoneinfo</span></tt> にあります。例えば、
+<tt class="docutils literal"><span class="pre">'US/Eastern'</span></tt> 、 <tt class="docutils literal"><span class="pre">'Australia/Melbourne'</span></tt> 、 <tt class="docutils literal"><span class="pre">'Egypt'</span></tt>  ないし
+<tt class="docutils literal"><span class="pre">'Europe/Amsterdam'</span></tt> と指定します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;TZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;US/Eastern&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">tzset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">tzname</span>
+<span class="go">(&#39;EST&#39;, &#39;EDT&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;TZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Egypt&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">tzset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">tzname</span>
+<span class="go">(&#39;EET&#39;, &#39;EEST&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="datetime.html#module-datetime" title="datetime: 基本的な日付型および時間型。"><tt class="xref py py-mod docutils literal"><span class="pre">datetime</span></tt></a></dt>
+<dd>日付と時刻に対する、よりオブジェクト指向のインタフェースです。</dd>
+<dt>Module <a class="reference internal" href="locale.html#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a></dt>
+<dd>国際化サービス。ロケールの設定は <a class="reference internal" href="#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-mod docutils literal"><span class="pre">time</span></tt></a>  モジュールのいくつかの関数が返す値に影響をおよぼすことがあります。</dd>
+<dt>Module <a class="reference internal" href="calendar.html#module-calendar" title="calendar: Unix の cal プログラム相当の機能を含んだカレンダーに関する関数群"><tt class="xref py py-mod docutils literal"><span class="pre">calendar</span></tt></a></dt>
+<dd>一般的なカレンダー関連の関数。   <tt class="xref py py-func docutils literal"><span class="pre">timegm()</span></tt> はこのモジュールの <a class="reference internal" href="#time.gmtime" title="time.gmtime"><tt class="xref py py-func docutils literal"><span class="pre">gmtime()</span></tt></a> の逆の操作を行います。</dd>
+</dl>
+</div>
+<p class="rubric">注記</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>現在では <tt class="docutils literal"><span class="pre">%Z</span></tt> の利用は推奨されていません。しかしここで実現したい時間及び分オフセットへの展開を行ってくれる <tt class="docutils literal"><span class="pre">%Z</span></tt>  エスケープは全ての
+ANSI C ライブラリでサポートされているわけではありません。また、オリジナルの 1982 年に提出された <span class="target" id="index-15"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc822.html"><strong>RFC 822</strong></a> 標準は西暦年の表現を 2
+桁と要求しています(%Y でなく%y )。しかし実際には 2000 年になるだいぶ以前から 4 桁の西暦年表現に移行しています。4 桁の西暦年表現は
+<span class="target" id="index-16"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> において義務付けられ、伴って <span class="target" id="index-17"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc822.html"><strong>RFC 822</strong></a> での取り決めは撤廃されました。</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="argparse.html" title="15.4. argparse — コマンドラインオプション、引数、サブコマンドのパーサー"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="io.html" title="15.2. io — ストリームを扱うコアツール"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="allos.html" >15. 汎用オペレーティングシステムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

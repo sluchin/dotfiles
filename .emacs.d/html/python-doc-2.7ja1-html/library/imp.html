@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>30.1. imp — import 内部へアクセスする &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="30. モジュールのインポート" href="modules.html" />
+    <link rel="next" title="30.2. importlib – __import__() の便利なラッパー" href="importlib.html" />
+    <link rel="prev" title="30. モジュールのインポート" href="modules.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="importlib.html" title="30.2. importlib – __import__() の便利なラッパー"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="30. モジュールのインポート"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">30. モジュールのインポート</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">30.1. <tt class="docutils literal"><span class="pre">imp</span></tt> &#8212; <tt class="docutils literal"><span class="pre">import</span></tt> 内部へアクセスする</a><ul>
+<li><a class="reference internal" href="#examples-imp">30.1.1. 例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="modules.html"
+                        title="前の章へ">30. モジュールのインポート</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="importlib.html"
+                        title="次の章へ">30.2. <tt class="docutils literal"><span class="pre">importlib</span></tt> &#8211; <tt class="docutils literal"><span class="pre">__import__()</span></tt> の便利なラッパー</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/imp.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-imp">
+<span id="imp-import"></span><h1>30.1. <a class="reference internal" href="#module-imp" title="imp: import文の実装へアクセスする。"><tt class="xref py py-mod docutils literal"><span class="pre">imp</span></tt></a> &#8212; <a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> 内部へアクセスする<a class="headerlink" href="#module-imp" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<span class="target" id="index-0"></span><p>このモジュールは <a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> 文を実装するために使われているメカニズムへのインターフェイスを提供します。次の定数と関数が定義されています:</p>
+<dl class="function">
+<dt id="imp.get_magic">
+<tt class="descclassname">imp.</tt><tt class="descname">get_magic</tt><big>(</big><big>)</big><a class="headerlink" href="#imp.get_magic" title="この定義へのパーマリンク">¶</a></dt>
+<dd><span class="target" id="index-1"></span><p>バイトコンパイルされたコードファイル(<tt class="file docutils literal"><span class="pre">.pyc</span></tt> ファイル)を認識するために使われるマジック文字列値を返します。 (この値は Python の各バージョンで異なります。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.get_suffixes">
+<tt class="descclassname">imp.</tt><tt class="descname">get_suffixes</tt><big>(</big><big>)</big><a class="headerlink" href="#imp.get_suffixes" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>3要素のタプルのリストを返します。それぞれのタプルは特定の種類のモジュールを説明しています。各タプルは <tt class="docutils literal"><span class="pre">(suffix,</span> <span class="pre">mode,</span> <span class="pre">type)</span></tt> という形式です。ここで、 <em>suffix</em> は探すファイル名を作るためにモジュール名に追加する文字列です。そのファイルをオープンするために、 <em>mode</em> は組み込み <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> 関数へ渡されるモード文字列です
+(これはテキストファイル対しては <tt class="docutils literal"><span class="pre">'r'</span></tt> 、バイナリファイルに対しては <tt class="docutils literal"><span class="pre">'rb'</span></tt> となります)。
+<em>type</em> はファイル型で、以下で説明する値 <a class="reference internal" href="#imp.PY_SOURCE" title="imp.PY_SOURCE"><tt class="xref py py-const docutils literal"><span class="pre">PY_SOURCE</span></tt></a>, <a class="reference internal" href="#imp.PY_COMPILED" title="imp.PY_COMPILED"><tt class="xref py py-const docutils literal"><span class="pre">PY_COMPILED</span></tt></a>
+あるいは、 <a class="reference internal" href="#imp.C_EXTENSION" title="imp.C_EXTENSION"><tt class="xref py py-const docutils literal"><span class="pre">C_EXTENSION</span></tt></a> の一つを取ります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.find_module">
+<tt class="descclassname">imp.</tt><tt class="descname">find_module</tt><big>(</big><em>name</em><span class="optional">[</span>, <em>path</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imp.find_module" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュール <em>name</em> を見つけようとします。
+<em>path</em> が省略されるか <tt class="docutils literal"><span class="pre">None</span></tt> ならば、 <tt class="docutils literal"><span class="pre">sys.path</span></tt> によって与えられるディレクトリ名のリストが検索されます。しかし、最初にいくつか特別な場所を検索します。まず、所定の名前をもつ組み込みモジュール(<a class="reference internal" href="#imp.C_BUILTIN" title="imp.C_BUILTIN"><tt class="xref py py-const docutils literal"><span class="pre">C_BUILTIN</span></tt></a>)を見つけようとします。それから、フリーズされたモジュール(<a class="reference internal" href="#imp.PY_FROZEN" title="imp.PY_FROZEN"><tt class="xref py py-const docutils literal"><span class="pre">PY_FROZEN</span></tt></a>)、そしていくつかのシステムでは他の場所が同様に検索されます
+(Windowsでは、特定のファイルを指すレジストリの中を見ます)。</p>
+<p>それ以外の場合、 <em>path</em> はディレクトリ名のリストでなければなりません。上の <a class="reference internal" href="#imp.get_suffixes" title="imp.get_suffixes"><tt class="xref py py-func docutils literal"><span class="pre">get_suffixes()</span></tt></a> が返す拡張子のいずれかを伴ったファイルを各ディレクトリの中で検索します。リスト内の有効でない名前は黙って無視されます(しかし、すべてのリスト項目は文字列でなければなりません)。</p>
+<p>検索が成功すれば、戻り値は3要素のタプル <tt class="docutils literal"><span class="pre">(file,</span> <span class="pre">pathname,</span> <span class="pre">description)</span></tt> です:</p>
+<p><em>file</em> は先頭に位置合わせされたオープンファイルオブジェクトで、 <em>pathname</em> は見つかったファイルのパス名です。そして、 <em>description</em> は <a class="reference internal" href="#imp.get_suffixes" title="imp.get_suffixes"><tt class="xref py py-func docutils literal"><span class="pre">get_suffixes()</span></tt></a> が返すリストに含まれているような3要素のタプルで、見つかったモジュールの種類を説明しています。</p>
+<p>モジュールがファイルとして存在していなければ、返された <em>file</em> は <tt class="docutils literal"><span class="pre">None</span></tt> で、
+<em>pathname</em> は空文字列、 <em>description</em> タプルはその拡張子とモードに対して空文字列を含みます。モジュール型は上の括弧の中に示されます。検索が失敗すれば、 <a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> が発生します。他の例外は引数または環境に問題があることを示唆します。</p>
+<p>モジュールがパッケージならば、 <em>file</em> は <tt class="docutils literal"><span class="pre">None</span></tt> で、 <em>pathname</em> はパッケージのパスで
+<em>description</em> タプルの最後の項目は <a class="reference internal" href="#imp.PKG_DIRECTORY" title="imp.PKG_DIRECTORY"><tt class="xref py py-const docutils literal"><span class="pre">PKG_DIRECTORY</span></tt></a> です。</p>
+<p>この関数は階層的なモジュール名(ドットを含んだ名前)を扱いません。
+<em>P.M</em> 、すなわち、パッケージ <em>P</em> のサブモジュール <em>M</em> を見つけるためには、パッケージ <em>P</em> を見つけてロードするために <a class="reference internal" href="#imp.find_module" title="imp.find_module"><tt class="xref py py-func docutils literal"><span class="pre">find_module()</span></tt></a> と <a class="reference internal" href="#imp.load_module" title="imp.load_module"><tt class="xref py py-func docutils literal"><span class="pre">load_module()</span></tt></a> を使い、それから <tt class="docutils literal"><span class="pre">P.__path__</span></tt> に設定された <em>path</em> 引数とともに <a class="reference internal" href="#imp.find_module" title="imp.find_module"><tt class="xref py py-func docutils literal"><span class="pre">find_module()</span></tt></a> を使ってください。
+<em>P</em> 自身がドット名のときは、このレシピを再帰的に適用してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.load_module">
+<tt class="descclassname">imp.</tt><tt class="descname">load_module</tt><big>(</big><em>name</em>, <em>file</em>, <em>pathname</em>, <em>description</em><big>)</big><a class="headerlink" href="#imp.load_module" title="この定義へのパーマリンク">¶</a></dt>
+<dd><span class="target" id="index-2"></span><p><a class="reference internal" href="#imp.find_module" title="imp.find_module"><tt class="xref py py-func docutils literal"><span class="pre">find_module()</span></tt></a> を使って(あるいは、互換性のある結果を作り出す検索を行って)以前見つけたモジュールをロードします。この関数はモジュールをインポートするという以上のことを行います:
+モジュールが既にインポートされているならば、 <a class="reference internal" href="functions.html#reload" title="reload"><tt class="xref py py-func docutils literal"><span class="pre">reload()</span></tt></a> と同じです!
+<em>name</em> 引数は(これがパッケージのサブモジュールならばパッケージ名を含む)完全なモジュール名を示します。
+<em>file</em> 引数はオープンしたファイルで、 <em>pathname</em> は対応するファイル名です。モジュールがパッケージであるかファイルからロードされようとしていないとき、これらはそれぞれ <tt class="docutils literal"><span class="pre">None</span></tt> と <tt class="docutils literal"><span class="pre">''</span></tt> であっても構いません。
+<a class="reference internal" href="#imp.get_suffixes" title="imp.get_suffixes"><tt class="xref py py-func docutils literal"><span class="pre">get_suffixes()</span></tt></a> が返すように <em>description</em> 引数はタプルで、どの種類のモジュールがロードされなければならないかを説明するものです。</p>
+<p>ロードが成功したならば、戻り値はモジュールオブジェクトです。そうでなければ、例外(たいていは <a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a>)が発生します。</p>
+<p><strong>重要:</strong> <em>file</em> 引数が <tt class="docutils literal"><span class="pre">None</span></tt> でなければ、例外が発生した場合でも呼び出し側にはそれを閉じる責任があります。これを行うには、 <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> ... <a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 文を使うことが最も良いです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.new_module">
+<tt class="descclassname">imp.</tt><tt class="descname">new_module</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#imp.new_module" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> という名前の新しい空モジュールオブジェクトを返します。このオブジェクトは <tt class="docutils literal"><span class="pre">sys.modules</span></tt> に挿入され <em>ません</em> 。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.lock_held">
+<tt class="descclassname">imp.</tt><tt class="descname">lock_held</tt><big>(</big><big>)</big><a class="headerlink" href="#imp.lock_held" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在インポートロックが維持されているならば、 <tt class="docutils literal"><span class="pre">True</span></tt> を返します。そうでなければ、 <tt class="docutils literal"><span class="pre">False</span></tt> を返します。スレッドのないプラットホームでは、常に <tt class="docutils literal"><span class="pre">False</span></tt> を返します。</p>
+<p>スレッドのあるプラットホームでは、インポートが完了するまでインポートを実行するスレッドは内部ロックを維持します。このロックは元のインポートが完了するまで他のスレッドがインポートすることを阻止します。言い換えると、元のスレッドがそのインポート(および、もしあるならば、それによって引き起こされるインポート)
+の途中で構築した不完全なモジュールオブジェクトを、他のスレッドが見られないようにします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.acquire_lock">
+<tt class="descclassname">imp.</tt><tt class="descname">acquire_lock</tt><big>(</big><big>)</big><a class="headerlink" href="#imp.acquire_lock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>実行中のスレッドでインタープリタのインポートロックを取得します。インポートフックは、スレッドセーフのためにこのロックを取得しなければなりません。</p>
+<p>一旦スレッドがインポートロックを取得したら、その同じスレッドはブロックされることなくそのロックを再度取得できます。スレッドはロックを取得するのと同じだけ解放しなければなりません。</p>
+<p>スレッドのないプラットホームではこの関数は何もしません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.release_lock">
+<tt class="descclassname">imp.</tt><tt class="descname">release_lock</tt><big>(</big><big>)</big><a class="headerlink" href="#imp.release_lock" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インタープリタのインポートロックを解放します。スレッドのないプラットホームではこの関数は何もしません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<p>整数値をもつ次の定数はこのモジュールの中で定義されており、
+<a class="reference internal" href="#imp.find_module" title="imp.find_module"><tt class="xref py py-func docutils literal"><span class="pre">find_module()</span></tt></a> の検索結果を表すために使われます。</p>
+<dl class="data">
+<dt id="imp.PY_SOURCE">
+<tt class="descclassname">imp.</tt><tt class="descname">PY_SOURCE</tt><a class="headerlink" href="#imp.PY_SOURCE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ソースファイルとしてモジュールが発見された。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="imp.PY_COMPILED">
+<tt class="descclassname">imp.</tt><tt class="descname">PY_COMPILED</tt><a class="headerlink" href="#imp.PY_COMPILED" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンパイルされたコードオブジェクトファイルとしてモジュールが発見された。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="imp.C_EXTENSION">
+<tt class="descclassname">imp.</tt><tt class="descname">C_EXTENSION</tt><a class="headerlink" href="#imp.C_EXTENSION" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>動的にロード可能な共有ライブラリとしてモジュールが発見された。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="imp.PKG_DIRECTORY">
+<tt class="descclassname">imp.</tt><tt class="descname">PKG_DIRECTORY</tt><a class="headerlink" href="#imp.PKG_DIRECTORY" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パッケージディレクトリとしてモジュールが発見された。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="imp.C_BUILTIN">
+<tt class="descclassname">imp.</tt><tt class="descname">C_BUILTIN</tt><a class="headerlink" href="#imp.C_BUILTIN" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールが組み込みモジュールとして発見された。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="imp.PY_FROZEN">
+<tt class="descclassname">imp.</tt><tt class="descname">PY_FROZEN</tt><a class="headerlink" href="#imp.PY_FROZEN" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールがフリーズされたモジュールとして発見された(<a class="reference internal" href="#imp.init_frozen" title="imp.init_frozen"><tt class="xref py py-func docutils literal"><span class="pre">init_frozen()</span></tt></a> を参照)。</p>
+</dd></dl>
+
+<p>以下の定数と関数は旧バージョンのものです。
+<a class="reference internal" href="#imp.find_module" title="imp.find_module"><tt class="xref py py-func docutils literal"><span class="pre">find_module()</span></tt></a> や <a class="reference internal" href="#imp.load_module" title="imp.load_module"><tt class="xref py py-func docutils literal"><span class="pre">load_module()</span></tt></a> を使えば同様の機能を利用できます。これらは後方互換性のために残されています:</p>
+<dl class="data">
+<dt id="imp.SEARCH_ERROR">
+<tt class="descclassname">imp.</tt><tt class="descname">SEARCH_ERROR</tt><a class="headerlink" href="#imp.SEARCH_ERROR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>使われていません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.init_builtin">
+<tt class="descclassname">imp.</tt><tt class="descname">init_builtin</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#imp.init_builtin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> という名前の組み込みモジュールを初期化し、そのモジュールオブジェクトを <tt class="docutils literal"><span class="pre">sys.modules</span></tt> に格納した上で返します。モジュールが既に初期化されている場合は、 <em>再度</em> 初期化されます。再初期化は組み込みモジュールの <tt class="docutils literal"><span class="pre">__dict__</span></tt> を <tt class="docutils literal"><span class="pre">sys.modules</span></tt> のエントリーに結びつけられたキャッシュモジュールからコピーする過程を含みます。
+<em>name</em> という名前の組み込みモジュールがない場合は、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.init_frozen">
+<tt class="descclassname">imp.</tt><tt class="descname">init_frozen</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#imp.init_frozen" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> という名前のフリーズされたモジュールを初期化し、モジュールオブジェクトを返します。モジュールが既に初期化されている場合は、 <em>再度</em> 初期化されます。
+<em>name</em> という名前のフリーズされたモジュールがない場合は、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。
+(フリーズされたモジュールは Python で書かれたモジュールで、そのコンパイルされたバイトコードオブジェクトが
+Python の <strong class="program">freeze</strong> ユーティリティを使ってカスタムビルド版の Python インタープリタへ組み込まれています。差し当たり、 <tt class="file docutils literal"><span class="pre">Tools/freeze/</span></tt> を参照してください。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.is_builtin">
+<tt class="descclassname">imp.</tt><tt class="descname">is_builtin</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#imp.is_builtin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> という名前の再初期化できる組み込みモジュールがある場合は、 <tt class="docutils literal"><span class="pre">1</span></tt> を返します。
+<em>name</em> という名前の再初期化できない組み込みモジュールがある場合は、 <tt class="docutils literal"><span class="pre">-1</span></tt> を返します
+(<a class="reference internal" href="#imp.init_builtin" title="imp.init_builtin"><tt class="xref py py-func docutils literal"><span class="pre">init_builtin()</span></tt></a> を参照してください)。 <em>name</em> という名前の組み込みモジュールがない場合は、 <tt class="docutils literal"><span class="pre">0</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.is_frozen">
+<tt class="descclassname">imp.</tt><tt class="descname">is_frozen</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#imp.is_frozen" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> という名前のフリーズされたモジュール(<a class="reference internal" href="#imp.init_frozen" title="imp.init_frozen"><tt class="xref py py-func docutils literal"><span class="pre">init_frozen()</span></tt></a> を参照)がある場合は、 <tt class="docutils literal"><span class="pre">True</span></tt> を返します。または、そのようなモジュールがない場合は、 <tt class="docutils literal"><span class="pre">False</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.load_compiled">
+<tt class="descclassname">imp.</tt><tt class="descname">load_compiled</tt><big>(</big><em>name</em>, <em>pathname</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imp.load_compiled" title="この定義へのパーマリンク">¶</a></dt>
+<dd><span class="target" id="index-3"></span><p>バイトコンパイルされたコードファイルとして実装されているモジュールをロードして初期化し、そのモジュールオブジェクトを返します。モジュールが既に初期化されている場合は、 <em>再度</em> 初期化されます。
+<em>name</em> 引数はモジュールオブジェクトを作ったり、アクセスするために使います。
+<em>pathname</em> 引数はバイトコンパイルされたコードファイルを指します。
+<em>file</em> 引数はバイトコンパイルされたコードファイルで、バイナリモードでオープンされ、先頭からアクセスされます。現在は、ユーザ定義のファイルをエミュレートするクラスではなく、実際のファイルオブジェクトでなければなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.load_dynamic">
+<tt class="descclassname">imp.</tt><tt class="descname">load_dynamic</tt><big>(</big><em>name</em>, <em>pathname</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imp.load_dynamic" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>動的ロード可能な共有ライブラリとして実装されているモジュールをロードして初期化します。モジュールが既に初期化されている場合は、 <em>再度</em> 初期化します。再初期化はモジュールのキャッシュされたインスタンスの <tt class="docutils literal"><span class="pre">__dict__</span></tt> 属性を
+<tt class="docutils literal"><span class="pre">sys.modules</span></tt> にキャッシュされたモジュールの中で使われた値に上書きコピーする過程を含みます。
+<em>pathname</em> 引数は共有ライブラリを指していなければなりません。
+<em>name</em> 引数は初期化関数の名前を作るために使われます。共有ライブラリの <tt class="docutils literal"><span class="pre">initname()</span></tt> という名前の外部C関数が呼び出されます。オプションの <em>file</em> 引数は無視されます。
+(注意: 共有ライブラリはシステムに大きく依存します。また、すべてのシステムがサポートしているわけではありません。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imp.load_source">
+<tt class="descclassname">imp.</tt><tt class="descname">load_source</tt><big>(</big><em>name</em>, <em>pathname</em><span class="optional">[</span>, <em>file</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imp.load_source" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python ソースファイルとして実装されているモジュールをロードして初期化し、モジュールオブジェクトを返します。モジュールが既に初期化されている場合は、 <em>再度</em> 初期化します。
+<em>name</em> 引数はモジュールオブジェクトを作成したり、アクセスしたりするために使われます。
+<em>pathname</em> 引数はソースファイルを指します。
+<em>file</em> 引数はソースファイルで、テキストとして読み込むためにオープンされ、先頭からアクセスされます。現在は、ユーザ定義のファイルをエミュレートするクラスではなく、実際のファイルオブジェクトでなければなりません。
+(拡張子 <tt class="file docutils literal"><span class="pre">.pyc</span></tt> または <tt class="file docutils literal"><span class="pre">.pyo</span></tt> をもつ)正しく対応するバイトコンパイルされたファイルが存在する場合は、与えられたソースファイルを構文解析する代わりにそれが使われることに注意してください。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="imp.NullImporter">
+<em class="property">class </em><tt class="descclassname">imp.</tt><tt class="descname">NullImporter</tt><big>(</big><em>path_string</em><big>)</big><a class="headerlink" href="#imp.NullImporter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#imp.NullImporter" title="imp.NullImporter"><tt class="xref py py-class docutils literal"><span class="pre">NullImporter</span></tt></a> 型は <span class="target" id="index-4"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0302"><strong>PEP 302</strong></a> インポートフックで、何もモジュールが見つからなかったときの非ディレクトリパス文字列を処理します。この型を既存のディレクトリや空文字列に対してコールすると <a class="reference internal" href="exceptions.html#exceptions.ImportError" title="exceptions.ImportError"><tt class="xref py py-exc docutils literal"><span class="pre">ImportError</span></tt></a> が発生します。それ以外の場合は <a class="reference internal" href="#imp.NullImporter" title="imp.NullImporter"><tt class="xref py py-class docutils literal"><span class="pre">NullImporter</span></tt></a> のインスタンスが返されます。</p>
+<p>Python は、ディレクトリでなく <tt class="docutils literal"><span class="pre">sys.path_hooks</span></tt> のどのパスフックでも処理されていないすべてのパスエントリに対して、この型のインスタンスを <tt class="docutils literal"><span class="pre">sys.path_importer_cache</span></tt> に追加します。このインスタンスが持つメソッドは次のひとつです。</p>
+<dl class="method">
+<dt id="imp.NullImporter.find_module">
+<tt class="descname">find_module</tt><big>(</big><em>fullname</em><span class="optional">[</span>, <em>path</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imp.NullImporter.find_module" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは常に <tt class="docutils literal"><span class="pre">None</span></tt> を返し、要求されたモジュールが見つからなかったことを表します。</p>
+</dd></dl>
+
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<div class="section" id="examples-imp">
+<span id="id1"></span><h2>30.1.1. 例<a class="headerlink" href="#examples-imp" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>次の関数は Python 1.4 までの標準 import 文(階層的なモジュール名がない)をエミュレートします。
+(この <em>実装</em> はそのバージョンでは動作しないでしょう。なぜなら、 <a class="reference internal" href="#imp.find_module" title="imp.find_module"><tt class="xref py py-func docutils literal"><span class="pre">find_module()</span></tt></a> は拡張されており、また <a class="reference internal" href="#imp.load_module" title="imp.load_module"><tt class="xref py py-func docutils literal"><span class="pre">load_module()</span></tt></a> が 1.4 で追加されているからです。)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">def</span> <span class="nf">__import__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">locals</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c"># Fast path: see if the module has already been imported.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c"># If any of the following calls raises an exception,</span>
+    <span class="c"># there&#39;s a problem we can&#39;t handle -- let the caller handle it.</span>
+
+    <span class="n">fp</span><span class="p">,</span> <span class="n">pathname</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">find_module</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">imp</span><span class="o">.</span><span class="n">load_module</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">pathname</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c"># Since we may exit via an exception, close fp explicitly.</span>
+        <span class="k">if</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<span class="target" id="index-5"></span><p>階層的なモジュール名を実装し、 <a class="reference internal" href="functions.html#reload" title="reload"><tt class="xref py py-func docutils literal"><span class="pre">reload()</span></tt></a> 関数を含むより完全な例はモジュール <tt class="xref py py-mod docutils literal"><span class="pre">knee</span></tt> にあります。
+<tt class="xref py py-mod docutils literal"><span class="pre">knee</span></tt> モジュールは Python のソースディストリビューションの中の <tt class="file docutils literal"><span class="pre">Demo/imputil/</span></tt> にあります。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="importlib.html" title="30.2. importlib – __import__() の便利なラッパー"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="30. モジュールのインポート"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="modules.html" >30. モジュールのインポート</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

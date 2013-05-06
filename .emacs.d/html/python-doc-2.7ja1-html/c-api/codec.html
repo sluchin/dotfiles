@@ -1,0 +1,273 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>codec レジストリとサポート関数 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="ユーティリティ関数" href="utilities.html" />
+    <link rel="next" title="抽象オブジェクトレイヤ (abstract objects layer)" href="abstract.html" />
+    <link rel="prev" title="リフレクション" href="reflection.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="abstract.html" title="抽象オブジェクトレイヤ (abstract objects layer)"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="reflection.html" title="リフレクション"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="utilities.html" accesskey="U">ユーティリティ関数</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">codec レジストリとサポート関数</a><ul>
+<li><a class="reference internal" href="#api">コーデック検索API</a></li>
+<li><a class="reference internal" href="#unicode-api">Unicode エラーハンドラ用レジストリ API</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="reflection.html"
+                        title="前の章へ">リフレクション</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="abstract.html"
+                        title="次の章へ">抽象オブジェクトレイヤ (abstract objects layer)</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/codec.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="codec-registry"></span><div class="section" id="codec">
+<h1>codec レジストリとサポート関数<a class="headerlink" href="#codec" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<dl class="function">
+<dt id="PyCodec_Register">
+int <tt class="descname">PyCodec_Register</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*search_function</em><big>)</big><a class="headerlink" href="#PyCodec_Register" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい codec 検索関数を登録します。</p>
+<p>副作用として、この関数は <tt class="xref py py-mod docutils literal"><span class="pre">encodings</span></tt> パッケージが常に検索関数の先頭に来るように、まだロードされていない場合はロードします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_KnownEncoding">
+int <tt class="descname">PyCodec_KnownEncoding</tt><big>(</big>const char<em>&nbsp;*encoding</em><big>)</big><a class="headerlink" href="#PyCodec_KnownEncoding" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>encoding</em> のための登録された codec が存在するかどうかに応じて <tt class="docutils literal"><span class="pre">1</span></tt> か <tt class="docutils literal"><span class="pre">0</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_Encode">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_Encode</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*object</em>, const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyCodec_Encode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>汎用の codec ベースの encode API.</p>
+<p><em>encoding</em> に応じて見つかったエンコーダ関数に対して <em>object</em> を渡します。エラーハンドリングメソッドは <em>errors</em> で指定します。
+<em>errors</em> は <em>NULL</em> でもよく、その場合はその codec のデフォルトのメソッドが利用されます。エンコーダが見つからなかった場合は <a class="reference internal" href="../library/exceptions.html#exceptions.LookupError" title="exceptions.LookupError"><tt class="xref py py-exc docutils literal"><span class="pre">LookupError</span></tt></a> を発生させます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_Decode">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_Decode</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*object</em>, const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyCodec_Decode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>汎用の codec ベースの dencode API.</p>
+<p><em>encoding</em> に応じて見つかったデコーダ関数に対して <em>object</em> を渡します。エラーハンドリングメソッドは <em>errors</em> で指定します。
+<em>errors</em> は <em>NULL</em> でもよく、その場合はその codec のデフォルトのメソッドが利用されます。デコーダが見つからなかった場合は <a class="reference internal" href="../library/exceptions.html#exceptions.LookupError" title="exceptions.LookupError"><tt class="xref py py-exc docutils literal"><span class="pre">LookupError</span></tt></a> を発生させます。</p>
+</dd></dl>
+
+<div class="section" id="api">
+<h2>コーデック検索API<a class="headerlink" href="#api" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下の関数では、文字列 <em>encoding</em> は全て小文字に変換することで、効率的に、大文字小文字を無視した検索をします。コーデックが見つからない場合、 <a class="reference internal" href="../library/exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を設定して <em>NULL</em> を返します。</p>
+<dl class="function">
+<dt id="PyCodec_Encoder">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_Encoder</tt><big>(</big>const char<em>&nbsp;*encoding</em><big>)</big><a class="headerlink" href="#PyCodec_Encoder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>encoding</em> のエンコーダ関数を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_Decoder">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_Decoder</tt><big>(</big>const char<em>&nbsp;*encoding</em><big>)</big><a class="headerlink" href="#PyCodec_Decoder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>encoding</em> のデコーダ関数を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_IncrementalEncoder">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_IncrementalEncoder</tt><big>(</big>const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyCodec_IncrementalEncoder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>encoding</em> の <tt class="xref py py-class docutils literal"><span class="pre">IncrementalEncoder</span></tt> オブジェクトを返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_IncrementalDecoder">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_IncrementalDecoder</tt><big>(</big>const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyCodec_IncrementalDecoder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>encoding</em> の <tt class="xref py py-class docutils literal"><span class="pre">IncrementalDecoder</span></tt> オブジェクトを返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_StreamReader">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_StreamReader</tt><big>(</big>const char<em>&nbsp;*encoding</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*stream</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyCodec_StreamReader" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>encoding</em> の <tt class="xref py py-class docutils literal"><span class="pre">StreamReader</span></tt> ファクトリ関数を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_StreamWriter">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_StreamWriter</tt><big>(</big>const char<em>&nbsp;*encoding</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*stream</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyCodec_StreamWriter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>encoding</em> の <tt class="xref py py-class docutils literal"><span class="pre">StreamWriter</span></tt> ファクトリ関数を返します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="unicode-api">
+<h2>Unicode エラーハンドラ用レジストリ API<a class="headerlink" href="#unicode-api" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="PyCodec_RegisterError">
+int <tt class="descname">PyCodec_RegisterError</tt><big>(</big>const char<em>&nbsp;*name</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*error</em><big>)</big><a class="headerlink" href="#PyCodec_RegisterError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エラーハンドルのためのコールバック関数 <em>error</em> を <em>name</em> で登録します。このコールバック関数は、コーデックがエンコードできない文字/デコードできないバイトに遭遇した時に、そのエンコード/デコード関数の呼び出しで <em>name</em> が指定されていたら呼び出されます。</p>
+<p>コールバックは1つの引数として、 <a class="reference internal" href="../library/exceptions.html#exceptions.UnicodeEncodeError" title="exceptions.UnicodeEncodeError"><tt class="xref py py-exc docutils literal"><span class="pre">UnicodeEncodeError</span></tt></a>, <a class="reference internal" href="../library/exceptions.html#exceptions.UnicodeDecodeError" title="exceptions.UnicodeDecodeError"><tt class="xref py py-exc docutils literal"><span class="pre">UnicodeDecodeError</span></tt></a>,
+<a class="reference internal" href="../library/exceptions.html#exceptions.UnicodeTranslateError" title="exceptions.UnicodeTranslateError"><tt class="xref py py-exc docutils literal"><span class="pre">UnicodeTranslateError</span></tt></a> のどれかのインスタンスを受け取ります。このインスタンスは問題のある文字列やバイト列に関する情報と、その元の文字列中のオフセットを持っています。(その情報を取得するための関数については
+<a class="reference internal" href="exceptions.html#unicodeexceptions"><em>Unicode 例外オブジェクト</em></a> を参照してください。)
+コールバックは渡された例外を発生させるか、2要素のタプルに問題のシーケンスの代替と、
+encode/decode を再開する元の文字列中のオフセットとなる整数を格納して返します。</p>
+<p>成功したら <tt class="docutils literal"><span class="pre">0</span></tt> を、エラー時は <tt class="docutils literal"><span class="pre">-1</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_LookupError">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_LookupError</tt><big>(</big>const char<em>&nbsp;*name</em><big>)</big><a class="headerlink" href="#PyCodec_LookupError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> で登録されたエラーハンドリングコールバック関数を検索します。特別な場合として、 <em>NULL</em> が渡された場合、 &#8220;strict&#8221; のエラーハンドリングコールバック関数を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_StrictErrors">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_StrictErrors</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*exc</em><big>)</big><a class="headerlink" href="#PyCodec_StrictErrors" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>exc</em> を例外として発生させます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_IgnoreErrors">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_IgnoreErrors</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*exc</em><big>)</big><a class="headerlink" href="#PyCodec_IgnoreErrors" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>unicode エラーを無視し、問題の入力をスキップします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_ReplaceErrors">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_ReplaceErrors</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*exc</em><big>)</big><a class="headerlink" href="#PyCodec_ReplaceErrors" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>unicode エラーを <tt class="docutils literal"><span class="pre">?</span></tt> か <tt class="docutils literal"><span class="pre">U+FFFD</span></tt> で置き換えます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_XMLCharRefReplaceErrors">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_XMLCharRefReplaceErrors</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*exc</em><big>)</big><a class="headerlink" href="#PyCodec_XMLCharRefReplaceErrors" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>unicode encode エラーを XML文字参照で置き換えます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCodec_BackslashReplaceErrors">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCodec_BackslashReplaceErrors</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*exc</em><big>)</big><a class="headerlink" href="#PyCodec_BackslashReplaceErrors" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>unicode encode エラーをバックスラッシュエスケープ (<tt class="docutils literal"><span class="pre">\x</span></tt>, <tt class="docutils literal"><span class="pre">\u</span></tt>, <tt class="docutils literal"><span class="pre">\U</span></tt>)
+で置き換えます。</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="abstract.html" title="抽象オブジェクトレイヤ (abstract objects layer)"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="reflection.html" title="リフレクション"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="utilities.html" >ユーティリティ関数</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ロギングクックブック &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python HOWTO" href="index.html" />
+    <link rel="next" title="正規表現 HOWTO" href="regex.html" />
+    <link rel="prev" title="ロギング HOWTO" href="logging.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="regex.html" title="正規表現 HOWTO"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="ロギング HOWTO"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ロギングクックブック</a><ul>
+<li><a class="reference internal" href="#id2">複数のモジュールでロギングを使う</a></li>
+<li><a class="reference internal" href="#id3">複数のハンドラとフォーマッタ</a></li>
+<li><a class="reference internal" href="#multiple-destinations">複数の出力先にログを出力する</a></li>
+<li><a class="reference internal" href="#id5">設定サーバの例</a></li>
+<li><a class="reference internal" href="#network-logging">ネットワーク越しのロギングイベントの送信と受信</a></li>
+<li><a class="reference internal" href="#context-info">コンテキスト情報をログ記録出力に付加する</a><ul>
+<li><a class="reference internal" href="#loggeradapter">LoggerAdapter を使ったコンテキスト情報の伝達</a></li>
+<li><a class="reference internal" href="#filter">Filter を使ったコンテキスト情報の伝達</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#multiple-processes">複数のプロセスからの単一ファイルへのログ記録</a></li>
+<li><a class="reference internal" href="#id9">ファイルの循環を使う</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="logging.html"
+                        title="前の章へ">ロギング HOWTO</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="regex.html"
+                        title="次の章へ">正規表現 HOWTO</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/logging-cookbook.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="logging-cookbook">
+<span id="id1"></span><h1>ロギングクックブック<a class="headerlink" href="#logging-cookbook" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Vinay Sajip &lt;vinay_sajip at red-dove dot com&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>このページでは、過去に見つかった、ロギングに関するいくつかの便利なレシピを紹介します。</p>
+<div class="section" id="id2">
+<h2>複数のモジュールでロギングを使う<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">logging.getLogger('someLogger')</span></tt> の複数回の呼び出しは同じロガーへの参照を返します。これは同じ Python インタプリタプロセス上で動いている限り、一つのモジュールの中からに限らず、モジュールをまたいでも当てはまります。同じオブジェクトへの参照という点でも正しいです。さらに、一つのモジュールの中で親ロガーを定義して設定し、別のモジュールで子ロガーを定義する (ただし設定はしない) ことが可能で、すべての子ロガーへの呼び出しは親にまで渡されます。まずはメインのモジュールです:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">auxiliary_module</span>
+
+<span class="c"># create logger with &#39;spam_application&#39;</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;spam_application&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="c"># create file handler which logs even debug messages</span>
+<span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s">&#39;spam.log&#39;</span><span class="p">)</span>
+<span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="c"># create console handler with a higher log level</span>
+<span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+<span class="c"># create formatter and add it to the handlers</span>
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> - </span><span class="si">%(name)s</span><span class="s"> - </span><span class="si">%(levelname)s</span><span class="s"> - </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="c"># add the handlers to the logger</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;creating an instance of auxiliary_module.Auxiliary&#39;</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">auxiliary_module</span><span class="o">.</span><span class="n">Auxiliary</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;created an instance of auxiliary_module.Auxiliary&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;calling auxiliary_module.Auxiliary.do_something&#39;</span><span class="p">)</span>
+<span class="n">a</span><span class="o">.</span><span class="n">do_something</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;finished auxiliary_module.Auxiliary.do_something&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;calling auxiliary_module.some_function()&#39;</span><span class="p">)</span>
+<span class="n">auxiliary_module</span><span class="o">.</span><span class="n">some_function</span><span class="p">()</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;done with auxiliary_module.some_function()&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>そして補助モジュール (auxiliary module) がこちらです:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="c"># create logger</span>
+<span class="n">module_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;spam_application.auxiliary&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Auxiliary</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;spam_application.auxiliary.Auxiliary&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;creating an instance of Auxiliary&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">do_something</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;doing something&#39;</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;done doing something&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">some_function</span><span class="p">():</span>
+    <span class="n">module_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;received a call to &quot;some_function&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>出力はこのようになります:</p>
+<div class="highlight-python"><pre>2005-03-23 23:47:11,663 - spam_application - INFO -
+   creating an instance of auxiliary_module.Auxiliary
+2005-03-23 23:47:11,665 - spam_application.auxiliary.Auxiliary - INFO -
+   creating an instance of Auxiliary
+2005-03-23 23:47:11,665 - spam_application - INFO -
+   created an instance of auxiliary_module.Auxiliary
+2005-03-23 23:47:11,668 - spam_application - INFO -
+   calling auxiliary_module.Auxiliary.do_something
+2005-03-23 23:47:11,668 - spam_application.auxiliary.Auxiliary - INFO -
+   doing something
+2005-03-23 23:47:11,669 - spam_application.auxiliary.Auxiliary - INFO -
+   done doing something
+2005-03-23 23:47:11,670 - spam_application - INFO -
+   finished auxiliary_module.Auxiliary.do_something
+2005-03-23 23:47:11,671 - spam_application - INFO -
+   calling auxiliary_module.some_function()
+2005-03-23 23:47:11,672 - spam_application.auxiliary - INFO -
+   received a call to 'some_function'
+2005-03-23 23:47:11,673 - spam_application - INFO -
+   done with auxiliary_module.some_function()</pre>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>複数のハンドラとフォーマッタ<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ロガーは通常の Python オブジェクトです。
+<tt class="xref py py-func docutils literal"><span class="pre">addHandler()</span></tt> メソッドは追加されるハンドラの個数について最小値も最大値も定めていません。時にアプリケーションがすべての深刻度のすべてのメッセージをテキストファイルに記録しつつ、同時にエラーやそれ以上のものをコンソールに出力することが役に立ちます。これを実現する方法は、単に適切なハンドラを設定するだけです。アプリケーションコードの中のログ記録の呼び出しは変更されずに残ります。少し前に取り上げた単純なモジュール式の例を少し変えるとこうなります:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;simple_example&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="c"># create file handler which logs even debug messages</span>
+<span class="n">fh</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s">&#39;spam.log&#39;</span><span class="p">)</span>
+<span class="n">fh</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="c"># create console handler with a higher log level</span>
+<span class="n">ch</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+<span class="c"># create formatter and add it to the handlers</span>
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> - </span><span class="si">%(name)s</span><span class="s"> - </span><span class="si">%(levelname)s</span><span class="s"> - </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="n">ch</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="n">fh</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="c"># add the handlers to logger</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+<span class="c"># &#39;application&#39; code</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;debug message&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;info message&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;warn message&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;error message&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s">&#39;critical message&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>「アプリケーション」のコードは複数のハンドラについて何も気にしていないことに注目してください。変更した箇所は新しい <em>fh</em> という名のハンドラを追加して設定したところがすべてです。</p>
+<p>新しいハンドラを高い、もしくは低い深刻度に対するフィルタと共に生成できることは、アプリケーションを書いてテストを行うときとても助けになります。デバッグ用にたくさんの <tt class="docutils literal"><span class="pre">print</span></tt> 文を使う代わりに <tt class="docutils literal"><span class="pre">logger.debug</span></tt> を使いましょう。あとで消したりコメントアウトしたりしなければならない print 文と違って、
+logger.debug 命令はソースコードの中にそのまま残しておいて再び必要になるまで休眠させておけます。その時必要になるのはただロガーおよび/またはハンドラの深刻度の設定をいじることだけです。</p>
+</div>
+<div class="section" id="multiple-destinations">
+<span id="id4"></span><h2>複数の出力先にログを出力する<a class="headerlink" href="#multiple-destinations" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>コンソールとファイルに、別々のメッセージ書式で、別々の状況に応じたログ出力を行わせたいとしましょう。例えば DEBUG よりも高いレベルのメッセージはファイルに記録し、
+INFO 以上のレベルのメッセージはコンソールに出力したいという場合です。また、ファイルにはタイムスタンプを記録し、コンソールには出力しないとします。以下のようにすれば、こうした挙動を実現できます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="c"># set up logging to file - see previous section for more details</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+                    <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(name)-12s</span><span class="s"> </span><span class="si">%(levelname)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span>
+                    <span class="n">datefmt</span><span class="o">=</span><span class="s">&#39;%m-</span><span class="si">%d</span><span class="s"> %H:%M&#39;</span><span class="p">,</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="s">&#39;/temp/myapp.log&#39;</span><span class="p">,</span>
+                    <span class="n">filemode</span><span class="o">=</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+<span class="c"># define a Handler which writes INFO messages or higher to the sys.stderr</span>
+<span class="n">console</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+<span class="n">console</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="c"># set a format which is simpler for console use</span>
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(name)-12s</span><span class="s">: </span><span class="si">%(levelname)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="c"># tell the handler to use this format</span>
+<span class="n">console</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+<span class="c"># add the handler to the root logger</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
+
+<span class="c"># Now, we can log to the root logger, or any other logger. First the root...</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Jackdaws love my big sphinx of quartz.&#39;</span><span class="p">)</span>
+
+<span class="c"># Now, define a couple of other loggers which might represent areas in your</span>
+<span class="c"># application:</span>
+
+<span class="n">logger1</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;myapp.area1&#39;</span><span class="p">)</span>
+<span class="n">logger2</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;myapp.area2&#39;</span><span class="p">)</span>
+
+<span class="n">logger1</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Quick zephyrs blow, vexing daft Jim.&#39;</span><span class="p">)</span>
+<span class="n">logger1</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;How quickly daft jumping zebras vex.&#39;</span><span class="p">)</span>
+<span class="n">logger2</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Jail zesty vixen who grabbed pay from quack.&#39;</span><span class="p">)</span>
+<span class="n">logger2</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;The five boxing wizards jump quickly.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このスクリプトを実行すると、コンソールには以下のように表示されるでしょう:</p>
+<div class="highlight-python"><pre>root        : INFO     Jackdaws love my big sphinx of quartz.
+myapp.area1 : INFO     How quickly daft jumping zebras vex.
+myapp.area2 : WARNING  Jail zesty vixen who grabbed pay from quack.
+myapp.area2 : ERROR    The five boxing wizards jump quickly.</pre>
+</div>
+<p>そして、ファイルは以下のようになるはずです:</p>
+<div class="highlight-python"><pre>10-22 22:19 root         INFO     Jackdaws love my big sphinx of quartz.
+10-22 22:19 myapp.area1  DEBUG    Quick zephyrs blow, vexing daft Jim.
+10-22 22:19 myapp.area1  INFO     How quickly daft jumping zebras vex.
+10-22 22:19 myapp.area2  WARNING  Jail zesty vixen who grabbed pay from quack.
+10-22 22:19 myapp.area2  ERROR    The five boxing wizards jump quickly.</pre>
+</div>
+<p>これを見て分かる通り、 DEBUG メッセージはファイルだけに出力され、その他のメッセージは両方に出力されます。</p>
+<p>この例ではコンソールとファイルのハンドラだけを使っていますが、実際には任意の数のハンドラや組み合わせを使えます。</p>
+</div>
+<div class="section" id="id5">
+<h2>設定サーバの例<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ログ記録設定サーバを使うモジュールの例です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c"># read initial config file</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="s">&#39;logging.conf&#39;</span><span class="p">)</span>
+
+<span class="c"># create and start listener on port 9999</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">9999</span><span class="p">)</span>
+<span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;simpleExample&#39;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c"># loop through logging calls to see the difference</span>
+    <span class="c"># new configurations make, until Ctrl+C is pressed</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;debug message&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;info message&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&#39;warn message&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;error message&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s">&#39;critical message&#39;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="c"># cleanup</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stopListening</span><span class="p">()</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>そしてファイル名を受け取ってそのファイルをサーバに送るスクリプトですが、それに先だってバイナリエンコード長を新しいログ記録の設定として先に送っておきます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">socket</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">struct</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">data_to_send</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">HOST</span> <span class="o">=</span> <span class="s">&#39;localhost&#39;</span>
+<span class="n">PORT</span> <span class="o">=</span> <span class="mi">9999</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;connecting...&#39;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">HOST</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;sending config...&#39;</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s">&#39;&gt;L&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_to_send</span><span class="p">)))</span>
+<span class="n">s</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data_to_send</span><span class="p">)</span>
+<span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&#39;complete&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="network-logging">
+<span id="id6"></span><h2>ネットワーク越しのロギングイベントの送信と受信<a class="headerlink" href="#network-logging" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ログイベントをネットワーク越しに送信し、受信端でそれを処理したいとしましょう。
+<tt class="xref py py-class docutils literal"><span class="pre">SocketHandler</span></tt> インスタンスを送信端のルートロガーに接続すれば、簡単に実現できます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">logging.handlers</span>
+
+<span class="n">rootLogger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+<span class="n">rootLogger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">socketHandler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">SocketHandler</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">DEFAULT_TCP_LOGGING_PORT</span><span class="p">)</span>
+<span class="c"># don&#39;t bother with a formatter, since a socket handler sends the event as</span>
+<span class="c"># an unformatted pickle</span>
+<span class="n">rootLogger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">socketHandler</span><span class="p">)</span>
+
+<span class="c"># Now, we can log to the root logger, or any other logger. First the root...</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Jackdaws love my big sphinx of quartz.&#39;</span><span class="p">)</span>
+
+<span class="c"># Now, define a couple of other loggers which might represent areas in your</span>
+<span class="c"># application:</span>
+
+<span class="n">logger1</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;myapp.area1&#39;</span><span class="p">)</span>
+<span class="n">logger2</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;myapp.area2&#39;</span><span class="p">)</span>
+
+<span class="n">logger1</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Quick zephyrs blow, vexing daft Jim.&#39;</span><span class="p">)</span>
+<span class="n">logger1</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;How quickly daft jumping zebras vex.&#39;</span><span class="p">)</span>
+<span class="n">logger2</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&#39;Jail zesty vixen who grabbed pay from quack.&#39;</span><span class="p">)</span>
+<span class="n">logger2</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;The five boxing wizards jump quickly.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>受信端では、 <a class="reference internal" href="../library/socketserver.html#module-SocketServer" title="SocketServer: ネットワークサーバ構築のためのフレームワーク。"><tt class="xref py py-mod docutils literal"><span class="pre">SocketServer</span></tt></a> モジュールを使って受信プログラムを作成しておきます。簡単な実用プログラムを以下に示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.handlers</span>
+<span class="kn">import</span> <span class="nn">socketserver</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+
+
+<span class="k">class</span> <span class="nc">LogRecordStreamHandler</span><span class="p">(</span><span class="n">socketserver</span><span class="o">.</span><span class="n">StreamRequestHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Handler for a streaming logging request.</span>
+
+<span class="sd">    This basically logs the record using whatever logging policy is</span>
+<span class="sd">    configured locally.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle multiple requests - each expected to be a 4-byte length,</span>
+<span class="sd">        followed by the LogRecord in pickle format. Logs the record</span>
+<span class="sd">        according to whatever policy is configured locally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">slen</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;&gt;L&#39;</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">slen</span><span class="p">)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">slen</span><span class="p">:</span>
+                <span class="n">chunk</span> <span class="o">=</span> <span class="n">chunk</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">slen</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unPickle</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">makeLogRecord</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">handleLogRecord</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">unPickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handleLogRecord</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="c"># if a name is specified, we use the named logger rather than the one</span>
+        <span class="c"># implied by the record.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">logname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">logname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="c"># N.B. EVERY record gets logged. This is because Logger.handle</span>
+        <span class="c"># is normally called AFTER logger-level filtering. If you want</span>
+        <span class="c"># to do filtering, do it at the client end to save wasting</span>
+        <span class="c"># cycles and network bandwidth!</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">LogRecordSocketReceiver</span><span class="p">(</span><span class="n">socketserver</span><span class="o">.</span><span class="n">ThreadingTCPServer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple TCP socket-based logging receiver suitable for testing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">allow_reuse_address</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span>
+                 <span class="n">port</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">DEFAULT_TCP_LOGGING_PORT</span><span class="p">,</span>
+                 <span class="n">handler</span><span class="o">=</span><span class="n">LogRecordStreamHandler</span><span class="p">):</span>
+        <span class="n">socketserver</span><span class="o">.</span><span class="n">ThreadingTCPServer</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">),</span> <span class="n">handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abort</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logname</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">serve_until_stopped</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">select</span>
+        <span class="n">abort</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">abort</span><span class="p">:</span>
+            <span class="n">rd</span><span class="p">,</span> <span class="n">wr</span><span class="p">,</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">fileno</span><span class="p">()],</span>
+                                       <span class="p">[],</span> <span class="p">[],</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rd</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handle_request</span><span class="p">()</span>
+            <span class="n">abort</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">abort</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(relativeCreated)5d</span><span class="s"> </span><span class="si">%(name)-15s</span><span class="s"> </span><span class="si">%(levelname)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">tcpserver</span> <span class="o">=</span> <span class="n">LogRecordSocketReceiver</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;About to start TCP server...&#39;</span><span class="p">)</span>
+    <span class="n">tcpserver</span><span class="o">.</span><span class="n">serve_until_stopped</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>先にサーバを起動しておき、次にクライアントを起動します。クライアント側では、コンソールには何も出力されません;
+サーバ側では以下のようなメッセージを目にするはずです:</p>
+<div class="highlight-python"><pre>About to start TCP server...
+   59 root            INFO     Jackdaws love my big sphinx of quartz.
+   59 myapp.area1     DEBUG    Quick zephyrs blow, vexing daft Jim.
+   69 myapp.area1     INFO     How quickly daft jumping zebras vex.
+   69 myapp.area2     WARNING  Jail zesty vixen who grabbed pay from quack.
+   69 myapp.area2     ERROR    The five boxing wizards jump quickly.</pre>
+</div>
+<p>特定のシナリオでは pickle にはいくつかのセキュリティ上の問題があることに注意してください。これが問題になる場合、 <tt class="xref py py-meth docutils literal"><span class="pre">makePickle()</span></tt> メソッドをオーバーライドして代替手段を実装することで異なるシリアライズ手法を使用できます。代替シリアライズ手法を使うように上記のスクリプトを修正することもできます。</p>
+</div>
+<div class="section" id="context-info">
+<span id="id7"></span><h2>コンテキスト情報をログ記録出力に付加する<a class="headerlink" href="#context-info" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>時にはログ記録出力にログ関数の呼び出し時に渡されたパラメータに加えてコンテキスト情報を含めたいこともあるでしょう。たとえば、ネットワークアプリケーションで、クライアント固有の情報
+(例: リモートクライアントの名前、 IP アドレス) もログ記録に残しておきたいと思ったとしましょう。
+<em>extra</em> パラメータをこの目的に使うこともできますが、いつでもこの方法で情報を渡すのが便利なやり方とも限りません。また接続ごとに <a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> インスタンスを生成する誘惑に駆られるかもしれませんが、生成した <a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> インスタンスはガーベジコレクションで回収されないので、これは良いアイデアとは言えません。この例は現実的な問題ではないかもしれませんが、
+<a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> インスタンスの個数がアプリケーションの中でログ記録が行われるレベルの粒度に依存する場合、
+<a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> インスタンスの個数が事実上無制限にならないと、管理が難しくなります。</p>
+<div class="section" id="loggeradapter">
+<h3>LoggerAdapter を使ったコンテキスト情報の伝達<a class="headerlink" href="#loggeradapter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>ログ記録イベントの情報と一緒に出力される文脈情報を渡す簡単な方法は、
+<a class="reference internal" href="../library/logging.html#logging.LoggerAdapter" title="logging.LoggerAdapter"><tt class="xref py py-class docutils literal"><span class="pre">LoggerAdapter</span></tt></a> を使うことです。このクラスは <a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> のように見えるように設計されていて、
+<a class="reference internal" href="../library/logging.html#logging.debug" title="logging.debug"><tt class="xref py py-meth docutils literal"><span class="pre">debug()</span></tt></a>, <a class="reference internal" href="../library/logging.html#logging.info" title="logging.info"><tt class="xref py py-meth docutils literal"><span class="pre">info()</span></tt></a>, <a class="reference internal" href="../library/logging.html#logging.warning" title="logging.warning"><tt class="xref py py-meth docutils literal"><span class="pre">warning()</span></tt></a>, <a class="reference internal" href="../library/logging.html#logging.error" title="logging.error"><tt class="xref py py-meth docutils literal"><span class="pre">error()</span></tt></a>,
+<a class="reference internal" href="../library/logging.html#logging.exception" title="logging.exception"><tt class="xref py py-meth docutils literal"><span class="pre">exception()</span></tt></a>, <a class="reference internal" href="../library/logging.html#logging.critical" title="logging.critical"><tt class="xref py py-meth docutils literal"><span class="pre">critical()</span></tt></a>, <a class="reference internal" href="../library/logging.html#logging.log" title="logging.log"><tt class="xref py py-meth docutils literal"><span class="pre">log()</span></tt></a> の各メソッドを呼び出せるようになっています。これらのメソッドは対応する <a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> のメソッドと同じ引数を取るので、二つの型を取り替えて使うことができます。</p>
+<p><a class="reference internal" href="../library/logging.html#logging.LoggerAdapter" title="logging.LoggerAdapter"><tt class="xref py py-class docutils literal"><span class="pre">LoggerAdapter</span></tt></a> のインスタンスを生成する際には、
+<a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> インスタンスと文脈情報を収めた辞書風 (dict-like) のオブジェクトを渡します。
+<a class="reference internal" href="../library/logging.html#logging.LoggerAdapter" title="logging.LoggerAdapter"><tt class="xref py py-class docutils literal"><span class="pre">LoggerAdapter</span></tt></a> のログ記録メソッドを呼び出すと、呼び出しをコンストラクタに渡された配下の <a class="reference internal" href="../library/logging.html#logging.Logger" title="logging.Logger"><tt class="xref py py-class docutils literal"><span class="pre">Logger</span></tt></a> インスタンスに委譲し、その際文脈情報をその委譲された呼び出しに埋め込みます。
+<a class="reference internal" href="../library/logging.html#logging.LoggerAdapter" title="logging.LoggerAdapter"><tt class="xref py py-class docutils literal"><span class="pre">LoggerAdapter</span></tt></a> のコードから少し抜き出してみます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delegate a debug call to the underlying logger, after adding</span>
+<span class="sd">    contextual information from this adapter instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../library/logging.html#logging.LoggerAdapter" title="logging.LoggerAdapter"><tt class="xref py py-class docutils literal"><span class="pre">LoggerAdapter</span></tt></a> の <tt class="xref py py-meth docutils literal"><span class="pre">process()</span></tt> メソッドが文脈情報をログ出力に加える舞台です。そこではログ記録呼び出しのメッセージとキーワード引数が渡され、加工された (可能性のある) それらの情報を配下のロガーへの呼び出しに渡し直します。このメソッドのデフォルト実装ではメッセージは元のままですが、キーワード引数にはコンストラクタに渡された辞書風オブジェクトを値として &#8220;extra&#8221; キーが挿入されます。もちろん、呼び出し時に &#8220;extra&#8221; キーワードを使った場合には何事もなかったかのように上書きされます。</p>
+<p>&#8220;extra&#8221; を用いる利点は辞書風オブジェクトの中の値が <a class="reference internal" href="../library/logging.html#logging.LogRecord" title="logging.LogRecord"><tt class="xref py py-class docutils literal"><span class="pre">LogRecord</span></tt></a> インスタンスの __dict__ にマージされることで、辞書風オブジェクトのキーを知っている <a class="reference internal" href="../library/logging.html#logging.Formatter" title="logging.Formatter"><tt class="xref py py-class docutils literal"><span class="pre">Formatter</span></tt></a> を用意して文字列をカスタマイズするようにできることです。それ以外のメソッドが必要なとき、たとえば文脈情報をメッセージの前や後ろにつなげたい場合には、
+<a class="reference internal" href="../library/logging.html#logging.LoggerAdapter" title="logging.LoggerAdapter"><tt class="xref py py-class docutils literal"><span class="pre">LoggerAdapter</span></tt></a> から <tt class="xref py py-meth docutils literal"><span class="pre">process()</span></tt> を望むようにオーバライドしたサブクラスを作ることが必要なだけです。次に挙げるのはこのクラスを使った例で、コンストラクタで使われる「辞書風」オブジェクトにどの振る舞いが必要なのかも示しています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="k">class</span> <span class="nc">ConnInfo</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An example class which shows how an arbitrary class can be used as</span>
+<span class="sd">    the &#39;extra&#39; context information repository passed to a LoggerAdapter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To allow this instance to look like a dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&#39;ip&#39;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="s">&#39;192.168.0.1&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&#39;user&#39;</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="s">&#39;jim&#39;</span><span class="p">,</span> <span class="s">&#39;fred&#39;</span><span class="p">,</span> <span class="s">&#39;sheila&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;?&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To allow iteration over keys, which will be merged into</span>
+<span class="sd">        the LogRecord dict before formatting and output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;ip&#39;</span><span class="p">,</span> <span class="s">&#39;user&#39;</span><span class="p">]</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">keys</span><span class="o">.</span><span class="n">__iter__</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+    <span class="n">levels</span> <span class="o">=</span> <span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;a.b.c&#39;</span><span class="p">),</span>
+                               <span class="p">{</span> <span class="s">&#39;ip&#39;</span> <span class="p">:</span> <span class="s">&#39;123.231.231.123&#39;</span><span class="p">,</span> <span class="s">&#39;user&#39;</span> <span class="p">:</span> <span class="s">&#39;sheila&#39;</span> <span class="p">})</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+                        <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(asctime)-15s</span><span class="s"> </span><span class="si">%(name)-5s</span><span class="s"> </span><span class="si">%(levelname)-8s</span><span class="s"> IP: </span><span class="si">%(ip)-15s</span><span class="s"> User: </span><span class="si">%(user)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">a1</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;A debug message&#39;</span><span class="p">)</span>
+    <span class="n">a1</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;An info message with </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;some parameters&#39;</span><span class="p">)</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;d.e.f&#39;</span><span class="p">),</span> <span class="n">ConnInfo</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">lvl</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span>
+        <span class="n">lvlname</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span>
+        <span class="n">a2</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lvl</span><span class="p">,</span> <span class="s">&#39;A message at </span><span class="si">%s</span><span class="s"> level with </span><span class="si">%d</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">lvlname</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;parameters&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このスクリプトが実行されると、出力は以下のようになります:</p>
+<div class="highlight-python"><pre>2008-01-18 14:49:54,023 a.b.c DEBUG    IP: 123.231.231.123 User: sheila   A debug message
+2008-01-18 14:49:54,023 a.b.c INFO     IP: 123.231.231.123 User: sheila   An info message with some parameters
+2008-01-18 14:49:54,023 d.e.f CRITICAL IP: 192.168.0.1     User: jim      A message at CRITICAL level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f INFO     IP: 192.168.0.1     User: jim      A message at INFO level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f WARNING  IP: 192.168.0.1     User: sheila   A message at WARNING level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f ERROR    IP: 127.0.0.1       User: fred     A message at ERROR level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f ERROR    IP: 127.0.0.1       User: sheila   A message at ERROR level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f WARNING  IP: 192.168.0.1     User: sheila   A message at WARNING level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f WARNING  IP: 192.168.0.1     User: jim      A message at WARNING level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f INFO     IP: 192.168.0.1     User: fred     A message at INFO level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f WARNING  IP: 192.168.0.1     User: sheila   A message at WARNING level with 2 parameters
+2008-01-18 14:49:54,033 d.e.f WARNING  IP: 127.0.0.1       User: jim      A message at WARNING level with 2 parameters</pre>
+</div>
+</div>
+<div class="section" id="filter">
+<span id="filters-contextual"></span><h3>Filter を使ったコンテキスト情報の伝達<a class="headerlink" href="#filter" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>ユーザ定義の <a class="reference internal" href="../library/logging.html#logging.Filter" title="logging.Filter"><tt class="xref py py-class docutils literal"><span class="pre">Filter</span></tt></a> を使ってログ出力にコンテキスト情報を加えることもできます。 <tt class="docutils literal"><span class="pre">Filter</span></tt> インスタンスは、渡された <tt class="docutils literal"><span class="pre">LogRecords</span></tt>
+を修正することができます。これにより、適切なフォーマット文字列や必要なら <a class="reference internal" href="../library/logging.html#logging.Formatter" title="logging.Formatter"><tt class="xref py py-class docutils literal"><span class="pre">Formatter</span></tt></a> を使って、出力となる属性を新しく追加することも出来ます。</p>
+<p>例えば、web アプリケーションで、処理されるリクエスト (または、少なくともその重要な部分) は、スレッドローカル (<a class="reference internal" href="../library/threading.html#threading.local" title="threading.local"><tt class="xref py py-class docutils literal"><span class="pre">threading.local</span></tt></a>)
+な変数に保存して、 <tt class="docutils literal"><span class="pre">Filter</span></tt> からアクセスすることで、 <tt class="docutils literal"><span class="pre">LogRecord</span></tt> にリクエストの情報を追加できます。例えば、リモート IP アドレスやリモートユーザのユーザ名にアクセスしたいなら、上述の <tt class="docutils literal"><span class="pre">LoggerAdapter</span></tt> の例のように属性名
+&#8216;ip&#8217; や &#8216;user&#8217; を使うといったようにです。そのばあい、同じフォーマット文字列を使って以下に示すように似たような出力を得られます。これはスクリプトの例です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+
+<span class="k">class</span> <span class="nc">ContextFilter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Filter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a filter which injects contextual information into the log.</span>
+
+<span class="sd">    Rather than use actual contextual information, we just use random</span>
+<span class="sd">    data in this demo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">USERS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;jim&#39;</span><span class="p">,</span> <span class="s">&#39;fred&#39;</span><span class="p">,</span> <span class="s">&#39;sheila&#39;</span><span class="p">]</span>
+    <span class="n">IPS</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;123.231.231.123&#39;</span><span class="p">,</span> <span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="s">&#39;192.168.0.1&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+
+        <span class="n">record</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">ContextFilter</span><span class="o">.</span><span class="n">IPS</span><span class="p">)</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">ContextFilter</span><span class="o">.</span><span class="n">USERS</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+   <span class="n">levels</span> <span class="o">=</span> <span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span>
+   <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+                       <span class="n">format</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%(asctime)-15s</span><span class="s"> </span><span class="si">%(name)-5s</span><span class="s"> </span><span class="si">%(levelname)-8s</span><span class="s"> IP: </span><span class="si">%(ip)-15s</span><span class="s"> User: </span><span class="si">%(user)-8s</span><span class="s"> </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">)</span>
+   <span class="n">a1</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;a.b.c&#39;</span><span class="p">)</span>
+   <span class="n">a2</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;d.e.f&#39;</span><span class="p">)</span>
+
+   <span class="n">f</span> <span class="o">=</span> <span class="n">ContextFilter</span><span class="p">()</span>
+   <span class="n">a1</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+   <span class="n">a2</span><span class="o">.</span><span class="n">addFilter</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+   <span class="n">a1</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;A debug message&#39;</span><span class="p">)</span>
+   <span class="n">a1</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;An info message with </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;some parameters&#39;</span><span class="p">)</span>
+   <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+       <span class="n">lvl</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span>
+       <span class="n">lvlname</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span>
+       <span class="n">a2</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lvl</span><span class="p">,</span> <span class="s">&#39;A message at </span><span class="si">%s</span><span class="s"> level with </span><span class="si">%d</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">lvlname</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;parameters&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>そして、実行時に、以下のようになります:</p>
+<div class="highlight-python"><pre>2010-09-06 22:38:15,292 a.b.c DEBUG    IP: 123.231.231.123 User: fred     A debug message
+2010-09-06 22:38:15,300 a.b.c INFO     IP: 192.168.0.1     User: sheila   An info message with some parameters
+2010-09-06 22:38:15,300 d.e.f CRITICAL IP: 127.0.0.1       User: sheila   A message at CRITICAL level with 2 parameters
+2010-09-06 22:38:15,300 d.e.f ERROR    IP: 127.0.0.1       User: jim      A message at ERROR level with 2 parameters
+2010-09-06 22:38:15,300 d.e.f DEBUG    IP: 127.0.0.1       User: sheila   A message at DEBUG level with 2 parameters
+2010-09-06 22:38:15,300 d.e.f ERROR    IP: 123.231.231.123 User: fred     A message at ERROR level with 2 parameters
+2010-09-06 22:38:15,300 d.e.f CRITICAL IP: 192.168.0.1     User: jim      A message at CRITICAL level with 2 parameters
+2010-09-06 22:38:15,300 d.e.f CRITICAL IP: 127.0.0.1       User: sheila   A message at CRITICAL level with 2 parameters
+2010-09-06 22:38:15,300 d.e.f DEBUG    IP: 192.168.0.1     User: jim      A message at DEBUG level with 2 parameters
+2010-09-06 22:38:15,301 d.e.f ERROR    IP: 127.0.0.1       User: sheila   A message at ERROR level with 2 parameters
+2010-09-06 22:38:15,301 d.e.f DEBUG    IP: 123.231.231.123 User: fred     A message at DEBUG level with 2 parameters
+2010-09-06 22:38:15,301 d.e.f INFO     IP: 123.231.231.123 User: fred     A message at INFO level with 2 parameters</pre>
+</div>
+</div>
+</div>
+<div class="section" id="multiple-processes">
+<span id="id8"></span><h2>複数のプロセスからの単一ファイルへのログ記録<a class="headerlink" href="#multiple-processes" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ログ記録はスレッドセーフであり、単一プロセスの複数のスレッドからの単一ファイルへのログ記録はサポート <em>されています</em> が、
+<em>複数プロセス</em> からの単一ファイルへのログ記録はサポート <em>されません</em> 。なぜなら、複数のプロセスをまたいで単一のファイルへのアクセスを直列化する標準の方法が Python には存在しないからです。複数のプロセスから単一ファイルへログ記録しなければならないなら、最も良い方法は、すべてのプロセスが <tt class="xref py py-class docutils literal"><span class="pre">SocketHandler</span></tt> に対してログ記録を行い、独立したプロセスとしてソケットサーバを動かすことです。ソケットサーバはソケットから読み取ってファイルにログを書き出します。
+(この機能を実行するために、既存のプロセスの 1 つのスレッドを割り当てることもできます)
+以下の節では、このアプローチをさらに詳細に文書化しています。動作するソケット受信プログラムが含まれているので、アプリケーションに組み込むための出発点として使用できるでしょう。</p>
+<p><a class="reference internal" href="../library/multiprocessing.html#module-multiprocessing" title="multiprocessing: Process-based &quot;threading&quot; interface."><tt class="xref py py-mod docutils literal"><span class="pre">multiprocessing</span></tt></a> モジュールを含む最近のバージョンの Python を使用しているなら、複数のプロセスからファイルへのアクセスを直列化するために
+<a class="reference internal" href="../library/multiprocessing.html#module-multiprocessing" title="multiprocessing: Process-based &quot;threading&quot; interface."><tt class="xref py py-mod docutils literal"><span class="pre">multiprocessing</span></tt></a> モジュールの <tt class="xref py py-class docutils literal"><span class="pre">Lock</span></tt> クラスを使って独自のハンドラを書くことができます。既存の <a class="reference internal" href="../library/logging.handlers.html#logging.FileHandler" title="logging.FileHandler"><tt class="xref py py-class docutils literal"><span class="pre">FileHandler</span></tt></a> とそのサブクラスは現在のところ <a class="reference internal" href="../library/multiprocessing.html#module-multiprocessing" title="multiprocessing: Process-based &quot;threading&quot; interface."><tt class="xref py py-mod docutils literal"><span class="pre">multiprocessing</span></tt></a> を利用していませんが、将来は利用するようになるかもしれません。現在のところ <a class="reference internal" href="../library/multiprocessing.html#module-multiprocessing" title="multiprocessing: Process-based &quot;threading&quot; interface."><tt class="xref py py-mod docutils literal"><span class="pre">multiprocessing</span></tt></a> モジュールが提供するロック機能はすべてのプラットホームで動作するわけではないことに注意してください。
+(<a class="reference external" href="http://bugs.python.org/issue3770">http://bugs.python.org/issue3770</a> 参照)</p>
+</div>
+<div class="section" id="id9">
+<h2>ファイルの循環を使う<a class="headerlink" href="#id9" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ログファイルがある大きさに達したら、新しいファイルを開いてそこにログを取りたいことがあります。そのファイルをある数だけ残し、その数のファイルが生成されたらファイルを循環し、ファイルの数も大きさも制限したいこともあるでしょう。この利用パターンのために、logging パッケージは
+<a class="reference internal" href="../library/logging.handlers.html#logging.handlers.RotatingFileHandler" title="logging.handlers.RotatingFileHandler"><tt class="xref py py-class docutils literal"><span class="pre">RotatingFileHandler</span></tt></a> を提供しています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.handlers</span>
+
+<span class="n">LOG_FILENAME</span> <span class="o">=</span> <span class="s">&#39;logging_rotatingfile_example.out&#39;</span>
+
+<span class="c"># Set up a specific logger with our desired output level</span>
+<span class="n">my_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;MyLogger&#39;</span><span class="p">)</span>
+<span class="n">my_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="c"># Add the log message handler to the logger</span>
+<span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span>
+              <span class="n">LOG_FILENAME</span><span class="p">,</span> <span class="n">maxBytes</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">backupCount</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">my_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+<span class="c"># Log some messages</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">my_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;i = </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+
+<span class="c"># See what files are created</span>
+<span class="n">logfiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">*&#39;</span> <span class="o">%</span> <span class="n">LOG_FILENAME</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">logfiles</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この結果として、アプリケーションのログ履歴の一部である、 6 つに別れたファイルが得られます:</p>
+<div class="highlight-python"><pre>logging_rotatingfile_example.out
+logging_rotatingfile_example.out.1
+logging_rotatingfile_example.out.2
+logging_rotatingfile_example.out.3
+logging_rotatingfile_example.out.4
+logging_rotatingfile_example.out.5</pre>
+</div>
+<p>最新のファイルはいつでも <tt class="file docutils literal"><span class="pre">logging_rotatingfile_example.out</span></tt> で、サイズの上限に達するたびに拡張子 <tt class="docutils literal"><span class="pre">.1</span></tt> を付けた名前に改名されます。既にあるバックアップファイルはその拡張子がインクリメントされ (<tt class="docutils literal"><span class="pre">.1</span></tt> が <tt class="docutils literal"><span class="pre">.2</span></tt> になるなど)、
+<tt class="docutils literal"><span class="pre">.6</span></tt> ファイルは消去されます。</p>
+<p>明らかに、ここでは例示のためにファイルの大きさをとんでもなく小さな値に設定しています。実際に使うときは <em>maxBytes</em> を適切な値に設定してください。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="regex.html" title="正規表現 HOWTO"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="logging.html" title="ロギング HOWTO"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

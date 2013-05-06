@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Distutilsの拡張 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python モジュールの配布" href="index.html" />
+    <link rel="next" title="コマンドリファレンス" href="commandref.html" />
+    <link rel="prev" title="例" href="examples.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="commandref.html" title="コマンドリファレンス"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="例"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python モジュールの配布</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Distutilsの拡張</a><ul>
+<li><a class="reference internal" href="#id1">新しいコマンドの統合</a></li>
+<li><a class="reference internal" href="#id2">配布物の種類を追加する</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="examples.html"
+                        title="前の章へ">例</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="commandref.html"
+                        title="次の章へ">コマンドリファレンス</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/distutils/extending.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="distutils">
+<span id="extending-distutils"></span><h1>Distutilsの拡張<a class="headerlink" href="#distutils" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>Distutilsは様々な方法で拡張できます。ほとんどの拡張は存在するコマンドを新しいコマンドで置換する形でおこなわれます。新しいコマンドはたとえば存在するコマンドを置換して、そのコマンドでパッケージをどう処理するかの細部を変更することでプラットフォーム特有のパッケージ形式をサポートするために書かれているかもしれません</p>
+<p>ほとんどのdistutilsの拡張は存在するコマンドを変更したい <tt class="file docutils literal"><span class="pre">setup.py</span></tt>
+スクリプト中で行われます。ほとんどはパッケージにコピーされるファイル拡張子を <tt class="file docutils literal"><span class="pre">.py</span></tt> の他に、いくつか追加するものです。</p>
+<p>ほとんどのdistutilsのコマンド実装は <a class="reference internal" href="apiref.html#module-distutils.cmd" title="distutils.cmd: このモジュールは Command 抽象ベースクラスを提供します。このクラスは distutils.command サブパッケージ中のモジュールでサブクラスを作るために利用されます。"><tt class="xref py py-mod docutils literal"><span class="pre">distutils.cmd</span></tt></a> の
+<a class="reference internal" href="apiref.html#distutils.cmd.Command" title="distutils.cmd.Command"><tt class="xref py py-class docutils literal"><span class="pre">distutils.cmd.Command</span></tt></a> クラスのサブクラスとして実装されています。新しいコマンドは <tt class="xref py py-class docutils literal"><span class="pre">Command</span></tt> を直接継承し、置換するコマンドでは置換対象のコマンドのサブクラスにすることで <tt class="xref py py-class docutils literal"><span class="pre">Command</span></tt> を間接的に継承します。コマンドは <tt class="xref py py-class docutils literal"><span class="pre">Command</span></tt> から派生したものである必要があります。</p>
+<div class="section" id="id1">
+<h2>新しいコマンドの統合<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>新しいコマンド実装を統合するにはいくつかの方法があります。一番難しいものは新機能をdistutils本体に取り込み、それのサポートを提供するPythonのバージョンが出ることを待つ(そして使う)ことです。これは様々な理由で本当に難しいことです。</p>
+<p>もっとも一般的な、そしておそらくほとんどの場合にもっとも妥当な方法は、新しい実装をあなたの <tt class="file docutils literal"><span class="pre">setup.py</span></tt> スクリプトに取り込み、
+<a class="reference internal" href="apiref.html#distutils.core.setup" title="distutils.core.setup"><tt class="xref py py-func docutils literal"><span class="pre">distutils.core.setup()</span></tt></a> 関数でそれらを使うようにすることです。</p>
+<div class="highlight-python"><pre>from distutils.command.build_py import build_py as _build_py
+from distutils.core import setup
+
+class build_py(_build_py):
+    """Specialized Python source builder."""
+
+    # implement whatever needs to be different...
+
+setup(cmdclass={'build_py': build_py},
+      ...)</pre>
+</div>
+<p>このアプローチは新実装をある特定のパッケージで利用したい時、そのパッケージに興味をもつ人全員がコマンドの新実装を必要とする時にもっとも価値があります。</p>
+<p>Python 2.4から、インストールされたPythonを変更せずに、既存の
+<tt class="file docutils literal"><span class="pre">setup.py</span></tt> スクリプトをサポートするための3つめの選択肢が利用できるようになりました。これは追加のパッケージングシステムのサポートを追加するサードパーティ拡張を提供することを想定していますが、これらのコマンドはdistutilsが利用されている何にでも利用可能です。新しい設定オプション <em class="xref std std-option">command_packages</em>
+(コマンドラインオプション <em class="xref std std-option">--command-packages</em>) は、コマンド実装モジュールを検索する追加のパッケージを指定するために利用できます。 distutilsの全てのオプションと同様に、このオプションもコマンドラインまたは設定ファイルで指定できます。このオプションは設定ファイル中では <tt class="docutils literal"><span class="pre">[global]</span></tt> セクションか、コマンドラインのコマンドより前でだけ設定できます。設定ファイル中で指定する場合、コマンドラインで上書きすることができます。空文字列を指定するとデフォルト値が使われます。これはパッケージと一緒に提供する設定ファイルでは指定しないでください。</p>
+<p>この新オプションによってコマンド実装を探すためのパッケージをいくつでも追加することができます。複数のパッケージ名はコンマで区切って指定します。指定がなければ、検索は <a class="reference internal" href="apiref.html#module-distutils.command" title="distutils.command: このサブパッケージは標準のdistutilsコマンドを提供します。"><tt class="xref py py-mod docutils literal"><span class="pre">distutils.command</span></tt></a> パッケージのみで行われます。ただし <tt class="file docutils literal"><span class="pre">setup.py</span></tt> がオプション
+<em class="xref std std-option">--command-packages</em>  <em class="xref std std-option">distcmds,buildcmds</em> で実行されている場合には、パッケージは
+<a class="reference internal" href="apiref.html#module-distutils.command" title="distutils.command: このサブパッケージは標準のdistutilsコマンドを提供します。"><tt class="xref py py-mod docutils literal"><span class="pre">distutils.command</span></tt></a> 、 <tt class="xref py py-mod docutils literal"><span class="pre">distcmds</span></tt> 、そして <tt class="xref py py-mod docutils literal"><span class="pre">buildcmds</span></tt> を、この順番で検索します。新コマンドはコマンドと同じ名前のモジュールに、コマンドと同じ名前のクラスで実装されていると想定しています。上のコマドラインオプションの例では、コマンド
+<strong class="command">bdist_openpkg</strong> は、 <tt class="xref py py-class docutils literal"><span class="pre">distcmds.bdist_openpkg.bdist_openpkg</span></tt> か、
+<tt class="xref py py-class docutils literal"><span class="pre">buildcmds.bdist_openpkg.bdist_openpkg</span></tt> で実装されるかもしれません。</p>
+</div>
+<div class="section" id="id2">
+<h2>配布物の種類を追加する<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>配布物 (<tt class="file docutils literal"><span class="pre">dist/</span></tt> ディレクトリの中のファイル) を作成するコマンドは、 <strong class="command">upload</strong>
+がその配布物をPyPIにアップロードできるように、 <tt class="docutils literal"><span class="pre">(command,</span> <span class="pre">filename)</span></tt> のペアを
+<tt class="docutils literal"><span class="pre">self.distributions.dist_files</span></tt> に追加する必要があります。ペア中の <em>filename</em>
+はパスに関する情報を持たず、単にファイル名だけを持ちます。 dry-run モードでも、何が作成されたかを示すために、同じペアが必要になります。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="commandref.html" title="コマンドリファレンス"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="例"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python モジュールの配布</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

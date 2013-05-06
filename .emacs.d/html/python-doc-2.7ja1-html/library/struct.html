@@ -1,0 +1,580 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7.3. struct — 文字列データをパックされたバイナリデータとして解釈する &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="7. 文字列処理" href="strings.html" />
+    <link rel="next" title="7.4. difflib — 差分の計算を助ける" href="difflib.html" />
+    <link rel="prev" title="7.2. re — 正規表現操作" href="re.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="difflib.html" title="7.4. difflib — 差分の計算を助ける"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="re.html" title="7.2. re — 正規表現操作"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="strings.html" accesskey="U">7. 文字列処理</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">7.3. <tt class="docutils literal"><span class="pre">struct</span></tt> &#8212; 文字列データをパックされたバイナリデータとして解釈する</a><ul>
+<li><a class="reference internal" href="#id1">7.3.1. 関数と例外</a></li>
+<li><a class="reference internal" href="#struct-format-strings">7.3.2. フォーマット文字列</a><ul>
+<li><a class="reference internal" href="#struct-alignment">7.3.2.1. バイトオーダ, サイズ, アラインメント</a></li>
+<li><a class="reference internal" href="#format-characters">7.3.2.2. フォーマット文字</a></li>
+<li><a class="reference internal" href="#struct-examples">7.3.2.3. 例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#struct-objects">7.3.3. クラス</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="re.html"
+                        title="前の章へ">7.2. <tt class="docutils literal docutils literal docutils literal"><span class="pre">re</span></tt> &#8212; 正規表現操作</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="difflib.html"
+                        title="次の章へ">7.4. <tt class="docutils literal docutils literal docutils literal"><span class="pre">difflib</span></tt> &#8212; 差分の計算を助ける</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/struct.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-struct">
+<span id="struct"></span><h1>7.3. <a class="reference internal" href="#module-struct" title="struct: 文字列データをパックされたバイナリデータとして解釈する."><tt class="xref py py-mod docutils literal"><span class="pre">struct</span></tt></a> &#8212; 文字列データをパックされたバイナリデータとして解釈する<a class="headerlink" href="#module-struct" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">このモジュールは、 Python の値と Python 上で文字列データとして表される
+C の構造体データとの間の変換を実現します。このモジュールは特に、ファイルに保存されたり、ネットワーク接続を経由したバイナリデータを扱うときに使われます。このモジュールでは、C 構造体のレイアウトおよび Python の値との間で行いたい変換をコンパクトに表現するために、
+<a class="reference internal" href="#struct-format-strings"><em>フォーマット文字列</em></a> を使います。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">デフォルトでは、与えられた C の構造体をパックする際に、関連する C データ型を適切にアラインメント(alignment)するために数バイトのパディングを行うことがあります。この挙動が選択されたのは、パックされた構造体のバイト表現を対応する C 構造体のメモリレイアウトに正確に対応させるためです。プラットフォーム独立のデータフォーマットを扱ったり、隠れたパディングを排除したりするには、サイズ及びアラインメントとして <cite>native</cite> の代わりに <cite>standard</cite> を使うようにします:
+詳しくは <a class="reference internal" href="#struct-alignment"><em>バイトオーダ, サイズ, アラインメント</em></a> を参照して下さい。</p>
+</div>
+<div class="section" id="id1">
+<h2>7.3.1. 関数と例外<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このモジュールは以下の例外と関数を定義しています:</p>
+<dl class="exception">
+<dt id="struct.error">
+<em class="property">exception </em><tt class="descclassname">struct.</tt><tt class="descname">error</tt><a class="headerlink" href="#struct.error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>様々な状況で送出された例外です; 引数は何が問題かを記述する文字列です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="struct.pack">
+<tt class="descclassname">struct.</tt><tt class="descname">pack</tt><big>(</big><em>fmt</em>, <em>v1</em>, <em>v2</em>, <em>...</em><big>)</big><a class="headerlink" href="#struct.pack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>値 <tt class="docutils literal"><span class="pre">v1,</span> <span class="pre">v2,</span> <span class="pre">...</span></tt> が与えられたフォーマットで含まれる文字列データを返します。引数は指定したフォーマットが要求する型と正確に一致していなければなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="struct.pack_into">
+<tt class="descclassname">struct.</tt><tt class="descname">pack_into</tt><big>(</big><em>fmt</em>, <em>buffer</em>, <em>offset</em>, <em>v1</em>, <em>v2</em>, <em>...</em><big>)</big><a class="headerlink" href="#struct.pack_into" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">v1,</span> <span class="pre">v2,</span> <span class="pre">...</span></tt> を与えられたフォーマットに従ってパックし、そのバイト列を書き込み可能な <em>buffer</em>
+の <em>offset</em> を先頭に書き込みます。 offset が省略できないことに注意してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="struct.unpack">
+<tt class="descclassname">struct.</tt><tt class="descname">unpack</tt><big>(</big><em>fmt</em>, <em>string</em><big>)</big><a class="headerlink" href="#struct.unpack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>(おそらく <tt class="docutils literal"><span class="pre">pack(fmt,</span> <span class="pre">...)</span></tt> でパックされた) 文字列データを与えられた書式に従ってアンパックします。値が一つしかない場合を含め、結果はタプルで返されます。文字列データにはフォーマットが要求するだけのデータが正確に含まれていなければなりません
+(<tt class="docutils literal"><span class="pre">len(string)</span></tt> が <tt class="docutils literal"><span class="pre">calcsize(fmt)</span></tt> と一致しなければなりません)。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="struct.unpack_from">
+<tt class="descclassname">struct.</tt><tt class="descname">unpack_from</tt><big>(</big><em>fmt</em>, <em>buffer</em><span class="optional">[</span>, <em>offset=0</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#struct.unpack_from" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>buffer</em> を与えられたフォーマットでアンパックします。値が一つしかない場合を含め、結果はタプルで返されます。
+<em>buffer</em> には最低でも format に要求されるサイズのデータが必要です。
+(<tt class="docutils literal"><span class="pre">len(buffer[offset:])</span></tt> は <tt class="docutils literal"><span class="pre">calcsize(fmt)</span></tt> 以上でなければなりません)。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="struct.calcsize">
+<tt class="descclassname">struct.</tt><tt class="descname">calcsize</tt><big>(</big><em>fmt</em><big>)</big><a class="headerlink" href="#struct.calcsize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたフォーマットに対応する構造体のサイズ (すなわち文字列データのサイズ) を返します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="struct-format-strings">
+<span id="id2"></span><h2>7.3.2. フォーマット文字列<a class="headerlink" href="#struct-format-strings" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>フォーマット文字列はデータをパックしたりアンパックしたりするときの期待されるレイアウトを指定するためのメカニズムです。文字列はパック/アンパックされるデータの型を指定する
+<a class="reference internal" href="#format-characters"><em>フォーマット文字</em></a> から組み立てられます。さらに、 <a class="reference internal" href="#struct-alignment"><em>バイトオーダ, サイズ, アラインメント</em></a> を制御するための特殊文字もあります。</p>
+<div class="section" id="struct-alignment">
+<span id="id3"></span><h3>7.3.2.1. バイトオーダ, サイズ, アラインメント<a class="headerlink" href="#struct-alignment" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>デフォルトでは、C での型はマシンのネイティブ (native) の形式およびバイトオーダ (byte order) で表され、適切にアラインメント
+(alignment) するために、必要に応じて数バイトのパディングを行ってスキップします
+(これは C コンパイラが用いるルールに従います)。</p>
+<p>これに代わって、フォーマット文字列の最初の文字を使って、バイトオーダやサイズ、アラインメントを指定することができます。指定できる文字を以下のテーブルに示します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="53%" />
+<col width="14%" />
+<col width="23%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">文字</th>
+<th class="head">バイトオーダ</th>
+<th class="head">サイズ</th>
+<th class="head">アラインメント</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">&#64;</span></tt></td>
+<td>ネイティブ</td>
+<td>native</td>
+<td>native</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">=</span></tt></td>
+<td>ネイティブ</td>
+<td>standard</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">&lt;</span></tt></td>
+<td>リトルエンディアン</td>
+<td>standard</td>
+<td>none</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">&gt;</span></tt></td>
+<td>ビッグエンディアン</td>
+<td>standard</td>
+<td>none</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">!</span></tt></td>
+<td>ネットワーク (= ビッグエンディアン)</td>
+<td>standard</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<p>フォーマット文字列の最初の文字が上のいずれかでない場合、 <tt class="docutils literal"><span class="pre">'&#64;'</span></tt> であるとみなされます。</p>
+<p>ネイティブのバイトオーダはビッグエンディアンかリトルエンディアンで、ホスト計算機に依存します。例えば、Intel x86 および AMD64 (x86-64) はリトルエンディアンです。Motorola 68000 および PowerPC G5 はビッグエンディアンです。
+ARM および Intel Itanium はエンディアンを切り替えられる機能を備えています
+(バイエンディアン)。使っているシステムでのエンディアンは <tt class="docutils literal"><span class="pre">sys.byteorder</span></tt> を使って調べて下さい。</p>
+<p>ネイティブのサイズおよびアラインメントは C コンパイラの <tt class="docutils literal"><span class="pre">sizeof</span></tt> 式で決定されます。ネイティブのサイズおよびアラインメントはネイティブのバイトオーダと同時に使われます。</p>
+<p>標準サイズはフォーマット文字だけで決まります。 <a class="reference internal" href="#format-characters"><em>フォーマット文字</em></a> の表を参照して下さい。</p>
+<p><tt class="docutils literal"><span class="pre">'&#64;'</span></tt> と <tt class="docutils literal"><span class="pre">'='</span></tt> の違いに注意してください:
+両方ともネイティブのバイトオーダですが、後者のバイトサイズとアラインメントは標準のものに合わせてあります。</p>
+<p><tt class="docutils literal"><span class="pre">'!'</span></tt> 表記法はネットワークバイトオーダがビッグエンディアンかリトルエンディアンか忘れちゃったという熱意に乏しい人向けに用意されています。</p>
+<p>バイトオーダに関して、「(強制的にバイトスワップを行う)ネイティブの逆」を指定する方法はありません。 <tt class="docutils literal"><span class="pre">'&lt;'</span></tt> または <tt class="docutils literal"><span class="pre">'&gt;'</span></tt> のうちふさわしい方を選んでください。</p>
+<p>注意:</p>
+<ol class="arabic simple">
+<li>パディングは構造体のメンバの並びの中にだけ自動で追加されます。最初や最後にパディングが追加されることはありません。</li>
+<li>ネイティブでないサイズおよびアラインメントが使われる場合にはパディングは行われません。
+(たとえば &#8216;&lt;&#8217;, &#8216;&gt;&#8217;, &#8216;=&#8217;, &#8216;!&#8217; を使った場合です。)</li>
+<li>特定の型によるアラインメント要求に従うように構造体の末端をそろえるには、繰り返し回数をゼロにした特定の型でフォーマットを終端します。
+<a class="reference internal" href="#struct-examples"><em>例</em></a> を参照して下さい。</li>
+</ol>
+</div>
+<div class="section" id="format-characters">
+<span id="id4"></span><h3>7.3.2.2. フォーマット文字<a class="headerlink" href="#format-characters" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>フォーマット文字 (format character) は以下の意味を持っています;
+C と Python の間の変換では、値は正確に以下に指定された型でなくてはなりません:
+「標準のサイズ」列は standard サイズ使用時にパックされた値が何バイトかを示します。つまり、フォーマット文字列が <tt class="docutils literal"><span class="pre">'&lt;'</span></tt>, <tt class="docutils literal"><span class="pre">'&gt;'</span></tt>, <tt class="docutils literal"><span class="pre">'!'</span></tt>, <tt class="docutils literal"><span class="pre">'='</span></tt> のいずれかで始まっている場合のものです。native サイズ使用時にはパックされた値の大きさはプラットフォーム依存です。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="31%" />
+<col width="21%" />
+<col width="17%" />
+<col width="14%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">フォーマット</th>
+<th class="head">C での型</th>
+<th class="head">Python 型</th>
+<th class="head">標準のサイズ</th>
+<th class="head">備考</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">x</span></tt></td>
+<td>pad byte</td>
+<td>no value</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">c</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">char</span></tt></td>
+<td>長さ 1 の文字列</td>
+<td>1</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">b</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">signed</span> <span class="pre">char</span></tt></td>
+<td>整数型 (integer)</td>
+<td>1</td>
+<td>(3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">B</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">unsigned</span> <span class="pre">char</span></tt></td>
+<td>整数型</td>
+<td>1</td>
+<td>(3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">?</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">_Bool</span></tt></td>
+<td>真偽値型(bool)</td>
+<td>1</td>
+<td>(1)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">h</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">short</span></tt></td>
+<td>整数型</td>
+<td>1</td>
+<td>(3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">H</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">unsigned</span> <span class="pre">short</span></tt></td>
+<td>整数型</td>
+<td>2</td>
+<td>(3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">i</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">int</span></tt></td>
+<td>整数型</td>
+<td>4</td>
+<td>(3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">I</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">unsigned</span> <span class="pre">int</span></tt></td>
+<td>整数型</td>
+<td>4</td>
+<td>(3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">l</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">long</span></tt></td>
+<td>整数型</td>
+<td>4</td>
+<td>(3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">L</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span></tt></td>
+<td>整数型</td>
+<td>4</td>
+<td>(3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">q</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">long</span> <span class="pre">long</span></tt></td>
+<td>整数型</td>
+<td>8</td>
+<td>(2), (3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">Q</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">unsigned</span> <span class="pre">long</span>
+<span class="pre">long</span></tt></td>
+<td>整数型</td>
+<td>8</td>
+<td>(2), (3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">f</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">float</span></tt></td>
+<td>浮動小数点型</td>
+<td>4</td>
+<td>(4)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">d</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">double</span></tt></td>
+<td>浮動小数点型</td>
+<td>8</td>
+<td>(4)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">s</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">char[]</span></tt></td>
+<td>文字列</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">p</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">char[]</span></tt></td>
+<td>文字列</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">P</span></tt></td>
+<td><tt class="xref c c-type docutils literal"><span class="pre">void</span> <span class="pre">*</span></tt></td>
+<td>整数型</td>
+<td>&nbsp;</td>
+<td>(5), (3)</td>
+</tr>
+</tbody>
+</table>
+<p>注意事項:</p>
+<ol class="arabic">
+<li><p class="first"><tt class="docutils literal"><span class="pre">'?'</span></tt> 変換コードは C99 で定義された <tt class="xref c c-type docutils literal"><span class="pre">_Bool</span></tt> 型に対応します。その型が利用できない場合は、 <tt class="xref c c-type docutils literal"><span class="pre">char</span></tt> で代用されます。標準モードでは常に1バイトで表現されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</li>
+<li><p class="first">フォーマット文字 <tt class="docutils literal"><span class="pre">'q'</span></tt> および <tt class="docutils literal"><span class="pre">'Q'</span></tt> は、プラットフォームの C コンパイラが
+C の <tt class="xref c c-type docutils literal"><span class="pre">long</span> <span class="pre">long</span></tt> 型、
+Windows では <tt class="xref c c-type docutils literal"><span class="pre">__int64</span></tt> をサポートする場合にのみ、プラットフォームネイティブの値との変換を行うモードだけで利用することができます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</li>
+<li><p class="first">整数変換コードで非整数をパックしようとするとき、その非整数が
+<a class="reference internal" href="../reference/datamodel.html#object.__index__" title="object.__index__"><tt class="xref py py-meth docutils literal"><span class="pre">__index__()</span></tt></a> メソッドを持っていると、パッキングの前に、そのメソッドが変数を整数に変換するために呼び出されます。
+<a class="reference internal" href="../reference/datamodel.html#object.__index__" title="object.__index__"><tt class="xref py py-meth docutils literal"><span class="pre">__index__()</span></tt></a> メソッドが存在しないか、 <a class="reference internal" href="../reference/datamodel.html#object.__index__" title="object.__index__"><tt class="xref py py-meth docutils literal"><span class="pre">__index__()</span></tt></a> メソッドの呼び出しが <a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出したら、次に <a class="reference internal" href="../reference/datamodel.html#object.__int__" title="object.__int__"><tt class="xref py py-meth docutils literal"><span class="pre">__int__()</span></tt></a> メソッドが試されます。しかし、 <a class="reference internal" href="../reference/datamodel.html#object.__int__" title="object.__int__"><tt class="xref py py-meth docutils literal"><span class="pre">__int__()</span></tt></a> の使用は非推奨で、
+<a class="reference internal" href="exceptions.html#exceptions.DeprecationWarning" title="exceptions.DeprecationWarning"><tt class="xref py py-exc docutils literal"><span class="pre">DeprecationWarning</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>非整数への <a class="reference internal" href="../reference/datamodel.html#object.__index__" title="object.__index__"><tt class="xref py py-meth docutils literal"><span class="pre">__index__()</span></tt></a> メソッド の使用は 2.7 で追加されました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>バージョン 2.7 以前では、すべての整数変換コードが変換に <a class="reference internal" href="../reference/datamodel.html#object.__int__" title="object.__int__"><tt class="xref py py-meth docutils literal"><span class="pre">__int__()</span></tt></a>
+メソッドを使うわけではなく、浮動小数点の引数にのみ
+<a class="reference internal" href="exceptions.html#exceptions.DeprecationWarning" title="exceptions.DeprecationWarning"><tt class="xref py py-exc docutils literal"><span class="pre">DeprecationWarning</span></tt></a> が送出されていました。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">'f'</span></tt> および <tt class="docutils literal"><span class="pre">'d'</span></tt> 変換コードについて、パックされた表現は IEEE 754 binary32 (<tt class="docutils literal"><span class="pre">'f'</span></tt> の場合) または
+binary64 (<tt class="docutils literal"><span class="pre">'d'</span></tt> の場合) フォーマットが、プラットフォームにおける浮動小数点数のフォーマットに関係なく使われます。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">'P'</span></tt> フォーマット文字はネイティブバイトオーダでのみ利用可能です
+(デフォルトのネットワークバイトオーダに設定するか、
+<tt class="docutils literal"><span class="pre">'&#64;'</span></tt> バイトオーダ指定文字を指定しなければなりません)。
+<tt class="docutils literal"><span class="pre">'='</span></tt> を指定した場合、ホスト計算機のバイトオーダに基づいてリトルエンディアンとビッグエンディアンのどちらを使うかを決めます。
+struct モジュールはこの設定をネイティブのオーダ設定として解釈しないので、
+<tt class="docutils literal"><span class="pre">'P'</span></tt> を使うことはできません。</p>
+</li>
+</ol>
+<p>フォーマット文字の前に整数をつけ、繰り返し回数 (count) を指定することができます。例えば、フォーマット文字列 <tt class="docutils literal"><span class="pre">'4h'</span></tt> は
+<tt class="docutils literal"><span class="pre">'hhhh'</span></tt> と全く同じ意味です。</p>
+<p>フォーマット文字間の空白文字は無視されます; count とフォーマット文字の間にはスペースを入れてはいけません。</p>
+<p>フォーマット文字 <tt class="docutils literal"><span class="pre">'s'</span></tt> では、count は文字列のサイズとして扱われます。他のフォーマット文字のように繰り返し回数ではありません;
+例えば、 <tt class="docutils literal"><span class="pre">'10c'</span></tt> が 10 個のキャラクタを表すのに対して、 <tt class="docutils literal"><span class="pre">'10s'</span></tt>  は 10 バイトの長さを持った 1 個の文字列です。文字列をパックする際には、指定した長さにフィットするように、必要に応じて切り詰められたりヌル文字で穴埋めされたりします。また特殊なケースとして、(<tt class="docutils literal"><span class="pre">'0c'</span></tt> が 0 個のキャラクタを表すのに対して) <tt class="docutils literal"><span class="pre">'0s'</span></tt> は 1
+個の空文字列を意味します。</p>
+<p>フォーマット文字 <tt class="docutils literal"><span class="pre">'p'</span></tt> は &#8220;Pascal 文字列 (pascal string)&#8221;  をコードします。Pascal
+文字列は count で与えられる <em>固定長のバイト列</em> に収められた短い可変長の文字列です。このデータの先頭の 1
+バイトには文字列の長さか255 のうち、小さい方の数が収められます。その後に文字列のバイトデータが続きます。 <a class="reference internal" href="#struct.pack" title="struct.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> に渡された
+Pascal 文字列の長さが長すぎた (count-1 よりも長い) 場合、先頭の <tt class="docutils literal"><span class="pre">count-1</span></tt> バイトが書き込まれます。文字列が <tt class="docutils literal"><span class="pre">count-1</span></tt>
+よりも短い場合、指定した count バイトに達するまでの残りの部分はヌルで埋められます。 <a class="reference internal" href="#struct.unpack" title="struct.unpack"><tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt></a> では、フォーマット文字 <tt class="docutils literal"><span class="pre">'p'</span></tt>
+は指定された count バイトだけデータを読み込みますが、返される文字列は決して 255 文字を超えることはないので注意してください。</p>
+<p>フォーマット文字 <tt class="docutils literal"><span class="pre">'P'</span></tt> では、返される値は Python 整数型または long 整数型で、これはポインタの値を Python
+での整数にキャストする際に、値を保持するために必要なサイズに依存します。 <em>NULL</em> ポインタは常に Python 整数型の <tt class="docutils literal"><span class="pre">0</span></tt> になります。ポインタ型のサイズを持った値をパックする際には、Python 整数型および long 整数型オブジェクトを使うことができます。例えば、 Alpha および
+Merced プロセッサは 64 bit のポインタ値を使いますが、これはポインタを保持するために Python long 整数型が使われることを意味します;
+32 bit ポインタを使う他のプラットフォームでは Python 整数型が使われます。</p>
+<p>フォーマット文字 <tt class="docutils literal"><span class="pre">'?'</span></tt> では、返される値は <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> か <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> のどちらかです。パック時にはオブジェクトの真偽値が利用されます。
+0 か 1 のネイティブもしくは標準のbool表現がパックされます。そしてアンパック時には非ゼロの値は True になります。</p>
+</div>
+<div class="section" id="struct-examples">
+<span id="id5"></span><h3>7.3.2.3. 例<a class="headerlink" href="#struct-examples" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">全ての例は、ビッグエンディアンのマシンで、ネイティブのバイトオーダ、サイズおよびアラインメントを仮定します。</p>
+</div>
+<p>基本的な例として、三つの整数をパック/アンパックします:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">struct</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s">&#39;hhl&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">&#39;\x00\x01\x00\x02\x00\x00\x00\x03&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;hhl&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\x00\x01\x00\x02\x00\x00\x00\x03</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="go">(1, 2, 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calcsize</span><span class="p">(</span><span class="s">&#39;hhl&#39;</span><span class="p">)</span>
+<span class="go">8</span>
+</pre></div>
+</div>
+<p>アンパックした結果のフィールドは、変数に割り当てるか named tuple でラップすることによって名前を付けることができます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="s">&#39;raymond   </span><span class="se">\x32\x12\x08\x01\x08</span><span class="s">&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">serialnum</span><span class="p">,</span> <span class="n">school</span><span class="p">,</span> <span class="n">gradelevel</span> <span class="o">=</span> <span class="n">unpack</span><span class="p">(</span><span class="s">&#39;&lt;10sHHb&#39;</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Student</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;Student&#39;</span><span class="p">,</span> <span class="s">&#39;name serialnum school gradelevel&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Student</span><span class="o">.</span><span class="n">_make</span><span class="p">(</span><span class="n">unpack</span><span class="p">(</span><span class="s">&#39;&lt;10sHHb&#39;</span><span class="p">,</span> <span class="n">record</span><span class="p">))</span>
+<span class="go">Student(name=&#39;raymond   &#39;, serialnum=4658, school=264, gradelevel=8)</span>
+</pre></div>
+</div>
+<p>アラインメントの要求を満たすために必要なパディングが異なるという理由により、フォーマット文字の順番がサイズの違いを生み出すことがあります:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s">&#39;ci&#39;</span><span class="p">,</span> <span class="s">&#39;*&#39;</span><span class="p">,</span> <span class="mh">0x12131415</span><span class="p">)</span>
+<span class="go">&#39;*\x00\x00\x00\x12\x13\x14\x15&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s">&#39;ic&#39;</span><span class="p">,</span> <span class="mh">0x12131415</span><span class="p">,</span> <span class="s">&#39;*&#39;</span><span class="p">)</span>
+<span class="go">&#39;\x12\x13\x14\x15*&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calcsize</span><span class="p">(</span><span class="s">&#39;ci&#39;</span><span class="p">)</span>
+<span class="go">8</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calcsize</span><span class="p">(</span><span class="s">&#39;ic&#39;</span><span class="p">)</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+<p>以下のフォーマット <tt class="docutils literal"><span class="pre">'llh0l'</span></tt> は、
+long 型が 4 バイトを境界としてそろえられていると仮定して、末端に 2 バイトをパディングします:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pack</span><span class="p">(</span><span class="s">&#39;llh0l&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">&#39;\x00\x00\x00\x01\x00\x00\x00\x02\x00\x03\x00\x00&#39;</span>
+</pre></div>
+</div>
+<p>この例はネイティブのサイズとアラインメントが使われているときだけ思った通りに動きます。標準のサイズとアラインメントはアラインメントの設定ではいかなるアラインメントも行いません。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="array.html#module-array" title="array: 一様な型を持つ数値からなる空間効率のよいアレイ。"><tt class="xref py py-mod docutils literal"><span class="pre">array</span></tt></a></dt>
+<dd>一様なデータ型からなるバイナリ記録データのパック</dd>
+<dt>Module <a class="reference internal" href="xdrlib.html#module-xdrlib" title="xdrlib: 外部データ表現 (XDR, External Data Representation)  データのエンコードおよびデコード。"><tt class="xref py py-mod docutils literal"><span class="pre">xdrlib</span></tt></a></dt>
+<dd>XDR データのパックおよびアンパック。</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="struct-objects">
+<span id="id6"></span><h2>7.3.3. クラス<a class="headerlink" href="#struct-objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-struct" title="struct: 文字列データをパックされたバイナリデータとして解釈する."><tt class="xref py py-mod docutils literal"><span class="pre">struct</span></tt></a> モジュールは次の型を定義します:</p>
+<dl class="class">
+<dt id="struct.Struct">
+<em class="property">class </em><tt class="descclassname">struct.</tt><tt class="descname">Struct</tt><big>(</big><em>format</em><big>)</big><a class="headerlink" href="#struct.Struct" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>フォーマット文字列 <em>format</em> に従ってバイナリデータを読み書きする、新しい Struct オブジェクトを返します。
+Struct オブジェクトを一度作ってからそのメソッドを使うと、フォーマット文字列のコンパイルが一度で済むので、
+<a class="reference internal" href="#module-struct" title="struct: 文字列データをパックされたバイナリデータとして解釈する."><tt class="xref py py-mod docutils literal"><span class="pre">struct</span></tt></a> モジュールの関数を同じフォーマットで何度も呼び出すよりも効率的です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<p>コンパイルされた Struct オブジェクトは以下のメソッドと属性をサポートします:</p>
+<dl class="method">
+<dt id="struct.Struct.pack">
+<tt class="descname">pack</tt><big>(</big><em>v1</em>, <em>v2</em>, <em>...</em><big>)</big><a class="headerlink" href="#struct.Struct.pack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#struct.pack" title="struct.pack"><tt class="xref py py-func docutils literal"><span class="pre">pack()</span></tt></a> 関数と同じ、コンパイルされたフォーマットを利用するメソッドです。
+(<tt class="docutils literal"><span class="pre">len(result)</span></tt> は <tt class="xref py py-attr docutils literal"><span class="pre">self.size</span></tt> と等しいでしょう)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="struct.Struct.pack_into">
+<tt class="descname">pack_into</tt><big>(</big><em>buffer</em>, <em>offset</em>, <em>v1</em>, <em>v2</em>, <em>...</em><big>)</big><a class="headerlink" href="#struct.Struct.pack_into" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#struct.pack_into" title="struct.pack_into"><tt class="xref py py-func docutils literal"><span class="pre">pack_into()</span></tt></a> 関数と同じ、コンパイルされたフォーマットを利用するメソッドです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="struct.Struct.unpack">
+<tt class="descname">unpack</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#struct.Struct.unpack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#struct.unpack" title="struct.unpack"><tt class="xref py py-func docutils literal"><span class="pre">unpack()</span></tt></a> 関数と同じ、コンパイルされたフォーマットを利用するメソッドです。
+(<tt class="docutils literal"><span class="pre">len(string)</span></tt> は <tt class="xref py py-attr docutils literal"><span class="pre">self.size</span></tt> と等しくなければなりません)。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="struct.Struct.unpack_from">
+<tt class="descname">unpack_from</tt><big>(</big><em>buffer</em><span class="optional">[</span>, <em>offset=0</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#struct.Struct.unpack_from" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#struct.unpack_from" title="struct.unpack_from"><tt class="xref py py-func docutils literal"><span class="pre">unpack_from()</span></tt></a> 関数と同じ、コンパイルされたフォーマットを利用するメソッドです。
+(<tt class="docutils literal"><span class="pre">len(buffer[offset:])</span></tt> は <tt class="xref py py-attr docutils literal"><span class="pre">self.size</span></tt> 以上でなければなりません)。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="struct.Struct.format">
+<tt class="descname">format</tt><a class="headerlink" href="#struct.Struct.format" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この Struct オブジェクトを作成する時に利用されたフォーマット文字列です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="struct.Struct.size">
+<tt class="descname">size</tt><a class="headerlink" href="#struct.Struct.size" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="functions.html#format" title="format"><tt class="xref py py-attr docutils literal"><span class="pre">format</span></tt></a> に対応する struct (とそれによる文字列) のサイズを計算したものです。</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="difflib.html" title="7.4. difflib — 差分の計算を助ける"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="re.html" title="7.2. re — 正規表現操作"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="strings.html" >7. 文字列処理</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>22.2. locale — 国際化サービス &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="22. 国際化" href="i18n.html" />
+    <link rel="next" title="23. プログラムのフレームワーク" href="frameworks.html" />
+    <link rel="prev" title="22.1. gettext — 多言語対応に関する国際化サービス" href="gettext.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="frameworks.html" title="23. プログラムのフレームワーク"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="gettext.html" title="22.1. gettext — 多言語対応に関する国際化サービス"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="i18n.html" accesskey="U">22. 国際化</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">22.2. <tt class="docutils literal"><span class="pre">locale</span></tt> &#8212; 国際化サービス</a><ul>
+<li><a class="reference internal" href="#id1">22.2.1. ロケールの背景、詳細、ヒント、助言および補足説明</a></li>
+<li><a class="reference internal" href="#python-python">22.2.2. Python 拡張の作者と、Python を埋め込むようなプログラムに関して</a></li>
+<li><a class="reference internal" href="#locale-gettext">22.2.3. メッセージカタログへのアクセス</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="gettext.html"
+                        title="前の章へ">22.1. <tt class="docutils literal docutils literal docutils literal"><span class="pre">gettext</span></tt> &#8212; 多言語対応に関する国際化サービス</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="frameworks.html"
+                        title="次の章へ">23. プログラムのフレームワーク</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/locale.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-locale">
+<span id="locale"></span><h1>22.2. <a class="reference internal" href="#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a> &#8212; 国際化サービス<a class="headerlink" href="#module-locale" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a> モジュールは POSIX ロケールデータベースおよびロケール関連機能へのアクセスを提供します。 POSIX
+ロケール機構を使うことで、プログラマはソフトウェアが実行される各国における詳細を知らなくても、アプリケーション上で特定の地域文化に関係する部分を扱うことができます。</p>
+<p id="index-0"><a class="reference internal" href="#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a> モジュールは、 <tt class="xref py py-mod docutils literal"><span class="pre">_locale</span></tt>  を被うように実装されており、ANSI C ロケール実装を使っている
+<tt class="xref py py-mod docutils literal"><span class="pre">_locale</span></tt> が利用可能なら、こちらを先に使うようになっています。</p>
+<p><a class="reference internal" href="#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a> モジュールでは以下の例外と関数を定義しています:</p>
+<dl class="exception">
+<dt id="locale.Error">
+<em class="property">exception </em><tt class="descclassname">locale.</tt><tt class="descname">Error</tt><a class="headerlink" href="#locale.Error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> が失敗したときに送出される例外です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.setlocale">
+<tt class="descclassname">locale.</tt><tt class="descname">setlocale</tt><big>(</big><em>category</em><span class="optional">[</span>, <em>locale</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.setlocale" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>locale</em> を指定する場合、文字列、 <tt class="docutils literal"><span class="pre">(language</span> <span class="pre">code,</span> <span class="pre">encoding)</span></tt> 、からなるタプル、または <tt class="docutils literal"><span class="pre">None</span></tt>
+をとることができます。 <em>locale</em> がタプルのの場合、ロケール別名解決エンジンによって文字列に変換されます。 <em>locale</em> が与えられていて、かつ
+<tt class="docutils literal"><span class="pre">None</span></tt> でない場合、 <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> は <em>category</em> の設定を変更します。変更することのできるカテゴリは以下に列記されており、値はロケール設定の名前です。空の文字列を指定すると、ユーザの環境における標準設定になります。ロケールの変更に失敗した場合、 <a class="reference internal" href="#locale.Error" title="locale.Error"><tt class="xref py py-exc docutils literal"><span class="pre">Error</span></tt></a> が送出されます。成功した場合、新たなロケール設定が返されます。</p>
+<p><em>locale</em> が省略されたり <tt class="docutils literal"><span class="pre">None</span></tt> の場合、 <em>category</em>  の現在の設定が返されます。</p>
+<p><a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> はほとんどのシステムでスレッド安全ではありません。アプリケーションを書くとき、大抵は以下のコード</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">locale</span>
+<span class="n">locale</span><span class="o">.</span><span class="n">setlocale</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">LC_ALL</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>から書き始めます。これは全てのカテゴリをユーザの環境における標準設定 (大抵は環境変数 <span class="target" id="index-1"></span><tt class="xref std std-envvar docutils literal"><span class="pre">LANG</span></tt> で指定されています)
+に設定します。その後複数スレッドを使ってロケールを変更したりしない限り、問題は起こらないはずです。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.0 で変更: </span>引数 <em>locale</em> の値としてタプルをサポートしました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.localeconv">
+<tt class="descclassname">locale.</tt><tt class="descname">localeconv</tt><big>(</big><big>)</big><a class="headerlink" href="#locale.localeconv" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>地域的な慣行のデータベースを辞書として返します。辞書は以下の文字列をキーとして持っています:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="29%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">カテゴリ</th>
+<th class="head">キー名</th>
+<th class="head">意味</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference internal" href="#locale.LC_NUMERIC" title="locale.LC_NUMERIC"><tt class="xref py py-const docutils literal"><span class="pre">LC_NUMERIC</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">'decimal_point'</span></tt></td>
+<td>小数点を表す文字です。</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'grouping'</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">'thousands_sep'</span></tt>
+が来るかもしれない場所を相対的に表した数からなる配列です。配列が
+<a class="reference internal" href="#locale.CHAR_MAX" title="locale.CHAR_MAX"><tt class="xref py py-const docutils literal"><span class="pre">CHAR_MAX</span></tt></a> で終端されている場合、それ以上の桁では桁数字のグループ化を行いません。配列が
+<tt class="docutils literal"><span class="pre">0</span></tt>
+で終端されている場合、最後に指定したグループが反復的に使われます。</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'thousands_sep'</span></tt></td>
+<td>桁グループ間を区切るために使われる文字です。</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#locale.LC_MONETARY" title="locale.LC_MONETARY"><tt class="xref py py-const docutils literal"><span class="pre">LC_MONETARY</span></tt></a></td>
+<td><tt class="docutils literal"><span class="pre">'int_curr_symbol'</span></tt></td>
+<td>国際通貨を表現する記号です。</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'currency_symbol'</span></tt></td>
+<td>地域的な通貨を表現する記号です。</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'p_cs_precedes/n_cs_precedes'</span></tt></td>
+<td>通貨記号が値の前につくかどうかです (それぞれ正の値、負の値を表します)。</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'p_sep_by_space/n_sep_by_space'</span></tt></td>
+<td>通貨記号と値との間にスペースを入れるかどうかです
+(それぞれ正の値、負の値を表します)。</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'mon_decimal_point'</span></tt></td>
+<td>金額表示の際に使われる小数点です。</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'frac_digits'</span></tt></td>
+<td>金額を地域的な方法で表現する際の小数点以下の桁数です。</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'int_frac_digits'</span></tt></td>
+<td>金額を国際的な方法で表現する際の小数点以下の桁数です。</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'mon_thousands_sep'</span></tt></td>
+<td>金額表示の際に桁区切り記号です。</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'mon_grouping'</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">'grouping'</span></tt>
+と同じで、金額表示の際に使われます。</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'positive_sign'</span></tt></td>
+<td>正の値の金額表示に使われる記号です。</td>
+</tr>
+<tr class="row-odd"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'negative_sign'</span></tt></td>
+<td>負の値の金額表示に使われる記号です。</td>
+</tr>
+<tr class="row-even"><td>&nbsp;</td>
+<td><tt class="docutils literal"><span class="pre">'p_sign_posn/n_sign_posn'</span></tt></td>
+<td>符号の位置です
+(それぞれ正の値と負の値を表します)。以下を参照ください。</td>
+</tr>
+</tbody>
+</table>
+<p>数値形式の値に <a class="reference internal" href="#locale.CHAR_MAX" title="locale.CHAR_MAX"><tt class="xref py py-const docutils literal"><span class="pre">CHAR_MAX</span></tt></a> を設定すると、そのロケールでは値が指定されていないことを表します。</p>
+<p><tt class="docutils literal"><span class="pre">'p_sign_posn'</span></tt> および <tt class="docutils literal"><span class="pre">'n_sing_posn'</span></tt> の取り得る値は以下の通りです。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">値</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">0</span></tt></td>
+<td>通貨記号および値は丸括弧で囲われます。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">1</span></tt></td>
+<td>符号は値と通貨記号より前に来ます。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">2</span></tt></td>
+<td>符号は値と通貨記号の後に続きます。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">3</span></tt></td>
+<td>符号は値の直前に来ます。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">4</span></tt></td>
+<td>符号は値の直後に来ます。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">CHAR_MAX</span></tt></td>
+<td>このロケールでは特に指定しません。</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.nl_langinfo">
+<tt class="descclassname">locale.</tt><tt class="descname">nl_langinfo</tt><big>(</big><em>option</em><big>)</big><a class="headerlink" href="#locale.nl_langinfo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ロケール特有の情報を文字列として返します。この関数は全てのシステムで利用可能なわけではなく、指定できる <em>option</em> もプラットフォーム間で大きく異なります。引数として使えるのは、locale モジュールで利用可能なシンボル定数を表す数字です。</p>
+<p>関数 <a class="reference internal" href="#locale.nl_langinfo" title="locale.nl_langinfo"><tt class="xref py py-func docutils literal"><span class="pre">nl_langinfo()</span></tt></a> は以下のキーのうち一つを受理します。ほとんどの記述は GNU C
+ライブラリ中の対応する説明から引用されています。</p>
+<dl class="data">
+<dt id="locale.CODESET">
+<tt class="descclassname">locale.</tt><tt class="descname">CODESET</tt><a class="headerlink" href="#locale.CODESET" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>選択されたロケールで用いられている文字エンコーディングの名前を文字列で取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.D_T_FMT">
+<tt class="descclassname">locale.</tt><tt class="descname">D_T_FMT</tt><a class="headerlink" href="#locale.D_T_FMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>日付と時刻をロケール特有の方法で表現するために、 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt>
+の書式化文字列として用いることのできる文字列を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.D_FMT">
+<tt class="descclassname">locale.</tt><tt class="descname">D_FMT</tt><a class="headerlink" href="#locale.D_FMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>日付をロケール特有の方法で表現するために、 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt> の書式化文字列として用いることのできる文字列を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.T_FMT">
+<tt class="descclassname">locale.</tt><tt class="descname">T_FMT</tt><a class="headerlink" href="#locale.T_FMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>時刻をロケール特有の方法で表現するために、 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt> の書式化文字列として用いることのできる文字列を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.T_FMT_AMPM">
+<tt class="descclassname">locale.</tt><tt class="descname">T_FMT_AMPM</tt><a class="headerlink" href="#locale.T_FMT_AMPM" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>時刻を午前／午後の書式で表現するために、 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt> の書式化文字列として用いることのできる文字列を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<tt class="descname">DAY_1 ... DAY_7</tt></dt>
+<dd><p>1 週間中の n 番目の曜日名を取得します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">ロケール US における、 <tt class="xref py py-const docutils literal"><span class="pre">DAY_1</span></tt> を日曜日とする慣行に従っています。国際的な (ISO 8601)
+月曜日を週の初めとする慣行ではありません。</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<tt class="descname">ABDAY_1 ... ABDAY_7</tt></dt>
+<dd><p>1 週間中の n 番目の曜日名を略式表記で取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<tt class="descname">MON_1 ... MON_12</tt></dt>
+<dd><p>n 番目の月の名前を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt>
+<tt class="descname">ABMON_1 ... ABMON_12</tt></dt>
+<dd><p>n 番目の月の名前を略式表記で取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.RADIXCHAR">
+<tt class="descclassname">locale.</tt><tt class="descname">RADIXCHAR</tt><a class="headerlink" href="#locale.RADIXCHAR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>基数点 (小数点ドット、あるいは小数点コンマ、等) を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.THOUSEP">
+<tt class="descclassname">locale.</tt><tt class="descname">THOUSEP</tt><a class="headerlink" href="#locale.THOUSEP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>1000 単位桁区切り (3 桁ごとのグループ化) の区切り文字を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.YESEXPR">
+<tt class="descclassname">locale.</tt><tt class="descname">YESEXPR</tt><a class="headerlink" href="#locale.YESEXPR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>肯定／否定で答える質問に対する肯定回答を正規表現関数で認識するために利用できる正規表現を取得します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">表現は C ライブラリの <tt class="xref c c-func docutils literal"><span class="pre">regex()</span></tt> 関数に合ったものでなければならず、これは <a class="reference internal" href="re.html#module-re" title="re: 正規表現操作"><tt class="xref py py-mod docutils literal"><span class="pre">re</span></tt></a> で使われている構文とは異なるかもしれません。</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.NOEXPR">
+<tt class="descclassname">locale.</tt><tt class="descname">NOEXPR</tt><a class="headerlink" href="#locale.NOEXPR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>肯定／否定で答える質問に対する否定回答を正規表現関数で認識するために利用できる正規表現を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.CRNCYSTR">
+<tt class="descclassname">locale.</tt><tt class="descname">CRNCYSTR</tt><a class="headerlink" href="#locale.CRNCYSTR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>通貨シンボルを取得します。シンボルを値の前に表示させる場合には &#8220;-&#8221; 、値の後ろに表示させる場合には &#8220;+&#8221; 、シンボルを基数点と置き換える場合には &#8221;.&#8221;
+を前につけます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.ERA">
+<tt class="descclassname">locale.</tt><tt class="descname">ERA</tt><a class="headerlink" href="#locale.ERA" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のロケールで使われている年代を表現する値を取得します。</p>
+<p>ほとんどのロケールではこの値を定義していません。この値を設定しているロケールの例は日本です。日本では、日付の伝統的な表示法に、時の天皇に対応する元号名を含めます。</p>
+<p>通常この値を直接指定する必要はありません。 <tt class="docutils literal"><span class="pre">E</span></tt> を書式化文字列に指定することで、関数 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt> がこの情報を使うようになります。返される文字列の様式は決められていないので、異なるシステム間で様式に関する同じ知識が使えると期待してはいけません。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.ERA_D_T_FMT">
+<tt class="descclassname">locale.</tt><tt class="descname">ERA_D_T_FMT</tt><a class="headerlink" href="#locale.ERA_D_T_FMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>日付および時間をロケール固有の年代に基づいた方法で表現するために、 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt> の書式化文字列として用いることのできる文字列を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.ERA_D_FMT">
+<tt class="descclassname">locale.</tt><tt class="descname">ERA_D_FMT</tt><a class="headerlink" href="#locale.ERA_D_FMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>日付をロケール固有の年代に基づいた方法で表現するために、 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt>
+の書式化文字列として用いることのできる文字列を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.ERA_T_FMT">
+<tt class="descclassname">locale.</tt><tt class="descname">ERA_T_FMT</tt><a class="headerlink" href="#locale.ERA_T_FMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>時刻をロケール固有の年代に基づいた方法で表現するために、 <tt class="xref py py-func docutils literal"><span class="pre">strftime()</span></tt>
+の書式化文字列として用いることのできる文字列を取得します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.ALT_DIGITS">
+<tt class="descclassname">locale.</tt><tt class="descname">ALT_DIGITS</tt><a class="headerlink" href="#locale.ALT_DIGITS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>返される値は 0 から 99 までの 100 個の値の表現です。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.getdefaultlocale">
+<tt class="descclassname">locale.</tt><tt class="descname">getdefaultlocale</tt><big>(</big><span class="optional">[</span><em>envvars</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.getdefaultlocale" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>標準のロケール設定を取得しようと試み、結果をタプル <tt class="docutils literal"><span class="pre">(language</span> <span class="pre">code,</span> <span class="pre">encoding)</span></tt> の形式で返します。
+POSIXによると、 <tt class="docutils literal"><span class="pre">setlocale(LC_ALL,</span> <span class="pre">'')</span></tt> を呼ばなかったプログラムは、移植可能な <tt class="docutils literal"><span class="pre">'C'</span></tt> ロケール設定を使います。
+<tt class="docutils literal"><span class="pre">setlocale(LC_ALL,</span> <span class="pre">'')</span></tt> を呼ぶことで、 <span class="target" id="index-2"></span><tt class="xref std std-envvar docutils literal"><span class="pre">LANG</span></tt> 変数で定義された標準のロケール設定を使うようになります。
+Python では現在のロケール設定に干渉したくないので、上で述べたような方法でその挙動をエミュレーションしています。</p>
+<p>他のプラットフォームとの互換性を維持するために、環境変数 <span class="target" id="index-3"></span><tt class="xref std std-envvar docutils literal"><span class="pre">LANG</span></tt> だけでなく、引数 <em>envvars</em> で指定された環境変数のリストも調べられます。 <em>envvars</em> は標準では GNU gettext で使われているサーチパスになります; パスには必ず変数名 <tt class="docutils literal"><span class="pre">LANG</span></tt> が含まれているからです。GNU gettext サーチパスは <tt class="docutils literal"><span class="pre">'LANGUAGE'</span></tt> 、 <tt class="docutils literal"><span class="pre">'LC_ALL'</span></tt> 、 <tt class="docutils literal"><span class="pre">'LC_CTYPE'</span></tt> 、および
+<tt class="docutils literal"><span class="pre">'LANG'</span></tt> が列挙した順番に含まれています。</p>
+<p><tt class="docutils literal"><span class="pre">'C'</span></tt> の場合を除き、言語コードは <span class="target" id="index-4"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1766.html"><strong>RFC 1766</strong></a> に対応します。 <em>language code</em> および <em>encoding</em>
+が決定できなかった場合、 <tt class="docutils literal"><span class="pre">None</span></tt> になるかもしれません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.getlocale">
+<tt class="descclassname">locale.</tt><tt class="descname">getlocale</tt><big>(</big><span class="optional">[</span><em>category</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.getlocale" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたロケールカテゴリに対する現在の設定を、 <em>language code</em> 、 <em>encoding</em> を含むシーケンスで返します。 <em>category</em>
+として <a class="reference internal" href="#locale.LC_ALL" title="locale.LC_ALL"><tt class="xref py py-const docutils literal"><span class="pre">LC_ALL</span></tt></a> 以外の <tt class="xref py py-const docutils literal"><span class="pre">LC_*</span></tt> の値の一つを指定できます。標準の設定は <a class="reference internal" href="#locale.LC_CTYPE" title="locale.LC_CTYPE"><tt class="xref py py-const docutils literal"><span class="pre">LC_CTYPE</span></tt></a>
+です。</p>
+<p><tt class="docutils literal"><span class="pre">'C'</span></tt> の場合を除き、言語コードは <span class="target" id="index-5"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1766.html"><strong>RFC 1766</strong></a> に対応します。 <em>language code</em> および <em>encoding</em>
+が決定できなかった場合、 <tt class="docutils literal"><span class="pre">None</span></tt> になるかもしれません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.getpreferredencoding">
+<tt class="descclassname">locale.</tt><tt class="descname">getpreferredencoding</tt><big>(</big><span class="optional">[</span><em>do_setlocale</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.getpreferredencoding" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>テキストデータをエンコードする方法を、ユーザの設定に基づいて返します。ユーザの設定は異なるシステム間では異なった方法で表現され、システムによってはプログラミング的に得ることができないこともあるので、この関数が返すのはただの推測です。</p>
+<p>システムによっては、ユーザの設定を取得するために  <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> を呼び出す必要があるため、この関数はスレッド安全ではありません。 <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> を呼び出す必要がない、または呼び出したくない場合、 <em>do_setlocale</em> を <tt class="docutils literal"><span class="pre">False</span></tt> に設定する必要があります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.normalize">
+<tt class="descclassname">locale.</tt><tt class="descname">normalize</tt><big>(</big><em>localename</em><big>)</big><a class="headerlink" href="#locale.normalize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えたロケール名を規格化したロケールコードを返します。返されるロケールコードは <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> で使うために書式化されています。規格化が失敗した場合、もとの名前がそのまま返されます。</p>
+<p>与えたエンコードがシステムにとって未知の場合、標準の設定では、この関数は <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> と同様に、エンコーディングをロケールコードにおける標準のエンコーディングに設定します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.resetlocale">
+<tt class="descclassname">locale.</tt><tt class="descname">resetlocale</tt><big>(</big><span class="optional">[</span><em>category</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.resetlocale" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>category</em> のロケールを標準設定にします。</p>
+<p>標準設定は <a class="reference internal" href="#locale.getdefaultlocale" title="locale.getdefaultlocale"><tt class="xref py py-func docutils literal"><span class="pre">getdefaultlocale()</span></tt></a> を呼ぶことで決定されます。 <em>category</em> は標準で <a class="reference internal" href="#locale.LC_ALL" title="locale.LC_ALL"><tt class="xref py py-const docutils literal"><span class="pre">LC_ALL</span></tt></a>
+になっています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.strcoll">
+<tt class="descclassname">locale.</tt><tt class="descname">strcoll</tt><big>(</big><em>string1</em>, <em>string2</em><big>)</big><a class="headerlink" href="#locale.strcoll" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の <a class="reference internal" href="#locale.LC_COLLATE" title="locale.LC_COLLATE"><tt class="xref py py-const docutils literal"><span class="pre">LC_COLLATE</span></tt></a> 設定に従って二つの文字列を比較します。他の比較を行う関数と同じように、 <em>string1</em> が
+<em>string2</em>  に対して前に来るか、後に来るか、あるいは二つが等しいかによって、それぞれ負の値、正の値、あるいは <tt class="docutils literal"><span class="pre">0</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.strxfrm">
+<tt class="descclassname">locale.</tt><tt class="descname">strxfrm</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#locale.strxfrm" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-6">文字列を組み込み関数 <a class="reference internal" href="functions.html#cmp" title="cmp"><tt class="xref py py-func docutils literal"><span class="pre">cmp()</span></tt></a> で使える形式に変換し、かつロケールに則した結果を返します。この関数は同じ文字列が何度も比較される場合、例えば文字列からなるシーケンスを順序付けて並べる際に使うことができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.format">
+<tt class="descclassname">locale.</tt><tt class="descname">format</tt><big>(</big><em>format</em>, <em>val</em><span class="optional">[</span>, <em>grouping</em><span class="optional">[</span>, <em>monetary</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.format" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数値 <em>val</em> を現在の <a class="reference internal" href="#locale.LC_NUMERIC" title="locale.LC_NUMERIC"><tt class="xref py py-const docutils literal"><span class="pre">LC_NUMERIC</span></tt></a> の設定に基づいて書式化します。書式は <tt class="docutils literal"><span class="pre">%</span></tt> 演算子の慣行に従います。浮動小数点数については、必要に応じて浮動小数点が変更されます。 <em>grouping</em> が真なら、ロケールに配慮した桁数の区切りが行われます。</p>
+<p><em>monetary</em> が真なら、桁区切り記号やグループ化文字列を用いて変換を行います。</p>
+<p>この関数や、1文字の指定子でしか動作しないことに注意しましょう。フォーマット文字列を使う場合は <a class="reference internal" href="#locale.format_string" title="locale.format_string"><tt class="xref py py-func docutils literal"><span class="pre">format_string()</span></tt></a> を使用します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><em>monetary</em> パラメータが追加されました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.format_string">
+<tt class="descclassname">locale.</tt><tt class="descname">format_string</tt><big>(</big><em>format</em>, <em>val</em><span class="optional">[</span>, <em>grouping</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.format_string" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">format</span> <span class="pre">%</span> <span class="pre">val</span></tt> 形式のフォーマット指定子を、現在のロケール設定を考慮したうえで処理します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.currency">
+<tt class="descclassname">locale.</tt><tt class="descname">currency</tt><big>(</big><em>val</em><span class="optional">[</span>, <em>symbol</em><span class="optional">[</span>, <em>grouping</em><span class="optional">[</span>, <em>international</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#locale.currency" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数値 <em>val</em> を、現在の <a class="reference internal" href="#locale.LC_MONETARY" title="locale.LC_MONETARY"><tt class="xref py py-const docutils literal"><span class="pre">LC_MONETARY</span></tt></a> の設定にあわせてフォーマットします。</p>
+<p><em>symbol</em> が真の場合は、返される文字列に通貨記号が含まれるようになります。これはデフォルトの設定です。 <em>grouping</em> が真の場合(これはデフォルトではありません)は、値をグループ化します。 <em>international</em> が真の場合(これはデフォルトではありません)は、国際的な通貨記号を使用します。</p>
+<p>この関数は&#8217;C&#8217;ロケールでは動作しないことに注意しましょう。まず最初に <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> でロケールを設定する必要があります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.str">
+<tt class="descclassname">locale.</tt><tt class="descname">str</tt><big>(</big><em>float</em><big>)</big><a class="headerlink" href="#locale.str" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>浮動小数点数を <tt class="docutils literal"><span class="pre">str(float)</span></tt> と同じように書式化しますが、ロケールに配慮した小数点が使われます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.atof">
+<tt class="descclassname">locale.</tt><tt class="descname">atof</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#locale.atof" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列を <a class="reference internal" href="#locale.LC_NUMERIC" title="locale.LC_NUMERIC"><tt class="xref py py-const docutils literal"><span class="pre">LC_NUMERIC</span></tt></a> で設定された慣行に従って浮動小数点に変換します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="locale.atoi">
+<tt class="descclassname">locale.</tt><tt class="descname">atoi</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#locale.atoi" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列を <a class="reference internal" href="#locale.LC_NUMERIC" title="locale.LC_NUMERIC"><tt class="xref py py-const docutils literal"><span class="pre">LC_NUMERIC</span></tt></a> で設定された慣行に従って整数に変換します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.LC_CTYPE">
+<tt class="descclassname">locale.</tt><tt class="descname">LC_CTYPE</tt><a class="headerlink" href="#locale.LC_CTYPE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-7">文字タイプ関連の関数のためのロケールカテゴリです。このカテゴリの設定に従って、モジュール <a class="reference internal" href="string.html#module-string" title="string: 一般的な文字列操作"><tt class="xref py py-mod docutils literal"><span class="pre">string</span></tt></a> における関数の振る舞いが変わります。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.LC_COLLATE">
+<tt class="descclassname">locale.</tt><tt class="descname">LC_COLLATE</tt><a class="headerlink" href="#locale.LC_COLLATE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列を並べ替えるためのロケールカテゴリです。 <a class="reference internal" href="#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a> モジュールの関数 <a class="reference internal" href="#locale.strcoll" title="locale.strcoll"><tt class="xref py py-func docutils literal"><span class="pre">strcoll()</span></tt></a> および
+<a class="reference internal" href="#locale.strxfrm" title="locale.strxfrm"><tt class="xref py py-func docutils literal"><span class="pre">strxfrm()</span></tt></a> が影響を受けます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.LC_TIME">
+<tt class="descclassname">locale.</tt><tt class="descname">LC_TIME</tt><a class="headerlink" href="#locale.LC_TIME" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>時刻を書式化するためのロケールカテゴリです。 <a class="reference internal" href="time.html#time.strftime" title="time.strftime"><tt class="xref py py-func docutils literal"><span class="pre">time.strftime()</span></tt></a>  はこのカテゴリに設定されている慣行に従います。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.LC_MONETARY">
+<tt class="descclassname">locale.</tt><tt class="descname">LC_MONETARY</tt><a class="headerlink" href="#locale.LC_MONETARY" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>金額に関係する値を書式化するためのロケールカテゴリです。設定可能なオプションは関数 <a class="reference internal" href="#locale.localeconv" title="locale.localeconv"><tt class="xref py py-func docutils literal"><span class="pre">localeconv()</span></tt></a> で得ることができます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.LC_MESSAGES">
+<tt class="descclassname">locale.</tt><tt class="descname">LC_MESSAGES</tt><a class="headerlink" href="#locale.LC_MESSAGES" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージ表示のためのロケールカテゴリです。現在 Python はアプリケーション毎にロケールに対応したメッセージを出力する機能はサポートしていません。 <a class="reference internal" href="os.html#os.strerror" title="os.strerror"><tt class="xref py py-func docutils literal"><span class="pre">os.strerror()</span></tt></a> が返すような、オペレーティングシステムによって表示されるメッセージはこのカテゴリによって影響を受けます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.LC_NUMERIC">
+<tt class="descclassname">locale.</tt><tt class="descname">LC_NUMERIC</tt><a class="headerlink" href="#locale.LC_NUMERIC" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数字を書式化するためのロケールカテゴリです。関数 <a class="reference internal" href="functions.html#format" title="format"><tt class="xref py py-func docutils literal"><span class="pre">format()</span></tt></a> 、 <a class="reference internal" href="#locale.atoi" title="locale.atoi"><tt class="xref py py-func docutils literal"><span class="pre">atoi()</span></tt></a> 、 <a class="reference internal" href="#locale.atof" title="locale.atof"><tt class="xref py py-func docutils literal"><span class="pre">atof()</span></tt></a> および
+<a class="reference internal" href="#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a> モジュールの <a class="reference internal" href="functions.html#str" title="str"><tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt></a> が影響を受けます。他の数値書式化操作は影響を受けません。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.LC_ALL">
+<tt class="descclassname">locale.</tt><tt class="descname">LC_ALL</tt><a class="headerlink" href="#locale.LC_ALL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全てのロケール設定を総合したものです。ロケールを変更する際にこのフラグが使われた場合、そのロケールにおける全てのカテゴリを設定しようと試みます。一つでも失敗したカテゴリがあった場合、全てのカテゴリにおいて設定変更を行いません。このフラグを使ってロケールを取得した場合、全てのカテゴリにおける設定を示す文字列が返されます。この文字列は、後に設定を元に戻すために使うことができます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="locale.CHAR_MAX">
+<tt class="descclassname">locale.</tt><tt class="descname">CHAR_MAX</tt><a class="headerlink" href="#locale.CHAR_MAX" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#locale.localeconv" title="locale.localeconv"><tt class="xref py py-func docutils literal"><span class="pre">localeconv()</span></tt></a> の返す特別な値のためのシンボル定数です。</p>
+</dd></dl>
+
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">locale</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loc</span> <span class="o">=</span> <span class="n">locale</span><span class="o">.</span><span class="n">getlocale</span><span class="p">()</span> <span class="c"># get current locale</span>
+<span class="go"># use German locale; name might vary with platform</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span><span class="o">.</span><span class="n">setlocale</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">LC_ALL</span><span class="p">,</span> <span class="s">&#39;de_DE&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span><span class="o">.</span><span class="n">strcoll</span><span class="p">(</span><span class="s">&#39;f</span><span class="se">\xe4</span><span class="s">n&#39;</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span> <span class="c"># compare a string containing an umlaut</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span><span class="o">.</span><span class="n">setlocale</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">LC_ALL</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="c"># use user&#39;s preferred locale</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span><span class="o">.</span><span class="n">setlocale</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">LC_ALL</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span> <span class="c"># use default (C) locale</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">locale</span><span class="o">.</span><span class="n">setlocale</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">LC_ALL</span><span class="p">,</span> <span class="n">loc</span><span class="p">)</span> <span class="c"># restore saved locale</span>
+</pre></div>
+</div>
+<div class="section" id="id1">
+<h2>22.2.1. ロケールの背景、詳細、ヒント、助言および補足説明<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>C 標準では、ロケールはプログラム全体にわたる特性であり、その変更は高価な処理であるとしています。加えて、頻繁にロケールを変更するようなひどい実装はコアダンプを引き起こすこともあります。このことがロケールを正しく利用する上で苦痛となっています。</p>
+<p>そもそも、プログラムが起動した際、ロケールはユーザの希望するロケールにかかわらず <tt class="docutils literal"><span class="pre">C</span></tt> です。プログラムは <tt class="docutils literal"><span class="pre">setlocale(LC_ALL,</span>
+<span class="pre">'')</span></tt> を呼び出して、明示的にユーザの希望するロケール設定を行わなければなりません。</p>
+<p><a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> をライブラリルーチン内で呼ぶことは、それがプログラム全体に及ぼす副作用の面から、一般的によくない考えです。ロケールを保存したり復帰したりするのもよくありません: 高価な処理であり、ロケールの設定が復帰する以前に起動してしまった他のスレッドに悪影響を及ぼすからです。</p>
+<p>もし、汎用を目的としたモジュールを作っていて、ロケールによって影響をうけるような操作 (例えば <a class="reference internal" href="string.html#string.lower" title="string.lower"><tt class="xref py py-func docutils literal"><span class="pre">string.lower()</span></tt></a> や
+<a class="reference internal" href="time.html#time.strftime" title="time.strftime"><tt class="xref py py-func docutils literal"><span class="pre">time.strftime()</span></tt></a> の書式の一部) のロケール独立のバージョンが必要ということになれば、標準ライブラリルーチンを使わずに何とかしなければなりません。よりましな方法は、ロケール設定が正しく利用できているか確かめることです。最後の手段は、あなたのモジュールが <tt class="docutils literal"><span class="pre">C</span></tt>
+ロケール以外の設定には互換性がないとドキュメントに書くことです。</p>
+<p id="index-8"><a class="reference internal" href="string.html#module-string" title="string: 一般的な文字列操作"><tt class="xref py py-mod docutils literal"><span class="pre">string</span></tt></a> モジュールの大小文字の変換を行う関数はロケール設定によって影響を受けます。 <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a>  関数を呼んで
+<a class="reference internal" href="#locale.LC_CTYPE" title="locale.LC_CTYPE"><tt class="xref py py-const docutils literal"><span class="pre">LC_CTYPE</span></tt></a> 設定を変更した場合、変数 <tt class="docutils literal"><span class="pre">string.lowercase</span></tt> 、 <tt class="docutils literal"><span class="pre">string.uppercase</span></tt> および
+<tt class="docutils literal"><span class="pre">string.letters</span></tt> は計算しなおされます。例えば <tt class="docutils literal"><span class="pre">from</span> <span class="pre">string</span> <span class="pre">import</span> <span class="pre">letters</span></tt> のように、
+&#8216;<a class="reference internal" href="../reference/simple_stmts.html#from"><tt class="xref std std-keyword docutils literal"><span class="pre">from</span></tt></a> ... <a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> ...&#8217; を使ってこれらの変数を使っている場合には、それ以降の
+<a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> の影響を受けないので注意してください。</p>
+<p>ロケールに従って数値操作を行うための唯一の方法はこのモジュールで特別に定義されている関数:  <a class="reference internal" href="#locale.atof" title="locale.atof"><tt class="xref py py-func docutils literal"><span class="pre">atof()</span></tt></a> 、 <a class="reference internal" href="#locale.atoi" title="locale.atoi"><tt class="xref py py-func docutils literal"><span class="pre">atoi()</span></tt></a> 、
+<a class="reference internal" href="#locale.format" title="locale.format"><tt class="xref py py-func docutils literal"><span class="pre">format()</span></tt></a> 、 <a class="reference internal" href="#locale.str" title="locale.str"><tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt></a> を使うことです。</p>
+</div>
+<div class="section" id="python-python">
+<span id="embedding-locale"></span><h2>22.2.2. Python 拡張の作者と、Python を埋め込むようなプログラムに関して<a class="headerlink" href="#python-python" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>拡張モジュールは、現在のロケールを調べる以外は、決して <a class="reference internal" href="#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">setlocale()</span></tt></a> を呼び出してはなりません。しかし、返される値もロケールの復帰のために使えるだけなので、さほど便利とはいえません (例外はおそらくロケールが <tt class="docutils literal"><span class="pre">C</span></tt> かどうか調べることでしょう)。</p>
+<p>ロケールを変更するために Python コードで <a class="reference internal" href="#module-locale" title="locale: 国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">locale</span></tt></a> モジュールを使った場合、Python を埋め込んでいるアプリケーションにも影響を及ぼします。Python を埋め込んでいるアプリケーションに影響が及ぶことを望まない場合、 <tt class="file docutils literal"><span class="pre">config.c</span></tt> ファイル内の組み込みモジュールのテーブルから <tt class="xref py py-mod docutils literal"><span class="pre">_locale</span></tt> 拡張モジュール  (ここで全てを行っています)  を削除し、共有ライブラリから <tt class="xref py py-mod docutils literal"><span class="pre">_locate</span></tt>
+モジュールにアクセスできないようにしてください。</p>
+</div>
+<div class="section" id="locale-gettext">
+<span id="id2"></span><h2>22.2.3. メッセージカタログへのアクセス<a class="headerlink" href="#locale-gettext" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>C ライブラリの gettext インタフェースが提供されているシステムでは、 locake モジュールでそのインタフェースを公開しています。このインタフェースは関数 <a class="reference internal" href="gettext.html#module-gettext" title="gettext: 多言語対応に関する国際化サービス。"><tt class="xref py py-func docutils literal"><span class="pre">gettext()</span></tt></a> 、 <tt class="xref py py-func docutils literal"><span class="pre">dgettext()</span></tt> 、
+<tt class="xref py py-func docutils literal"><span class="pre">dcgettext()</span></tt> 、 <tt class="xref py py-func docutils literal"><span class="pre">textdomain()</span></tt> 、 <tt class="xref py py-func docutils literal"><span class="pre">bindtextdomain()</span></tt> 、および
+<tt class="xref py py-func docutils literal"><span class="pre">bind_textdomain_codeset()</span></tt> からなります。これらは <a class="reference internal" href="gettext.html#module-gettext" title="gettext: 多言語対応に関する国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">gettext</span></tt></a> モジュールの同名の関数に似ていますが、メッセージカタログとして C ライブラリのバイナリフォーマットを使い、メッセージカタログを探すために C ライブラリのサーチアルゴリズムを使います。</p>
+<p>Python アプリケーションでは、通常これらの関数を呼び出す必要はないはずで、代わりに <a class="reference internal" href="gettext.html#module-gettext" title="gettext: 多言語対応に関する国際化サービス。"><tt class="xref py py-mod docutils literal"><span class="pre">gettext</span></tt></a> を呼ぶべきです。例外として知られているのは、内部で <tt class="xref c c-func docutils literal"><span class="pre">gettext()</span></tt> または <tt class="xref py py-func docutils literal"><span class="pre">dcgettext()</span></tt>
+を呼び出すような C ライブラリにリンクするアプリケーションです。こうしたアプリケーションでは、ライブラリが正しいメッセージカタログを探せるようにテキストドメイン名を指定する必要があります。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="frameworks.html" title="23. プログラムのフレームワーク"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="gettext.html" title="22.1. gettext — 多言語対応に関する国際化サービス"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="i18n.html" >22. 国際化</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,176 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>35.5. crypt — Unix パスワードをチェックするための関数 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="35. Unix 固有のサービス" href="unix.html" />
+    <link rel="next" title="35.6. dl — 共有オブジェクトのC関数の呼び出し" href="dl.html" />
+    <link rel="prev" title="35.4. grp — グループデータベースへのアクセス" href="grp.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="dl.html" title="35.6. dl — 共有オブジェクトのC関数の呼び出し"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="grp.html" title="35.4. grp — グループデータベースへのアクセス"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="unix.html" accesskey="U">35. Unix 固有のサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="grp.html"
+                        title="前の章へ">35.4. <tt class="docutils literal"><span class="pre">grp</span></tt> &#8212; グループデータベースへのアクセス</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="dl.html"
+                        title="次の章へ">35.6. <tt class="docutils literal"><span class="pre">dl</span></tt> &#8212; 共有オブジェクトのC関数の呼び出し</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/crypt.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-crypt">
+<span id="crypt-unix"></span><h1>35.5. <a class="reference internal" href="#module-crypt" title="crypt: Unix パスワードをチェックするための関数 crypt()。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">crypt</span></tt></a> &#8212; Unix パスワードをチェックするための関数<a class="headerlink" href="#module-crypt" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">このモジュールは DES アルゴリズムに基づいた一方向ハッシュ関数である
+<em class="manpage">crypt(3)</em>  ルーチンを実装しています。詳細については Unix マニュアルページを参照してください。このモジュールは、Python スクリプトがユーザから入力されたパスワードを受理できるようにしたり、
+Unix パスワードに (脆弱性検査のための) 辞書攻撃を試みるのに使えます。</p>
+<p id="index-1">このモジュールは実行環境の <em class="manpage">crypt(3)</em> の実装に依存しています。そのため、現在の実装で利用可能な拡張を、このモジュールでもそのまま利用できます。</p>
+<dl class="function">
+<dt id="crypt.crypt">
+<tt class="descclassname">crypt.</tt><tt class="descname">crypt</tt><big>(</big><em>word</em>, <em>salt</em><big>)</big><a class="headerlink" href="#crypt.crypt" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>word</em> は通常はユーザのパスワードで、プロンプトやグラフィカルインタフェースからタイプ入力されます。
+<em>salt</em> は通常ランダムな 2 文字からなる文字列で、DES アルゴリズムに
+4096 通りのうち 1 つの方法で外乱を与えるために使われます。
+<em>salt</em> に使う文字は集合 <tt class="docutils literal"><span class="pre">[./a-zA-Z0-9]</span></tt> の要素でなければなりません。ハッシュされたパスワードを文字列として返します。パスワード文字列は <em>salt</em>
+と同じ文字集合に含まれる文字からなります (最初の 2 文字は <em>salt</em> 自体です).</p>
+<p id="index-2">いくつかの拡張された <em class="manpage">crypt(3)</em> は異なる値と <em>salt</em>
+の長さを許しているので、パスワードをチェックする際には crypt
+されたパスワード文字列全体を <em>salt</em> として渡すよう勧めます。</p>
+</dd></dl>
+
+<p>典型的な使用例のサンプルコード:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">crypt</span><span class="o">,</span> <span class="nn">getpass</span><span class="o">,</span> <span class="nn">pwd</span>
+
+<span class="k">def</span> <span class="nf">login</span><span class="p">():</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;Python login:&#39;</span><span class="p">)</span>
+    <span class="n">cryptedpasswd</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwnam</span><span class="p">(</span><span class="n">username</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cryptedpasswd</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cryptedpasswd</span> <span class="o">==</span> <span class="s">&#39;x&#39;</span> <span class="ow">or</span> <span class="n">cryptedpasswd</span> <span class="o">==</span> <span class="s">&#39;*&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s">&quot;Sorry, currently no support for shadow passwords&quot;</span><span class="p">)</span>
+        <span class="n">cleartext</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">crypt</span><span class="o">.</span><span class="n">crypt</span><span class="p">(</span><span class="n">cleartext</span><span class="p">,</span> <span class="n">cryptedpasswd</span><span class="p">)</span> <span class="o">==</span> <span class="n">cryptedpasswd</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="dl.html" title="35.6. dl — 共有オブジェクトのC関数の呼び出し"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="grp.html" title="35.4. grp — グループデータベースへのアクセス"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="unix.html" >35. Unix 固有のサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

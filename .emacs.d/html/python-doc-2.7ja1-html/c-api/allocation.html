@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>オブジェクトをヒープ上にメモリ確保する &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="オブジェクト実装サポート (object implementation support)" href="objimpl.html" />
+    <link rel="next" title="共通のオブジェクト構造体 (common object structure)" href="structures.html" />
+    <link rel="prev" title="オブジェクト実装サポート (object implementation support)" href="objimpl.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="structures.html" title="共通のオブジェクト構造体 (common object structure)"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="objimpl.html" title="オブジェクト実装サポート (object implementation support)"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="objimpl.html" accesskey="U">オブジェクト実装サポート (object implementation support)</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="objimpl.html"
+                        title="前の章へ">オブジェクト実装サポート (object implementation support)</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="structures.html"
+                        title="次の章へ">共通のオブジェクト構造体 (common object structure)</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/allocation.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="allocating-objects">
+<span id="id1"></span><h1>オブジェクトをヒープ上にメモリ確保する<a class="headerlink" href="#allocating-objects" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<dl class="function">
+<dt id="_PyObject_New">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">_PyObject_New</tt><big>(</big><a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a><em>&nbsp;*type</em><big>)</big><a class="headerlink" href="#_PyObject_New" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em></dd></dl>
+
+<dl class="function">
+<dt id="_PyObject_NewVar">
+<a class="reference internal" href="structures.html#PyVarObject" title="PyVarObject">PyVarObject</a>* <tt class="descname">_PyObject_NewVar</tt><big>(</big><a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a><em>&nbsp;*type</em>, Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#_PyObject_NewVar" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_PyObject_Del">
+void <tt class="descname">_PyObject_Del</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*op</em><big>)</big><a class="headerlink" href="#_PyObject_Del" title="この定義へのパーマリンク">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="PyObject_Init">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyObject_Init</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*op</em>, <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a><em>&nbsp;*type</em><big>)</big><a class="headerlink" href="#PyObject_Init" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p>新たにメモリ確保されたオブジェクト <em>op</em> に対し、型と初期状態での参照 (initial reference) を初期化します。初期化されたオブジェクトを返します。 <em>type</em> からそのオブジェクトが循環参照ガベージ検出の機能を有する場合、検出機構が監視対象とするオブジェクトのセットに追加されます。オブジェクトの他のフィールドには影響を及ぼしません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyObject_InitVar">
+<a class="reference internal" href="structures.html#PyVarObject" title="PyVarObject">PyVarObject</a>* <tt class="descname">PyObject_InitVar</tt><big>(</big><a class="reference internal" href="structures.html#PyVarObject" title="PyVarObject">PyVarObject</a><em>&nbsp;*op</em>, <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a><em>&nbsp;*type</em>, Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#PyObject_InitVar" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p><a class="reference internal" href="#PyObject_Init" title="PyObject_Init"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_Init()</span></tt></a> の全ての処理を行い、可変サイズオブジェクトの場合には長さ情報も初期化します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyObject_New">
+TYPE* <tt class="descname">PyObject_New</tt><big>(</big>TYPE, <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a><em>&nbsp;*type</em><big>)</big><a class="headerlink" href="#PyObject_New" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>C 構造体型 <em>TYPE</em> と Python 型オブジェクト <em>type</em> を使って新たな Python オブジェクトをメモリ確保します。 Python
+オブジェクトヘッダで定義されていないフィールドは初期化されません; オブジェクトの参照カウントは 1 になります。メモリ確保のサイズは型オブジェクトの
+<tt class="xref py py-attr docutils literal"><span class="pre">tp_basicsize</span></tt> で決定します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyObject_NewVar">
+TYPE* <tt class="descname">PyObject_NewVar</tt><big>(</big>TYPE, <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a><em>&nbsp;*type</em>, Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#PyObject_NewVar" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>C 構造体型 <em>TYPE</em> と Python 型オブジェクト <em>type</em> を使って新たな Python オブジェクトをメモリ確保します。 Python
+オブジェクトヘッダで定義されていないフィールドは初期化されません。確保されたメモリは、 <em>TYPE</em> 構造体に加え、vartype の
+<tt class="xref py py-attr docutils literal"><span class="pre">tp_itemsize</span></tt> フィールドで指定されているサイズ中の <em>size</em> フィールドを収容できます。この関数は、例えばタプルのように生成時にサイズを決定できるオブジェクトを実装する際に便利です。一連の複数のフィールドに対するアロケーション操作を一つにして埋め込むと、アロケーション回数が減り、メモリ管理の処理効率が向上します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyObject_Del">
+void <tt class="descname">PyObject_Del</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*op</em><big>)</big><a class="headerlink" href="#PyObject_Del" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#PyObject_New" title="PyObject_New"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_New()</span></tt></a> や <a class="reference internal" href="#PyObject_NewVar" title="PyObject_NewVar"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_NewVar()</span></tt></a> で確保されたメモリを解放します。この関数は、通常オブジェクトの型に指定されている <tt class="xref py py-attr docutils literal"><span class="pre">tp_dealloc</span></tt> ハンドラ内で呼び出します。この関数を呼び出した後では、オブジェクトのメモリ領域はもはや有効な Python オブジェクトを表現してはいないので、オブジェクトのフィールドに対してアクセスしてはなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Py_InitModule">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">Py_InitModule</tt><big>(</big>char<em>&nbsp;*name</em>, <a class="reference internal" href="structures.html#PyMethodDef" title="PyMethodDef">PyMethodDef</a><em>&nbsp;*methods</em><big>)</big><a class="headerlink" href="#Py_InitModule" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p><em>name</em> と関数のテーブルに基づいて新たなモジュールオブジェクトを生成し、生成されたモジュールオブジェクトを返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>以前のバージョンの Python では、 <em>methods</em> 引数の値として <em>NULL</em> をサポートしていませんでした.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Py_InitModule3">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">Py_InitModule3</tt><big>(</big>char<em>&nbsp;*name</em>, <a class="reference internal" href="structures.html#PyMethodDef" title="PyMethodDef">PyMethodDef</a><em>&nbsp;*methods</em>, char<em>&nbsp;*doc</em><big>)</big><a class="headerlink" href="#Py_InitModule3" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p><em>name</em> と関数のテーブルに基づいて新たなモジュールオブジェクトを生成し、生成されたモジュールオブジェクトを返します。 <em>doc</em> が
+<em>NULL</em> でない場合、モジュールの docstring として使われます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>以前のバージョンの Python では、 <em>methods</em> 引数の値として <em>NULL</em> をサポートしていませんでした.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Py_InitModule4">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">Py_InitModule4</tt><big>(</big>char<em>&nbsp;*name</em>, <a class="reference internal" href="structures.html#PyMethodDef" title="PyMethodDef">PyMethodDef</a><em>&nbsp;*methods</em>, char<em>&nbsp;*doc</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*self</em>, int<em>&nbsp;apiver</em><big>)</big><a class="headerlink" href="#Py_InitModule4" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p><em>name</em> と関数のテーブルに基づいて新たなモジュールオブジェクトを生成し、生成されたモジュールオブジェクトを返します。 <em>doc</em> が
+<em>NULL</em> でない場合、モジュールの docstring として使われます。 <em>self</em> が <em>NULL</em> でない場合、モジュール内の各関数の第一引数として渡されます (<em>NULL</em> の時には第一引数も <em>NULL</em> になります)。 (この関数は実験的な機能のために追加されたもので、現在の Python
+のバージョンで使われてはいないはずです。) <em>apiver</em> に渡してよい値は、 <tt class="xref py py-const docutils literal"><span class="pre">PYTHON_API_VERSION</span></tt>
+で定義されている定数だけです。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数のほとんどの用途は、代わりに <a class="reference internal" href="#Py_InitModule3" title="Py_InitModule3"><tt class="xref c c-func docutils literal"><span class="pre">Py_InitModule3()</span></tt></a> を使えるはずです; 本当にこの関数を使いたいときにだけ利用してください</p>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>以前のバージョンの Python では、 <em>methods</em> 引数の値として <em>NULL</em> をサポートしていませんでした.</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="_Py_NoneStruct">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a> <tt class="descname">_Py_NoneStruct</tt><a class="headerlink" href="#_Py_NoneStruct" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python からは <tt class="docutils literal"><span class="pre">None</span></tt> に見えるオブジェクトです。この値へのアクセスは、このオブジェクトへのポインタを評価する <tt class="docutils literal"><span class="pre">Py_None</span></tt>
+マクロを使わねばなりません。</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="structures.html" title="共通のオブジェクト構造体 (common object structure)"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="objimpl.html" title="オブジェクト実装サポート (object implementation support)"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="objimpl.html" >オブジェクト実装サポート (object implementation support)</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

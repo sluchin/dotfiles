@@ -1,0 +1,1906 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>15.11. curses — 文字セル表示のための端末操作 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="15. 汎用オペレーティングシステムサービス" href="allos.html" />
+    <link rel="next" title="15.14. curses.ascii — ASCII 文字に関するユーティリティ" href="curses.ascii.html" />
+    <link rel="prev" title="15.10. getpass — 可搬性のあるパスワード入力機構" href="getpass.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="curses.ascii.html" title="15.14. curses.ascii — ASCII 文字に関するユーティリティ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="getpass.html" title="15.10. getpass — 可搬性のあるパスワード入力機構"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="allos.html" accesskey="U">15. 汎用オペレーティングシステムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">15.11. <tt class="docutils literal"><span class="pre">curses</span></tt> &#8212; 文字セル表示のための端末操作</a><ul>
+<li><a class="reference internal" href="#curses-functions">15.11.1. 関数</a></li>
+<li><a class="reference internal" href="#window">15.11.2. Window オブジェクト</a></li>
+<li><a class="reference internal" href="#id2">15.11.3. 定数</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-curses.textpad">15.12. <tt class="docutils literal"><span class="pre">curses.textpad</span></tt> &#8212; curses プログラムのためのテキスト入力ウィジェット</a><ul>
+<li><a class="reference internal" href="#textbox">15.12.1. Textbox オブジェクト</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-curses.wrapper">15.13. <tt class="docutils literal"><span class="pre">curses.wrapper</span></tt> &#8212; curses プログラムのための端末ハンドラ</a></li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="getpass.html"
+                        title="前の章へ">15.10. <tt class="docutils literal"><span class="pre">getpass</span></tt> &#8212; 可搬性のあるパスワード入力機構</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="curses.ascii.html"
+                        title="次の章へ">15.14. <tt class="docutils literal"><span class="pre">curses.ascii</span></tt> &#8212; ASCII 文字に関するユーティリティ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/curses.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-curses">
+<span id="curses"></span><h1>15.11. <a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> &#8212; 文字セル表示のための端末操作<a class="headerlink" href="#module-curses" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 1.6 で変更: </span><tt class="docutils literal"><span class="pre">ncurses</span></tt> ライブラリのサポートを追加し、パッケージに変換しました.</p>
+<p><a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> モジュールは、可搬性のある端末操作を行うためのデファクトスタンダードである、curses
+ライブラリへのインタフェースを提供します。</p>
+<p>Unix 環境では curses は非常に広く用いられていますが、DOS、OS2、そしておそらく他のシステムのバージョンも利用することができます。この拡張モジュールは Linux および BSD 系の Unixで動作するオープンソースの curses ライブラリである ncurses の API に合致するように設計されています。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p>version 5.4 から、ncurses ライブラリは <tt class="docutils literal"><span class="pre">nl_langinfo</span></tt> 関数を利用して非ASCIIデータをどう解釈するかを決定するようになりました。これは、アプリケーションは <a class="reference internal" href="locale.html#locale.setlocale" title="locale.setlocale"><tt class="xref py py-func docutils literal"><span class="pre">locale.setlocale()</span></tt></a> 関数を呼び出して、
+Unicode文字列をシステムの利用可能なエンコーディングのどれかでエンコードする必要があることを意味します。この例では、システムのデフォルトエンコーディングを利用しています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">locale</span>
+<span class="n">locale</span><span class="o">.</span><span class="n">setlocale</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">LC_ALL</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+<span class="n">code</span> <span class="o">=</span> <span class="n">locale</span><span class="o">.</span><span class="n">getpreferredencoding</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="last">この後、 <a class="reference internal" href="stdtypes.html#str.encode" title="str.encode"><tt class="xref py py-meth docutils literal"><span class="pre">str.encode()</span></tt></a> を呼び出すときに <em>code</em> を利用します。</p>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="docutils">
+<dt>Module <a class="reference internal" href="curses.ascii.html#module-curses.ascii" title="curses.ascii: ASCII 文字に関する定数および集合帰属関数。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.ascii</span></tt></a></dt>
+<dd>ロケール設定に関わらず ASCII 文字を扱うためのユーティリティ。</dd>
+<dt>Module <a class="reference internal" href="curses.panel.html#module-curses.panel" title="curses.panel: curses ウィンドウに深さの概念を追加するパネルスタック拡張。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.panel</span></tt></a></dt>
+<dd>curses ウィンドウにデプス機能を追加するパネルスタック拡張。</dd>
+<dt>Module <a class="reference internal" href="#module-curses.textpad" title="curses.textpad: curses ウィンドウ内での Emacs ライクな入力編集機能。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.textpad</span></tt></a></dt>
+<dd><strong class="program">Emacs</strong> ライクなキーバインディングをサポートする編集可能な curses 用テキストウィジェット。</dd>
+<dt>Module <a class="reference internal" href="#module-curses.wrapper" title="curses.wrapper: curses プログラムのための端末設定ラッパ。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.wrapper</span></tt></a></dt>
+<dd>アプリケーションの起動時および終了時に適切な端末のセットアップとリセットを確実に行うための関数。</dd>
+<dt><a class="reference internal" href="../howto/curses.html#curses-howto"><em>Python で Curses プログラミング</em></a></dt>
+<dd>Andrew Kuchling および Eric Raymond によって書かれた、curses を Python で使うためのチュートリアルです。</dd>
+</dl>
+<p class="last">Python ソースコードの <tt class="file docutils literal"><span class="pre">Demo/curses/</span></tt> ディレクトリには、このモジュールで提供されている curses
+バインディングを使ったプログラム例がいくつか収められています。</p>
+</div>
+<div class="section" id="curses-functions">
+<span id="id1"></span><h2>15.11.1. 関数<a class="headerlink" href="#curses-functions" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> モジュールでは以下の例外を定義しています:</p>
+<dl class="exception">
+<dt id="curses.error">
+<em class="property">exception </em><tt class="descclassname">curses.</tt><tt class="descname">error</tt><a class="headerlink" href="#curses.error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>curses ライブラリ関数がエラーを返した際に送出される例外です。</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">関数やメソッドにおけるオプションの引数 <em>x</em> および <em>y</em>  がある場合、標準の値は常に現在のカーソルになります。オプションの <em>attr</em>
+がある場合、標準の値は <tt class="xref py py-const docutils literal"><span class="pre">A_NORMAL</span></tt> です。</p>
+</div>
+<p><a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> では以下の関数を定義しています:</p>
+<dl class="function">
+<dt id="curses.baudrate">
+<tt class="descclassname">curses.</tt><tt class="descname">baudrate</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.baudrate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末の出力速度をビット／秒で返します。ソフトウェア端末エミュレータの場合、これは固定の高い値を持つことになります。この関数は歴史的な理由で入れられています;
+かつては、この関数は時間遅延を生成するための出力ループを書くために用いられたり、行速度に応じてインタフェースを切り替えたりするために用いられたりしていました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.beep">
+<tt class="descclassname">curses.</tt><tt class="descname">beep</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.beep" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>注意を促す短い音を鳴らします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.can_change_color">
+<tt class="descclassname">curses.</tt><tt class="descname">can_change_color</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.can_change_color" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末に表示される色をプログラマが変更できるか否かによって、真または偽を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.cbreak">
+<tt class="descclassname">curses.</tt><tt class="descname">cbreak</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.cbreak" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>cbreak モードに入ります。cbreak モード (&#8220;rare&#8221; モードと呼ばれることもあります) では、通常の tty 行バッファリングはオフにされ、文字を一文字一文字読むことができます。ただし、raw モードとは異なり、特殊文字
+(割り込み:interrupt、終了:quit、一時停止:suspend、およびフロー制御) については、tty ドライバおよび呼び出し側のプログラムに対する通常の効果をもっています。まず <a class="reference internal" href="#curses.raw" title="curses.raw"><tt class="xref py py-func docutils literal"><span class="pre">raw()</span></tt></a> を呼び出し、次いで <a class="reference internal" href="#curses.cbreak" title="curses.cbreak"><tt class="xref py py-func docutils literal"><span class="pre">cbreak()</span></tt></a> を呼び出すと、端末を cbreak モードにします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.color_content">
+<tt class="descclassname">curses.</tt><tt class="descname">color_content</tt><big>(</big><em>color_number</em><big>)</big><a class="headerlink" href="#curses.color_content" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>色 <em>color_number</em> の赤、緑、および青 (RGB) 要素の強度を返します。 <em>color_number</em> は <tt class="docutils literal"><span class="pre">0</span></tt> から
+<tt class="xref py py-const docutils literal"><span class="pre">COLORS</span></tt> の間でなければなりません。与えられた色の R、G、B、の値からなる三要素のタプルが返されます。この値は <tt class="docutils literal"><span class="pre">0</span></tt>
+(その成分はない) から <tt class="docutils literal"><span class="pre">1000</span></tt> (その成分の最大強度) の範囲をとります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.color_pair">
+<tt class="descclassname">curses.</tt><tt class="descname">color_pair</tt><big>(</big><em>color_number</em><big>)</big><a class="headerlink" href="#curses.color_pair" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定された色の表示テキストにおける属性値を返します。属性値は <tt class="xref py py-const docutils literal"><span class="pre">A_STANDOUT</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">A_REVERSE</span></tt> 、およびその他の
+<tt class="xref py py-const docutils literal"><span class="pre">A_*</span></tt> 属性と組み合わせられています。 <a class="reference internal" href="#curses.pair_number" title="curses.pair_number"><tt class="xref py py-func docutils literal"><span class="pre">pair_number()</span></tt></a> はこの関数の逆です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.curs_set">
+<tt class="descclassname">curses.</tt><tt class="descname">curs_set</tt><big>(</big><em>visibility</em><big>)</big><a class="headerlink" href="#curses.curs_set" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カーソルの状態を設定します。 <em>visibility</em> は 0、1、または 2 に設定され、それぞれ不可視、通常、または非常に可視、を意味します。要求された可視属性を端末がサポートしている場合、以前のカーソル状態が返されます; そうでなければ例外が送出されます。多くの端末では、 &#8220;可視 (通常)&#8221;
+モードは下線カーソルで、&#8221;非常に可視&#8221; モードはブロックカーソルです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.def_prog_mode">
+<tt class="descclassname">curses.</tt><tt class="descname">def_prog_mode</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.def_prog_mode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の端末属性を、稼動中のプログラムが curses を使う際のモードである &#8220;プログラム&#8221; モードとして保存します。(このモードの反対は、プログラムが
+curses を使わない &#8220;シェル&#8221; モードです。) その後 <a class="reference internal" href="#curses.reset_prog_mode" title="curses.reset_prog_mode"><tt class="xref py py-func docutils literal"><span class="pre">reset_prog_mode()</span></tt></a> を呼ぶとこのモードを復旧します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.def_shell_mode">
+<tt class="descclassname">curses.</tt><tt class="descname">def_shell_mode</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.def_shell_mode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の端末属性を、稼動中のプログラムが curses を使っていないときのモードである &#8220;シェル&#8221; モードとして保存します。(このモードの反対は、プログラムが curses 機能を利用している &#8220;プログラム&#8221; モードです。) その後 <a class="reference internal" href="#curses.reset_shell_mode" title="curses.reset_shell_mode"><tt class="xref py py-func docutils literal"><span class="pre">reset_shell_mode()</span></tt></a>
+を呼ぶとこのモードを復旧します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.delay_output">
+<tt class="descclassname">curses.</tt><tt class="descname">delay_output</tt><big>(</big><em>ms</em><big>)</big><a class="headerlink" href="#curses.delay_output" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>出力に <em>ms</em> ミリ秒の一時停止を入れます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.doupdate">
+<tt class="descclassname">curses.</tt><tt class="descname">doupdate</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.doupdate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>物理スクリーン (physical screen) を更新します。curses ライブラリは、現在の物理スクリーンの内容と、次の状態として要求されている仮想スクリーンをそれぞれ表す、2 つのデータ構造を保持しています。 <a class="reference internal" href="#curses.doupdate" title="curses.doupdate"><tt class="xref py py-func docutils literal"><span class="pre">doupdate()</span></tt></a>
+は更新を適用し、物理スクリーンを仮想スクリーンに一致させます。</p>
+<p>仮想スクリーンは <tt class="xref py py-meth docutils literal"><span class="pre">addstr()</span></tt> のような書き込み操作をウィンドウに行った後に <tt class="xref py py-meth docutils literal"><span class="pre">noutrefresh()</span></tt>
+を呼び出して更新することができます。通常の <tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt> 呼び出しは、単に <tt class="xref py py-meth docutils literal"><span class="pre">noutrefresh()</span></tt>  を呼んだ後に
+<a class="reference internal" href="#curses.doupdate" title="curses.doupdate"><tt class="xref py py-func docutils literal"><span class="pre">doupdate()</span></tt></a> を呼ぶだけです; 複数のウィンドウを更新しなければならない場合、全てのウィンドウに対して
+<tt class="xref py py-meth docutils literal"><span class="pre">noutrefresh()</span></tt> を呼び出した後、一度だけ <a class="reference internal" href="#curses.doupdate" title="curses.doupdate"><tt class="xref py py-func docutils literal"><span class="pre">doupdate()</span></tt></a>
+を呼ぶことで、パフォーマンスを向上させることができ、おそらくスクリーンのちらつきも押さえることができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.echo">
+<tt class="descclassname">curses.</tt><tt class="descname">echo</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.echo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>echo モードに入ります。 echo モードでは、各文字入力はスクリーン上に入力された通りにエコーバックされます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.endwin">
+<tt class="descclassname">curses.</tt><tt class="descname">endwin</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.endwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ライブラリの非初期化を行い、端末を通常の状態に戻します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.erasechar">
+<tt class="descclassname">curses.</tt><tt class="descname">erasechar</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.erasechar" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザの現在の消去文字 (erase character) 設定を返します。 Unix オペレーティングシステムでは、この値は curses プログラムが制御している端末の属性であり、curses ライブラリ自体では設定されません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.filter">
+<tt class="descclassname">curses.</tt><tt class="descname">filter</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.filter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#curses.filter" title="curses.filter"><tt class="xref py py-func docutils literal"><span class="pre">filter()</span></tt></a> ルーチンを使う場合、 <a class="reference internal" href="#curses.initscr" title="curses.initscr"><tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt></a> を呼ぶ前に呼び出さなくてはなりません。この手順のもたらす効果は以下の通りです: まず二つの関数の呼び出しの間は、LINES は 1 に設定されます; clear、cup、cud、cud1、cuu1、cuu、vpa
+は無効化されます; home 文字列は cr の値に設定されます。これにより、カーソルは現在の行に制限されるので、スクリーンの更新も同様に制限されます。この関数は、スクリーンの他の部分に影響を及ぼさずに文字単位の行編集を行う場合に利用できます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.flash">
+<tt class="descclassname">curses.</tt><tt class="descname">flash</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.flash" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スクリーンをフラッシュ(flash) します。すなわち、画面を色反転 (reverse-video) にして、短時間でもとにもどします。人によっては、
+<a class="reference internal" href="#curses.beep" title="curses.beep"><tt class="xref py py-func docutils literal"><span class="pre">beep()</span></tt></a> で生成される可聴な注意音よりも、このような  &#8220;可視ベル(visible bell)&#8221; を好みます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.flushinp">
+<tt class="descclassname">curses.</tt><tt class="descname">flushinp</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.flushinp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての入力バッファをフラッシュします。この関数は、ユーザによってすでに入力されているが、まだプログラムによって処理されていない全ての先行入力文字
+(typeahead) を捨て去ります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.getmouse">
+<tt class="descclassname">curses.</tt><tt class="descname">getmouse</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.getmouse" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> が <tt class="xref py py-const docutils literal"><span class="pre">KEY_MOUSE</span></tt> を返してマウスイベントを通知した後、この関数を呼んで待ち行列 (queue)
+上に置かれているマウスイベントを取得しなければなりません。イベントは  <tt class="docutils literal"><span class="pre">(id,</span> <span class="pre">x,</span> <span class="pre">y,</span> <span class="pre">z,</span> <span class="pre">bstate)</span></tt> の 5
+要素のタプルで表現されています。 <em>id</em> は複数のデバイスを区別するための ID 値で、 <em>x</em>, <em>y</em>, <em>z</em> はイベントの座標値です (現在 <em>z</em>
+は使われていません)。 <em>bstate</em> は整数値で、その各ビットはイベントのタイプを示す値に設定されています。この値は以下に示す定数のうち一つまたはそれ以上のビット単位 OR  になっています。以下の定数の <em>n</em> は 1 から 4 のボタン番号を示します:
+<tt class="xref py py-const docutils literal"><span class="pre">BUTTONn_PRESSED</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">BUTTONn_RELEASED</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">BUTTONn_CLICKED</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">BUTTONn_DOUBLE_CLICKED</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">BUTTONn_TRIPLE_CLICKED</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">BUTTON_SHIFT</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">BUTTON_CTRL</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">BUTTON_ALT</span></tt>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.getsyx">
+<tt class="descclassname">curses.</tt><tt class="descname">getsyx</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.getsyx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>仮想スクリーンにおける現在のカーソル位置を y および x の順で返します。 leaveok が真に設定されていれば、 -1、-1 が返されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.getwin">
+<tt class="descclassname">curses.</tt><tt class="descname">getwin</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#curses.getwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>以前の <tt class="xref py py-func docutils literal"><span class="pre">putwin()</span></tt> 呼び出しでファイルに保存されている、ウィンドウ関連データを読み出します。次に、このルーチンはそのデータを使って新たなウィンドウを生成し初期化して、その新規ウィンドウオブジェクトを返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.has_colors">
+<tt class="descclassname">curses.</tt><tt class="descname">has_colors</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.has_colors" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末が色表示を行える場合には真を返します。そうでない場合には偽を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.has_ic">
+<tt class="descclassname">curses.</tt><tt class="descname">has_ic</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.has_ic" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末が文字の挿入／削除機能を持つ場合に真を返します。この関数は、最近の端末エミュレータがどれもこの機能を持っているのと同じく、歴史的な理由だけのために含められています。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.has_il">
+<tt class="descclassname">curses.</tt><tt class="descname">has_il</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.has_il" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末が行の挿入／削除機能を持つか、領域単位のスクロールによって機能をシミュレートできる場合に真を返します。この関数は、最近の端末エミュレータがどれもこの機能を持っているのと同じく、歴史的な理由だけのために含められています。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.has_key">
+<tt class="descclassname">curses.</tt><tt class="descname">has_key</tt><big>(</big><em>ch</em><big>)</big><a class="headerlink" href="#curses.has_key" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>キー値 <em>ch</em> をとり、現在の端末タイプがその値のキーを認識できる場合に真を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.halfdelay">
+<tt class="descclassname">curses.</tt><tt class="descname">halfdelay</tt><big>(</big><em>tenths</em><big>)</big><a class="headerlink" href="#curses.halfdelay" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>半遅延モード、すなわち cbreak モードに似た、ユーザが打鍵した文字がすぐにプログラムで利用できるようになるモードで使われます。しかしながら、何も入力されなかった場合、 <em>tenths</em> 十秒後に例外が送出されます。 <em>tenths</em> の値は 1 から 255 の間でなければなりません。半遅延モードから抜けるには <a class="reference internal" href="#curses.nocbreak" title="curses.nocbreak"><tt class="xref py py-func docutils literal"><span class="pre">nocbreak()</span></tt></a>  を使います。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.init_color">
+<tt class="descclassname">curses.</tt><tt class="descname">init_color</tt><big>(</big><em>color_number</em>, <em>r</em>, <em>g</em>, <em>b</em><big>)</big><a class="headerlink" href="#curses.init_color" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>色の定義を変更します。変更したい色番号と、その後に 3 つ組みの RGB 値 (赤、緑、青の成分の大きさ) をとります。 <em>color_number</em> の値は
+<tt class="docutils literal"><span class="pre">0</span></tt> から <tt class="xref py py-const docutils literal"><span class="pre">COLORS</span></tt> の間でなければなりません。 <em>r</em>, <em>g</em>, <em>b</em> の値は <tt class="docutils literal"><span class="pre">0</span></tt> から <tt class="docutils literal"><span class="pre">1000</span></tt> の間でなければなりません。 <a class="reference internal" href="#curses.init_color" title="curses.init_color"><tt class="xref py py-func docutils literal"><span class="pre">init_color()</span></tt></a> を使うと、スクリーン上でカラーが使用されている部分は全て新しい設定に即時変更されます。この関数はほとんどの端末で何も行いません; <a class="reference internal" href="#curses.can_change_color" title="curses.can_change_color"><tt class="xref py py-func docutils literal"><span class="pre">can_change_color()</span></tt></a> が <tt class="docutils literal"><span class="pre">1</span></tt> を返す場合にのみ動作します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.init_pair">
+<tt class="descclassname">curses.</tt><tt class="descname">init_pair</tt><big>(</big><em>pair_number</em>, <em>fg</em>, <em>bg</em><big>)</big><a class="headerlink" href="#curses.init_pair" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>色ペアの定義を変更します。3 つの引数: 変更したい色ペア、前景色の色番号、背景色の色番号、をとります。 <em>pair_number</em> は <tt class="docutils literal"><span class="pre">1</span></tt> から
+<tt class="docutils literal"><span class="pre">COLOR_PAIRS</span> <span class="pre">-1</span></tt> の間でなければなりません (<tt class="docutils literal"><span class="pre">0</span></tt> 色ペアは黒色背景に白色前景となるように設定されており、変更することができません)
+。 <em>fg</em> および <em>bg</em> 引数は <tt class="docutils literal"><span class="pre">0</span></tt> と <tt class="xref py py-const docutils literal"><span class="pre">COLORS</span></tt> の間でなければなりません。色ペアが以前に初期化されていれば、スクリーンを更新して、指定された色ペアの部分を新たな設定に変更します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.initscr">
+<tt class="descclassname">curses.</tt><tt class="descname">initscr</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.initscr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ライブラリを初期化します。スクリーン全体をあらわす <tt class="xref py py-class docutils literal"><span class="pre">WindowObject</span></tt>  を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">端末のオープン時にエラーが発生した場合、curses ライブラリによってインタープリタが終了される場合があります。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.isendwin">
+<tt class="descclassname">curses.</tt><tt class="descname">isendwin</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.isendwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#curses.endwin" title="curses.endwin"><tt class="xref py py-func docutils literal"><span class="pre">endwin()</span></tt></a> がすでに呼び出されている (すなわち、curses ライブラリが非初期化されてしまっている) 場合に真を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.keyname">
+<tt class="descclassname">curses.</tt><tt class="descname">keyname</tt><big>(</big><em>k</em><big>)</big><a class="headerlink" href="#curses.keyname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>k</em> に番号付けされているキーの名前を返します。印字可能な ASCII 文字を生成するキーの名前はそのキーの文字自体になります。コントロールキーと組み合わせたキーの名前は、キャレットの後に対応する ASCII 文字が続く 2 文字の文字列になります。Alt キーと組み合わせたキー
+(128-255) の名前は、先頭に &#8216;M-&#8216; が付き、その後に対応する ASCII 文字が続く文字列になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.killchar">
+<tt class="descclassname">curses.</tt><tt class="descname">killchar</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.killchar" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザの現在の行削除文字を返します。 Unix オペレーティングシステムでは、この値は curses プログラムが制御している端末の属性であり、curses
+ライブラリ自体では設定されません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.longname">
+<tt class="descclassname">curses.</tt><tt class="descname">longname</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.longname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の端末について記述している terminfo の長形式 name フィールドが入った文字列を返します。verbose 形式記述の最大長は 128
+文字です。この値は <a class="reference internal" href="#curses.initscr" title="curses.initscr"><tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt></a> 呼び出しの後でのみ定義されています。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.meta">
+<tt class="descclassname">curses.</tt><tt class="descname">meta</tt><big>(</big><em>yes</em><big>)</big><a class="headerlink" href="#curses.meta" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>yes</em> が 1 の場合、8 ビット文字を入力として許します。 <em>yes</em> が 0 の場合、 7 ビット文字だけを許します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.mouseinterval">
+<tt class="descclassname">curses.</tt><tt class="descname">mouseinterval</tt><big>(</big><em>interval</em><big>)</big><a class="headerlink" href="#curses.mouseinterval" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ボタンが押されてから離されるまでの時間をマウスクリック一回として認識する最大の時間間隔を設定します。以前の内部設定値を返します。標準の値は 200
+ミリ秒、または 5 分の 1 秒です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.mousemask">
+<tt class="descclassname">curses.</tt><tt class="descname">mousemask</tt><big>(</big><em>mousemask</em><big>)</big><a class="headerlink" href="#curses.mousemask" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>報告すべきマウスイベントを設定し、 <tt class="docutils literal"><span class="pre">(availmask,</span> <span class="pre">oldmask)</span></tt> の組からなるタプルを返します。 <em>availmask</em>
+はどの指定されたマウスイベントのどれが報告されるかを示します; どのイベント指定も完全に失敗した場合には 0 が返ります。 <em>oldmask</em>
+は与えられたウィンドウの以前のマウスイベントマスクです。この関数が呼ばれない限り、マウスイベントは何も報告されません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.napms">
+<tt class="descclassname">curses.</tt><tt class="descname">napms</tt><big>(</big><em>ms</em><big>)</big><a class="headerlink" href="#curses.napms" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>ms</em> ミリ秒スリープします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.newpad">
+<tt class="descclassname">curses.</tt><tt class="descname">newpad</tt><big>(</big><em>nlines</em>, <em>ncols</em><big>)</big><a class="headerlink" href="#curses.newpad" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた行とカラム数を持つパッド (pad) データ構造を生成し、そのポインタを返します。パッドはウィンドウオブジェクトとして返されます。</p>
+<p>パッドはウィンドウと同じようなものですが、スクリーンのサイズによる制限をうけず、スクリーンの特定の部分に関連付けられていなくてもかまいません。大きなウィンドウが必要であり、スクリーンにはそのウィンドウの一部しか一度に表示しない場合に使えます。 (スクロールや入力エコーなどによる)
+パッドに対する再描画は起こりません。パッドに対する <tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">noutrefresh()</span></tt> メソッドは、パッド中の表示する部分と表示するために利用するスクリーン上の位置を指定する 6 つの引数が必要です。これらの引数は pminrow、 pmincol、
+sminrow、 smincol、 smaxrow、smaxcol です;  p で始まる引数はパッド中の表示領域の左上位置で、s で始まる引数はパッド領域を表示するスクリーン上のクリップ矩形を指定します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.newwin">
+<tt class="descclassname">curses.</tt><tt class="descname">newwin</tt><big>(</big><span class="optional">[</span><em>nlines</em>, <em>ncols</em><span class="optional">]</span>, <em>begin_y</em>, <em>begin_x</em><big>)</big><a class="headerlink" href="#curses.newwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>左上の角が <tt class="docutils literal"><span class="pre">(begin_y,</span> <span class="pre">begin_x)</span></tt> で、高さ／幅が <em>nlines</em> / <em>ncols</em> の新規ウィンドウを返します。</p>
+<p>標準では、ウィンドウは指定された位置からスクリーンの右下まで広がります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.nl">
+<tt class="descclassname">curses.</tt><tt class="descname">nl</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.nl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>newlime モードに入ります。このモードはリターンキーを入力中の改行として変換し、出力時に改行文字を復帰 (return) と改行 (line-feed)
+に変換します。newline モードは初期化時にはオンになっています。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.nocbreak">
+<tt class="descclassname">curses.</tt><tt class="descname">nocbreak</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.nocbreak" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>cbreak モードから離れます。行バッファリングを行う通常の &#8220;cooked&#8221;  モードに戻ります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.noecho">
+<tt class="descclassname">curses.</tt><tt class="descname">noecho</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.noecho" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>echo モードから離れます。入力のエコーバックはオフにされます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.nonl">
+<tt class="descclassname">curses.</tt><tt class="descname">nonl</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.nonl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>newline モードから離れます。入力時のリターンキーから改行への変換、および出力時の改行から復帰／改行への低レベル変換を無効化します
+(ただし、 <tt class="docutils literal"><span class="pre">addch('\n')</span></tt> の振る舞いは変更せず、仮想スクリーン上では常に復帰と改行に等しくなります)。変換をオフにすることで、 curses
+は水平方向の動きを少しだけ高速化できることがあります; また、入力中のリターンキーの検出ができるようになります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.noqiflush">
+<tt class="descclassname">curses.</tt><tt class="descname">noqiflush</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.noqiflush" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>noquiflush ルーチンを使うと、通常行われている INTR、QUIT、および SUSP 文字による入力および出力キューのフラッシュが行われなくなります。シグナルハンドラが終了した際、割り込みが発生しなかったかのように出力を続たい場合、ハンドラ中で <a class="reference internal" href="#curses.noqiflush" title="curses.noqiflush"><tt class="xref py py-func docutils literal"><span class="pre">noqiflush()</span></tt></a>
+を呼び出すことができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.noraw">
+<tt class="descclassname">curses.</tt><tt class="descname">noraw</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.noraw" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>raw モードから離れます。行バッファリングを行う通常の &#8220;cooked&#8221;  モードに戻ります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.pair_content">
+<tt class="descclassname">curses.</tt><tt class="descname">pair_content</tt><big>(</big><em>pair_number</em><big>)</big><a class="headerlink" href="#curses.pair_content" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要求された色ペア中の色を含む <tt class="docutils literal"><span class="pre">(fg,</span> <span class="pre">bg)</span></tt> からなるタプルを返します。 <em>pair_number</em> は <tt class="docutils literal"><span class="pre">1</span></tt> から <tt class="docutils literal"><span class="pre">COLOR_PAIRS</span>
+<span class="pre">-</span> <span class="pre">1</span></tt> の間でなければなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.pair_number">
+<tt class="descclassname">curses.</tt><tt class="descname">pair_number</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#curses.pair_number" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>attr</em> に対する色ペアセットの番号を返します。 <a class="reference internal" href="#curses.color_pair" title="curses.color_pair"><tt class="xref py py-func docutils literal"><span class="pre">color_pair()</span></tt></a>  はこの関数の逆に相当します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.putp">
+<tt class="descclassname">curses.</tt><tt class="descname">putp</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#curses.putp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">tputs(str,</span> <span class="pre">1,</span> <span class="pre">putchar)</span></tt> と等価です; 現在の端末における、指定された terminfo 機能の値を出力します。putp
+の出力は常に標準出力に送られるので注意して下さい。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.qiflush">
+<tt class="descclassname">curses.</tt><tt class="descname">qiflush</tt><big>(</big><span class="optional">[</span><em>flag</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.qiflush" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flag</em> が偽なら、 <a class="reference internal" href="#curses.noqiflush" title="curses.noqiflush"><tt class="xref py py-func docutils literal"><span class="pre">noqiflush()</span></tt></a> を呼ぶのとと同じ効果です。 <em>flag</em> が真か、引数が与えられていない場合、制御文字が読み出された最にキューはフラッシュされます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.raw">
+<tt class="descclassname">curses.</tt><tt class="descname">raw</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.raw" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>raw モードに入ります。raw モードでは、通常の行バッファリングと割り込み (interrupt)、終了 (quit)、一時停止
+(suspend)、およびフロー制御キーはオフになります; 文字は curses 入力関数に一文字づつ渡されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.reset_prog_mode">
+<tt class="descclassname">curses.</tt><tt class="descname">reset_prog_mode</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.reset_prog_mode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末を &#8220;program&#8221; モードに復旧し、予め <a class="reference internal" href="#curses.def_prog_mode" title="curses.def_prog_mode"><tt class="xref py py-func docutils literal"><span class="pre">def_prog_mode()</span></tt></a> で保存した内容に戻します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.reset_shell_mode">
+<tt class="descclassname">curses.</tt><tt class="descname">reset_shell_mode</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.reset_shell_mode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末を &#8220;shell&#8221; モードに復旧し、予め <a class="reference internal" href="#curses.def_shell_mode" title="curses.def_shell_mode"><tt class="xref py py-func docutils literal"><span class="pre">def_shell_mode()</span></tt></a> で保存した内容に戻します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.setsyx">
+<tt class="descclassname">curses.</tt><tt class="descname">setsyx</tt><big>(</big><em>y</em>, <em>x</em><big>)</big><a class="headerlink" href="#curses.setsyx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>仮想スクリーンカーソルを <em>y</em>, <em>x</em> に設定します。 <em>y</em> および <em>x</em> が共に -1 の場合、leaveok が設定されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.setupterm">
+<tt class="descclassname">curses.</tt><tt class="descname">setupterm</tt><big>(</big><span class="optional">[</span><em>termstr</em>, <em>fd</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.setupterm" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末を初期化します。 <em>termstr</em> は文字列で、端末の名前を与えます; 省略された場合、TERM 環境変数の値が使われます。 <em>fd</em> は初期化シーケンスが送られる先のファイル記述子です; <em>fd</em> を与えない場合、 <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> のファイル記述子が使われます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.start_color">
+<tt class="descclassname">curses.</tt><tt class="descname">start_color</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.start_color" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プログラマがカラーを利用したい場合で、かつ他の何らかのカラー操作ルーチンを呼び出す前に呼び出さなくてはなりません。この関数は <a class="reference internal" href="#curses.initscr" title="curses.initscr"><tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt></a>
+を呼んだ直後に呼ぶようにしておくとよいでしょう。</p>
+<p><a class="reference internal" href="#curses.start_color" title="curses.start_color"><tt class="xref py py-func docutils literal"><span class="pre">start_color()</span></tt></a> は 8 つの基本色 (黒、赤、緑、黄、青、マゼンタ、シアン、および白)
+と、色数の最大値と端末がサポートする色ペアの最大数が入っている、 <a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> モジュールにおける二つのグローバル変数、
+<tt class="xref py py-const docutils literal"><span class="pre">COLORS</span></tt> および <tt class="xref py py-const docutils literal"><span class="pre">COLOR_PAIRS</span></tt> を初期化します。この関数はまた、色設定を端末のスイッチが入れられたときの状態に戻します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.termattrs">
+<tt class="descclassname">curses.</tt><tt class="descname">termattrs</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.termattrs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>端末がサポートする全てのビデオ属性を論理和した値を返します。この情報は、curses プログラムがスクリーンの見え方を完全に制御する必要がある場合に便利です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.termname">
+<tt class="descclassname">curses.</tt><tt class="descname">termname</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.termname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>14 文字以下になるように切り詰められた環境変数 TERM の値を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.tigetflag">
+<tt class="descclassname">curses.</tt><tt class="descname">tigetflag</tt><big>(</big><em>capname</em><big>)</big><a class="headerlink" href="#curses.tigetflag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>terminfo 機能名 <em>capname</em> に対応する機能値をブール値で返します。 <em>capname</em> がブール値で表される機能値でない場合 <tt class="docutils literal"><span class="pre">-1</span></tt>
+が返され、機能がキャンセルされているか、端末記述上に見つからない場合には <tt class="docutils literal"><span class="pre">0</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.tigetnum">
+<tt class="descclassname">curses.</tt><tt class="descname">tigetnum</tt><big>(</big><em>capname</em><big>)</big><a class="headerlink" href="#curses.tigetnum" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>terminfo 機能名 <em>capname</em> に対応する機能値を数値で返します。 <em>capname</em> が数値で表される機能値でない場合 <tt class="docutils literal"><span class="pre">-2</span></tt>
+が返され、機能がキャンセルされているか、端末記述上に見つからない場合には <tt class="docutils literal"><span class="pre">-1</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.tigetstr">
+<tt class="descclassname">curses.</tt><tt class="descname">tigetstr</tt><big>(</big><em>capname</em><big>)</big><a class="headerlink" href="#curses.tigetstr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>terminfo 機能名 <em>capname</em> に対応する機能値を文字列値で返します。 <em>capname</em> が文字列値で表される機能値でない場合や、機能がキャンセルされているか、端末記述上に見つからない場合には <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.tparm">
+<tt class="descclassname">curses.</tt><tt class="descname">tparm</tt><big>(</big><em>str</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.tparm" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>str</em> を与えられたパラメタを使って文字列にインスタンス化します。 <em>str</em> は terminfo データベースから得られたパラメタを持つ文字列でなければなりません。例えば、 <tt class="docutils literal"><span class="pre">tparm(tigetstr(&quot;cup&quot;),</span> <span class="pre">5,</span> <span class="pre">3)</span></tt>  は <tt class="docutils literal"><span class="pre">'\033[6;4H'</span></tt>
+のようになります。厳密には端末の形式によって異なる結果となります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.typeahead">
+<tt class="descclassname">curses.</tt><tt class="descname">typeahead</tt><big>(</big><em>fd</em><big>)</big><a class="headerlink" href="#curses.typeahead" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>先読みチェックに使うためのファイル記述子 <em>fd</em> を指定します。 <em>fd</em> が <tt class="docutils literal"><span class="pre">-1</span></tt> の場合、先読みチェックは行われません。</p>
+<p>curses ライブラリはスクリーンを更新する間、先読み文字列を定期的に検索することで &#8220;行はみ出し最適化 (line-breakout
+optimization)&#8221; を行います。入力が得られ、かつ入力は端末からのものである場合、現在行おうとしている更新は refresh や doupdate
+を再度呼び出すまで先送りにします。この関数は異なるファイル記述子で先読みチェックを行うように指定することができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.unctrl">
+<tt class="descclassname">curses.</tt><tt class="descname">unctrl</tt><big>(</big><em>ch</em><big>)</big><a class="headerlink" href="#curses.unctrl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>ch</em> の印字可能な表現を文字列で返します。制御文字は例えば <tt class="docutils literal"><span class="pre">^C</span></tt> のようにキャレットに続く文字として表示されます。印字可能文字はそのままです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.ungetch">
+<tt class="descclassname">curses.</tt><tt class="descname">ungetch</tt><big>(</big><em>ch</em><big>)</big><a class="headerlink" href="#curses.ungetch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>ch</em> をプッシュして、 <tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> を次に呼び出したときに返されるようにします。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt> を呼び出すまでは <em>ch</em> は一つしかプッシュできません。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.ungetmouse">
+<tt class="descclassname">curses.</tt><tt class="descname">ungetmouse</tt><big>(</big><em>id</em>, <em>x</em>, <em>y</em>, <em>z</em>, <em>bstate</em><big>)</big><a class="headerlink" href="#curses.ungetmouse" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた状態データが関連付けられた <tt class="xref py py-const docutils literal"><span class="pre">KEY_MOUSE</span></tt> イベントを入力キューにプッシュします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.use_env">
+<tt class="descclassname">curses.</tt><tt class="descname">use_env</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#curses.use_env" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数を使う場合、 <a class="reference internal" href="#curses.initscr" title="curses.initscr"><tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt></a> または newterm を呼ぶ前に呼び出さなくてはなりません。 <em>flag</em> が偽の場合、環境変数
+<span class="target" id="index-0"></span><tt class="xref std std-envvar docutils literal"><span class="pre">LINES</span></tt> および <span class="target" id="index-1"></span><tt class="xref std std-envvar docutils literal"><span class="pre">COLUMNS</span></tt> の値 (これらは標準の設定で使われます) の値が設定されていたり、curses
+がウィンドウ内で動作して (この場合 <span class="target" id="index-2"></span><tt class="xref std std-envvar docutils literal"><span class="pre">LINES</span></tt> や <span class="target" id="index-3"></span><tt class="xref std std-envvar docutils literal"><span class="pre">COLUMNS</span></tt> が設定されていないとウィンドウのサイズを使います) いても、terminfo  データベースに指定された lines および columns の値を使います。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="curses.use_default_colors">
+<tt class="descclassname">curses.</tt><tt class="descname">use_default_colors</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.use_default_colors" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この機能をサポートしている端末上で、色の値としてデフォルト値を使う設定をします。あなたのアプリケーションで透過性とサポートするためにこの関数を使ってください。デフォルトの色は色番号-1に割り当てられます。</p>
+<p>この関数を呼んだ後、たとえば <tt class="docutils literal"><span class="pre">init_pair(x,</span> <span class="pre">curses.COLOR_RED,</span> <span class="pre">-1)</span></tt>
+は色ペア <em>x</em> を赤い前景色とデフォルトの背景色に初期化します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="window">
+<span id="curses-window-objects"></span><h2>15.11.2. Window オブジェクト<a class="headerlink" href="#window" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>上記の <a class="reference internal" href="#curses.initscr" title="curses.initscr"><tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt></a> や <a class="reference internal" href="#curses.newwin" title="curses.newwin"><tt class="xref py py-func docutils literal"><span class="pre">newwin()</span></tt></a> が返すウィンドウは、以下のメソッドを持ちます:</p>
+<dl class="method">
+<dt id="curses.window.addch">
+<tt class="descclassname">window.</tt><tt class="descname">addch</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>ch</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.addch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">ここで <em>文字</em> は Python 文字 (長さ 1 の文字列) C における文字 (ASCII コード) を意味します。(この注釈は文字について触れているドキュメントではどこでも当てはまります。) 組み込みの <a class="reference internal" href="functions.html#ord" title="ord"><tt class="xref py py-func docutils literal"><span class="pre">ord()</span></tt></a> は文字列をコードの集まりにする際に便利です。</p>
+</div>
+<p><tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> にある文字 <em>ch</em> を属性 <em>attr</em> で描画します。このときその場所に以前描画された文字は上書きされます。標準の設定では、文字の位置および属性はウィンドウオブジェクトにおける現在の設定になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.addnstr">
+<tt class="descclassname">window.</tt><tt class="descname">addnstr</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>str</em>, <em>n</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.addnstr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列 <em>str</em> から最大で <em>n</em> 文字を <tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt>  に属性 <em>attr</em> で描画します。以前ディスプレイにあった内容はすべて上書きされます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.addstr">
+<tt class="descclassname">window.</tt><tt class="descname">addstr</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>str</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.addstr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> に文字列 <em>str</em> を属性 <em>attr</em> で描画します。以前ディスプレイにあった内容はすべて上書きされます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.attroff">
+<tt class="descclassname">window.</tt><tt class="descname">attroff</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#curses.window.attroff" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のウィンドウに書き込まれた全ての内容に対し &#8220;バックグラウンド&#8221;  に設定された属性 <em>attr</em> を除去します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.attron">
+<tt class="descclassname">window.</tt><tt class="descname">attron</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#curses.window.attron" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のウィンドウに書き込まれた全ての内容に対し &#8220;バックグラウンド&#8221;  に属性 <em>attr</em> を追加します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.attrset">
+<tt class="descclassname">window.</tt><tt class="descname">attrset</tt><big>(</big><em>attr</em><big>)</big><a class="headerlink" href="#curses.window.attrset" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;バックグラウンド&#8221; の属性セットを <em>attr</em> に設定します。初期値は 0 (属性なし) です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.bkgd">
+<tt class="descclassname">window.</tt><tt class="descname">bkgd</tt><big>(</big><em>ch</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.bkgd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウ上の背景プロパティを、 <em>attr</em> を属性とする文字 <em>ch</em> に設定します。変更はそのウィンドウ中の全ての文字に以下のようにして適用されます:</p>
+<ul class="simple">
+<li>ウィンドウ中の全ての文字の属性が新たな背景属性に変更されます。</li>
+<li>以前の背景文字が出現すると、常に新たな背景文字に変更されます。</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.bkgdset">
+<tt class="descclassname">window.</tt><tt class="descname">bkgdset</tt><big>(</big><em>ch</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.bkgdset" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウの背景を設定します。ウィンドウの背景は、文字と何らかの属性の組み合わせから成り立ちます。背景情報の属性の部分は、ウィンドウ上に描画されている空白でない全ての文字と組み合わされ (OR され) ます。空白文字には文字部分と属性部分の両方が組み合わされます。背景は文字のプロパティとなり、スクロールや行／文字の挿入／削除操作の際には文字と一緒に移動します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.border">
+<tt class="descclassname">window.</tt><tt class="descname">border</tt><big>(</big><span class="optional">[</span><em>ls</em><span class="optional">[</span>, <em>rs</em><span class="optional">[</span>, <em>ts</em><span class="optional">[</span>, <em>bs</em><span class="optional">[</span>, <em>tl</em><span class="optional">[</span>, <em>tr</em><span class="optional">[</span>, <em>bl</em><span class="optional">[</span>, <em>br</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.border" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウの縁に境界線を描画します。各引数には境界の特定部分を表現するために使われる文字を指定します; 詳細は以下のテーブルを参照してください。文字は整数または 1 文字からなる文字列で指定されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">どの引数も、 <tt class="docutils literal"><span class="pre">0</span></tt> を指定した場合標準設定の文字が使われるようになります。キーワード引数は使うことが <em>できません</em> 。標準の設定はテーブル中に示されています:</p>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="26%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">引数</th>
+<th class="head">記述</th>
+<th class="head">標準の設定値</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><em>ls</em></td>
+<td>左側</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_VLINE</span></tt></td>
+</tr>
+<tr class="row-odd"><td><em>rs</em></td>
+<td>右側</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_VLINE</span></tt></td>
+</tr>
+<tr class="row-even"><td><em>ts</em></td>
+<td>上側</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_HLINE</span></tt></td>
+</tr>
+<tr class="row-odd"><td><em>bs</em></td>
+<td>下側</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_HLINE</span></tt></td>
+</tr>
+<tr class="row-even"><td><em>tl</em></td>
+<td>左上の角</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_ULCORNER</span></tt></td>
+</tr>
+<tr class="row-odd"><td><em>tr</em></td>
+<td>右上の角</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_URCORNER</span></tt></td>
+</tr>
+<tr class="row-even"><td><em>bl</em></td>
+<td>左下の角</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_LLCORNER</span></tt></td>
+</tr>
+<tr class="row-odd"><td><em>br</em></td>
+<td>右下の角</td>
+<td><tt class="xref py py-const docutils literal"><span class="pre">ACS_LRCORNER</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.box">
+<tt class="descclassname">window.</tt><tt class="descname">box</tt><big>(</big><span class="optional">[</span><em>vertch</em>, <em>horch</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.box" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#curses.window.border" title="curses.window.border"><tt class="xref py py-meth docutils literal"><span class="pre">border()</span></tt></a> と同様ですが、 <em>ls</em> および <em>rs</em> は共に <em>vertch</em> で、 <em>ts</em> および <em>bs</em> は共に <em>horch</em>
+です。この関数では、角に使われる文字は常に標準設定の値です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.chgat">
+<tt class="descclassname">window.</tt><tt class="descname">chgat</tt><big>(</big><em>[y, x, ] [num,] attr</em><big>)</big><a class="headerlink" href="#curses.window.chgat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のカーソルのポジションか、引数が指定された場合は <tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> から、
+<em>num</em> 文字の属性を設定します。
+<em>num</em> が指定されない、または <em>num</em> = -1 の場合は、属性はその行の終わりまでのすべての文字に適用されます。この関数はカーソルを移動しません。変更された行に対して <a class="reference internal" href="#curses.window.touchline" title="curses.window.touchline"><tt class="xref py py-meth docutils literal"><span class="pre">touchline()</span></tt></a> メソッドが呼び出されるので、その行の内容は次のwindow refreshの時に再描画されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.clear">
+<tt class="descclassname">window.</tt><tt class="descname">clear</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.clear" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#curses.window.erase" title="curses.window.erase"><tt class="xref py py-meth docutils literal"><span class="pre">erase()</span></tt></a> に似ていますが、次に <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> が呼び出された際に全てのウィンドウを再描画するようにします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.clearok">
+<tt class="descclassname">window.</tt><tt class="descname">clearok</tt><big>(</big><em>yes</em><big>)</big><a class="headerlink" href="#curses.window.clearok" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>yes</em> が 1 ならば、次の <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> はウィンドウを完全に消去します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.clrtobot">
+<tt class="descclassname">window.</tt><tt class="descname">clrtobot</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.clrtobot" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カーソルの位置からウィンドウの端までを消去します: カーソル以降の全ての行が削除されるため、 <a class="reference internal" href="#curses.window.clrtoeol" title="curses.window.clrtoeol"><tt class="xref py py-meth docutils literal"><span class="pre">clrtoeol()</span></tt></a> が実行されたのとおなじになります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.clrtoeol">
+<tt class="descclassname">window.</tt><tt class="descname">clrtoeol</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.clrtoeol" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カーソル位置から行末までを消去します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.cursyncup">
+<tt class="descclassname">window.</tt><tt class="descname">cursyncup</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.cursyncup" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウの全ての親ウィンドウについて、現在のカーソル位置を反映するよう更新します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.delch">
+<tt class="descclassname">window.</tt><tt class="descname">delch</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.delch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> にある文字を削除します。 Delete any character at <tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.deleteln">
+<tt class="descclassname">window.</tt><tt class="descname">deleteln</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.deleteln" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カーソルの下にある行を削除します。後続の行はすべて 1 行上に移動します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.derwin">
+<tt class="descclassname">window.</tt><tt class="descname">derwin</tt><big>(</big><span class="optional">[</span><em>nlines</em>, <em>ncols</em><span class="optional">]</span>, <em>begin_y</em>, <em>begin_x</em><big>)</big><a class="headerlink" href="#curses.window.derwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;derive window (ウィンドウを派生する)&#8221; の短縮形です。 <a class="reference internal" href="#curses.window.derwin" title="curses.window.derwin"><tt class="xref py py-meth docutils literal"><span class="pre">derwin()</span></tt></a> は <a class="reference internal" href="#curses.window.subwin" title="curses.window.subwin"><tt class="xref py py-meth docutils literal"><span class="pre">subwin()</span></tt></a> と同じですが、
+<em>begin_y</em> および <em>begin+x</em> はスクリーン全体の原点ではなく、ウィンドウの原点からの相対位置です。派生したウィンドウオブジェクトが返されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.echochar">
+<tt class="descclassname">window.</tt><tt class="descname">echochar</tt><big>(</big><em>ch</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.echochar" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字 <em>ch</em> に属性 <em>attr</em> を付与し、即座に <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> をウィンドウに対して呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.enclose">
+<tt class="descclassname">window.</tt><tt class="descname">enclose</tt><big>(</big><em>y</em>, <em>x</em><big>)</big><a class="headerlink" href="#curses.window.enclose" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた文字セル座標をスクリーン原点から相対的なものとし、ウィンドウの中に含まれるかを調べて、真または偽を返します。スクリーン上のウィンドウの一部がマウスイベントの発生場所を含むかどうかを調べる上で便利です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.erase">
+<tt class="descclassname">window.</tt><tt class="descname">erase</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.erase" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウをクリアします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.getbegyx">
+<tt class="descclassname">window.</tt><tt class="descname">getbegyx</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.getbegyx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>左上の角の座標をあらわすタプル <tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.getch">
+<tt class="descclassname">window.</tt><tt class="descname">getch</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.getch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字を取得します。返される整数は ASCII の範囲の値となる <em>わけではない</em> ので注意してください。ファンクションキー、キーパッド上のキー等は 256 よりも大きな数字を返します。無遅延 (no-delay) モードでは、入力がない場合 -1 が返されます。それ以外の場合は、 <a class="reference internal" href="#curses.window.getch" title="curses.window.getch"><tt class="xref py py-func docutils literal"><span class="pre">getch()</span></tt></a> はキー入力を待ちます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.getkey">
+<tt class="descclassname">window.</tt><tt class="descname">getkey</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.getkey" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字を取得し、 <a class="reference internal" href="#curses.window.getch" title="curses.window.getch"><tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt></a> のように整数を返す代わりに文字列を返します。ファンクションキー、キーバットキーなどはキー名の入った複数バイトからなる文字列を返します。無遅延モードでは、入力がない場合例外が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.getmaxyx">
+<tt class="descclassname">window.</tt><tt class="descname">getmaxyx</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.getmaxyx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウの高さおよび幅を表すタプル <tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt>  を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.getparyx">
+<tt class="descclassname">window.</tt><tt class="descname">getparyx</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.getparyx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>親ウィンドウ中におけるウィンドウの開始位置を x と y の二つの整数で返します。ウィンドウに親ウィンドウがない場合 <tt class="docutils literal"><span class="pre">-1,-1</span></tt>  を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.getstr">
+<tt class="descclassname">window.</tt><tt class="descname">getstr</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.getstr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>原始的な文字編集機能つきで、ユーザの入力文字列を読み取ります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.getyx">
+<tt class="descclassname">window.</tt><tt class="descname">getyx</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.getyx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウの左上角からの相対で表した現在のカーソル位置をタプル <tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> で返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.hline">
+<tt class="descclassname">window.</tt><tt class="descname">hline</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>ch</em>, <em>n</em><big>)</big><a class="headerlink" href="#curses.window.hline" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> から始まり、 <em>n</em> の長さを持つ、文字 <em>ch</em> で作られる水平線を表示します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.idcok">
+<tt class="descclassname">window.</tt><tt class="descname">idcok</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#curses.window.idcok" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flag</em> が偽の場合、curses は端末のハードウェアによる文字挿入／削除機能を使おうとしなくなります; <em>flag</em> が真ならば、文字挿入／削除は有効にされます。curses が最初に初期化された際には文字挿入／削除は標準の設定で有効になっています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.idlok">
+<tt class="descclassname">window.</tt><tt class="descname">idlok</tt><big>(</big><em>yes</em><big>)</big><a class="headerlink" href="#curses.window.idlok" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>yes</em> が 1 であれば、 <a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> はハードウェアの行編集機能を利用しようと試みます。行挿入／削除は無効化されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.immedok">
+<tt class="descclassname">window.</tt><tt class="descname">immedok</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#curses.window.immedok" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flag</em> が真ならば、ウィンドウイメージ内における何らかの変更があるとウィンドウを更新するようになります; すなわち、 <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a>
+を自分で呼ばなくても良くなります。とはいえ、wrefresh を繰り返し呼び出すことになるため、この操作はかなりパフォーマンスを低下させます。標準の設定では無効になっています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.inch">
+<tt class="descclassname">window.</tt><tt class="descname">inch</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.inch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウの指定の位置の文字を返します。下位 8 ビットが常に文字となり、それより上のビットは属性を表します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.insch">
+<tt class="descclassname">window.</tt><tt class="descname">insch</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>ch</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.insch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> に文字 <em>ch</em> を属性 <em>attr</em> で描画し、行の <em>x</em> からの内容を 1 文字分右にずらします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.insdelln">
+<tt class="descclassname">window.</tt><tt class="descname">insdelln</tt><big>(</big><em>nlines</em><big>)</big><a class="headerlink" href="#curses.window.insdelln" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>nlines</em> 行を指定されたウィンドウの現在の行の上に挿入します。その下にある <em>nlines</em> 行は失われます。負の <em>nlines</em> を指定すると、カーソルのある行以降の <em>nlines</em> を削除し、削除された行の後ろに続く内容が上に来ます。その下にある <em>nlines</em> は消去されます。現在のカーソル位置はそのままです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.insertln">
+<tt class="descclassname">window.</tt><tt class="descname">insertln</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.insertln" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カーソルの下に空行を 1 行入れます。それ以降の行は 1 行づつ下に移動します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.insnstr">
+<tt class="descclassname">window.</tt><tt class="descname">insnstr</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>str</em>, <em>n</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.insnstr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列をカーソルの下にある文字の前に (一行に収まるだけ) 最大 <em>n</em> 文字挿入します。 <em>n</em> がゼロまたは負の値の場合、文字列全体が挿入されます。カーソルの右にある全ての文字は右に移動し、行の左端にある文字は失われます。カーソル位置は (<em>y</em>, <em>x</em> が指定されていた場合はそこに移動しますが、その後は) 変化しません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.insstr">
+<tt class="descclassname">window.</tt><tt class="descname">insstr</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>str</em><span class="optional">[</span>, <em>attr</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.insstr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>キャラクタ文字列を (行に収まるだけ) カーソルより前に挿入します。カーソルの右側にある文字は全て右にシフトし、行の右端の文字は失われます。カーソル位置は
+(<em>y</em>, <em>x</em> が指定されていた場合はそこに移動しますが、その後は) 変化しません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.instr">
+<tt class="descclassname">window.</tt><tt class="descname">instr</tt><big>(</big><em>[y, x] [, n]</em><big>)</big><a class="headerlink" href="#curses.window.instr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のカーソル位置、または <em>y</em>, <em>x</em> が指定されている場合にはその場所から始まるキャラクタ文字列をウィンドウから抽出して返します。属性は文字から剥ぎ取られます。 <em>n</em> が指定された場合、 <a class="reference internal" href="#curses.window.instr" title="curses.window.instr"><tt class="xref py py-meth docutils literal"><span class="pre">instr()</span></tt></a> は (末尾の NUL 文字を除いて) 最大で <em>n</em> 文字までの長さからなる文字列を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.is_linetouched">
+<tt class="descclassname">window.</tt><tt class="descname">is_linetouched</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#curses.window.is_linetouched" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定した行が、最後に <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> を呼んだ時から変更されている場合に真を返します; そうでない場合には偽を返します。 <em>line</em>
+が現在のウィンドウ上の有効な行でない場合、 <a class="reference internal" href="#curses.error" title="curses.error"><tt class="xref py py-exc docutils literal"><span class="pre">curses.error</span></tt></a> 例外を送出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.is_wintouched">
+<tt class="descclassname">window.</tt><tt class="descname">is_wintouched</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.is_wintouched" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定したウィンドウが、最後に <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> を呼んだ時から変更されている場合に真を返します; そうでない場合には偽を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.keypad">
+<tt class="descclassname">window.</tt><tt class="descname">keypad</tt><big>(</big><em>yes</em><big>)</big><a class="headerlink" href="#curses.window.keypad" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>yes</em> が 1 の場合、ある種のキー (キーパッドやファンクションキー) によって生成されたエスケープシーケンスは <a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> で解釈されます。 <em>yes</em> が 0 の場合、エスケープシーケンスは入力ストリームにそのままの状態で残されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.leaveok">
+<tt class="descclassname">window.</tt><tt class="descname">leaveok</tt><big>(</big><em>yes</em><big>)</big><a class="headerlink" href="#curses.window.leaveok" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>yes</em> が 1 の場合、カーソルは &#8220;カーソル位置&#8221; に移動せず現在の場所にとどめます。これにより、カーソルの移動を減らせる可能性があります。この場合、カーソルは不可視にされます。</p>
+<p><em>yes</em> が 0 の場合、カーソルは更新の際に常に &#8220;カーソル位置&#8221; に移動します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.move">
+<tt class="descclassname">window.</tt><tt class="descname">move</tt><big>(</big><em>new_y</em>, <em>new_x</em><big>)</big><a class="headerlink" href="#curses.window.move" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カーソルを <tt class="docutils literal"><span class="pre">(new_y,</span> <span class="pre">new_x)</span></tt> に移動します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.mvderwin">
+<tt class="descclassname">window.</tt><tt class="descname">mvderwin</tt><big>(</big><em>y</em>, <em>x</em><big>)</big><a class="headerlink" href="#curses.window.mvderwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウを親ウィンドウの中で移動します。ウィンドウのスクリーン相対となるパラメタ群は変化しません。このルーチンは親ウィンドウの一部をスクリーン上の同じ物理位置に表示する際に用いられます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.mvwin">
+<tt class="descclassname">window.</tt><tt class="descname">mvwin</tt><big>(</big><em>new_y</em>, <em>new_x</em><big>)</big><a class="headerlink" href="#curses.window.mvwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウの左上角が <tt class="docutils literal"><span class="pre">(new_y,</span> <span class="pre">new_x)</span></tt> になるように移動します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.nodelay">
+<tt class="descclassname">window.</tt><tt class="descname">nodelay</tt><big>(</big><em>yes</em><big>)</big><a class="headerlink" href="#curses.window.nodelay" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>yes</em> が <tt class="docutils literal"><span class="pre">1</span></tt> の場合、 <a class="reference internal" href="#curses.window.getch" title="curses.window.getch"><tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt></a> は非ブロックで動作します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.notimeout">
+<tt class="descclassname">window.</tt><tt class="descname">notimeout</tt><big>(</big><em>yes</em><big>)</big><a class="headerlink" href="#curses.window.notimeout" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>yes</em> が <tt class="docutils literal"><span class="pre">1</span></tt> の場合、エスケープシーケンスはタイムアウトしなくなります。</p>
+<p><em>yes</em> が <tt class="docutils literal"><span class="pre">0</span></tt> の場合、数ミリ秒間の間エスケープシーケンスは解釈されず、入力ストリーム中にそのままの状態で残されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.noutrefresh">
+<tt class="descclassname">window.</tt><tt class="descname">noutrefresh</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.noutrefresh" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>更新をマークはしますが待機します。この関数はウィンドウのデータ構造を表現したい内容を反映するように更新しますが、物理スクリーン上に反映させるための強制更新を行いません。更新を行うためには <a class="reference internal" href="#curses.doupdate" title="curses.doupdate"><tt class="xref py py-func docutils literal"><span class="pre">doupdate()</span></tt></a> を呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.overlay">
+<tt class="descclassname">window.</tt><tt class="descname">overlay</tt><big>(</big><em>destwin</em><span class="optional">[</span>, <em>sminrow</em>, <em>smincol</em>, <em>dminrow</em>, <em>dmincol</em>, <em>dmaxrow</em>, <em>dmaxcol</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.overlay" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウを <em>destwin</em> の上に重ね書き (overlay) します。ウィンドウは同じサイズである必要はなく、重なっている領域だけが複写されます。この複写は非破壊的 (non-destructive) です。これは現在の背景文字が <em>destwin</em> の内容を上書きしないことを意味します。</p>
+<p>複写領域をきめ細かく制御するために、 <a class="reference internal" href="#curses.window.overlay" title="curses.window.overlay"><tt class="xref py py-meth docutils literal"><span class="pre">overlay()</span></tt></a> の第二形式を使うことができます。 <em>sminrow</em> および <em>smincol</em> は元のウィンドウの左上の座標で、他の変数は <em>destwin</em> 内の矩形を表します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.overwrite">
+<tt class="descclassname">window.</tt><tt class="descname">overwrite</tt><big>(</big><em>destwin</em><span class="optional">[</span>, <em>sminrow</em>, <em>smincol</em>, <em>dminrow</em>, <em>dmincol</em>, <em>dmaxrow</em>, <em>dmaxcol</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.overwrite" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>destwin</em> の上にウィンドウの内容を上書き (overwrite) します。ウィンドウは同じサイズである必要はなく、重なっている領域だけが複写されます。この複写は破壊的 (destructive) です。これは現在の背景文字が <em>destwin</em> の内容を上書きすることを意味します。</p>
+<p>複写領域をきめ細かく制御するために、 <a class="reference internal" href="#curses.window.overlay" title="curses.window.overlay"><tt class="xref py py-meth docutils literal"><span class="pre">overlay()</span></tt></a> の第二形式を使うことができます。 <em>sminrow</em> および <em>smincol</em> は元のウィンドウの左上の座標で、他の変数は <em>destwin</em> 内の矩形を表します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.putwin">
+<tt class="descclassname">window.</tt><tt class="descname">putwin</tt><big>(</big><em>file</em><big>)</big><a class="headerlink" href="#curses.window.putwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウに関連付けられている全てのデータを与えられたファイルオブジェクトに書き込みます。この情報は後に <a class="reference internal" href="#curses.getwin" title="curses.getwin"><tt class="xref py py-func docutils literal"><span class="pre">getwin()</span></tt></a> 関数を使って取得することができます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.redrawln">
+<tt class="descclassname">window.</tt><tt class="descname">redrawln</tt><big>(</big><em>beg</em>, <em>num</em><big>)</big><a class="headerlink" href="#curses.window.redrawln" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>beg</em> 行から始まる <em>num</em> スクリーン行の表示内容が壊れており、次の <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> 呼び出しで完全に再描画されなければならないことを通知します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.redrawwin">
+<tt class="descclassname">window.</tt><tt class="descname">redrawwin</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.redrawwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウ全体を更新 (touch) し、次の <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> 呼び出しで完全に再描画されるようにします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.refresh">
+<tt class="descclassname">window.</tt><tt class="descname">refresh</tt><big>(</big><span class="optional">[</span><em>pminrow</em>, <em>pmincol</em>, <em>sminrow</em>, <em>smincol</em>, <em>smaxrow</em>, <em>smaxcol</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.refresh" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ディスプレイを即時更新し (現実のウィンドウとこれまでの描画／削除メソッドの内容との同期をとり) ます。</p>
+<p>6 つのオプション引数はウィンドウが <a class="reference internal" href="#curses.newpad" title="curses.newpad"><tt class="xref py py-func docutils literal"><span class="pre">newpad()</span></tt></a> で生成された場合にのみ指定することができます。追加の引数はパッドやスクリーンのどの部分が含まれるのかを示すために必要です。 <em>pminrow</em> および <em>pmincol</em> にはパッドが表示されている矩形の左上角を指定します。 <em>sminrow</em>,  <em>smincol</em>, <em>smaxrow</em>,  および <em>smaxcol</em>
+には、スクリーン上に表示される矩形の縁を指定します。パッド内に表示される矩形の右下角はスクリーン座標から計算されるので、矩形は同じサイズでなければなりません。矩形は両方とも、それぞれのウィンドウ構造内に完全に含まれていなければなりません。 <em>pminrow</em>,
+<em>pmincol</em>, <em>sminrow</em>, または <em>smincol</em>  に負の値を指定すると、ゼロを指定したものとして扱われます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.scroll">
+<tt class="descclassname">window.</tt><tt class="descname">scroll</tt><big>(</big><span class="optional">[</span><em>lines=1</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.scroll" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スクリーンまたはスクロール領域を上に <em>lines</em> 行スクロールします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.scrollok">
+<tt class="descclassname">window.</tt><tt class="descname">scrollok</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#curses.window.scrollok" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウのカーソルが、最下行で改行を行ったり最後の文字を入力したりした結果、ウィンドウやスクロール領域の縁からはみ出して移動した際の動作を制御します。 <em>flag</em> が偽の場合、カーソルは最下行にそのままにしておかれます。 <em>flag</em> が真の場合、ウィンドウは 1 行上にスクロールします。端末の物理スクロール効果を得るためには <a class="reference internal" href="#curses.window.idlok" title="curses.window.idlok"><tt class="xref py py-meth docutils literal"><span class="pre">idlok()</span></tt></a> も呼び出す必要があるので注意してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.setscrreg">
+<tt class="descclassname">window.</tt><tt class="descname">setscrreg</tt><big>(</big><em>top</em>, <em>bottom</em><big>)</big><a class="headerlink" href="#curses.window.setscrreg" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スクロール領域を <em>top</em> から <em>bottom</em> に設定します。スクロール動作は全てこの領域で行われます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.standend">
+<tt class="descclassname">window.</tt><tt class="descname">standend</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.standend" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>A_STANDOUT</em> 属性をオフにします。端末によっては、この操作で全ての属性をオフにする副作用が発生します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.standout">
+<tt class="descclassname">window.</tt><tt class="descname">standout</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.standout" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>A_STANDOUT</em> 属性をオンにします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.subpad">
+<tt class="descclassname">window.</tt><tt class="descname">subpad</tt><big>(</big><span class="optional">[</span><em>nlines</em>, <em>ncols</em><span class="optional">]</span>, <em>begin_y</em>, <em>begin_x</em><big>)</big><a class="headerlink" href="#curses.window.subpad" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>左上の角が <tt class="docutils literal"><span class="pre">(begin_y,</span> <span class="pre">begin_x)</span></tt> にあり、幅／高さがそれぞれ <em>ncols</em> / <em>nlines</em> であるようなサブウィンドウを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.subwin">
+<tt class="descclassname">window.</tt><tt class="descname">subwin</tt><big>(</big><span class="optional">[</span><em>nlines</em>, <em>ncols</em><span class="optional">]</span>, <em>begin_y</em>, <em>begin_x</em><big>)</big><a class="headerlink" href="#curses.window.subwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>左上の角が <tt class="docutils literal"><span class="pre">(begin_y,</span> <span class="pre">begin_x)</span></tt> にあり、幅／高さがそれぞれ <em>ncols</em> / <em>nlines</em> であるようなサブウィンドウを返します。</p>
+<p>標準の設定では、サブウィンドウは指定された場所からウィンドウの右下角まで広がります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.syncdown">
+<tt class="descclassname">window.</tt><tt class="descname">syncdown</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.syncdown" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このウィンドウの上位のウィンドウのいずれかで更新(touch)された各場所をこのウィンドウ内でも更新します。このルーチンは <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a>
+から呼び出されるので、手動で呼び出す必要はほとんどないはずです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.syncok">
+<tt class="descclassname">window.</tt><tt class="descname">syncok</tt><big>(</big><em>flag</em><big>)</big><a class="headerlink" href="#curses.window.syncok" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>flag</em> を真にして呼び出すと、ウィンドウが変更された際は常に <a class="reference internal" href="#curses.window.syncup" title="curses.window.syncup"><tt class="xref py py-meth docutils literal"><span class="pre">syncup()</span></tt></a> を自動的に呼ぶようになります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.syncup">
+<tt class="descclassname">window.</tt><tt class="descname">syncup</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.syncup" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウ内で更新 (touch) した場所を、上位の全てのウィンドウ内でも更新します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.timeout">
+<tt class="descclassname">window.</tt><tt class="descname">timeout</tt><big>(</big><em>delay</em><big>)</big><a class="headerlink" href="#curses.window.timeout" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウのブロックまたは非ブロック読み込み動作を設定します。 <em>delay</em> が負の場合、ブロック読み出しが使われ、入力を無期限で待ち受けます。 <em>delay</em> がゼロの場合、非ブロック読み出しが使われ、入力待ちの文字がない場合 <a class="reference internal" href="#curses.window.getch" title="curses.window.getch"><tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt></a> は -1 を返します。 <em>delay</em> が正の値であれば、 <a class="reference internal" href="#curses.window.getch" title="curses.window.getch"><tt class="xref py py-meth docutils literal"><span class="pre">getch()</span></tt></a> は <em>delay</em> ミリ秒間ブロックし、ブロック後の時点で入力がない場合には -1
+を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.touchline">
+<tt class="descclassname">window.</tt><tt class="descname">touchline</tt><big>(</big><em>start</em>, <em>count</em><span class="optional">[</span>, <em>changed</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.window.touchline" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>start</em> から始まる <em>count</em> 行が変更されたかのように振舞わせます。もし <em>changed</em> が与えられた場合、その引数は指定された行が変更された(<em>changed</em>=1)か、変更されていないか(<em>changed</em>=0)を指定します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.touchwin">
+<tt class="descclassname">window.</tt><tt class="descname">touchwin</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.touchwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>描画を最適化するために、全てのウィンドウが変更されたかのように振舞わせます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.untouchwin">
+<tt class="descclassname">window.</tt><tt class="descname">untouchwin</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.window.untouchwin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウ内の全ての行を、最後に <a class="reference internal" href="#curses.window.refresh" title="curses.window.refresh"><tt class="xref py py-meth docutils literal"><span class="pre">refresh()</span></tt></a> を呼んだ際から変更されていないものとしてマークします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.window.vline">
+<tt class="descclassname">window.</tt><tt class="descname">vline</tt><big>(</big><span class="optional">[</span><em>y</em>, <em>x</em><span class="optional">]</span>, <em>ch</em>, <em>n</em><big>)</big><a class="headerlink" href="#curses.window.vline" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(y,</span> <span class="pre">x)</span></tt> から始まり、 <em>n</em> の長さを持つ、文字 <em>ch</em> で作られる垂直線を表示します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h2>15.11.3. 定数<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-curses" title="curses: 可搬性のある端末操作を提供する curses ライブラリへのインタフェース． (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">curses</span></tt></a> モジュールでは以下のデータメンバを定義しています:</p>
+<dl class="data">
+<dt id="curses.ERR">
+<tt class="descclassname">curses.</tt><tt class="descname">ERR</tt><a class="headerlink" href="#curses.ERR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-func docutils literal"><span class="pre">getch()</span></tt> のような整数を返す curses ルーチンのいくつかは、失敗した際に <a class="reference internal" href="#curses.ERR" title="curses.ERR"><tt class="xref py py-const docutils literal"><span class="pre">ERR</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="curses.OK">
+<tt class="descclassname">curses.</tt><tt class="descname">OK</tt><a class="headerlink" href="#curses.OK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#curses.napms" title="curses.napms"><tt class="xref py py-func docutils literal"><span class="pre">napms()</span></tt></a> のような整数を返す curses ルーチンのいくつかは、成功した際に <a class="reference internal" href="#curses.OK" title="curses.OK"><tt class="xref py py-const docutils literal"><span class="pre">OK</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="curses.version">
+<tt class="descclassname">curses.</tt><tt class="descname">version</tt><a class="headerlink" href="#curses.version" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールの現在のバージョンを表現する文字列です。 <tt class="xref py py-const docutils literal"><span class="pre">__version__</span></tt> でも取得できます。</p>
+</dd></dl>
+
+<p>以下に文字セルの属性を指定するために利用可能ないくつかの定数を示します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">属性</th>
+<th class="head">意味</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">A_ALTCHARSET</span></tt></td>
+<td>代用文字 (alternate character) モード。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">A_BLINK</span></tt></td>
+<td>点滅モード。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">A_BOLD</span></tt></td>
+<td>太字モード。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">A_DIM</span></tt></td>
+<td>低輝度モード。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">A_NORMAL</span></tt></td>
+<td>通常の属性。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">A_REVERSE</span></tt></td>
+<td>背景色と前景色を入れ替える。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">A_STANDOUT</span></tt></td>
+<td>強調モード。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">A_UNDERLINE</span></tt></td>
+<td>下線モード。</td>
+</tr>
+</tbody>
+</table>
+<p>キーは <tt class="docutils literal"><span class="pre">KEY_</span></tt> で始まる名前をもつ整数定数です。利用可能なキーキャップはシステムに依存します。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">キー定数</th>
+<th class="head">キー</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_MIN</span></tt></td>
+<td>最小のキー値</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_BREAK</span></tt></td>
+<td>ブレーク (Break, 信頼できません)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_DOWN</span></tt></td>
+<td>下向き矢印 (Down-arrow)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_UP</span></tt></td>
+<td>上向き矢印 (Up-arrow)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_LEFT</span></tt></td>
+<td>左向き矢印 (Left-arrow)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_RIGHT</span></tt></td>
+<td>右向き矢印 (Right-arrow)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_HOME</span></tt></td>
+<td>ホームキー (Home, または上左矢印)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_BACKSPACE</span></tt></td>
+<td>バックスペース (Backspace, 信頼できません)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_F0</span></tt></td>
+<td>ファンクションキー 64 個までサポートされています。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_Fn</span></tt></td>
+<td>ファンクションキー <em>n</em> の値</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_DL</span></tt></td>
+<td>行削除 (Delete line)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_IL</span></tt></td>
+<td>行挿入 (Insert line)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_DC</span></tt></td>
+<td>文字削除 (Delete char)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_IC</span></tt></td>
+<td>文字挿入、または文字挿入モードへ入る</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_EIC</span></tt></td>
+<td>文字挿入モードから抜ける</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_CLEAR</span></tt></td>
+<td>画面消去</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_EOS</span></tt></td>
+<td>画面の末端まで消去</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_EOL</span></tt></td>
+<td>行末端まで消去</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SF</span></tt></td>
+<td>前に 1 行スクロール</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SR</span></tt></td>
+<td>後ろ (逆方向) に 1 行スクロール</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_NPAGE</span></tt></td>
+<td>次のページ (Page Next)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_PPAGE</span></tt></td>
+<td>前のページ (Page Prev)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_STAB</span></tt></td>
+<td>タブ設定</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_CTAB</span></tt></td>
+<td>タブリセット</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_CATAB</span></tt></td>
+<td>全てのタブをリセット</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_ENTER</span></tt></td>
+<td>入力または送信 (信頼できません)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SRESET</span></tt></td>
+<td>ソフトウェア (部分的) リセット (信頼できません)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_RESET</span></tt></td>
+<td>リセットまたはハードリセット (信頼できません)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_PRINT</span></tt></td>
+<td>印刷 (Print)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_LL</span></tt></td>
+<td>下ホーム (Home down) または最下行 (左下)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_A1</span></tt></td>
+<td>キーパッドの左上キー</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_A3</span></tt></td>
+<td>キーパッドの右上キー</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_B2</span></tt></td>
+<td>キーパッドの中央キー</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_C1</span></tt></td>
+<td>キーパッドの左下キー</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_C3</span></tt></td>
+<td>キーパッドの右下キー</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_BTAB</span></tt></td>
+<td>Back tab</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_BEG</span></tt></td>
+<td>開始 (Beg)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_CANCEL</span></tt></td>
+<td>キャンセル (Cancel)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_CLOSE</span></tt></td>
+<td>閉じる (Close)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_COMMAND</span></tt></td>
+<td>コマンド (Cmd)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_COPY</span></tt></td>
+<td>コピー (Copy)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_CREATE</span></tt></td>
+<td>生成 (Create)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_END</span></tt></td>
+<td>終了 (End)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_EXIT</span></tt></td>
+<td>終了 (Exit)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_FIND</span></tt></td>
+<td>検索 (Find)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_HELP</span></tt></td>
+<td>ヘルプ (Help)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_MARK</span></tt></td>
+<td>マーク (Mark)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_MESSAGE</span></tt></td>
+<td>メッセージ (Message)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_MOVE</span></tt></td>
+<td>移動 (Move)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_NEXT</span></tt></td>
+<td>次へ (Next)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_OPEN</span></tt></td>
+<td>開く (Open)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_OPTIONS</span></tt></td>
+<td>オプション (Options)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_PREVIOUS</span></tt></td>
+<td>前へ (Prev)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_REDO</span></tt></td>
+<td>やり直し (Redo)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_REFERENCE</span></tt></td>
+<td>参照 (Ref)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_REFRESH</span></tt></td>
+<td>更新 (Refresh)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_REPLACE</span></tt></td>
+<td>置換 (Replace)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_RESTART</span></tt></td>
+<td>再起動 (Restart)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_RESUME</span></tt></td>
+<td>再開 (Resume)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SAVE</span></tt></td>
+<td>保存 (Save)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SBEG</span></tt></td>
+<td>シフト付き開始 Beg</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SCANCEL</span></tt></td>
+<td>シフト付きキャンセル Cancel</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SCOMMAND</span></tt></td>
+<td>シフト付き Command</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SCOPY</span></tt></td>
+<td>シフト付き Copy</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SCREATE</span></tt></td>
+<td>シフト付き Create</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SDC</span></tt></td>
+<td>シフト付き Delete char</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SDL</span></tt></td>
+<td>シフト付き Delete line</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SELECT</span></tt></td>
+<td>選択 (Select)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SEND</span></tt></td>
+<td>シフト付き End</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SEOL</span></tt></td>
+<td>シフト付き Clear line</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SEXIT</span></tt></td>
+<td>シフト付き Dxit</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SFIND</span></tt></td>
+<td>シフト付き Find</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SHELP</span></tt></td>
+<td>シフト付き Help</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SHOME</span></tt></td>
+<td>シフト付き Home</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SIC</span></tt></td>
+<td>シフト付き Input</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SLEFT</span></tt></td>
+<td>シフト付き Left arrow</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SMESSAGE</span></tt></td>
+<td>シフト付き Message</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SMOVE</span></tt></td>
+<td>シフト付き Move</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SNEXT</span></tt></td>
+<td>シフト付き Next</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SOPTIONS</span></tt></td>
+<td>シフト付き Options</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SPREVIOUS</span></tt></td>
+<td>シフト付き Prev</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SPRINT</span></tt></td>
+<td>シフト付き Print</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SREDO</span></tt></td>
+<td>シフト付き Redo</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SREPLACE</span></tt></td>
+<td>シフト付き Replace</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SRIGHT</span></tt></td>
+<td>シフト付き Right arrow</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SRSUME</span></tt></td>
+<td>シフト付き Resume</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SSAVE</span></tt></td>
+<td>シフト付き Save</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SSUSPEND</span></tt></td>
+<td>シフト付き Suspend</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_SUNDO</span></tt></td>
+<td>シフト付き Undo</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_SUSPEND</span></tt></td>
+<td>一時停止 (Suspend)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_UNDO</span></tt></td>
+<td>元に戻す (Undo)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_MOUSE</span></tt></td>
+<td>マウスイベント通知</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">KEY_RESIZE</span></tt></td>
+<td>端末リサイズイベント</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">KEY_MAX</span></tt></td>
+<td>最大キー値</td>
+</tr>
+</tbody>
+</table>
+<p>VT100 や、X 端末エミュレータのようなソフトウェアエミュレーションでは、通常少なくとも 4 つのファンクションキー (<tt class="xref py py-const docutils literal"><span class="pre">KEY_F1</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">KEY_F2</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">KEY_F3</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">KEY_F4</span></tt>) が利用可能で、矢印キーは
+<tt class="xref py py-const docutils literal"><span class="pre">KEY_UP</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">KEY_DOWN</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">KEY_LEFT</span></tt> および <tt class="xref py py-const docutils literal"><span class="pre">KEY_RIGHT</span></tt>
+が対応付けられています。計算機に PC キーボードが付属している場合、矢印キーと 12 個のファンクションキー (古い PC キーボードには 10 個しかファンクションキーがないかもしれません) が利用できると考えてよいでしょう; また、以下のキーパッド対応付けは標準的なものです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="62%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">キーキャップ</th>
+<th class="head">定数</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Insert</span></tt></td>
+<td>KEY_IC</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Delete</span></tt></td>
+<td>KEY_DC</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Home</span></tt></td>
+<td>KEY_HOME</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">End</span></tt></td>
+<td>KEY_END</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Page</span> <span class="pre">Up</span></tt></td>
+<td>KEY_NPAGE</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Page</span> <span class="pre">Down</span></tt></td>
+<td>KEY_PPAGE</td>
+</tr>
+</tbody>
+</table>
+<p>代用文字 (alternative character) セットを以下の表に列挙します。これらは VT100 端末から継承したものであり、X 端末のようなソフトウェアエミュレーション上で一般に利用可能なものです。グラフィックが利用できない場合、curses は印字可能 ASCII文字による粗雑な近似出力を行います。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">これらは <a class="reference internal" href="#curses.initscr" title="curses.initscr"><tt class="xref py py-func docutils literal"><span class="pre">initscr()</span></tt></a> が呼び出された後でしか利用できません。</p>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">ACS コード</th>
+<th class="head">意味</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_BBSS</span></tt></td>
+<td>右上角の別名</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_BLOCK</span></tt></td>
+<td>黒四角ブロック</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_BOARD</span></tt></td>
+<td>白四角ブロック</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_BSBS</span></tt></td>
+<td>水平線の別名</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_BSSB</span></tt></td>
+<td>左上角の別名</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_BSSS</span></tt></td>
+<td>上向き T 字罫線の別名</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_BTEE</span></tt></td>
+<td>下向き T 字罫線</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_BULLET</span></tt></td>
+<td>黒丸(bullet)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_CKBOARD</span></tt></td>
+<td>チェッカーボードパタン (点描)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_DARROW</span></tt></td>
+<td>下向き矢印</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_DEGREE</span></tt></td>
+<td>度</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_DIAMOND</span></tt></td>
+<td>ダイアモンド</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_GEQUAL</span></tt></td>
+<td>より大きいか等しい</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_HLINE</span></tt></td>
+<td>水平線</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_LANTERN</span></tt></td>
+<td>ランタン(lantern) シンボル</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_LARROW</span></tt></td>
+<td>left arrow</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_LEQUAL</span></tt></td>
+<td>より小さいか等しい</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_LLCORNER</span></tt></td>
+<td>左下角</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_LRCORNER</span></tt></td>
+<td>右下角</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_LTEE</span></tt></td>
+<td>left tee</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_NEQUAL</span></tt></td>
+<td>等号否定</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_PI</span></tt></td>
+<td>パイ記号</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_PLMINUS</span></tt></td>
+<td>プラスマイナス記号</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_PLUS</span></tt></td>
+<td>大プラス記号</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_RARROW</span></tt></td>
+<td>右向き矢印</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_RTEE</span></tt></td>
+<td>右向き T 字罫線</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_S1</span></tt></td>
+<td>scan line 1</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_S3</span></tt></td>
+<td>scan line 3</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_S7</span></tt></td>
+<td>scan line 7</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_S9</span></tt></td>
+<td>scan line 9</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_SBBS</span></tt></td>
+<td>右下角の別名</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_SBSB</span></tt></td>
+<td>垂直線の別名</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_SBSS</span></tt></td>
+<td>右向き T 字罫線の別名</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_SSBB</span></tt></td>
+<td>左下角の別名</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_SSBS</span></tt></td>
+<td>下向き T 字罫線の別名</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_SSSB</span></tt></td>
+<td>左向き T 字罫線の別名</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_SSSS</span></tt></td>
+<td>交差罫線または大プラス記号の別名</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_STERLING</span></tt></td>
+<td>ポンドスターリング記号</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_TTEE</span></tt></td>
+<td>上向き T 字罫線</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_UARROW</span></tt></td>
+<td>上向き矢印</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_ULCORNER</span></tt></td>
+<td>左上角</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ACS_URCORNER</span></tt></td>
+<td>右上角</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">ACS_VLINE</span></tt></td>
+<td>垂直線</td>
+</tr>
+</tbody>
+</table>
+<p>以下のテーブルは定義済みの色を列挙したものです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">定数</th>
+<th class="head">色</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COLOR_BLACK</span></tt></td>
+<td>黒</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COLOR_BLUE</span></tt></td>
+<td>青</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COLOR_CYAN</span></tt></td>
+<td>シアン (薄く緑がかった青)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COLOR_GREEN</span></tt></td>
+<td>緑</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COLOR_MAGENTA</span></tt></td>
+<td>マゼンタ (紫がかった赤)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COLOR_RED</span></tt></td>
+<td>赤</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">COLOR_WHITE</span></tt></td>
+<td>白</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">COLOR_YELLOW</span></tt></td>
+<td>黄色</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="module-curses.textpad">
+<span id="curses-textpad-curses"></span><h1>15.12. <a class="reference internal" href="#module-curses.textpad" title="curses.textpad: curses ウィンドウ内での Emacs ライクな入力編集機能。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.textpad</span></tt></a> &#8212; curses プログラムのためのテキスト入力ウィジェット<a class="headerlink" href="#module-curses.textpad" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.6 で追加.</span></p>
+<p><a class="reference internal" href="#module-curses.textpad" title="curses.textpad: curses ウィンドウ内での Emacs ライクな入力編集機能。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.textpad</span></tt></a> モジュールでは、curses ウィンドウ内での基本的なテキスト編集を処理し、Emacs に似た (すなわち
+Netscape Navigator,  BBedit 6.x, FrameMaker, その他諸々のプログラムとも似た) キーバインドをサポートしている
+<a class="reference internal" href="#curses.textpad.Textbox" title="curses.textpad.Textbox"><tt class="xref py py-class docutils literal"><span class="pre">Textbox</span></tt></a> クラスを提供します。このモジュールではまた、テキストボックスを枠で囲むなどの目的のために有用な、矩形描画関数を提供しています。</p>
+<p><a class="reference internal" href="#module-curses.textpad" title="curses.textpad: curses ウィンドウ内での Emacs ライクな入力編集機能。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.textpad</span></tt></a> モジュールでは以下の関数を定義しています:</p>
+<dl class="function">
+<dt id="curses.textpad.rectangle">
+<tt class="descclassname">curses.textpad.</tt><tt class="descname">rectangle</tt><big>(</big><em>win</em>, <em>uly</em>, <em>ulx</em>, <em>lry</em>, <em>lrx</em><big>)</big><a class="headerlink" href="#curses.textpad.rectangle" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>矩形を描画します。最初の引数はウィンドウオブジェクトでなければなりません; 残りの引数はそのウィンドウからの相対座標になります。 2 番目および 3
+番目の引数は描画すべき矩形の左上角の y および x 座標です; 4 番目および 5 番目の引数は右下角の y および x 座標です。矩形は、
+VT100/IBM PC におけるフォーム文字を利用できる端末(xterm やその他のほとんどのソフトウェア端末エミュレータを含む)
+ではそれを使って描画されます。そうでなければ ASCII 文字のダッシュ、垂直バー、およびプラス記号で描画されます。</p>
+</dd></dl>
+
+<div class="section" id="textbox">
+<span id="curses-textpad-objects"></span><h2>15.12.1. Textbox オブジェクト<a class="headerlink" href="#textbox" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下のような <a class="reference internal" href="#curses.textpad.Textbox" title="curses.textpad.Textbox"><tt class="xref py py-class docutils literal"><span class="pre">Textbox</span></tt></a> オブジェクトをインスタンス生成することができます:</p>
+<dl class="class">
+<dt id="curses.textpad.Textbox">
+<em class="property">class </em><tt class="descclassname">curses.textpad.</tt><tt class="descname">Textbox</tt><big>(</big><em>win</em><big>)</big><a class="headerlink" href="#curses.textpad.Textbox" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>テキストボックスウィジェットオブジェクトを返します。 <em>win</em> 引数は、テキストボックスを入れるための <tt class="xref py py-class docutils literal"><span class="pre">WindowObject</span></tt> でなければなりません。テキストボックスの編集カーソルは、最初はテキストボックスが入っているウィンドウの左上角に配置され、その座標は <tt class="docutils literal"><span class="pre">(0,</span> <span class="pre">0)</span></tt>
+です。インスタンスの <a class="reference internal" href="#curses.textpad.Textbox.stripspaces" title="curses.textpad.Textbox.stripspaces"><tt class="xref py py-attr docutils literal"><span class="pre">stripspaces</span></tt></a>  フラグの初期値はオンに設定されます。</p>
+<p><a class="reference internal" href="#curses.textpad.Textbox" title="curses.textpad.Textbox"><tt class="xref py py-class docutils literal"><span class="pre">Textbox</span></tt></a> オブジェクトは以下のメソッドを持ちます:</p>
+<dl class="method">
+<dt id="curses.textpad.Textbox.edit">
+<tt class="descname">edit</tt><big>(</big><span class="optional">[</span><em>validator</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#curses.textpad.Textbox.edit" title="この定義へのパーマリンク">¶</a></dt>
+<dd></dd></dl>
+
+<p>普段使うことになるエントリポイントです。終了キーストロークの一つが入力されるまで編集キーストロークを受け付けます。 <em>validator</em>
+を与える場合、関数でなければなりません。 <em>validator</em> はキーストロークが入力されるたびにそのキーストロークが引数となって呼び出されます;
+返された値に対して、コマンドキーストロークとして解釈が行われます。このメソッドはウィンドウの内容を文字列として返します;
+ウィンドウ内の空白が含められるかどうかは <a class="reference internal" href="#curses.textpad.Textbox.stripspaces" title="curses.textpad.Textbox.stripspaces"><tt class="xref py py-attr docutils literal"><span class="pre">stripspaces</span></tt></a> メンバで決められます。</p>
+<dl class="method">
+<dt id="curses.textpad.Textbox.do_command">
+<tt class="descname">do_command</tt><big>(</big><em>ch</em><big>)</big><a class="headerlink" href="#curses.textpad.Textbox.do_command" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>単一のコマンドキーストロークを処理します。以下にサポートされている特殊キーストロークを示します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">キーストローク</th>
+<th class="head">動作</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Control-A</span></tt></td>
+<td>ウィンドウの左端に移動します。</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Control-B</span></tt></td>
+<td>カーソルを左へ移動し、必要なら前の行に折り返します。</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Control-D</span></tt></td>
+<td>カーソル下の文字を削除します。</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Control-E</span></tt></td>
+<td>右端 (stripspaces がオフのとき) または行末 (stripspaces
+がオンのとき) に移動します。</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Control-F</span></tt></td>
+<td>カーソルを右に移動し、必要なら次の行に折り返します。</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Control-G</span></tt></td>
+<td>ウィンドウを終了し、その内容を返します。</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Control-H</span></tt></td>
+<td>逆方向に文字を削除します。(バックスペース)</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Control-J</span></tt></td>
+<td>ウィンドウが 1 行であれば終了し、そうでなければ新しい行を挿入します。</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Control-K</span></tt></td>
+<td>行が空白行ならその行全体を削除し、そうでなければカーソル以降行末までを消去します。</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Control-L</span></tt></td>
+<td>スクリーンを更新します。</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Control-N</span></tt></td>
+<td>カーソルを下に移動します; 1 行下に移動します。</td>
+</tr>
+<tr class="row-odd"><td><tt class="kbd docutils literal"><span class="pre">Control-O</span></tt></td>
+<td>カーソルの場所に空行を 1 行挿入します。</td>
+</tr>
+<tr class="row-even"><td><tt class="kbd docutils literal"><span class="pre">Control-P</span></tt></td>
+<td>カーソルを上に移動します; 1 行上に移動します。</td>
+</tr>
+</tbody>
+</table>
+<p>移動操作は、カーソルがウィンドウの縁にあって移動ができない場合には何も行いません。場合によっては、以下のような同義のキーストロークがサポートされています:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="57%" />
+<col width="43%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">定数</th>
+<th class="head">キーストローク</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">KEY_LEFT</span></tt></td>
+<td><tt class="kbd docutils literal"><span class="pre">Control-B</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">KEY_RIGHT</span></tt></td>
+<td><tt class="kbd docutils literal"><span class="pre">Control-F</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">KEY_UP</span></tt></td>
+<td><tt class="kbd docutils literal"><span class="pre">Control-P</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-const docutils literal"><span class="pre">KEY_DOWN</span></tt></td>
+<td><tt class="kbd docutils literal"><span class="pre">Control-N</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-const docutils literal"><span class="pre">KEY_BACKSPACE</span></tt></td>
+<td><tt class="kbd docutils literal"><span class="pre">Control-h</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>他のキーストロークは、与えられた文字を挿入し、(行折り返し付きで) 右に移動するコマンドとして扱われます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="curses.textpad.Textbox.gather">
+<tt class="descname">gather</tt><big>(</big><big>)</big><a class="headerlink" href="#curses.textpad.Textbox.gather" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドはウィンドウの内容を文字列として返します; ウィンドウ内の空白が含められるかどうかは
+<a class="reference internal" href="#curses.textpad.Textbox.stripspaces" title="curses.textpad.Textbox.stripspaces"><tt class="xref py py-attr docutils literal"><span class="pre">stripspaces</span></tt></a> メンバ変数で決められます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="curses.textpad.Textbox.stripspaces">
+<tt class="descname">stripspaces</tt><a class="headerlink" href="#curses.textpad.Textbox.stripspaces" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このデータメンバはウィンドウ内の空白領域の解釈方法を制御するためのフラグです。フラグがオンに設定されている場合、各行の末端にある空白領域は無視されます;
+すなわち、末端空白領域にカーソルが入ると、その場所の代わりに行の末尾にカーソルが移動します。また、末端の空白領域はウィンドウの内容を取得する際に剥ぎ取られます。</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-curses.wrapper">
+<span id="curses-wrapper-curses"></span><h1>15.13. <a class="reference internal" href="#module-curses.wrapper" title="curses.wrapper: curses プログラムのための端末設定ラッパ。"><tt class="xref py py-mod docutils literal"><span class="pre">curses.wrapper</span></tt></a> &#8212; curses プログラムのための端末ハンドラ<a class="headerlink" href="#module-curses.wrapper" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.6 で追加.</span></p>
+<p>このモジュールでは関数 <a class="reference internal" href="#curses.wrapper.wrapper" title="curses.wrapper.wrapper"><tt class="xref py py-func docutils literal"><span class="pre">wrapper()</span></tt></a> 一つを提供しています。これは curses 使用アプリケーションの残りの部分となるもう一つの関数です。アプリケーションが例外を送出した場合、 <a class="reference internal" href="#curses.wrapper.wrapper" title="curses.wrapper.wrapper"><tt class="xref py py-func docutils literal"><span class="pre">wrapper()</span></tt></a> は例外を再送出してトレースバックを生成する前に端末を正常な状態に復元します。</p>
+<dl class="function">
+<dt id="curses.wrapper.wrapper">
+<tt class="descclassname">curses.wrapper.</tt><tt class="descname">wrapper</tt><big>(</big><em>func</em>, <em>...</em><big>)</big><a class="headerlink" href="#curses.wrapper.wrapper" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>curses を初期化し、別の関数 <em>func</em> を呼び出、エラーが発生した場合には通常のキーボード／スクリーン動作に戻すラッパ関数です。呼び出し可能オブジェクト <em>func</em> は主ウィンドウの &#8216;stdscr&#8217; に対する最初の引数として渡されます。その他の引数は <a class="reference internal" href="#curses.wrapper.wrapper" title="curses.wrapper.wrapper"><tt class="xref py py-func docutils literal"><span class="pre">wrapper()</span></tt></a>
+に渡されます。</p>
+</dd></dl>
+
+<p>フック関数を呼び出す前に、 <a class="reference internal" href="#curses.wrapper.wrapper" title="curses.wrapper.wrapper"><tt class="xref py py-func docutils literal"><span class="pre">wrapper()</span></tt></a> は cbreak モードをオン、エコーをオフにし、端末キーパッドを有効にします。端末がカラーをサポートしている場合にはカラーを初期化します。 (通常終了も例外による終了も) 終了時には cooked モードに復元し、エコーをオンにし、端末キーパッドを無効化します。</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="curses.ascii.html" title="15.14. curses.ascii — ASCII 文字に関するユーティリティ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="getpass.html" title="15.10. getpass — 可搬性のあるパスワード入力機構"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="allos.html" >15. 汎用オペレーティングシステムサービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

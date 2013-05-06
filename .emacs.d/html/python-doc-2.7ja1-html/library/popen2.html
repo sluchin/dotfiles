@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>17.5. popen2 — アクセス可能な I/O ストリームを持つ子プロセス生成 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="17. プロセス間通信とネットワーク" href="ipc.html" />
+    <link rel="next" title="17.6. asyncore — 非同期ソケットハンドラ" href="asyncore.html" />
+    <link rel="prev" title="17.4. signal — 非同期イベントにハンドラを設定する" href="signal.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="asyncore.html" title="17.6. asyncore — 非同期ソケットハンドラ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="signal.html" title="17.4. signal — 非同期イベントにハンドラを設定する"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="ipc.html" accesskey="U">17. プロセス間通信とネットワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">17.5. <tt class="docutils literal"><span class="pre">popen2</span></tt> &#8212; アクセス可能な I/O ストリームを持つ子プロセス生成</a><ul>
+<li><a class="reference internal" href="#popen3-popen4">17.5.1. Popen3 および Popen4 オブジェクト</a></li>
+<li><a class="reference internal" href="#popen2-flow-control">17.5.2. フロー制御の問題</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="signal.html"
+                        title="前の章へ">17.4. <tt class="docutils literal"><span class="pre">signal</span></tt> &#8212; 非同期イベントにハンドラを設定する</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="asyncore.html"
+                        title="次の章へ">17.6. <tt class="docutils literal docutils literal docutils literal"><span class="pre">asyncore</span></tt> &#8212; 非同期ソケットハンドラ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/popen2.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-popen2">
+<span id="popen2-i-o"></span><h1>17.5. <a class="reference internal" href="#module-popen2" title="popen2: アクセス可能な I/O ストリームを持つ子プロセス生成。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">popen2</span></tt></a> &#8212; アクセス可能な I/O ストリームを持つ子プロセス生成<a class="headerlink" href="#module-popen2" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃: </span>このモジュールは時代遅れです。 <a class="reference internal" href="subprocess.html#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a> モジュールを利用してください。
+特に <a class="reference internal" href="subprocess.html#subprocess-replacements"><em>古い関数を subprocess モジュールで置き換える</em></a> 節を参照してください。</p>
+<p>このモジュールにより、Unix および Windows でプロセスを起動し、その入力／出力／エラー出力パイプに接続し、そのリターンコードを取得することができます。</p>
+<p><a class="reference internal" href="subprocess.html#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a> モジュールが、新しいプロセスを起動してその結果を受け取るためのより強力な仕組みを持っています。
+<a class="reference internal" href="#module-popen2" title="popen2: アクセス可能な I/O ストリームを持つ子プロセス生成。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">popen2</span></tt></a> モジュールよりも <a class="reference internal" href="subprocess.html#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a> モジュールを利用することが推奨されます。</p>
+<p>このモジュールで提供されている第一のインタフェースは 3 つのファクトリ関数です。これらの関数のいずれも、 <em>bufsize</em> を指定した場合、 I/O
+パイプのバッファサイズを決定します。 <em>mode</em> を指定する場合、文字列 <tt class="docutils literal"><span class="pre">'b'</span></tt> または <tt class="docutils literal"><span class="pre">'t'</span></tt>  でなければなりません; Windows
+では、ファイルオブジェクトをバイナリあるいはテキストモードのどちらで開くかを決めなければなりません。 <em>mode</em> の標準の値は <tt class="docutils literal"><span class="pre">'t'</span></tt> です。</p>
+<p>Unixでは <em>cmd</em> はシーケンスでもよく、その場合には (<a class="reference internal" href="os.html#os.spawnv" title="os.spawnv"><tt class="xref py py-func docutils literal"><span class="pre">os.spawnv()</span></tt></a> のように)引数はプログラムシェルを経由せず直接渡されます。
+<em>cmd</em> が文字列の場合、(<a class="reference internal" href="os.html#os.system" title="os.system"><tt class="xref py py-func docutils literal"><span class="pre">os.system()</span></tt></a> のように)シェルに渡されます。</p>
+<p>子プロセスからのリターンコードを取得するには、 <a class="reference internal" href="#popen2.Popen3" title="popen2.Popen3"><tt class="xref py py-class docutils literal"><span class="pre">Popen3</span></tt></a> および <a class="reference internal" href="#popen2.Popen4" title="popen2.Popen4"><tt class="xref py py-class docutils literal"><span class="pre">Popen4</span></tt></a> クラスの <tt class="xref py py-meth docutils literal"><span class="pre">poll()</span></tt>
+あるいは <tt class="xref py py-meth docutils literal"><span class="pre">wait()</span></tt> メソッドを使うしかありません; これらの機能は Unixでしか利用できません。この情報は <a class="reference internal" href="#module-popen2" title="popen2: アクセス可能な I/O ストリームを持つ子プロセス生成。 (撤廃)"><tt class="xref py py-func docutils literal"><span class="pre">popen2()</span></tt></a> 、
+<a class="reference internal" href="#popen2.popen3" title="popen2.popen3"><tt class="xref py py-func docutils literal"><span class="pre">popen3()</span></tt></a> 、および <a class="reference internal" href="#popen2.popen4" title="popen2.popen4"><tt class="xref py py-func docutils literal"><span class="pre">popen4()</span></tt></a> 関数、あるいは <a class="reference internal" href="os.html#module-os" title="os: 雑多なオペレーティングシステムインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">os</span></tt></a> モジュールにおける同等の関数の使用によっては得ることができません。 (<a class="reference internal" href="os.html#module-os" title="os: 雑多なオペレーティングシステムインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">os</span></tt></a> モジュールの関数から返されるタプルは <a class="reference internal" href="#module-popen2" title="popen2: アクセス可能な I/O ストリームを持つ子プロセス生成。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">popen2</span></tt></a> モジュールの関数から返されるものとは違う順序です。)</p>
+<dl class="function">
+<dt id="popen2.popen2">
+<tt class="descclassname">popen2.</tt><tt class="descname">popen2</tt><big>(</big><em>cmd</em><span class="optional">[</span>, <em>bufsize</em><span class="optional">[</span>, <em>mode</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#popen2.popen2" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>cmd</em> をサブプロセスとして実行します。ファイルオブジェクト <tt class="docutils literal"><span class="pre">(child_stdout,</span> <span class="pre">child_stdin)</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="popen2.popen3">
+<tt class="descclassname">popen2.</tt><tt class="descname">popen3</tt><big>(</big><em>cmd</em><span class="optional">[</span>, <em>bufsize</em><span class="optional">[</span>, <em>mode</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#popen2.popen3" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>cmd</em> をサブプロセスとして実行します。ファイルオブジェクト <tt class="docutils literal"><span class="pre">(child_stdout,</span> <span class="pre">child_stdin,</span> <span class="pre">child_stderr)</span></tt>
+を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="popen2.popen4">
+<tt class="descclassname">popen2.</tt><tt class="descname">popen4</tt><big>(</big><em>cmd</em><span class="optional">[</span>, <em>bufsize</em><span class="optional">[</span>, <em>mode</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#popen2.popen4" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>cmd</em> をサブプロセスとして実行します。ファイルオブジェクト <tt class="docutils literal"><span class="pre">(child_stdout_and_stderr,</span> <span class="pre">child_stdin)</span></tt>.</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<p>Unixでは、ファクトリ関数によって返されるオブジェクトを定義しているクラスも利用することができます。これらのオブジェクトは Windows 実装で使われていないため、そのプラットフォーム上で使うことはできません。</p>
+<dl class="class">
+<dt id="popen2.Popen3">
+<em class="property">class </em><tt class="descclassname">popen2.</tt><tt class="descname">Popen3</tt><big>(</big><em>cmd</em><span class="optional">[</span>, <em>capturestderr</em><span class="optional">[</span>, <em>bufsize</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#popen2.Popen3" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスは子プロセスを表現します。通常、 <a class="reference internal" href="#popen2.Popen3" title="popen2.Popen3"><tt class="xref py py-class docutils literal"><span class="pre">Popen3</span></tt></a> インスタンスは上で述べた <a class="reference internal" href="#module-popen2" title="popen2: アクセス可能な I/O ストリームを持つ子プロセス生成。 (撤廃)"><tt class="xref py py-func docutils literal"><span class="pre">popen2()</span></tt></a> および
+<a class="reference internal" href="#popen2.popen3" title="popen2.popen3"><tt class="xref py py-func docutils literal"><span class="pre">popen3()</span></tt></a>  ファクトリ関数を使って生成されます。</p>
+<p><a class="reference internal" href="#popen2.Popen3" title="popen2.Popen3"><tt class="xref py py-class docutils literal"><span class="pre">Popen3</span></tt></a> オブジェクトを生成するためにいずれかのヘルパー関数を使っていないのなら、 <em>cmd</em> パラメタは子プロセスで実行するシェルコマンドになります。 <em>capturestderr</em> フラグが真であれば、このオブジェクトが子プロセスの標準エラー出力を捕獲しなければならないことを意味します。標準の値は偽です。 <em>bufsize</em> パラメタが存在する場合、子プロセスへの／からの I/O バッファのサイズを指定します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="popen2.Popen4">
+<em class="property">class </em><tt class="descclassname">popen2.</tt><tt class="descname">Popen4</tt><big>(</big><em>cmd</em><span class="optional">[</span>, <em>bufsize</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#popen2.Popen4" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#popen2.Popen3" title="popen2.Popen3"><tt class="xref py py-class docutils literal"><span class="pre">Popen3</span></tt></a> に似ていますが、標準エラー出力を標準出力と同じファイルオブジェクトで捕獲します。このオブジェクトは通常
+<a class="reference internal" href="#popen2.popen4" title="popen2.popen4"><tt class="xref py py-func docutils literal"><span class="pre">popen4()</span></tt></a> で生成されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<div class="section" id="popen3-popen4">
+<span id="popen3-objects"></span><h2>17.5.1. Popen3 および Popen4 オブジェクト<a class="headerlink" href="#popen3-popen4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#popen2.Popen3" title="popen2.Popen3"><tt class="xref py py-class docutils literal"><span class="pre">Popen3</span></tt></a> および <a class="reference internal" href="#popen2.Popen4" title="popen2.Popen4"><tt class="xref py py-class docutils literal"><span class="pre">Popen4</span></tt></a> クラスのインスタンスは以下のメソッドを持ちます:</p>
+<dl class="method">
+<dt id="popen2.Popen3.poll">
+<tt class="descclassname">Popen3.</tt><tt class="descname">poll</tt><big>(</big><big>)</big><a class="headerlink" href="#popen2.Popen3.poll" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスがまだ終了していない際には <tt class="docutils literal"><span class="pre">-1</span></tt> を、そうでない場合にはステータスコード (<a class="reference internal" href="#popen2.Popen3.wait" title="popen2.Popen3.wait"><tt class="xref py py-meth docutils literal"><span class="pre">wait()</span></tt></a> を参照) を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="popen2.Popen3.wait">
+<tt class="descclassname">Popen3.</tt><tt class="descname">wait</tt><big>(</big><big>)</big><a class="headerlink" href="#popen2.Popen3.wait" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスの状態コード出力を待機して返します。状態コードでは子プロセスのリターンコードと、プロセスが <tt class="xref c c-func docutils literal"><span class="pre">exit()</span></tt> によって終了したか、あるいはシグナルによって死んだかについての情報を符号化しています。状態コードの解釈を助けるための関数は <a class="reference internal" href="os.html#module-os" title="os: 雑多なオペレーティングシステムインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">os</span></tt></a>
+モジュールで定義されています;  <a class="reference internal" href="os.html#os-process"><em>プロセス管理</em></a> 節の <tt class="xref py py-func docutils literal"><span class="pre">W*()</span></tt> 関数ファミリを参照してください。</p>
+</dd></dl>
+
+<p>以下の属性も利用可能です:</p>
+<dl class="attribute">
+<dt id="popen2.Popen3.fromchild">
+<tt class="descclassname">Popen3.</tt><tt class="descname">fromchild</tt><a class="headerlink" href="#popen2.Popen3.fromchild" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスからの出力を提供するファイルオブジェクトです。 <tt class="xref py py-class docutils literal"><span class="pre">Poepn4</span></tt> インスタンスの場合、この値は標準出力と標準エラー出力の両方を提供するオブジェクトになります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="popen2.Popen3.tochild">
+<tt class="descclassname">Popen3.</tt><tt class="descname">tochild</tt><a class="headerlink" href="#popen2.Popen3.tochild" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスへの入力を提供するファイルオブジェクトです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="popen2.Popen3.childerr">
+<tt class="descclassname">Popen3.</tt><tt class="descname">childerr</tt><a class="headerlink" href="#popen2.Popen3.childerr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンストラクタに <em>capturestderr</em> を渡した際には子プロセスからの標準エラー出力を提供するファイルオブジェクトで、そうでない場合
+<tt class="docutils literal"><span class="pre">None</span></tt> になります。 <a class="reference internal" href="#popen2.Popen4" title="popen2.Popen4"><tt class="xref py py-class docutils literal"><span class="pre">Popen4</span></tt></a> インスタンスでは、この値は常に <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="popen2.Popen3.pid">
+<tt class="descclassname">Popen3.</tt><tt class="descname">pid</tt><a class="headerlink" href="#popen2.Popen3.pid" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスのプロセス番号です。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="popen2-flow-control">
+<span id="id1"></span><h2>17.5.2. フロー制御の問題<a class="headerlink" href="#popen2-flow-control" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>何らかの形式でプロセス間通信を利用している際には常に、制御フローについて注意深く考える必要があります。これはこのモジュール (あるいは <a class="reference internal" href="os.html#module-os" title="os: 雑多なオペレーティングシステムインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">os</span></tt></a>
+モジュールにおける等価な機能) で生成されるファイルオブジェクトの場合にもあてはまります。</p>
+<p>親プロセスが子プロセスの標準出力を読み出している一方で、子プロセスが大量のデータを標準エラー出力に書き込んでいる場合、この子プロセスから出力を読み出そうとするとデッドロックが発生します。同様の状況は読み書きの他の組み合わせでも生じます。本質的な要因は、一方のプロセスが別のプロセスでブロック型の読み出しをしている際に、 <tt class="xref py py-const docutils literal"><span class="pre">_PC_PIPE_BUF</span></tt>
+バイトを超えるデータがブロック型の入出力を行うプロセスによって書き込まれることにあります。</p>
+<p>こうした状況を扱うには幾つかのやりかたがあります。</p>
+<p>多くの場合、もっとも単純なアプリケーションに対する変更は、親プロセスで以下のようなモデル:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">popen2</span>
+
+<span class="n">r</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">popen2</span><span class="o">.</span><span class="n">popen3</span><span class="p">(</span><span class="s">&#39;python slave.py&#39;</span><span class="p">)</span>
+<span class="n">e</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="n">r</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="n">r</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">e</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">w</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>に従うようにし、子プロセスで以下:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c"># note that each of these print statements</span>
+<span class="c"># writes a single long string</span>
+
+<span class="k">print</span> <span class="o">&gt;&gt;</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="mi">400</span> <span class="o">*</span> <span class="s">&#39;this is a test</span><span class="se">\n</span><span class="s">&#39;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+<span class="k">print</span> <span class="o">&gt;&gt;</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">400</span> <span class="o">*</span> <span class="s">&#39;this is another test</span><span class="se">\n</span><span class="s">&#39;</span>
+</pre></div>
+</div>
+<p>のようなコードにすることでしょう。</p>
+<p>とりわけ、 <tt class="docutils literal"><span class="pre">sys.stderr</span></tt> は全てのデータを書き込んた後に閉じられなければならないということに注意してください。さもなければ、
+<tt class="xref py py-meth docutils literal"><span class="pre">readlines()</span></tt> は返ってきません。また、 <tt class="docutils literal"><span class="pre">sys.stderr.close()</span></tt> が <tt class="docutils literal"><span class="pre">stderr</span></tt> を閉じないように
+<a class="reference internal" href="os.html#os.close" title="os.close"><tt class="xref py py-func docutils literal"><span class="pre">os.close()</span></tt></a> を使わなければならないことにも注意してください。 (そうでなく、 <tt class="docutils literal"><span class="pre">sys.stderr</span></tt>
+に関連付けると、暗黙のうちに閉じられてしまうので、それ以降のエラーが出力されません)。</p>
+<p>より一般的なアプローチをサポートする必要があるアプリケーションでは、パイプ経由の I/O を <a class="reference internal" href="select.html#module-select" title="select: 複数のストリームに対して I/O 処理の完了を待機します。"><tt class="xref py py-func docutils literal"><span class="pre">select()</span></tt></a> ループでまとめるか、個々の
+<tt class="xref py py-func docutils literal"><span class="pre">popen*()</span></tt> 関数や <tt class="xref py py-class docutils literal"><span class="pre">Popen*</span></tt> クラスが提供する各々のファイルに対して、個別のスレッドを使って読み出しを行います。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="subprocess.html#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a></dt>
+<dd>子プロセスの起動と管理のためのモジュール</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="asyncore.html" title="17.6. asyncore — 非同期ソケットハンドラ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="signal.html" title="17.4. signal — 非同期イベントにハンドラを設定する"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="ipc.html" >17. プロセス間通信とネットワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

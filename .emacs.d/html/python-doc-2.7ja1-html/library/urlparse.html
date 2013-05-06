@@ -1,0 +1,492 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>20.16. urlparse — URL を解析して構成要素にする &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="20. インターネットプロトコルとその支援" href="internet.html" />
+    <link rel="next" title="20.17. SocketServer — ネットワークサーバ構築のためのフレームワーク" href="socketserver.html" />
+    <link rel="prev" title="20.15. uuid — RFC 4122 に準拠した UUID オブジェクト" href="uuid.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="socketserver.html" title="20.17. SocketServer — ネットワークサーバ構築のためのフレームワーク"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="uuid.html" title="20.15. uuid — RFC 4122 に準拠した UUID オブジェクト"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" accesskey="U">20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">20.16. <tt class="docutils literal"><span class="pre">urlparse</span></tt> &#8212; URL を解析して構成要素にする</a><ul>
+<li><a class="reference internal" href="#urlparse-urlsplit">20.16.1. <tt class="docutils literal"><span class="pre">urlparse()</span></tt> および <tt class="docutils literal"><span class="pre">urlsplit()</span></tt> の結果</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="uuid.html"
+                        title="前の章へ">20.15. <tt class="docutils literal docutils literal"><span class="pre">uuid</span></tt> &#8212; RFC 4122 に準拠した UUID オブジェクト</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="socketserver.html"
+                        title="次の章へ">20.17. <tt class="docutils literal docutils literal docutils literal"><span class="pre">SocketServer</span></tt> &#8212; ネットワークサーバ構築のためのフレームワーク</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/urlparse.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-urlparse">
+<span id="urlparse-url"></span><h1>20.16. <a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-mod docutils literal"><span class="pre">urlparse</span></tt></a> &#8212; URL を解析して構成要素にする<a class="headerlink" href="#module-urlparse" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<span class="target" id="index-0"></span><div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-mod docutils literal"><span class="pre">urlparse</span></tt></a> モジュールは Python 3 では <tt class="xref py py-mod docutils literal"><span class="pre">urllib.parse</span></tt> にリネームされました。
+<a class="reference internal" href="../glossary.html#term-to3"><em class="xref std std-term">2to3</em></a> ツールはソースコードのimportを自動的に Python 3 用に修正します。</p>
+</div>
+<p>このモジュールでは URL (Uniform Resource Locator) 文字列をその構成要素 (アドレススキーム、ネットワーク上の位置、パスその他)
+に分解したり、構成要素を URL に組みなおしたり、&#8221;相対 URL (relative URL)&#8221; を指定した &#8220;基底 URL (base URL)&#8221;
+に基づいて絶対 URL に変換するための標準的なインタフェースを定義しています。</p>
+<p>このモジュールは相対 URL のインターネット RFC に対応するように設計されました (そして RFC の初期ドラフトのバグを発見しました！)。サポートされる URL スキームは以下の通りです: <tt class="docutils literal"><span class="pre">file</span></tt>, <tt class="docutils literal"><span class="pre">ftp</span></tt>, <tt class="docutils literal"><span class="pre">gopher</span></tt>, <tt class="docutils literal"><span class="pre">hdl</span></tt>, <tt class="docutils literal"><span class="pre">http</span></tt>,
+<tt class="docutils literal"><span class="pre">https</span></tt>, <tt class="docutils literal"><span class="pre">imap</span></tt>, <tt class="docutils literal"><span class="pre">mailto</span></tt>, <tt class="docutils literal"><span class="pre">mms</span></tt>, <tt class="docutils literal"><span class="pre">news</span></tt>,  <tt class="docutils literal"><span class="pre">nntp</span></tt>, <tt class="docutils literal"><span class="pre">prospero</span></tt>,
+<tt class="docutils literal"><span class="pre">rsync</span></tt>, <tt class="docutils literal"><span class="pre">rtsp</span></tt>, <tt class="docutils literal"><span class="pre">rtspu</span></tt>,  <tt class="docutils literal"><span class="pre">sftp</span></tt>, <tt class="docutils literal"><span class="pre">shttp</span></tt>, <tt class="docutils literal"><span class="pre">sip</span></tt>, <tt class="docutils literal"><span class="pre">sips</span></tt>,
+<tt class="docutils literal"><span class="pre">snews</span></tt>, <tt class="docutils literal"><span class="pre">svn</span></tt>,  <tt class="docutils literal"><span class="pre">svn+ssh</span></tt>, <tt class="docutils literal"><span class="pre">telnet</span></tt>, <tt class="docutils literal"><span class="pre">wais</span></tt> 。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加: </span><tt class="docutils literal"><span class="pre">sftp</span></tt> および <tt class="docutils literal"><span class="pre">sips</span></tt> スキームのサポートが追加されました.</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/urlparse.py?view=markup">urlparse module Python source code</a></p>
+</div>
+<p><a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-mod docutils literal"><span class="pre">urlparse</span></tt></a> モジュールには以下の関数が定義されています。</p>
+<dl class="function">
+<dt id="urlparse.urlparse">
+<tt class="descclassname">urlparse.</tt><tt class="descname">urlparse</tt><big>(</big><em>urlstring</em><span class="optional">[</span>, <em>scheme</em><span class="optional">[</span>, <em>allow_fragments</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urlparse.urlparse" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>URL を解釈して 6 つの構成要素にし、6 要素のタプルを返します。このタプルは URL の一般的な構造:
+<tt class="docutils literal"><span class="pre">scheme://netloc/path;parameters?query#fragment</span></tt> に対応しています。各タプル要素は文字列で、空の場合もあります。構成要素がさらに小さい要素に分解されることはありません (例えばネットワーク上の位置は単一の文字列になります)。また % によるエスケープは展開されません。上で示された区切り文字がタプルの各要素の一部分として含まれることはありませんが、 <em>path</em> 要素の先頭のスラッシュがある場合には例外です。たとえば以下のようになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="s">&#39;http://www.cwi.nl:80/</span><span class="si">%7E</span><span class="s">guido/Python.html&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span>   <span class="c"># doctest: +NORMALIZE_WHITESPACE</span>
+<span class="go">ParseResult(scheme=&#39;http&#39;, netloc=&#39;www.cwi.nl:80&#39;, path=&#39;/%7Eguido/Python.html&#39;,</span>
+<span class="go">            params=&#39;&#39;, query=&#39;&#39;, fragment=&#39;&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">scheme</span>
+<span class="go">&#39;http&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">port</span>
+<span class="go">80</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">o</span><span class="o">.</span><span class="n">geturl</span><span class="p">()</span>
+<span class="go">&#39;http://www.cwi.nl:80/%7Eguido/Python.html&#39;</span>
+</pre></div>
+</div>
+<p><span class="target" id="index-1"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1808.html"><strong>RFC 1808</strong></a> にある文法仕様に基づき、 urlparse は &#8216;//&#8217; で始まる場合にのみ
+netloc を認識します。それ以外の場合は、入力は相対URLであると推定され、
+path 部分で始まることになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlparse</span><span class="p">(</span><span class="s">&#39;//www.cwi.nl:80/</span><span class="si">%7E</span><span class="s">guido/Python.html&#39;</span><span class="p">)</span>
+<span class="go">ParseResult(scheme=&#39;&#39;, netloc=&#39;www.cwi.nl:80&#39;, path=&#39;/%7Eguido/Python.html&#39;,</span>
+<span class="go">           params=&#39;&#39;, query=&#39;&#39;, fragment=&#39;&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlparse</span><span class="p">(</span><span class="s">&#39;www.cwi.nl:80/</span><span class="si">%7E</span><span class="s">guido/Python.html&#39;</span><span class="p">)</span>
+<span class="go">ParseResult(scheme=&#39;&#39;, netloc=&#39;&#39;, path=&#39;www.cwi.nl:80/%7Eguido/Python.html&#39;,</span>
+<span class="go">           params=&#39;&#39;, query=&#39;&#39;, fragment=&#39;&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urlparse</span><span class="p">(</span><span class="s">&#39;help/Python.html&#39;</span><span class="p">)</span>
+<span class="go">ParseResult(scheme=&#39;&#39;, netloc=&#39;&#39;, path=&#39;help/Python.html&#39;, params=&#39;&#39;,</span>
+<span class="go">           query=&#39;&#39;, fragment=&#39;&#39;)</span>
+</pre></div>
+</div>
+<p><em>scheme</em> 引数が指定されている場合、標準のアドレススキームを表し、アドレススキームを指定していない URL に対してのみ使われます。この引数の標準の値は空文字列です。</p>
+<p><em>allow_fragments</em> 引数が偽の場合、URL のアドレススキームがフラグメント指定をサポートしていても指定できなくなります。この引数の標準の値は <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> です。</p>
+<p>戻り値は実際には <a class="reference internal" href="functions.html#tuple" title="tuple"><tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></a> のサブクラスのインスタンスです。このクラスには以下の読み出し専用の便利な属性が追加されています。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="13%" />
+<col width="40%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">属性</th>
+<th class="head">インデクス</th>
+<th class="head">値</th>
+<th class="head">指定されなかった場合の値</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">scheme</span></tt></td>
+<td>0</td>
+<td>URL スキーム</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">netloc</span></tt></td>
+<td>1</td>
+<td>ネットワーク上の位置</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">path</span></tt></td>
+<td>2</td>
+<td>階層的パス</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">params</span></tt></td>
+<td>3</td>
+<td>最後のパス要素に対するパラメータ</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">query</span></tt></td>
+<td>4</td>
+<td>クエリ要素</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">fragment</span></tt></td>
+<td>5</td>
+<td>フラグメント指定子</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">username</span></tt></td>
+<td>&nbsp;</td>
+<td>ユーザ名</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">password</span></tt></td>
+<td>&nbsp;</td>
+<td>パスワード</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">hostname</span></tt></td>
+<td>&nbsp;</td>
+<td>ホスト名 (小文字)</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">port</span></tt></td>
+<td>&nbsp;</td>
+<td>ポート番号を表わす整数 (もしあれば)</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>結果オブジェクトのより詳しい情報は <a class="reference internal" href="#urlparse-result-object"><em>urlparse() および urlsplit() の結果</em></a> 節を参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>戻り値に属性が追加されました.</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>IPv6 の URL パースに対応しました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urlparse.parse_qs">
+<tt class="descclassname">urlparse.</tt><tt class="descname">parse_qs</tt><big>(</big><em>qs</em><span class="optional">[</span>, <em>keep_blank_values</em><span class="optional">[</span>, <em>strict_parsing</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urlparse.parse_qs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列引数として渡されたクエリ文字列  (<em class="mimetype">application/x-www-form-urlencoded</em> 型のデータ)
+を解釈します。解釈されたデータを辞書として返します。辞書のキーは一意なクエリ変数名で、値は各変数名に対する値からなるリストです。</p>
+<p>オプションの引数 <em>keep_blank_values</em> は、パーセントエンコードされたクエリの中の値が入っていないクエリの値を空白文字列と見なすかどうかを示すフラグです。値が真であれば、値の入っていないフィールドは空文字列のままになります。標準では偽で、値の入っていないフィールドを無視し、そのフィールドはクエリに含まれていないものとして扱います。</p>
+<p>オプションの引数 <em>strict_pasing</em> はパース時のエラーをどう扱うかを決めるフラグです。値が偽なら (標準の設定です)、エラーは暗黙のうちに無視します。値が真なら <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a>  例外を送出します。</p>
+<p>辞書等をクエリ文字列に変換する場合は <tt class="xref py py-func docutils literal"><span class="pre">urllib.</span> <span class="pre">urlencode()</span></tt> 関数を使用してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加: </span><a class="reference internal" href="cgi.html#module-cgi" title="cgi: PythonスクリプトをCGIとして実行するためのヘルパー"><tt class="xref py py-mod docutils literal"><span class="pre">cgi</span></tt></a> モジュールからコピーされてきました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urlparse.parse_qsl">
+<tt class="descclassname">urlparse.</tt><tt class="descname">parse_qsl</tt><big>(</big><em>qs</em><span class="optional">[</span>, <em>keep_blank_values</em><span class="optional">[</span>, <em>strict_parsing</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urlparse.parse_qsl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列引数として渡されたクエリ文字列  (<em class="mimetype">application/x-www-form-urlencoded</em> 型のデータ) を解釈します。解釈されたデータは名前と値のペアからなるリストです。</p>
+<p>オプションの引数 <em>keep_blank_values</em> は、パーセントエンコードされたクエリ中で値の入っていないものを空文字列と見なすかどうかを示すフラグです。値が真であれば、値の入っていないフィールドは空文字列のままになります。標準では偽で、値の入っていないフィールドを無視し、そのフィールドはクエリに含まれていないものとして扱います。</p>
+<p>オプションの引数 <em>strict_pasing</em> はパース時のエラーをどう扱うかを決めるフラグです。値が偽なら (標準の設定です)、エラーは暗黙のうちに無視します。値が真なら <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a>  例外を送出します。</p>
+<p>ペアのリストからクエリ文字列を生成する場合には <a class="reference internal" href="urllib.html#module-urllib" title="urllib: URL による任意のネットワークリソースへのアクセス (socket が必要です)。"><tt class="xref py py-mod docutils literal"><span class="pre">urllib</span></tt></a>.urlencode() 関数を使用します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加: </span><a class="reference internal" href="cgi.html#module-cgi" title="cgi: PythonスクリプトをCGIとして実行するためのヘルパー"><tt class="xref py py-mod docutils literal"><span class="pre">cgi</span></tt></a> モジュールからコピーされてきました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urlparse.urlunparse">
+<tt class="descclassname">urlparse.</tt><tt class="descname">urlunparse</tt><big>(</big><em>parts</em><big>)</big><a class="headerlink" href="#urlparse.urlunparse" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">urlparse()</span></tt> が返すような形式のタプルから URL を構築します。
+<em>parts</em> 引数は任意の 6 要素イテラブルです。解析された元の URL が、不要な区切り文字を持っていた場合には、多少違いはあるが等価な URL になるかもしれません。 (例えばクエリ内容が空の ?
+のようなもので、RFC はこれらを等価だと述べています。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urlparse.urlsplit">
+<tt class="descclassname">urlparse.</tt><tt class="descname">urlsplit</tt><big>(</big><em>urlstring</em><span class="optional">[</span>, <em>scheme</em><span class="optional">[</span>, <em>allow_fragments</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#urlparse.urlsplit" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-func docutils literal"><span class="pre">urlparse()</span></tt></a> に似ていますが、URL から params を切り離しません。このメソッドは通常、URL の <em>path</em>
+部分において、各セグメントにパラメタ指定をできるようにした最近の URL 構文 (<span class="target" id="index-2"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2396.html"><strong>RFC 2396</strong></a> 参照) が必要な場合に、 <a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-func docutils literal"><span class="pre">urlparse()</span></tt></a> の代わりに使われます。パスセグメントとパラメタを分割するためには分割用の関数が必要です。この関数は 5
+要素のタプル: (アドレススキーム、ネットワーク上の位置、パス、クエリ、フラグメント指定子)  を返します。</p>
+<p>戻り値は実際には <a class="reference internal" href="functions.html#tuple" title="tuple"><tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></a> のサブクラスのインスタンスです。このクラスには以下の読み出し専用の便利な属性が追加されています。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="13%" />
+<col width="40%" />
+<col width="28%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">属性</th>
+<th class="head">インデクス</th>
+<th class="head">値</th>
+<th class="head">指定されなかった場合の値</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">scheme</span></tt></td>
+<td>0</td>
+<td>URL スキーム</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">netloc</span></tt></td>
+<td>1</td>
+<td>ネットワーク上の位置</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">path</span></tt></td>
+<td>2</td>
+<td>階層的パス</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">query</span></tt></td>
+<td>3</td>
+<td>クエリ要素</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">fragment</span></tt></td>
+<td>4</td>
+<td>フラグメント指定子</td>
+<td>空文字列</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">username</span></tt></td>
+<td>&nbsp;</td>
+<td>ユーザ名</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">password</span></tt></td>
+<td>&nbsp;</td>
+<td>パスワード</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">hostname</span></tt></td>
+<td>&nbsp;</td>
+<td>ホスト名 (小文字)</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">port</span></tt></td>
+<td>&nbsp;</td>
+<td>ポート番号を表わす整数 (もしあれば)</td>
+<td><a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p>結果オブジェクトのより詳しい情報は <a class="reference internal" href="#urlparse-result-object"><em>urlparse() および urlsplit() の結果</em></a> 節を参照してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>戻り値に属性が追加されました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urlparse.urlunsplit">
+<tt class="descclassname">urlparse.</tt><tt class="descname">urlunsplit</tt><big>(</big><em>parts</em><big>)</big><a class="headerlink" href="#urlparse.urlunsplit" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">urlsplit()</span></tt> が返すような形式のタプル中のエレメントを組み合わせて、文字列の完全な URL にします。 <em>parts</em> 引数は任意の 5
+要素イテラブルです。解析された元の URL が、不要な区切り文字を持っていた場合には、多少違いはあるが等価な URL になるかもしれません。
+(例えばクエリ内容が空の ? のようなもので、RFC はこれらを等価だと述べています。)</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urlparse.urljoin">
+<tt class="descclassname">urlparse.</tt><tt class="descname">urljoin</tt><big>(</big><em>base</em>, <em>url</em><span class="optional">[</span>, <em>allow_fragments</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#urlparse.urljoin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;基底 URL&#8221;(<em>base</em>)と別のURL(<em>url</em>)を組み合わせて、完全な URL (&#8220;絶対 URL&#8221;) を構成します。ぶっちゃけ、この関数は基底 URL の要素、特にアドレススキーム、ネットワーク上の位置、およびパス (の一部) を使って、相対 URL にない要素を提供します。以下の例のようになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">urlparse</span> <span class="kn">import</span> <span class="n">urljoin</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">urljoin</span><span class="p">(</span><span class="s">&#39;http://www.cwi.nl/</span><span class="si">%7E</span><span class="s">guido/Python.html&#39;</span><span class="p">,</span> <span class="s">&#39;FAQ.html&#39;</span><span class="p">)</span>
+<span class="go">&#39;http://www.cwi.nl/%7Eguido/FAQ.html&#39;</span>
+</pre></div>
+</div>
+<p><em>allow_fragments</em> 引数は <tt class="docutils literal"><span class="pre">urlparse()</span></tt> における引数と同じ意味とデフォルトを持ちます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><em>url</em> が(<tt class="docutils literal"><span class="pre">//</span></tt> か <tt class="docutils literal"><span class="pre">scheme://</span></tt> で始まっている)絶対URLであれば、その <em>url</em> のホスト名と/もしくは scheme は、結果に反映されます。例えば:</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">urljoin</span><span class="p">(</span><span class="s">&#39;http://www.cwi.nl/</span><span class="si">%7E</span><span class="s">guido/Python.html&#39;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s">&#39;//www.python.org/</span><span class="si">%7E</span><span class="s">guido&#39;</span><span class="p">)</span>
+<span class="go">&#39;http://www.python.org/%7Eguido&#39;</span>
+</pre></div>
+</div>
+<p>もしこの動作が望みのものでない場合は、 <em>url</em> を <a class="reference internal" href="#urlparse.urlsplit" title="urlparse.urlsplit"><tt class="xref py py-func docutils literal"><span class="pre">urlsplit()</span></tt></a> と <a class="reference internal" href="#urlparse.urlunsplit" title="urlparse.urlunsplit"><tt class="xref py py-func docutils literal"><span class="pre">urlunsplit()</span></tt></a>
+で先に処理して、 <em>scheme</em> と <em>netloc</em> を削除してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="urlparse.urldefrag">
+<tt class="descclassname">urlparse.</tt><tt class="descname">urldefrag</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#urlparse.urldefrag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>url</em> がフラグメント指定子を含む場合、フラグメント指定子を持たないバージョンに修正された <em>url</em> と、別の文字列に分割されたフラグメント指定子を返します。 <em>url</em> 中にフラグメント指定子がない場合、そのままの <em>url</em> と空文字列を返します。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><span class="target" id="index-3"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3986.html"><strong>RFC 3986</strong></a> - Uniform Resource Identifiers</dt>
+<dd>これが現在の標準規格(STD66)です。 urlparse モジュールに対するすべての変更は、この規格を確認しなければなりません。後方互換性のため、あるいは、メジャーなブラウザに見られる事実上標準となった
+URL 解析への要求のために、この規格から外れている部分があります。</dd>
+<dt><span class="target" id="index-4"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2732.html"><strong>RFC 2732</strong></a> - Format for Literal IPv6 Addresses in URL&#8217;s.</dt>
+<dd>この規格は IPv6 の URL を解析するときの要求事項を記述しています。</dd>
+<dt><span class="target" id="index-5"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2396.html"><strong>RFC 2396</strong></a> - Uniform Resource Identifiers (URI): Generic Syntax</dt>
+<dd>この RFC では Uniform Resource Name (URN) と Uniform Resource Locator (URL)
+の両方に対する一般的な文法的要求事項を記述しています。</dd>
+<dt><span class="target" id="index-6"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2368.html"><strong>RFC 2368</strong></a> - The mailto URL scheme.</dt>
+<dd>mailto URL スキームに対する文法的要求事項.</dd>
+<dt><span class="target" id="index-7"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1808.html"><strong>RFC 1808</strong></a> - Relative Uniform Resource Locators</dt>
+<dd>この RFC には絶対 URL と相対 URL を結合するための規則がボーダケースの取扱い方を決定する &#8220;異常な例&#8221; つきで収められています。</dd>
+<dt><span class="target" id="index-8"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1738.html"><strong>RFC 1738</strong></a> - Uniform Resource Locators (URL)</dt>
+<dd>この RFC では絶対 URL の形式的な文法と意味付けを仕様化しています。</dd>
+</dl>
+</div>
+<div class="section" id="urlparse-urlsplit">
+<span id="urlparse-result-object"></span><h2>20.16.1. <a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-func docutils literal"><span class="pre">urlparse()</span></tt></a> および <a class="reference internal" href="#urlparse.urlsplit" title="urlparse.urlsplit"><tt class="xref py py-func docutils literal"><span class="pre">urlsplit()</span></tt></a> の結果<a class="headerlink" href="#urlparse-urlsplit" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-func docutils literal"><span class="pre">urlparse()</span></tt></a> および <a class="reference internal" href="#urlparse.urlsplit" title="urlparse.urlsplit"><tt class="xref py py-func docutils literal"><span class="pre">urlsplit()</span></tt></a> から得られる結果オブジェクトはそれぞれ <a class="reference internal" href="functions.html#tuple" title="tuple"><tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></a>
+型のサブクラスです。これらのクラスはそれぞれの関数の説明の中で述べたような属性とともに、追加のメソッドを一つ提供しています。</p>
+<dl class="method">
+<dt id="urlparse.ParseResult.geturl">
+<tt class="descclassname">ParseResult.</tt><tt class="descname">geturl</tt><big>(</big><big>)</big><a class="headerlink" href="#urlparse.ParseResult.geturl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>再結合された形で元の URL の文字列を返します。この文字列は元の URL とは次のような点で異なるかもしれません。スキームは常に小文字に正規化されます。また空の要素は省略されます。特に、空のパラメータ、クエリ、フラグメント識別子は取り除かれます。</p>
+<p>このメソッドの結果は再び解析に回されたとしても不動点となります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">urlparse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s">&#39;HTTP://www.Python.org/doc/#&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r1</span><span class="o">.</span><span class="n">geturl</span><span class="p">()</span>
+<span class="go">&#39;http://www.Python.org/doc/&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">r1</span><span class="o">.</span><span class="n">geturl</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r2</span><span class="o">.</span><span class="n">geturl</span><span class="p">()</span>
+<span class="go">&#39;http://www.Python.org/doc/&#39;</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<p>以下のクラスが解析結果の実装を提供します。</p>
+<dl class="class">
+<dt id="urlparse.BaseResult">
+<em class="property">class </em><tt class="descclassname">urlparse.</tt><tt class="descname">BaseResult</tt><a class="headerlink" href="#urlparse.BaseResult" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>具体的な結果クラスたちの基底クラスです。このクラスがほとんどの属性の定義を与えます。しかし <tt class="xref py py-meth docutils literal"><span class="pre">geturl()</span></tt> メソッドは提供しません。このクラスは <a class="reference internal" href="functions.html#tuple" title="tuple"><tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></a> から派生していますが、 <a class="reference internal" href="../reference/datamodel.html#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> や <a class="reference internal" href="../reference/datamodel.html#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> をオーバーライドしません。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urlparse.ParseResult">
+<em class="property">class </em><tt class="descclassname">urlparse.</tt><tt class="descname">ParseResult</tt><big>(</big><em>scheme</em>, <em>netloc</em>, <em>path</em>, <em>params</em>, <em>query</em>, <em>fragment</em><big>)</big><a class="headerlink" href="#urlparse.ParseResult" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-urlparse" title="urlparse: URL の解析と構築"><tt class="xref py py-func docutils literal"><span class="pre">urlparse()</span></tt></a> の結果のための具体クラスです。 <a class="reference internal" href="../reference/datamodel.html#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> メソッドをオーバーライドして正しい個数の引数が引き渡されたことを確認するようにしています。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="urlparse.SplitResult">
+<em class="property">class </em><tt class="descclassname">urlparse.</tt><tt class="descname">SplitResult</tt><big>(</big><em>scheme</em>, <em>netloc</em>, <em>path</em>, <em>query</em>, <em>fragment</em><big>)</big><a class="headerlink" href="#urlparse.SplitResult" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#urlparse.urlsplit" title="urlparse.urlsplit"><tt class="xref py py-func docutils literal"><span class="pre">urlsplit()</span></tt></a> の結果のための具体クラスです。 <a class="reference internal" href="../reference/datamodel.html#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> メソッドをオーバーライドして正しい個数の引数が引き渡されたことを確認するようにしています。</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="socketserver.html" title="20.17. SocketServer — ネットワークサーバ構築のためのフレームワーク"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="uuid.html" title="20.15. uuid — RFC 4122 に準拠した UUID オブジェクト"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" >20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

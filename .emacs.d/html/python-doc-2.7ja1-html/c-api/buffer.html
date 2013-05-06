@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>buffer オブジェクトと memoryview オブジェクト &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="具象オブジェクト (concrete object) レイヤ" href="concrete.html" />
+    <link rel="next" title="タプルオブジェクト (tuple object)" href="tuple.html" />
+    <link rel="prev" title="Unicode オブジェクトと codec" href="unicode.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tuple.html" title="タプルオブジェクト (tuple object)"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="unicode.html" title="Unicode オブジェクトと codec"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" accesskey="U">具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">buffer オブジェクトと memoryview オブジェクト</a><ul>
+<li><a class="reference internal" href="#py-buffer">新スタイル Py_buffer 構造体</a></li>
+<li><a class="reference internal" href="#id1">バッファ関連関数</a></li>
+<li><a class="reference internal" href="#memoryview">memoryview オブジェクト</a></li>
+<li><a class="reference internal" href="#id2">旧スタイルバッファオブジェクト</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="unicode.html"
+                        title="前の章へ">Unicode オブジェクトと codec</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tuple.html"
+                        title="次の章へ">タプルオブジェクト (tuple object)</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/buffer.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="buffer-memoryview">
+<span id="bufferobjects"></span><h1>buffer オブジェクトと memoryview オブジェクト<a class="headerlink" href="#buffer-memoryview" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">C で実装された Python オブジェクトは、&#8221;バッファインタフェース (buffer interface)&#8221; と呼ばれる一連の関数を公開していることがあります。これらの関数は、あるオブジェクトのデータを生 (raw) のバイト列形式で公開するために使います。このオブジェクトの使い手は、バッファインタフェースを使うことで、オブジェクトをあらかじめコピーしておく必要なしに、オブジェクトのデータに直接アクセスできます。</p>
+<p>バッファインタフェースをサポートするオブジェクトの例として、文字列型とアレイ (array) 型の二つがあります。文字列オブジェクトは、その内容をバッファインタフェースのバイト単位形式で公開しています。アレイもその内容を公開していますが、注意する必要があるのはアレイの要素は複数バイトの値になりうる、ということです。</p>
+<p>バッファインタフェースの使い手の一例として、ファイルオブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">write()</span></tt> メソッドがあります。バッファインタフェースを介してバイト列を公開しているオブジェクトは全て、ファイルへの書き出しができます。オブジェクトのバッファインタフェースを操作し、対象となるオブジェクトからデータを返させる  <a class="reference internal" href="arg.html#PyArg_ParseTuple" title="PyArg_ParseTuple"><tt class="xref c c-func docutils literal"><span class="pre">PyArg_ParseTuple()</span></tt></a> には数多くのデータ書式化コードがあります。</p>
+<p>バージョン 1.6 から、Python は Python レベルのバッファオブジェクトと、
+C 言語レベルのバッファ API を提供しており、任意のビルトイン型やユーザー定義型はその文字列表現を公開することができます。しかし、両方共、幾つかの欠点のために廃止予定扱いされていて、
+Python 3.0 では公式に削除され、新しい C 言語レベルのバッファ API と新しい Python レベルの <a class="reference internal" href="../library/stdtypes.html#memoryview" title="memoryview"><tt class="xref py py-class docutils literal"><span class="pre">memoryview</span></tt></a> という名前のオブジェクトに置き換えられています。</p>
+<p>新しいバッファ API は Python 2.6 に逆移植されており、 <tt class="xref py py-class docutils literal"><span class="pre">memoryviews</span></tt>
+オブジェクトは Python 2.7 に逆移植されています。古いバージョンとの互換性が必要なければ、古いAPIの代わりにこれらを使うことをおすすめします。</p>
+<div class="section" id="py-buffer">
+<h2>新スタイル Py_buffer 構造体<a class="headerlink" href="#py-buffer" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="type">
+<dt id="Py_buffer">
+<tt class="descname">Py_buffer</tt><a class="headerlink" href="#Py_buffer" title="この定義へのパーマリンク">¶</a></dt>
+<dd><dl class="member">
+<dt id="Py_buffer.buf">
+void *<tt class="descname">buf</tt><a class="headerlink" href="#Py_buffer.buf" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オブジェクトのメモリの開始位置へのポインタ</p>
+</dd></dl>
+
+<dl class="member">
+<dt>
+Py_ssize_t <tt class="descname">len</tt></dt>
+<dd><p>メモリのトータルサイズ [byte]</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="Py_buffer.readonly">
+int <tt class="descname">readonly</tt><a class="headerlink" href="#Py_buffer.readonly" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バッファが読み込み専用かどうかを示す</p>
+</dd></dl>
+
+<dl class="member">
+<dt>
+const char *<tt class="descname">format</tt></dt>
+<dd><p>バッファを通してアクセスできる要素の形式を指定する、 <a class="reference internal" href="../library/struct.html#module-struct" title="struct: 文字列データをパックされたバイナリデータとして解釈する."><tt class="xref py py-mod docutils literal"><span class="pre">struct</span></tt></a>
+モジュールスタイル文法の、 <em>NULL</em> 終端文字列。このポインタの値が <em>NULL</em> なら、 <tt class="docutils literal"><span class="pre">&quot;B&quot;</span></tt> (符号無しバイト) として扱われます。</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="Py_buffer.ndim">
+int <tt class="descname">ndim</tt><a class="headerlink" href="#Py_buffer.ndim" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メモリが多次元配列を表している時の次元数。 0 の場合、 <tt class="xref c c-data docutils literal"><span class="pre">strides</span></tt>
+と <tt class="xref c c-data docutils literal"><span class="pre">suboffsets</span></tt> は <em>NULL</em> でなければなりません。</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="Py_buffer.shape">
+Py_ssize_t *<tt class="descname">shape</tt><a class="headerlink" href="#Py_buffer.shape" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メモリが多次元配列を表しているとき、その形を示す長さ <tt class="xref c c-data docutils literal"><span class="pre">ndim</span></tt> の
+<tt class="xref c c-type docutils literal"><span class="pre">Py_ssize_t</span></tt> の配列。
+<tt class="docutils literal"><span class="pre">((*shape)[0]</span> <span class="pre">*</span> <span class="pre">...</span> <span class="pre">*</span> <span class="pre">(*shape)[ndims-1])*itemsize</span></tt> は <tt class="xref c c-data docutils literal"><span class="pre">len</span></tt>
+と等しくなければならないことに気をつけてください。</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="Py_buffer.strides">
+Py_ssize_t *<tt class="descname">strides</tt><a class="headerlink" href="#Py_buffer.strides" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>各次元で次の要素を得るためにスキップするバイト数を示す、長さ <tt class="xref c c-data docutils literal"><span class="pre">ndim</span></tt>
+の <tt class="xref c c-type docutils literal"><span class="pre">Py_ssize_t</span></tt> の配列。</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="Py_buffer.suboffsets">
+Py_ssize_t *<tt class="descname">suboffsets</tt><a class="headerlink" href="#Py_buffer.suboffsets" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>長さ <tt class="xref c c-data docutils literal"><span class="pre">ndim</span></tt> の <tt class="xref c c-type docutils literal"><span class="pre">Py_ssize_t</span></tt> の配列。
+suboffset の各数値が 0 以上であるとき、その次元に格納されているのはポインタで、
+suboffset の値はそのポインタの参照を解決するときに何バイトのオフセットを足すかを示しています。
+suboffset に負の数が格納されているときは、参照解決が不要であること
+(連続したメモリブロック内に直接配置されていること)を意味しています。</p>
+<p>次の例は、 strides も suboffsets も非NULL の時に、N次元配列からN次元インデックスで示される要素のポインタを返す関数です。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">void</span> <span class="o">*</span><span class="nf">get_item_pointer</span><span class="p">(</span><span class="kt">int</span> <span class="n">ndim</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">buf</span><span class="p">,</span> <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">strides</span><span class="p">,</span>
+    <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">suboffsets</span><span class="p">,</span> <span class="n">Py_ssize_t</span> <span class="o">*</span><span class="n">indices</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">pointer</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ndim</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">pointer</span> <span class="o">+=</span> <span class="n">strides</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">suboffsets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span><span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+            <span class="n">pointer</span> <span class="o">=</span> <span class="o">*</span><span class="p">((</span><span class="kt">char</span><span class="o">**</span><span class="p">)</span><span class="n">pointer</span><span class="p">)</span> <span class="o">+</span> <span class="n">suboffsets</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pointer</span><span class="p">;</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="member">
+<dt id="Py_buffer.itemsize">
+Py_ssize_t <tt class="descname">itemsize</tt><a class="headerlink" href="#Py_buffer.itemsize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは共有メモリ上の各要素のbyte単位のサイズを格納する変数です。これは <a class="reference internal" href="#PyBuffer_SizeFromFormat" title="PyBuffer_SizeFromFormat"><tt class="xref c c-func docutils literal"><span class="pre">PyBuffer_SizeFromFormat()</span></tt></a> を使って計算できる値なので技術的には不要なのですが、バッファを提供する側はフォーマット文字列を解析しなくてもこの情報を知っているでしょうし、バッファを受け取る側にとっては正しく解釈するのに必要な情報です。なので、要素サイズを格納するほうが便利ですし高速です。</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="Py_buffer.internal">
+void *<tt class="descname">internal</tt><a class="headerlink" href="#Py_buffer.internal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バッファを提供する側のオブジェクトが内部的に利用するための変数です。例えば、提供側はこの変数に整数型をキャストして、 shape, strides, suboffsets
+といった配列をバッファを開放するときに同時に開放するべきかどうかを管理するフラグに使うことができるでしょう。バッファを受け取る側は、この値を変更してはなりません。</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h2>バッファ関連関数<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="function">
+<dt id="PyObject_CheckBuffer">
+int <tt class="descname">PyObject_CheckBuffer</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em><big>)</big><a class="headerlink" href="#PyObject_CheckBuffer" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>obj</em> がバッファインタフェースをサポートしている場合に 1 を、それ以外の場合に 0 を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyObject_GetBuffer">
+int <tt class="descname">PyObject_GetBuffer</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em>, <a class="reference internal" href="#Py_buffer" title="Py_buffer">Py_buffer</a><em>&nbsp;*view</em>, int<em>&nbsp;flags</em><big>)</big><a class="headerlink" href="#PyObject_GetBuffer" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>obj</em> を <a class="reference internal" href="#Py_buffer" title="Py_buffer"><tt class="xref c c-type docutils literal"><span class="pre">Py_buffer</span></tt></a> <em>view</em> へエクスポートします。これらの引数は <em>NULL</em> であってはなりません。
+<em>flag</em> 引数は呼び出し側がどんなバッファを扱おうとしているのか、バッファ提供側がどんなバッファを返すことが許されているのかを示す、ビットフィールドです。バッファインタフェースは複雑なメモリ共有を可能にしていますが、呼び出し元はすべての複雑なバッファを扱えるとは限らず、バッファ提供側がシンプルなビューを提供できるならそれを利用したいとかもしれません。</p>
+<p>バッファ提供側はすべての方法でメモリを共有できるとは限らず、呼び出し側に何かが不可能であることを伝えるためにエラーを発生させる必要があるかもしれません。その場合のエラーは、もしその問題を実際に引き起こしているのが別のエラーだったとしても、
+<a class="reference internal" href="../library/exceptions.html#exceptions.BufferError" title="exceptions.BufferError"><tt class="xref py py-exc docutils literal"><span class="pre">BufferError</span></tt></a> でなければなりません。バッファ提供側は flag の情報を使って <a class="reference internal" href="#Py_buffer" title="Py_buffer"><tt class="xref c c-data docutils literal"><span class="pre">Py_buffer</span></tt></a> 構造体のどのフィールドへの非デフォルト値の設定を省略したり、要求されたシンプルな view を提供できない場合はエラーを発生させたりすることができます。</p>
+<p>成功したら 0 が、エラー時には -1 が返されます。</p>
+<p>次のテーブルは、 <em>flags</em> 引数が取りうる値です。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Flag</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_SIMPLE</span></tt></td>
+<td>これはデフォルトの flag の状態です。結果のバッファは書き込み可能かもしれませんし、不可能かもしれません。データのフォーマットは unsigned byte とします。これは &#8220;スタンドアロン&#8221; のフラグ定数です。他の定数と &#8216;|&#8217;
+を取る必要はありません。提供側はこのような連続したバイト列のバッファを提供できない場合に、エラーを発生させるかもしれません。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_WRITABLE</span></tt></td>
+<td>結果のバッファは書込み可能でなければなりません。書き込み不可能な場合はエラーを発生させます。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_STRIDES</span></tt></td>
+<td>この値は <tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_ND</span></tt> を含みます。バッファは strides 情報を提供しなければなりません。
+(言い換えると、 strides は NULL であってはいけません。)
+このフラグは、呼び出し元が、要素間に隙間のある不連続な配列を扱えるときに使われます。 strides を扱うことは、自動的に shape も扱えることを要求されます。提供側は stride 形式のバッファを提供できないとき(例えば、
+suboffset が必要な場合)はエラーを発生させます。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_ND</span></tt></td>
+<td>バッファは shape 情報を提供しなければなりません。メモリは C スタイルの並び (最後の次元が一番高速) だと仮定されます。提供側はこの種類の連続バッファを提供できない場合はエラーを発生させます。このフラグが指定されていな場合は shape
+は <em>NULL</em> になります。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_C_CONTIGUOUS</span></tt>
+<tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_F_CONTIGUOUS</span></tt>
+<tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_ANY_CONTIGUOUS</span></tt></td>
+<td>これらのフラグは、返されるバッファの並びを指定します。それぞれ、C並び(最後の次元が一番高速)、Fortran並び(最初の次元が一番高速), そのどちらでも、を意味します。これらのフラグは <tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_STRIDES</span></tt> を含んでおり、
+strides 情報が正しく格納されていることを保証します。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_INDIRECT</span></tt></td>
+<td>このフラグは、返されるバッファが suboffsets 情報を含んでいることを示します。(suboffsets が必要無いときは NULL でもかまいません。) このフラグは、バッファ利用側が suboffsets
+を使って参照されている間接配列を扱えるときに利用されます。このフラグは <tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_STRIDES</span></tt> を含みます。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_FORMAT</span></tt></td>
+<td>返されるバッファは正しい format 情報を持っていなければなりません。このフラグは、バッファ利用側が実際に格納されているデータの &#8216;種類&#8217; をチェックするときに利用します。バッファ提供側は、要求された場合は常にこの情報を提供できるべきです。 format が明示的に要求されていない場合は format は
+<em>NULL</em> (<tt class="docutils literal"><span class="pre">'B'</span></tt>, unsigned byte を意味する)であるべきです。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_STRIDED</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_STRIDES</span> <span class="pre">|</span> <span class="pre">PyBUF_WRITABLE)</span></tt> と同じ</td>
+</tr>
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_STRIDED_RO</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_STRIDES)</span></tt> と同じ</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_RECORDS</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_STRIDES</span> <span class="pre">|</span> <span class="pre">PyBUF_FORMAT</span> <span class="pre">|</span> <span class="pre">PyBUF_WRITABLE)</span></tt> と同じ</td>
+</tr>
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_RECORDS_RO</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_STRIDES</span> <span class="pre">|</span> <span class="pre">PyBUF_FORMAT)</span></tt> と同じ</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_FULL</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_INDIRECT</span> <span class="pre">|</span> <span class="pre">PyBUF_FORMAT</span> <span class="pre">|</span> <span class="pre">PyBUF_WRITABLE)</span></tt> と同じ</td>
+</tr>
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_FULL_RO</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_INDIRECT</span> <span class="pre">|</span> <span class="pre">PyBUF_FORMAT)</span></tt> と同じ</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_CONTIG</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_ND</span> <span class="pre">|</span> <span class="pre">PyBUF_WRITABLE)</span></tt> と同じ</td>
+</tr>
+<tr class="row-even"><td><tt class="xref c c-macro docutils literal"><span class="pre">PyBUF_CONTIG_RO</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">(PyBUF_ND)</span></tt> と同じ</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_Release">
+void <tt class="descname">PyBuffer_Release</tt><big>(</big><a class="reference internal" href="#Py_buffer" title="Py_buffer">Py_buffer</a><em>&nbsp;*view</em><big>)</big><a class="headerlink" href="#PyBuffer_Release" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>view</em> バッファを開放します。バッファが利用されなくなったときに、そのメモリを開放できるようにこの関数を呼び出すべきです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_SizeFromFormat">
+Py_ssize_t <tt class="descname">PyBuffer_SizeFromFormat</tt><big>(</big>const char<em>&nbsp;*</em><big>)</big><a class="headerlink" href="#PyBuffer_SizeFromFormat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#Py_buffer.itemsize" title="Py_buffer.itemsize"><tt class="xref c c-data docutils literal"><span class="pre">itemsize</span></tt></a> の値を <tt class="xref c c-data docutils literal"><span class="pre">format</span></tt> から計算して返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_IsContiguous">
+int <tt class="descname">PyBuffer_IsContiguous</tt><big>(</big><a class="reference internal" href="#Py_buffer" title="Py_buffer">Py_buffer</a><em>&nbsp;*view</em>, char<em>&nbsp;fortran</em><big>)</big><a class="headerlink" href="#PyBuffer_IsContiguous" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>view</em> で定義されているメモリが、 C スタイル (<em>fortran</em> == <tt class="docutils literal"><span class="pre">'C'</span></tt>) のときか、
+Fortran スタイル (<em>fortran</em> == <tt class="docutils literal"><span class="pre">'F'</span></tt>) のときか、そのいずれか
+(<em>fortran</em> == <tt class="docutils literal"><span class="pre">'A'</span></tt>) であれば 1 を返します。それ以外の場合は 0 を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_FillContiguousStrides">
+void <tt class="descname">PyBuffer_FillContiguousStrides</tt><big>(</big>int<em>&nbsp;ndim</em>, Py_ssize_t<em>&nbsp;*shape</em>, Py_ssize_t<em>&nbsp;*strides</em>, Py_ssize_t<em>&nbsp;itemsize</em>, char<em>&nbsp;fortran</em><big>)</big><a class="headerlink" href="#PyBuffer_FillContiguousStrides" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>strides</em> 配列を、 <em>itemsize</em> の大きさの要素がバイト単位で連続した、
+<em>shape</em> の形をした (<em>fortran</em> が <tt class="docutils literal"><span class="pre">'C'</span></tt> なら C-style, <tt class="docutils literal"><span class="pre">'F'</span></tt>
+なら Fortran-style の) 多次元配列として埋める。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_FillInfo">
+int <tt class="descname">PyBuffer_FillInfo</tt><big>(</big><a class="reference internal" href="#Py_buffer" title="Py_buffer">Py_buffer</a><em>&nbsp;*view</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em>, void<em>&nbsp;*buf</em>, Py_ssize_t<em>&nbsp;len</em>, int<em>&nbsp;readonly</em>, int<em>&nbsp;infoflags</em><big>)</big><a class="headerlink" href="#PyBuffer_FillInfo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バッファ提供側が与えられた長さの &#8220;unsigned bytes&#8221; の連続した1つのメモリブロックしか提供できないものとして、 <em>view</em> バッファ情報構造体を正しく埋める。成功したら 0 を、エラー時には (例外を発生させつつ) -1 を返す。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="memoryview">
+<h2>memoryview オブジェクト<a class="headerlink" href="#memoryview" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+<p><a class="reference internal" href="../library/stdtypes.html#memoryview" title="memoryview"><tt class="xref py py-class docutils literal"><span class="pre">memoryview</span></tt></a> オブジェクトは、新しい、他のオブジェクトと同じように扱える
+Python オブジェクトの形をした C言語レベルのバッファへのインタフェースです。</p>
+<dl class="function">
+<dt id="PyMemoryView_FromObject">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a> *<tt class="descname">PyMemoryView_FromObject</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em><big>)</big><a class="headerlink" href="#PyMemoryView_FromObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しいバッファインタフェースを定義しているオブジェクトから memoryview
+オブジェクトを作ります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMemoryView_FromBuffer">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a> *<tt class="descname">PyMemoryView_FromBuffer</tt><big>(</big><a class="reference internal" href="#Py_buffer" title="Py_buffer">Py_buffer</a><em>&nbsp;*view</em><big>)</big><a class="headerlink" href="#PyMemoryView_FromBuffer" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>buffer-info 構造体 <em>view</em> をラップする memoryview オブジェクトを作ります。作られた memoryview オブジェクトはバッファを所有することになるので、
+<em>view</em> を開放してはいけません。このバッファは memoryview オブジェクトが削除されるときに解放されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMemoryView_GetContiguous">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a> *<tt class="descname">PyMemoryView_GetContiguous</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em>, int<em>&nbsp;buffertype</em>, char<em>&nbsp;order</em><big>)</big><a class="headerlink" href="#PyMemoryView_GetContiguous" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>buffer インタフェースを定義しているオブジェクトから (&#8216;C&#8217; か &#8216;F&#8217;ortran の <em>order</em> で)
+連続したメモリチャンクへの memoryview オブジェクトを作ります。メモリが連続している場合、 memoryview オブジェクトは元のメモリを参照します。それ以外の場合、メモリはコピーされて、 memoryview オブジェクトは新しい bytes
+オブジェクトを参照します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMemoryView_Check">
+int <tt class="descname">PyMemoryView_Check</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em><big>)</big><a class="headerlink" href="#PyMemoryView_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>obj</em> が memoryview オブジェクトの場合に真を返します。現在のところ、 <a class="reference internal" href="../library/stdtypes.html#memoryview" title="memoryview"><tt class="xref py py-class docutils literal"><span class="pre">memoryview</span></tt></a> のサブクラスの作成は許可されていません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyMemoryView_GET_BUFFER">
+<a class="reference internal" href="#Py_buffer" title="Py_buffer">Py_buffer</a> *<tt class="descname">PyMemoryView_GET_BUFFER</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em><big>)</big><a class="headerlink" href="#PyMemoryView_GET_BUFFER" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたオブジェクトにラップされた buffer-info 構造体へのポインタを返します。オブジェクトは memoryview インスタンスで <strong>なければなりません</strong> 。このマクロはオブジェクトの型をチェックしないので、呼び出し側で保証しなければクラッシュする可能性があります。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h2>旧スタイルバッファオブジェクト<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p id="index-1">古いバッファインタフェースに関するより詳しい情報は、 &#8220;バッファオブジェクト構造体&#8221; 節 ( <a class="reference internal" href="typeobj.html#buffer-structs"><em>バッファオブジェクト構造体 (buffer object structure)</em></a> 節) の、
+<a class="reference internal" href="typeobj.html#PyBufferProcs" title="PyBufferProcs"><tt class="xref c c-type docutils literal"><span class="pre">PyBufferProcs</span></tt></a> の説明のところにあります。</p>
+<p>&#8220;バッファオブジェクト&#8221; はヘッダファイル <tt class="file docutils literal"><span class="pre">bufferobject.h</span></tt>  の中で定義されています (このファイルは
+<tt class="file docutils literal"><span class="pre">Python.h</span></tt> がインクルードしています)。バッファオブジェクトは、 Python プログラミングのレベルからは文字列オブジェクトと非常によく似ているように見えます: スライス、インデックス指定、結合、その他標準の文字列操作をサポートしています。しかし、バッファオブジェクトのデータは二つのデータソース: 何らかのメモリブロックか、バッファインタフェースを公開している別のオブジェクト、のいずれかに由来しています。</p>
+<p>バッファオブジェクトは、他のオブジェクトのバッファインタフェースから Python プログラマにデータを公開する方法として便利です。バッファオブジェクトはゼロコピーなスライス機構 (zero-copy slicing  mechanism) としても使われます。ブロックメモリを参照するというバッファオブジェクトの機能を使うことで、任意のデータをきわめて簡単に Python プログラマに公開できます。メモリブロックは巨大でもかまいませんし、C
+拡張モジュール内の定数配列でもかまいません。また、オペレーティングシステムライブラリ側に渡す前の、操作用の生のブロックメモリでもかまいませんし、構造化されたデータをネイティブのメモリ配置形式でやりとりするためにも使えます。</p>
+<dl class="type">
+<dt id="PyBufferObject">
+<tt class="descname">PyBufferObject</tt><a class="headerlink" href="#PyBufferObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="structures.html#PyObject" title="PyObject"><tt class="xref c c-type docutils literal"><span class="pre">PyObject</span></tt></a> のサブタイプはバッファオブジェクトを表現します。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="PyBuffer_Type">
+<a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a> <tt class="descname">PyBuffer_Type</tt><a class="headerlink" href="#PyBuffer_Type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-2">Python バッファ型 (buffer type) を表現する <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject"><tt class="xref c c-type docutils literal"><span class="pre">PyTypeObject</span></tt></a> です; Python レイヤにおける
+<tt class="docutils literal"><span class="pre">buffer</span></tt> や <tt class="docutils literal"><span class="pre">types.BufferType</span></tt> と同じオブジェクトです。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="Py_END_OF_BUFFER">
+int <tt class="descname">Py_END_OF_BUFFER</tt><a class="headerlink" href="#Py_END_OF_BUFFER" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この定数は、 <a class="reference internal" href="#PyBuffer_FromObject" title="PyBuffer_FromObject"><tt class="xref c c-func docutils literal"><span class="pre">PyBuffer_FromObject()</span></tt></a> や <a class="reference internal" href="#PyBuffer_FromReadWriteObject" title="PyBuffer_FromReadWriteObject"><tt class="xref c c-func docutils literal"><span class="pre">PyBuffer_FromReadWriteObject()</span></tt></a> に
+<em>size</em> パラメタとして渡します。このパラメタを渡すと、 <a class="reference internal" href="#PyBufferObject" title="PyBufferObject"><tt class="xref c c-type docutils literal"><span class="pre">PyBufferObject</span></tt></a> は指定された <em>offset</em>
+からバッファの終わりまでを <em>base</em> オブジェクトとして参照します。このパラメタを使うことで、関数の呼び出し側が <em>base</em> オブジェクトのサイズを調べる必要がなくなります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_Check">
+int <tt class="descname">PyBuffer_Check</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyBuffer_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が <a class="reference internal" href="#PyBuffer_Type" title="PyBuffer_Type"><tt class="xref c c-data docutils literal"><span class="pre">PyBuffer_Type</span></tt></a> 型のときに真を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_FromObject">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyBuffer_FromObject</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*base</em>, Py_ssize_t<em>&nbsp;offset</em>, Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#PyBuffer_FromObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>新たな読み出し専用バッファオブジェクトを返します。 <em>base</em> が読み出し専用バッファに必要なバッファプロトコルをサポートしていない場合や、厳密に一つのバッファセグメントを提供していない場合には <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出し、 <em>offset</em> がゼロ以下の場合には
+<a class="reference internal" href="../library/exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。バッファオブジェクトは <em>base</em> オブジェクトに対する参照を保持し、バッファオブジェクトの内容は
+<em>base</em> オブジェクトの <em>offset</em> から <em>size</em> バイトのバッファインタフェースへの参照になります。 <em>size</em> が
+<tt class="xref py py-const docutils literal"><span class="pre">Py_END_OF_BUFFER</span></tt> の場合、新たに作成するバッファオブジェクトの内容は <em>base</em> から公開されているバッファの末尾までにわたります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>offset</em>, <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_FromReadWriteObject">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyBuffer_FromReadWriteObject</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*base</em>, Py_ssize_t<em>&nbsp;offset</em>, Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#PyBuffer_FromReadWriteObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>新たな書き込み可能バッファオブジェクトを返します。パラメタおよび例外は <a class="reference internal" href="#PyBuffer_FromObject" title="PyBuffer_FromObject"><tt class="xref c c-func docutils literal"><span class="pre">PyBuffer_FromObject()</span></tt></a> と同じです。 <em>base</em>
+オブジェクトが書き込み可能バッファに必要なバッファプロトコルを公開していない場合、 <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>offset</em>, <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_FromMemory">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyBuffer_FromMemory</tt><big>(</big>void<em>&nbsp;*ptr</em>, Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#PyBuffer_FromMemory" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>メモリ上の指定された場所から指定されたサイズのデータを読み出せる、新たな読み出し専用バッファオブジェクトを返します。この関数が返すバッファオブジェクトが存続する間、 <em>ptr</em> で与えられたメモリバッファがデアロケートされないようにするのは呼び出し側の責任です。 <em>size</em>
+がゼロ以下の場合には <a class="reference internal" href="../library/exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。 <em>size</em> には <tt class="xref py py-const docutils literal"><span class="pre">Py_END_OF_BUFFER</span></tt> を指定しては
+<em>いけません</em> ; 指定すると、 <a class="reference internal" href="../library/exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_FromReadWriteMemory">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyBuffer_FromReadWriteMemory</tt><big>(</big>void<em>&nbsp;*ptr</em>, Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#PyBuffer_FromReadWriteMemory" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><a class="reference internal" href="#PyBuffer_FromMemory" title="PyBuffer_FromMemory"><tt class="xref c c-func docutils literal"><span class="pre">PyBuffer_FromMemory()</span></tt></a> に似ていますが、書き込み可能なバッファを返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyBuffer_New">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyBuffer_New</tt><big>(</big>Py_ssize_t<em>&nbsp;size</em><big>)</big><a class="headerlink" href="#PyBuffer_New" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>size</em> バイトのメモリバッファを独自に維持する新たな書き込み可能バッファオブジェクトを返します。 <em>size</em>
+がゼロまたは正の値でない場合、 <a class="reference internal" href="../library/exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。( <a class="reference internal" href="objbuffer.html#PyObject_AsWriteBuffer" title="PyObject_AsWriteBuffer"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_AsWriteBuffer()</span></tt></a>
+が返すような) メモリバッファは特に整列されていないので注意して下さい。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tuple.html" title="タプルオブジェクト (tuple object)"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="unicode.html" title="Unicode オブジェクトと codec"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" >具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

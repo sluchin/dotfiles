@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8.6. array — 効率のよい数値アレイ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="8. データ型" href="datatypes.html" />
+    <link rel="next" title="8.7. sets — ユニークな要素の順序なしコレクション" href="sets.html" />
+    <link rel="prev" title="8.5. bisect — 配列二分法アルゴリズム" href="bisect.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="sets.html" title="8.7. sets — ユニークな要素の順序なしコレクション"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="bisect.html" title="8.5. bisect — 配列二分法アルゴリズム"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" accesskey="U">8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="bisect.html"
+                        title="前の章へ">8.5. <tt class="docutils literal"><span class="pre">bisect</span></tt> &#8212; 配列二分法アルゴリズム</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="sets.html"
+                        title="次の章へ">8.7. <tt class="docutils literal"><span class="pre">sets</span></tt> &#8212; ユニークな要素の順序なしコレクション</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/array.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-array">
+<span id="array"></span><h1>8.6. <a class="reference internal" href="#module-array" title="array: 一様な型を持つ数値からなる空間効率のよいアレイ。"><tt class="xref py py-mod docutils literal"><span class="pre">array</span></tt></a> &#8212; 効率のよい数値アレイ<a class="headerlink" href="#module-array" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">このモジュールでは、基本的な値 (文字、整数、浮動小数点数) のアレイ
+(array、配列) をコンパクトに表現できるオブジェクト型を定義しています。アレイはシーケンス (sequence) 型であり、中に入れるオブジェクトの型に制限があることを除けば、リストとまったく同じように振る舞います。オブジェクト生成時に一文字の <em class="dfn">型コード</em> を用いて型を指定します。次の型コードが定義されています:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="21%" />
+<col width="32%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">型コード</th>
+<th class="head">C の型</th>
+<th class="head">Python の型</th>
+<th class="head">最小サイズ (バイト単位)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'c'</span></tt></td>
+<td>char</td>
+<td>文字(str型)</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'b'</span></tt></td>
+<td>signed char</td>
+<td>int型</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'B'</span></tt></td>
+<td>unsigned char</td>
+<td>int型</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'u'</span></tt></td>
+<td>Py_UNICODE</td>
+<td>Unicode文字(unicode型)</td>
+<td>2 (ノートを参照)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'h'</span></tt></td>
+<td>signed short</td>
+<td>int型</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'H'</span></tt></td>
+<td>unsigned short</td>
+<td>int型</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'i'</span></tt></td>
+<td>signed int</td>
+<td>int型</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'I'</span></tt></td>
+<td>unsigned int</td>
+<td>long型</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'l'</span></tt></td>
+<td>signed long</td>
+<td>int型</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'L'</span></tt></td>
+<td>unsigned long</td>
+<td>long型</td>
+<td>4</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'f'</span></tt></td>
+<td>float</td>
+<td>float型</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'d'</span></tt></td>
+<td>double</td>
+<td>float型</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="docutils literal"><span class="pre">'u'</span></tt> 型コードは Python の Unicode 文字列に対応します。一文字幅の文字は 2 バイトで二文字幅の文字は 4 バイトです。</p>
+</div>
+<p>値の実際の表現はマシンアーキテクチャ (厳密に言うとCの実装) によって決まります。値の実際のサイズは <tt class="xref py py-attr docutils literal"><span class="pre">itemsize</span></tt> 属性から得られます。
+Python の通常の整数型では C の unsigned (long) 整数の最大範囲を表せないため、
+<tt class="docutils literal"><span class="pre">'L'</span></tt> と <tt class="docutils literal"><span class="pre">'I'</span></tt> で表現されている要素に入る値は Python では長整数として表されます。</p>
+<p>このモジュールでは次の型を定義しています:</p>
+<dl class="class">
+<dt id="array.array">
+<em class="property">class </em><tt class="descclassname">array.</tt><tt class="descname">array</tt><big>(</big><em>typecode</em><span class="optional">[</span>, <em>initializer</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#array.array" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>要素のデータ型が <em>typecode</em> に限定される新しいアレイで、オプションの値 <em>initializer</em> を渡すと初期値になりますが、リスト、文字列または適当な型のイテレーション可能オブジェクトでなければなりません。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span>以前はリストか文字列しか受け付けませんでした。</p>
+<p>リストか文字列を渡した場合、新たに作成されたアレイの <a class="reference internal" href="#array.array.fromlist" title="array.array.fromlist"><tt class="xref py py-meth docutils literal"><span class="pre">fromlist()</span></tt></a> 、
+<a class="reference internal" href="#array.array.fromstring" title="array.array.fromstring"><tt class="xref py py-meth docutils literal"><span class="pre">fromstring()</span></tt></a> あるいは <a class="reference internal" href="#array.array.fromunicode" title="array.array.fromunicode"><tt class="xref py py-meth docutils literal"><span class="pre">fromunicode()</span></tt></a> メソッド
+(以下を参照して下さい)に渡され、初期値としてアレイに追加されます。それ以外の場合には、イテレーション可能オブジェクト
+<em>initializer</em> は新たに作成されたオブジェクトの <a class="reference internal" href="#array.array.extend" title="array.array.extend"><tt class="xref py py-meth docutils literal"><span class="pre">extend()</span></tt></a> メソッドに渡されます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="array.ArrayType">
+<tt class="descclassname">array.</tt><tt class="descname">ArrayType</tt><a class="headerlink" href="#array.ArrayType" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#module-array" title="array: 一様な型を持つ数値からなる空間効率のよいアレイ。"><tt class="xref py py-class docutils literal"><span class="pre">array</span></tt></a> の別名です。撤廃されました。</p>
+</dd></dl>
+
+<p>アレイオブジェクトでは、インデクス指定、スライス、連結および反復といった、通常のシーケンスの演算をサポートしています。スライス代入を使うときは、代入値は同じ型コードのアレイオブジェクトでなければなりません。それ以外のオブジェクトを指定すると <a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。アレイオブジェクトはバッファインタフェースを実装しており、バッファオブジェクトをサポートしている場所ならどこでも利用できます。</p>
+<p>次のデータ要素やメソッドもサポートされています:</p>
+<dl class="attribute">
+<dt id="array.array.typecode">
+<tt class="descclassname">array.</tt><tt class="descname">typecode</tt><a class="headerlink" href="#array.array.typecode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイを作るときに使う型コード文字です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="array.array.itemsize">
+<tt class="descclassname">array.</tt><tt class="descname">itemsize</tt><a class="headerlink" href="#array.array.itemsize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイの要素 1 つの内部表現に使われるバイト長です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.append">
+<tt class="descclassname">array.</tt><tt class="descname">append</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#array.array.append" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>値 <em>x</em> の新たな要素をアレイの末尾に追加します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.buffer_info">
+<tt class="descclassname">array.</tt><tt class="descname">buffer_info</tt><big>(</big><big>)</big><a class="headerlink" href="#array.array.buffer_info" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイの内容を記憶するために使っているバッファの、現在のメモリアドレスと要素数の入ったタプル <tt class="docutils literal"><span class="pre">(address,</span> <span class="pre">length)</span></tt> を返します。バイト単位で表したメモリバッファの大きさは
+<tt class="docutils literal"><span class="pre">array.buffer_info()[1]</span> <span class="pre">*</span> <span class="pre">array.itemsize</span></tt> で計算できます。例えば <tt class="xref c c-func docutils literal"><span class="pre">ioctl()</span></tt> 操作のような、メモリアドレスを必要とする低レベルな
+(そして、本質的に危険な) I/Oインタフェースを使って作業する場合に、ときどき便利です。アレイ自体が存在し、長さを変えるような演算を適用しない限り、有効な値を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">C やC++ で書いたコードからアレイオブジェクトを使う場合
+(<a class="reference internal" href="#array.array.buffer_info" title="array.array.buffer_info"><tt class="xref py py-meth docutils literal"><span class="pre">buffer_info()</span></tt></a> の情報を使う意味のある唯一の方法です) は、アレイオブジェクトでサポートしているバッファインタフェースを使う方がより理にかなっています。このメソッドは後方互換性のために保守されており、新しいコードでの使用は避けるべきです。バッファインタフェースの説明は
+<a class="reference internal" href="../c-api/buffer.html#bufferobjects"><em>buffer オブジェクトと memoryview オブジェクト</em></a> にあります。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.byteswap">
+<tt class="descclassname">array.</tt><tt class="descname">byteswap</tt><big>(</big><big>)</big><a class="headerlink" href="#array.array.byteswap" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイのすべての要素に対して「バイトスワップ」
+(リトルエンディアンとビッグエンディアンの変換) を行います。このメソッドは大きさが 1、2、4 および 8 バイトの値にのみをサポートしています。他の型の値に使うと <a class="reference internal" href="exceptions.html#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> を送出します。異なるバイトオーダをもつ計算機で書かれたファイルからデータを読み込むときに役に立ちます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.count">
+<tt class="descclassname">array.</tt><tt class="descname">count</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#array.array.count" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シーケンス中の <em>x</em> の出現回数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.extend">
+<tt class="descclassname">array.</tt><tt class="descname">extend</tt><big>(</big><em>iterable</em><big>)</big><a class="headerlink" href="#array.array.extend" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>iterable</em> から要素を取り出し、アレイの末尾に要素を追加します。
+<em>iterable</em> が別のアレイ型である場合、二つのアレイは <em>全く</em> 同じ型コードでなければなりません。それ以外の場合には <a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。
+<em>iterable</em> がアレイでない場合、アレイに値を追加できるような正しい型の要素からなるイテレーション可能オブジェクトでなければなりません。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span>以前は他のアレイ型しか引数に指定できませんでした。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.fromfile">
+<tt class="descclassname">array.</tt><tt class="descname">fromfile</tt><big>(</big><em>f</em>, <em>n</em><big>)</big><a class="headerlink" href="#array.array.fromfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルオブジェクト <em>f</em> から (マシン依存のデータ形式そのままで)
+<em>n</em> 個の要素を読み出し、アレイの末尾に要素を追加します。
+<em>n</em> 個の要素を読めなかったときは <a class="reference internal" href="exceptions.html#exceptions.EOFError" title="exceptions.EOFError"><tt class="xref py py-exc docutils literal"><span class="pre">EOFError</span></tt></a> を送出しますが、それまでに読み出せた値はアレイに追加されています。
+<em>f</em> は本当の組み込みファイルオブジェクトでなければなりません。
+<a class="reference internal" href="#array.array.read" title="array.array.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a> メソッドをもつ他の型では動作しません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.fromlist">
+<tt class="descclassname">array.</tt><tt class="descname">fromlist</tt><big>(</big><em>list</em><big>)</big><a class="headerlink" href="#array.array.fromlist" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>リストから要素を追加します。型に関するエラーが発生した場合にアレイが変更されないことを除き、
+<tt class="docutils literal"><span class="pre">for</span> <span class="pre">x</span> <span class="pre">in</span> <span class="pre">list:</span> <span class="pre">a.append(x)</span></tt> と同じです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.fromstring">
+<tt class="descclassname">array.</tt><tt class="descname">fromstring</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#array.array.fromstring" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列から要素を追加します。文字列は、
+(ファイルから <a class="reference internal" href="#array.array.fromfile" title="array.array.fromfile"><tt class="xref py py-meth docutils literal"><span class="pre">fromfile()</span></tt></a> メソッドを使って値を読み込んだときのように)
+マシン依存のデータ形式で表された値の配列として解釈されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.fromunicode">
+<tt class="descclassname">array.</tt><tt class="descname">fromunicode</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#array.array.fromunicode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定した Unicode 文字列のデータを使ってアレイを拡張します。アレイの型コードは <tt class="docutils literal"><span class="pre">'u'</span></tt> でなければなりません。それ以外の場合には、 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。他の型のアレイに Unicode 型のデータを追加するには、
+<tt class="docutils literal"><span class="pre">array.fromstring(unicodestring.decode(enc))</span></tt> を使ってください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.index">
+<tt class="descclassname">array.</tt><tt class="descname">index</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#array.array.index" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイ中で <em>x</em> が出現するインデクスのうち最小の値 <em>i</em> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.insert">
+<tt class="descclassname">array.</tt><tt class="descname">insert</tt><big>(</big><em>i</em>, <em>x</em><big>)</big><a class="headerlink" href="#array.array.insert" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイ中の位置 <em>i</em> の前に値 <em>x</em> をもつ新しい要素を挿入します。
+<em>i</em> の値が負の場合、アレイの末尾からの相対位置として扱います。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.pop">
+<tt class="descclassname">array.</tt><tt class="descname">pop</tt><big>(</big><span class="optional">[</span><em>i</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#array.array.pop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイからインデクスが <em>i</em> の要素を取り除いて返します。オプションの引数はデフォルトで <tt class="docutils literal"><span class="pre">-1</span></tt> になっていて、最後の要素を取り除いて返すようになっています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.read">
+<tt class="descclassname">array.</tt><tt class="descname">read</tt><big>(</big><em>f</em>, <em>n</em><big>)</big><a class="headerlink" href="#array.array.read" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="deprecated">
+<span class="versionmodified">バージョン 1.5.1 で撤廃: </span><a class="reference internal" href="#array.array.fromfile" title="array.array.fromfile"><tt class="xref py py-meth docutils literal"><span class="pre">fromfile()</span></tt></a> メソッドを使ってください。</p>
+<p>ファイルオブジェクト <em>f</em> から (マシン依存のデータ形式そのままで)
+<em>n</em> 個の要素を読み出し、アレイの末尾に要素を追加します。
+<em>n</em> 個の要素を読めなかったときは <a class="reference internal" href="exceptions.html#exceptions.EOFError" title="exceptions.EOFError"><tt class="xref py py-exc docutils literal"><span class="pre">EOFError</span></tt></a> を送出しますが、それまでに読み出せた値はアレイに追加されています。
+<em>f</em> は本当の組み込みファイルオブジェクトでなければなりません。
+<a class="reference internal" href="#array.array.read" title="array.array.read"><tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt></a> メソッドをもつ他の型では動作しません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.remove">
+<tt class="descclassname">array.</tt><tt class="descname">remove</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#array.array.remove" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイ中の <em>x</em> のうち、最初に現れたものを取り除きます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.reverse">
+<tt class="descclassname">array.</tt><tt class="descname">reverse</tt><big>(</big><big>)</big><a class="headerlink" href="#array.array.reverse" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイの要素の順番を逆にします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.tofile">
+<tt class="descclassname">array.</tt><tt class="descname">tofile</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#array.array.tofile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイのすべての要素をファイルオブジェクト <em>f</em> に
+(マシン依存のデータ形式そのままで)書き込みます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.tolist">
+<tt class="descclassname">array.</tt><tt class="descname">tolist</tt><big>(</big><big>)</big><a class="headerlink" href="#array.array.tolist" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイを同じ要素を持つ普通のリストに変換します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.tostring">
+<tt class="descclassname">array.</tt><tt class="descname">tostring</tt><big>(</big><big>)</big><a class="headerlink" href="#array.array.tostring" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイをマシン依存のデータアレイに変換し、文字列表現 (<a class="reference internal" href="#array.array.tofile" title="array.array.tofile"><tt class="xref py py-meth docutils literal"><span class="pre">tofile()</span></tt></a> メソッドによってファイルに書き込まれるものと同じバイト列) を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.tounicode">
+<tt class="descclassname">array.</tt><tt class="descname">tounicode</tt><big>(</big><big>)</big><a class="headerlink" href="#array.array.tounicode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アレイを Unicode 文字列に変換します。アレイの型コードは <tt class="docutils literal"><span class="pre">'u'</span></tt> でなければなりません。それ以外の場合には <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> を送出します。他の型のアレイから Unicode 文字列を得るには、
+<tt class="docutils literal"><span class="pre">array.tostring().decode(enc)</span></tt> を使ってください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="array.array.write">
+<tt class="descclassname">array.</tt><tt class="descname">write</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#array.array.write" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="deprecated">
+<span class="versionmodified">バージョン 1.5.1 で撤廃: </span><a class="reference internal" href="#array.array.tofile" title="array.array.tofile"><tt class="xref py py-meth docutils literal"><span class="pre">tofile()</span></tt></a> メソッドを使ってください。</p>
+<p>ファイルオブジェクト <em>f</em> に、全ての要素を(マシン依存のデータ形式そのままで)書き込みます。</p>
+</dd></dl>
+
+<p>アレイオブジェクトを表示したり文字列に変換したりすると、
+<tt class="docutils literal"><span class="pre">array(typecode,</span> <span class="pre">initializer)</span></tt> という形式で表現されます。アレイが空の場合、 <em>initializer</em> の表示を省略します。アレイが空でなければ、 <em>typecode</em> が <tt class="docutils literal"><span class="pre">'c'</span></tt> の場合には文字列に、それ以外の場合には数値のリストになります。関数 <a class="reference internal" href="#module-array" title="array: 一様な型を持つ数値からなる空間効率のよいアレイ。"><tt class="xref py py-func docutils literal"><span class="pre">array()</span></tt></a> を <tt class="docutils literal"><span class="pre">from</span> <span class="pre">array</span> <span class="pre">import</span> <span class="pre">array</span></tt> で import している限り、変換後の文字列に <a class="reference internal" href="functions.html#eval" title="eval"><tt class="xref py py-func docutils literal"><span class="pre">eval()</span></tt></a> を用いると元のアレイオブジェクトと同じデータ型と値を持つアレイに逆変換できることが保証されています。文字列表現の例を以下に示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">array</span><span class="p">(</span><span class="s">&#39;l&#39;</span><span class="p">)</span>
+<span class="n">array</span><span class="p">(</span><span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;hello world&#39;</span><span class="p">)</span>
+<span class="n">array</span><span class="p">(</span><span class="s">&#39;u&#39;</span><span class="p">,</span> <span class="s">u&#39;hello </span><span class="se">\u2641</span><span class="s">&#39;</span><span class="p">)</span>
+<span class="n">array</span><span class="p">(</span><span class="s">&#39;l&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="n">array</span><span class="p">(</span><span class="s">&#39;d&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.14</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="struct.html#module-struct" title="struct: 文字列データをパックされたバイナリデータとして解釈する."><tt class="xref py py-mod docutils literal"><span class="pre">struct</span></tt></a></dt>
+<dd>異なる種類のバイナリデータのパックおよびアンパック。</dd>
+<dt>Module <a class="reference internal" href="xdrlib.html#module-xdrlib" title="xdrlib: 外部データ表現 (XDR, External Data Representation)  データのエンコードおよびデコード。"><tt class="xref py py-mod docutils literal"><span class="pre">xdrlib</span></tt></a></dt>
+<dd>遠隔手続き呼び出しシステムで使われる外部データ表現仕様
+(External Data Representation, XDR) のデータのパックおよびアンパック。</dd>
+<dt><a class="reference external" href="http://numpy.sourceforge.net/numdoc/HTML/numdoc.htm">The Numerical Python Manual</a></dt>
+<dd>Numeric Python 拡張モジュール (NumPy) では、別の方法でシーケンス型を定義しています。
+Numerical Python に関する詳しい情報は <a class="reference external" href="http://numpy.sourceforge.net/">http://numpy.sourceforge.net/</a> を参照してください。
+(NumPy マニュアルの PDF バージョンは
+<a class="reference external" href="http://numpy.sourceforge.net/numdoc/numdoc.pdf">http://numpy.sourceforge.net/numdoc/numdoc.pdf</a> で手に入ります。)</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="sets.html" title="8.7. sets — ユニークな要素の順序なしコレクション"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="bisect.html" title="8.5. bisect — 配列二分法アルゴリズム"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="datatypes.html" >8. データ型</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>28. カスタム Python インタプリタ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python 標準ライブラリ" href="index.html" />
+    <link rel="next" title="28.1. code — インタプリタ基底クラス" href="code.html" />
+    <link rel="prev" title="27.17. distutils — Python モジュールの構築とインストール" href="distutils.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="28.1. code — インタプリタ基底クラス"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="distutils.html" title="27.17. distutils — Python モジュールの構築とインストール"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python 標準ライブラリ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="distutils.html"
+                        title="前の章へ">27.17. <tt class="docutils literal"><span class="pre">distutils</span></tt> &#8212; Python モジュールの構築とインストール</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="code.html"
+                        title="次の章へ">28.1. <tt class="docutils literal docutils literal docutils literal"><span class="pre">code</span></tt> &#8212; インタプリタ基底クラス</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/custominterp.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="python">
+<span id="custominterp"></span><h1>28. カスタム Python インタプリタ<a class="headerlink" href="#python" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>この章で解説されるモジュールで Python の対話インタプリタに似たインタフェースを書くことができます。もし Python そのもの以外に何か特殊な機能をサポートした Python インタプリタを作りたければ、
+<a class="reference internal" href="code.html#module-code" title="code: read-eval-print ループを実装するのを助ける"><tt class="xref py py-mod docutils literal"><span class="pre">code</span></tt></a> モジュールを参照してください。
+(<a class="reference internal" href="codeop.html#module-codeop" title="codeop: (完全ではないかもしれない)Pythonコードをコンパイルする。"><tt class="xref py py-mod docutils literal"><span class="pre">codeop</span></tt></a> モジュールはより低レベルで、不完全(かもしれない)
+Python コード断片のコンパイルをサポートするために使われます。)</p>
+<p>この章で解説されるモジュールの完全な一覧は:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code.html">28.1. <tt class="docutils literal"><span class="pre">code</span></tt> &#8212; インタプリタ基底クラス</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code.html#interpreter-objects">28.1.1. 対話的なインタプリタオブジェクト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code.html#console-objects">28.1.2. 対話的なコンソールオブジェクト</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="codeop.html">28.2. <tt class="docutils literal"><span class="pre">codeop</span></tt> &#8212; Pythonコードをコンパイルする</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="28.1. code — インタプリタ基底クラス"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="distutils.html" title="27.17. distutils — Python モジュールの構築とインストール"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

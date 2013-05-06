@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>14. 浮動小数点演算、その問題と制限 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python チュートリアル" href="index.html" />
+    <link rel="next" title="15. 日本語訳について" href="jptranslation.html" />
+    <link rel="prev" title="13. 対話入力編集とヒストリ置換" href="interactive.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="jptranslation.html" title="15. 日本語訳について"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="interactive.html" title="13. 対話入力編集とヒストリ置換"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">14. 浮動小数点演算、その問題と制限</a><ul>
+<li><a class="reference internal" href="#tut-fp-error">14.1. 表現エラー</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="interactive.html"
+                        title="前の章へ">13. 対話入力編集とヒストリ置換</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="jptranslation.html"
+                        title="次の章へ">15. 日本語訳について</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/floatingpoint.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tut-fp-issues">
+<span id="id1"></span><h1>14. 浮動小数点演算、その問題と制限<a class="headerlink" href="#tut-fp-issues" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>浮動小数点数は、計算機ハードウェアの中では、基数を 2 とする (2進法の)
+分数として表現されています。例えば、小数</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.125</span>
+</pre></div>
+</div>
+<p>は、 1/10 + 2/100 + 5/1000 という値を持ちますが、これと同様に、 2 進法の分数</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.001</span>
+</pre></div>
+</div>
+<p>は 0/2 + 0/4 + 1/8 という値になります。これら二つの分数は同じ値を持っていますが、ただ一つ、最初の分数は基数 10 で記述されており、二番目の分数は基数 2 で記述されていることが違います。</p>
+<p>残念なことに、ほとんどの小数は 2 進法の分数として正確に表わすことができません。その結果、一般に、入力した 10 進の浮動小数点数は、 2 進法の浮動小数点数で近似された後、実際にマシンに記憶されます。</p>
+<p>最初は基数 10 を使うと問題を簡単に理解できます。分数 1/3 を考えてみましょう。分数 1/3 は、基数 10 の分数として、以下のように近似することができます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.3</span>
+</pre></div>
+</div>
+<p>さらに正確な近似は、</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.33</span>
+</pre></div>
+</div>
+<p>です。さらに正確に近似すると、</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.333</span>
+</pre></div>
+</div>
+<p>となり、以後同様です。何個桁数を増やして書こうが、結果は決して厳密な 1/3 にはなりません。しかし、少しづつ正確な近似にはなっていくでしょう。</p>
+<p>同様に、基数を 2 とした表現で何桁使おうとも、10 進数の 0.1 は基数を 2 とした小数で正確に表現することはできません。基数 2 では、1/10 は循環小数 (repeating
+fraction) となります。</p>
+<div class="highlight-python"><pre>0.0001100110011001100110011001100110011001100110011...</pre>
+</div>
+<p>どこか有限の桁で止めると、近似値を得ることになります。</p>
+<p>Python を実行する典型的なコンピュータでは、 Python の float 型は 53bit の精度を持っています。この場合、10進数で <tt class="docutils literal"><span class="pre">0.1</span></tt> と書いたときに内部では次のような2進の小数が格納されます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">0.00011001100110011001100110011001100110011001100110011010</span>
+</pre></div>
+</div>
+<p>これは、 1/10 に近いですが、厳密に同じ値ではありません。</p>
+<p>Python は格納されている値の10進小数での近似値を表示するので、格納されている値が元の10進小数の近似値でしか無いことを忘れがちです。もし Python が2進数で近似された 0.1 の近似値をそのまま10進数で表示していたら、その結果は次のようになったでしょう。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mf">0.1</span>
+<span class="go">0.1000000000000000055511151231257827021181583404541015625</span>
+</pre></div>
+</div>
+<p>これは、ほとんどの人が必要と感じるよりも多すぎる桁数です。なので、 Python は丸めた値を表示することで、桁数を扱いやすい範囲にとどめます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mf">0.1</span>
+<span class="go">0.1</span>
+</pre></div>
+</div>
+<p>現実には、上の表示は錯覚であると気づくのは重要なことです。マシン内の値は厳密に 1/10 ではなく、単に真のマシン内の  <em>表示される値</em>
+を丸めているだけなのです。このことは、これらの値に対して演算を行うとすぐに顕在化します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mf">0.1</span> <span class="o">+</span> <span class="mf">0.2</span>
+<span class="go">0.30000000000000004</span>
+</pre></div>
+</div>
+<p>この動作は2進数の浮動小数点にとってはごく自然なものです。これは Python
+のバグではありませんし、あなたのコードのバグでもありません。ハードウェアの浮動小数点演算をサポートしている全ての言語で同じ種類の問題を見つけることができます。 (いくつかの言語ではデフォルトの、あるいはどの出力モードを選んでも、この差を <strong>表示</strong> しないかもしれませんが)</p>
+<p>他にも期待と異なるかもしれない場合があります。例えば、 2.675 という値を小数点以下2桁で丸めようとすると、次のような結果になります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="mf">2.675</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">2.67</span>
+</pre></div>
+</div>
+<p>組み込み関数 <a class="reference internal" href="../library/functions.html#round" title="round"><tt class="xref py py-func docutils literal"><span class="pre">round()</span></tt></a> のドキュメントには、もっとも近い値に丸め、中央値の場合は 0 から遠い方に丸めると書かれています。10進数の 2.675 は 2.67 と 2.68
+のちょうど真ん中なので、結果として 2.68 (の2進数による近似値) を期待するかもしれません。しかし、 10進数の <tt class="docutils literal"><span class="pre">2.675</span></tt> は2進数の近似値に変換され、その正確な値は次のようになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mf">2.67499999999999982236431605997495353221893310546875</span>
+</pre></div>
+</div>
+<p>この近似値は 2.68 よりすこし 2.67 に近いので、 2.67 に丸められます。</p>
+<p>10 進数で中央値になる値がどちらに丸められるかを制御しないといけない場合は、
+<a class="reference internal" href="../library/decimal.html#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールを使うことを検討するべきです。ちなみに、 <a class="reference internal" href="../library/decimal.html#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールは Python の float 値に格納された正確な値を見るためにも利用できます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mf">2.675</span><span class="p">)</span>
+<span class="go">Decimal(&#39;2.67499999999999982236431605997495353221893310546875&#39;)</span>
+</pre></div>
+</div>
+<p>別の重要な例として、 0.1 が正確には 1/10 でないために、 0.1 を10回足しても正確には 1.0 にならないというものがあります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">sum</span> <span class="o">+=</span> <span class="mf">0.1</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span>
+<span class="go">0.9999999999999999</span>
+</pre></div>
+</div>
+<p>2 進の浮動小数点数に対する算術演算は、このような意外性をたくさん持っています。
+&#8220;0.1&#8221; に関する問題は、以下の &#8220;表現エラー&#8221; の章で詳細に説明します。
+2 進法の浮動小数点演算にともなうその他のよく知られた意外な事象に関しては
+<a class="reference external" href="http://www.lahey.com/float.htm">The Perils of Floating Point</a> を参照してください。</p>
+<p>究極的にいうと、&#8221;容易な答えはありません&#8221;。ですが、浮動小数点数のことを過度に警戒しないでください！ Python の float 型操作におけるエラーは浮動小数点処理ハードウェアから受けついたものであり、ほとんどのマシン上では一つの演算あたり高々 2**53 分の 1 です。この誤差はほとんどの作業で充分以上のものですが、浮動小数点演算は 10 進の演算ではなく、浮動小数点の演算を新たに行うと、新たな丸め誤差の影響を受けることを心にとどめておいてください。</p>
+<p>異常なケースが存在する一方で、普段の浮動小数点演算の利用では、単に最終的な結果の値を必要な 10 進の桁数に丸めて表示するのなら、最終的には期待通りの結果を得ることになるでしょう。
+float の表示についてきめ細かな制御をしたければ、 <a class="reference internal" href="../library/string.html#formatstrings"><em>書式指定文字列の文法</em></a> にある
+<a class="reference internal" href="../library/stdtypes.html#str.format" title="str.format"><tt class="xref py py-meth docutils literal"><span class="pre">str.format()</span></tt></a> メソッドのフォーマット仕様を参照してください。</p>
+<div class="section" id="tut-fp-error">
+<span id="id2"></span><h2>14.1. 表現エラー<a class="headerlink" href="#tut-fp-error" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この章では、&#8221;0.1&#8221; の例について詳細に説明し、このようなケースに対してどのようにすれば正確な分析を自分で行えるかを示します。ここでは、 2
+進法表現の浮動小数点数についての基礎的な知識があるものとして話を進めます。</p>
+<p>表現エラー(<em class="dfn">Representation error</em>)は、いくつかの (実際にはほとんどの)
+10 進の小数が 2 進法 (基数 2 )の分数として表現できないという事実に関係しています。これは Python (あるいは Perl、 C、 C++、Japa、Fortran 、およびその他多く) が期待通りの正確な 10 進数を表示できない主要な理由です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mf">0.1</span> <span class="o">+</span> <span class="mf">0.2</span>
+<span class="go">0.30000000000000004</span>
+</pre></div>
+</div>
+<p>なぜこうなるのでしょうか？ 1/10 と 2/10 は 2 進法の小数で厳密に表現することができません。今日 (2010年7月) のマシンは、ほとんどすべて IEEE-754 浮動小数点演算を使用しており、ほとんどすべてのプラットフォームでは Python の浮動小数点を IEEE-754
+における &#8220;倍精度(double precision)&#8221; に対応付けます。754 の double には 53
+ビットの精度を持つ数が入るので、計算機に入力を行おうとすると、可能な限り
+0.1 を最も近い値の分数に変換し、 <em>J</em>/2**<em>N</em> の形式にしようと努力します。
+<em>J</em> はちょうど 53 ビットの精度の整数です。</p>
+<div class="highlight-python"><pre>1 / 10 ~= J / (2**N)</pre>
+</div>
+<p>を書き直すと、</p>
+<div class="highlight-python"><pre>J ~= 2**N / 10</pre>
+</div>
+<p>となります。  <em>J</em> は厳密に 53 ビットの精度を持っている (<tt class="docutils literal"><span class="pre">&gt;=</span> <span class="pre">2**52</span></tt> だが
+<tt class="docutils literal"><span class="pre">&lt;</span> <span class="pre">2**53</span></tt> ) ことを思い出すと、 <em>N</em> として最適な値は 56 になります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span><span class="o">**</span><span class="mi">52</span>
+<span class="go">4503599627370496</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span><span class="o">**</span><span class="mi">53</span>
+<span class="go">9007199254740992</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">2</span><span class="o">**</span><span class="mi">56</span><span class="o">/</span><span class="mi">10</span>
+<span class="go">7205759403792793</span>
+</pre></div>
+</div>
+<p>すなわち、56 は <em>J</em> をちょうど 53 ビットの精度のままに保つ <em>N</em> の唯一の値です。
+<em>J</em> の取りえる値はその商を丸めたものです。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">56</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+<p>残りは 10 の半分以上なので、最良の近似は丸め値を一つ増やした (round up)
+ものになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">+</span><span class="mi">1</span>
+<span class="go">7205759403792794</span>
+</pre></div>
+</div>
+<p>従って、754 倍精度における 1/10 の取りえる最良の近似は 2**56 以上の値、もしくは</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="mi">7205759403792794</span> <span class="o">/</span> <span class="mi">72057594037927936</span>
+</pre></div>
+</div>
+<p>となります。丸め値を 1 増やしたので、この値は実際には 1/10 より少し小さいことに注意してください; 丸め値を 1 増やさない場合、商は 1/10 よりもわずかに小さくなります。しかし、どちらにしろ <em>厳密に</em> 1/10 ではありません！</p>
+<p>つまり、計算機は 1/10 を &#8220;理解する&#8221; ことは決してありません。計算機が理解できるのは、上記のような厳密な分数であり、 754
+の倍精度浮動小数点数で得られるもっともよい近似は:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="o">.</span><span class="mi">1</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="mi">56</span>
+<span class="go">7205759403792794.0</span>
+</pre></div>
+</div>
+<p>となります。</p>
+<p>この分数に 10**30 を掛ければ、有効数字 30 桁の十進数の  (切り詰められた)
+値を見ることができます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">7205759403792794</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">30</span> <span class="o">//</span> <span class="mi">2</span><span class="o">**</span><span class="mi">56</span>
+<span class="go">100000000000000005551115123125L</span>
+</pre></div>
+</div>
+<p>これは、計算機が記憶している正確な数値が、10 進数値
+0.100000000000000005551115123125 にほぼ等しいということです。
+Python 2.7 と Python 3.1 より前のバージョンでは、 Python はこの値を小数点以下
+17桁に丸めて &#8216;0.10000000000000001&#8217; になっていました。現在のバージョンの Python は、元の2進数に正確に戻すことのできる最小の桁数の小数を表示するので、結果は &#8216;0.1&#8217; になります。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="jptranslation.html" title="15. 日本語訳について"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="interactive.html" title="13. 対話入力編集とヒストリ置換"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

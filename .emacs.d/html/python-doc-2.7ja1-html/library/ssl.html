@@ -1,0 +1,680 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>17.3. ssl — ソケットオブジェクトに対する TLS/SSL ラッパー &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="17. プロセス間通信とネットワーク" href="ipc.html" />
+    <link rel="next" title="17.4. signal — 非同期イベントにハンドラを設定する" href="signal.html" />
+    <link rel="prev" title="17.2. socket — 低レベルネットワークインターフェース" href="socket.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="signal.html" title="17.4. signal — 非同期イベントにハンドラを設定する"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="socket.html" title="17.2. socket — 低レベルネットワークインターフェース"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="ipc.html" accesskey="U">17. プロセス間通信とネットワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">17.3. <tt class="docutils literal"><span class="pre">ssl</span></tt> &#8212; ソケットオブジェクトに対する TLS/SSL ラッパー</a><ul>
+<li><a class="reference internal" href="#id1">17.3.1. 関数、定数、例外</a></li>
+<li><a class="reference internal" href="#sslsocket">17.3.2. SSLSocket オブジェクト</a></li>
+<li><a class="reference internal" href="#ssl-certificates">17.3.3. 証明書</a></li>
+<li><a class="reference internal" href="#id3">17.3.4. 例</a><ul>
+<li><a class="reference internal" href="#ssl">17.3.4.1. SSLサポートをテストする</a></li>
+<li><a class="reference internal" href="#id4">17.3.4.2. クライアントサイドの処理</a></li>
+<li><a class="reference internal" href="#id5">17.3.4.3. サーバーサイドの処理</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="socket.html"
+                        title="前の章へ">17.2. <tt class="docutils literal docutils literal"><span class="pre">socket</span></tt> &#8212; 低レベルネットワークインターフェース</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="signal.html"
+                        title="次の章へ">17.4. <tt class="docutils literal docutils literal docutils literal"><span class="pre">signal</span></tt> &#8212; 非同期イベントにハンドラを設定する</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/ssl.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-ssl">
+<span id="ssl-tls-ssl"></span><h1>17.3. <a class="reference internal" href="#module-ssl" title="ssl: ソケットオブジェクトに対する TLS/SSL ラッパー"><tt class="xref py py-mod docutils literal"><span class="pre">ssl</span></tt></a> &#8212; ソケットオブジェクトに対する TLS/SSL ラッパー<a class="headerlink" href="#module-ssl" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<span class="target" id="index-0"></span><p id="index-1">このモジュールは Transport Layer Security (よく &#8220;Secure Sockets Layer&#8221;
+という名前で知られています) 暗号化と、クライアントサイド、サーバーサイド両方のネットワークソケットのためのピア認証の仕組みを提供しています。このモジュールはOpenSSLライブラリを利用しています。
+OpenSSLは、全てのモダンなUnixシステム、Windows、Mac OS X、その他幾つかの
+OpenSSLがインストールされているプラットフォームで利用できます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">OSのソケットAPIに対して実装されているので、幾つかの挙動はプラットフォーム依存になるかもしれません。インストールされているOpenSSLのバージョンの違いも挙動の違いの原因になるかもしれません。</p>
+</div>
+<p>このセクションでは、 <tt class="docutils literal"><span class="pre">ssl</span></tt> モジュールのオブジェクトと関数の解説します。
+TLS, SSL, certificates に関するより一般的な情報は、末尾にある &#8220;See Also&#8221;
+のセクションを参照してください。</p>
+<p>このモジュールは1つのクラス、 <tt class="xref py py-class docutils literal"><span class="pre">ssl.SSLSocket</span></tt> を提供します。このクラスは <a class="reference internal" href="socket.html#socket.socket" title="socket.socket"><tt class="xref py py-class docutils literal"><span class="pre">socket.socket</span></tt></a> クラスを継承していて、ソケットで通信されるデータをSSLで暗号化・復号するソケットに似たラッパーになります。また、このクラスは追加で、 <tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt> と <tt class="xref py py-meth docutils literal"><span class="pre">write()</span></tt> メソッド、接続の相手側からの証明書を取得する <tt class="xref py py-meth docutils literal"><span class="pre">getpeercert()</span></tt> メソッド、セキュア接続で使うための暗号方式を取得する <tt class="xref py py-meth docutils literal"><span class="pre">cipher()</span></tt>
+メソッドをサポートしています。</p>
+<div class="section" id="id1">
+<h2>17.3.1. 関数、定数、例外<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="exception">
+<dt id="ssl.SSLError">
+<em class="property">exception </em><tt class="descclassname">ssl.</tt><tt class="descname">SSLError</tt><a class="headerlink" href="#ssl.SSLError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>下層のSSL実装からのエラーを伝えるための例外です。このエラーは、低レベルなネットワークの上に載っている、高レベルな暗号化と認証レイヤーでの問題を通知します。このエラーは <a class="reference internal" href="socket.html#socket.error" title="socket.error"><tt class="xref py py-exc docutils literal"><span class="pre">socket.error</span></tt></a> のサブタイプで、 <a class="reference internal" href="socket.html#socket.error" title="socket.error"><tt class="xref py py-exc docutils literal"><span class="pre">socket.error</span></tt></a> は
+<a class="reference internal" href="exceptions.html#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> のサブタイプです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.wrap_socket">
+<tt class="descclassname">ssl.</tt><tt class="descname">wrap_socket</tt><big>(</big><em>sock</em>, <em>keyfile=None</em>, <em>certfile=None</em>, <em>server_side=False</em>, <em>cert_reqs=CERT_NONE</em>, <em>ssl_version={see docs}</em>, <em>ca_certs=None</em>, <em>do_handshake_on_connect=True</em>, <em>suppress_ragged_eofs=True</em>, <em>ciphers=None</em><big>)</big><a class="headerlink" href="#ssl.wrap_socket" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="socket.html#socket.socket" title="socket.socket"><tt class="xref py py-class docutils literal"><span class="pre">socket.socket</span></tt></a> のインスタンス <tt class="docutils literal"><span class="pre">sock</span></tt> を受け取り、 <a class="reference internal" href="socket.html#socket.socket" title="socket.socket"><tt class="xref py py-class docutils literal"><span class="pre">socket.socket</span></tt></a> のサブタイプである
+<tt class="xref py py-class docutils literal"><span class="pre">ssl.SSLSocket</span></tt> のインスタンスを返します。 <tt class="xref py py-class docutils literal"><span class="pre">ssl.SSLSocket</span></tt> は低レイヤのソケットをSSLコンテキストでラップします。クライアントサイドソケットにおいて、コンテキストの生成は遅延されます。つまり、低レイヤのソケットがまだ接続されていない場合、コンテキストの生成はそのソケットの
+<tt class="xref py py-meth docutils literal"><span class="pre">connect()</span></tt> メソッドが呼ばれた後に行われます。サーバーサイドソケットの場合、そのソケットに接続先が居なければそれは listen 用ソケットだと判断されます。 <tt class="xref py py-meth docutils literal"><span class="pre">accept()</span></tt> メソッドで生成されるクライアント接続に対してのサーバーサイド
+SSLラップは自動的に行われます。そのクライアント接続に対して <a class="reference internal" href="#ssl.wrap_socket" title="ssl.wrap_socket"><tt class="xref py py-func docutils literal"><span class="pre">wrap_socket()</span></tt></a> を実行すると
+<a class="reference internal" href="#ssl.SSLError" title="ssl.SSLError"><tt class="xref py py-exc docutils literal"><span class="pre">SSLError</span></tt></a> が発生します。</p>
+<p>オプションの <tt class="docutils literal"><span class="pre">keyfile</span></tt> と <tt class="docutils literal"><span class="pre">certfile</span></tt> 引数は、接続のこちら側を識別するために利用される証明書を含むファイルを指定します。証明書がどのように <tt class="docutils literal"><span class="pre">certfile</span></tt> に格納されるかについてのより詳しい情報は、 <a class="reference internal" href="#ssl-certificates"><em>証明書</em></a>
+を参照してください。</p>
+<p>多くの場合、証明書と同じファイルに秘密鍵も格納されています。この場合、 <tt class="docutils literal"><span class="pre">certfile</span></tt>
+引数だけが必要とされます。秘密鍵が証明書と別のファイルに格納されている場合、両方の引数を指定しなければなりません。秘密鍵が <tt class="docutils literal"><span class="pre">certfile</span></tt> に格納されている場合、秘密鍵は証明書チェインの最初の証明書よりも先にないといけません。</p>
+<div class="highlight-python"><pre>-----BEGIN RSA PRIVATE KEY-----
+... (private key in base64 encoding) ...
+-----END RSA PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+... (certificate in base64 PEM encoding) ...
+-----END CERTIFICATE-----</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">server_side</span></tt> 引数は真偽値で、このソケットがサーバーサイドとクライアントサイドのどちらの動作をするのかを指定します。</p>
+<p><tt class="docutils literal"><span class="pre">cert_reqs</span></tt> 引数は、接続の相手側からの証明書を必要とするかどうかと、それを検証(validate)するかどうかを指定します。これは次の3つの定数のどれかで無ければなりません:
+<a class="reference internal" href="#ssl.CERT_NONE" title="ssl.CERT_NONE"><tt class="xref py py-const docutils literal"><span class="pre">CERT_NONE</span></tt></a> (証明書は無視されます), <a class="reference internal" href="#ssl.CERT_OPTIONAL" title="ssl.CERT_OPTIONAL"><tt class="xref py py-const docutils literal"><span class="pre">CERT_OPTIONAL</span></tt></a>
+(必要としないが、提供された場合は検証する), <a class="reference internal" href="#ssl.CERT_REQUIRED" title="ssl.CERT_REQUIRED"><tt class="xref py py-const docutils literal"><span class="pre">CERT_REQUIRED</span></tt></a>
+(証明書を必要とし、検証する)。もしこの引数が <a class="reference internal" href="#ssl.CERT_NONE" title="ssl.CERT_NONE"><tt class="xref py py-const docutils literal"><span class="pre">CERT_NONE</span></tt></a> 以外だった場合、 <tt class="docutils literal"><span class="pre">ca_certs</span></tt> 引数はCA証明書ファイルを指定していなければなりません。</p>
+<p><tt class="docutils literal"><span class="pre">ca_certs</span></tt> ファイルは、接続の相手側から渡された証明書を検証するために使う、一連のCA証明書を結合したものを含んでいます。このファイル内にどう証明書を並べるかについての詳しい情報は <a class="reference internal" href="#ssl-certificates"><em>証明書</em></a>
+を参照してください。</p>
+<p><tt class="docutils literal"><span class="pre">ssl_version</span></tt> 引数は、使用するSSLプロトコルのバージョンを指定します。通常、サーバー側が特定のプロトコルバージョンを選び、クライアント側はサーバーの選んだプロトコルを受け入れなければなりません。ほとんどのバージョンは他のバージョンと互換性がありません。もしこの引数が指定されなかった場合、クライアントサイドでは、デフォルトの
+SSLバージョンは SSLv3 になります。サーバーサイドでは SSLv23 です。これらのバージョンは、できるだけの互換性を確保するように選ばれています。</p>
+<p>次のテーブルは、どのクライアント側のバージョンがどのサーバー側のバージョンに接続できるかを示しています。</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="15%" />
+<col width="15%" />
+<col width="16%" />
+<col width="15%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><em>client</em> / <strong>server</strong></td>
+<td><strong>SSLv2</strong></td>
+<td><strong>SSLv3</strong></td>
+<td><strong>SSLv23</strong></td>
+<td><strong>TLSv1</strong></td>
+</tr>
+<tr class="row-even"><td><em>SSLv2</em></td>
+<td>yes</td>
+<td>no</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr class="row-odd"><td><em>SSLv3</em></td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr class="row-even"><td><em>SSLv23</em></td>
+<td>yes</td>
+<td>no</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr class="row-odd"><td><em>TLSv1</em></td>
+<td>no</td>
+<td>no</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">どの接続が成功するかは、 OpenSSL のバージョンに依存して大きく変わります。例えば、いくつか古めのバージョンの OpenSSL (OS X 10.4 の 0.9.7l など)
+では、 SSLv2 クライアントは SSLv23 サーバーに接続できませんでした。また、 OpenSSL 1.0.0 の初期では、 SSLv23 クライアントは明示的に SSLv2
+cipher を有効にしない限りは SSLv2 接続を試みずませんでした。このバージョンで SSLv2 を有効にするには、 <em>ciphers</em> 引数に <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> か
+<tt class="docutils literal"><span class="pre">&quot;SSLv2&quot;</span></tt> を指定することができます。</p>
+</div>
+<p><em>ciphers</em> 引数はこの SSL オブジェクトで利用可能な cipher を指定します。これは、 <a class="reference external" href="http://www.openssl.org/docs/apps/ciphers.html#CIPHER_LIST_FORMAT">OpenSSL cipher list format</a>
+にある文字列のどれかでなければなりません。</p>
+<p><tt class="docutils literal"><span class="pre">do_handshake_on_connect</span></tt> 引数は、 <tt class="xref py py-meth docutils literal"><span class="pre">socket.connect()</span></tt> の後に自動的に
+SSLハンドシェイクを行うか、それともアプリケーションが明示的に <a class="reference internal" href="#ssl.SSLSocket.do_handshake" title="ssl.SSLSocket.do_handshake"><tt class="xref py py-meth docutils literal"><span class="pre">SSLSocket.do_handshake()</span></tt></a>
+メソッドを実行するかを指定します。
+<a class="reference internal" href="#ssl.SSLSocket.do_handshake" title="ssl.SSLSocket.do_handshake"><tt class="xref py py-meth docutils literal"><span class="pre">SSLSocket.do_handshake()</span></tt></a> を明示的に呼びだすことで、ハンドシェイクによるソケットI/Oのブロッキング動作を制御できます。</p>
+<p><tt class="docutils literal"><span class="pre">suppress_ragged_eofs</span></tt> 引数は、 <a class="reference internal" href="#ssl.SSLSocket.read" title="ssl.SSLSocket.read"><tt class="xref py py-meth docutils literal"><span class="pre">SSLSocket.read()</span></tt></a> メソッドが、接続先から予期しないEOFを受け取った時に通知する方法を指定します。
+<a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> (デフォルト) の場合、下位のソケットレイヤーから予期せぬEOFエラーが来た場合、通常のEOFを返します。 <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> の場合、呼び出し元に例外を投げて通知します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>新しいオプション引数 <em>ciphers</em></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.RAND_status">
+<tt class="descclassname">ssl.</tt><tt class="descname">RAND_status</tt><big>(</big><big>)</big><a class="headerlink" href="#ssl.RAND_status" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>SSL 擬似乱数生成器が十分なランダム性(randomness)を受け取っている時に真を、それ以外の場合は偽を返します。
+<a class="reference internal" href="#ssl.RAND_egd" title="ssl.RAND_egd"><tt class="xref py py-func docutils literal"><span class="pre">ssl.RAND_egd()</span></tt></a> と <a class="reference internal" href="#ssl.RAND_add" title="ssl.RAND_add"><tt class="xref py py-func docutils literal"><span class="pre">ssl.RAND_add()</span></tt></a> を使って擬似乱数生成機にランダム性を加えることができます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.RAND_egd">
+<tt class="descclassname">ssl.</tt><tt class="descname">RAND_egd</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#ssl.RAND_egd" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>もしエントロピー収集デーモン(EGD=entropy-gathering daemon)が動いていて、
+<tt class="docutils literal"><span class="pre">path</span></tt> がEGDへのソケットのパスだった場合、この関数はそのソケットから
+256バイトのランダム性を読み込み、SSL擬似乱数生成器にそれを渡すことで、生成される暗号鍵のセキュリティを向上させることができます。これは、より良いランダム性のソースが無いシステムでのみ必要です。</p>
+<p>エントロピー収集デーモンについては、
+<a class="reference external" href="http://egd.sourceforge.net/">http://egd.sourceforge.net/</a> や <a class="reference external" href="http://prngd.sourceforge.net/">http://prngd.sourceforge.net/</a>
+を参照してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.RAND_add">
+<tt class="descclassname">ssl.</tt><tt class="descname">RAND_add</tt><big>(</big><em>bytes</em>, <em>entropy</em><big>)</big><a class="headerlink" href="#ssl.RAND_add" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた <tt class="docutils literal"><span class="pre">bytes</span></tt> をSSL擬似乱数生成器に混ぜます。
+<tt class="docutils literal"><span class="pre">entropy</span></tt> 引数(float値)は、その文字列に含まれるエントロピーの下限(lower bound)です。
+(なので、いつでも <tt class="xref py py-const docutils literal"><span class="pre">0.0</span></tt> を使うことができます。)
+エントロピーのソースについてのより詳しい情報は、 <span class="target" id="index-2"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1750.html"><strong>RFC 1750</strong></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.cert_time_to_seconds">
+<tt class="descclassname">ssl.</tt><tt class="descname">cert_time_to_seconds</tt><big>(</big><em>timestring</em><big>)</big><a class="headerlink" href="#ssl.cert_time_to_seconds" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>証明書内の &#8220;notBefore&#8221; や &#8220;notAfter&#8221; で使われている日時の文字列表現 <em>timestring</em>
+から、通常のエポック秒を含むfloat値にして返します。</p>
+<p>例です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ssl</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssl</span><span class="o">.</span><span class="n">cert_time_to_seconds</span><span class="p">(</span><span class="s">&quot;May  9 00:00:00 2007 GMT&quot;</span><span class="p">)</span>
+<span class="go">1178694000.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">time</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span><span class="o">.</span><span class="n">ctime</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">cert_time_to_seconds</span><span class="p">(</span><span class="s">&quot;May  9 00:00:00 2007 GMT&quot;</span><span class="p">))</span>
+<span class="go">&#39;Wed May  9 00:00:00 2007&#39;</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.get_server_certificate">
+<tt class="descclassname">ssl.</tt><tt class="descname">get_server_certificate</tt><big>(</big><em>addr</em>, <em>ssl_version=PROTOCOL_SSLv3</em>, <em>ca_certs=None</em><big>)</big><a class="headerlink" href="#ssl.get_server_certificate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>SSLで保護されたサーバーのアドレス <tt class="docutils literal"><span class="pre">addr</span></tt> を (<em>hostname</em>, <em>port-number</em>)
+の形で受け取り、そのサーバーから証明書を取得し、それを PEMエンコードされた文字列として返します。
+<tt class="docutils literal"><span class="pre">ssl_version</span></tt> が指定された場合は、サーバーに接続を試みるときにそのバージョンのSSLプロトコルを利用します。
+<tt class="docutils literal"><span class="pre">ca_certs</span></tt> が指定された場合、それは <a class="reference internal" href="#ssl.wrap_socket" title="ssl.wrap_socket"><tt class="xref py py-func docutils literal"><span class="pre">wrap_socket()</span></tt></a> の同名の引数と同じフォーマットで、ルート証明書のリストを含むファイルでなければなりません。この関数はサーバー証明書をルート証明書リストに対して認証し、認証が失敗した場合にこの関数も失敗します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.DER_cert_to_PEM_cert">
+<tt class="descclassname">ssl.</tt><tt class="descname">DER_cert_to_PEM_cert</tt><big>(</big><em>DER_cert_bytes</em><big>)</big><a class="headerlink" href="#ssl.DER_cert_to_PEM_cert" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>DERエンコードされたバイト列として与えられた証明書から、
+PEMエンコードされたバージョンの同じ証明書を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ssl.PEM_cert_to_DER_cert">
+<tt class="descclassname">ssl.</tt><tt class="descname">PEM_cert_to_DER_cert</tt><big>(</big><em>PEM_cert_string</em><big>)</big><a class="headerlink" href="#ssl.PEM_cert_to_DER_cert" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>PEM 形式のASCII文字列として与えられた証明書から、同じ証明書をDERエンコードしたバイト列を返します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.CERT_NONE">
+<tt class="descclassname">ssl.</tt><tt class="descname">CERT_NONE</tt><a class="headerlink" href="#ssl.CERT_NONE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ソケット接続先からの証明書やその認証を必要としないときに、 <tt class="xref py py-func docutils literal"><span class="pre">sslobject()</span></tt>
+の <tt class="docutils literal"><span class="pre">cert_reqs</span></tt> 引数に指定する値。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.CERT_OPTIONAL">
+<tt class="descclassname">ssl.</tt><tt class="descname">CERT_OPTIONAL</tt><a class="headerlink" href="#ssl.CERT_OPTIONAL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ソケット接続先からの証明書を必要としないが、もし証明書があればそれを認証する場合に
+<tt class="xref py py-func docutils literal"><span class="pre">sslobject()</span></tt> の <tt class="docutils literal"><span class="pre">cert_reqs</span></tt> 引数に指定する値。この設定を利用するときは、 <tt class="docutils literal"><span class="pre">ca_certs</span></tt> 引数に有効な証明書認証ファイルが渡される必要があることに注意してください。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.CERT_REQUIRED">
+<tt class="descclassname">ssl.</tt><tt class="descname">CERT_REQUIRED</tt><a class="headerlink" href="#ssl.CERT_REQUIRED" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ソケット接続先からの証明書とその認証が必要なときに <tt class="xref py py-func docutils literal"><span class="pre">sslobject()</span></tt> の
+<tt class="docutils literal"><span class="pre">cert_reqs</span></tt> 引数に指定する値。この設定を利用するときは、 <tt class="docutils literal"><span class="pre">ca_certs</span></tt> 引数に有効な証明書認証ファイルが渡される必要があることに注意してください。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.PROTOCOL_SSLv2">
+<tt class="descclassname">ssl.</tt><tt class="descname">PROTOCOL_SSLv2</tt><a class="headerlink" href="#ssl.PROTOCOL_SSLv2" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>チャンネル暗号化プロトコルに SSL バージョン2を選択する。</p>
+<p>このプロトコルは、 OpenSSL が OPENSSL_NO_SSL2 フラグが有効な状態でコンパイルされている場合には利用できません。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">SSL version 2 は非セキュアです。このプロトコルは強く非推奨です。</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.PROTOCOL_SSLv23">
+<tt class="descclassname">ssl.</tt><tt class="descname">PROTOCOL_SSLv23</tt><a class="headerlink" href="#ssl.PROTOCOL_SSLv23" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>チャンネル暗号化プロトコルとしてSSLバージョン2か3を選択します。これはサーバー側が相手側への最大限の互換性を確保するための設定です。しかし、この設定では非常に低い品質の暗号化が選ばれる可能性があります。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.PROTOCOL_SSLv3">
+<tt class="descclassname">ssl.</tt><tt class="descname">PROTOCOL_SSLv3</tt><a class="headerlink" href="#ssl.PROTOCOL_SSLv3" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>チャンネル暗号化プロトコルとしてSSLバージョン3をを選択します。クライアントにとって、これは最大限に互換性の高いSSLの種類です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.PROTOCOL_TLSv1">
+<tt class="descclassname">ssl.</tt><tt class="descname">PROTOCOL_TLSv1</tt><a class="headerlink" href="#ssl.PROTOCOL_TLSv1" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>チャンネル暗号化プロトコルとしてTLSバージョン1を選択します。これは最も現代的で、接続の両サイドが利用できる場合は、たぶん最も安全な選択肢です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.OPENSSL_VERSION">
+<tt class="descclassname">ssl.</tt><tt class="descname">OPENSSL_VERSION</tt><a class="headerlink" href="#ssl.OPENSSL_VERSION" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インタプリタによってロードされた OpenSSL ライブラリのバージョン文字列:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ssl</span><span class="o">.</span><span class="n">OPENSSL_VERSION</span>
+<span class="go">&#39;OpenSSL 0.9.8k 25 Mar 2009&#39;</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.OPENSSL_VERSION_INFO">
+<tt class="descclassname">ssl.</tt><tt class="descname">OPENSSL_VERSION_INFO</tt><a class="headerlink" href="#ssl.OPENSSL_VERSION_INFO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>OpenSSL ライブラリのバージョン情報を表す5つの整数のタプル:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ssl</span><span class="o">.</span><span class="n">OPENSSL_VERSION_INFO</span>
+<span class="go">(0, 9, 8, 11, 15)</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="data">
+<dt id="ssl.OPENSSL_VERSION_NUMBER">
+<tt class="descclassname">ssl.</tt><tt class="descname">OPENSSL_VERSION_NUMBER</tt><a class="headerlink" href="#ssl.OPENSSL_VERSION_NUMBER" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>1つの整数の形式の、 OpenSSL ライブラリの生のバージョン番号:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">ssl</span><span class="o">.</span><span class="n">OPENSSL_VERSION_NUMBER</span>
+<span class="go">9470143L</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">ssl</span><span class="o">.</span><span class="n">OPENSSL_VERSION_NUMBER</span><span class="p">)</span>
+<span class="go">&#39;0x9080bfL&#39;</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+</div>
+<div class="section" id="sslsocket">
+<h2>17.3.2. SSLSocket オブジェクト<a class="headerlink" href="#sslsocket" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="method">
+<dt id="ssl.SSLSocket.read">
+<tt class="descclassname">SSLSocket.</tt><tt class="descname">read</tt><big>(</big><span class="optional">[</span><em>nbytes=1024</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#ssl.SSLSocket.read" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">nbytes</span></tt> 以下のバイト列を SSL暗号化されたチャンネルから受信してそれを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssl.SSLSocket.write">
+<tt class="descclassname">SSLSocket.</tt><tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#ssl.SSLSocket.write" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">data</span></tt> をSSLチャンネルを使って暗号化した上で接続の相手側へ送ります。書き込めたバイト数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssl.SSLSocket.getpeercert">
+<tt class="descclassname">SSLSocket.</tt><tt class="descname">getpeercert</tt><big>(</big><em>binary_form=False</em><big>)</big><a class="headerlink" href="#ssl.SSLSocket.getpeercert" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>接続先に証明書が無い場合、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+<p><tt class="docutils literal"><span class="pre">binary_form</span></tt> が <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> で接続先から証明書を取得した場合、このメソッドは <a class="reference internal" href="stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> のインスタンスを返します。証明書が認証されていない場合、辞書は空です。証明書が認証されていた場合、 <tt class="docutils literal"><span class="pre">subject</span></tt> (証明書が発行された principal),
+<tt class="docutils literal"><span class="pre">notafter</span></tt> (その証明書がそれ以降信頼できなくなる時間) が格納された辞書を返します。証明書は既に認証されているので、 <tt class="docutils literal"><span class="pre">notBefore</span></tt> と <tt class="docutils literal"><span class="pre">issuer</span></tt> フィールドは返されません。証明書が <em>Subject Alternative Name</em> 拡張(<span class="target" id="index-4"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc3280.html"><strong>RFC 3280</strong></a> を参照)のインスタンスを格納していた場合、 <tt class="docutils literal"><span class="pre">subjectAltName</span></tt> キーも辞書に含まれます。</p>
+<p>&#8220;subject&#8221; フィールドは、証明書の principal に格納されているRDN
+(relative distinguishued name)のシーケンスを格納したタプルで、各RDNは
+name-value ペアのシーケンスです。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&#39;notAfter&#39;</span><span class="p">:</span> <span class="s">&#39;Feb 16 16:54:50 2013 GMT&#39;</span><span class="p">,</span>
+ <span class="s">&#39;subject&#39;</span><span class="p">:</span> <span class="p">(((</span><span class="s">&#39;countryName&#39;</span><span class="p">,</span> <span class="s">u&#39;US&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;stateOrProvinceName&#39;</span><span class="p">,</span> <span class="s">u&#39;Delaware&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;localityName&#39;</span><span class="p">,</span> <span class="s">u&#39;Wilmington&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;organizationName&#39;</span><span class="p">,</span> <span class="s">u&#39;Python Software Foundation&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;organizationalUnitName&#39;</span><span class="p">,</span> <span class="s">u&#39;SSL&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;commonName&#39;</span><span class="p">,</span> <span class="s">u&#39;somemachine.python.org&#39;</span><span class="p">),))}</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">binary_form</span></tt> 引数が <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> だった場合、証明書が渡されていればこのメソッドはDERエンコードされた証明書全体をバイト列として返し、接続先が証明書を提示しなかった場合は <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返します。この戻り値は認証とは独立しています。認証が要求されていた場合 (<a class="reference internal" href="#ssl.CERT_OPTIONAL" title="ssl.CERT_OPTIONAL"><tt class="xref py py-const docutils literal"><span class="pre">CERT_OPTIONAL</span></tt></a>
+か <a class="reference internal" href="#ssl.CERT_REQUIRED" title="ssl.CERT_REQUIRED"><tt class="xref py py-const docutils literal"><span class="pre">CERT_REQUIRED</span></tt></a>) その証明書は認証されますが、 <a class="reference internal" href="#ssl.CERT_NONE" title="ssl.CERT_NONE"><tt class="xref py py-const docutils literal"><span class="pre">CERT_NONE</span></tt></a>
+が接続時に利用された場合、証明書があったとしても、それは認証されません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssl.SSLSocket.cipher">
+<tt class="descclassname">SSLSocket.</tt><tt class="descname">cipher</tt><big>(</big><big>)</big><a class="headerlink" href="#ssl.SSLSocket.cipher" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>利用されている暗号の名前、その暗号の利用を定義しているSSLプロトコルのバージョン、利用されている鍵のbit長の3つの値を含むタプルを返します。もし接続が確立されていない場合、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssl.SSLSocket.do_handshake">
+<tt class="descclassname">SSLSocket.</tt><tt class="descname">do_handshake</tt><big>(</big><big>)</big><a class="headerlink" href="#ssl.SSLSocket.do_handshake" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TLS/SSL ハンドシェイクを実施します。ノンブロッキングソケットで利用された場合、ハンドシェイクが完了するまでは
+<a class="reference internal" href="#ssl.SSLError" title="ssl.SSLError"><tt class="xref py py-exc docutils literal"><span class="pre">SSLError</span></tt></a> の <tt class="docutils literal"><span class="pre">arg[0]</span></tt> に <tt class="xref py py-const docutils literal"><span class="pre">SSL_ERROR_WANT_READ</span></tt> か
+<tt class="xref py py-const docutils literal"><span class="pre">SSL_ERROR_WANT_WRITE</span></tt> が設定された例外が発生し、このメソッドを繰り返し実行しなければなりません。例えば、ブロッキングソケットを真似する場合は次のようになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">do_handshake</span><span class="p">()</span>
+        <span class="k">break</span>
+    <span class="k">except</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSLError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSL_ERROR_WANT_READ</span><span class="p">:</span>
+            <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="n">s</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[])</span>
+        <span class="k">elif</span> <span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSL_ERROR_WANT_WRITE</span><span class="p">:</span>
+            <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([],</span> <span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="p">[])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="ssl.SSLSocket.unwrap">
+<tt class="descclassname">SSLSocket.</tt><tt class="descname">unwrap</tt><big>(</big><big>)</big><a class="headerlink" href="#ssl.SSLSocket.unwrap" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>SSLシャットダウンハンドシェイクを実行します。これは下位レイヤーのソケットからTLSレイヤーを取り除き、下位レイヤーのソケットオブジェクトを返します。これは暗号化されたオペレーションから暗号化されていない接続に移行するときに利用されます。以降の通信には、このメソッドが返したソケットインスタンスを利用するべきです。元のソケットインスタンスは unwrap 後に正しく機能しないかもしれません。</p>
+</dd></dl>
+
+<span class="target" id="index-5"></span></div>
+<div class="section" id="ssl-certificates">
+<span id="index-6"></span><span id="id2"></span><h2>17.3.3. 証明書<a class="headerlink" href="#ssl-certificates" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>証明書を大まかに説明すると、公開鍵/秘密鍵システムの一種です。このシステムでは、各 <em>principal</em> (これはマシン、人、組織などです) は、ユニークな2つの暗号鍵を割り当てられます。1つは公開され、 <em>公開鍵(public key)</em>
+と呼ばれます。もう一方は秘密にされ、 <em>秘密鍵(private key)</em> と呼ばれます。
+2つの鍵は関連しており、片方の鍵で暗号化したメッセージは、もう片方の鍵 <strong>のみ</strong>
+で復号できます。</p>
+<p>証明書は2つの principal の情報を含んでいます。証明書は <em>subject</em> 名とその公開鍵を含んでいます。また、もう一つの principal である <em>発行者(issuer)</em> からの、 subject が本人であることと、その公開鍵が正しいことの宣言(statement)を含んでいます。発行者からの宣言は、その発行者の秘密鍵で署名されています。発行者の秘密鍵は発行者しか知りませんが、誰もがその発行者の公開鍵を利用して宣言を復号し、証明書内の別の情報と比較することで認証することができます。証明書はまた、その証明書が有効である期限に関する情報も含んでいます。この期限は &#8220;notBefore&#8221; と &#8220;notAfter&#8221; と呼ばれる2つのフィールドで表現されています。</p>
+<p>Python において証明書を利用する場合、クライアントもサーバーも自分を証明するために証明書を利用することができます。ネットワーク接続の相手側に証明書の提示を要求する事ができ、そのクライアントやサーバーが認証を必要とするならその証明書を認証することができます。認証が失敗した場合、接続は例外を発生させます。認証は下位層のOpenSSLフレームワークが自動的に行います。アプリケーションは認証機構について意識する必要はありません。しかし、アプリケーションは認証プロセスのために幾つかの証明書を提供する必要があるかもしれません。</p>
+<p>Python は証明書を格納したファイルを利用します。そのファイルは &#8220;PEM&#8221; (<span class="target" id="index-7"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1422.html"><strong>RFC 1422</strong></a> 参照)
+フォーマットという、ヘッダー行とフッター行の間にbase-64エンコードされた形をとっている必要があります。</p>
+<div class="highlight-python"><pre>-----BEGIN CERTIFICATE-----
+... (certificate in base64 PEM encoding) ...
+-----END CERTIFICATE-----</pre>
+</div>
+<p>Pythonが利用する証明書を格納したファイルは、ときには <em>証明書チェイン(certificate chain)</em>
+と呼ばれる証明書のシーケンスを格納します。このチェインは、まずクライアントやサーバー自体の principal の証明書で始まらなければなりません。それ以降に続く証明書は、手前の証明書の発行者(issuer)の証明書になり、最後にsubject と発行者が同じ <em>自己署名(self-signed)</em> 証明書で終わります。この最後の証明書は <em>ルート証明書(root certificate</em>
+と呼ばれます。これらの証明書チェインは1つの証明書ファイルに結合されなければなりません。例えば、3つの証明書からなる証明書チェインがあるとします。私たちのサーバーの証明書から、私たちのサーバーに署名した認証局の証明書、そして認証局の証明書を発行した機関のルート証明書です。</p>
+<div class="highlight-python"><pre>-----BEGIN CERTIFICATE-----
+... (certificate for your server)...
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+... (the certificate for the CA)...
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+... (the root certificate for the CA's issuer)...
+-----END CERTIFICATE-----</pre>
+</div>
+<p>もし相手から送られてきた証明書の認証をしたい場合、信頼している各発行者の証明書チェインが入った &#8220;CA certs&#8221; ファイルを提供する必要があります。繰り返しますが、このファイルは単純に、各チェインを結合しただけのものです。認証のために、Pythonはそのファイルの中の最初にマッチしたチェインを利用します。</p>
+<p>幾つかの &#8220;standard&#8221; ルート証明書が、幾つかの認証機関から入手できます:
+<a class="reference external" href="http://www.cacert.org/index.php?id=3">CACert.org</a>, <a class="reference external" href="http://www.thawte.com/roots/">Thawte</a>, <a class="reference external" href="http://www.verisign.com/support/roots.html">Verisign</a>, <a class="reference external" href="http://www.PositiveSSL.com/ssl-certificate-support/cert_installation/UTN-USERFirst-Hardware.crt">Positive SSL</a>
+(python.org が利用しています), <a class="reference external" href="http://www.geotrust.com/resources/root_certificates/index.asp">Equifax and GeoTrust</a>.</p>
+<p>一般的に、 SSL3 か TLS1 を利用している場合、&#8221;CA certs&#8221; ファイルに全てのチェインを保存する必要はありません。接続先はそれ自身の証明書からルート証明書までの証明書チェインを送ってくるはずで、&#8221;CA certs&#8221; にはルート証明書だけあれば充分なはずです。証明書チェインを組み立てる方法についてのより詳しい情報は、 <span class="target" id="index-8"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc4158.html"><strong>RFC 4158</strong></a> を参照してください。</p>
+<p>SSL暗号化接続サービスを提供するサーバーを建てる場合、適切な証明書を取得するには、認証局から買うなどの幾つかの方法があります。また、自己署名証明書を作るケースもあります。
+OpenSSLを使って自己署名証明書を作るには、次のようにします。</p>
+<div class="highlight-python"><pre>% openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout cert.pem
+Generating a 1024 bit RSA private key
+.......++++++
+.............................++++++
+writing new private key to 'cert.pem'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:US
+State or Province Name (full name) [Some-State]:MyState
+Locality Name (eg, city) []:Some City
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:My Organization, Inc.
+Organizational Unit Name (eg, section) []:My Group
+Common Name (eg, YOUR name) []:myserver.mygroup.myorganization.com
+Email Address []:ops@myserver.mygroup.myorganization.com
+%</pre>
+</div>
+<p>自己署名証明書の欠点は、それ自身がルート証明書であり、他の人はその証明書を持っていない
+(そして信頼しない)ことです。</p>
+</div>
+<div class="section" id="id3">
+<h2>17.3.4. 例<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="ssl">
+<h3>17.3.4.1. SSLサポートをテストする<a class="headerlink" href="#ssl" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>インストールされているPythonがSSLをサポートしているかどうかをテストするために、ユーザーコードは次のイディオムを利用することができます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">ssl</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="o">...</span> <span class="c"># do something that requires SSL support</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>17.3.4.2. クライアントサイドの処理<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>次の例では、SSLサーバーに接続し、サーバーのアドレスと証明書を表示し、数バイト送信し、レスポンスの一部を読み込みます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">socket</span><span class="o">,</span> <span class="nn">ssl</span><span class="o">,</span> <span class="nn">pprint</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+
+<span class="c"># サーバーからの証明書を要求する</span>
+<span class="n">ssl_sock</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">wrap_socket</span><span class="p">(</span><span class="n">s</span><span class="p">,</span>
+                           <span class="n">ca_certs</span><span class="o">=</span><span class="s">&quot;/etc/ca_certs_file&quot;</span><span class="p">,</span>
+                           <span class="n">cert_reqs</span><span class="o">=</span><span class="n">ssl</span><span class="o">.</span><span class="n">CERT_REQUIRED</span><span class="p">)</span>
+
+<span class="n">ssl_sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="s">&#39;www.verisign.com&#39;</span><span class="p">,</span> <span class="mi">443</span><span class="p">))</span>
+
+<span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">ssl_sock</span><span class="o">.</span><span class="n">getpeername</span><span class="p">())</span>
+<span class="k">print</span> <span class="n">ssl_sock</span><span class="o">.</span><span class="n">cipher</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">ssl_sock</span><span class="o">.</span><span class="n">getpeercert</span><span class="p">())</span>
+
+<span class="c"># シンプルなHTTPリクエストを送信する。 -- 実際のコードではhttplibを利用してください。</span>
+<span class="n">ssl_sock</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;&quot;&quot;GET / HTTP/1.0</span><span class="se">\r</span><span class="s"></span>
+<span class="s">Host: www.verisign.com</span><span class="se">\r\n\r\n</span><span class="s">&quot;&quot;&quot;</span><span class="p">)</span>
+
+<span class="c"># 1チャンクのデータを読む。</span>
+<span class="c"># サーバーから返されたデータの全てを読み込むとは限らない。</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ssl_sock</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="c"># SSLSocketを閉じると下位レイヤーのソケットも閉じられることに注目してください。</span>
+<span class="n">ssl_sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>2007年9月時点で、このプログラムによって表示される証明書は次のようになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span><span class="s">&#39;notAfter&#39;</span><span class="p">:</span> <span class="s">&#39;May  8 23:59:59 2009 GMT&#39;</span><span class="p">,</span>
+ <span class="s">&#39;subject&#39;</span><span class="p">:</span> <span class="p">(((</span><span class="s">&#39;serialNumber&#39;</span><span class="p">,</span> <span class="s">u&#39;2497886&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;1.3.6.1.4.1.311.60.2.1.3&#39;</span><span class="p">,</span> <span class="s">u&#39;US&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;1.3.6.1.4.1.311.60.2.1.2&#39;</span><span class="p">,</span> <span class="s">u&#39;Delaware&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;countryName&#39;</span><span class="p">,</span> <span class="s">u&#39;US&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;postalCode&#39;</span><span class="p">,</span> <span class="s">u&#39;94043&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;stateOrProvinceName&#39;</span><span class="p">,</span> <span class="s">u&#39;California&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;localityName&#39;</span><span class="p">,</span> <span class="s">u&#39;Mountain View&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;streetAddress&#39;</span><span class="p">,</span> <span class="s">u&#39;487 East Middlefield Road&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;organizationName&#39;</span><span class="p">,</span> <span class="s">u&#39;VeriSign, Inc.&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;organizationalUnitName&#39;</span><span class="p">,</span>
+               <span class="s">u&#39;Production Security Services&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;organizationalUnitName&#39;</span><span class="p">,</span>
+               <span class="s">u&#39;Terms of use at www.verisign.com/rpa (c)06&#39;</span><span class="p">),),</span>
+             <span class="p">((</span><span class="s">&#39;commonName&#39;</span><span class="p">,</span> <span class="s">u&#39;www.verisign.com&#39;</span><span class="p">),))}</span>
+</pre></div>
+</div>
+<p>これは不完全な形の <tt class="docutils literal"><span class="pre">subject</span></tt> フィールドです。</p>
+</div>
+<div class="section" id="id5">
+<h3>17.3.4.3. サーバーサイドの処理<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>サーバーサイドの処理では、通常、サーバー証明書と秘密鍵がそれぞれファイルに格納された形で必要です。ソケットを開き、ポートにバインドし、そのソケットの <tt class="xref py py-meth docutils literal"><span class="pre">listen()</span></tt> を呼び、クライアントからの接続を待ちます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">socket</span><span class="o">,</span> <span class="nn">ssl</span>
+
+<span class="n">bindsocket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">()</span>
+<span class="n">bindsocket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="s">&#39;myaddr.mydomain.com&#39;</span><span class="p">,</span> <span class="mi">10023</span><span class="p">))</span>
+<span class="n">bindsocket</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>誰かが接続してきた場合、 <tt class="xref py py-meth docutils literal"><span class="pre">accept()</span></tt> を呼んで新しいソケットを作成し、
+<a class="reference internal" href="#ssl.wrap_socket" title="ssl.wrap_socket"><tt class="xref py py-func docutils literal"><span class="pre">wrap_socket()</span></tt></a> を利用してサーバーサイドSSLコンテキストを生成します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">newsocket</span><span class="p">,</span> <span class="n">fromaddr</span> <span class="o">=</span> <span class="n">bindsocket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+    <span class="n">connstream</span> <span class="o">=</span> <span class="n">ssl</span><span class="o">.</span><span class="n">wrap_socket</span><span class="p">(</span><span class="n">newsocket</span><span class="p">,</span>
+                                 <span class="n">server_side</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                 <span class="n">certfile</span><span class="o">=</span><span class="s">&quot;mycertfile&quot;</span><span class="p">,</span>
+                                 <span class="n">keyfile</span><span class="o">=</span><span class="s">&quot;mykeyfile&quot;</span><span class="p">,</span>
+                                 <span class="n">ssl_version</span><span class="o">=</span><span class="n">ssl</span><span class="o">.</span><span class="n">PROTOCOL_TLSv1</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">deal_with_client</span><span class="p">(</span><span class="n">connstream</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">connstream</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SHUT_RDWR</span><span class="p">)</span>
+        <span class="n">connstream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>そして、 <tt class="docutils literal"><span class="pre">connstream</span></tt> からデータを読み、クライアントと切断する(あるいはクライアントが切断してくる)まで何か処理をします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">deal_with_client</span><span class="p">(</span><span class="n">connstream</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">connstream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="c"># null data means the client is finished with us</span>
+    <span class="k">while</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">do_something</span><span class="p">(</span><span class="n">connstream</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+            <span class="c"># we&#39;ll assume do_something returns False</span>
+            <span class="c"># when we&#39;re finished with client</span>
+            <span class="k">break</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">connstream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="c"># finished with client</span>
+</pre></div>
+</div>
+<p>そして新しいクライアント接続のために listen に戻ります。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Class <a class="reference internal" href="socket.html#socket.socket" title="socket.socket"><tt class="xref py py-class docutils literal"><span class="pre">socket.socket</span></tt></a></dt>
+<dd>下位レイヤーの <a class="reference internal" href="socket.html#module-socket" title="socket: 低レベルネットワークインターフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">socket</span></tt></a> クラスのドキュメント</dd>
+<dt><a class="reference external" href="http://www3.rad.com/networks/applications/secure/tls.htm">TLS (Transport Layer Security) and SSL (Secure Socket Layer)</a></dt>
+<dd>Debby Koren</dd>
+<dt><a class="reference external" href="http://www.ietf.org/rfc/rfc1422">RFC 1422: Privacy Enhancement for Internet Electronic Mail: Part II: Certificate-Based Key Management</a></dt>
+<dd>Steve Kent</dd>
+<dt><a class="reference external" href="http://www.ietf.org/rfc/rfc1750">RFC 1750: Randomness Recommendations for Security</a></dt>
+<dd>D. Eastlake et. al.</dd>
+<dt><a class="reference external" href="http://www.ietf.org/rfc/rfc3280">RFC 3280: Internet X.509 Public Key Infrastructure Certificate and CRL Profile</a></dt>
+<dd>Housley et. al.</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="signal.html" title="17.4. signal — 非同期イベントにハンドラを設定する"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="socket.html" title="17.2. socket — 低レベルネットワークインターフェース"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="ipc.html" >17. プロセス間通信とネットワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

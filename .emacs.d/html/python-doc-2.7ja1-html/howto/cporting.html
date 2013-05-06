@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.0 への拡張モジュール移植 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python HOWTO" href="index.html" />
+    <link rel="next" title="Python で Curses プログラミング" href="curses.html" />
+    <link rel="prev" title="Python の支援活動 HOWTO" href="advocacy.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="curses.html" title="Python で Curses プログラミング"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="advocacy.html" title="Python の支援活動 HOWTO"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.0 への拡張モジュール移植</a><ul>
+<li><a class="reference internal" href="#id2">条件コンパイル</a></li>
+<li><a class="reference internal" href="#api">オブジェクト API の変更</a><ul>
+<li><a class="reference internal" href="#str-unicode">str/unicode の統合</a></li>
+<li><a class="reference internal" href="#long-int">long/int の統合</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">モジュールの初期化と状態情報</a></li>
+<li><a class="reference internal" href="#id4">ほかの選択肢</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="advocacy.html"
+                        title="前の章へ">Python の支援活動 HOWTO</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="curses.html"
+                        title="次の章へ">Python で Curses プログラミング</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/cporting.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="id1">
+<h1>3.0 への拡張モジュール移植<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">author:</th><td class="field-body">Benjamin Peterson</td>
+</tr>
+</tbody>
+</table>
+<div class="topic">
+<p class="topic-title first">概要</p>
+<p>C-API の変更は Python 3.0 の目標には入っていませんでしたが、Python レベルでの変更がたくさんあったので、2.x の API を無傷で済ませることはできませんでした。実際、 <a class="reference internal" href="../library/functions.html#int" title="int"><tt class="xref py py-func docutils literal"><span class="pre">int()</span></tt></a> と <a class="reference internal" href="../library/functions.html#long" title="long"><tt class="xref py py-func docutils literal"><span class="pre">long()</span></tt></a> の統合などは C レベルのほうが目立ちます。この文書では、なくなった互換性と、その対処方法について記述しようと思います。</p>
+</div>
+<div class="section" id="id2">
+<h2>条件コンパイル<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>一部のコードを 3.0 にだけコンパイルするための一番簡単な方法は、
+<tt class="xref c c-macro docutils literal"><span class="pre">PY_MAJOR_VERSION</span></tt> が 3 以上かどうかチェックすることです。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="cp">#if PY_MAJOR_VERSION &gt;= 3</span>
+<span class="cp">#define IS_PY3K</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>存在しなくなった関数については、条件ブロックの中で同等品にエイリアスすれば良いでしょう。</p>
+</div>
+<div class="section" id="api">
+<h2>オブジェクト API の変更<a class="headerlink" href="#api" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python 3.0 では、似た機能を持つタイプのいくつかを、統合したり、きっちり分けたりしました。</p>
+<div class="section" id="str-unicode">
+<h3>str/unicode の統合<a class="headerlink" href="#str-unicode" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Python 3.0 の <a class="reference internal" href="../library/functions.html#str" title="str"><tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt></a> (C では <tt class="docutils literal"><span class="pre">PyString_*</span></tt> 関数) タイプは 2.x の
+<a class="reference internal" href="../library/functions.html#unicode" title="unicode"><tt class="xref py py-func docutils literal"><span class="pre">unicode()</span></tt></a> (<tt class="docutils literal"><span class="pre">PyUnicode_*</span></tt>) と同じものです。昔の 8 ビット文字列タイプは
+<tt class="xref py py-func docutils literal"><span class="pre">bytes()</span></tt> です。Python 2.6 以降には互換性ヘッダ <tt class="file docutils literal"><span class="pre">bytesobject.h</span></tt>
+が用意されており、 <tt class="docutils literal"><span class="pre">PyBytes</span></tt> 系の名前を <tt class="docutils literal"><span class="pre">PyString</span></tt> 系にマップしています。
+3.0 との互換性を最大限確保するには、 <tt class="xref c c-type docutils literal"><span class="pre">PyUnicode</span></tt> は文字データに、
+<tt class="xref c c-type docutils literal"><span class="pre">PyBytes</span></tt> はバイナリデータにだけ使うべきです。ほかにも、3.0 の
+<tt class="xref c c-type docutils literal"><span class="pre">PyBytes</span></tt> と <tt class="xref c c-type docutils literal"><span class="pre">PyUnicode</span></tt> は 2.x の <tt class="xref c c-type docutils literal"><span class="pre">PyString</span></tt> と
+<tt class="xref c c-type docutils literal"><span class="pre">PyUnicode</span></tt> とは違って交換不可能だということも重要です。以下の例では
+<tt class="xref c c-type docutils literal"><span class="pre">PyUnicode</span></tt>, <tt class="xref c c-type docutils literal"><span class="pre">PyString</span></tt>, <tt class="xref c c-type docutils literal"><span class="pre">PyBytes</span></tt> に関するベストプラクティスを見ることができます。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="cp">#include &quot;stdlib.h&quot;</span>
+<span class="cp">#include &quot;Python.h&quot;</span>
+<span class="cp">#include &quot;bytesobject.h&quot;</span>
+
+<span class="cm">/* text example */</span>
+<span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">say_hello</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">result</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;U:say_hello&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">PyUnicode_FromFormat</span><span class="p">(</span><span class="s">&quot;Hello, %S!&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/* just a forward */</span>
+<span class="k">static</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">do_encode</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="p">);</span>
+
+<span class="cm">/* bytes example */</span>
+<span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">encode_object</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="o">*</span><span class="n">encoded</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">result</span><span class="p">,</span> <span class="o">*</span><span class="n">myobj</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;O:encode_object&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">myobj</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="n">encoded</span> <span class="o">=</span> <span class="n">do_encode</span><span class="p">(</span><span class="n">myobj</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">encoded</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">PyBytes_FromString</span><span class="p">(</span><span class="n">encoded</span><span class="p">);</span>
+    <span class="n">free</span><span class="p">(</span><span class="n">encoded</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="long-int">
+<h3>long/int の統合<a class="headerlink" href="#long-int" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Python 3.0 では整数タイプが一つしかありません。これは Python レベルでは
+<a class="reference internal" href="../library/functions.html#int" title="int"><tt class="xref py py-func docutils literal"><span class="pre">int()</span></tt></a> と呼ばれますが、実際には 2.x の <a class="reference internal" href="../library/functions.html#long" title="long"><tt class="xref py py-func docutils literal"><span class="pre">long()</span></tt></a> タイプと同じものです。C-API では <tt class="docutils literal"><span class="pre">PyInt_*</span></tt> 関数群の中身が、お隣さんの
+<tt class="docutils literal"><span class="pre">PyLong_*</span></tt> に交換されています。ここでとるべき最良の行動指針は、
+<tt class="file docutils literal"><span class="pre">intobject.h</span></tt> で <tt class="docutils literal"><span class="pre">PyLong_*</span></tt> にエイリアスされている <tt class="docutils literal"><span class="pre">PyInt_*</span></tt>
+を使うというものです。ある場合には抽象 API 群 <tt class="docutils literal"><span class="pre">PyNumber_*</span></tt> も使えるかもしれません。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="cp">#include &quot;Python.h&quot;</span>
+<span class="cp">#include &quot;intobject.h&quot;</span>
+
+<span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">add_ints</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">self</span><span class="p">,</span> <span class="n">PyObject</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">one</span><span class="p">,</span> <span class="n">two</span><span class="p">;</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">result</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">PyArg_ParseTuple</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;ii:add_ints&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">one</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">two</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="n">PyInt_FromLong</span><span class="p">(</span><span class="n">one</span> <span class="o">+</span> <span class="n">two</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>モジュールの初期化と状態情報<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python 3.0 には、改良された拡張モジュール初期化システムがあります (
+<span class="target" id="index-0"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-3121"><strong>PEP 3121</strong></a> 参照)。モジュールの状態はグローバル変数に持つのではなく、インタプリタ固有の構造体に持つべきだということになったのです。2.x と 3.0
+のどちらでも動くモジュールを作るのにはコツが要ります。次の簡単な例で、その方法を実演してみます。</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="cp">#include &quot;Python.h&quot;</span>
+
+<span class="k">struct</span> <span class="n">module_state</span> <span class="p">{</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">error</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cp">#if PY_MAJOR_VERSION &gt;= 3</span>
+<span class="cp">#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))</span>
+<span class="cp">#else</span>
+<span class="cp">#define GETSTATE(m) (&amp;_state)</span>
+<span class="k">static</span> <span class="k">struct</span> <span class="n">module_state</span> <span class="n">_state</span><span class="p">;</span>
+<span class="cp">#endif</span>
+
+<span class="k">static</span> <span class="n">PyObject</span> <span class="o">*</span>
+<span class="nf">error_out</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">module_state</span> <span class="o">*</span><span class="n">st</span> <span class="o">=</span> <span class="n">GETSTATE</span><span class="p">(</span><span class="n">m</span><span class="p">);</span>
+    <span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">st</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">,</span> <span class="s">&quot;something bad happened&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">PyMethodDef</span> <span class="n">myextension_methods</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="s">&quot;error_out&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">PyCFunction</span><span class="p">)</span><span class="n">error_out</span><span class="p">,</span> <span class="n">METH_NOARGS</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">},</span>
+    <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">}</span>
+<span class="p">};</span>
+
+<span class="cp">#if PY_MAJOR_VERSION &gt;= 3</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="nf">myextension_traverse</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">m</span><span class="p">,</span> <span class="n">visitproc</span> <span class="n">visit</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Py_VISIT</span><span class="p">(</span><span class="n">GETSTATE</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="nf">myextension_clear</span><span class="p">(</span><span class="n">PyObject</span> <span class="o">*</span><span class="n">m</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Py_CLEAR</span><span class="p">(</span><span class="n">GETSTATE</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">error</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="k">static</span> <span class="k">struct</span> <span class="n">PyModuleDef</span> <span class="n">moduledef</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">PyModuleDef_HEAD_INIT</span><span class="p">,</span>
+        <span class="s">&quot;myextension&quot;</span><span class="p">,</span>
+        <span class="nb">NULL</span><span class="p">,</span>
+        <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">module_state</span><span class="p">),</span>
+        <span class="n">myextension_methods</span><span class="p">,</span>
+        <span class="nb">NULL</span><span class="p">,</span>
+        <span class="n">myextension_traverse</span><span class="p">,</span>
+        <span class="n">myextension_clear</span><span class="p">,</span>
+        <span class="nb">NULL</span>
+<span class="p">};</span>
+
+<span class="cp">#define INITERROR return NULL</span>
+
+<span class="n">PyObject</span> <span class="o">*</span>
+<span class="n">PyInit_myextension</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+
+<span class="cp">#else</span>
+<span class="cp">#define INITERROR return</span>
+
+<span class="kt">void</span>
+<span class="n">initmyextension</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="cp">#endif</span>
+<span class="p">{</span>
+<span class="cp">#if PY_MAJOR_VERSION &gt;= 3</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">module</span> <span class="o">=</span> <span class="n">PyModule_Create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">moduledef</span><span class="p">);</span>
+<span class="cp">#else</span>
+    <span class="n">PyObject</span> <span class="o">*</span><span class="n">module</span> <span class="o">=</span> <span class="n">Py_InitModule</span><span class="p">(</span><span class="s">&quot;myextension&quot;</span><span class="p">,</span> <span class="n">myextension_methods</span><span class="p">);</span>
+<span class="cp">#endif</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">module</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+        <span class="n">INITERROR</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">module_state</span> <span class="o">*</span><span class="n">st</span> <span class="o">=</span> <span class="n">GETSTATE</span><span class="p">(</span><span class="n">module</span><span class="p">);</span>
+
+    <span class="n">st</span><span class="o">-&gt;</span><span class="n">error</span> <span class="o">=</span> <span class="n">PyErr_NewException</span><span class="p">(</span><span class="s">&quot;myextension.Error&quot;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">st</span><span class="o">-&gt;</span><span class="n">error</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Py_DECREF</span><span class="p">(</span><span class="n">module</span><span class="p">);</span>
+        <span class="n">INITERROR</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="cp">#if PY_MAJOR_VERSION &gt;= 3</span>
+    <span class="k">return</span> <span class="n">module</span><span class="p">;</span>
+<span class="cp">#endif</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>ほかの選択肢<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>新規に拡張モジュールを書こうと思っているのであれば、 <a class="reference external" href="http://www.cython.org">Cython</a> を検討してみても良いでしょう。これは
+Python 風の言語を C に翻訳してくれるもので、出力される拡張モジュールは Python 3.x と 2.x に両方対応しています。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="curses.html" title="Python で Curses プログラミング"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="advocacy.html" title="Python の支援活動 HOWTO"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

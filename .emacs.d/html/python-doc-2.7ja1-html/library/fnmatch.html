@@ -1,0 +1,232 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.8. fnmatch — Unix ファイル名のパターンマッチ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="next" title="10.9. linecache — テキストラインにランダムアクセスする" href="linecache.html" />
+    <link rel="prev" title="10.7. glob — Unix 形式のパス名のパターン展開" href="glob.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="linecache.html" title="10.9. linecache — テキストラインにランダムアクセスする"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="glob.html" title="10.7. glob — Unix 形式のパス名のパターン展開"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" accesskey="U">10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="glob.html"
+                        title="前の章へ">10.7. <tt class="docutils literal"><span class="pre">glob</span></tt> &#8212; Unix 形式のパス名のパターン展開</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="linecache.html"
+                        title="次の章へ">10.9. <tt class="docutils literal"><span class="pre">linecache</span></tt> &#8212; テキストラインにランダムアクセスする</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/fnmatch.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-fnmatch">
+<span id="fnmatch-unix"></span><h1>10.8. <a class="reference internal" href="#module-fnmatch" title="fnmatch: Unix シェル形式のファイル名のパターンマッチ。"><tt class="xref py py-mod docutils literal"><span class="pre">fnmatch</span></tt></a> &#8212; Unix ファイル名のパターンマッチ<a class="headerlink" href="#module-fnmatch" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<span class="target" id="index-0"></span><p id="index-1">このモジュールは Unix のシェル形式のワイルドカードへの対応を提供しますが、(<a class="reference internal" href="re.html#module-re" title="re: 正規表現操作"><tt class="xref py py-mod docutils literal"><span class="pre">re</span></tt></a> モジュールでドキュメント化されている)
+正規表現と同じでは <em>ありません</em> 。シェル形式のワイルドカードで使われる特別な文字は、</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Pattern</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">*</span></tt></td>
+<td>すべてにマッチします</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">?</span></tt></td>
+<td>任意の一文字にマッチします</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">[seq]</span></tt></td>
+<td><em>seq</em> にある任意の文字にマッチします</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">[!seq]</span></tt></td>
+<td><em>seq</em> にない任意の文字にマッチします</td>
+</tr>
+</tbody>
+</table>
+<p id="index-2">ファイル名のセパレーター(Unixでは <tt class="docutils literal"><span class="pre">'/'</span></tt>)はこのモジュールに固有なものでは <em>ない</em> ことに注意してください。パス名展開については、
+<a class="reference internal" href="glob.html#module-glob" title="glob: Unix シェル形式のパス名のパターン展開。"><tt class="xref py py-mod docutils literal"><span class="pre">glob</span></tt></a> モジュールを参照してください (<a class="reference internal" href="glob.html#module-glob" title="glob: Unix シェル形式のパス名のパターン展開。"><tt class="xref py py-mod docutils literal"><span class="pre">glob</span></tt></a> はパス名の部分にマッチさせるのに <a class="reference internal" href="#module-fnmatch" title="fnmatch: Unix シェル形式のファイル名のパターンマッチ。"><tt class="xref py py-func docutils literal"><span class="pre">fnmatch()</span></tt></a> を使っています)。同様に、ピリオドで始まるファイル名はこのモジュールに固有ではなくて、 <tt class="docutils literal"><span class="pre">*</span></tt> と <tt class="docutils literal"><span class="pre">?</span></tt> のパターンでマッチします。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/fnmatch.py?view=markup">fnmatch の Python ソースコード</a></p>
+</div>
+<dl class="function">
+<dt id="fnmatch.fnmatch">
+<tt class="descclassname">fnmatch.</tt><tt class="descname">fnmatch</tt><big>(</big><em>filename</em>, <em>pattern</em><big>)</big><a class="headerlink" href="#fnmatch.fnmatch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>filenameの文字列がpatternの文字列にマッチするかテストして、 <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> 、 <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> のいずれかを返します。オペレーティングシステムが大文字、小文字を区別しない場合、比較を行う前に、両方のパラメタを全て大文字、または全て小文字に揃えます。オペレーティングシステムが標準でどうなっているかに関係なく、大小文字を区別して比較する場合には、 <a class="reference internal" href="#fnmatch.fnmatchcase" title="fnmatch.fnmatchcase"><tt class="xref py py-func docutils literal"><span class="pre">fnmatchcase()</span></tt></a> が使えます。</p>
+<p>次の例では、カレントディレクトリにある、拡張子が <tt class="docutils literal"><span class="pre">.txt</span></tt> である全てのファイルを表示しています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s">&#39;*.txt&#39;</span><span class="p">):</span>
+        <span class="k">print</span> <span class="nb">file</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="fnmatch.fnmatchcase">
+<tt class="descclassname">fnmatch.</tt><tt class="descname">fnmatchcase</tt><big>(</big><em>filename</em>, <em>pattern</em><big>)</big><a class="headerlink" href="#fnmatch.fnmatchcase" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> が <em>pattern</em> にマッチするかテストして、 <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> 、 <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。比較は大文字、小文字を区別します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fnmatch.filter">
+<tt class="descclassname">fnmatch.</tt><tt class="descname">filter</tt><big>(</big><em>names</em>, <em>pattern</em><big>)</big><a class="headerlink" href="#fnmatch.filter" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>pattern</em> にマッチする <em>names</em> のリストの部分集合を返します。
+<tt class="docutils literal"><span class="pre">[n</span> <span class="pre">for</span> <span class="pre">n</span> <span class="pre">in</span> <span class="pre">names</span> <span class="pre">if</span> <span class="pre">fnmatch(n,</span> <span class="pre">pattern)]</span></tt>
+と同じですが、もっと効率よく実装しています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="fnmatch.translate">
+<tt class="descclassname">fnmatch.</tt><tt class="descname">translate</tt><big>(</big><em>pattern</em><big>)</big><a class="headerlink" href="#fnmatch.translate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シェルスタイルの <em>pattern</em> を、正規表現に変換して返します。</p>
+<p>メタ文字をクォートする方法が無いことに気を付けてください。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">fnmatch</span><span class="o">,</span> <span class="nn">re</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regex</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s">&#39;*.txt&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">regex</span>
+<span class="go">&#39;.*\\.txt$&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reobj</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reobj</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;foobar.txt&#39;</span><span class="p">)</span>
+<span class="go">&lt;_sre.SRE_Match object at 0x...&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="glob.html#module-glob" title="glob: Unix シェル形式のパス名のパターン展開。"><tt class="xref py py-mod docutils literal"><span class="pre">glob</span></tt></a></dt>
+<dd>Unix シェル形式のパス展開。</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="linecache.html" title="10.9. linecache — テキストラインにランダムアクセスする"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="glob.html" title="10.7. glob — Unix 形式のパス名のパターン展開"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" >10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

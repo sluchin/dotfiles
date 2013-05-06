@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ビルド済み配布物を作成する &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python モジュールの配布" href="index.html" />
+    <link rel="next" title="パッケージインデクスに登録する" href="packageindex.html" />
+    <link rel="prev" title="ソースコード配布物を作成する" href="sourcedist.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="packageindex.html" title="パッケージインデクスに登録する"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="sourcedist.html" title="ソースコード配布物を作成する"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python モジュールの配布</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ビルド済み配布物を作成する</a><ul>
+<li><a class="reference internal" href="#creating-dumb">ダム形式のビルド済み配布物を作成する</a></li>
+<li><a class="reference internal" href="#rpm">RPM パッケージを作成する</a></li>
+<li><a class="reference internal" href="#windows">Windows インストーラを作成する</a></li>
+<li><a class="reference internal" href="#cross-compile-windows">Windowsでのクロスコンパイル</a><ul>
+<li><a class="reference internal" href="#postinstallation-script">インストール後実行スクリプト (postinstallation script)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#vista-user-access-control-uac">Vista User Access Control (UAC)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="sourcedist.html"
+                        title="前の章へ">ソースコード配布物を作成する</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="packageindex.html"
+                        title="次の章へ">パッケージインデクスに登録する</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/distutils/builtdist.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="built-dist">
+<span id="id1"></span><h1>ビルド済み配布物を作成する<a class="headerlink" href="#built-dist" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>&#8220;ビルド済み配布物&#8221; とは、おそらく皆さんが通常 &#8220;バイナリパッケージ&#8221; とか &#8220;インストーラ&#8221; (背景にしている知識によって違います) と考えているものです。とはいえ、配布物が必然的にバイナリ形式になるわけではありません。配布物には、 Python ソースコード、かつ/またはバイトコードが入るからです; また、我々はパッケージという呼び方もしません。すでに Python の用語として使っているからです (また、 &#8220;インストーラ&#8221;
+という言葉は主流のデスクトップシステム特有の用語です)</p>
+<p>ビルド済み配布物は、モジュール配布物をインストール作業者にとってできるだけ簡単な状況にする方法です: ビルド済み配布物は、RPM ベースの Linux
+システムユーザにとってはバイナリ RPM 、Windows ユーザにとっては実行可能なインストーラ、 Debian ベースの Linux システムでは
+Debian パッケージ、などといった具合です。当然のことながら、一人の人間が世の中にある全てのプラットフォーム用にビルド済み配布物を作成できるわけではありません。そこで、 Distutils の設計は。開発者が自分の専門分野 &#8212; コードを書き、ソース配布物を作成する
+&#8212; に集中できる一方で、 <em>パッケージ作成者 (packager)</em> と呼ばれる、開発者とエンドユーザとの中間に位置する人々がソースコード配布物を多くのプラットフォームにおけるビルド済み配布物に変換できるようになっています。</p>
+<p>もちろん、モジュール開発者自身がパッケージ作成者かもしれません; また、パッケージを作成するのはオリジナルの作成者が利用できないプラットフォームにアクセスできるような &#8220;外部の&#8221; ボランティアかもしれませんし、ソース配布物を定期的に取り込んで、アクセスできるかぎりのプラットフォーム向けにビルド済み配布物を生成するソフトウェアかもしれません。作業を行うのが誰であれ、パッケージ作成者は setup  スクリプトを利用し、
+<strong class="command">bdist</strong> コマンドファミリを使ってビルド済み配布物を作成します。</p>
+<p>単純な例として、Distutils ソースツリーから以下のコマンドを実行したとします:</p>
+<div class="highlight-python"><pre>python setup.py bdist</pre>
+</div>
+<p>すると、Distutils はモジュール配布物 (ここでは Distutils 自体) をビルドし、&#8221;偽の (fake)&#8221; インストールを
+(<tt class="file docutils literal"><span class="pre">build</span></tt> ディレクトリで) 行います。そして現在のプラットフォームにおける標準の形式でビルド済み配布物を生成します。デフォルトのビルド済み形式とは、Unixでは &#8220;ダム (dumb)&#8221; の tar ファイルで、 Windows ではシンプルな実行形式のインストーラになります。(tar ファイルは、特定の場所に手作業で解凍しないと動作しないので、 &#8220;ダム: 賢くない&#8221; 形式とみなします。)</p>
+<p>従って、 Unix システムで上記のコマンドを実行すると、 <tt class="file docutils literal"><span class="pre">Distutils-1.0.</span><em><span class="pre">plat</span></em><span class="pre">.tar.gz</span></tt> を作成します;  この
+tarball を正しい場所で解凍すると、ちょうどソース配布物をダウンロードして <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt> を実行したのと同じように、正しい場所に Distutils がインストールされます。 (&#8220;正しい場所 (right place)&#8221; とは、ファイルシステムのルート下か、
+Python の <tt class="file docutils literal"><em><span class="pre">prefix</span></em></tt> ディレクトリ下で、これは <strong class="command">bdist_dumb</strong> に指定するコマンドで変わります;
+デフォルトの設定では、 <tt class="file docutils literal"><em><span class="pre">prefix</span></em></tt> からの相対パスにインストールされるダム配布物が得られます。)</p>
+<p>言うまでもなく、 pure Python 配布物の場合なら、 <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt> するのに比べて大して簡単になったとは言えません&#8212;しかし、非 pure 配布物で、コンパイルの必要な拡張モジュールを含む場合、拡張モジュールを利用できるか否かという大きな違いになりえます。また、 RPM パッケージや Windows 用の実行形式インストーラのような &#8220;スマートな&#8221; ビルド済み配布物を作成しておけば、たとえ拡張モジュールが一切入っていなくてもユーザにとっては便利になります。</p>
+<p><strong class="command">bdist</strong> コマンドには、 <em class="xref std std-option">--formats</em> オプションがあります。これは <strong class="command">sdist</strong>
+コマンドの場合に似ていて、生成したいビルド済み配布物の形式を選択できます: 例えば、</p>
+<div class="highlight-python"><pre>python setup.py bdist --format=zip</pre>
+</div>
+<p>とすると、Unix システムでは、 <tt class="file docutils literal"><span class="pre">Distutils-1.0.</span><em><span class="pre">plat</span></em><span class="pre">.zip</span></tt> を作成します&#8212; 先にも述べたように、Distutils
+をインストールするには、このアーカイブ形式をルートディレクトリ下で展開します。</p>
+<p>ビルド済み配布物として利用できる形式を以下に示します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="64%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">形式</th>
+<th class="head">説明</th>
+<th class="head">注記</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">gztar</span></tt></td>
+<td>gzip 圧縮された tar ファイル
+(<tt class="file docutils literal"><span class="pre">.tar.gz</span></tt>)</td>
+<td>(1),(3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ztar</span></tt></td>
+<td>compress 圧縮された tar ファイル
+(<tt class="file docutils literal"><span class="pre">.tar.Z</span></tt>)</td>
+<td>(3)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">tar</span></tt></td>
+<td>tar ファイル (<tt class="file docutils literal"><span class="pre">.tar</span></tt>)</td>
+<td>(3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">zip</span></tt></td>
+<td>zip ファイル (<tt class="file docutils literal"><span class="pre">.zip</span></tt>)</td>
+<td>(2),(4)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">rpm</span></tt></td>
+<td>RPM 形式</td>
+<td>(5)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">pkgtool</span></tt></td>
+<td>Solaris <strong class="program">pkgtool</strong> 形式</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">sdux</span></tt></td>
+<td>HP-UX <strong class="program">swinstall</strong> 形式</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">wininst</span></tt></td>
+<td>Windows 用の自己展開形式 ZIP ファイル</td>
+<td>(4)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">msi</span></tt></td>
+<td>マイクロソフト・インストーラー</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>注記:</p>
+<ol class="arabic simple">
+<li>Unixでのデフォルト形式です</li>
+<li>Windows でのデフォルト形式です</li>
+<li>外部ユーティリティが必要です: <strong class="program">tar</strong> と、 <strong class="program">gzip</strong> または <strong class="program">bzip2</strong> または
+<strong class="program">compress</strong> のいずれか</li>
+<li>外部ユーティリティの <strong class="program">zip</strong> か、 <a class="reference internal" href="../library/zipfile.html#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a>  モジュール (Python 1.6 からは標準 Python
+ライブラリの一部になっています) が必要です</li>
+<li>外部ユーティリティの <strong class="program">rpm</strong> 、バージョン 3.0.4  以上が必要です (バージョンを調べるには、 <tt class="docutils literal"><span class="pre">rpm</span> <span class="pre">--version</span></tt>
+とします)</li>
+</ol>
+<p><strong class="command">bdist</strong> コマンドを使うとき、必ず <em class="xref std std-option">--formats</em>  オプションを使わなければならないわけではありません;
+自分の使いたい形式をダイレクトに実装しているコマンドも使えます。こうした <strong class="command">bdist</strong> &#8220;サブコマンド (sub-command)&#8221; は、実際には類似のいくつかの形式を生成できます; 例えば、 <strong class="command">bdist_dumb</strong> コマンドは、全ての &#8220;ダム&#8221; アーカイブ形式
+(<tt class="docutils literal"><span class="pre">tar</span></tt>, <tt class="docutils literal"><span class="pre">ztar</span></tt>, <tt class="docutils literal"><span class="pre">gztar</span></tt>, および <tt class="docutils literal"><span class="pre">zip</span></tt>) を作成できますし、 <strong class="command">bdist_rpm</strong> はバイナリ
+RPM とソース RPM の両方を生成できます。 <strong class="command">bdist</strong> サブコマンドと、それぞれが生成する形式を以下に示します:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="53%" />
+<col width="47%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">コマンド</th>
+<th class="head">形式</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong class="command">bdist_dumb</strong></td>
+<td>tar, ztar, gztar, zip</td>
+</tr>
+<tr class="row-odd"><td><strong class="command">bdist_rpm</strong></td>
+<td>rpm, srpm</td>
+</tr>
+<tr class="row-even"><td><strong class="command">bdist_wininst</strong></td>
+<td>wininst</td>
+</tr>
+<tr class="row-odd"><td><strong class="command">bdist_msi</strong></td>
+<td>msi</td>
+</tr>
+</tbody>
+</table>
+<p><strong class="command">bdist_*</strong> コマンドについては、以下の節で詳しく述べます。</p>
+<div class="section" id="creating-dumb">
+<span id="id2"></span><h2>ダム形式のビルド済み配布物を作成する<a class="headerlink" href="#creating-dumb" title="このヘッドラインへのパーマリンク">¶</a></h2>
+</div>
+<div class="section" id="rpm">
+<span id="creating-rpms"></span><h2>RPM パッケージを作成する<a class="headerlink" href="#rpm" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>RPM 形式は、Red Hat, SuSE, Mandrake といった、多くの一般的な Linux
+ディストリビューションで使われています。普段使っているのがこれらの環境のいずれか (またはその他の RPM ベースの Linux  ディストリビューション)
+なら、同じディストリビューションを使っている他のユーザ用に RPM パッケージを作成するのはとるに足らないことでしょう。一方、モジュール配布物の複雑さや、
+Linux ディストリビューション間の違いにもよりますが、他の RPM ベースのディストリビューションでも動作するような RPM
+を作成できるかもしれません。</p>
+<p>通常、モジュール配布物の RPM を作成するには、 <strong class="command">bdist_rpm</strong>  コマンドを使います:</p>
+<div class="highlight-python"><pre>python setup.py bdist_rpm</pre>
+</div>
+<p>あるいは、 <strong class="command">bdist</strong> コマンドを <em class="xref std std-option">--format</em>  オプション付きで使います:</p>
+<div class="highlight-python"><pre>python setup.py bdist --formats=rpm</pre>
+</div>
+<p>前者の場合、 RPM 特有のオプションを指定できます; 後者の場合、一度の実行で複数の形式を指定できます。両方同時にやりたければ、それぞれの形式について各コマンドごとにオプション付きで <strong class="command">bdist_*</strong> コマンドを並べます:</p>
+<div class="highlight-python"><pre>python setup.py bdist_rpm --packager="John Doe &lt;jdoe@example.org&gt;" \
+                bdist_wininst --target-version="2.0"</pre>
+</div>
+<p>Distutils が setup スクリプトで制御されているのとほとんど同じく、 RPM パッケージの作成は、 <tt class="file docutils literal"><span class="pre">.spec</span></tt>
+で制御されています。 RPM の作成を簡便に解決するため、 <strong class="command">bdist_rpm</strong> コマンドでは通常、 setup
+スクリプトに与えた情報とコマンドライン、そして Distutils 設定ファイルに基づいて <tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルを作成します。
+<tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルの様々なオプションやセクション情報は、以下のようにして setup スクリプトから取り出されます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="55%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">RPM <tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルのオプションまたはセクション</th>
+<th class="head">Distutils setup スクリプト内のオプション</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Name</td>
+<td><em class="xref std std-option">name</em></td>
+</tr>
+<tr class="row-odd"><td>Summary (preamble 内)</td>
+<td><em class="xref std std-option">description</em></td>
+</tr>
+<tr class="row-even"><td>Version</td>
+<td><em class="xref std std-option">version</em></td>
+</tr>
+<tr class="row-odd"><td>Vendor</td>
+<td><em class="xref std std-option">author</em> と <em class="xref std std-option">author_email</em>,
+または  &#8212; &amp; <em class="xref std std-option">maintainer</em> と
+<em class="xref std std-option">maintainer_email</em></td>
+</tr>
+<tr class="row-even"><td>Copyright</td>
+<td><em class="xref std std-option">license</em></td>
+</tr>
+<tr class="row-odd"><td>Url</td>
+<td><em class="xref std std-option">url</em></td>
+</tr>
+<tr class="row-even"><td>%description (セクション)</td>
+<td><em class="xref std std-option">long_description</em></td>
+</tr>
+</tbody>
+</table>
+<p>また、 <tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイル内の多くのオプションは、 setup スクリプト中に対応するオプションがありません。これらのほとんどは、以下に示す
+<strong class="command">bdist_rpm</strong> コマンドのオプションで扱えます:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="40%" />
+<col width="34%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">RPM <tt class="file docutils literal"><span class="pre">.spec</span></tt>
+ファイルのオプションまたはセクション</th>
+<th class="head"><strong class="command">bdist_rpm</strong> オプション</th>
+<th class="head">デフォルト値</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Release</td>
+<td><em class="xref std std-option">release</em></td>
+<td>&#8220;1&#8221;</td>
+</tr>
+<tr class="row-odd"><td>Group</td>
+<td><em class="xref std std-option">group</em></td>
+<td>&#8220;Development/Libraries&#8221;</td>
+</tr>
+<tr class="row-even"><td>Vendor</td>
+<td><em class="xref std std-option">vendor</em></td>
+<td>(上記参照)</td>
+</tr>
+<tr class="row-odd"><td>Packager</td>
+<td><em class="xref std std-option">packager</em></td>
+<td>(none)</td>
+</tr>
+<tr class="row-even"><td>Provides</td>
+<td><em class="xref std std-option">provides</em></td>
+<td>(none)</td>
+</tr>
+<tr class="row-odd"><td>Requires</td>
+<td><em class="xref std std-option">requires</em></td>
+<td>(none)</td>
+</tr>
+<tr class="row-even"><td>Conflicts</td>
+<td><em class="xref std std-option">conflicts</em></td>
+<td>(none)</td>
+</tr>
+<tr class="row-odd"><td>Obsoletes</td>
+<td><em class="xref std std-option">obsoletes</em></td>
+<td>(none)</td>
+</tr>
+<tr class="row-even"><td>Distribution</td>
+<td><em class="xref std std-option">distribution_name</em></td>
+<td>(none)</td>
+</tr>
+<tr class="row-odd"><td>BuildRequires</td>
+<td><em class="xref std std-option">build_requires</em></td>
+<td>(none)</td>
+</tr>
+<tr class="row-even"><td>Icon</td>
+<td><em class="xref std std-option">icon</em></td>
+<td>(none)</td>
+</tr>
+</tbody>
+</table>
+<p>言うまでもなく、こうしたオプションをコマンドラインで指定するのは面倒だし、エラーの元になりますから、普通は <tt class="file docutils literal"><span class="pre">setup.cfg</span></tt> に書いておくのがベストです &#8212;  <a class="reference internal" href="configfile.html#setup-config"><em>setup 設定ファイル (setup configuration file) を書く</em></a> 節を参照してください。沢山の Python
+モジュール配布物を配布したりパッケージ化したりしているのなら、配布物全部に当てはまるオプションを個人用の Distutils 設定ファイル
+(<tt class="file docutils literal"><span class="pre">~/.pydistutils.cfg</span></tt>) に入れられます。このファイルを一時的に無効にしたい場合、 setup.py に &#8211;no-user-cfg オプションを指定できます。</p>
+<p>バイナリ形式の RPM パッケージを作成する際には三つの段階があり、 Distutils はこれら全ての段階を自動的に処理します:</p>
+<ol class="arabic simple">
+<li>RPM パッケージの内容を記述する <tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルを作成します (<tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルは setup
+スクリプトに似たファイルです; 実際、 setup スクリプトのほとんどの情報が <tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルから引き揚げられます)</li>
+<li>ソース RPM を作成します</li>
+<li>&#8220;バイナリ (binary)&#8221; RPM を生成します (モジュール配布物に Python 拡張モジュールが入っているか否かで、バイナリコードが含まれることも含まれないこともあります)</li>
+</ol>
+<p>通常、RPM は最後の二つのステップをまとめて行います; Distutils を使うと、普通は三つのステップ全てをまとめて行います。</p>
+<p>望むなら、これらの三つのステップを分割できます。 <strong class="command">bdist_rpm</strong>  コマンドに <em class="xref std std-option">--spec-only</em>
+を指定すれば、単に <tt class="file docutils literal"><span class="pre">.spec</span></tt> を作成して終了します; この場合、 <tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルは &#8220;配布物ディレクトリ
+(distribution directory)&#8221;&#8212; 通常は <tt class="file docutils literal"><span class="pre">dist/</span></tt> に作成されますが、 <em class="xref std std-option">--dist-dir</em>
+オプションで変更することもできます。(通常、 <tt class="file docutils literal"><span class="pre">.spec</span></tt> ファイルは &#8220;ビルドツリー (build tree)&#8221;、すなわち
+<strong class="command">build_rpm</strong> が作成する一時ディレクトリの中から引き揚げられます。)</p>
+</div>
+<div class="section" id="windows">
+<span id="creating-wininst"></span><h2>Windows インストーラを作成する<a class="headerlink" href="#windows" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>実行可能なインストーラは、Windows 環境ではごく自然なバイナリ配布形式です。インストーラは結構なグラフィカルユーザインタフェースを表示して、モジュール配布物に関するいくつかの情報を setup スクリプト内のメタデータから取り出して示し、ユーザがいくつかのオプションを選んだり、インストールを決行するか取りやめるか選んだりできるようにします。</p>
+<p>メタデータは setup スクリプトから取り出されるので、Windows インストーラの作成は至って簡単で、以下を実行するだけです:</p>
+<div class="highlight-python"><pre>python setup.py bdist_wininst</pre>
+</div>
+<p>あるいは、 <strong class="command">bdist</strong> コマンドを <em class="xref std std-option">--formats</em>  オプション付きで実行します:</p>
+<div class="highlight-python"><pre>python setup.py bdist --formats=wininst</pre>
+</div>
+<p>(pure Python モジュールとパッケージだけの入った) pure モジュール配布物の場合、作成されるインストーラは実行バージョンに依存しない形式になり、 <tt class="file docutils literal"><span class="pre">foo-1.0.win32.exe</span></tt> のような名前になります。 pure モジュールの Windows インストーラは Unix や
+Mac OS X でも作成できます。</p>
+<p>非 pure 配布物の場合、拡張モジュールは Windows プラットフォーム上だけで作成でき、Python のバージョンに依存したインストーラになります。インストーラのファイル名もバージョン依存性を反映して、 <tt class="file docutils literal"><span class="pre">foo-1.0.win32-py2.0.exe</span></tt> のような形式になります。従って、サポートしたい全てのバージョンの Python に対して、別々のインストーラを作成しなければなりません。</p>
+<p>インストーラは、ターゲットとなるシステムにインストールを実行した後、 pure モジュールを通常 (normal) モードと最適化 (optimizing)
+モードでバイトコード(<a class="reference internal" href="../glossary.html#term-bytecode"><em class="xref std std-term">bytecode</em></a>)にコンパイルしようと試みます。何らかの理由があってコンパイルさせたくなければ、 <strong class="command">bdist_wininst</strong> コマンドを
+<em class="xref std std-option">--no-target-compile</em> かつ/または <em class="xref std std-option">--no-target-optimize</em>
+オプション付きで実行します。</p>
+<p>デフォルトでは、インストーラは実行時にクールな &#8220;Python Powered&#8221;  ロゴを表示しますが、自作の152x261ビットマップ画像も指定できます。画像は Windows の <tt class="file docutils literal"><span class="pre">.bmp</span></tt> ファイル形式でなくてはならず、 <em class="xref std std-option">--bitmap</em> オプションで指定します。</p>
+<p>インストーラを起動すると、デスクトップの背景ウィンドウ上にでっかいタイトルも表示します。タイトルは配布物の名前とバージョン番号から作成します。 <em class="xref std std-option">--title</em> オプションを使えば、タイトルを別のテキストに変更できます。</p>
+<p>インストーラファイルは &#8220;配布物ディレクトリ (distribution directory)&#8221; &#8212; 通常は <tt class="file docutils literal"><span class="pre">dist/</span></tt>
+に作成されますが、 <em class="xref std std-option">--dist-dir</em>  オプションで指定することもできます。</p>
+</div>
+<div class="section" id="cross-compile-windows">
+<span id="id3"></span><h2>Windowsでのクロスコンパイル<a class="headerlink" href="#cross-compile-windows" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python 2.6 から、 distutils は Windows プラットフォーム間でのクロスコンパイルに対応しました。これによって、必要なツールがインストールされていれば、 32bit 版の Windows で 64bit 版の拡張を作成したり、その逆が可能になりました。</p>
+<p>別のプラットフォーム用にビルドするには、 build コマンドの <em class="xref std std-option">--plat-name</em>
+オプションを指定します。有効な値は、現在のところ、 &#8216;win32&#8217;, &#8216;win-amd64&#8217;,
+&#8216;win-ia64&#8217; です。例えば、次のようにして 32bit 版の Windows で 64bit 版の拡張をビルドできます。</p>
+<div class="highlight-python"><pre>python setup.py build --plat-name=win-amd64</pre>
+</div>
+<p>Windows インストーラもこのオプションをサポートしています。なので次のコマンドを実行すると:</p>
+<div class="highlight-python"><pre>python setup.py build --plat-name=win-amd64 bdist_wininst</pre>
+</div>
+<p>64bit のインストーラを32bitのWindowsで作成できます。</p>
+<p>クロスコンパイルするためには、Python のソースコードをダウンロードして Python
+自体をターゲットのプラットフォーム用にクロスコンパイルしなければなりません。
+Python のバイナリインストールからではクロスコンパイルできません。(他のプラットフォーム用の .lib などのファイルが含まれないからです。)
+具体的に言えば、拡張のクロスコンパイルができるようになるには、 32bit OS
+のユーザーは Visual Studio 2008 を使って Python ソースツリー内の
+<tt class="file docutils literal"><span class="pre">PCBuild/PCbuild.sln</span></tt> ソリューションファイルを開き、
+&#8220;x64&#8221; コンフィギュレーションで &#8216;pythoncore&#8217; プロジェクトをビルドしなければなりません。</p>
+<p>デフォルトでは、 Visual Studio 2008 は 64bit のコンパイラーなどのツールをインストールしないことに注意してください。
+Visual Studio セットアッププロセスを再実行して、それらのツールを選択する必要があるでしょう。(コントロールパネル -&gt; [追加と削除] から簡単に既存のインストールをチェック、修正できます。)</p>
+<div class="section" id="postinstallation-script">
+<span id="id4"></span><h3>インストール後実行スクリプト (postinstallation script)<a class="headerlink" href="#postinstallation-script" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Python 2.3 からは、インストール実行後スクリプトを <em class="xref std std-option">--install-script</em> オプションで指定できるようになりました。スクリプトはディレクトリを含まないベースネーム (basename) で指定しなければならず、スクリプトファイル名は setup 関数の
+scripts 引数中に挙げられていなければなりません。</p>
+<p>指定したスクリプトは、インストール時、ターゲットとなるシステム上で全てのファイルがコピーされた後に実行されます。このとき <tt class="docutils literal"><span class="pre">argv[1]</span></tt> を
+<em class="xref std std-option">-install</em> に設定します。また、アンインストール時には、ファイルを削除する前に <tt class="docutils literal"><span class="pre">argv[1]</span></tt> を
+<em class="xref std std-option">-remove</em> に設定して実行します。</p>
+<p>Windows インストーラでは、インストールスクリプトは埋め込みで実行され、全ての出力 (<tt class="docutils literal"><span class="pre">sys.stdout</span></tt> 、 <tt class="docutils literal"><span class="pre">sys.stderr</span></tt>)
+はバッファにリダイレクトされ、スクリプトの終了後に GUI 上に表示されます。</p>
+<p>インストールスクリプトでは、インストール/アンインストールのコンテキストで特に有用ないくつかの機能を、追加の組み込み関数として利用することができます。</p>
+<dl class="function">
+<dt id="directory_created">
+<tt class="descname">directory_created</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#directory_created" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="file_created">
+<tt class="descname">file_created</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#file_created" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これらの関数は、インストール後実行スクリプトがディレクトリやファイルを作成した際に呼び出さなければなりません。この関数はアンインストーラに作成された <em>path</em> を登録し、配布物をアンインストールする際にファイルが消されるようにします。安全を期すために、ディレクトリは空の時にのみ削除されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="get_special_folder_path">
+<tt class="descname">get_special_folder_path</tt><big>(</big><em>csidl_string</em><big>)</big><a class="headerlink" href="#get_special_folder_path" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数は、「スタートメニュー」や「デスクトップ」といった、 Windows における特殊なフォルダ位置を取得する際に使えます。この関数はフォルダのフルパスを返します。 <em>csidl_string</em> は以下の文字列のいずれかでなければなりません:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="s">&quot;CSIDL_APPDATA&quot;</span>
+
+<span class="s">&quot;CSIDL_COMMON_STARTMENU&quot;</span>
+<span class="s">&quot;CSIDL_STARTMENU&quot;</span>
+
+<span class="s">&quot;CSIDL_COMMON_DESKTOPDIRECTORY&quot;</span>
+<span class="s">&quot;CSIDL_DESKTOPDIRECTORY&quot;</span>
+
+<span class="s">&quot;CSIDL_COMMON_STARTUP&quot;</span>
+<span class="s">&quot;CSIDL_STARTUP&quot;</span>
+
+<span class="s">&quot;CSIDL_COMMON_PROGRAMS&quot;</span>
+<span class="s">&quot;CSIDL_PROGRAMS&quot;</span>
+
+<span class="s">&quot;CSIDL_FONTS&quot;</span>
+</pre></div>
+</div>
+<p>該当するフォルダを取得できなかった場合、 <a class="reference internal" href="../library/exceptions.html#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a> が送出されます。</p>
+<p>どの種類のフォルダを取得できるかは、特定の Windows のバージョンごとに異なります。また、おそらく設定によっても異なるでしょう。詳細については、
+<tt class="xref c c-func docutils literal"><span class="pre">SHGetSpecialFolderPath()</span></tt> 関数に関する Microsoft のドキュメントを参照してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="create_shortcut">
+<tt class="descname">create_shortcut</tt><big>(</big><em>target</em>, <em>description</em>, <em>filename</em><span class="optional">[</span>, <em>arguments</em><span class="optional">[</span>, <em>workdir</em><span class="optional">[</span>, <em>iconpath</em><span class="optional">[</span>, <em>iconindex</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#create_shortcut" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数はショートカットを作成します。 <em>target</em> はショートカットによって起動されるプログラムへのパスです。 <em>description</em>
+はショートカットに対する説明です。 <em>filename</em> はユーザから見えるショートカットの名前です。コマンドライン引数があれば、 <em>arguments</em>
+に指定します。 <em>workdir</em> はプログラムの作業ディレクトリです。 <em>iconpath</em> はショートカットのためのアイコンが入ったファイルで、
+<em>iconindex</em> はファイル <em>iconpath</em> 中のアイコンへのインデクスです。これについても、詳しくは <tt class="xref py py-class docutils literal"><span class="pre">IShellLink</span></tt>
+インタフェースに関する Microsoft のドキュメントを参照してください。</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="vista-user-access-control-uac">
+<h2>Vista User Access Control (UAC)<a class="headerlink" href="#vista-user-access-control-uac" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python 2.6 から、 bdist_wininst は <em class="xref std std-option">--user-access-control</em> オプションをサポートしています。デフォルトは &#8216;none&#8217; (UAC制御をしないことを意味します) で、それ以外の有効な値は
+&#8216;auto&#8217; (Python が全ユーザー用にインストールされていれば UAC 昇格を行う)、
+&#8216;force&#8217; (常に昇格を行う) です。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="packageindex.html" title="パッケージインデクスに登録する"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="sourcedist.html" title="ソースコード配布物を作成する"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python モジュールの配布</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

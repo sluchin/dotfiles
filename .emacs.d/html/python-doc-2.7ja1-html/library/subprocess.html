@@ -1,0 +1,772 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>17.1. subprocess — サブプロセス管理 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="17. プロセス間通信とネットワーク" href="ipc.html" />
+    <link rel="next" title="17.2. socket — 低レベルネットワークインターフェース" href="socket.html" />
+    <link rel="prev" title="17. プロセス間通信とネットワーク" href="ipc.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="socket.html" title="17.2. socket — 低レベルネットワークインターフェース"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="ipc.html" title="17. プロセス間通信とネットワーク"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="ipc.html" accesskey="U">17. プロセス間通信とネットワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">17.1. <tt class="docutils literal"><span class="pre">subprocess</span></tt> &#8212; サブプロセス管理</a><ul>
+<li><a class="reference internal" href="#id1">17.1.1. subprocess モジュールを使う</a><ul>
+<li><a class="reference internal" href="#id2">17.1.1.1. 便利な関数</a></li>
+<li><a class="reference internal" href="#id3">17.1.1.2. 例外</a></li>
+<li><a class="reference internal" href="#id4">17.1.1.3. セキュリティ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#popen">17.1.2. Popen オブジェクト</a></li>
+<li><a class="reference internal" href="#windows-popen">17.1.3. Windows Popen ヘルパ</a><ul>
+<li><a class="reference internal" href="#id5">17.1.3.1. 定数</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#subprocess-replacements">17.1.4. 古い関数を subprocess モジュールで置き換える</a><ul>
+<li><a class="reference internal" href="#bin-sh">17.1.4.1. /bin/sh シェルのバッククォートを置き換える</a></li>
+<li><a class="reference internal" href="#id7">17.1.4.2. シェルのパイプラインを置き換える</a></li>
+<li><a class="reference internal" href="#os-system">17.1.4.3. <tt class="docutils literal"><span class="pre">os.system()</span></tt> を置き換える</a></li>
+<li><a class="reference internal" href="#os-spawn">17.1.4.4. <tt class="docutils literal"><span class="pre">os.spawn</span></tt> 関数群を置き換える</a></li>
+<li><a class="reference internal" href="#os-popen-os-popen2-os-popen3">17.1.4.5. <tt class="docutils literal"><span class="pre">os.popen()</span></tt>, <tt class="docutils literal"><span class="pre">os.popen2()</span></tt>, <tt class="docutils literal"><span class="pre">os.popen3()</span></tt> を置き換える</a></li>
+<li><a class="reference internal" href="#popen2">17.1.4.6. <tt class="docutils literal"><span class="pre">popen2</span></tt> モジュールの関数群を置き換える</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">17.1.5. 注釈</a><ul>
+<li><a class="reference internal" href="#windows">17.1.5.1. Windows における引数シーケンスから文字列への変換</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="ipc.html"
+                        title="前の章へ">17. プロセス間通信とネットワーク</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="socket.html"
+                        title="次の章へ">17.2. <tt class="docutils literal docutils literal docutils literal"><span class="pre">socket</span></tt> &#8212; 低レベルネットワークインターフェース</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/subprocess.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-subprocess">
+<span id="subprocess"></span><h1>17.1. <a class="reference internal" href="#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a> &#8212; サブプロセス管理<a class="headerlink" href="#module-subprocess" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+<p><a class="reference internal" href="#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a> モジュールは、新しくプロセスを開始したり、それらの標準入出力/エラー出力に対してパイプで接続したり、それらの終了ステータスを取得したりします。このモジュールは以下のような古いいくつかのモジュールを置き換えることを目的としています:</p>
+<div class="highlight-python"><pre>os.system
+os.spawn*
+os.popen*
+popen2.*
+commands.*</pre>
+</div>
+<p>これらのモジュールや関数の代わりに、 <a class="reference internal" href="#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a> モジュールをどのように使うかについては以下の節で説明します。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last"><span class="target" id="index-0"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0324"><strong>PEP 324</strong></a> &#8211; PEP proposing the subprocess module</p>
+</div>
+<div class="section" id="id1">
+<h2>17.1.1. subprocess モジュールを使う<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このモジュールでは <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> と呼ばれるクラスを定義しています:</p>
+<dl class="class">
+<dt id="subprocess.Popen">
+<em class="property">class </em><tt class="descclassname">subprocess.</tt><tt class="descname">Popen</tt><big>(</big><em>args</em>, <em>bufsize=0</em>, <em>executable=None</em>, <em>stdin=None</em>, <em>stdout=None</em>, <em>stderr=None</em>, <em>preexec_fn=None</em>, <em>close_fds=False</em>, <em>shell=False</em>, <em>cwd=None</em>, <em>env=None</em>, <em>universal_newlines=False</em>, <em>startupinfo=None</em>, <em>creationflags=0</em><big>)</big><a class="headerlink" href="#subprocess.Popen" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>各引数の説明は以下のとおりです:</p>
+<p><em>args</em> は文字列か、あるいはプログラムへの引数のシーケンスです。実行するプログラムは通常 <em>args</em> シーケンスあるいは文字列の最初の要素ですが、
+<em>executable</em> 引数を使うことにより明示的に指定することもできます。
+<em>executable</em> が与えられると、その引数シーケンスの最初の要素は、多くのプログラムではコマンド名として扱われます。ただ、コマンド名は実際に実行される名前とは違う場合があります。
+Unix では、コマンド名は <strong class="program">ps</strong> のようなユーティリティプログラムに表示されます。</p>
+<p>Unix で <em>shell=False</em> の場合 (デフォルト): この場合、 Popen クラスは子プログラムを実行するのに
+<a class="reference internal" href="os.html#os.execvp" title="os.execvp"><tt class="xref py py-meth docutils literal"><span class="pre">os.execvp()</span></tt></a> を使います。 文字列が引数として与えられた場合、実行されるプログラムの名前かパスとして使われます；ただし、プログラムは引数無しの場合のみ動作します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p><em>args</em> を正しくトークン化するには、 <a class="reference internal" href="shlex.html#shlex.split" title="shlex.split"><tt class="xref py py-meth docutils literal"><span class="pre">shlex.split()</span></tt></a> が便利です。このメソッドは特に複雑な状況で活躍します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">shlex</span><span class="o">,</span> <span class="nn">subprocess</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">command_line</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">()</span>
+<span class="go">/bin/vikings -input eggs.txt -output &quot;spam spam.txt&quot; -cmd &quot;echo &#39;$MONEY&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">command_line</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">args</span>
+<span class="go">[&#39;/bin/vikings&#39;, &#39;-input&#39;, &#39;eggs.txt&#39;, &#39;-output&#39;, &#39;spam spam.txt&#39;, &#39;-cmd&#39;, &quot;ech &#39;$MONEY&quot;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="c"># Success!</span>
+</pre></div>
+</div>
+<p class="last">シェルの中で (<em>-input</em> 、 <em>eggs.txt</em> のように)
+スペースで区切られたオプションと引数はリストの別の要素として区切られていること、シェルの中で (上にあるようなスペースを含むファイル名や
+<em>echo</em> コマンドのように) クォーティングかバックスラッシュエスケープが必要なものは単一のリスト要素にされていることに注目してください。</p>
+</div>
+<p>Unix で <em>shell=True</em> の場合: args が文字列の場合、シェルを介して実行されるコマンドライン文字列を指定します。文字列は厳密にシェルプロンプトで打つ形式と一致しなければなりません。例えば、文字列の中にスペースを含むファイル名がある場合、はクォーティングかバックスラッシュエスケープが必要です。
+args が文字列の場合には最初の要素はコマンド名を表わす文字列としてそして残りの要素は続く引数としてシェルに渡されます。これは、以下の <em>Popen</em> と等価ということです。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Popen</span><span class="p">([</span><span class="s">&#39;/bin/sh&#39;</span><span class="p">,</span> <span class="s">&#39;-c&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">...</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p>信頼されていないソースからの衛生化されていない入力を組み込んだシェルコマンドを実行すると、任意のコマンドを実行されることになるセキュリティ上の重大な欠陥 <a class="reference external" href="http://en.wikipedia.org/wiki/Shell_injection#Shell_injection">シェルインジェクション(en)</a>
+に対して脆弱になります。この理由から、コマンド文字列が外部入力から構成される場合、 <em>shell=True</em> は <em>絶対に使うべきではありません</em>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">call</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filename</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&quot;What file would you like to display?</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="go">What file would you like to display?</span>
+<span class="go">non_existent; rm -rf / #</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">call</span><span class="p">(</span><span class="s">&quot;cat &quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c"># Uh-oh. This will end badly...</span>
+</pre></div>
+</div>
+<p class="last"><em>shell=False</em> は、この脆弱性に悩まされません。上述のノートは、
+<em>shell=False</em> を使ったコードを動かすのに役立つでしょう。</p>
+</div>
+<p>Windows の場合: <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> クラスは子プログラムを実行するのに文字列の扱える CreateProcess()
+を使います。 <em>args</em> がシーケンスの場合、これは
+<a class="reference internal" href="#converting-argument-sequence"><em>Windows における引数シーケンスから文字列への変換</em></a> で解説する方法に従って、文字列に変換されます。</p>
+<p><em>bufsize</em> は、もしこれが与えられた場合、ビルトインの open() 関数の該当する引数と同じ意味をもちます: <tt class="xref py py-const docutils literal"><span class="pre">0</span></tt>
+はバッファされないことを意味し、 <tt class="xref py py-const docutils literal"><span class="pre">1</span></tt> は行ごとにバッファされることを、それ以外の正の値は (ほぼ)
+その大きさのバッファが使われることを意味します。負の <em>bufsize</em> はシステムのデフォルト値が使われることを意味し、通常これはバッファがすべて有効となります。 <em>bufsize</em> のデフォルト値は <tt class="xref py py-const docutils literal"><span class="pre">0</span></tt> (バッファされない) です。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">パフォーマンス上の問題がある場合、 <em>bufsize</em> を -1 か十分大きな正の値 (例えば 4096) に設定し、バッファを有効にすることを勧めます。</p>
+</div>
+<p><em>executable</em> 引数には実行するプログラムを指定します。これはほとんど必要ありません: ふつう、実行するプログラムは <em>args</em>
+引数で指定されるからです。 <tt class="docutils literal"><span class="pre">shell=True</span></tt> の場合、 <em>executable</em> 引数は使用するシェルを指定します。 Unix
+では、デフォルトのシェルは <tt class="file docutils literal"><span class="pre">/bin/sh</span></tt> です。Windows では、デフォルトのシェルは <span class="target" id="index-1"></span><tt class="xref std std-envvar docutils literal"><span class="pre">COMSPEC</span></tt>
+環境変数で指定されます。
+Windows で <tt class="docutils literal"><span class="pre">shell=True</span></tt> を有効にする必要があるのは <tt class="docutils literal"><span class="pre">dir</span></tt> や <tt class="docutils literal"><span class="pre">copy</span></tt> などのシェル組み込みのコマンドを使いたい場合だけです。バッチファイルを実行するときも、コンソールベースで起動するときも、
+<tt class="docutils literal"><span class="pre">shell=True</span></tt> にする必要はありません。</p>
+<p><em>stdin</em>, <em>stdout</em> および <em>stderr</em> には、実行するプログラムの標準入力、標準出力、および標準エラー出力のファイルハンドルをそれぞれ指定します。とりうる値は <a class="reference internal" href="#subprocess.PIPE" title="subprocess.PIPE"><tt class="xref py py-data docutils literal"><span class="pre">PIPE</span></tt></a> 、既存のファイル記述子 (正の整数)、既存のファイルオブジェクト、そして
+<tt class="docutils literal"><span class="pre">None</span></tt> です。
+<a class="reference internal" href="#subprocess.PIPE" title="subprocess.PIPE"><tt class="xref py py-data docutils literal"><span class="pre">PIPE</span></tt></a> を指定すると新しいパイプが子プロセスに向けて作られます。 <tt class="docutils literal"><span class="pre">None</span></tt>
+を指定するとリダイレクトは起こりません。子プロセスのファイルハンドルはすべて親から受け継がれます。加えて、 <em>stderr</em> を <a class="reference internal" href="#subprocess.STDOUT" title="subprocess.STDOUT"><tt class="xref py py-data docutils literal"><span class="pre">STDOUT</span></tt></a> にすると、アプリケーションの stderr からの出力は stdout と同じファイルハンドルに出力されます。</p>
+<p><em>preexec_fn</em> に callable オブジェクトが指定されている場合、このオブジェクトは子プロセスが起動されてから、プログラムが exec
+される直前に呼ばれます。(Unixのみ)
+もしくは、Windowsで <em>close_fds</em> が真の場合、すべてのファイルハンドルは子プロセスに引き継がれません。
+Windowsの場合、 <em>close_fds</em> を真にしながら、 <em>stdin</em>, <em>stdout</em>, <em>stderr</em> を利用して標準ハンドルをリダイレクトすることはできません。</p>
+<p><em>close_fds</em> が真の場合、子プロセスが実行される前に <tt class="xref py py-const docutils literal"><span class="pre">0</span></tt> 、 <tt class="xref py py-const docutils literal"><span class="pre">1</span></tt> および <tt class="xref py py-const docutils literal"><span class="pre">2</span></tt>
+をのぞくすべてのファイル記述子が閉じられます。(Unixのみ)</p>
+<p><em>shell</em> が <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> の場合、指定されたコマンドはシェルを介して実行されます。</p>
+<p><em>cwd</em> が <tt class="docutils literal"><span class="pre">None</span></tt> 以外の場合、子プロセスのカレントディレクトリが実行される前に <em>cwd</em> に変更されます。このディレクトリは実行ファイルを探す段階では考慮されませんので、プログラムのパスを <em>cwd</em> に対する相対パスで指定することはできない、ということに注意してください。</p>
+<p><em>env</em> が <tt class="docutils literal"><span class="pre">None</span></tt> 以外の場合、これは新しいプロセスでの環境変数を定義します。デフォルトでは、子プロセスは現在のプロセスの環境変数を引き継ぎます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<blockquote class="last">
+<div><em>env</em> を特定の値として与える場合、プログラムを実行するのに必要な変数全てを与えなければなりません。
+Windows で <a class="reference external" href="http://en.wikipedia.org/wiki/Side-by-Side_Assembly">side-by-side assembly</a> を実行するためには、
+<em>env</em> は正しい <span class="target" id="index-2"></span><tt class="xref std std-envvar docutils literal"><span class="pre">SystemRoot</span></tt> を <strong>含まなければいけません</strong> 。</div></blockquote>
+</div>
+<p><em>universal_newlines</em> が <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> の場合、 stdout および stderr
+のファイルオブジェクトはテキストファイルとして open されますが、行の終端は Unix形式の行末 <tt class="docutils literal"><span class="pre">'\n'</span></tt> か、古い Macintosh 形式の行末
+<tt class="docutils literal"><span class="pre">'\r'</span></tt> か、あるいは Windows 形式の行末 <tt class="docutils literal"><span class="pre">'\r\n'</span></tt> のいずれも許されます。これらすべての外部表現は Python プログラムには
+<tt class="docutils literal"><span class="pre">'\n'</span></tt> として認識されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この機能は Python に universal newline がサポートされている場合 (デフォルト) にのみ有効です。また、
+<a class="reference internal" href="#subprocess.Popen.stdout" title="subprocess.Popen.stdout"><tt class="xref py py-attr docutils literal"><span class="pre">stdout</span></tt></a>, <a class="reference internal" href="#subprocess.Popen.stdin" title="subprocess.Popen.stdin"><tt class="xref py py-attr docutils literal"><span class="pre">stdin</span></tt></a> および <a class="reference internal" href="#subprocess.Popen.stderr" title="subprocess.Popen.stderr"><tt class="xref py py-attr docutils literal"><span class="pre">stderr</span></tt></a> のファイルオブジェクトの newlines 属性は
+communicate() メソッドでは更新されません。</p>
+</div>
+<p><em>startupinfo</em> は、根底の <tt class="docutils literal"><span class="pre">CreateProcess</span></tt> 関数に渡される
+<a class="reference internal" href="#subprocess.STARTUPINFO" title="subprocess.STARTUPINFO"><tt class="xref py py-class docutils literal"><span class="pre">STARTUPINFO</span></tt></a> オブジェクトになります。
+<em>creationflags</em> は、与えられるなら、 <a class="reference internal" href="#subprocess.CREATE_NEW_CONSOLE" title="subprocess.CREATE_NEW_CONSOLE"><tt class="xref py py-data docutils literal"><span class="pre">CREATE_NEW_CONSOLE</span></tt></a> または
+<a class="reference internal" href="#subprocess.CREATE_NEW_PROCESS_GROUP" title="subprocess.CREATE_NEW_PROCESS_GROUP"><tt class="xref py py-data docutils literal"><span class="pre">CREATE_NEW_PROCESS_GROUP</span></tt></a> にできます。(Windows のみ)</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.PIPE">
+<tt class="descclassname">subprocess.</tt><tt class="descname">PIPE</tt><a class="headerlink" href="#subprocess.PIPE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> の <em>stdin</em>, <em>stdout</em>, <em>stderr</em> 引数に渡して、標準ストリームに対するパイプを開くことを指定するための特別な値.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.STDOUT">
+<tt class="descclassname">subprocess.</tt><tt class="descname">STDOUT</tt><a class="headerlink" href="#subprocess.STDOUT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> の <em>stderr</em> 引数に渡して、標準エラーが標準出力と同じハンドルに出力されるように指定するための特別な値.</p>
+</dd></dl>
+
+<div class="section" id="id2">
+<h3>17.1.1.1. 便利な関数<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>このモジュールは以下の二つのショートカット関数も定義しています:</p>
+<dl class="function">
+<dt id="subprocess.call">
+<tt class="descclassname">subprocess.</tt><tt class="descname">call</tt><big>(</big><em>*popenargs</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#subprocess.call" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コマンドを指定された引数で実行し、そのコマンドが完了するのを待って、 <tt class="xref py py-attr docutils literal"><span class="pre">returncode</span></tt> 属性を返します。</p>
+<p>この引数は <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> コンストラクタの引数と同じです。使用例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">retcode</span> <span class="o">=</span> <span class="n">call</span><span class="p">([</span><span class="s">&quot;ls&quot;</span><span class="p">,</span> <span class="s">&quot;-l&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last"><a class="reference internal" href="#subprocess.Popen.wait" title="subprocess.Popen.wait"><tt class="xref py py-meth docutils literal"><span class="pre">Popen.wait()</span></tt></a> のように、これは以下の場合にデッドロックになります。
+<tt class="docutils literal"><span class="pre">stdout=PIPE</span></tt> および/または <tt class="docutils literal"><span class="pre">stderr=PIPE</span></tt> を使って、子プロセスが十分な出力を生成したのに、出力先が、OS パイプバッファがそれ以上のデータを受け付けるのを待っているような場合です。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="subprocess.check_call">
+<tt class="descclassname">subprocess.</tt><tt class="descname">check_call</tt><big>(</big><em>*popenargs</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#subprocess.check_call" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コマンドを引数付きで実行します。コマンドが完了するのを待ちます。終了コードがゼロならば終わりますが、そうでなければ
+<tt class="xref py py-exc docutils literal"><span class="pre">CalledProcessError</span></tt> 例外を送出します。 <tt class="xref py py-exc docutils literal"><span class="pre">CalledProcessError</span></tt> オブジェクトにはリターンコードが
+<tt class="xref py py-attr docutils literal"><span class="pre">returncode</span></tt> 属性として収められています。</p>
+<p>引数は <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> コンストラクタと一緒です。使用例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">([</span><span class="s">&quot;ls&quot;</span><span class="p">,</span> <span class="s">&quot;-l&quot;</span><span class="p">])</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last"><a class="reference internal" href="#subprocess.call" title="subprocess.call"><tt class="xref py py-func docutils literal"><span class="pre">call()</span></tt></a> の警告を参照してください。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="subprocess.check_output">
+<tt class="descclassname">subprocess.</tt><tt class="descname">check_output</tt><big>(</big><em>*popenargs</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#subprocess.check_output" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数でコマンドを実行し、その出力をバイト文字列として返します。</p>
+<p>終了コードが非 0 なら、 <tt class="xref py py-exc docutils literal"><span class="pre">CalledProcessError</span></tt> を送出します。
+<tt class="xref py py-exc docutils literal"><span class="pre">CalledProcessError</span></tt> オブジェクトは、戻りコードを
+<tt class="xref py py-attr docutils literal"><span class="pre">returncode</span></tt> 属性に、出力を <tt class="xref py py-attr docutils literal"><span class="pre">output</span></tt> 属性に保持します。</p>
+<p>引数は、 <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> コンストラクタのものと同じです。例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&quot;ls&quot;</span><span class="p">,</span> <span class="s">&quot;-l&quot;</span><span class="p">,</span> <span class="s">&quot;/dev/null&quot;</span><span class="p">])</span>
+<span class="go">&#39;crw-rw-rw- 1 root root 1, 3 Oct 18  2007 /dev/null\n&#39;</span>
+</pre></div>
+</div>
+<p>stdout 引数は内部で使われるため、許可されません。結果の標準エラーを捕捉するには、 <tt class="docutils literal"><span class="pre">stderr=subprocess.STDOUT</span></tt> を使ってください:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="s">&quot;/bin/sh&quot;</span><span class="p">,</span> <span class="s">&quot;-c&quot;</span><span class="p">,</span> <span class="s">&quot;ls non_existent_file; exit 0&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+<span class="go">&#39;ls: non_existent_file: No such file or directory\n&#39;</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>17.1.1.2. 例外<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>子プロセス内で raise した例外は、新しいプログラムが実行される前であれば、親プロセスでも raise されます。さらに、この例外オブジェクトには
+<tt class="xref py py-attr docutils literal"><span class="pre">child_traceback</span></tt> という属性が追加されており、これには子プロセスの視点からの traceback 情報が格納されています。</p>
+<p>もっとも一般的に起こる例外は <a class="reference internal" href="exceptions.html#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a> です。これは、たとえば存在しないファイルを実行しようとしたときなどに発生します。アプリケーションは <a class="reference internal" href="exceptions.html#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a> 例外にはあらかじめ準備しておく必要があります。</p>
+<p>不適当な引数で <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> が呼ばれた場合は、 <a class="reference internal" href="exceptions.html#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> が発生します。</p>
+<p><a class="reference internal" href="#subprocess.check_call" title="subprocess.check_call"><tt class="xref py py-func docutils literal"><span class="pre">check_call()</span></tt></a> はもし呼び出されたプロセスがゼロでないリターンコードを返したならば <tt class="xref py py-exc docutils literal"><span class="pre">CalledProcessError</span></tt>
+を送出します。</p>
+</div>
+<div class="section" id="id4">
+<h3>17.1.1.3. セキュリティ<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>ほかの popen 関数とは異なり、この実装は決して暗黙のうちに /bin/sh を実行しません。これはシェルのメタ文字をふくむすべての文字が安全に子プロセスに渡されるということを意味しています。</p>
+</div>
+</div>
+<div class="section" id="popen">
+<h2>17.1.2. Popen オブジェクト<a class="headerlink" href="#popen" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> クラスのインスタンスには、以下のようなメソッドがあります:</p>
+<dl class="method">
+<dt id="subprocess.Popen.poll">
+<tt class="descclassname">Popen.</tt><tt class="descname">poll</tt><big>(</big><big>)</big><a class="headerlink" href="#subprocess.Popen.poll" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスが終了しているかどうかを検査します。
+<a class="reference internal" href="#subprocess.Popen.returncode" title="subprocess.Popen.returncode"><tt class="xref py py-attr docutils literal"><span class="pre">returncode</span></tt></a> 属性を設定し、返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="subprocess.Popen.wait">
+<tt class="descclassname">Popen.</tt><tt class="descname">wait</tt><big>(</big><big>)</big><a class="headerlink" href="#subprocess.Popen.wait" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスが終了するまで待ちます。
+<a class="reference internal" href="#subprocess.Popen.returncode" title="subprocess.Popen.returncode"><tt class="xref py py-attr docutils literal"><span class="pre">returncode</span></tt></a> 属性を設定し、返します。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">これは、子プロセスが十分な出力を生成したのに、出力先が、
+OS パイプバッファがそれ以上のデータを受け付けるのを待っているような場合に、デッドロックになります。これを避けるために、 <a class="reference internal" href="#subprocess.Popen.communicate" title="subprocess.Popen.communicate"><tt class="xref py py-meth docutils literal"><span class="pre">communicate()</span></tt></a> を利用してください。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subprocess.Popen.communicate">
+<tt class="descclassname">Popen.</tt><tt class="descname">communicate</tt><big>(</big><em>input=None</em><big>)</big><a class="headerlink" href="#subprocess.Popen.communicate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>プロセスと通信します: end-of-file に到達するまでデータを stdin に送信し、stdout および stderr からデータを受信します。プロセスが終了するまで待ちます。オプション引数 <em>input</em> には子プロセスに送られる文字列か、あるいはデータを送らない場合は <tt class="docutils literal"><span class="pre">None</span></tt>
+を指定します。</p>
+<p><a class="reference internal" href="#subprocess.Popen.communicate" title="subprocess.Popen.communicate"><tt class="xref py py-meth docutils literal"><span class="pre">communicate()</span></tt></a> はタプル <tt class="docutils literal"><span class="pre">(stdoutdata,</span> <span class="pre">stderrdata)</span></tt> を返します。</p>
+<p>子プロセスの標準入力にデータを送りたい場合は、 Popen オブジェクトを <tt class="docutils literal"><span class="pre">stdin=PIPE</span></tt>
+と指定して作成しなければなりません。同じく、戻り値のタプルから <tt class="docutils literal"><span class="pre">None</span></tt> ではない値を取得するためには、
+<tt class="docutils literal"><span class="pre">stdout=PIPE</span></tt> かつ/または <tt class="docutils literal"><span class="pre">stderr=PIPE</span></tt> を指定しなければなりません。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">受信したデータはメモリ中にバッファされます。そのため、返されるデータが大きいかあるいは制限がないような場合はこのメソッドを使うべきではありません。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="subprocess.Popen.send_signal">
+<tt class="descclassname">Popen.</tt><tt class="descname">send_signal</tt><big>(</big><em>signal</em><big>)</big><a class="headerlink" href="#subprocess.Popen.send_signal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>signal</em> シグナルを子プロセスに送ります。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">Windows では、 SIGTERM は <a class="reference internal" href="#subprocess.Popen.terminate" title="subprocess.Popen.terminate"><tt class="xref py py-meth docutils literal"><span class="pre">terminate()</span></tt></a> のエイリアスです。
+CTRL_C_EVENT と CTRL_BREAK_EVENT を、
+<cite>CREATE_NEW_PROCESS_GROUP</cite> を含む <em>creationflags</em> で始まった、プロセスに送れます。</p>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="subprocess.Popen.terminate">
+<tt class="descclassname">Popen.</tt><tt class="descname">terminate</tt><big>(</big><big>)</big><a class="headerlink" href="#subprocess.Popen.terminate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスを止めます。
+Posix OSでは、このメソッドは SIGTERM シグナルを子プロセスに送ります。
+Windows では、 Win32 API の <tt class="xref c c-func docutils literal"><span class="pre">TerminateProcess()</span></tt> 関数を利用して子プロセスを止めます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="subprocess.Popen.kill">
+<tt class="descclassname">Popen.</tt><tt class="descname">kill</tt><big>(</big><big>)</big><a class="headerlink" href="#subprocess.Popen.kill" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスを殺します。
+Posix OS では SIGKILL シグナルを子プロセスに送ります。
+Windows では、 <a class="reference internal" href="#subprocess.Popen.kill" title="subprocess.Popen.kill"><tt class="xref py py-meth docutils literal"><span class="pre">kill()</span></tt></a> は <a class="reference internal" href="#subprocess.Popen.terminate" title="subprocess.Popen.terminate"><tt class="xref py py-meth docutils literal"><span class="pre">terminate()</span></tt></a> のエイリアスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<p>以下の属性も利用できます:</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last"><tt class="xref py py-meth docutils literal"><span class="pre">stdin.write()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">stdout.read()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">stderr.read()</span></tt> を利用すると、別のパイプのOSパイプバッファがいっぱいになってデッドロックする恐れがあります。これを避けるためには <tt class="xref py py-meth docutils literal"><span class="pre">communicate()</span></tt> を利用してください。</p>
+</div>
+<dl class="attribute">
+<dt id="subprocess.Popen.stdin">
+<tt class="descclassname">Popen.</tt><tt class="descname">stdin</tt><a class="headerlink" href="#subprocess.Popen.stdin" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>stdin</em> 引数が <a class="reference internal" href="#subprocess.PIPE" title="subprocess.PIPE"><tt class="xref py py-data docutils literal"><span class="pre">PIPE</span></tt></a> の場合、この属性には子プロセスの入力に使われるファイルオブジェクトになります。そうでない場合は <tt class="docutils literal"><span class="pre">None</span></tt>
+です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.Popen.stdout">
+<tt class="descclassname">Popen.</tt><tt class="descname">stdout</tt><a class="headerlink" href="#subprocess.Popen.stdout" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>stdout</em> 引数が <a class="reference internal" href="#subprocess.PIPE" title="subprocess.PIPE"><tt class="xref py py-data docutils literal"><span class="pre">PIPE</span></tt></a> の場合、この属性には子プロセスの出力に使われるファイルオブジェクトになります。そうでない場合は <tt class="docutils literal"><span class="pre">None</span></tt>
+です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.Popen.stderr">
+<tt class="descclassname">Popen.</tt><tt class="descname">stderr</tt><a class="headerlink" href="#subprocess.Popen.stderr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>stderr</em> 引数が <a class="reference internal" href="#subprocess.PIPE" title="subprocess.PIPE"><tt class="xref py py-data docutils literal"><span class="pre">PIPE</span></tt></a> の場合、この属性には子プロセスのエラー出力に使われるファイルオブジェクトになります。そうでない場合は
+<tt class="docutils literal"><span class="pre">None</span></tt> です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.Popen.pid">
+<tt class="descclassname">Popen.</tt><tt class="descname">pid</tt><a class="headerlink" href="#subprocess.Popen.pid" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>子プロセスのプロセス ID が入ります。</p>
+<p><em>shell</em> 引数を <tt class="docutils literal"><span class="pre">True</span></tt> にセットした場合は、生成されたシェルのプロセス ID になります。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.Popen.returncode">
+<tt class="descclassname">Popen.</tt><tt class="descname">returncode</tt><a class="headerlink" href="#subprocess.Popen.returncode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.Popen.poll" title="subprocess.Popen.poll"><tt class="xref py py-meth docutils literal"><span class="pre">poll()</span></tt></a> か <a class="reference internal" href="#subprocess.Popen.wait" title="subprocess.Popen.wait"><tt class="xref py py-meth docutils literal"><span class="pre">wait()</span></tt></a> (か、間接的に <a class="reference internal" href="#subprocess.Popen.communicate" title="subprocess.Popen.communicate"><tt class="xref py py-meth docutils literal"><span class="pre">communicate()</span></tt></a> )から設定された、子プロセスの終了ステータスが入ります。
+<tt class="docutils literal"><span class="pre">None</span></tt> はまだその子プロセスが終了していないことを示します。</p>
+<p>負の値 -N は子プロセスがシグナル N により中止させられたことを示します (Unix のみ)。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="windows-popen">
+<h2>17.1.3. Windows Popen ヘルパ<a class="headerlink" href="#windows-popen" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#subprocess.STARTUPINFO" title="subprocess.STARTUPINFO"><tt class="xref py py-class docutils literal"><span class="pre">STARTUPINFO</span></tt></a> クラスと以下の定数は、Windows でいつでも利用できます。</p>
+<dl class="class">
+<dt id="subprocess.STARTUPINFO">
+<em class="property">class </em><tt class="descclassname">subprocess.</tt><tt class="descname">STARTUPINFO</tt><a class="headerlink" href="#subprocess.STARTUPINFO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> の生成に使われる Windows
+<a class="reference external" href="http://msdn.microsoft.com/en-us/library/ms686331(v=vs.85).aspx">STARTUPINFO</a>
+構造の部分的なサポートです。</p>
+<dl class="attribute">
+<dt id="subprocess.STARTUPINFO.dwFlags">
+<tt class="descname">dwFlags</tt><a class="headerlink" href="#subprocess.STARTUPINFO.dwFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>特定の <a class="reference internal" href="#subprocess.STARTUPINFO" title="subprocess.STARTUPINFO"><tt class="xref py py-class docutils literal"><span class="pre">STARTUPINFO</span></tt></a> のメンバが、プロセスがウィンドウを生成するときに使われるかを決定するビットフィールドです:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">si</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STARTUPINFO</span><span class="p">()</span>
+<span class="n">si</span><span class="o">.</span><span class="n">dwFlags</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STARTF_USESTDHANDLES</span> <span class="o">|</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">STARTF_USESHOWWINDOW</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.STARTUPINFO.hStdInput">
+<tt class="descname">hStdInput</tt><a class="headerlink" href="#subprocess.STARTUPINFO.hStdInput" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.STARTUPINFO.dwFlags" title="subprocess.STARTUPINFO.dwFlags"><tt class="xref py py-attr docutils literal"><span class="pre">dwFlags</span></tt></a> が <a class="reference internal" href="#subprocess.STARTF_USESTDHANDLES" title="subprocess.STARTF_USESTDHANDLES"><tt class="xref py py-data docutils literal"><span class="pre">STARTF_USESTDHANDLES</span></tt></a> を指定すれば、このメンバがプロセスの標準入力処理です。
+<a class="reference internal" href="#subprocess.STARTF_USESTDHANDLES" title="subprocess.STARTF_USESTDHANDLES"><tt class="xref py py-data docutils literal"><span class="pre">STARTF_USESTDHANDLES</span></tt></a> が指定されなければ、標準入力のデフォルトはキーボードバッファです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.STARTUPINFO.hStdOutput">
+<tt class="descname">hStdOutput</tt><a class="headerlink" href="#subprocess.STARTUPINFO.hStdOutput" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.STARTUPINFO.dwFlags" title="subprocess.STARTUPINFO.dwFlags"><tt class="xref py py-attr docutils literal"><span class="pre">dwFlags</span></tt></a> が <a class="reference internal" href="#subprocess.STARTF_USESTDHANDLES" title="subprocess.STARTF_USESTDHANDLES"><tt class="xref py py-data docutils literal"><span class="pre">STARTF_USESTDHANDLES</span></tt></a> を指定すれば、このメンバがプロセスの標準出力処理です。そうでなければ、このメンバは無視され、標準出力のデフォルトはコンソールウィンドウのバッファです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.STARTUPINFO.hStdError">
+<tt class="descname">hStdError</tt><a class="headerlink" href="#subprocess.STARTUPINFO.hStdError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.STARTUPINFO.dwFlags" title="subprocess.STARTUPINFO.dwFlags"><tt class="xref py py-attr docutils literal"><span class="pre">dwFlags</span></tt></a> が <a class="reference internal" href="#subprocess.STARTF_USESTDHANDLES" title="subprocess.STARTF_USESTDHANDLES"><tt class="xref py py-data docutils literal"><span class="pre">STARTF_USESTDHANDLES</span></tt></a> を指定すれば、このメンバがプロセスの標準エラー処理です。そうでなければ、このメンバは無視され、標準エラーのデフォルトはコンソールウィンドウのバッファです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="subprocess.STARTUPINFO.wShowWindow">
+<tt class="descname">wShowWindow</tt><a class="headerlink" href="#subprocess.STARTUPINFO.wShowWindow" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#subprocess.STARTUPINFO.dwFlags" title="subprocess.STARTUPINFO.dwFlags"><tt class="xref py py-attr docutils literal"><span class="pre">dwFlags</span></tt></a> が <a class="reference internal" href="#subprocess.STARTF_USESHOWWINDOW" title="subprocess.STARTF_USESHOWWINDOW"><tt class="xref py py-data docutils literal"><span class="pre">STARTF_USESHOWWINDOW</span></tt></a> を指定すれば、このメンバは
+<a class="reference external" href="http://msdn.microsoft.com/en-us/library/ms633548(v=vs.85).aspx">ShowWindow</a>
+関数の <tt class="docutils literal"><span class="pre">nCmdShow</span></tt> パラメタで指定された値なら、 <tt class="docutils literal"><span class="pre">SW_SHOWDEFAULT</span></tt>
+以外の任意のものにできます。しかし、このメンバは無視されます。</p>
+<p>この属性には <a class="reference internal" href="#subprocess.SW_HIDE" title="subprocess.SW_HIDE"><tt class="xref py py-data docutils literal"><span class="pre">SW_HIDE</span></tt></a> が提供されています。これは、 <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> が <tt class="docutils literal"><span class="pre">shell=True</span></tt> として呼び出されたときに使われます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="id5">
+<h3>17.1.3.1. 定数<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference internal" href="#module-subprocess" title="subprocess: サブプロセス管理"><tt class="xref py py-mod docutils literal"><span class="pre">subprocess</span></tt></a> モジュールは、以下の定数を公開します。</p>
+<dl class="data">
+<dt id="subprocess.STD_INPUT_HANDLE">
+<tt class="descclassname">subprocess.</tt><tt class="descname">STD_INPUT_HANDLE</tt><a class="headerlink" href="#subprocess.STD_INPUT_HANDLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>標準入力デバイスです。この初期値は、コンソール入力バッファ、
+<tt class="docutils literal"><span class="pre">CONIN$</span></tt> です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.STD_OUTPUT_HANDLE">
+<tt class="descclassname">subprocess.</tt><tt class="descname">STD_OUTPUT_HANDLE</tt><a class="headerlink" href="#subprocess.STD_OUTPUT_HANDLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>標準出力デバイスです。この初期値は、アクティブコンソールスクリーン、
+<tt class="docutils literal"><span class="pre">CONOUT$</span></tt> です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.STD_ERROR_HANDLE">
+<tt class="descclassname">subprocess.</tt><tt class="descname">STD_ERROR_HANDLE</tt><a class="headerlink" href="#subprocess.STD_ERROR_HANDLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>標準エラーデバイスです。この初期値は、アクティブコンソールスクリーン、
+<tt class="docutils literal"><span class="pre">CONOUT$</span></tt> です。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.SW_HIDE">
+<tt class="descclassname">subprocess.</tt><tt class="descname">SW_HIDE</tt><a class="headerlink" href="#subprocess.SW_HIDE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ウィンドウを隠します。別のウィンドウが活性化します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.STARTF_USESTDHANDLES">
+<tt class="descclassname">subprocess.</tt><tt class="descname">STARTF_USESTDHANDLES</tt><a class="headerlink" href="#subprocess.STARTF_USESTDHANDLES" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>追加情報を保持する、 <a class="reference internal" href="#subprocess.STARTUPINFO.hStdInput" title="subprocess.STARTUPINFO.hStdInput"><tt class="xref py py-attr docutils literal"><span class="pre">STARTUPINFO.hStdInput</span></tt></a>,
+<a class="reference internal" href="#subprocess.STARTUPINFO.hStdOutput" title="subprocess.STARTUPINFO.hStdOutput"><tt class="xref py py-attr docutils literal"><span class="pre">STARTUPINFO.hStdOutput</span></tt></a>, および <a class="reference internal" href="#subprocess.STARTUPINFO.hStdError" title="subprocess.STARTUPINFO.hStdError"><tt class="xref py py-attr docutils literal"><span class="pre">STARTUPINFO.hStdError</span></tt></a>
+メンバを指定します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.STARTF_USESHOWWINDOW">
+<tt class="descclassname">subprocess.</tt><tt class="descname">STARTF_USESHOWWINDOW</tt><a class="headerlink" href="#subprocess.STARTF_USESHOWWINDOW" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>追加情報を保持する、 <a class="reference internal" href="#subprocess.STARTUPINFO.wShowWindow" title="subprocess.STARTUPINFO.wShowWindow"><tt class="xref py py-attr docutils literal"><span class="pre">STARTUPINFO.wShowWindow</span></tt></a>
+メンバを指定します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.CREATE_NEW_CONSOLE">
+<tt class="descclassname">subprocess.</tt><tt class="descname">CREATE_NEW_CONSOLE</tt><a class="headerlink" href="#subprocess.CREATE_NEW_CONSOLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しいプロセスが、親プロセスのコンソールを継承する (デフォルト)
+のではなく、新しいコンソールを持ちます。</p>
+<p><a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> が <tt class="docutils literal"><span class="pre">shell=True</span></tt> として生成されたとき、このフラグは必ず設定されます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="subprocess.CREATE_NEW_PROCESS_GROUP">
+<tt class="descclassname">subprocess.</tt><tt class="descname">CREATE_NEW_PROCESS_GROUP</tt><a class="headerlink" href="#subprocess.CREATE_NEW_PROCESS_GROUP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しいプロセスグループが生成されることを指定する <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a>
+<tt class="docutils literal"><span class="pre">creationflags</span></tt> パラメタです。このフラグは、サブプロセスで
+<a class="reference internal" href="os.html#os.kill" title="os.kill"><tt class="xref py py-func docutils literal"><span class="pre">os.kill()</span></tt></a> を使うのに必要です。</p>
+<p><a class="reference internal" href="#subprocess.CREATE_NEW_CONSOLE" title="subprocess.CREATE_NEW_CONSOLE"><tt class="xref py py-data docutils literal"><span class="pre">CREATE_NEW_CONSOLE</span></tt></a> が指定されていたら、このフラグは無視されます。</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="subprocess-replacements">
+<span id="id6"></span><h2>17.1.4. 古い関数を subprocess モジュールで置き換える<a class="headerlink" href="#subprocess-replacements" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下、この節では、&#8221;a ==&gt; b&#8221; と書かれているものは a の代替として b が使えるということを表します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この節で紹介されている関数はすべて、実行するプログラムが見つからないときは (いくぶん) 静かに終了します。このモジュールは <a class="reference internal" href="exceptions.html#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a>
+例外を発生させます。</p>
+</div>
+<p>以下の例では、 subprocess モジュールは &#8220;from subprocess import *&#8221; でインポートされたと仮定しています。</p>
+<div class="section" id="bin-sh">
+<h3>17.1.4.1. /bin/sh シェルのバッククォートを置き換える<a class="headerlink" href="#bin-sh" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-python"><pre>output=`mycmd myarg`
+==&gt;
+output = Popen(["mycmd", "myarg"], stdout=PIPE).communicate()[0]</pre>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>17.1.4.2. シェルのパイプラインを置き換える<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-python"><pre>output=`dmesg | grep hda`
+==&gt;
+p1 = Popen(["dmesg"], stdout=PIPE)
+p2 = Popen(["grep", "hda"], stdin=p1.stdout, stdout=PIPE)
+p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+output = p2.communicate()[0]</pre>
+</div>
+<p>p2 を開始した後の p1.stdout.close() の呼び出しは、p1 が p2 の前に存在した場合に、p1 が SIGPIPE を受け取るために重要です。</p>
+</div>
+<div class="section" id="os-system">
+<h3>17.1.4.3. <a class="reference internal" href="os.html#os.system" title="os.system"><tt class="xref py py-func docutils literal"><span class="pre">os.system()</span></tt></a> を置き換える<a class="headerlink" href="#os-system" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-python"><pre>sts = os.system("mycmd" + " myarg")
+==&gt;
+p = Popen("mycmd" + " myarg", shell=True)
+sts = os.waitpid(p.pid, 0)[1]</pre>
+</div>
+<p>注意:</p>
+<ul class="simple">
+<li>このプログラムは普通シェル経由で呼び出す必要はありません。</li>
+<li>終了状態を見るよりも <tt class="xref py py-attr docutils literal"><span class="pre">returncode</span></tt> 属性を見るほうが簡単です。</li>
+</ul>
+<p>より現実的な例ではこうなるでしょう:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="n">retcode</span> <span class="o">=</span> <span class="n">call</span><span class="p">(</span><span class="s">&quot;mycmd&quot;</span> <span class="o">+</span> <span class="s">&quot; myarg&quot;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">retcode</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span> <span class="o">&gt;&gt;</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;子プロセスがシグナルによって中止されました&quot;</span><span class="p">,</span> <span class="o">-</span><span class="n">retcode</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="o">&gt;&gt;</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;子プロセスが終了コードを返しました&quot;</span><span class="p">,</span> <span class="n">retcode</span>
+<span class="k">except</span> <span class="ne">OSError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="o">&gt;&gt;</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;実行に失敗しました:&quot;</span><span class="p">,</span> <span class="n">e</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="os-spawn">
+<h3>17.1.4.4. <a class="reference internal" href="os.html#os.spawnl" title="os.spawnl"><tt class="xref py py-func docutils literal"><span class="pre">os.spawn</span></tt></a> 関数群を置き換える<a class="headerlink" href="#os-spawn" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>P_NOWAIT の例:</p>
+<div class="highlight-python"><pre>pid = os.spawnlp(os.P_NOWAIT, "/bin/mycmd", "mycmd", "myarg")
+==&gt;
+pid = Popen(["/bin/mycmd", "myarg"]).pid</pre>
+</div>
+<p>P_WAIT の例:</p>
+<div class="highlight-python"><pre>retcode = os.spawnlp(os.P_WAIT, "/bin/mycmd", "mycmd", "myarg")
+==&gt;
+retcode = call(["/bin/mycmd", "myarg"])</pre>
+</div>
+<p>シーケンスを使った例:</p>
+<div class="highlight-python"><pre>os.spawnvp(os.P_NOWAIT, path, args)
+==&gt;
+Popen([path] + args[1:])</pre>
+</div>
+<p>環境変数を使った例:</p>
+<div class="highlight-python"><pre>os.spawnlpe(os.P_NOWAIT, "/bin/mycmd", "mycmd", "myarg", env)
+==&gt;
+Popen(["/bin/mycmd", "myarg"], env={"PATH": "/usr/bin"})</pre>
+</div>
+</div>
+<div class="section" id="os-popen-os-popen2-os-popen3">
+<h3>17.1.4.5. <a class="reference internal" href="os.html#os.popen" title="os.popen"><tt class="xref py py-func docutils literal"><span class="pre">os.popen()</span></tt></a>, <a class="reference internal" href="os.html#os.popen2" title="os.popen2"><tt class="xref py py-func docutils literal"><span class="pre">os.popen2()</span></tt></a>, <a class="reference internal" href="os.html#os.popen3" title="os.popen3"><tt class="xref py py-func docutils literal"><span class="pre">os.popen3()</span></tt></a> を置き換える<a class="headerlink" href="#os-popen-os-popen2-os-popen3" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-python"><pre>pipe = os.popen("cmd", 'r', bufsize)
+==&gt;
+pipe = Popen("cmd", shell=True, bufsize=bufsize, stdout=PIPE).stdout</pre>
+</div>
+<div class="highlight-python"><pre>pipe = os.popen("cmd", 'w', bufsize)
+==&gt;
+pipe = Popen("cmd", shell=True, bufsize=bufsize, stdin=PIPE).stdin</pre>
+</div>
+<div class="highlight-python"><pre>(child_stdin, child_stdout) = os.popen2("cmd", mode, bufsize)
+==&gt;
+p = Popen("cmd", shell=True, bufsize=bufsize,
+          stdin=PIPE, stdout=PIPE, close_fds=True)
+(child_stdin, child_stdout) = (p.stdin, p.stdout)</pre>
+</div>
+<div class="highlight-python"><pre>(child_stdin,
+ child_stdout,
+ child_stderr) = os.popen3("cmd", mode, bufsize)
+==&gt;
+p = Popen("cmd", shell=True, bufsize=bufsize,
+          stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
+(child_stdin,
+ child_stdout,
+ child_stderr) = (p.stdin, p.stdout, p.stderr)</pre>
+</div>
+<div class="highlight-python"><pre>(child_stdin, child_stdout_and_stderr) = os.popen4("cmd", mode,
+                                                   bufsize)
+==&gt;
+p = Popen("cmd", shell=True, bufsize=bufsize,
+          stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+(child_stdin, child_stdout_and_stderr) = (p.stdin, p.stdout)</pre>
+</div>
+<p>Unix では、 os.popen2、os.popen3、os.popen4 は実行するコマンドとしてシーケンスも受け入れます。どちらにせよ、引数はシェルの干渉を受けることなく直接渡されます。この使い方は以下のように置き換えられます。</p>
+<div class="highlight-python"><pre>(child_stdin, child_stdout) = os.popen2(["/bin/ls", "-l"], mode,
+                                        bufsize)
+==&gt;
+p = Popen(["/bin/ls", "-l"], bufsize=bufsize,
+          stdin=PIPE, stdout=PIPE)
+(child_stdin, child_stdout) = (p.stdin, p.stdout)</pre>
+</div>
+<p>終了コードハンドリングは以下のように解釈します。</p>
+<div class="highlight-python"><pre>pipe = os.popen("cmd", 'w')
+...
+rc = pipe.close()
+if rc is not None and rc &gt;&gt; 8:
+    print "There were some errors"
+==&gt;
+process = Popen("cmd", 'w', shell=True, stdin=PIPE)
+...
+process.stdin.close()
+if process.wait() != 0:
+    print "There were some errors"</pre>
+</div>
+</div>
+<div class="section" id="popen2">
+<h3>17.1.4.6. <a class="reference internal" href="popen2.html#module-popen2" title="popen2: アクセス可能な I/O ストリームを持つ子プロセス生成。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">popen2</span></tt></a> モジュールの関数群を置き換える<a class="headerlink" href="#popen2" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-python"><pre>(child_stdout, child_stdin) = popen2.popen2("somestring", bufsize, mode)
+==&gt;
+p = Popen(["somestring"], shell=True, bufsize=bufsize,
+          stdin=PIPE, stdout=PIPE, close_fds=True)
+(child_stdout, child_stdin) = (p.stdout, p.stdin)</pre>
+</div>
+<p>Unix では、 popen2 は実行するコマンドとしてシーケンスも受け入れます。どちらにせよ、引数はシェルの干渉を受けることなく、直接渡されます。この使い方は、以下のように置き換えられます。</p>
+<div class="highlight-python"><pre>(child_stdout, child_stdin) = popen2.popen2(["mycmd", "myarg"], bufsize,
+                                            mode)
+==&gt;
+p = Popen(["mycmd", "myarg"], bufsize=bufsize,
+          stdin=PIPE, stdout=PIPE, close_fds=True)
+(child_stdout, child_stdin) = (p.stdout, p.stdin)</pre>
+</div>
+<p>popen2.Popen3 および popen2.Popen4 は基本的には subprocess.Popen と同様です。ただし、違う点は:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> は実行できなかった場合に例外を発生させます。</li>
+<li><em>capturestderr</em> 引数は <em>stderr</em> 引数に代わりました。</li>
+<li><tt class="docutils literal"><span class="pre">stdin=PIPE</span></tt> および <tt class="docutils literal"><span class="pre">stdout=PIPE</span></tt> を指定する必要があります。</li>
+<li>popen2 はデフォルトですべてのファイル記述子を閉じますが、 <a class="reference internal" href="#subprocess.Popen" title="subprocess.Popen"><tt class="xref py py-class docutils literal"><span class="pre">Popen</span></tt></a> では明示的に <tt class="docutils literal"><span class="pre">close_fds=True</span></tt>
+を指定する必要があります。</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id8">
+<h2>17.1.5. 注釈<a class="headerlink" href="#id8" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="windows">
+<span id="converting-argument-sequence"></span><h3>17.1.5.1. Windows における引数シーケンスから文字列への変換<a class="headerlink" href="#windows" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Windows では、 <em>args</em> シーケンスは以下の (MS C ランタイムで使われる規則に対応する) 規則を使って解析できる文字列に変換されます:</p>
+<ol class="arabic simple">
+<li>引数は、スペースかタブのどちらかの空白で分けられます。</li>
+<li>ダブルクオーテーションマークで囲まれた文字列は、空白が含まれていたとしても
+1 つの引数として解釈されます。クオートされた文字列は引数に埋め込めます。</li>
+<li>バックスラッシュに続くダブルクオーテーションマークは、文字通りのダブルクオーテーションマークと解釈されます。</li>
+<li>バックスラッシュは、ダブルクオーテーションが続かない限り、文字通りに解釈されます。</li>
+<li>複数のバックスラッシュにダブルクオーテーションマークが続くなら、バックスラッシュ 2 つで 1 つのバックスラッシュ文字と解釈されます。バックスラッシュの数が奇数なら、最後のバックスラッシュは規則 3 に従って続くダブルクオーテーションマークをエスケープします。</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="socket.html" title="17.2. socket — 低レベルネットワークインターフェース"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="ipc.html" title="17. プロセス間通信とネットワーク"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="ipc.html" >17. プロセス間通信とネットワーク</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

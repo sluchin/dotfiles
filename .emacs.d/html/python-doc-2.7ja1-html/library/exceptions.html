@@ -1,0 +1,621 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>6. 組み込み例外 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python 標準ライブラリ" href="index.html" />
+    <link rel="next" title="7. 文字列処理" href="strings.html" />
+    <link rel="prev" title="5. 組み込み型" href="stdtypes.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="strings.html" title="7. 文字列処理"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="stdtypes.html" title="5. 組み込み型"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python 標準ライブラリ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">6. 組み込み例外</a><ul>
+<li><a class="reference internal" href="#id2">6.1. 例外のクラス階層</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="stdtypes.html"
+                        title="前の章へ">5. 組み込み型</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="strings.html"
+                        title="次の章へ">7. 文字列処理</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/exceptions.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-exceptions">
+<span id="id1"></span><span id="bltin-exceptions"></span><h1>6. 組み込み例外<a class="headerlink" href="#module-exceptions" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>例外はクラスオブジェクトです。例外はモジュール <a class="reference internal" href="#module-exceptions" title="exceptions: 標準の例外クラス群"><tt class="xref py py-mod docutils literal"><span class="pre">exceptions</span></tt></a>
+で定義されています。このモジュールを明示的にインポートする必要はありません。例外は <a class="reference internal" href="#module-exceptions" title="exceptions: 標準の例外クラス群"><tt class="xref py py-mod docutils literal"><span class="pre">exceptions</span></tt></a> モジュールと同様に組み込み名前空間で与えられます。</p>
+<p id="index-0"><a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文の中で、 <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 節を使って特定の例外クラスについて記述した場合、その節は指定した例外クラスから派生したクラスも扱います (指定した例外クラスの派生元のクラスは含みません)。サブクラス化の関係にない 2 つの例外クラスは、それらが同じ名前だったとしても等しくなることはありません。</p>
+<p id="index-1">以下に列挙した組み込み例外はインタプリタや組み込み関数によって生成されます。特に注記しないかぎり、これらの例外はエラーの詳しい原因を示している、 &#8220;関連値 (associated value)&#8221; を持ちます。この値は文字列または複数の情報 (例えばエラーコードや、エラーコードを説明する文字列) を含むタプルです。この関連値は <a class="reference internal" href="../reference/simple_stmts.html#raise"><tt class="xref std std-keyword docutils literal"><span class="pre">raise</span></tt></a> 文の 2 番目の引数です。例外が標準のルートクラスである <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> の派生クラスであれば、関連値は例外インスタンスの <tt class="xref py py-attr docutils literal"><span class="pre">args</span></tt> 属性中に置かれます。</p>
+<p>ユーザによるコードも組み込み例外を送出することができます。これは例外処理をテストしたり、インタプリタがある例外を送出する状況と &#8220;ちょうど同じような&#8221; エラー条件であることを報告させるために使うことができます。しかし、ユーザが適切でないエラーを送出するようコードすることを妨げる方法はないので注意してください。</p>
+<p>組み込み例外クラスは新たな例外を定義するためにサブクラス化することができます。新しい例外は、少なくとも <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> クラスから派生することをお勧めします。
+<a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> からは派生しないで下さい。例外を定義する上での詳しい情報は、
+Python チュートリアルの <a class="reference internal" href="../tutorial/errors.html#tut-userexceptions"><em>ユーザ定義の例外</em></a> の項目にあります。</p>
+<p>以下の例外クラスは他の例外クラスの基底クラスとしてのみ使われます。</p>
+<dl class="exception">
+<dt id="exceptions.BaseException">
+<em class="property">exception </em><tt class="descname">BaseException</tt><a class="headerlink" href="#exceptions.BaseException" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての組み込み例外のルートクラスです。ユーザ定義例外が直接このクラスを継承することは意図していません (そうした場合は
+<a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> を使ってください)。このクラスに対して <a class="reference internal" href="functions.html#str" title="str"><tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt></a>
+や <a class="reference internal" href="functions.html#unicode" title="unicode"><tt class="xref py py-func docutils literal"><span class="pre">unicode()</span></tt></a> が呼ばれた場合、引数の文字列表現か、引数が無い時には空文字列が返されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<dl class="attribute">
+<dt id="exceptions.BaseException.args">
+<tt class="descname">args</tt><a class="headerlink" href="#exceptions.BaseException.args" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>例外コンストラクタに与えられた引数のタプルです。組み込み例外は普通、エラーメッセージを与える一つの文字列だけを引数として呼ばれますが、中には (<a class="reference internal" href="#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> など) いくつかの引数を必要とし、このタプルの要素に特別な意味を込めるものもあります。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.Exception">
+<em class="property">exception </em><tt class="descname">Exception</tt><a class="headerlink" href="#exceptions.Exception" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全ての組み込み例外のうち、システム終了でないものはこのクラスから導出されています。全てのユーザ定義例外はこのクラスの派生クラスであるべきです。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> を継承するように変更されました.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.StandardError">
+<em class="property">exception </em><tt class="descname">StandardError</tt><a class="headerlink" href="#exceptions.StandardError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#exceptions.StopIteration" title="exceptions.StopIteration"><tt class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></tt></a>, <a class="reference internal" href="#exceptions.SystemExit" title="exceptions.SystemExit"><tt class="xref py py-exc docutils literal"><span class="pre">SystemExit</span></tt></a>, <a class="reference internal" href="#exceptions.KeyboardInterrupt" title="exceptions.KeyboardInterrupt"><tt class="xref py py-exc docutils literal"><span class="pre">KeyboardInterrupt</span></tt></a>,
+<a class="reference internal" href="#exceptions.SystemExit" title="exceptions.SystemExit"><tt class="xref py py-exc docutils literal"><span class="pre">SystemExit</span></tt></a> 以外の、全ての組み込み例外の基底クラスです。
+<a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-exc docutils literal"><span class="pre">StandardError</span></tt></a> 自体は <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> の派生クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ArithmeticError">
+<em class="property">exception </em><tt class="descname">ArithmeticError</tt><a class="headerlink" href="#exceptions.ArithmeticError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>算術上の様々なエラーにおいて送出される組み込み例外
+<a class="reference internal" href="#exceptions.OverflowError" title="exceptions.OverflowError"><tt class="xref py py-exc docutils literal"><span class="pre">OverflowError</span></tt></a>, <a class="reference internal" href="#exceptions.ZeroDivisionError" title="exceptions.ZeroDivisionError"><tt class="xref py py-exc docutils literal"><span class="pre">ZeroDivisionError</span></tt></a>,
+<a class="reference internal" href="#exceptions.FloatingPointError" title="exceptions.FloatingPointError"><tt class="xref py py-exc docutils literal"><span class="pre">FloatingPointError</span></tt></a> の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.BufferError">
+<em class="property">exception </em><tt class="descname">BufferError</tt><a class="headerlink" href="#exceptions.BufferError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バッファ (<a class="reference internal" href="../c-api/buffer.html#bufferobjects"><em>buffer</em></a>) に関連する演算が行えなかったときに送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.LookupError">
+<em class="property">exception </em><tt class="descname">LookupError</tt><a class="headerlink" href="#exceptions.LookupError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>マップ型またはシーケンス型に使われたキーやインデックスが無効な場合に送出される例外 <a class="reference internal" href="#exceptions.IndexError" title="exceptions.IndexError"><tt class="xref py py-exc docutils literal"><span class="pre">IndexError</span></tt></a> および <a class="reference internal" href="#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> の基底クラスです。 <a class="reference internal" href="codecs.html#codecs.lookup" title="codecs.lookup"><tt class="xref py py-func docutils literal"><span class="pre">codecs.lookup()</span></tt></a> によって直接送出されることもあります。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.EnvironmentError">
+<em class="property">exception </em><tt class="descname">EnvironmentError</tt><a class="headerlink" href="#exceptions.EnvironmentError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python システムの外部で起こる可能性のある例外 <a class="reference internal" href="#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> および
+<a class="reference internal" href="#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a> の基底クラスです。この型の例外が 2 つの要素を持つタプルで生成された場合、 1 番目の要素はインスタンスの <a class="reference internal" href="errno.html#module-errno" title="errno: 標準の errno システムシンボル。"><tt class="xref py py-attr docutils literal"><span class="pre">errno</span></tt></a>
+属性で得ることができます (この値はエラー番号と見なされます)。 2 番目の要素は <tt class="xref py py-attr docutils literal"><span class="pre">strerror</span></tt> 属性です (この値は通常、エラーに関連するメッセージです)。タプル自体は <tt class="xref py py-attr docutils literal"><span class="pre">args</span></tt> 属性から得ることもできます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+<p><a class="reference internal" href="#exceptions.EnvironmentError" title="exceptions.EnvironmentError"><tt class="xref py py-exc docutils literal"><span class="pre">EnvironmentError</span></tt></a> 例外が 3 要素のタプルで生成された場合、最初の 2 つの要素は上記と同様に値を得ることができ、さらに 3 番目の要素は
+<tt class="xref py py-attr docutils literal"><span class="pre">filename</span></tt> 属性で得ることができます。しかしながら、以前のバージョンとの互換性のために、 <tt class="xref py py-attr docutils literal"><span class="pre">args</span></tt> 属性にはコンストラクタに渡した最初の 2 つの引数からなる 2 要素のタプルしか含みません。</p>
+<p>この例外が 3 つ以外の引数で生成された場合、 <tt class="xref py py-attr docutils literal"><span class="pre">filename</span></tt> 属性は
+<tt class="docutils literal"><span class="pre">None</span></tt> になります。この例外が 2 つまたは 3 つ以外の引数で生成された場合、 <a class="reference internal" href="errno.html#module-errno" title="errno: 標準の errno システムシンボル。"><tt class="xref py py-attr docutils literal"><span class="pre">errno</span></tt></a> および <tt class="xref py py-attr docutils literal"><span class="pre">strerror</span></tt> 属性も <tt class="docutils literal"><span class="pre">None</span></tt> になります。後者のケースでは、 <tt class="xref py py-attr docutils literal"><span class="pre">args</span></tt> がコンストラクタに与えた引数をそのままタプルの形で含んでいます。</p>
+</dd></dl>
+
+<p>以下の例外は実際に送出される例外です。</p>
+<dl class="exception">
+<dt id="exceptions.AssertionError">
+<em class="property">exception </em><tt class="descname">AssertionError</tt><a class="headerlink" href="#exceptions.AssertionError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-2"><a class="reference internal" href="../reference/simple_stmts.html#assert"><tt class="xref std std-keyword docutils literal"><span class="pre">assert</span></tt></a> 文が失敗した場合に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.AttributeError">
+<em class="property">exception </em><tt class="descname">AttributeError</tt><a class="headerlink" href="#exceptions.AttributeError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>属性の参照 (<a class="reference internal" href="../reference/expressions.html#attribute-references"><em>属性参照</em></a> を参照) や代入が失敗した場合に送出されます (オブジェクトが属性の参照や属性の代入をまったくサポートしていない場合には <a class="reference internal" href="#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> が送出されます)。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.EOFError">
+<em class="property">exception </em><tt class="descname">EOFError</tt><a class="headerlink" href="#exceptions.EOFError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>組み込み関数 (<a class="reference internal" href="functions.html#input" title="input"><tt class="xref py py-func docutils literal"><span class="pre">input()</span></tt></a> または <a class="reference internal" href="functions.html#raw_input" title="raw_input"><tt class="xref py py-func docutils literal"><span class="pre">raw_input()</span></tt></a>) のいずれかで、データを全く読まないうちにファイルの終端 (EOF) に到達した場合に送出されます (注意: <a class="reference internal" href="stdtypes.html#file.read" title="file.read"><tt class="xref py py-meth docutils literal"><span class="pre">file.read()</span></tt></a> および <a class="reference internal" href="stdtypes.html#file.readline" title="file.readline"><tt class="xref py py-meth docutils literal"><span class="pre">file.readline()</span></tt></a> メソッドの場合、データを読まないうちに EOF にたどり着くと空の文字列を返します)。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.FloatingPointError">
+<em class="property">exception </em><tt class="descname">FloatingPointError</tt><a class="headerlink" href="#exceptions.FloatingPointError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>浮動小数点演算が失敗した場合に送出されます。この例外は Python
+のどのバージョンでも常に定義されていますが、 Python が
+<tt class="docutils literal"><span class="pre">--with-fpectl</span></tt> オプションを有効にしてコンパイルされているか、
+<tt class="file docutils literal"><span class="pre">pyconfig.h</span></tt> ファイルにシンボル <tt class="xref py py-const docutils literal"><span class="pre">WANT_SIGFPE_HANDLER</span></tt>
+が定義されている場合にのみ送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.GeneratorExit">
+<em class="property">exception </em><tt class="descname">GeneratorExit</tt><a class="headerlink" href="#exceptions.GeneratorExit" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ジェネレータ (<a class="reference internal" href="../glossary.html#term-generator"><em class="xref std std-term">generator</em></a>) の <tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt> メソッドが呼び出されたときに送出されます。この例外は厳密にはエラーではないので、
+<a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-exc docutils literal"><span class="pre">StandardError</span></tt></a> ではなく <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> を直接継承しています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> を継承するように変更されました。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.IOError">
+<em class="property">exception </em><tt class="descname">IOError</tt><a class="headerlink" href="#exceptions.IOError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>(<a class="reference internal" href="../reference/simple_stmts.html#print"><tt class="xref std std-keyword docutils literal"><span class="pre">print</span></tt></a> 文、組み込みの <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> またはファイルオブジェクトに対するメソッドといった) I/O 操作が、例えば &#8220;ファイルが存在しません&#8221; や &#8220;ディスクの空き領域がありません&#8221; といった I/O に関連した理由で失敗した場合に送出されます。</p>
+<p>このクラスは <a class="reference internal" href="#exceptions.EnvironmentError" title="exceptions.EnvironmentError"><tt class="xref py py-exc docutils literal"><span class="pre">EnvironmentError</span></tt></a> の派生クラスです。この例外クラスのインスタンス属性に関する情報は上記の
+<a class="reference internal" href="#exceptions.EnvironmentError" title="exceptions.EnvironmentError"><tt class="xref py py-exc docutils literal"><span class="pre">EnvironmentError</span></tt></a> に関する議論を参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><a class="reference internal" href="socket.html#socket.error" title="socket.error"><tt class="xref py py-exc docutils literal"><span class="pre">socket.error</span></tt></a> は、この例外を基底クラスとして使うように変更されました。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ImportError">
+<em class="property">exception </em><tt class="descname">ImportError</tt><a class="headerlink" href="#exceptions.ImportError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> 文でモジュール定義を見つけられなかった場合や、
+<tt class="docutils literal"><span class="pre">from</span> <span class="pre">...</span> <span class="pre">import</span></tt> 文で指定した名前をインポートすることができなかった場合に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.IndexError">
+<em class="property">exception </em><tt class="descname">IndexError</tt><a class="headerlink" href="#exceptions.IndexError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シーケンスのインデックス指定がシーケンスの範囲を超えている場合に送出されます　(スライスのインデックスはシーケンスの範囲に収まるように暗黙のうちに調整されます; インデックスが通常の整数でない場合、
+<a class="reference internal" href="#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> が送出されます)。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.KeyError">
+<em class="property">exception </em><tt class="descname">KeyError</tt><a class="headerlink" href="#exceptions.KeyError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>マップ型 (辞書型) オブジェクトのキーが、オブジェクトのキー集合内に見つからなかった場合に送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.KeyboardInterrupt">
+<em class="property">exception </em><tt class="descname">KeyboardInterrupt</tt><a class="headerlink" href="#exceptions.KeyboardInterrupt" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザが割り込みキー (通常は <tt class="kbd docutils literal"><span class="pre">Control-C</span></tt> または <tt class="kbd docutils literal"><span class="pre">Delete</span></tt> キー)
+を押した場合に送出されます。割り込みが起きたかどうかはインタプリタの実行中に定期的に調べられます。組み込み関数 <a class="reference internal" href="functions.html#input" title="input"><tt class="xref py py-func docutils literal"><span class="pre">input()</span></tt></a> や
+<a class="reference internal" href="functions.html#raw_input" title="raw_input"><tt class="xref py py-func docutils literal"><span class="pre">raw_input()</span></tt></a> がユーザの入力を待っている間に割り込みキーを押してもこの例外が送出されます。この例外は <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> を処理するコードに誤って捕捉されてインタプリタの終了が阻害されないように <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a>
+を継承しています。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> を継承するように変更されました.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.MemoryError">
+<em class="property">exception </em><tt class="descname">MemoryError</tt><a class="headerlink" href="#exceptions.MemoryError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ある操作中にメモリが不足したが、その状況は (オブジェクトをいくつか消去することで) まだ復旧可能かもしれない場合に送出されます。例外の関連値は、どんな種類の (内部) 操作がメモリ不足になっているかを示す文字列です。背後にあるメモリ管理アーキテクチャ (C の
+<tt class="xref c c-func docutils literal"><span class="pre">malloc()</span></tt> 関数) によっては、インタプリタが常にその状況を完璧に復旧できるとはかぎらないので注意してください; プログラムの暴走が原因の場合にも、やはり実行スタックの追跡結果を出力できるようにするために例外が送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.NameError">
+<em class="property">exception </em><tt class="descname">NameError</tt><a class="headerlink" href="#exceptions.NameError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ローカルまたはグローバルの名前が見つからなかった場合に送出されます。これは非限定の名前のみに適用されます。関連値は見つからなかった名前を含むエラーメッセージです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.NotImplementedError">
+<em class="property">exception </em><tt class="descname">NotImplementedError</tt><a class="headerlink" href="#exceptions.NotImplementedError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この例外は <a class="reference internal" href="#exceptions.RuntimeError" title="exceptions.RuntimeError"><tt class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></tt></a> から派生しています。ユーザ定義の基底クラスにおいて、抽象メソッドが派生クラスでオーバライドされることを要求する場合、この例外を送出しなくてはなりません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.OSError">
+<em class="property">exception </em><tt class="descname">OSError</tt><a class="headerlink" href="#exceptions.OSError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-3">このクラスは <a class="reference internal" href="#exceptions.EnvironmentError" title="exceptions.EnvironmentError"><tt class="xref py py-exc docutils literal"><span class="pre">EnvironmentError</span></tt></a> から派生しています。関数がシステムに関連したエラーを返した場合に送出されます
+(引数の型が間違っている場合や、他の偶発的なエラーは除きます)。
+<a class="reference internal" href="errno.html#module-errno" title="errno: 標準の errno システムシンボル。"><tt class="xref py py-attr docutils literal"><span class="pre">errno</span></tt></a> 属性は <tt class="xref c c-data docutils literal"><span class="pre">errno</span></tt> に基づく数字のエラーコードで、
+<tt class="xref py py-attr docutils literal"><span class="pre">strerror</span></tt> 属性は C の <tt class="xref c c-func docutils literal"><span class="pre">perror()</span></tt> 関数で表示されるような文字列です。オペレーティングシステムに依存したエラーコードの定義と名前については、
+<a class="reference internal" href="errno.html#module-errno" title="errno: 標準の errno システムシンボル。"><tt class="xref py py-mod docutils literal"><span class="pre">errno</span></tt></a> モジュールを参照して下さい。</p>
+<p>ファイルシステムのパスに関係する例外 (<tt class="xref py py-func docutils literal"><span class="pre">chdir()</span></tt> や
+<tt class="xref py py-func docutils literal"><span class="pre">unlink()</span></tt> など) では、例外インスタンスは 3 番目の属性
+<tt class="xref py py-attr docutils literal"><span class="pre">filename</span></tt> を持ちます。これは関数に渡されたファイル名です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.OverflowError">
+<em class="property">exception </em><tt class="descname">OverflowError</tt><a class="headerlink" href="#exceptions.OverflowError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>算術演算の結果が表現できない大きな値になった場合に送出されます。これは long integer の演算と通常の整数に関するほとんどの操作では起こりません (long integer の演算ではむしろ <a class="reference internal" href="#exceptions.MemoryError" title="exceptions.MemoryError"><tt class="xref py py-exc docutils literal"><span class="pre">MemoryError</span></tt></a> が送出されることになるでしょう)。整数に関するほとんどの操作では、代わりに long integer が返されます。
+C の浮動小数点演算の例外処理は標準化されていないので、ほとんどの浮動小数点演算もチェックされません。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ReferenceError">
+<em class="property">exception </em><tt class="descname">ReferenceError</tt><a class="headerlink" href="#exceptions.ReferenceError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="weakref.html#weakref.proxy" title="weakref.proxy"><tt class="xref py py-func docutils literal"><span class="pre">weakref.proxy()</span></tt></a> によって生成された弱参照 (weak reference)
+プロキシを使って、ガーベジコレクションによって回収された後の参照対象オブジェクトの属性にアクセスした場合に送出されます。弱参照については
+<a class="reference internal" href="weakref.html#module-weakref" title="weakref: 弱参照と弱辞書のサポート。"><tt class="xref py py-mod docutils literal"><span class="pre">weakref</span></tt></a> モジュールを参照してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加: </span>以前は <a class="reference internal" href="weakref.html#weakref.ReferenceError" title="weakref.ReferenceError"><tt class="xref py py-exc docutils literal"><span class="pre">weakref.ReferenceError</span></tt></a> 例外として知られていました。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.RuntimeError">
+<em class="property">exception </em><tt class="descname">RuntimeError</tt><a class="headerlink" href="#exceptions.RuntimeError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>他のカテゴリに分類できないエラーが検出された場合に送出されます。関連値は、何が問題だったのかをより詳細に示す文字列です
+(この例外はほとんど過去のバージョンのインタプリタにおける遺物です。今ではあまり使われることはありません)。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.StopIteration">
+<em class="property">exception </em><tt class="descname">StopIteration</tt><a class="headerlink" href="#exceptions.StopIteration" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>イテレータ (<a class="reference internal" href="../glossary.html#term-iterator"><em class="xref std std-term">iterator</em></a>) の <a class="reference internal" href="stdtypes.html#iterator.next" title="iterator.next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a> メソッドにより、それ以上要素がないことを知らせるために送出されます。この例外は、通常の利用方法ではエラーとはみなされないため、
+<a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-exc docutils literal"><span class="pre">StandardError</span></tt></a> ではなく <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> から派生しています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SyntaxError">
+<em class="property">exception </em><tt class="descname">SyntaxError</tt><a class="headerlink" href="#exceptions.SyntaxError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パーザが構文エラーに遭遇した場合に送出されます。この例外は
+<a class="reference internal" href="../reference/simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> 文、 <a class="reference internal" href="../reference/simple_stmts.html#exec"><tt class="xref std std-keyword docutils literal"><span class="pre">exec</span></tt></a> 文、組み込み関数
+<tt class="xref py py-func docutils literal"><span class="pre">evel()</span></tt> や <a class="reference internal" href="functions.html#input" title="input"><tt class="xref py py-func docutils literal"><span class="pre">input()</span></tt></a> 、初期化スクリプトの読み込みや標準入力で (対話的な実行時にも) 起こる可能性があります。</p>
+<p>このクラスのインスタンスは、例外の詳細に簡単にアクセスできるようにするために、属性 <tt class="xref py py-attr docutils literal"><span class="pre">filename</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">lineno</span></tt>,
+<tt class="xref py py-attr docutils literal"><span class="pre">offset</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">text</span></tt> を持ちます。例外インスタンスに対する <a class="reference internal" href="functions.html#str" title="str"><tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt></a> はメッセージのみを返します。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.IndentationError">
+<em class="property">exception </em><tt class="descname">IndentationError</tt><a class="headerlink" href="#exceptions.IndentationError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>正しくないインデントに関する構文エラーの基底クラスです。これは
+<a class="reference internal" href="#exceptions.SyntaxError" title="exceptions.SyntaxError"><tt class="xref py py-exc docutils literal"><span class="pre">SyntaxError</span></tt></a> のサブクラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.TabError">
+<em class="property">exception </em><tt class="descname">TabError</tt><a class="headerlink" href="#exceptions.TabError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>タブとスペースを一貫しない方法でインデントに使っているときに送出されます。これは <a class="reference internal" href="#exceptions.IndentationError" title="exceptions.IndentationError"><tt class="xref py py-exc docutils literal"><span class="pre">IndentationError</span></tt></a> のサブクラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SystemError">
+<em class="property">exception </em><tt class="descname">SystemError</tt><a class="headerlink" href="#exceptions.SystemError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インタプリタが内部エラーを発見したが、その状況は全ての望みを棄てさせるほど深刻ではないように思われる場合に送出されます。関連値は
+(下位層の言葉で) 何がまずいのかを示す文字列です。</p>
+<p>Python の作者か、あなたの Python インタプリタを保守している人にこのエラーを報告してください。このとき、 Python インタプリタのバージョン
+(<tt class="docutils literal"><span class="pre">sys.version</span></tt>; Python の対話的セッションを開始した際にも出力されます)、正確なエラーメッセージ (例外の関連値) を忘れずに報告してください。そしてもし可能ならエラーを引き起こしたプログラムのソースコードを報告してください。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SystemExit">
+<em class="property">exception </em><tt class="descname">SystemExit</tt><a class="headerlink" href="#exceptions.SystemExit" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この例外は <a class="reference internal" href="sys.html#sys.exit" title="sys.exit"><tt class="xref py py-func docutils literal"><span class="pre">sys.exit()</span></tt></a> 関数によって送出されます。この例外が処理されなかった場合、スタックのトレースバックを全く表示することなく
+Python インタプリタは終了します。関連値が通常の整数であれば、システム終了ステータスを表します (<tt class="xref c c-func docutils literal"><span class="pre">exit()</span></tt> 関数に渡されます)。値が <tt class="docutils literal"><span class="pre">None</span></tt> の場合、終了ステータスは 0 です。 (文字列のような) 他の型の場合、そのオブジェクトの値が表示され、終了ステータスは 1 になります。</p>
+<p>この例外のインスタンスは属性 <a class="reference internal" href="code.html#module-code" title="code: read-eval-print ループを実装するのを助ける"><tt class="xref py py-attr docutils literal"><span class="pre">code</span></tt></a> を持ちます。この値は終了ステータスまたはエラーメッセージ (標準では <tt class="docutils literal"><span class="pre">None</span></tt>) に設定されます。また、この例外は厳密にはエラーではないため、 <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-exc docutils literal"><span class="pre">StandardError</span></tt></a>
+ではなく <a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> から派生しています。</p>
+<p><a class="reference internal" href="sys.html#sys.exit" title="sys.exit"><tt class="xref py py-func docutils literal"><span class="pre">sys.exit()</span></tt></a> は、クリーンアップのための処理 (<a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文の
+<a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節) が実行されるようにするため、またデバッガが制御不能になるリスクを冒さずにスクリプトを実行できるようにするために例外に翻訳されます。即座に終了することが真に強く必要であるとき (例えば、 <tt class="xref py py-func docutils literal"><span class="pre">fork()</span></tt> を呼んだ後の子プロセス内) には <a class="reference internal" href="os.html#os._exit" title="os._exit"><tt class="xref py py-func docutils literal"><span class="pre">os._exit()</span></tt></a>
+関数を使うことができます。</p>
+<p>この例外は <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> を捕まえるコードに間違って捕まえられないように、 <a class="reference internal" href="#exceptions.StandardError" title="exceptions.StandardError"><tt class="xref py py-exc docutils literal"><span class="pre">StandardError</span></tt></a> や <a class="reference internal" href="#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> からではなく
+<a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> を継承しています。これにより、この例外は着実に呼出し元の方に伝わっていってインタプリタを終了させます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><a class="reference internal" href="#exceptions.BaseException" title="exceptions.BaseException"><tt class="xref py py-exc docutils literal"><span class="pre">BaseException</span></tt></a> を継承するように変更されました。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.TypeError">
+<em class="property">exception </em><tt class="descname">TypeError</tt><a class="headerlink" href="#exceptions.TypeError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>組み込み演算または関数が適切でない型のオブジェクトに対して適用された際に送出されます。関連値は型の不整合に関して詳細を述べた文字列です。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnboundLocalError">
+<em class="property">exception </em><tt class="descname">UnboundLocalError</tt><a class="headerlink" href="#exceptions.UnboundLocalError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>関数やメソッド内のローカルな変数に対して参照を行ったが、その変数には値が代入されていなかった場合に送出されます。 <a class="reference internal" href="#exceptions.NameError" title="exceptions.NameError"><tt class="xref py py-exc docutils literal"><span class="pre">NameError</span></tt></a>
+のサブクラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeError">
+<em class="property">exception </em><tt class="descname">UnicodeError</tt><a class="headerlink" href="#exceptions.UnicodeError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Unicode に関するエンコードまたはデコードのエラーが発生した際に送出されます。 <a class="reference internal" href="#exceptions.ValueError" title="exceptions.ValueError"><tt class="xref py py-exc docutils literal"><span class="pre">ValueError</span></tt></a> のサブクラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeEncodeError">
+<em class="property">exception </em><tt class="descname">UnicodeEncodeError</tt><a class="headerlink" href="#exceptions.UnicodeEncodeError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Unicode 関連のエラーがエンコード中に発生した際に送出されます。
+<a class="reference internal" href="#exceptions.UnicodeError" title="exceptions.UnicodeError"><tt class="xref py py-exc docutils literal"><span class="pre">UnicodeError</span></tt></a> のサブクラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeDecodeError">
+<em class="property">exception </em><tt class="descname">UnicodeDecodeError</tt><a class="headerlink" href="#exceptions.UnicodeDecodeError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Unicode 関連のエラーがデコード中に発生した際に送出されます。
+<a class="reference internal" href="#exceptions.UnicodeError" title="exceptions.UnicodeError"><tt class="xref py py-exc docutils literal"><span class="pre">UnicodeError</span></tt></a> のサブクラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeTranslateError">
+<em class="property">exception </em><tt class="descname">UnicodeTranslateError</tt><a class="headerlink" href="#exceptions.UnicodeTranslateError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Unicode 関連のエラーがコード翻訳に発生した際に送出されます。
+<a class="reference internal" href="#exceptions.UnicodeError" title="exceptions.UnicodeError"><tt class="xref py py-exc docutils literal"><span class="pre">UnicodeError</span></tt></a> のサブクラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ValueError">
+<em class="property">exception </em><tt class="descname">ValueError</tt><a class="headerlink" href="#exceptions.ValueError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>組み込み演算や関数が、正しい型だが適切でない値を受け取った場合や、
+<a class="reference internal" href="#exceptions.IndexError" title="exceptions.IndexError"><tt class="xref py py-exc docutils literal"><span class="pre">IndexError</span></tt></a> のような詳細な説明のできない状況で送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.VMSError">
+<em class="property">exception </em><tt class="descname">VMSError</tt><a class="headerlink" href="#exceptions.VMSError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>VMS においてのみ利用可能です。 VMS 特有のエラーが起こったときに送出されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.WindowsError">
+<em class="property">exception </em><tt class="descname">WindowsError</tt><a class="headerlink" href="#exceptions.WindowsError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Windows 特有のエラーか、エラー番号が <tt class="xref c c-data docutils literal"><span class="pre">errno</span></tt> 値に対応しない場合に送出されます。 <tt class="xref py py-attr docutils literal"><span class="pre">winerrno</span></tt> および <tt class="xref py py-attr docutils literal"><span class="pre">strerror</span></tt> の値は
+Windows プラットフォーム API の関数 <tt class="xref c c-func docutils literal"><span class="pre">GetLastError()</span></tt> と
+<tt class="xref c c-func docutils literal"><span class="pre">FormatMessage()</span></tt> の戻り値から生成されます。 <a class="reference internal" href="errno.html#module-errno" title="errno: 標準の errno システムシンボル。"><tt class="xref py py-attr docutils literal"><span class="pre">errno</span></tt></a> の値は <tt class="xref py py-attr docutils literal"><span class="pre">winerror</span></tt> の値を対応する <tt class="docutils literal"><span class="pre">errno.h</span></tt> の値にマップしたものです。
+<a class="reference internal" href="#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a> のサブクラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.0 で追加.</span></p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>以前のバージョンは <tt class="xref c c-func docutils literal"><span class="pre">GetLastError()</span></tt> のコードを
+<a class="reference internal" href="errno.html#module-errno" title="errno: 標準の errno システムシンボル。"><tt class="xref py py-attr docutils literal"><span class="pre">errno</span></tt></a> に入れていました。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ZeroDivisionError">
+<em class="property">exception </em><tt class="descname">ZeroDivisionError</tt><a class="headerlink" href="#exceptions.ZeroDivisionError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>除算またモジュロ演算における 2 番目の引数が 0 であった場合に送出されます。関連値は文字列で、その演算における被演算子と演算子の型を示します。</p>
+</dd></dl>
+
+<p>以下の例外は警告カテゴリとして使われます。詳細については
+<a class="reference internal" href="warnings.html#module-warnings" title="warnings: 警告メッセージを送出したり、その処理方法を制御したりします。"><tt class="xref py py-mod docutils literal"><span class="pre">warnings</span></tt></a> モジュールを参照してください。</p>
+<dl class="exception">
+<dt id="exceptions.Warning">
+<em class="property">exception </em><tt class="descname">Warning</tt><a class="headerlink" href="#exceptions.Warning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>警告カテゴリの基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UserWarning">
+<em class="property">exception </em><tt class="descname">UserWarning</tt><a class="headerlink" href="#exceptions.UserWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ユーザコードによって生成される警告の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.DeprecationWarning">
+<em class="property">exception </em><tt class="descname">DeprecationWarning</tt><a class="headerlink" href="#exceptions.DeprecationWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>廃止された機能に対する警告の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.PendingDeprecationWarning">
+<em class="property">exception </em><tt class="descname">PendingDeprecationWarning</tt><a class="headerlink" href="#exceptions.PendingDeprecationWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>将来廃止される予定の機能に対する警告の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.SyntaxWarning">
+<em class="property">exception </em><tt class="descname">SyntaxWarning</tt><a class="headerlink" href="#exceptions.SyntaxWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>曖昧な構文に対する警告の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.RuntimeWarning">
+<em class="property">exception </em><tt class="descname">RuntimeWarning</tt><a class="headerlink" href="#exceptions.RuntimeWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>あいまいなランタイム挙動に対する警告の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.FutureWarning">
+<em class="property">exception </em><tt class="descname">FutureWarning</tt><a class="headerlink" href="#exceptions.FutureWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>将来意味構成が変わることになっている文の構成に対する警告の基底クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.ImportWarning">
+<em class="property">exception </em><tt class="descname">ImportWarning</tt><a class="headerlink" href="#exceptions.ImportWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュールインポートの誤りと思われるものに対する警告の基底クラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="exceptions.UnicodeWarning">
+<em class="property">exception </em><tt class="descname">UnicodeWarning</tt><a class="headerlink" href="#exceptions.UnicodeWarning" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Unicode に関連した警告の基底クラスです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<div class="section" id="id2">
+<h2>6.1. 例外のクラス階層<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>組み込み例外のクラス階層は以下のようになっています:</p>
+<div class="highlight-python"><pre>BaseException
+ +-- SystemExit
+ +-- KeyboardInterrupt
+ +-- GeneratorExit
+ +-- Exception
+      +-- StopIteration
+      +-- StandardError
+      |    +-- BufferError
+      |    +-- ArithmeticError
+      |    |    +-- FloatingPointError
+      |    |    +-- OverflowError
+      |    |    +-- ZeroDivisionError
+      |    +-- AssertionError
+      |    +-- AttributeError
+      |    +-- EnvironmentError
+      |    |    +-- IOError
+      |    |    +-- OSError
+      |    |         +-- WindowsError (Windows)
+      |    |         +-- VMSError (VMS)
+      |    +-- EOFError
+      |    +-- ImportError
+      |    +-- LookupError
+      |    |    +-- IndexError
+      |    |    +-- KeyError
+      |    +-- MemoryError
+      |    +-- NameError
+      |    |    +-- UnboundLocalError
+      |    +-- ReferenceError
+      |    +-- RuntimeError
+      |    |    +-- NotImplementedError
+      |    +-- SyntaxError
+      |    |    +-- IndentationError
+      |    |         +-- TabError
+      |    +-- SystemError
+      |    +-- TypeError
+      |    +-- ValueError
+      |         +-- UnicodeError
+      |              +-- UnicodeDecodeError
+      |              +-- UnicodeEncodeError
+      |              +-- UnicodeTranslateError
+      +-- Warning
+           +-- DeprecationWarning
+           +-- PendingDeprecationWarning
+           +-- RuntimeWarning
+           +-- SyntaxWarning
+           +-- UserWarning
+           +-- FutureWarning
+	   +-- ImportWarning
+	   +-- UnicodeWarning
+	   +-- BytesWarning
+</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="strings.html" title="7. 文字列処理"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="stdtypes.html" title="5. 組み込み型"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

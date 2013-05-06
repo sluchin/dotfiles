@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>24.1. Tkinter — Tcl/Tk への Python インタフェース &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="24. Tkを用いたグラフィカルユーザインターフェイス" href="tk.html" />
+    <link rel="next" title="24.2. ttk — Tk themed widgets" href="ttk.html" />
+    <link rel="prev" title="24. Tkを用いたグラフィカルユーザインターフェイス" href="tk.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="ttk.html" title="24.2. ttk — Tk themed widgets"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="tk.html" title="24. Tkを用いたグラフィカルユーザインターフェイス"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="tk.html" accesskey="U">24. Tkを用いたグラフィカルユーザインターフェイス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">24.1. <tt class="docutils literal"><span class="pre">Tkinter</span></tt> &#8212; Tcl/Tk への Python インタフェース</a><ul>
+<li><a class="reference internal" href="#tkinter">24.1.1. Tkinter モジュール</a></li>
+<li><a class="reference internal" href="#tkinter-life-preserver">24.1.2. Tkinter お助け手帳 (life preserver)</a><ul>
+<li><a class="reference internal" href="#id1">24.1.2.1. この節の使い方</a></li>
+<li><a class="reference internal" href="#hello-world">24.1.2.2. 簡単なHello Worldプログラム</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tcl-tk">24.1.3. Tcl/Tk を (本当に少しだけ) 見渡してみる</a></li>
+<li><a class="reference internal" href="#tk-tkinter">24.1.4. 基本的な Tk プログラムと Tkinter との対応関係</a></li>
+<li><a class="reference internal" href="#id2">24.1.5. Tk と Tkinter はどのように関わっているのか</a></li>
+<li><a class="reference internal" href="#id3">24.1.6. 簡単なリファレンス</a><ul>
+<li><a class="reference internal" href="#tkinter-setting-options">24.1.6.1. オプションの設定</a></li>
+<li><a class="reference internal" href="#packer">24.1.6.2. Packer</a></li>
+<li><a class="reference internal" href="#id5">24.1.6.3. Packer のオプション</a></li>
+<li><a class="reference internal" href="#id6">24.1.6.4. ウィジェット変数を関連付ける</a></li>
+<li><a class="reference internal" href="#id7">24.1.6.5. ウィンドウマネジャ</a></li>
+<li><a class="reference internal" href="#tk">24.1.6.6. Tk オプションデータ型</a></li>
+<li><a class="reference internal" href="#id8">24.1.6.7. バインドとイベント</a></li>
+<li><a class="reference internal" href="#index">24.1.6.8. index パラメータ</a></li>
+<li><a class="reference internal" href="#id9">24.1.6.9. 画像</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="tk.html"
+                        title="前の章へ">24. Tkを用いたグラフィカルユーザインターフェイス</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="ttk.html"
+                        title="次の章へ">24.2. <tt class="docutils literal docutils literal"><span class="pre">ttk</span></tt> &#8212; Tk themed widgets</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/tkinter.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-Tkinter">
+<span id="tkinter-tcl-tk-python"></span><h1>24.1. <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> &#8212; Tcl/Tk への Python インタフェース<a class="headerlink" href="#module-Tkinter" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> モジュール (&#8220;Tk インタフェース&#8221;) は、
+Tk GUI ツールキットに対する標準の Python インタフェースです。
+Tk と <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> はほとんどの Unix プラットフォームの他、
+Windows システム上でも利用できます。
+(Tk 自体は Python の一部ではありません。 Tk は ActiveState で保守されています。)</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> は Python 3.0 において <tt class="xref py py-mod docutils literal"><span class="pre">tkinter</span></tt> に改名されました。
+<a class="reference internal" href="../glossary.html#term-to3"><em class="xref std std-term">2to3</em></a> ツールはソースの 3.0 への変換時に自動的に import を対応させます。</p>
+</div>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.python.org/topics/tkinter/">Python Tkinter Resources</a></dt>
+<dd>Python Tkinter Topic Guide では、Tk を Python から利用する上での情報と、その他の Tk
+にまつわる情報源を数多く提供しています。</dd>
+<dt><a class="reference external" href="http://www.pythonware.com/library/an-introduction-to-tkinter.htm">An Introduction to Tkinter</a></dt>
+<dd>Fredrik Lundh のオンラインリファレンス資料です。</dd>
+<dt><a class="reference external" href="http://infohost.nmt.edu/tcc/help/pubs/lang.html">Tkinter reference: a GUI for Python</a></dt>
+<dd>オンラインリファレンス資料です。</dd>
+<dt><a class="reference external" href="http://www.amazon.com/exec/obidos/ASIN/1884777813">Python and Tkinter Programming</a></dt>
+<dd>John Graysonによる解説書 (ISBN 1-884777-81-3) です。</dd>
+</dl>
+</div>
+<div class="section" id="tkinter">
+<h2>24.1.1. Tkinter モジュール<a class="headerlink" href="#tkinter" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>ほとんどの場合、本当に必要となるのは <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> モジュールだけですが、他にもいくつかの追加モジュールを利用できます。 Tk
+インタフェース自体は <tt class="xref py py-mod docutils literal"><span class="pre">_tkinter</span></tt> と言う名前のバイナリモジュール内にあります。このモジュールに入っているのは Tk
+への低水準のインタフェースであり、アプリケーションプログラマが直接使ってはなりません。
+<tt class="xref py py-mod docutils literal"><span class="pre">_tkinter</span></tt> は通常共有ライブラリ (や DLL)
+になっていますが、 Python インタプリタに静的にリンクされていることもあります。</p>
+<p>Tk インタフェースモジュールの他にも、
+<a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> には Python モジュールが数多く入っています。最も重要なモジュールは、
+<a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> 自体と <tt class="xref py py-mod docutils literal"><span class="pre">Tkconstants</span></tt> と呼ばれるモジュールの二つです。前者は自動的に後者を import するので、以下のように一方のモジュールを import するだけで Tkinter を使えるようになります:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">Tkinter</span>
+</pre></div>
+</div>
+<p>あるいは、よく使うやり方で:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">Tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p>のようにします。</p>
+<dl class="class">
+<dt id="Tkinter.Tk">
+<em class="property">class </em><tt class="descclassname">Tkinter.</tt><tt class="descname">Tk</tt><big>(</big><em>screenName=None</em>, <em>baseName=None</em>, <em>className='Tk'</em>, <em>useTk=1</em><big>)</big><a class="headerlink" href="#Tkinter.Tk" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#Tkinter.Tk" title="Tkinter.Tk"><tt class="xref py py-class docutils literal"><span class="pre">Tk</span></tt></a> クラスは引数なしでインスタンス化します。これは Tk のトップレベルウィジェットを生成します。通常、トップレベルウィジェットはアプリケーションのメインウィンドウになります。それぞれのインスタンスごとに固有の Tcl インタプリタが関連づけられます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span><em>useTk</em> パラメタが追加されました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Tkinter.Tcl">
+<tt class="descclassname">Tkinter.</tt><tt class="descname">Tcl</tt><big>(</big><em>screenName=None</em>, <em>baseName=None</em>, <em>className='Tk'</em>, <em>useTk=0</em><big>)</big><a class="headerlink" href="#Tkinter.Tcl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#Tkinter.Tcl" title="Tkinter.Tcl"><tt class="xref py py-func docutils literal"><span class="pre">Tcl()</span></tt></a> はファクトリ関数で、 <a class="reference internal" href="#Tkinter.Tk" title="Tkinter.Tk"><tt class="xref py py-class docutils literal"><span class="pre">Tk</span></tt></a> クラスで生成するオブジェクトとよく似たオブジェクトを生成します。ただし Tk サブシステムを初期化しません。この関数は、余分なトップレベルウィンドウを作る必要がなかったり、
+(X サーバを持たない Unix/Linux システムなどのように) 作成できない環境において Tcl インタプリタを駆動したい場合に便利です。 <a class="reference internal" href="#Tkinter.Tcl" title="Tkinter.Tcl"><tt class="xref py py-func docutils literal"><span class="pre">Tcl()</span></tt></a>
+で生成したオブジェクトに対して <tt class="xref py py-meth docutils literal"><span class="pre">loadtk()</span></tt> メソッドを呼び出せば、トップレベルウィンドウを作成 (して、Tk サブシステムを初期化)
+します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<p>Tk をサポートしているモジュールには、他にも以下のようなモジュールがあります:</p>
+<dl class="docutils">
+<dt><a class="reference internal" href="scrolledtext.html#module-ScrolledText" title="ScrolledText: 垂直スクロールバーを持つテキストウィジェット。 (Tk)"><tt class="xref py py-mod docutils literal"><span class="pre">ScrolledText</span></tt></a></dt>
+<dd>垂直スクロールバー付きのテキストウィジェットです。</dd>
+<dt><tt class="xref py py-mod docutils literal"><span class="pre">tkColorChooser</span></tt></dt>
+<dd>ユーザに色を選択させるためのダイアログです。</dd>
+<dt><tt class="xref py py-mod docutils literal"><span class="pre">tkCommonDialog</span></tt></dt>
+<dd>このリストの他のモジュールが定義しているダイアログの基底クラスです。</dd>
+<dt><tt class="xref py py-mod docutils literal"><span class="pre">tkFileDialog</span></tt></dt>
+<dd>ユーザが開きたいファイルや保存したいファイルを指定できるようにする共通のダイアログです。</dd>
+<dt><tt class="xref py py-mod docutils literal"><span class="pre">tkFont</span></tt></dt>
+<dd>フォントの扱いを補助するためのユーティリティです。</dd>
+<dt><tt class="xref py py-mod docutils literal"><span class="pre">tkMessageBox</span></tt></dt>
+<dd>標準的な Tk のダイアログボックスにアクセスします。</dd>
+<dt><tt class="xref py py-mod docutils literal"><span class="pre">tkSimpleDialog</span></tt></dt>
+<dd>基本的なダイアログと便宜関数 (convenience function) です。</dd>
+<dt><tt class="xref py py-mod docutils literal"><span class="pre">Tkdnd</span></tt></dt>
+<dd><a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> 用のドラッグアンドドロップのサポートです。実験的なサポートで、Tk DND に置き替わった時点で撤廃されるはずです。</dd>
+<dt><a class="reference internal" href="turtle.html#module-turtle" title="turtle: Tkのためのタートルグラフィックス"><tt class="xref py py-mod docutils literal"><span class="pre">turtle</span></tt></a></dt>
+<dd>Tk ウィンドウ上でタートルグラフィックスを実現します。</dd>
+</dl>
+<p>これらも Python 3.0 で改名されました。新たな <tt class="docutils literal"><span class="pre">tkinter</span></tt> パッケージのサブモジュールになったのです。</p>
+</div>
+<div class="section" id="tkinter-life-preserver">
+<h2>24.1.2. Tkinter お助け手帳 (life preserver)<a class="headerlink" href="#tkinter-life-preserver" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この節は、
+Tk や Tkinter を全て網羅したチュートリアルを目指しているわけではありません。むしろ、Tkinter のシステムを学ぶ上での指針を示すための、その場しのぎ的なマニュアルです。</p>
+<p>謝辞:</p>
+<ul class="simple">
+<li>Tkinter は Steen Lumholt と Guido van Rossum が作成しました。</li>
+<li>Tk は John Ousterhout が Berkeley の在籍中に作成しました。</li>
+<li>この Life Preserver は Virginia 大学の Matt Conway 他が書きました。</li>
+<li>html へのレンダリングやたくさんの編集は、Ken Manheimer が FrameMaker
+版から行いました。</li>
+<li>Fredrik Lundh はクラスインタフェース詳細な説明を書いたり内容を改訂したりして、現行の Tk 4.2 に合うようにしました。</li>
+<li>Mike Clarkson はドキュメントをLaTeX 形式に変換し、リファレンスマニュアルのユーザインタフェースの章をコンパイルしました。</li>
+</ul>
+<div class="section" id="id1">
+<h3>24.1.2.1. この節の使い方<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>この節は二つの部分で構成されています: 前半では、背景となることがらを
+(大雑把に) 網羅しています。後半は、キーボードの横に置けるような手軽なリファレンスになっています。</p>
+<p>「ホゲホゲ (blah) するにはどうしたらよいですか」という形の問いに答えようと思うなら、まず Tk で「ホゲホゲ」する方法を調べてから、このドキュメントに戻ってきてその方法に対応する <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> の関数呼び出しに変換するのが多くの場合最善の方法になります。 Python
+プログラマが Tk ドキュメンテーションを見れば、たいてい正しい Python コマンドの見当をつけられます。従って、
+Tkinter を使うには Tk についてほんの少しだけ知っていればよいということになります。このドキュメントではその役割を果たせないので、次善の策として、すでにある最良のドキュメントについていくつかヒントを示しておくことにしましょう:</p>
+<ul class="simple">
+<li>Tk の man マニュアルのコピーを手に入れるよう強く勧めます。とりわけ最も役立つのは <tt class="file docutils literal"><span class="pre">mann</span></tt> ディレクトリ内にあるマニュアルです。
+<tt class="docutils literal"><span class="pre">man3</span></tt> のマニュアルページは Tk ライブラリに対する C インタフェースについての説明なので、スクリプト書きにとって取り立てて役に立つ内容ではありません。</li>
+<li>Addison-Wesley は John Ousterhout の書いた
+Tcl and the Tk Toolkit (ISBN 0-201-63337-X) という名前の本を出版しています。この本は初心者向けの Tcl と Tk の良い入門書です。内容は網羅的ではなく、詳細の多くは man マニュアル任せにしています。</li>
+<li>たいていの場合、
+<tt class="file docutils literal"><span class="pre">Tkinter.py</span></tt> は参照先としては最後の地 (last resort)
+ですが、それ以外の手段で調べても分からない場合には救いの地 (good place) になるかもしれません。</li>
+</ul>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://tcl.activestate.com/">ActiveState Tclホームページ</a></dt>
+<dd>Tk/Tcl の開発は ActiveState で大々的に行われています。</dd>
+<dt><a class="reference external" href="http://www.amazon.com/exec/obidos/ASIN/020163337X">Tcl and the Tk Toolkit</a></dt>
+<dd>Tcl を考案した John Ousterhout による本です。</dd>
+<dt><a class="reference external" href="http://www.amazon.com/exec/obidos/ASIN/0130220280">Practical Programming in Tcl and Tk</a></dt>
+<dd>Brent Welch の百科事典のような本です。</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="hello-world">
+<h3>24.1.2.2. 簡単なHello Worldプログラム<a class="headerlink" href="#hello-world" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">Tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">Application</span><span class="p">(</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">say_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;hi there, everyone!&quot;</span>
+
+    <span class="k">def</span> <span class="nf">createWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QUIT</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QUIT</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;QUIT&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QUIT</span><span class="p">[</span><span class="s">&quot;fg&quot;</span><span class="p">]</span>   <span class="o">=</span> <span class="s">&quot;red&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">QUIT</span><span class="p">[</span><span class="s">&quot;command&quot;</span><span class="p">]</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">quit</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">QUIT</span><span class="o">.</span><span class="n">pack</span><span class="p">({</span><span class="s">&quot;side&quot;</span><span class="p">:</span> <span class="s">&quot;left&quot;</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hi_there</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hi_there</span><span class="p">[</span><span class="s">&quot;text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Hello&quot;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hi_there</span><span class="p">[</span><span class="s">&quot;command&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">say_hi</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hi_there</span><span class="o">.</span><span class="n">pack</span><span class="p">({</span><span class="s">&quot;side&quot;</span><span class="p">:</span> <span class="s">&quot;left&quot;</span><span class="p">})</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">Frame</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">createWidgets</span><span class="p">()</span>
+
+<span class="n">root</span> <span class="o">=</span> <span class="n">Tk</span><span class="p">()</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Application</span><span class="p">(</span><span class="n">master</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+<span class="n">root</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="tcl-tk">
+<h2>24.1.3. Tcl/Tk を (本当に少しだけ) 見渡してみる<a class="headerlink" href="#tcl-tk" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>クラス階層は複雑に見えますが、実際にプログラムを書く際には、アプリケーションプログラマはほとんど常にクラス階層の最底辺にあるクラスしか参照しません。</p>
+<p>注意:</p>
+<ul class="simple">
+<li>クラスのいくつかは、特定の関数を一つの名前空間下にまとめるために提供されています。こうしたクラスは個別にインスタンス化するためのものではありません。</li>
+<li><a class="reference internal" href="#Tkinter.Tk" title="Tkinter.Tk"><tt class="xref py py-class docutils literal"><span class="pre">Tk</span></tt></a> クラスはアプリケーション内で一度だけインスタンス化するようになっています。アプリケーションプログラマが明示的にインスタンス化する必要はなく、他のクラスがインスタンス化されると常にシステムが作成します。</li>
+<li><tt class="xref py py-class docutils literal"><span class="pre">Widget</span></tt> クラスもまた、インスタンス化して使うようにはなっていません。このクラスはサブクラス化して「実際の」ウィジェットを作成するためのものです。(C++ で言うところの、
+&#8216;抽象クラス (abstract class)&#8217; です)。</li>
+</ul>
+<p>このリファレンス資料を活用するには、Tk の短いプログラムを読んだり、
+Tk コマンドの様々な側面を知っておく必要がままあるでしょう。
+(下の説明の <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> 版は、
+<a class="reference internal" href="#tkinter-basic-mapping"><em>基本的な Tk プログラムと Tkinter との対応関係</em></a> 節を参照してください。)</p>
+<p>Tk スクリプトは Tcl プログラムです。全ての Tcl プログラムに同じく、
+Tk スクリプトはトークンをスペースで区切って並べます。
+Tk ウィジェットとは、ウィジェットの <em>クラス</em> 、ウィジェットの設定を行う <em>オプション</em> 、そしてウィジェットに役立つことをさせる <em>アクション</em>
+をあわせたものに過ぎません。</p>
+<p>Tk でウィジェットを作るには、常に次のような形式のコマンドを使います:</p>
+<div class="highlight-python"><pre>classCommand newPathname options</pre>
+</div>
+<dl class="docutils">
+<dt><em>classCommand</em></dt>
+<dd>どの種類のウィジェット (ボタン、ラベル、メニュー、...) を作るかを表します。</dd>
+<dt><em>newPathname</em></dt>
+<dd>作成するウィジェットにつける新たな名前です。Tk 内の全ての名前は一意になっていなければなりません。一意性を持たせる助けとして、
+Tk 内のウィジェットは、ファイルシステムにおけるファイルと同様、
+<em>パス名 (pathname)</em> を使って名づけられます。トップレベルのウィジェット、すなわち <em>ルート</em> は <tt class="docutils literal"><span class="pre">.</span></tt>  (ピリオド)
+という名前になり、その子ウィジェット階層もピリオドで区切ってゆきます。ウィジェットの名前は、例えば
+<tt class="docutils literal"><span class="pre">.myApp.controlPanel.okButton</span></tt> のようになります。</dd>
+<dt><em>options</em></dt>
+<dd>ウィジェットの見た目を設定します。場合によってはウィジェットの挙動も設定します。オプションはフラグと値がリストになった形式をとります。 Unix
+のシェルコマンドのフラグと同じように、フラグの前には &#8216;-&#8216; がつき、複数の単語からなる値はクオートで囲まれます。</dd>
+</dl>
+<p>以下に例を示します:</p>
+<div class="highlight-python"><pre>button   .fred   -fg red -text "hi there"
+   ^       ^     \_____________________/
+   |       |                |
+ class    new            options
+command  widget  (-opt val -opt val ...)</pre>
+</div>
+<p>ウィジェットを作成すると、ウィジェットへのパス名は新しいコマンドになります。この新たな <em>widget command</em> は、プログラマが新たに作成したウィジェットに <em>action</em> を実行させる際のハンドル (handle) になります。C では someAction(fred, someOptions) と表し、
+C++ では fred.someAction(someOptions) と表すでしょう。Tkでは:</p>
+<div class="highlight-python"><pre>.fred someAction someOptions</pre>
+</div>
+<p>のようにします。オブジェクト名 <tt class="docutils literal"><span class="pre">.fred</span></tt> はドットから始まっているので注意してください。</p>
+<p>読者の想像の通り、 <em>someAction</em> に指定できる値はウィジェットのクラスに依存しています: fred がボタンなら <tt class="docutils literal"><span class="pre">.fred</span> <span class="pre">disable</span></tt> はうまくいきます (fred はグレーになります) が、fred がラベルならうまくいきません (Tkではラベルの無効化をサポートしていないからです)。</p>
+<p><em>someOptions</em> に指定できる値はアクションの内容に依存しています。
+<tt class="docutils literal"><span class="pre">disable</span></tt> のようなアクションは引数を必要としませんが、テキストエントリボックスの <tt class="docutils literal"><span class="pre">delete</span></tt> コマンドのようなアクションにはテキストを削除する範囲を指定するための引数が必要になります。</p>
+</div>
+<div class="section" id="tk-tkinter">
+<span id="tkinter-basic-mapping"></span><h2>24.1.4. 基本的な Tk プログラムと Tkinter との対応関係<a class="headerlink" href="#tk-tkinter" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Tkのクラスコマンドは、Tkinterのクラスコンストラクタに対応しています。</p>
+<div class="highlight-python"><pre>button .fred                =====&gt;  fred = Button()</pre>
+</div>
+<p>オブジェクトの親 (master) は、オブジェクトの作成時に指定した新たな名前から非明示的に決定されます。Tkinter では親を明示的に指定します。</p>
+<div class="highlight-python"><pre>button .panel.fred          =====&gt;  fred = Button(panel)</pre>
+</div>
+<p>Tk の設定オプションは、ハイフンをつけたタグと値の組からなるリストで指定します。Tkinter では、オプションはキーワード引数にしてインスタンスのコンストラクタに指定したり、
+<tt class="xref py py-meth docutils literal"><span class="pre">config()</span></tt> にキーワード引数を指定して呼び出したり、インデクス指定を使ってインスタンスに代入したりして設定します。オプションの設定については
+<a class="reference internal" href="#tkinter-setting-options"><em>オプションの設定</em></a> 節を参照してください。</p>
+<div class="highlight-python"><pre>button .fred -fg red        =====&gt;  fred = Button(panel, fg = "red")
+.fred configure -fg red     =====&gt;  fred["fg"] = red
+                            OR ==&gt;  fred.config(fg = "red")</pre>
+</div>
+<p>Tk でウィジェットにアクションを実行させるには、ウィジェット名をコマンドにして、その後にアクション名を続け、必要に応じて引数 (オプション) を続けます。
+Tkinter では、クラスインスタンスのメソッドを呼び出して、ウィジェットのアクションを呼び出します。あるウィジェットがどんなアクション (メソッド) を実行できるかは、
+Tkinter.py モジュール内にリストされています。</p>
+<div class="highlight-python"><pre>.fred invoke                =====&gt;  fred.invoke()</pre>
+</div>
+<p>Tk でウィジェットを packer (ジオメトリマネジャ) に渡すには、
+pack コマンドをオプション引数付きで呼び出します。 Tkinter では
+Pack クラスがこの機能すべてを握っていて、様々な pack の形式がメソッドとして実装されています。
+<a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> のウィジェットは全て Packer からサブクラス化されているため、pack 操作にまつわる全てのメソッドを継承しています。 Form
+ジオメトリマネジャに関する詳しい情報については
+<a class="reference internal" href="tix.html#module-Tix" title="Tix: Tkinter用のTk拡張ウィジェット"><tt class="xref py py-mod docutils literal"><span class="pre">Tix</span></tt></a> モジュールのドキュメントを参照してください。</p>
+<div class="highlight-python"><pre>pack .fred -side left       =====&gt;  fred.pack(side = "left")</pre>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>24.1.5. Tk と Tkinter はどのように関わっているのか<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>上から下に、呼び出しの階層構造を説明してゆきます:</p>
+<dl class="docutils">
+<dt>あなたのアプリケーション (Python)</dt>
+<dd>まず、 Python アプリケーションが <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> を呼び出します。</dd>
+<dt>Tkinter ( Python モジュール)</dt>
+<dd>上記の呼び出し (例えば、ボタンウィジェットの作成) は、
+<em>Tkinter</em> モジュール内で実現されており、Python で書かれています。この Python で書かれた関数は、コマンドと引数を解析して変換し、あたかもコマンドが Python スクリプトではなく Tk スクリプトから来たようにみせかけます。</dd>
+<dt>tkinter (C)</dt>
+<dd>上記のコマンドと引数は <em>tkinter</em>  (小文字です。注意してください)
+拡張モジュール内の C 関数に渡されます。</dd>
+<dt>Tk Widgets (C and Tcl)</dt>
+<dd>上記の C 関数は、Tk ライブラリを構成する C 関数の入った別の C
+モジュールへの呼び出しを行えるようになっています。 Tk は C と Tcl
+を少し使って実装されています。
+Tk ウィジェットの Tcl 部分は、ウィジェットのデフォルト動作をバインドするために使われ、Python で書かれた <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> モジュールが
+import される時点で一度だけ実行されます。(ユーザがこの過程を目にすることはありません。)</dd>
+<dt>Tk (C)</dt>
+<dd>Tkウィジェットの Tk 部分で実装されている最終的な対応付け操作によって...</dd>
+<dt>Xlib (C)</dt>
+<dd>Xlib ライブラリがスクリーン上にグラフィックスを描きます。</dd>
+</dl>
+</div>
+<div class="section" id="id3">
+<h2>24.1.6. 簡単なリファレンス<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="tkinter-setting-options">
+<span id="id4"></span><h3>24.1.6.1. オプションの設定<a class="headerlink" href="#tkinter-setting-options" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>オプションは、色やウィジェットの境界線幅などを制御します。オプションの設定には三通りの方法があります:</p>
+<dl class="docutils">
+<dt>オブジェクトを作成する時にキーワード引数を使う</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="n">fred</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fg</span> <span class="o">=</span> <span class="s">&quot;red&quot;</span><span class="p">,</span> <span class="n">bg</span> <span class="o">=</span> <span class="s">&quot;blue&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt>オブジェクトを作成した後、オプション名を辞書インデックスのように扱う</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="n">fred</span><span class="p">[</span><span class="s">&quot;fg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;red&quot;</span>
+<span class="n">fred</span><span class="p">[</span><span class="s">&quot;bg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;blue&quot;</span>
+</pre></div>
+</div>
+</dd>
+<dt>オブジェクトを生成した後、config()メソッドを使って複数の属性を更新する</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="n">fred</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">fg</span> <span class="o">=</span> <span class="s">&quot;red&quot;</span><span class="p">,</span> <span class="n">bg</span> <span class="o">=</span> <span class="s">&quot;blue&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>オプションとその振る舞いに関する詳細な説明は、該当するウィジェットの Tk の man マニュアルを参照してください。</p>
+<p>man マニュアルには、各ウィジェットの
+&#8220;STANDARD OPTIONS (標準オプション)&#8221; と
+&#8220;WIDGET SPECIFIC OPTIONS (ウィジェット固有のオプション)&#8221;
+がリストされていることに注意しましょう。前者は多くのウィジェットに共通のオプションのリストで、後者は特定のウィジェットに特有のオプションです。標準オプションの説明は man マニュアルの <em class="manpage">options(3)</em> にあります。</p>
+<p>このドキュメントでは、標準オプションとウィジェット固有のオプションを区別していません。オプションによっては、ある種のウィジェットに適用できません。あるウィジェットがあるオプションに対応しているかどうかは、ウィジェットのクラスによります。例えばボタンには <tt class="docutils literal"><span class="pre">command</span></tt>
+オプションがありますが、ラベルにはありません。</p>
+<p>あるウィジェットがどんなオプションをサポートしているかは、ウィジェットの man マニュアルにリストされています。また、実行時にウィジェットの
+<tt class="xref py py-meth docutils literal"><span class="pre">config()</span></tt> メソッドを引数なしで呼び出したり、
+<tt class="xref py py-meth docutils literal"><span class="pre">keys()</span></tt> メソッドを呼び出したりして問い合わせることもできます。メソッド呼び出しを行うと辞書型の値を返します。この辞書は、オプションの名前がキー (例えば <tt class="docutils literal"><span class="pre">'relief'</span></tt>) になっていて、値が 5
+要素のタプルになっています。</p>
+<p><tt class="docutils literal"><span class="pre">bg</span></tt> のように、いくつかのオプションはより長い名前を持つ共通のオプションに対する同義語になっています (<tt class="docutils literal"><span class="pre">bg</span></tt> は &#8220;background&#8221; を短縮したものです)。短縮形のオプション名を <tt class="docutils literal"><span class="pre">config()</span></tt> に渡すと、
+5 要素ではなく 2 要素のタプルを返します。このタプルには、同義語の名前と「本当の」オプション名が入っています
+(例えば <tt class="docutils literal"><span class="pre">('bg',</span> <span class="pre">'background')</span></tt>)。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="58%" />
+<col width="21%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">インデックス</th>
+<th class="head">意味</th>
+<th class="head">例</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>オプション名</td>
+<td><tt class="docutils literal"><span class="pre">'relief'</span></tt></td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>データベース検索用のオプション名</td>
+<td><tt class="docutils literal"><span class="pre">'relief'</span></tt></td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>データベース検索用のオプションクラス</td>
+<td><tt class="docutils literal"><span class="pre">'Relief'</span></tt></td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>デフォルト値</td>
+<td><tt class="docutils literal"><span class="pre">'raised'</span></tt></td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>現在の値</td>
+<td><tt class="docutils literal"><span class="pre">'groove'</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">fred</span><span class="o">.</span><span class="n">config</span><span class="p">()</span>
+<span class="go">{&#39;relief&#39; : (&#39;relief&#39;, &#39;relief&#39;, &#39;Relief&#39;, &#39;raised&#39;, &#39;groove&#39;)}</span>
+</pre></div>
+</div>
+<p>もちろん、実際に出力される辞書には利用可能なオプションが全て表示されます。上の表示例は単なる例にすぎません。</p>
+</div>
+<div class="section" id="packer">
+<h3>24.1.6.2. Packer<a class="headerlink" href="#packer" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p id="index-0">packer は Tk のジオメトリ管理メカニズムの一つです。ジオメトリマネジャは、複数のウィジェットの位置を、それぞれのウィジェットを含むコンテナ - 共通の <em>マスタ (master)</em> からの相対で指定するために使います。やや扱いにくい <em>placer</em> (あまり使われないのでここでは取り上げません) と違い、packer は定性的な関係を表す指定子 - <em>上 (above)</em> 、
+<em>〜の左 (to the left of)</em> 、 <em>引き延ばし (filling)</em>
+など - を受け取り、厳密な配置座標の決定を全て行ってくれます。</p>
+<p>どんな <em>マスタ</em> ウィジェットでも、大きさは内部の
+&#8220;スレイブ (slave) ウィジェット&#8221; の大きさで決まります。
+packer は、スレイブウィジェットを
+pack 先のマスタウィジェット中のどこに配置するかを制御するために使われます。望みのレイアウトを達成するには、ウィジェットをフレームにパックし、そのフレームをまた別のフレームにパックできます。さらに、一度パックを行うと、それ以後の設定変更に合わせて動的に並べ方を調整します。</p>
+<p>ジオメトリマネジャがウィジェットのジオメトリを確定するまで、ウィジェットは表示されないので注意してください。初心者のころにはよくジオメトリの確定を忘れてしまい、ウィジェットを生成したのに何も表示されず驚くことになります。ウィジェットは、(例えば packer の <tt class="xref py py-meth docutils literal"><span class="pre">pack()</span></tt> メソッドを適用して)
+ジオメトリを確定した後で初めて表示されます。</p>
+<p>pack() メソッドは、キーワード引数つきで呼び出せます。キーワード引数は、ウィジェットをコンテナ内のどこに表示するか、メインのアプリケーションウィンドウをリサイズしたときにウィジェットがどう振舞うかを制御します。以下に例を示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fred</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>                     <span class="c"># デフォルトでは、side = &quot;top&quot;</span>
+<span class="n">fred</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span> <span class="o">=</span> <span class="s">&quot;left&quot;</span><span class="p">)</span>
+<span class="n">fred</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">expand</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h3>24.1.6.3. Packer のオプション<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>packer と packer の取りえるオプションについての詳細は、man マニュアルや
+John Ousterhout の本の183ページを参照してください。</p>
+<dl class="docutils">
+<dt>anchor</dt>
+<dd>アンカーの型です。 packer が区画内に各スレイブを配置する位置を示します。</dd>
+<dt>expand</dt>
+<dd>ブール値で、 <tt class="docutils literal"><span class="pre">0</span></tt> または <tt class="docutils literal"><span class="pre">1</span></tt> になります。</dd>
+<dt>fill</dt>
+<dd>指定できる値は <tt class="docutils literal"><span class="pre">'x'</span></tt> 、 <tt class="docutils literal"><span class="pre">'y'</span></tt> 、 <tt class="docutils literal"><span class="pre">'both'</span></tt> 、 <tt class="docutils literal"><span class="pre">'none'</span></tt> です。</dd>
+<dt>ipadx と ipady</dt>
+<dd>スレイブウィジェットの各側面の内側に行うパディング幅を表す長さを指定します。</dd>
+<dt>padx と pady</dt>
+<dd>スレイブウィジェットの各側面の外側に行うパディング幅を表す長さを指定します。</dd>
+<dt>side</dt>
+<dd>指定できる値は <tt class="docutils literal"><span class="pre">'left'</span></tt>, <tt class="docutils literal"><span class="pre">'right'</span></tt>, <tt class="docutils literal"><span class="pre">'top'</span></tt>,  <tt class="docutils literal"><span class="pre">'bottom'</span></tt> です。</dd>
+</dl>
+</div>
+<div class="section" id="id6">
+<h3>24.1.6.4. ウィジェット変数を関連付ける<a class="headerlink" href="#id6" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>ウィジェットによっては、(テキスト入力ウィジェットのように)
+特殊なオプションを使って、現在設定されている値をアプリケーション内の変数に直接関連付けできます。このようなオプションには <tt class="docutils literal"><span class="pre">variable</span></tt>,
+<tt class="docutils literal"><span class="pre">textvariable</span></tt>, <tt class="docutils literal"><span class="pre">onvalue</span></tt>, <tt class="docutils literal"><span class="pre">offvalue</span></tt> および <tt class="docutils literal"><span class="pre">value</span></tt> があります。この関連付けは双方向に働きます: 変数の値が何らかの理由で変更されると、関連付けされているウィジェットも更新され、新しい値を反映します。</p>
+<p>残念ながら、現在の <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> の実装では、 <tt class="docutils literal"><span class="pre">variable</span></tt> や
+<tt class="docutils literal"><span class="pre">textvariable</span></tt> オプションでは任意の Python
+の値をウィジェットに渡せません。この関連付け機能がうまく働くのは、 <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> モジュール内で
+Variable というクラスからサブクラス化されている変数によるオプションだけです。</p>
+<p>Variable には、 <tt class="xref py py-class docutils literal"><span class="pre">StringVar</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">IntVar</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">DoubleVar</span></tt>,
+<tt class="xref py py-class docutils literal"><span class="pre">BooleanVar</span></tt> といった便利なサブクラスがすでにすでに数多く定義されています。こうした変数の現在の値を読み出したければ、 <tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> メソッドを呼び出します。また、値を変更したければ <tt class="xref py py-meth docutils literal"><span class="pre">set()</span></tt> メソッドを呼び出します。このプロトコルに従っている限り、それ以上なにも手を加えなくてもウィジェットは常に現在値に追従します。</p>
+<p>例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">App</span><span class="p">(</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">Frame</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">entrythingy</span> <span class="o">=</span> <span class="n">Entry</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entrythingy</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+        <span class="c"># アプリケーション変数です</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span> <span class="o">=</span> <span class="n">StringVar</span><span class="p">()</span>
+        <span class="c"># 変数の値を設定します</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">&quot;this is a variable&quot;</span><span class="p">)</span>
+        <span class="c"># エントリウィジェットに変数の値を監視させます</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entrythingy</span><span class="p">[</span><span class="s">&quot;textvariable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">contents</span>
+
+        <span class="c"># ユーザがリターンキーを押した時にコールバックを呼び出させます</span>
+        <span class="c"># これで、このプログラムは、ユーザがリターンキーを押すと</span>
+        <span class="c"># アプリケーション変数の値を出力するようになります。</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entrythingy</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s">&#39;&lt;Key-Return&gt;&#39;</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">print_contents</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">print_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;hi. contents of entry is now ----&gt;&quot;</span><span class="p">,</span> \
+              <span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>24.1.6.5. ウィンドウマネジャ<a class="headerlink" href="#id7" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p id="index-1">Tk には、ウィンドウマネジャとやり取りするための <tt class="docutils literal"><span class="pre">wm</span></tt> というユーティリティコマンドがあります。
+<tt class="docutils literal"><span class="pre">wm</span></tt> コマンドにオプションを指定すると、タイトルや配置、アイコンビットマップなどを操作できます。
+<a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> では、こうしたコマンドは <tt class="xref py py-class docutils literal"><span class="pre">Wm</span></tt>
+クラスのメソッドとして実装されています。トップレベルウィジェットは <tt class="xref py py-class docutils literal"><span class="pre">Wm</span></tt> クラスからサブクラス化されているので、 <tt class="xref py py-class docutils literal"><span class="pre">Wm</span></tt> のメソッドを直接呼び出せます。</p>
+<p>あるウィジェットの入っているトップレベルウィンドウを取得したい場合、大抵は単にウィジェットのマスタを参照するだけですみます。とはいえ、ウィジェットがフレーム内にパックされている場合、マスタはトップレベルウィンドウではありません。任意のウィジェットの入っているトップレベルウィンドウを知りたければ <tt class="xref py py-meth docutils literal"><span class="pre">_root()</span></tt> メソッドを呼び出してください。このメソッドはアンダースコアがついていますが、これはこの関数が <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> の実装の一部であり、Tk の機能に対するインタフェースではないことを示しています。</p>
+<p>以下に典型的な使い方の例をいくつか挙げます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">Tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="k">class</span> <span class="nc">App</span><span class="p">(</span><span class="n">Frame</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">Frame</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">master</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+
+<span class="c"># アプリケーションを作成します</span>
+<span class="n">myapp</span> <span class="o">=</span> <span class="n">App</span><span class="p">()</span>
+
+<span class="c">#</span>
+<span class="c"># ウィンドウマネジャクラスのメソッドを呼び出します。</span>
+<span class="c">#</span>
+<span class="n">myapp</span><span class="o">.</span><span class="n">master</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;My Do-Nothing Application&quot;</span><span class="p">)</span>
+<span class="n">myapp</span><span class="o">.</span><span class="n">master</span><span class="o">.</span><span class="n">maxsize</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+
+<span class="c"># プログラムを開始します</span>
+<span class="n">myapp</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tk">
+<h3>24.1.6.6. Tk オプションデータ型<a class="headerlink" href="#tk" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="docutils" id="index-2">
+<dt>anchor</dt>
+<dd>指定できる値はコンパスの方位です:
+<tt class="docutils literal"><span class="pre">&quot;n&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;ne&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;e&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;se&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;s&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;sw&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;w&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;nw&quot;</span></tt> 、および <tt class="docutils literal"><span class="pre">&quot;center&quot;</span></tt> 。</dd>
+<dt>bitmap</dt>
+<dd>八つの組み込み、名前付きビットマップ:
+<tt class="docutils literal"><span class="pre">'error'</span></tt> 、 <tt class="docutils literal"><span class="pre">'gray25'</span></tt> 、 <tt class="docutils literal"><span class="pre">'gray50'</span></tt> 、 <tt class="docutils literal"><span class="pre">'hourglass'</span></tt> 、 <tt class="docutils literal"><span class="pre">'info'</span></tt> 、 <tt class="docutils literal"><span class="pre">'questhead'</span></tt> 、 <tt class="docutils literal"><span class="pre">'question'</span></tt> 、 <tt class="docutils literal"><span class="pre">'warning'</span></tt> 。
+X ビットマップファイル名を指定するために、
+<tt class="docutils literal"><span class="pre">&quot;&#64;/usr/contrib/bitmap/gumby.bit&quot;</span></tt> のような <tt class="docutils literal"><span class="pre">&#64;</span></tt>
+を先頭に付けたファイルへの完全なパスを与えてください。</dd>
+<dt>boolean</dt>
+<dd>整数0または1、あるいは、文字列 <tt class="docutils literal"><span class="pre">&quot;yes&quot;</span></tt> または <tt class="docutils literal"><span class="pre">&quot;no&quot;</span></tt> を渡すことができます。</dd>
+<dt>callback</dt>
+<dd><p class="first">これは引数を取らない Python 関数ならどれでも構いません。例えば:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">print_it</span><span class="p">():</span>
+        <span class="k">print</span> <span class="s">&quot;hi there&quot;</span>
+<span class="n">fred</span><span class="p">[</span><span class="s">&quot;command&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">print_it</span>
+</pre></div>
+</div>
+</dd>
+<dt>color</dt>
+<dd>色は rgb.txt ファイルの X カラーの名前か、または RGB 値を表す文字列として与えられます。
+RGB 値を表す文字列は、4ビット: <tt class="docutils literal"><span class="pre">&quot;#RGB&quot;</span></tt>, 8
+bit: <tt class="docutils literal"><span class="pre">&quot;#RRGGBB&quot;</span></tt>, 12 bit&#8221; <tt class="docutils literal"><span class="pre">&quot;#RRRGGGBBB&quot;</span></tt>, あるいは、16 bit
+<tt class="docutils literal"><span class="pre">&quot;#RRRRGGGGBBBB&quot;</span></tt> の範囲を取ります。ここでは、R,G,Bは適切な十六進数ならどんなものでも表します。詳細は、Ousterhout の本の160ページを参照してください。</dd>
+<dt>cursor</dt>
+<dd><tt class="file docutils literal"><span class="pre">cursorfont.h</span></tt> の標準Xカーソル名を、接頭語 <tt class="docutils literal"><span class="pre">XC_</span></tt>
+無しで使うことができます。例えば、handカーソル(<tt class="xref py py-const docutils literal"><span class="pre">XC_hand2</span></tt>)を得るには、文字列
+<tt class="docutils literal"><span class="pre">&quot;hand2&quot;</span></tt> を使ってください。あなた自身のビットマップとマスクファイルを指定することもできます。
+Ousterhout の本の179ページを参照してください。</dd>
+<dt>distance</dt>
+<dd>スクリーン上の距離をピクセルか絶対距離のどちらかで指定できます。ピクセルは数として与えられ、絶対距離は文字列として与えられます。絶対距離を表す文字列は、単位を表す終了文字
+(センチメートルには <tt class="docutils literal"><span class="pre">c</span></tt> 、インチには <tt class="docutils literal"><span class="pre">i</span></tt> 、ミリメートルには <tt class="docutils literal"><span class="pre">m</span></tt> 、プリンタのポイントには <tt class="docutils literal"><span class="pre">p</span></tt>)を伴います。例えば、3.5インチは <tt class="docutils literal"><span class="pre">&quot;3.5i&quot;</span></tt> と表現します。</dd>
+<dt>font</dt>
+<dd>Tkは <tt class="docutils literal"><span class="pre">{courier</span> <span class="pre">10</span> <span class="pre">bold}</span></tt> のようなリストフォント名形式を使います。正の数のフォントサイズはポイント単位で表され。負の数のサイズはピクセル単位で表されます。</dd>
+<dt>geometry</dt>
+<dd>これは <tt class="docutils literal"><span class="pre">widthxheight</span></tt> 形式の文字列です。ここでは、ほとんどのウィジェットに対して幅と高さピクセル単位で
+(テキストを表示するウィジェットに対しては文字単位で)表されます。例えば: <tt class="docutils literal"><span class="pre">fred[&quot;geometry&quot;]</span> <span class="pre">=</span> <span class="pre">&quot;200x100&quot;</span></tt> 。</dd>
+<dt>justify</dt>
+<dd>指定できる値は文字列です: <tt class="docutils literal"><span class="pre">&quot;left&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;center&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;right&quot;</span></tt> 、そして <tt class="docutils literal"><span class="pre">&quot;fill&quot;</span></tt> 。</dd>
+<dt>region</dt>
+<dd>これは空白で区切られた四つの要素をもつ文字列です。各要素は指定可能な距離です(以下を参照)。例えば: <tt class="docutils literal"><span class="pre">&quot;2</span> <span class="pre">3</span> <span class="pre">4</span> <span class="pre">5&quot;</span></tt> と <tt class="docutils literal"><span class="pre">&quot;3i</span> <span class="pre">2i</span> <span class="pre">4.5i</span> <span class="pre">2i&quot;</span></tt> と <tt class="docutils literal"><span class="pre">&quot;3c</span> <span class="pre">2c</span> <span class="pre">4c</span> <span class="pre">10.43c&quot;</span></tt> は、すべて指定可能な範囲です。</dd>
+<dt>relief</dt>
+<dd>ウィジェットのボーダのスタイルが何かを決めます。指定できる値は:
+<tt class="docutils literal"><span class="pre">&quot;raised&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;sunken&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;flat&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;groove&quot;</span></tt> 、と <tt class="docutils literal"><span class="pre">&quot;ridge&quot;</span></tt> 。</dd>
+<dt>scrollcommand</dt>
+<dd>これはほとんど常にスクロールバー・ウィジェットの <tt class="xref py py-meth docutils literal"><span class="pre">set()</span></tt> メソッドですが、一引数を取るどんなウィジェットメソッドでもあり得ます。例えば、
+Python ソース配布の <tt class="file docutils literal"><span class="pre">Demo/tkinter/matt/canvas-with-scrollbars.py</span></tt>
+ファイルを参照してください。</dd>
+<dt>wrap:</dt>
+<dd>次の中の一つでなければなりません: <tt class="docutils literal"><span class="pre">&quot;none&quot;</span></tt> 、 <tt class="docutils literal"><span class="pre">&quot;char&quot;</span></tt> 、あるいは <tt class="docutils literal"><span class="pre">&quot;word&quot;</span></tt> 。</dd>
+</dl>
+</div>
+<div class="section" id="id8">
+<h3>24.1.6.7. バインドとイベント<a class="headerlink" href="#id8" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p id="index-3">ウィジェットコマンドからの bind メソッドによって、あるイベントを待つことと、そのイベント型が起きたときにコールバック関数を呼び出すことができるようになります。
+bind メソッドの形式は:</p>
+<div class="highlight-python"><pre>def bind(self, sequence, func, add=''):</pre>
+</div>
+<p>ここでは:</p>
+<dl class="docutils">
+<dt>sequence</dt>
+<dd>は対象とするイベントの型を示す文字列です。
+(詳細については、bind の man ページと
+John Ousterhout の本の201ページを参照してください。)</dd>
+<dt>func</dt>
+<dd>は一引数を取り、イベントが起きるときに呼び出される Python
+関数です。イベント・インスタンスが引数として渡されます。
+(このように実施される関数は、一般に <em>callbacks</em> として知られています。)</dd>
+<dt>add</dt>
+<dd>はオプションで、
+<tt class="docutils literal"><span class="pre">''</span></tt> か <tt class="docutils literal"><span class="pre">'+'</span></tt> のどちらかです。空文字列を渡すことは、このイベントが関係する他のどんなバインドをもこのバインドが置き換えることを意味します。
+<tt class="docutils literal"><span class="pre">'+'</span></tt> を使う仕方は、この関数がこのイベント型にバインドされる関数のリストに追加されることを意味しています。</dd>
+</dl>
+<p>例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">turnRed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">widget</span><span class="p">[</span><span class="s">&quot;activeforeground&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;red&quot;</span>
+
+<span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s">&quot;&lt;Enter&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">turnRed</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>イベントのウィジェットフィールドが <tt class="xref py py-meth docutils literal"><span class="pre">turnRed()</span></tt> コールバック内でどのようにアクセスされているかに注意してください。このフィールドは X イベントを捕らえるウィジェットを含んでいます。以下の表はあなたがアクセスできる他のイベントフィールドとそれらの Tk での表現方法の一覧です。Tk man ページを参照するときに役に立つでしょう。</p>
+<div class="highlight-python"><pre>Tk      Tkinterイベントフィールド       Tk      Tkinterイベントフィールド
+--      -------------------------       --      -------------------------
+%f      focus                           %A      char
+%h      height                          %E      send_event
+%k      keycode                         %K      keysym
+%s      state                           %N      keysym_num
+%t      time                            %T      type
+%w      width                           %W      widget
+%x      x                               %X      x_root
+%y      y                               %Y      y_root</pre>
+</div>
+</div>
+<div class="section" id="index">
+<h3>24.1.6.8. index パラメータ<a class="headerlink" href="#index" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>たくさんのウィジェットが渡される&#8221;index&#8221;パラメータを必要とします。これらはテキストウィジェットでの特定の場所や、エントリウィジェットでの特定の文字、あるいは、メニューウィジェットでの特定のメニュー項目を指定するために使われます。</p>
+<dl class="docutils">
+<dt>エントリウィジェットのインデックス(インデックス、ビューインデックスなど)</dt>
+<dd><p class="first">エントリウィジェットは表示されているテキスト内の文字位置を参照するオプションを持っています。テキストウィジェットにおけるこれらの特別な位置にアクセスするために、これらの <a class="reference internal" href="#module-Tkinter" title="Tkinter: グラフィカルユーザインタフェースを実現する Tcl/Tk へのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">Tkinter</span></tt></a> 関数を使うことができます:</p>
+<dl class="last docutils">
+<dt>AtEnd()</dt>
+<dd>テキストの最後の位置を参照します</dd>
+<dt>AtInsert()</dt>
+<dd>テキストカーソルの位置を参照します</dd>
+<dt>AtSelFirst()</dt>
+<dd>選択されたテキストの先頭の位置を指します</dd>
+<dt>AtSelLast()</dt>
+<dd>選択されているテキストおよび最終的に選択されたテキストの末尾の位置を示します。</dd>
+<dt>At(x[, y])</dt>
+<dd>ピクセル位置 <em>x</em>, <em>y</em> (テキストを一行だけ含むテキストエントリウィジェットの場合には <em>y</em> は使われない)の文字を参照します。</dd>
+</dl>
+</dd>
+<dt>テキストウィジェットのインデックス</dt>
+<dd>テキストウィジェットに対するインデックス記法はとても機能が豊富で、
+Tk manページでよく説明されています。</dd>
+<dt>メニューのインデックス(menu.invoke()、menu.entryconfig()など)</dt>
+<dd><blockquote class="first">
+<div>メニューに対するいくつかのオプションとメソッドは特定のメニュー項目を操作します。メニューインデックスはオプションまたはパラメータのために必要とされるときはいつでも、以下のものを渡すことができます:</div></blockquote>
+<ul class="last simple">
+<li>頭から数えられ、0で始まるウィジェットの数字の位置を指す整数。</li>
+<li>文字列 <tt class="docutils literal"><span class="pre">'active'</span></tt> 、現在カーソルがあるメニューの位置を指します。</li>
+<li>最後のメニューを指す文字列 <tt class="docutils literal"><span class="pre">&quot;last&quot;</span></tt> 。</li>
+<li><tt class="docutils literal"><span class="pre">&#64;6</span></tt> のような <tt class="docutils literal"><span class="pre">&#64;</span></tt> が前に来る整数。ここでは、整数がメニューの座標系における y ピクセル座標として解釈されます。</li>
+<li>文字列 <tt class="docutils literal"><span class="pre">&quot;none&quot;</span></tt> 、どんなメニューエントリもまったく指しておらず、ほとんどの場合、すべてのエントリの動作を停止させるために menu.activate()
+と一緒に使われます。そして、最後に、</li>
+<li>メニューの先頭から一番下までスキャンしたときに、メニューエントリのラベルに一致したパターンであるテキスト文字列。このインデックス型は他すべての後に考慮されることに注意してください。その代わりに、それは <tt class="docutils literal"><span class="pre">last</span></tt> 、 <tt class="docutils literal"><span class="pre">active</span></tt> または <tt class="docutils literal"><span class="pre">none</span></tt>
+とラベル付けされたメニュー項目への一致は上のリテラルとして解釈されることを意味します。</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="id9">
+<h3>24.1.6.9. 画像<a class="headerlink" href="#id9" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>Bitmap/Pixelmap 画像を <tt class="xref py py-class docutils literal"><span class="pre">Tkinter.Image</span></tt> のサブクラスを使って作ることができます:</p>
+<ul class="simple">
+<li><tt class="xref py py-class docutils literal"><span class="pre">BitmapImage</span></tt> は X11 ビットマップデータに対して使えます。</li>
+<li><tt class="xref py py-class docutils literal"><span class="pre">PhotoImage</span></tt> は GIF と PPM/PGM カラービットマップに対して使えます。</li>
+</ul>
+<p>画像のどちらの型でも <tt class="docutils literal"><span class="pre">file</span></tt> または <tt class="docutils literal"><span class="pre">data</span></tt> オプションを使って作られます
+(その上、他のオプションも利用できます)。</p>
+<p><tt class="docutils literal"><span class="pre">image</span></tt> オプションがウィジェットにサポートされるところならどこでも、画像オブジェクトを使うことができます(例えば、ラベル、ボタン、メニュー)。これらの場合では、Tk は画像への参照を保持しないでしょう。画像オブジェクトへの最後の
+Python の参照が削除されたときに、おまけに画像データが削除されます。そして、どこで画像が使われていようとも、Tk は空の箱を表示します。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="ttk.html" title="24.2. ttk — Tk themed widgets"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="tk.html" title="24. Tkを用いたグラフィカルユーザインターフェイス"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="tk.html" >24. Tkを用いたグラフィカルユーザインターフェイス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

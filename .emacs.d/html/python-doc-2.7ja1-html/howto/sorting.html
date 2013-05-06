@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ソート HOW TO &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python HOWTO" href="index.html" />
+    <link rel="next" title="Unicode HOWTO" href="unicode.html" />
+    <link rel="prev" title="ソケットプログラミング HOWTO" href="sockets.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="unicode.html" title="Unicode HOWTO"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="sockets.html" title="ソケットプログラミング HOWTO"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ソート HOW TO</a><ul>
+<li><a class="reference internal" href="#id1">ソートの基本</a></li>
+<li><a class="reference internal" href="#key">Key 関数</a></li>
+<li><a class="reference internal" href="#operator">operator モジュール関数</a></li>
+<li><a class="reference internal" href="#id2">昇順と降順</a></li>
+<li><a class="reference internal" href="#id3">ソートの安定性と複合的なソート</a></li>
+<li><a class="reference internal" href="#id4">デコレート-ソート-アンデコレート を利用した古いやり方</a></li>
+<li><a class="reference internal" href="#cmp"><em>cmp</em> パラメータを利用した古い方法</a></li>
+<li><a class="reference internal" href="#id5">残りいくつかとまとめ</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="sockets.html"
+                        title="前の章へ">ソケットプログラミング HOWTO</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="unicode.html"
+                        title="次の章へ">Unicode HOWTO</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/howto/sorting.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="how-to">
+<span id="sortinghowto"></span><h1>ソート HOW TO<a class="headerlink" href="#how-to" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Author:</th><td class="field-body">Andrew Dalke and Raymond Hettinger</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Release:</th><td class="field-body">0.1</td>
+</tr>
+</tbody>
+</table>
+<p>Python のリストにはリストをインプレースに変更する、組み込みメソッド <tt class="xref py py-meth docutils literal"><span class="pre">list.sort()</span></tt> があります。他にもイテラブルからソートしたリストを作成する組み込み関数 <a class="reference internal" href="../library/functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> があります。</p>
+<p>このドキュメントでは Python を使った様々なソートのテクニックを探索します。</p>
+<div class="section" id="id1">
+<h2>ソートの基本<a class="headerlink" href="#id1" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>単純な昇順のソートはとても簡単です: <a class="reference internal" href="../library/functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> 関数を呼ぶだけです。そうすれば、新たにソートされたリストが返されます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="go">[1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+<p>リストの <tt class="xref py py-meth docutils literal"><span class="pre">list.sort()</span></tt> メソッドを呼びだしても同じことができます。この方法はリストをインプレースに変更します
+(そして sorted との混乱を避けるため <em>None</em> を返します)。多くの場合、こちらの方法は <a class="reference internal" href="../library/functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> と比べると不便です
+- ただし、元々のリストが不要な場合には、わずかですがより効率的です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">[1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+<p>違いは他にもあります、 <tt class="xref py py-meth docutils literal"><span class="pre">list.sort()</span></tt> メソッドはリストにのみ定義されています。一方 <a class="reference internal" href="../library/functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> 関数は任意のイテラブルを受け付けます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s">&#39;E&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s">&#39;A&#39;</span><span class="p">})</span>
+<span class="go">[1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="key">
+<h2>Key 関数<a class="headerlink" href="#key" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python 2.4 から、 <tt class="xref py py-meth docutils literal"><span class="pre">list.sort()</span></tt> と <a class="reference internal" href="../library/functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> には <em>key</em> パラメータが追加されました、これは比較を行う前にリストの各要素に対して呼び出される関数を指定するパラメータです。</p>
+<p>例えば、大文字小文字を区別しない文字列比較の例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="s">&quot;This is a test string from Andrew&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span>
+<span class="go">[&#39;a&#39;, &#39;Andrew&#39;, &#39;from&#39;, &#39;is&#39;, &#39;string&#39;, &#39;test&#39;, &#39;This&#39;]</span>
+</pre></div>
+</div>
+<p><em>key</em> パラメータは単一の引数をとり、ソートに利用される key を返さなければいけません。この制約によりソートを高速に行えます、キー関数は各入力レコードに対してきっちり一回だけ呼び出されるからです。</p>
+<p>よくある利用パターンはいくつかの要素から成る対象をインデクスのどれかをキーとしてソートすることです。例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">student_tuples</span> <span class="o">=</span> <span class="p">[</span>
+<span class="go">    (&#39;john&#39;, &#39;A&#39;, 15),</span>
+<span class="go">    (&#39;jane&#39;, &#39;B&#39;, 12),</span>
+<span class="go">    (&#39;dave&#39;, &#39;B&#39;, 10),</span>
+<span class="go">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_tuples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">student</span><span class="p">:</span> <span class="n">student</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>   <span class="c"># sort by age</span>
+<span class="go">[(&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;john&#39;, &#39;A&#39;, 15)]</span>
+</pre></div>
+</div>
+<p>同じテクニックは名前づけされた属性 (named attributes) を使うことでオブジェクトに対しても動作します。例えば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Student</span><span class="p">:</span>
+<span class="go">        def __init__(self, name, grade, age):</span>
+<span class="go">            self.name = name</span>
+<span class="go">            self.grade = grade</span>
+<span class="go">            self.age = age</span>
+<span class="go">        def __repr__(self):</span>
+<span class="go">            return repr((self.name, self.grade, self.age))</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">student_objects</span> <span class="o">=</span> <span class="p">[</span>
+<span class="go">    Student(&#39;john&#39;, &#39;A&#39;, 15),</span>
+<span class="go">    Student(&#39;jane&#39;, &#39;B&#39;, 12),</span>
+<span class="go">    Student(&#39;dave&#39;, &#39;B&#39;, 10),</span>
+<span class="go">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_objects</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">student</span><span class="p">:</span> <span class="n">student</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>   <span class="c"># sort by age</span>
+<span class="go">[(&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;john&#39;, &#39;A&#39;, 15)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="operator">
+<h2>operator モジュール関数<a class="headerlink" href="#operator" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>上述した key 関数のパターンはとても一般的です、そのため、Python は高速で扱いやすいアクセサ関数を提供しています。
+operator モジュールには <a class="reference internal" href="../library/operator.html#operator.itemgetter" title="operator.itemgetter"><tt class="xref py py-func docutils literal"><span class="pre">operator.itemgetter()</span></tt></a>,
+<a class="reference internal" href="../library/operator.html#operator.attrgetter" title="operator.attrgetter"><tt class="xref py py-func docutils literal"><span class="pre">operator.attrgetter()</span></tt></a>, そして Python 2.5 から利用できるようになった
+<a class="reference internal" href="../library/operator.html#operator.methodcaller" title="operator.methodcaller"><tt class="xref py py-func docutils literal"><span class="pre">operator.methodcaller()</span></tt></a> 関数があります。</p>
+<p>これらの関数を利用すると、上の例はもっと簡単で高速になります:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span><span class="p">,</span> <span class="n">attrgetter</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_tuples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">[(&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;john&#39;, &#39;A&#39;, 15)]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_objects</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s">&#39;age&#39;</span><span class="p">))</span>
+<span class="go">[(&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;john&#39;, &#39;A&#39;, 15)]</span>
+</pre></div>
+</div>
+<p>operator モジュールの関数は複数の段階でのソートを可能にします。例えば、 <em>grade</em> でソートしてさらに <em>age</em> でソートする場合:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_tuples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">[(&#39;john&#39;, &#39;A&#39;, 15), (&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12)]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_objects</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s">&#39;grade&#39;</span><span class="p">,</span> <span class="s">&#39;age&#39;</span><span class="p">))</span>
+<span class="go">[(&#39;john&#39;, &#39;A&#39;, 15), (&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>昇順と降順<a class="headerlink" href="#id2" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">list.sort()</span></tt> と <a class="reference internal" href="../library/functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> の両方とも <em>reverse</em> パラメータを真偽値として受け付けます。このパラメータは降順ソートを行うかどうかのフラグとして利用されます。例えば、学生のデータを <em>age</em> の逆順で得たい場合は:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_tuples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">[(&#39;john&#39;, &#39;A&#39;, 15), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;dave&#39;, &#39;B&#39;, 10)]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_objects</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s">&#39;age&#39;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="go">[(&#39;john&#39;, &#39;A&#39;, 15), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;dave&#39;, &#39;B&#39;, 10)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h2>ソートの安定性と複合的なソート<a class="headerlink" href="#id3" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Python 2.2 からソートは、 <a class="reference external" href="http://en.wikipedia.org/wiki/Sorting_algorithm#Stability">stable</a>
+であることが保証されるようになりました。これはレコードの中に同じキーがある場合、元々の順序が維持されるということを意味します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="go">[(&#39;blue&#39;, 1), (&#39;blue&#39;, 2), (&#39;red&#39;, 1), (&#39;red&#39;, 2)]</span>
+</pre></div>
+</div>
+<p>二つの <em>blue</em> のレコートが元々の順序を維持して、
+<tt class="docutils literal"><span class="pre">('blue',</span> <span class="pre">1)</span></tt> が <tt class="docutils literal"><span class="pre">('blue',</span> <span class="pre">2)</span></tt> の前にあること注意してください。</p>
+<p>この素晴しい性質によって複数のソートを段階的に組み合わせることができます。例えば、学生データを <em>grade</em> の降順にソートし、さらに <em>age</em> の昇順にソートしたい場合には、まず <em>age</em> でソートし、次に <em>grade</em> でもう一度ソートします:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">student_objects</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s">&#39;age&#39;</span><span class="p">))</span>     <span class="c"># sort on secondary key</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">attrgetter</span><span class="p">(</span><span class="s">&#39;grade&#39;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>       <span class="c"># now sort on primary key, descending</span>
+<span class="go">[(&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;john&#39;, &#39;A&#39;, 15)]</span>
+</pre></div>
+</div>
+<p>Python では <a class="reference external" href="http://en.wikipedia.org/wiki/Timsort">Timsort</a> アルゴリズムが利用されていて、効率良く複数のソートを行うことができます、これは現在のデータセット中のあらゆる順序をそのまま利用できるからです。</p>
+</div>
+<div class="section" id="id4">
+<h2>デコレート-ソート-アンデコレート を利用した古いやり方<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>このイディオムは以下の3つのステップにちなんでデコレート-ソート-アンデコレート (Decorate-Sort-Undecorate) と呼ばれています。</p>
+<ul class="simple">
+<li>まず、元となるリストをソートしたい順序を制御する新しい値でデコレートします。</li>
+<li>次に、デコレートしたリストをソートします。</li>
+<li>最後に、デコレートを取り除き、新しい順序で元々の値のみを持つリストを作ります。</li>
+</ul>
+<p>例えば、DSU アプローチを利用して学生データを <em>grade</em> でソートする場合:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">decorated</span> <span class="o">=</span> <span class="p">[(</span><span class="n">student</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">student</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">student</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">student_objects</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">decorated</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">student</span> <span class="k">for</span> <span class="n">grade</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">student</span> <span class="ow">in</span> <span class="n">decorated</span><span class="p">]</span>               <span class="c"># undecorate</span>
+<span class="go">[(&#39;john&#39;, &#39;A&#39;, 15), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;dave&#39;, &#39;B&#39;, 10)]</span>
+</pre></div>
+</div>
+<p>このイディオムはタブルが辞書編集的に比較されるため正しく動作します;
+最初の要素が比較され、同じ場合には第二の要素が比較され、以下も同様に動きます。</p>
+<p>デコレートしたリストのインデクス <em>i</em> は全ての場合で含まれる必要はありませんが、そうすることで二つの利点があります:</p>
+<ul class="simple">
+<li>ソートが安定になります &#8211; もし二つの要素が同じキーを持つ場合、それらの順序がソートされたリストでも維持されます。</li>
+<li>元々の要素が比較可能な要素を持つとは限りません、なぜならデコレートされたタブルの順序は多くの場合、最初の二つの要素で決定されるからです。例として元のリストは直接比較できない複素数を含むことができます。</li>
+</ul>
+<p>このイディオムの別名に
+<a class="reference external" href="http://en.wikipedia.org/wiki/Schwartzian_transform">Schwartzian transform</a>
+があります。これは Perl プログラマの間で有名な Randal L. Schwartz にちなんでいます。</p>
+<p>巨大なリストや比較の情報を得る計算が高くつくリストに対するソートや
+Python のバージョンが 2.4 より前の場合には、
+DSU はリストをソートするのに最速な方法のようです。
+2.4 以降では、key 関数が同じ機能を提供します。</p>
+</div>
+<div class="section" id="cmp">
+<h2><em>cmp</em> パラメータを利用した古い方法<a class="headerlink" href="#cmp" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>この HOWTO の内容の多くは Python 2.4 以降を仮定しています。それ以前では 組み込み関数 <a class="reference internal" href="../library/functions.html#sorted" title="sorted"><tt class="xref py py-func docutils literal"><span class="pre">sorted()</span></tt></a> と <tt class="xref py py-meth docutils literal"><span class="pre">list.sort()</span></tt> はキーワード引数をとりませんでした。その代わりに Py2.x バージョンの全ては、ユーザが比較関数を指定するための
+<em>cmp</em> パラメーターをサポートしました。</p>
+<p>Py3.0 では <em>cmp</em> パラメータは完全に削除されました
+(ぜいたくな比較と <a class="reference internal" href="../reference/datamodel.html#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> マジックメソッドの衝突を除き、言語を単純化しまとるための多大な労力の一環として)</p>
+<p>Py2.x ではソートにオプションとして比較に利用できる関数を与えることができます。関数は比較される二つの引数をとり、小さい場合には負の値を、等しい場合には
+0 を、大きい場合には正の値を返さなければいけません。例えば、以下のようにできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">numeric_compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="go">        return x - y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="nb">cmp</span><span class="o">=</span><span class="n">numeric_compare</span><span class="p">)</span>
+<span class="go">[1, 2, 3, 4, 5]</span>
+</pre></div>
+</div>
+<p>また、比較順を逆にすることもできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">reverse_numeric</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="go">        return y - x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="nb">cmp</span><span class="o">=</span><span class="n">reverse_numeric</span><span class="p">)</span>
+<span class="go">[5, 4, 3, 2, 1]</span>
+</pre></div>
+</div>
+<p>Python 2.x から 3.x にコードを移植する場合、比較関数を持っている場合には key 関数に比較しなければならないような状況に陥るかもしれません。以下のラッパーがそれを簡単にしてくれるでしょう:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">cmp_to_key</span><span class="p">(</span><span class="n">mycmp</span><span class="p">):</span>
+    <span class="s">&#39;Convert a cmp= function into a key= function&#39;</span>
+    <span class="k">class</span> <span class="nc">K</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mycmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span>
+        <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mycmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mycmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mycmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+        <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mycmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">mycmp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">K</span>
+</pre></div>
+</div>
+<p>key 関数を変換するには、古い比較関数をラップするだけです:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="n">cmp_to_key</span><span class="p">(</span><span class="n">reverse_numeric</span><span class="p">))</span>
+<span class="go">[5, 4, 3, 2, 1]</span>
+</pre></div>
+</div>
+<p>Python 2.7 には、functools モジュールに <a class="reference internal" href="../library/functools.html#functools.cmp_to_key" title="functools.cmp_to_key"><tt class="xref py py-func docutils literal"><span class="pre">functools.cmp_to_key()</span></tt></a> 関数が追加されました。</p>
+</div>
+<div class="section" id="id5">
+<h2>残りいくつかとまとめ<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<ul class="simple">
+<li>ロケールに注意したソートをするには、キー関数 <a class="reference internal" href="../library/locale.html#locale.strxfrm" title="locale.strxfrm"><tt class="xref py py-func docutils literal"><span class="pre">locale.strxfrm()</span></tt></a> を利用するか、比較関数に <a class="reference internal" href="../library/locale.html#locale.strcoll" title="locale.strcoll"><tt class="xref py py-func docutils literal"><span class="pre">locale.strcoll()</span></tt></a> を利用します。</li>
+</ul>
+<ul>
+<li><p class="first"><em>reverse</em> パラメータはソートの安定性を保ちます
+(つまり、レコードのキーが等しい場合元々の順序が維持されます)。面白いことにこの影響はパラメータ無しで <a class="reference internal" href="../library/functions.html#reversed" title="reversed"><tt class="xref py py-func docutils literal"><span class="pre">reversed()</span></tt></a> 関数を二回使うことで模倣することができます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">data</span><span class="p">))))</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<ul>
+<li><p class="first">ソートルーチンは二つのオブジェクトを比較するのに
+<a class="reference internal" href="../reference/datamodel.html#object.__lt__" title="object.__lt__"><tt class="xref py py-meth docutils literal"><span class="pre">__lt__()</span></tt></a> を利用することを保証しています。そのため <a class="reference internal" href="../reference/datamodel.html#object.__lt__" title="object.__lt__"><tt class="xref py py-meth docutils literal"><span class="pre">__lt__()</span></tt></a> メソッドを定義することで、標準のソート順序を追加できます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Student</span><span class="o">.</span><span class="n">__lt__</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">age</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">age</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">student_objects</span><span class="p">)</span>
+<span class="go">[(&#39;dave&#39;, &#39;B&#39;, 10), (&#39;jane&#39;, &#39;B&#39;, 12), (&#39;john&#39;, &#39;A&#39;, 15)]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<ul>
+<li><p class="first">key 関数はソートするオブジェクトに依存する必要はありません。
+key 関数は外部リソースにアクセスすることもできます。例えば学生の成績が辞書に保存されている場合、それを利用して別の学生の名前のリストをソートすることができます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">students</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;dave&#39;</span><span class="p">,</span> <span class="s">&#39;john&#39;</span><span class="p">,</span> <span class="s">&#39;jane&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">newgrades</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;john&#39;</span><span class="p">:</span> <span class="s">&#39;F&#39;</span><span class="p">,</span> <span class="s">&#39;jane&#39;</span><span class="p">:</span><span class="s">&#39;A&#39;</span><span class="p">,</span> <span class="s">&#39;dave&#39;</span><span class="p">:</span> <span class="s">&#39;C&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">students</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">newgrades</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">)</span>
+<span class="go">[&#39;jane&#39;, &#39;dave&#39;, &#39;john&#39;]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="unicode.html" title="Unicode HOWTO"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="sockets.html" title="ソケットプログラミング HOWTO"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python HOWTO</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

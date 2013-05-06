@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>20.10. imaplib — IMAP4 プロトコルクライアント &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="20. インターネットプロトコルとその支援" href="internet.html" />
+    <link rel="next" title="20.11. nntplib — NNTP プロトコルクライアント" href="nntplib.html" />
+    <link rel="prev" title="20.9. poplib — POP3 プロトコルクライアント" href="poplib.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="nntplib.html" title="20.11. nntplib — NNTP プロトコルクライアント"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="poplib.html" title="20.9. poplib — POP3 プロトコルクライアント"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" accesskey="U">20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">20.10. <tt class="docutils literal"><span class="pre">imaplib</span></tt> &#8212; IMAP4 プロトコルクライアント</a><ul>
+<li><a class="reference internal" href="#imap4">20.10.1. IMAP4 オブジェクト</a></li>
+<li><a class="reference internal" href="#imap4-example">20.10.2. IMAP4 の使用例</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="poplib.html"
+                        title="前の章へ">20.9. <tt class="docutils literal docutils literal"><span class="pre">poplib</span></tt> &#8212; POP3 プロトコルクライアント</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="nntplib.html"
+                        title="次の章へ">20.11. <tt class="docutils literal"><span class="pre">nntplib</span></tt> &#8212; NNTP プロトコルクライアント</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/imaplib.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-imaplib">
+<span id="imaplib-imap4"></span><h1>20.10. <a class="reference internal" href="#module-imaplib" title="imaplib: IMAP4 protocol client (requires sockets)."><tt class="xref py py-mod docutils literal"><span class="pre">imaplib</span></tt></a> &#8212; IMAP4 プロトコルクライアント<a class="headerlink" href="#module-imaplib" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">このモジュールでは三つのクラス、 <a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a>, <a class="reference internal" href="#imaplib.IMAP4_SSL" title="imaplib.IMAP4_SSL"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4_SSL</span></tt></a> と <a class="reference internal" href="#imaplib.IMAP4_stream" title="imaplib.IMAP4_stream"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4_stream</span></tt></a>
+を定義します。これらのクラスは IMAP4 サーバへの接続をカプセル化し、 <span class="target" id="index-1"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2060.html"><strong>RFC 2060</strong></a> に定義されている IMAP4rev1
+クライアントプロトコルの大規模なサブセットを実装しています。このクラスは IMAP4 (<span class="target" id="index-2"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc1730.html"><strong>RFC 1730</strong></a>) 準拠のサーバと後方互換性がありますが、 <tt class="docutils literal"><span class="pre">STATUS</span></tt> コマンドは IMAP4 ではサポートされていないので注意してください。</p>
+<p><a class="reference internal" href="#module-imaplib" title="imaplib: IMAP4 protocol client (requires sockets)."><tt class="xref py py-mod docutils literal"><span class="pre">imaplib</span></tt></a> モジュール内では三つのクラスを提供しており、 <a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a> は基底クラスとなります:</p>
+<dl class="class">
+<dt id="imaplib.IMAP4">
+<em class="property">class </em><tt class="descclassname">imaplib.</tt><tt class="descname">IMAP4</tt><big>(</big><span class="optional">[</span><em>host</em><span class="optional">[</span>, <em>port</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスは実際の IMAP4 プロトコルを実装しています。インスタンスが初期化された際に接続が生成され、プロトコルバージョン (IMAP4 または
+IMAP4rev1) が決定されます。 <em>host</em> が指定されていない場合、 <tt class="docutils literal"><span class="pre">''</span></tt> (ローカルホスト) が用いられます。 <em>port</em>
+が省略された場合、標準の IMAP4 ポート番号 (143)  が用いられます。</p>
+</dd></dl>
+
+<p>例外は <a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a> クラスの属性として定義されています:</p>
+<dl class="exception">
+<dt id="imaplib.IMAP4.error">
+<em class="property">exception </em><tt class="descclassname">IMAP4.</tt><tt class="descname">error</tt><a class="headerlink" href="#imaplib.IMAP4.error" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>何らかのエラー発生の際に送出される例外です。例外の理由は文字列としてコンストラクタに渡されます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="imaplib.IMAP4.abort">
+<em class="property">exception </em><tt class="descclassname">IMAP4.</tt><tt class="descname">abort</tt><a class="headerlink" href="#imaplib.IMAP4.abort" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>IMAP4 サーバのエラーが生じると、この例外が送出されます。この例外は <a class="reference internal" href="#imaplib.IMAP4.error" title="imaplib.IMAP4.error"><tt class="xref py py-exc docutils literal"><span class="pre">IMAP4.error</span></tt></a> のサブクラスです。通常、インスタンスを閉じ、新たなインスタンスを再び生成することで、この例外から復旧できます。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="imaplib.IMAP4.readonly">
+<em class="property">exception </em><tt class="descclassname">IMAP4.</tt><tt class="descname">readonly</tt><a class="headerlink" href="#imaplib.IMAP4.readonly" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この例外は書き込み可能なメールボックスの状態がサーバによって変更された際に送出されます。この例外は <a class="reference internal" href="#imaplib.IMAP4.error" title="imaplib.IMAP4.error"><tt class="xref py py-exc docutils literal"><span class="pre">IMAP4.error</span></tt></a> のサブクラスです。他の何らかのクライアントが現在書き込み権限を獲得しており、メールボックスを開きなおして書き込み権限を再獲得する必要があります。</p>
+</dd></dl>
+
+<p>このモジュールではもう一つ、安全 (secure) な接続を使ったサブクラスがあります:</p>
+<dl class="class">
+<dt id="imaplib.IMAP4_SSL">
+<em class="property">class </em><tt class="descclassname">imaplib.</tt><tt class="descname">IMAP4_SSL</tt><big>(</big><span class="optional">[</span><em>host</em><span class="optional">[</span>, <em>port</em><span class="optional">[</span>, <em>keyfile</em><span class="optional">[</span>, <em>certfile</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4_SSL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a> から派生したサブクラスで、SSL 暗号化ソケットを介して接続を行います (このクラスを利用するためには SSL サポート付きでコンパイルされた socket モジュールが必要です) 。 <em>host</em> が指定されていない場合、 <tt class="docutils literal"><span class="pre">''</span></tt> (ローカルホスト) が用いられます。
+<em>port</em> が省略された場合、標準の IMAP4-over-SSL ポート番号 (993)  が用いられます。 <em>keyfile</em> および
+<em>certfile</em> もオプションです - これらは SSL 接続のための PEM 形式の秘密鍵 (private key) と認証チェイン
+(certificate chain) ファイルです。</p>
+</dd></dl>
+
+<p>さらにもう一つのサブクラスは、子プロセスで確立した接続を使用する場合に使用します。</p>
+<dl class="class">
+<dt id="imaplib.IMAP4_stream">
+<em class="property">class </em><tt class="descclassname">imaplib.</tt><tt class="descname">IMAP4_stream</tt><big>(</big><em>command</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4_stream" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a> から派生したサブクラスで、 <em>command</em> を <tt class="docutils literal"><span class="pre">os.popen2()</span></tt> に渡して作成される
+<tt class="docutils literal"><span class="pre">stdin/stdout</span></tt> ディスクリプタと接続します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<p>以下のユーティリティ関数が定義されています:</p>
+<dl class="function">
+<dt id="imaplib.Internaldate2tuple">
+<tt class="descclassname">imaplib.</tt><tt class="descname">Internaldate2tuple</tt><big>(</big><em>datestr</em><big>)</big><a class="headerlink" href="#imaplib.Internaldate2tuple" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>IMAP4 の <tt class="docutils literal"><span class="pre">INTERNALDATE</span></tt> 文字列を解析してそれに相当するローカルタイムを返します。戻り値は <a class="reference internal" href="time.html#time.struct_time" title="time.struct_time"><tt class="xref py py-class docutils literal"><span class="pre">time.struct_time</span></tt></a> のインスタンスか、文字列のフォーマットが不正な場合は None です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imaplib.Int2AP">
+<tt class="descclassname">imaplib.</tt><tt class="descname">Int2AP</tt><big>(</big><em>num</em><big>)</big><a class="headerlink" href="#imaplib.Int2AP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>整数を [<tt class="docutils literal"><span class="pre">A</span></tt> .. <tt class="docutils literal"><span class="pre">P</span></tt>] からなる文字集合を用いて表現した文字列に変換します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imaplib.ParseFlags">
+<tt class="descclassname">imaplib.</tt><tt class="descname">ParseFlags</tt><big>(</big><em>flagstr</em><big>)</big><a class="headerlink" href="#imaplib.ParseFlags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>IMAP4 <tt class="docutils literal"><span class="pre">FLAGS</span></tt> 応答を個々のフラグからなるタプルに変換します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="imaplib.Time2Internaldate">
+<tt class="descclassname">imaplib.</tt><tt class="descname">Time2Internaldate</tt><big>(</big><em>date_time</em><big>)</big><a class="headerlink" href="#imaplib.Time2Internaldate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>date_time</em> を IMAP4 の <tt class="docutils literal"><span class="pre">INTERNALDATE</span></tt> 表現形式に変換します。戻り値は <tt class="docutils literal"><span class="pre">&quot;DD-Mmm-YYYY</span> <span class="pre">HH:MM:SS</span> <span class="pre">+HHMM&quot;</span></tt> (ダブルクォートを含む) の形をした文字列です。
+<em>date_time</em> 引数は (<a class="reference internal" href="time.html#time.time" title="time.time"><tt class="xref py py-func docutils literal"><span class="pre">time.time()</span></tt></a> が返す) epoch からの経過秒数を表す数値
+(int か float) か、(<a class="reference internal" href="time.html#time.localtime" title="time.localtime"><tt class="xref py py-func docutils literal"><span class="pre">time.localtime()</span></tt></a> が返す) ローカルタイムを表現する
+9要素タプルか、ダブルクォートされた文字列です。文字列だった場合、それがすでに正しいフォーマットになっていると仮定されます。</p>
+</dd></dl>
+
+<p>IMAP4 メッセージ番号は、メールボックスに対する変更が行われた後には変化します; 特に、 <tt class="docutils literal"><span class="pre">EXPUNGE</span></tt> 命令はメッセージの削除を行いますが、残ったメッセージには再度番号を振りなおします。従って、メッセージ番号ではなく、 UID 命令を使い、その UID を利用するよう強く勧めます。</p>
+<p>モジュールの末尾に、より拡張的な使用例が収められたテストセクションがあります。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">プロトコルに関する記述、およびプロトコルを実装したサーバのソースとバイナリは、全てワシントン大学の <em>IMAP Information Center</em>
+(<a class="reference external" href="http://www.washington.edu/imap/">http://www.washington.edu/imap/</a>) にあります。</p>
+</div>
+<div class="section" id="imap4">
+<span id="imap4-objects"></span><h2>20.10.1. IMAP4 オブジェクト<a class="headerlink" href="#imap4" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>全ての IMAP4rev1 命令は、同じ名前のメソッドで表されており、大文字のものも小文字のものもあります。</p>
+<p>命令に対する引数は全て文字列に変換されます。例外は <tt class="docutils literal"><span class="pre">AUTHENTICATE</span></tt> の引数と <tt class="docutils literal"><span class="pre">APPEND</span></tt> の最後の引数で、これは IMAP4
+リテラルとして渡されます。必要に応じて (IMAP4 プロトコルが感知対象としている文字が文字列に入っており、かつ丸括弧か二重引用符で囲われていなかった場合) 文字列はクオートされます。しかし、 <tt class="docutils literal"><span class="pre">LOGIN</span></tt> 命令の  <em>password</em> 引数は常にクオートされます。文字列がクオートされないようにしたい
+(例えば <tt class="docutils literal"><span class="pre">STORE</span></tt> 命令の <em>flags</em> 引数) 場合、文字列を丸括弧で囲んでください (例: <tt class="docutils literal"><span class="pre">r'(\Deleted)'</span></tt>)。</p>
+<p>各命令はタプル: <tt class="docutils literal"><span class="pre">(type,</span> <span class="pre">[data,</span> <span class="pre">...])</span></tt> を返し、 <em>type</em> は通常 <tt class="docutils literal"><span class="pre">'OK'</span></tt> または <tt class="docutils literal"><span class="pre">'NO'</span></tt> です。
+<em>data</em> は命令に対する応答をテキストにしたものか、命令に対する実行結果です。各 <em>data</em> は文字列かタプルとなります。タプルの場合、最初の要素はレスポンスのヘッダで、次の要素にはデータが格納されます。 (ie: &#8216;literal&#8217; value)</p>
+<p>以下のコマンドにおける <em>message_set</em> オプションは、操作の対象となるひとつあるいは複数のメッセージを指す文字列です。単一のメッセージ番号
+(<tt class="docutils literal"><span class="pre">'1'</span></tt>) かメッセージ番号の範囲 (<tt class="docutils literal"><span class="pre">'2:4'</span></tt>)、あるいは連続していないメッセージをカンマでつなげたもの (<tt class="docutils literal"><span class="pre">'1:3,6:9'</span></tt>)
+となります。範囲指定でアスタリスクを使用すると、上限を無限とすることができます (<tt class="docutils literal"><span class="pre">'3:*'</span></tt>)。</p>
+<p><a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a> のインスタンスは以下のメソッドを持っています:</p>
+<dl class="method">
+<dt id="imaplib.IMAP4.append">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">append</tt><big>(</big><em>mailbox</em>, <em>flags</em>, <em>date_time</em>, <em>message</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.append" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定された名前のメールボックスに <em>message</em> を追加します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.authenticate">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">authenticate</tt><big>(</big><em>mechanism</em>, <em>authobject</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.authenticate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>認証命令です &#8212; 応答の処理が必要です。</p>
+<p><em>mechanism</em> は利用する認証メカニズムを与えます。認証メカニズムはインスタンス変数 <tt class="docutils literal"><span class="pre">capabilities</span></tt> の中に
+<tt class="docutils literal"><span class="pre">AUTH=mechanism</span></tt> という形式で現れる必要があります。</p>
+<p><em>authobject</em> は呼び出し可能なオブジェクトである必要があります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">data</span> <span class="o">=</span> <span class="n">authobject</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これはサーバで継続応答を処理するためによばれます。これは(おそらく)暗号化されて、サーバへ送られた <tt class="docutils literal"><span class="pre">data</span></tt> を返します。もしクライアントが中断応答
+<tt class="docutils literal"><span class="pre">*</span></tt> を送信した場合にはこれは <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.check">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">check</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバ上のメールボックスにチェックポイントを設定します。 Checkpoint mailbox on server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.close">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在選択されているメールボックスを閉じます。削除されたメッセージは書き込み可能メールボックスから除去されます。 <tt class="docutils literal"><span class="pre">LOGOUT</span></tt> 前に実行することを勧めます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.copy">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">copy</tt><big>(</big><em>message_set</em>, <em>new_mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.copy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>message_set</em> で指定したメッセージ群を <em>new_mailbox</em> の末尾にコピーします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.create">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">create</tt><big>(</big><em>mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.create" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>mailbox</em> と名づけられた新たなメールボックスを生成します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.delete">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">delete</tt><big>(</big><em>mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.delete" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>mailbox</em> と名づけられた古いメールボックスを削除します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.deleteacl">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">deleteacl</tt><big>(</big><em>mailbox</em>, <em>who</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.deleteacl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>mailbox における who についてのACLを削除(権限を削除)します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.expunge">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">expunge</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.expunge" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>選択されたメールボックスから削除された要素を永久に除去します。各々の削除されたメッセージに対して、 <tt class="docutils literal"><span class="pre">EXPUNGE</span></tt> 応答を生成します。返されるデータには <tt class="docutils literal"><span class="pre">EXPUNGE</span></tt> メッセージ番号を受信した順番に並べたリストが入っています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.fetch">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">fetch</tt><big>(</big><em>message_set</em>, <em>message_parts</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.fetch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージ (の一部) を取りよせます。 <em>message_parts</em> はメッセージパートの名前を表す文字列を丸括弧で囲ったもので、例えば: <tt class="docutils literal"><span class="pre">&quot;(UID</span>
+<span class="pre">BODY[TEXT])&quot;</span></tt> のようになります。返されるデータはメッセージパートのエンベロープ情報とデータからなるタプルです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.getacl">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">getacl</tt><big>(</big><em>mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.getacl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>mailbox</em> に対する <tt class="docutils literal"><span class="pre">ACL</span></tt> を取得します。このメソッドは非標準ですが、 <tt class="docutils literal"><span class="pre">Cyrus</span></tt> サーバでサポートされています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.getannotation">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">getannotation</tt><big>(</big><em>mailbox</em>, <em>entry</em>, <em>attribute</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.getannotation" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>mailbox</em> に対する <tt class="docutils literal"><span class="pre">ANNOTATION</span></tt> を取得します。このメソッドは非標準ですが、 <tt class="docutils literal"><span class="pre">Cyrus</span></tt> サーバでサポートされています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.getquota">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">getquota</tt><big>(</big><em>root</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.getquota" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">quota</span></tt> <em>root</em> により、リソース使用状況と制限値を取得します。このメソッドは <span class="target" id="index-3"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2087.html"><strong>RFC 2087</strong></a> で定義されている IMAP4
+QUOTA 拡張の一部です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.getquotaroot">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">getquotaroot</tt><big>(</big><em>mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.getquotaroot" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>mailbox</em> に対して <tt class="docutils literal"><span class="pre">quota</span></tt> <em>root</em> を実行した結果のリストを取得します。このメソッドは <span class="target" id="index-4"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2087.html"><strong>RFC 2087</strong></a> で定義されている
+IMAP4 QUOTA 拡張の一部です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.list">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">list</tt><big>(</big><span class="optional">[</span><em>directory</em><span class="optional">[</span>, <em>pattern</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.list" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>pattern</em> にマッチする <em>directory</em> メールボックス名を列挙します。 <em>directory</em> の標準の設定値は最上レベルのメールフォルダで、
+<em>pattern</em> は標準の設定では全てにマッチします。返されるデータには <tt class="docutils literal"><span class="pre">LIST</span></tt> 応答のリストが入っています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.login">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">login</tt><big>(</big><em>user</em>, <em>password</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.login" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>平文パスワードを使ってクライアントを照合します。 <em>password</em> はクオートされます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.login_cram_md5">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">login_cram_md5</tt><big>(</big><em>user</em>, <em>password</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.login_cram_md5" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パスワードの保護のため、クライアント認証時に <tt class="docutils literal"><span class="pre">CRAM-MD5</span></tt> だけを使用します。これは、 <tt class="docutils literal"><span class="pre">CAPABILITY</span></tt> レスポンスに
+<tt class="docutils literal"><span class="pre">AUTH=CRAM-MD5</span></tt> が含まれる場合のみ有効です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.logout">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">logout</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.logout" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバへの接続を遮断します。サーバからの <tt class="docutils literal"><span class="pre">BYE</span></tt> 応答を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.lsub">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">lsub</tt><big>(</big><span class="optional">[</span><em>directory</em><span class="optional">[</span>, <em>pattern</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.lsub" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>購読しているメールボックス名のうち、ディレクトリ内でパターンにマッチするものを列挙します。 <em>directory</em>
+の標準の設定値は最上レベルのメールフォルダで、 <em>pattern</em> は標準の設定では全てにマッチします。返されるデータには返されるデータはメッセージパートエンベロープ情報とデータからなるタプルです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.myrights">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">myrights</tt><big>(</big><em>mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.myrights" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>mailboxにおける自分のACLを返します。(すなわち自分がmailboxで持っている権限を返します。)</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.namespace">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">namespace</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.namespace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>RFC2342で定義されるIMAP名前空間を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.noop">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">noop</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.noop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバに <tt class="docutils literal"><span class="pre">NOOP</span></tt> を送信します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.open">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">open</tt><big>(</big><em>host</em>, <em>port</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>host</em> 上の <em>port</em> に対するソケットを開きます。このメソッドは <a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a> のコンストラクタから暗黙的に呼び出されます。このメソッドで確立された接続オブジェクトは <tt class="docutils literal"><span class="pre">read</span></tt>,
+<tt class="docutils literal"><span class="pre">readline</span></tt>, <tt class="docutils literal"><span class="pre">send</span></tt>, <tt class="docutils literal"><span class="pre">shutdown</span></tt> メソッドで使われます。このメソッドはオーバライドすることができます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.partial">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">partial</tt><big>(</big><em>message_num</em>, <em>message_part</em>, <em>start</em>, <em>length</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.partial" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージの後略された部分を取り寄せます。返されるデータはメッセージパートエンベロープ情報とデータからなるタプルです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.proxyauth">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">proxyauth</tt><big>(</big><em>user</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.proxyauth" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>user</em> として認証されたものとします。認証された管理者がユーザの代理としてメールボックスにアクセスする際に使用します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.read">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">read</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.read" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>遠隔のサーバから <em>size</em> バイト読み出します。このメソッドはオーバライドすることができます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.readline">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">readline</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.readline" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>遠隔のサーバから一行読み出します。このメソッドはオーバライドすることができます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.recent">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">recent</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.recent" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバに更新を促します。新たなメッセージがない場合応答は <tt class="docutils literal"><span class="pre">None</span></tt> になり、そうでない場合 <tt class="docutils literal"><span class="pre">RECENT</span></tt> 応答の値になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.rename">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">rename</tt><big>(</big><em>oldmailbox</em>, <em>newmailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.rename" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>oldmailbox</em> という名前のメールボックスを <em>newmailbox</em> に名称変更します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.response">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">response</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.response" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>応答 <em>code</em> を受信していれば、そのデータを返し、そうでなければ <tt class="docutils literal"><span class="pre">None</span></tt> を返します。通常の形式 (usual type)
+ではなく指定したコードを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.search">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">search</tt><big>(</big><em>charset</em>, <em>criterion</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.search" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>条件に合致するメッセージをメールボックスから検索します。 <em>charset</em> は <tt class="docutils literal"><span class="pre">None</span></tt> でもよく、この場合にはサーバへの要求内に
+<tt class="docutils literal"><span class="pre">CHARSET</span></tt> は指定されません。IMAP プロトコルは少なくとも一つの条件 (criterion) が指定されるよう要求しています;
+サーバがエラーを返した場合、例外が送出されます。</p>
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># M is a connected IMAP4 instance...</span>
+<span class="n">typ</span><span class="p">,</span> <span class="n">msgnums</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;FROM&#39;</span><span class="p">,</span> <span class="s">&#39;&quot;LDJ&quot;&#39;</span><span class="p">)</span>
+
+<span class="c"># or:</span>
+<span class="n">typ</span><span class="p">,</span> <span class="n">msgnums</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;(FROM &quot;LDJ&quot;)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.select">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">select</tt><big>(</big><span class="optional">[</span><em>mailbox</em><span class="optional">[</span>, <em>readonly</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.select" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックスを選択します。返されるデータは <em>mailbox</em> 内のメッセージ数 (<tt class="docutils literal"><span class="pre">EXISTS</span></tt> 応答) です。標準の設定では <em>mailbox</em>
+は <tt class="docutils literal"><span class="pre">'INBOX'</span></tt> です。 <em>readonly</em> が設定された場合、メールボックスに対する変更はできません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.send">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">send</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.send" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>遠隔のサーバに <tt class="docutils literal"><span class="pre">data</span></tt> を送信します。このメソッドはオーバライドすることができます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.setacl">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">setacl</tt><big>(</big><em>mailbox</em>, <em>who</em>, <em>what</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.setacl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">ACL</span></tt> を <em>mailbox</em> に設定します。このメソッドは非標準ですが、 <tt class="docutils literal"><span class="pre">Cyrus</span></tt> サーバでサポートされています。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.setannotation">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">setannotation</tt><big>(</big><em>mailbox</em>, <em>entry</em>, <em>attribute</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.setannotation" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">ANNOTATION</span></tt> を <em>mailbox</em> に設定します。このメソッドは非標準ですが、 <tt class="docutils literal"><span class="pre">Cyrus</span></tt> サーバでサポートされています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.setquota">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">setquota</tt><big>(</big><em>root</em>, <em>limits</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.setquota" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">quota</span></tt> <em>root</em> のリソースを <em>limits</em> に設定します。このメソッドは <span class="target" id="index-5"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2087.html"><strong>RFC 2087</strong></a> で定義されている IMAP4
+QUOTA 拡張の一部です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.shutdown">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">shutdown</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.shutdown" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">open</span></tt> で確立された接続を閉じます。
+<a class="reference internal" href="#imaplib.IMAP4.logout" title="imaplib.IMAP4.logout"><tt class="xref py py-meth docutils literal"><span class="pre">IMAP4.logout()</span></tt></a> は暗黙的にこのメソッドを呼び出します。このメソッドはオーバライドすることができます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.socket">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">socket</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4.socket" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバへの接続に使われているソケットインスタンスを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.sort">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">sort</tt><big>(</big><em>sort_criteria</em>, <em>charset</em>, <em>search_criterion</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.sort" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">sort</span></tt> 命令は <tt class="docutils literal"><span class="pre">search</span></tt> に結果の並べ替え (sort) 機能をつけた変種です。返されるデータには、条件に合致するメッセージ番号をスペースで分割したリストが入っています。 sort 命令は <em>search_criterium</em>
+の前に二つの引数を持ちます;  <em>sort_criteria</em> のリストを丸括弧で囲ったものと、検索時の <em>charset</em> です。 <tt class="docutils literal"><span class="pre">search</span></tt>
+と違って、検索時の <em>charset</em> は必須です。 <tt class="docutils literal"><span class="pre">uid</span> <span class="pre">sort</span></tt> 命令もあり、 <tt class="docutils literal"><span class="pre">search</span></tt> に対する <tt class="docutils literal"><span class="pre">uid</span> <span class="pre">search</span></tt>
+と同じように <tt class="docutils literal"><span class="pre">sort</span></tt> 命令に対応します。 <tt class="docutils literal"><span class="pre">sort</span></tt> 命令はまず、charset 引数の指定に従って searching criteria
+の文字列を解釈し、メールボックスから与えられた検索条件に合致するメッセージを探します。次に、合致したメッセージの数を返します。</p>
+<p><tt class="docutils literal"><span class="pre">IMAP4rev1</span></tt> 拡張命令です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.status">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">status</tt><big>(</big><em>mailbox</em>, <em>names</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.status" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>mailbox</em> の指定ステータス名の状態情報を要求します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.store">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">store</tt><big>(</big><em>message_set</em>, <em>command</em>, <em>flag_list</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.store" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メールボックス内のメッセージ群のフラグ設定を変更します。 <em>command</em> は <span class="target" id="index-6"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2060.html"><strong>RFC 2060</strong></a> のセクション 6.4.6 で指定されているもので、
+&#8220;FLAGS&#8221;, &#8220;+FLAGS&#8221;, あるいは &#8220;-FLAGS&#8221; のいずれかとなります。オプションで末尾に &#8221;.SILENT&#8221; がつくこともあります。</p>
+<p>たとえば、すべてのメッセージに削除フラグを設定するには次のようにします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">typ</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;ALL&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+   <span class="n">M</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="s">&#39;+FLAGS&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">Deleted&#39;</span><span class="p">)</span>
+<span class="n">M</span><span class="o">.</span><span class="n">expunge</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.subscribe">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">subscribe</tt><big>(</big><em>mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.subscribe" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たなメールボックスを購読 (subscribe) します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.thread">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">thread</tt><big>(</big><em>threading_algorithm</em>, <em>charset</em>, <em>search_criterion</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.thread" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">thread</span></tt> コマンドは <tt class="docutils literal"><span class="pre">search</span></tt> にスレッドの概念を加えた変形版です。返されるデータは空白で区切られたスレッドメンバのリストを含んでいます。</p>
+<p>各スレッドメンバは0以上のメッセージ番号からなり、空白で区切られており、親子関係を示しています。</p>
+<p><tt class="docutils literal"><span class="pre">thread</span></tt> コマンドは <em>search_criterion</em> 引数の前に2つの引数を持っています。
+<em>threading_algorithm</em> と <em>charset</em> です。 <tt class="docutils literal"><span class="pre">search</span></tt> コマンドとは違い、 <em>charset</em> は必須です。
+<tt class="docutils literal"><span class="pre">search</span></tt> に対する <tt class="docutils literal"><span class="pre">uid</span> <span class="pre">search</span></tt> と同様に、 <tt class="docutils literal"><span class="pre">thread</span></tt> にも <tt class="docutils literal"><span class="pre">uid</span> <span class="pre">thread</span></tt> があります。</p>
+<p><tt class="docutils literal"><span class="pre">thread</span></tt> コマンドはまずメールボックス中のメッセージを、charsetを用いた検索条件で検索します。その後マッチしたメッセージを指定されたスレッドアルゴリズムでスレッド化して返します.</p>
+<p>これは <tt class="docutils literal"><span class="pre">IMAP4rev1</span></tt> の拡張コマンドです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.uid">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">uid</tt><big>(</big><em>command</em>, <em>arg</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.uid" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>command args を、メッセージ番号ではなく UID で指定されたメッセージ群に対して実行します。命令内容に応じた応答を返します。少なくとも一つの引数を与えなくてはなりません; 何も与えない場合、サーバはエラーを返し、例外が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.unsubscribe">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">unsubscribe</tt><big>(</big><em>mailbox</em><big>)</big><a class="headerlink" href="#imaplib.IMAP4.unsubscribe" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>古いメールボックスの購読を解除 (unsubscribe) します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="imaplib.IMAP4.xatom">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">xatom</tt><big>(</big><em>name</em><span class="optional">[</span>, <em>arg</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#imaplib.IMAP4.xatom" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバから <tt class="docutils literal"><span class="pre">CAPABILITY</span></tt> 応答で通知された単純な拡張命令を許容 (allow) します。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#imaplib.IMAP4_SSL" title="imaplib.IMAP4_SSL"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4_SSL</span></tt></a> のインスタンスは追加のメソッドを一つだけ持ちます:</p>
+<dl class="method">
+<dt id="imaplib.IMAP4_SSL.ssl">
+<tt class="descclassname">IMAP4_SSL.</tt><tt class="descname">ssl</tt><big>(</big><big>)</big><a class="headerlink" href="#imaplib.IMAP4_SSL.ssl" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバへの安全な接続に使われる SSLObject インスタンスを返します。</p>
+</dd></dl>
+
+<p>以下の属性が <a class="reference internal" href="#imaplib.IMAP4" title="imaplib.IMAP4"><tt class="xref py py-class docutils literal"><span class="pre">IMAP4</span></tt></a> のインスタンス上で定義されています:</p>
+<dl class="attribute">
+<dt id="imaplib.IMAP4.PROTOCOL_VERSION">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">PROTOCOL_VERSION</tt><a class="headerlink" href="#imaplib.IMAP4.PROTOCOL_VERSION" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>サーバから返された <tt class="docutils literal"><span class="pre">CAPABILITY</span></tt> 応答にある、サポートされている最新のプロトコルです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="imaplib.IMAP4.debug">
+<tt class="descclassname">IMAP4.</tt><tt class="descname">debug</tt><a class="headerlink" href="#imaplib.IMAP4.debug" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デバッグ出力を制御するための整数値です。初期値はモジュール変数 <tt class="docutils literal"><span class="pre">Debug</span></tt> から取られます。3 以上の値にすると各命令をトレースします。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="imap4-example">
+<span id="id1"></span><h2>20.10.2. IMAP4 の使用例<a class="headerlink" href="#imap4-example" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>以下にメールボックスを開き、全てのメッセージを取得して印刷する最小の (エラーチェックをしない) 使用例を示します:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">getpass</span><span class="o">,</span> <span class="nn">imaplib</span>
+
+<span class="n">M</span> <span class="o">=</span> <span class="n">imaplib</span><span class="o">.</span><span class="n">IMAP4</span><span class="p">()</span>
+<span class="n">M</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">(),</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">())</span>
+<span class="n">M</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+<span class="n">typ</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;ALL&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+    <span class="n">typ</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="s">&#39;(RFC822)&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&#39;Message </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">M</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">M</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="nntplib.html" title="20.11. nntplib — NNTP プロトコルクライアント"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="poplib.html" title="20.9. poplib — POP3 プロトコルクライアント"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="internet.html" >20. インターネットプロトコルとその支援</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,868 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>12.5. tarfile — tar アーカイブファイルを読み書きする &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="12. データ圧縮とアーカイブ" href="archiving.html" />
+    <link rel="next" title="13. ファイルフォーマット" href="fileformats.html" />
+    <link rel="prev" title="12.4. zipfile — ZIP アーカイブの処理" href="zipfile.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fileformats.html" title="13. ファイルフォーマット"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="zipfile.html" title="12.4. zipfile — ZIP アーカイブの処理"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="archiving.html" accesskey="U">12. データ圧縮とアーカイブ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">12.5. <tt class="docutils literal"><span class="pre">tarfile</span></tt> &#8212; tar アーカイブファイルを読み書きする</a><ul>
+<li><a class="reference internal" href="#tarfile">12.5.1. TarFile オブジェクト</a></li>
+<li><a class="reference internal" href="#tarinfo">12.5.2. TarInfo オブジェクト</a></li>
+<li><a class="reference internal" href="#tar-examples">12.5.3. 例</a></li>
+<li><a class="reference internal" href="#tar">12.5.4. サポートされる tar のフォーマット</a></li>
+<li><a class="reference internal" href="#unicode">12.5.5. Unicode に関する問題</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="zipfile.html"
+                        title="前の章へ">12.4. <tt class="docutils literal docutils literal"><span class="pre">zipfile</span></tt> &#8212; ZIP アーカイブの処理</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="fileformats.html"
+                        title="次の章へ">13. ファイルフォーマット</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/tarfile.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-tarfile">
+<span id="tarfile-tar"></span><span id="tarfile-mod"></span><h1>12.5. <a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> &#8212; tar アーカイブファイルを読み書きする<a class="headerlink" href="#module-tarfile" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+<p><a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> モジュールは、gzipやbz2圧縮されたものも含めて、tarアーカイブの読み書きができます。
+(<tt class="file docutils literal"><span class="pre">.zip</span></tt> ファイルの読み書きは <a class="reference internal" href="zipfile.html#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a> モジュールで可能です。)</p>
+<p>いくつかの事実と外観：</p>
+<ul class="simple">
+<li><a class="reference internal" href="gzip.html#module-gzip" title="gzip: ファイルオブジェクトを用いた gzip  圧縮および解凍のためのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">gzip</span></tt></a> と <a class="reference internal" href="bz2.html#module-bz2" title="bz2: bzip2 互換の圧縮／解凍ルーチンへのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">bz2</span></tt></a> で圧縮されたアーカイブを読み書きします。</li>
+</ul>
+<ul class="simple">
+<li>POSIX.1-1988 (ustar) フォーマットの読み書きをサポートしています。</li>
+</ul>
+<ul class="simple">
+<li><em>longname</em>, <em>longlink</em> 拡張を含めた、GNU tarフォーマットの読み書きをサポートしています。
+<em>sparse</em> 拡張は読み込みのみサポートしています。</li>
+</ul>
+<ul>
+<li><p class="first">POSIX.1-2001 (pax) フォーマットの読み書きをサポートしています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</li>
+</ul>
+<ul class="simple">
+<li>ディレクトリ、普通のファイル、ハードリンク、シンボリックリンク、fifo、キャラクタデバイスおよびブロックデバイスを処理します。また、タイムスタンプ、アクセス許可およびオーナーのようなファイル情報の取得および保存が可能です。</li>
+</ul>
+<dl class="function">
+<dt id="tarfile.open">
+<tt class="descclassname">tarfile.</tt><tt class="descname">open</tt><big>(</big><em>name=None</em>, <em>mode='r'</em>, <em>fileobj=None</em>, <em>bufsize=10240</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#tarfile.open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名 <em>name</em> の <a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトを返します。
+<a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトと、利用出来るキーワード引数に関する詳細な情報については、
+<a class="reference internal" href="#tarfile-objects"><em>TarFile オブジェクト</em></a> 節を参照してください。</p>
+<p><em>mode</em> は <tt class="docutils literal"><span class="pre">'filemode[:compression]'</span></tt> の形式をとる文字列でなければなりません。デフォルトの値は <tt class="docutils literal"><span class="pre">'r'</span></tt>
+です。以下に <em>mode</em> のとりうる組み合わせ全てを示します。</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">mode</th>
+<th class="head">動作</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'r'</span> <span class="pre">または</span> <span class="pre">'r:*'</span></tt></td>
+<td>圧縮方法に関して透過的に、読み込み用にオープンします(推奨)。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'r:'</span></tt></td>
+<td>非圧縮で読み込み用に排他的にオープンします。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'r:gz'</span></tt></td>
+<td>gzip 圧縮で読み込み用にオープンします。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'r:bz2'</span></tt></td>
+<td>bzip2 圧縮で読み込み用にオープンします。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'a'</span> <span class="pre">または</span> <span class="pre">'a:'</span></tt></td>
+<td>非圧縮で追加用にオープンします。ファイルが存在しない場合は新たに作成されます。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'w'</span> <span class="pre">または</span> <span class="pre">'w:'</span></tt></td>
+<td>非圧縮で書き込み用にオープンします。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'w:gz'</span></tt></td>
+<td>gzip 圧縮で書き込み用にオープンします。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'w:bz2'</span></tt></td>
+<td>bzip2 圧縮で書き込み用にオープンします。</td>
+</tr>
+</tbody>
+</table>
+<p><tt class="docutils literal"><span class="pre">'a:gz'</span></tt> あるいは <tt class="docutils literal"><span class="pre">'a:bz2'</span></tt> は可能ではないことに注意して下さい。もし
+<em>mode</em> が、ある(圧縮した)ファイルを読み込み用にオープンするのに適していないなら、 <a class="reference internal" href="#tarfile.ReadError" title="tarfile.ReadError"><tt class="xref py py-exc docutils literal"><span class="pre">ReadError</span></tt></a> が発生します。これを防ぐには
+<em>mode</em> <tt class="docutils literal"><span class="pre">'r'</span></tt> を使って下さい。もし圧縮メソッドがサポートされていなければ、 <a class="reference internal" href="#tarfile.CompressionError" title="tarfile.CompressionError"><tt class="xref py py-exc docutils literal"><span class="pre">CompressionError</span></tt></a> が発生します。</p>
+<p>もし <em>fileobj</em> が指定されていれば、それは <em>name</em> でオープンされたファイルオブジェクトの代替として使うことができます。そのファイルオブジェクトの位置が0にあることを前提に動作します。</p>
+<p>特別な目的のために、 <em>mode</em> の2番目の形式: <tt class="docutils literal"><span class="pre">'ファイルモード|[圧縮]'</span></tt> があります。この形式を使うと、
+<a class="reference internal" href="#tarfile.open" title="tarfile.open"><tt class="xref py py-func docutils literal"><span class="pre">tarfile.open()</span></tt></a> が返すのはデータをブロックからなるストリームとして扱う <a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトになります。この場合、ファイルに対してランダムな seek を行えなくなります。 <em>fileobj</em> を指定する場合、 <tt class="docutils literal"><span class="pre">read()</span></tt> および <tt class="docutils literal"><span class="pre">write()</span></tt>
+メソッドを持つ任意のオブジェクトにできます。 <em>bufsize</em> にはブロックサイズを指定します。デフォルトは <tt class="docutils literal"><span class="pre">20</span> <span class="pre">*</span> <span class="pre">512</span></tt>
+バイトです。 <tt class="docutils literal"><span class="pre">sys.stdin</span></tt> 、ソケットファイルオブジェクト、テープデバイスと組み合わせる場合にはこの形式を使ってください。ただし、このような <a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトにはランダムアクセスを行えないという制限があります。
+<a class="reference internal" href="#tar-examples"><em>例</em></a> 節を参照してください。現在可能なモードは：</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">モード</th>
+<th class="head">動作</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'r|*'</span></tt></td>
+<td>tar ブロックの <em>ストリーム</em> を 圧縮方法に関して透過的に読み込み用にオープンします。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'r|'</span></tt></td>
+<td>非圧縮 tar ブロックの <em>ストリーム</em> を読み込み用にオープンします。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'r|gz'</span></tt></td>
+<td>gzip 圧縮の <em>ストリーム</em> を読み込み用にオープンします。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'r|bz2'</span></tt></td>
+<td>bzip2 圧縮の <em>ストリーム</em> を読み込み用にオープンします。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'w|'</span></tt></td>
+<td>非圧縮の <em>ストリーム</em> を書き込み用にオープンします。</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">'w|gz'</span></tt></td>
+<td>gzip 圧縮の <em>ストリーム</em> を書き込み用にオープンします。</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">'w|bz2'</span></tt></td>
+<td>bzip2 圧縮の <em>ストリーム</em> を書き込み用にオープンします。</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="tarfile.TarFile">
+<em class="property">class </em><tt class="descclassname">tarfile.</tt><tt class="descname">TarFile</tt><a class="headerlink" href="#tarfile.TarFile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>tar アーカイブを読んだり、書いたりするためのクラスです。このクラスを直接使わず、代わりに <a class="reference internal" href="#tarfile.open" title="tarfile.open"><tt class="xref py py-func docutils literal"><span class="pre">tarfile.open()</span></tt></a> を使ってください。
+<a class="reference internal" href="#tarfile-objects"><em>TarFile オブジェクト</em></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tarfile.is_tarfile">
+<tt class="descclassname">tarfile.</tt><tt class="descname">is_tarfile</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#tarfile.is_tarfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>もし <em>name</em> が tar アーカイブファイルであり、 <a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> モジュールで読み出せる場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tarfile.TarFileCompat">
+<em class="property">class </em><tt class="descclassname">tarfile.</tt><tt class="descname">TarFileCompat</tt><big>(</big><em>filename</em>, <em>mode='r'</em>, <em>compression=TAR_PLAIN</em><big>)</big><a class="headerlink" href="#tarfile.TarFileCompat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="zipfile.html#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a> 風なインターフェースを持つ tar アーカイブへの制限されたアクセスのためのクラスです。詳細は
+<a class="reference internal" href="zipfile.html#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a> のドキュメントを参照してください。 <em>compression</em> は、以下の定数のどれかでなければなりません：</p>
+<dl class="data">
+<dt id="tarfile.TarFileCompat.TAR_PLAIN">
+<tt class="descname">TAR_PLAIN</tt><a class="headerlink" href="#tarfile.TarFileCompat.TAR_PLAIN" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>非圧縮 tar アーカイブのための定数。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tarfile.TarFileCompat.TAR_GZIPPED">
+<tt class="descname">TAR_GZIPPED</tt><a class="headerlink" href="#tarfile.TarFileCompat.TAR_GZIPPED" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="gzip.html#module-gzip" title="gzip: ファイルオブジェクトを用いた gzip  圧縮および解凍のためのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">gzip</span></tt></a> 圧縮 tar アーカイブのための定数。</p>
+</dd></dl>
+
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃: </span><a class="reference internal" href="#tarfile.TarFileCompat" title="tarfile.TarFileCompat"><tt class="xref py py-class docutils literal"><span class="pre">TarFileCompat</span></tt></a> クラスは、 Python 3.0 で削除されるので、非推奨になりました。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tarfile.TarError">
+<em class="property">exception </em><tt class="descclassname">tarfile.</tt><tt class="descname">TarError</tt><a class="headerlink" href="#tarfile.TarError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>すべての <a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> 例外のための基本クラスです。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tarfile.ReadError">
+<em class="property">exception </em><tt class="descclassname">tarfile.</tt><tt class="descname">ReadError</tt><a class="headerlink" href="#tarfile.ReadError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>tar アーカイブがオープンされた時、 <a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> モジュールで操作できないか、あるいは何か無効であるとき発生します。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tarfile.CompressionError">
+<em class="property">exception </em><tt class="descclassname">tarfile.</tt><tt class="descname">CompressionError</tt><a class="headerlink" href="#tarfile.CompressionError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>圧縮方法がサポートされていないか、あるいはデータを正しくデコードできない時に発生します。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tarfile.StreamError">
+<em class="property">exception </em><tt class="descclassname">tarfile.</tt><tt class="descname">StreamError</tt><a class="headerlink" href="#tarfile.StreamError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ストリーム風の <a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトで典型的な制限のために発生します。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tarfile.ExtractError">
+<em class="property">exception </em><tt class="descclassname">tarfile.</tt><tt class="descname">ExtractError</tt><a class="headerlink" href="#tarfile.ExtractError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarFile.extract" title="tarfile.TarFile.extract"><tt class="xref py py-meth docutils literal"><span class="pre">TarFile.extract()</span></tt></a> を使った時に <em>致命的でない</em> エラーに対して発生します。ただし <tt class="xref py py-attr docutils literal"><span class="pre">TarFile.errorlevel</span></tt><tt class="docutils literal"><span class="pre">==</span> <span class="pre">2</span></tt> の場合に限ります。</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tarfile.HeaderError">
+<em class="property">exception </em><tt class="descclassname">tarfile.</tt><tt class="descname">HeaderError</tt><a class="headerlink" href="#tarfile.HeaderError" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarInfo.frombuf" title="tarfile.TarInfo.frombuf"><tt class="xref py py-meth docutils literal"><span class="pre">TarInfo.frombuf()</span></tt></a> メソッドが、バッファが不正だったときに送出します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<p>以下の各定数は、 <a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> モジュールが作成できるtarアーカイブフォーマットを定義しています。詳細は、 <a class="reference internal" href="#tar-formats"><em>サポートされる tar のフォーマット</em></a> を参照してください。</p>
+<dl class="data">
+<dt id="tarfile.USTAR_FORMAT">
+<tt class="descclassname">tarfile.</tt><tt class="descname">USTAR_FORMAT</tt><a class="headerlink" href="#tarfile.USTAR_FORMAT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>POSIX.1-1988 (ustar) フォーマット</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tarfile.GNU_FORMAT">
+<tt class="descclassname">tarfile.</tt><tt class="descname">GNU_FORMAT</tt><a class="headerlink" href="#tarfile.GNU_FORMAT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>GNU tar フォーマット</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tarfile.PAX_FORMAT">
+<tt class="descclassname">tarfile.</tt><tt class="descname">PAX_FORMAT</tt><a class="headerlink" href="#tarfile.PAX_FORMAT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>POSIX.1-2001 (pax) フォーマット</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="tarfile.DEFAULT_FORMAT">
+<tt class="descclassname">tarfile.</tt><tt class="descname">DEFAULT_FORMAT</tt><a class="headerlink" href="#tarfile.DEFAULT_FORMAT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブを作成する際のデフォルトのフォーマット。現在は <a class="reference internal" href="#tarfile.GNU_FORMAT" title="tarfile.GNU_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">GNU_FORMAT</span></tt></a></p>
+</dd></dl>
+
+<p>以下のモジュールレベル変数が利用できます。</p>
+<dl class="data">
+<dt id="tarfile.ENCODING">
+<tt class="descclassname">tarfile.</tt><tt class="descname">ENCODING</tt><a class="headerlink" href="#tarfile.ENCODING" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デフォルト文字エンコーディング。
+<a class="reference internal" href="sys.html#sys.getfilesystemencoding" title="sys.getfilesystemencoding"><tt class="xref py py-func docutils literal"><span class="pre">sys.getfilesystemencoding()</span></tt></a> か <a class="reference internal" href="sys.html#sys.getdefaultencoding" title="sys.getdefaultencoding"><tt class="xref py py-func docutils literal"><span class="pre">sys.getdefaultencoding()</span></tt></a>
+のどちらかの値。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="docutils">
+<dt>Module <a class="reference internal" href="zipfile.html#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a></dt>
+<dd><a class="reference internal" href="zipfile.html#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a> 標準モジュールのドキュメント。</dd>
+</dl>
+<dl class="last docutils">
+<dt><a class="reference external" href="http://www.gnu.org/software/tar/manual/html_node/Standard.html">GNU tar マニュアル, 基本 Tar 形式</a></dt>
+<dd>GNU tar 拡張機能を含む、 tar アーカイブファイルのためのドキュメント。</dd>
+</dl>
+</div>
+<div class="section" id="tarfile">
+<span id="tarfile-objects"></span><h2>12.5.1. TarFile オブジェクト<a class="headerlink" href="#tarfile" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトは、tar アーカイブへのインターフェースを提供します。 tar
+アーカイブは一連のブロックです。アーカイブメンバー(保存されたファイル)は、ヘッダーブロックとそれに続くデータブロックから構成されています。ある tar
+アーカイブにファイルを何回も保存することができます。各アーカイブメンバーは、 <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a>
+オブジェクトによって表わされます、詳細については <a class="reference internal" href="#tarinfo-objects"><em>TarInfo オブジェクト</em></a> を参照してください。</p>
+<p><a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトは <a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文によりコンテキストマネージャーとして利用できます。 with ブロックが終了したときにオブジェクトは close されます。例外が発生した時、内部で利用されているファイルオブジェクトのみが close され、開かれたアーカイブは終了されないことに注意してください。
+<a class="reference internal" href="#tar-examples"><em>例</em></a> セクションにあるユースケースを参照してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加: </span>コンテキストマネージャープロトコルがサポートされました。</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">tarfile.</tt><tt class="descname">TarFile</tt><big>(</big><em>name=None</em>, <em>mode='r'</em>, <em>fileobj=None</em>, <em>format=DEFAULT_FORMAT</em>, <em>tarinfo=TarInfo</em>, <em>dereference=False</em>, <em>ignore_zeros=False</em>, <em>encoding=ENCODING</em>, <em>errors=None</em>, <em>pax_headers=None</em>, <em>debug=0</em>, <em>errorlevel=0</em><big>)</big></dt>
+<dd><p>以下の全ての引数はオプションで、インスタンス属性としてもアクセスすることができます。</p>
+<p><em>name</em> はアーカイブのパス名。 <em>fileobj</em> が渡された場合は省略可能。その場合、ファイルオブジェクトの <tt class="xref py py-attr docutils literal"><span class="pre">name</span></tt> 属性があれば、それを利用します。</p>
+<p><em>mode</em> は、既存のアーカイブファールから読み込むための <tt class="docutils literal"><span class="pre">'r'</span></tt>,
+既存のアーカイブファイルに追記するための <tt class="docutils literal"><span class="pre">'a'</span></tt>,
+既存のファイルがあれば上書きして新しいファイルを作成する <tt class="docutils literal"><span class="pre">'w'</span></tt>
+のいずれかです。</p>
+<p>もし <em>fileobj</em> が与えられていれば、それを使ってデータを読み書きします。もしそれが決定できれば、 <em>mode</em> は <em>fileobj</em>
+のモードで上書きされます。
+<em>fileobj</em> は位置0から利用されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> をクローズする時に、 <em>fileobj</em> はクローズされません。</p>
+</div>
+<p><em>format</em> はアーカイブのフォーマットを制御します。モジュールレベルで定義されている、 <a class="reference internal" href="#tarfile.USTAR_FORMAT" title="tarfile.USTAR_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">USTAR_FORMAT</span></tt></a>, <a class="reference internal" href="#tarfile.GNU_FORMAT" title="tarfile.GNU_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">GNU_FORMAT</span></tt></a>, <a class="reference internal" href="#tarfile.PAX_FORMAT" title="tarfile.PAX_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">PAX_FORMAT</span></tt></a>
+のいずれかである必要があります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p><em>tarinfo</em> 引数を利用して、デフォルトの <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> クラスを別のクラスで置き換えられます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p><em>dereference</em> が <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> だった場合、シンボリックリンクやハードリンクがアーカイブに追加されます。
+<a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> だった場合、リンクのターゲットとなるファイルの内容がアーカイブに追加されます。シンボリックリンクをサポートしていないシステムでは効果がありません。</p>
+<p><em>ignore_zeros</em> が <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> だった場合、空ブロックをアーカイブの終端だと扱います。
+<a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> だった場合、空の(無効な)ブロックをスキップして、可能な限り多くのメンバを取得しようとします。このオプションは、連結(concatenate)されたり、壊れたアーカイブファイルを扱うときにのみ、意味があります。</p>
+<p><em>debug</em> は <tt class="docutils literal"><span class="pre">0</span></tt> (デバッグメッセージ無し)から <tt class="docutils literal"><span class="pre">3</span></tt> (全デバッグメッセージ)
+まで設定できます。このメッセージは <tt class="docutils literal"><span class="pre">sys.stderr</span></tt> に書き込まれます。</p>
+<p><em>errorlevel</em> が <tt class="docutils literal"><span class="pre">0</span></tt> の場合、 <a class="reference internal" href="#tarfile.TarFile.extract" title="tarfile.TarFile.extract"><tt class="xref py py-meth docutils literal"><span class="pre">TarFile.extract()</span></tt></a> 使用時に全てのエラーが無視されます。エラーが無視された場合でも、 <em>debug</em> が有効であれば、エラーメッセージは出力されます。
+<tt class="docutils literal"><span class="pre">1</span></tt> の場合、全ての <em>致命的な(fatal)</em> エラーは <a class="reference internal" href="exceptions.html#exceptions.OSError" title="exceptions.OSError"><tt class="xref py py-exc docutils literal"><span class="pre">OSError</span></tt></a> か <a class="reference internal" href="exceptions.html#exceptions.IOError" title="exceptions.IOError"><tt class="xref py py-exc docutils literal"><span class="pre">IOError</span></tt></a> を送出します。
+<tt class="docutils literal"><span class="pre">2</span></tt> の場合、全ての <em>致命的でない(non-fatal)</em> エラーも <a class="reference internal" href="#tarfile.TarError" title="tarfile.TarError"><tt class="xref py py-exc docutils literal"><span class="pre">TarError</span></tt></a> 例外として送出されます。</p>
+<p><em>encoding</em> と <em>errors</em> 引数は、文字列と unicode オブジェクトとの間の相互変換方法を指定します。デフォルトの設定で、ほとんどのユーザーでうまく動作するでしょう。詳しい情報は、 <a class="reference internal" href="#tar-unicode"><em>Unicode に関する問題</em></a> 節を参照してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p><em>pax_headers</em> 引数は、オプションの、 unicode 文字列の辞書で、 <em>format</em> が <a class="reference internal" href="#tarfile.PAX_FORMAT" title="tarfile.PAX_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">PAX_FORMAT</span></tt></a>
+だった場合に pax グローバルヘッダに追加されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.open">
+<tt class="descclassname">TarFile.</tt><tt class="descname">open</tt><big>(</big><em>...</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.open" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>代替コンストラクタです。モジュールレベルでの <a class="reference internal" href="#tarfile.open" title="tarfile.open"><tt class="xref py py-func docutils literal"><span class="pre">tarfile.open()</span></tt></a>
+関数は、実際はこのクラスメソッドへのショートカットです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.getmember">
+<tt class="descclassname">TarFile.</tt><tt class="descname">getmember</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.getmember" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メンバー <em>name</em> に対する <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトを返します。もし
+<em>name</em> がアーカイブに見つからなければ、 <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> が発生します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">アーカイブ内にメンバーが複数ある場合は、最後に出現するものが最新のバージョンとみなされます。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.getmembers">
+<tt class="descclassname">TarFile.</tt><tt class="descname">getmembers</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarFile.getmembers" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> アーカイブのメンバーをオブジェクトのリストとして返します。このリストはアーカイブ内のメンバーと同じ順番です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.getnames">
+<tt class="descclassname">TarFile.</tt><tt class="descname">getnames</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarFile.getnames" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メンバーをその名前のリストとして返します。これは <a class="reference internal" href="#tarfile.TarFile.getmembers" title="tarfile.TarFile.getmembers"><tt class="xref py py-meth docutils literal"><span class="pre">getmembers()</span></tt></a> で返されるリストと同じ順番です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.list">
+<tt class="descclassname">TarFile.</tt><tt class="descname">list</tt><big>(</big><em>verbose=True</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.list" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>目次を <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> に表示します。もし <em>verbose</em> が <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a>
+であれば、メンバー名のみ表示します。 <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> であれば、 <tt class="docutils literal"><span class="pre">&quot;ls</span> <span class="pre">-l&quot;</span></tt> に似た出力を生成します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.next">
+<tt class="descclassname">TarFile.</tt><tt class="descname">next</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarFile.next" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> が読み込み用にオープンされている時、アーカイブの次のメンバーを
+<a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトとして返します。もしそれ以上利用可能なものがなければ、 <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.extractall">
+<tt class="descclassname">TarFile.</tt><tt class="descname">extractall</tt><big>(</big><em>path=&quot;.&quot;</em>, <em>members=None</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.extractall" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>全てのメンバーをアーカイブから現在の作業ディレクトリーまたは <em>path</em> に抽出します。オプションの <em>members</em> が与えられるときには、
+<a class="reference internal" href="#tarfile.TarFile.getmembers" title="tarfile.TarFile.getmembers"><tt class="xref py py-meth docutils literal"><span class="pre">getmembers()</span></tt></a> で返されるリストの一部でなければなりません。所有者、変更時刻、パーミッションのようなディレクトリー情報は全てのメンバーが抽出された後にセットされます。これは二つの問題を回避するためです。一つはディレクトリーの変更時刻はその中にファイルが作成されるたびにリセットされるということ。もう一つは、ディレクトリーに書き込み許可がなければその中のファイル抽出は失敗してしまうということです。</p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">内容を信頼できないtarアーカイブを、事前の内部チェック前に展開してはいけません。ファイルが <em>path</em> の外側に作られる可能性があります。例えば、 <tt class="docutils literal"><span class="pre">&quot;/&quot;</span></tt> で始まる絶対パスのファイル名や、2重ドット <tt class="docutils literal"><span class="pre">&quot;..&quot;</span></tt>
+で始まるパスのファイル名です。</p>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.extract">
+<tt class="descclassname">TarFile.</tt><tt class="descname">extract</tt><big>(</big><em>member</em>, <em>path=&quot;&quot;</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.extract" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メンバーをアーカイブから現在の作業ディレクトリに、その完全名を使って抽出します。ファイル情報はできるだけ正確に抽出されます。
+<em>member</em> は、ファイル名でも <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトでも構いません。
+<em>path</em> を使って、異なるディレクトリを指定することができます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="#tarfile.TarFile.extract" title="tarfile.TarFile.extract"><tt class="xref py py-meth docutils literal"><span class="pre">extract()</span></tt></a> メソッドは幾つかの展開に関する問題を扱いません。殆どの場合、 <a class="reference internal" href="#tarfile.TarFile.extractall" title="tarfile.TarFile.extractall"><tt class="xref py py-meth docutils literal"><span class="pre">extractall()</span></tt></a> メソッドの利用を考慮するべきです。</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last"><a class="reference internal" href="#tarfile.TarFile.extractall" title="tarfile.TarFile.extractall"><tt class="xref py py-meth docutils literal"><span class="pre">extractall()</span></tt></a> の警告(warning)を参照</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.extractfile">
+<tt class="descclassname">TarFile.</tt><tt class="descname">extractfile</tt><big>(</big><em>member</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.extractfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブからメンバーをオブジェクトとして抽出します。 <em>member</em> は、ファイル名あるいは <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトです。もし
+<em>member</em> が普通のファイルであれば、ファイル風のオブジェクトを返します。もし
+<em>member</em> がリンクであれば、ファイル風のオブジェクトをリンクのターゲットから構成します。もし <em>member</em> が上のどれでもなければ、
+<a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> が返されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">ファイル風のオブジェクトは読み出し専用です。このオブジェクトは
+<tt class="xref py py-meth docutils literal"><span class="pre">read()</span></tt>, <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a>, <tt class="xref py py-meth docutils literal"><span class="pre">readlines()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">seek()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">tell()</span></tt>, <a class="reference internal" href="#tarfile.TarFile.close" title="tarfile.TarFile.close"><tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt></a>. の各メソッドを提供し、行に対するイテレーションをサポートします。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.add">
+<tt class="descclassname">TarFile.</tt><tt class="descname">add</tt><big>(</big><em>name</em>, <em>arcname=None</em>, <em>recursive=True</em>, <em>exclude=None</em>, <em>filter=None</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.add" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル <em>name</em> をアーカイブに追加します。
+<em>name</em> は、任意のファイルタイプ (ディレクトリ、fifo、シンボリックリンク等)です。もし <em>arcname</em> が与えられていれば、それはアーカイブ内のファイルの代替名を指定します。デフォルトではディレクトリは再帰的に追加されます。これは、 <em>recursive</em> を <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> に設定することで避けることができます。
+<em>exclude</em> を指定する場合、それは1つのファイル名を引数にとってブール値を返す関数である必要があります。この関数の戻り値が <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> の場合、そのファイルが除外されます。
+<a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> の場合、そのファイルは追加されます。
+<em>filter</em> を指定する場合、それは <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトを引数として受け取り、操作した <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトを返す関数でなければなりません。代わりに <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を返した場合、 <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトはアーカイブから除外されます。
+<a class="reference internal" href="#tar-examples"><em>例</em></a> にある例を参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><em>exclude</em> 引数が追加されました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span><em>filter</em> 引数が追加されました。</p>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.7 で撤廃: </span><em>exclude</em> 引数は廃止予定です。代わりに <em>filter</em> 引数を利用してください。
+将来 <em>exclude</em> 引数が削除されたときに互換性を保つため、
+<em>filter</em> は位置引数ではなくてキーワード引数として利用するべきです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.addfile">
+<tt class="descclassname">TarFile.</tt><tt class="descname">addfile</tt><big>(</big><em>tarinfo</em>, <em>fileobj=None</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.addfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクト <em>tarinfo</em> をアーカイブに追加します。もし <em>fileobj</em>
+が与えられていれば、 <tt class="docutils literal"><span class="pre">tarinfo.size</span></tt>  バイトがそれから読まれ、アーカイブに追加されます。 <a class="reference internal" href="#tarfile.TarFile.gettarinfo" title="tarfile.TarFile.gettarinfo"><tt class="xref py py-meth docutils literal"><span class="pre">gettarinfo()</span></tt></a> を使って
+<a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトを作成することができます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">Windows プラットフォームでは、 <em>fileobj</em> は、ファイルサイズに関する問題を避けるために、常に、モード <tt class="docutils literal"><span class="pre">'rb'</span></tt>
+でオープンされるべきです。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.gettarinfo">
+<tt class="descclassname">TarFile.</tt><tt class="descname">gettarinfo</tt><big>(</big><em>name=None</em>, <em>arcname=None</em>, <em>fileobj=None</em><big>)</big><a class="headerlink" href="#tarfile.TarFile.gettarinfo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル <em>name</em> あるいはファイルオブジェクト <em>fileobj</em> のどちらかに対して
+(そのファイル記述子に <tt class="docutils literal"><span class="pre">os.fstat()</span></tt> を使って) <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトを作成します。
+<a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> の属性のいくつかは、 <a class="reference internal" href="#tarfile.TarFile.addfile" title="tarfile.TarFile.addfile"><tt class="xref py py-meth docutils literal"><span class="pre">addfile()</span></tt></a> を使って追加する前に修正することができます。もし <em>arcname</em> が与えられていれば、アーカイブ内のファイルの代替名を指定します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarFile.close">
+<tt class="descclassname">TarFile.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarFile.close" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> をクローズします。書き出しモードでは、完了ゼロブロックが 2つ、アーカイブに追加されます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarFile.posix">
+<tt class="descclassname">TarFile.</tt><tt class="descname">posix</tt><a class="headerlink" href="#tarfile.TarFile.posix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この値を <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> にすることは、 <a class="reference internal" href="functions.html#format" title="format"><tt class="xref py py-attr docutils literal"><span class="pre">format</span></tt></a> を <a class="reference internal" href="#tarfile.USTAR_FORMAT" title="tarfile.USTAR_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">USTAR_FORMAT</span></tt></a> にすることと同じです。この値を <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> にすることは、 <a class="reference internal" href="functions.html#format" title="format"><tt class="xref py py-attr docutils literal"><span class="pre">format</span></tt></a> を <a class="reference internal" href="#tarfile.GNU_FORMAT" title="tarfile.GNU_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">GNU_FORMAT</span></tt></a> にすることと同じです。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span><em>posix</em> のデフォルト値が <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> になりました.</p>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.6 で撤廃: </span>代わりに <a class="reference internal" href="functions.html#format" title="format"><tt class="xref py py-attr docutils literal"><span class="pre">format</span></tt></a> 属性を利用してください。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarFile.pax_headers">
+<tt class="descclassname">TarFile.</tt><tt class="descname">pax_headers</tt><a class="headerlink" href="#tarfile.TarFile.pax_headers" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>pax グローバルヘッダに含まれる key-value ペアの辞書</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+</div>
+<div class="section" id="tarinfo">
+<span id="tarinfo-objects"></span><h2>12.5.2. TarInfo オブジェクト<a class="headerlink" href="#tarinfo" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトは <a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> の一つのメンバーを表します。ファイルに必要な(ファイルタイプ、ファイルサイズ、時刻、パーミッション、所有者等のような)すべての属性を保存する他に、そのタイプを決定するのに役に立ついくつかのメソッドを提供します。これにはファイルのデータそのものは <em>含まれません</em> 。</p>
+<p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトは <tt class="docutils literal"><span class="pre">TarFile</span></tt> のメソッド <tt class="docutils literal"><span class="pre">getmember()</span></tt> 、 <tt class="docutils literal"><span class="pre">getmembers()</span></tt> および
+<tt class="docutils literal"><span class="pre">gettarinfo()</span></tt> によって返されます。</p>
+<dl class="class">
+<dt id="tarfile.TarInfo">
+<em class="property">class </em><tt class="descclassname">tarfile.</tt><tt class="descname">TarInfo</tt><big>(</big><em>name=&quot;&quot;</em><big>)</big><a class="headerlink" href="#tarfile.TarInfo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトを作成します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.frombuf">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">frombuf</tt><big>(</big><em>buf</em><big>)</big><a class="headerlink" href="#tarfile.TarInfo.frombuf" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトを文字列バッファ <em>buf</em> から作成して返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加: </span>バッファが不正な場合は、 <a class="reference internal" href="#tarfile.HeaderError" title="tarfile.HeaderError"><tt class="xref py py-exc docutils literal"><span class="pre">HeaderError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.fromtarfile">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">fromtarfile</tt><big>(</big><em>tarfile</em><big>)</big><a class="headerlink" href="#tarfile.TarInfo.fromtarfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> オブジェクトの <em>tarfile</em> から、次のメンバを読み込んで、それを
+<a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトとして返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.tobuf">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">tobuf</tt><big>(</big><em>format=DEFAULT_FORMAT</em>, <em>encoding=ENCODING</em>, <em>errors='strict'</em><big>)</big><a class="headerlink" href="#tarfile.TarInfo.tobuf" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトから文字列バッファを作成します。引数についての情報は、 <a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> クラスのコンストラクタを参照してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>引数が追加されました。</p>
+</dd></dl>
+
+<p><tt class="docutils literal"><span class="pre">TarInfo</span></tt> オブジェクトには以下の public なデータ属性があります：</p>
+<dl class="attribute">
+<dt id="tarfile.TarInfo.name">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">name</tt><a class="headerlink" href="#tarfile.TarInfo.name" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アーカイブメンバーの名前。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.size">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">size</tt><a class="headerlink" href="#tarfile.TarInfo.size" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バイト単位でのサイズ。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.mtime">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">mtime</tt><a class="headerlink" href="#tarfile.TarInfo.mtime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最終更新時刻。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.mode">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">mode</tt><a class="headerlink" href="#tarfile.TarInfo.mode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>許可ビット。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.type">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">type</tt><a class="headerlink" href="#tarfile.TarInfo.type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルタイプです。 <em>type</em> は普通、以下の定数: <tt class="xref py py-const docutils literal"><span class="pre">REGTYPE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">AREGTYPE</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">LNKTYPE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">SYMTYPE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">DIRTYPE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">FIFOTYPE</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">CONTTYPE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">CHRTYPE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">BLKTYPE</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">GNUTYPE_SPARSE</span></tt>
+のいずれかです。 <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトのタイプをもっと簡単に決定するには、下記の <tt class="docutils literal"><span class="pre">is_*()</span></tt> メソッドを使って下さい。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.linkname">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">linkname</tt><a class="headerlink" href="#tarfile.TarInfo.linkname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ターゲットファイル名の名前で、これはタイプ <tt class="xref py py-const docutils literal"><span class="pre">LNKTYPE</span></tt> と  <tt class="xref py py-const docutils literal"><span class="pre">SYMTYPE</span></tt>
+の <a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトにだけ存在します。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.uid">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">uid</tt><a class="headerlink" href="#tarfile.TarInfo.uid" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルメンバを保存した元のユーザのユーザ ID です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.gid">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">gid</tt><a class="headerlink" href="#tarfile.TarInfo.gid" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルメンバを保存した元のユーザのグループ ID です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.uname">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">uname</tt><a class="headerlink" href="#tarfile.TarInfo.uname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルメンバを保存した元のユーザのユーザ名です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.gname">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">gname</tt><a class="headerlink" href="#tarfile.TarInfo.gname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルメンバを保存した元のユーザのグループ名です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tarfile.TarInfo.pax_headers">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">pax_headers</tt><a class="headerlink" href="#tarfile.TarInfo.pax_headers" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>pax 拡張ヘッダに関連付けられた、 key-value ペアの辞書。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<p><a class="reference internal" href="#tarfile.TarInfo" title="tarfile.TarInfo"><tt class="xref py py-class docutils literal"><span class="pre">TarInfo</span></tt></a> オブジェクトは便利な照会用のメソッドもいくつか提供しています:</p>
+<dl class="method">
+<dt id="tarfile.TarInfo.isfile">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">isfile</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.isfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-class docutils literal"><span class="pre">Tarinfo</span></tt> オブジェクトが普通のファイルの場合に、 <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.isreg">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">isreg</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.isreg" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#tarfile.TarInfo.isfile" title="tarfile.TarInfo.isfile"><tt class="xref py py-meth docutils literal"><span class="pre">isfile()</span></tt></a> と同じです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.isdir">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">isdir</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.isdir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ディレクトリの場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.issym">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">issym</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.issym" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>シンボリックリンクの場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.islnk">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">islnk</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.islnk" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ハードリンクの場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.ischr">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">ischr</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.ischr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>キャラクタデバイスの場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.isblk">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">isblk</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.isblk" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックデバイスの場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.isfifo">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">isfifo</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.isfifo" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>FIFO の場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tarfile.TarInfo.isdev">
+<tt class="descclassname">TarInfo.</tt><tt class="descname">isdev</tt><big>(</big><big>)</big><a class="headerlink" href="#tarfile.TarInfo.isdev" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>キャラクタデバイス、ブロックデバイスあるいは FIFOのいずれかの場合に <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tar-examples">
+<span id="id1"></span><h2>12.5.3. 例<a class="headerlink" href="#tar-examples" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>tar アーカイブから現在のディレクトリーに全て抽出する方法</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;sample.tar.gz&quot;</span><span class="p">)</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">()</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>tarアーカイブの一部を、リストの代わりにジェネレータ関数を利用して、
+<a class="reference internal" href="#tarfile.TarFile.extractall" title="tarfile.TarFile.extractall"><tt class="xref py py-meth docutils literal"><span class="pre">TarFile.extractall()</span></tt></a> で展開する方法</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+
+<span class="k">def</span> <span class="nf">py_files</span><span class="p">(</span><span class="n">members</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">tarinfo</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;.py&quot;</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">tarinfo</span>
+
+<span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;sample.tar.gz&quot;</span><span class="p">)</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">members</span><span class="o">=</span><span class="n">py_files</span><span class="p">(</span><span class="n">tar</span><span class="p">))</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>非圧縮 tar アーカイブをファイル名のリストから作成する方法</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;sample.tar&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="s">&quot;bar&quot;</span><span class="p">,</span> <span class="s">&quot;quux&quot;</span><span class="p">]:</span>
+    <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文を利用した同じ例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;sample.tar&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="s">&quot;bar&quot;</span><span class="p">,</span> <span class="s">&quot;quux&quot;</span><span class="p">]:</span>
+        <span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>gzip 圧縮 tar アーカイブを作成してメンバー情報のいくつかを表示する方法</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;sample.tar.gz&quot;</span><span class="p">,</span> <span class="s">&quot;r:gz&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">tarinfo</span> <span class="ow">in</span> <span class="n">tar</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&quot; は大きさが &quot;</span><span class="p">,</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s">&quot;バイトで &quot;</span><span class="p">,</span>
+    <span class="k">if</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isreg</span><span class="p">():</span>
+        <span class="k">print</span> <span class="s">&quot;普通のファイルです。&quot;</span>
+    <span class="k">elif</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+        <span class="k">print</span> <span class="s">&quot;ディレクトリです。&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;ファイル・ディレクトリ以外のものです。&quot;</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#tarfile.TarFile.add" title="tarfile.TarFile.add"><tt class="xref py py-meth docutils literal"><span class="pre">TarFile.add()</span></tt></a> 関数の <em>filter</em> 引数を利用してユーザー情報をリセットしながらアーカイブを作成する例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="n">tarinfo</span><span class="p">):</span>
+    <span class="n">tarinfo</span><span class="o">.</span><span class="n">uid</span> <span class="o">=</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">gid</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tarinfo</span><span class="o">.</span><span class="n">uname</span> <span class="o">=</span> <span class="n">tarinfo</span><span class="o">.</span><span class="n">gname</span> <span class="o">=</span> <span class="s">&quot;root&quot;</span>
+    <span class="k">return</span> <span class="n">tarinfo</span>
+<span class="n">tar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&quot;sample.tar.gz&quot;</span><span class="p">,</span> <span class="s">&quot;w:gz&quot;</span><span class="p">)</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;foo&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">reset</span><span class="p">)</span>
+<span class="n">tar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tar">
+<span id="tar-formats"></span><h2>12.5.4. サポートされる tar のフォーマット<a class="headerlink" href="#tar" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> モジュールは、3つの tar フォーマットを作成することができます。</p>
+<ul class="simple">
+<li>POSIX.1-1988 ustar format (<a class="reference internal" href="#tarfile.USTAR_FORMAT" title="tarfile.USTAR_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">USTAR_FORMAT</span></tt></a>). ファイル名の長さは256文字までで、リンク名の長さは100文字までです。最大のファイルサイズは8GBです。このフォーマットは古くて制限が多いですが、広くサポートされています。</li>
+</ul>
+<ul class="simple">
+<li>GNU tar format (<a class="reference internal" href="#tarfile.GNU_FORMAT" title="tarfile.GNU_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">GNU_FORMAT</span></tt></a>). 長いファイル名とリンク名、8GBを超えるファイルやスパース(sparse)ファイルをサポートしています。これは GNU/Linux システムにおいて、デ・ファクト・スタンダードになっています。
+<a class="reference internal" href="#module-tarfile" title="tarfile: tar-形式のアーカイブファイルを読み書きします。"><tt class="xref py py-mod docutils literal"><span class="pre">tarfile</span></tt></a> モジュールは長いファイル名を完全にサポートしています。スパースファイルは読み込みのみサポートしています。</li>
+</ul>
+<ul>
+<li><p class="first">The POSIX.1-2001 pax format (<a class="reference internal" href="#tarfile.PAX_FORMAT" title="tarfile.PAX_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">PAX_FORMAT</span></tt></a>).
+一番柔軟性があり、ほぼ制限が無いフォーマットです。長いファイル名やリンク名、大きいファイルをサポートし、パス名をポータブルな方法で保存します。しかし、現在のところ、全ての tar の実装が pax フォーマットを正しく扱えるわけではありません。</p>
+<p><em>pax</em> フォーマットは既存の <em>ustar</em> フォーマットの拡張です。
+<em>ustar</em> では保存できない情報を追加のヘッダを利用して保存します。
+<em>pax</em> には2種類のヘッダがあります。
+1つ目は拡張ヘッダで、その次のファイルヘッダに影響します。
+2つ目はグローバルヘッダで、アーカイブ全体に対して有効で、それ以降の全てのファイルに影響します。全ての pax ヘッダの内容は、ポータブル性のために <em>UTF-8</em> で保存されます。</p>
+</li>
+</ul>
+<p>他にも、読み込みのみサポートしている tar フォーマットが幾つかあります。</p>
+<ul class="simple">
+<li>ancient V7 format.
+これは Unix 7th Edition から存在する、最初の tar フォーマットです。通常のファイルとディレクトリのみ保存します。名前は100文字を超えてはならず、ユーザー/グループ名に関する情報は保存されません。幾つかのアーカイブは、フィールドがASCIIでない文字を含む場合に、ヘッダのチェックサムの計算を誤っています。</li>
+</ul>
+<ul class="simple">
+<li>The SunOS tar extended format.
+POSIX.1-2001 pax フォーマットの亜流ですが、互換性がありません。</li>
+</ul>
+</div>
+<div class="section" id="unicode">
+<span id="tar-unicode"></span><h2>12.5.5. Unicode に関する問題<a class="headerlink" href="#unicode" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>tarフォーマットはもともと、テープドライブにファイルシステムのバックアップを取る目的で設計されました。現在、tarアーカイブはファイルを配布する場合に一般的に用いられ、ネットワークごしに送受信されます。オリジナルのフォーマットの抱える1つの問題(ほか多くのフォーマットも同じですが)は、文字エンコーディングが異なる環境を考慮していないことです。例えば、通常の <em>UTF-8</em> の環境で作成されたアーカイブは、非ASCII文字を含んでいた場合
+<em>Latin-1</em> のシステムでは正しく読み込むことができません。非ASCII文字を含む名前(ファイル名、リンク名、ユーザー/グループ名)が破壊されます。不幸なことに、アーカイブのエンコーディングを自動検出する方法はありません。</p>
+<p>pax フォーマットはこの問題を解決するように設計されました。このフォーマットは、非ASCII文字の名前を <em>UTF-8</em> で保存します。
+pax アーカイブを読み込むときに、この <em>UTF-8</em> の名前がローカルのファイルシステムのエンコーディングに変換されます。</p>
+<p>unicode 変換の動作は、 <a class="reference internal" href="#tarfile.TarFile" title="tarfile.TarFile"><tt class="xref py py-class docutils literal"><span class="pre">TarFile</span></tt></a> クラスの <em>encoding</em> と <em>errors</em>
+キーワード引数によって制御されます。</p>
+<p><em>encoding</em> のデフォルト値はローカルの文字エンコーディングです。これは <a class="reference internal" href="sys.html#sys.getfilesystemencoding" title="sys.getfilesystemencoding"><tt class="xref py py-func docutils literal"><span class="pre">sys.getfilesystemencoding()</span></tt></a> と <a class="reference internal" href="sys.html#sys.getdefaultencoding" title="sys.getdefaultencoding"><tt class="xref py py-func docutils literal"><span class="pre">sys.getdefaultencoding()</span></tt></a>
+から取得されます。読み込みモードでは、 <em>encoding</em> は pax フォーマット内の unicode
+の名前をローカルの文字エンコーディングに変換するために利用されます。書き込みモードでは、 <em>encoding</em> の扱いは選択されたアーカイブフォーマットに依存します。
+<a class="reference internal" href="#tarfile.PAX_FORMAT" title="tarfile.PAX_FORMAT"><tt class="xref py py-const docutils literal"><span class="pre">PAX_FORMAT</span></tt></a> の場合、入力された非ASCII文字を含む文字は <em>UTF-8</em>
+文字列として保存する前に一旦デコードする必要があるので、そこで <em>encoding</em> が利用されます。それ以外のフォーマットでは、 <em>encoding</em> は、入力された名前に unicode が含まれない限りは利用されません。unicodeが含まれている場合、アーカイブに保存する前に <em>encoding</em>
+でエンコードされます。</p>
+<p><em>errors</em> 引数は、 <em>encoding</em> を利用して変換できない文字の扱いを指定します。利用可能な値は、 <a class="reference internal" href="codecs.html#codec-base-classes"><em>Codec 基底クラス</em></a> 節でリストアップされています。読み込みモードでは、追加の値として <tt class="docutils literal"><span class="pre">'utf-8'</span></tt> を選択することができ、エラーが発生したときは <em>UTF-8</em> を利用することができます。(これがデフォルトです)
+書き込みモードでは、 <em>errors</em> のデフォルト値は <tt class="docutils literal"><span class="pre">'strict'</span></tt> になっていて、名前が気づかないうちに変化することが無いようにしています。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fileformats.html" title="13. ファイルフォーマット"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="zipfile.html" title="12.4. zipfile — ZIP アーカイブの処理"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="archiving.html" >12. データ圧縮とアーカイブ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

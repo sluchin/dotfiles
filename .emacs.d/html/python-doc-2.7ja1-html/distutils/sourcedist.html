@@ -1,0 +1,365 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ソースコード配布物を作成する &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python モジュールの配布" href="index.html" />
+    <link rel="next" title="ビルド済み配布物を作成する" href="builtdist.html" />
+    <link rel="prev" title="setup 設定ファイル (setup configuration file) を書く" href="configfile.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="builtdist.html" title="ビルド済み配布物を作成する"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="configfile.html" title="setup 設定ファイル (setup configuration file) を書く"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python モジュールの配布</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ソースコード配布物を作成する</a><ul>
+<li><a class="reference internal" href="#manifest">配布するファイルを指定する</a></li>
+<li><a class="reference internal" href="#manifest-options">マニフェスト (manifest) 関連のオプション</a></li>
+<li><a class="reference internal" href="#manifest-in">MANIFEST.in テンプレート</a><ul>
+<li><a class="reference internal" href="#id4">原則</a></li>
+<li><a class="reference internal" href="#id5">コマンド</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="configfile.html"
+                        title="前の章へ">setup 設定ファイル (setup configuration file) を書く</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="builtdist.html"
+                        title="次の章へ">ビルド済み配布物を作成する</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/distutils/sourcedist.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="source-dist">
+<span id="id1"></span><h1>ソースコード配布物を作成する<a class="headerlink" href="#source-dist" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="introduction.html#distutils-simple-example"><em>簡単な例</em></a> 節で示したように、ソースコード配布物を作成するには <strong class="command">sdist</strong>
+コマンドを使います。最も単純な例では、</p>
+<div class="highlight-python"><pre>python setup.py sdist</pre>
+</div>
+<p>のようにします (ここでは、 <strong class="command">sdist</strong> に関するオプションを setup スクリプトや設定ファイル中で行っていないものと仮定します)。
+<strong class="command">sdist</strong> は、現在のプラットフォームでのデフォルトのアーカイブ形式でアーカイブを生成します。デフォルトの形式は Unixでは gzip
+で圧縮された tar ファイル形式 (<tt class="file docutils literal"><span class="pre">.tar.gz</span></tt>) で、Windows では ZIP 形式です。</p>
+<p><em class="xref std std-option">--formats</em> オプションを使えば、好きなだけ圧縮形式を指定できます。例えば:</p>
+<div class="highlight-python"><pre>python setup.py sdist --formats=gztar,zip</pre>
+</div>
+<p>は、gzip された tarball と zip ファイルを作成します。利用可能な形式は以下の通りです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="63%" />
+<col width="17%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">形式</th>
+<th class="head">説明</th>
+<th class="head">注記</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">zip</span></tt></td>
+<td>zip ファイル (<tt class="file docutils literal"><span class="pre">.zip</span></tt>)</td>
+<td>(1),(3)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">gztar</span></tt></td>
+<td>gzip 圧縮された tar ファイル
+(<tt class="file docutils literal"><span class="pre">.tar.gz</span></tt>)</td>
+<td>(2)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">bztar</span></tt></td>
+<td>bzip2 圧縮された tar ファイル
+(<tt class="file docutils literal"><span class="pre">.tar.bz2</span></tt>)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ztar</span></tt></td>
+<td>compress 圧縮された tar ファイル
+(<tt class="file docutils literal"><span class="pre">.tar.Z</span></tt>)</td>
+<td>(4)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">tar</span></tt></td>
+<td>tar ファイル (<tt class="file docutils literal"><span class="pre">.tar</span></tt>)</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>注記:</p>
+<ol class="arabic simple">
+<li>Windows でのデフォルトです</li>
+<li>Unixでのデフォルトです</li>
+<li>外部ユーティリティの <strong class="program">zip</strong> か、 <a class="reference internal" href="../library/zipfile.html#module-zipfile" title="zipfile: ZIP-フォーマットのアーカイブファイルを読み書きする"><tt class="xref py py-mod docutils literal"><span class="pre">zipfile</span></tt></a>  モジュールが必要です (Python 1.6 からは標準ライブラリになっています)</li>
+<li>外部ユーティリティ <strong class="program">compress</strong> が必要です。このフォーマットは廃止待ちで、将来のバージョンの Python では削除されるでしょう。</li>
+</ol>
+<p><tt class="docutils literal"><span class="pre">tar</span></tt> フォーマットのどれか (<tt class="docutils literal"><span class="pre">gztar</span></tt>, <tt class="docutils literal"><span class="pre">bztar</span></tt>, <tt class="docutils literal"><span class="pre">ztar</span></tt>, <tt class="docutils literal"><span class="pre">tar</span></tt>) を Unix で利用する時、アーカイブ内の各メンバに設定される <tt class="docutils literal"><span class="pre">owner</span></tt> と <tt class="docutils literal"><span class="pre">group</span></tt> 名を指定することができます。</p>
+<p>例えば、アーカイブ内の全てのファイルの所有者を root にするには、次のようにします。</p>
+<div class="highlight-python"><pre>python setup.py sdist --owner=root --group=root</pre>
+</div>
+<div class="section" id="manifest">
+<span id="id2"></span><h2>配布するファイルを指定する<a class="headerlink" href="#manifest" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>明確なファイルのリスト (またはファイルリストを生成する方法) を明示的に与えなかった場合、 <strong class="command">sdist</strong>
+コマンドはソース配布物に以下のような最小のデフォルトのセットを含めます:</p>
+<ul class="simple">
+<li><em class="xref std std-option">py_modules</em> と <em class="xref std std-option">packages</em> オプションに指定された Python ソースファイル全て</li>
+<li><em class="xref std std-option">ext_modules</em> や <em class="xref std std-option">libraries</em> オプションに記載された C ソースファイル</li>
+<li><em class="xref std std-option">scripts</em> オプションで指定されたスクリプト。
+<a class="reference internal" href="setupscript.html#distutils-installing-scripts"><em>スクリプトをインストールする</em></a> を参照してください。</li>
+<li>テストスクリプトと思しきファイル全て: <tt class="file docutils literal"><span class="pre">test/test*.py</span></tt> (現状では、Distutils
+はテストスクリプトをただソース配布物に含めるだけですが、将来は Python モジュール配布物に対するテスト標準ができるかもしれません)</li>
+<li><tt class="file docutils literal"><span class="pre">README.txt</span></tt> (または <tt class="file docutils literal"><span class="pre">README</span></tt>)、 <tt class="file docutils literal"><span class="pre">setup.py</span></tt>  (または setup
+スクリプトにしているもの) 、および <tt class="file docutils literal"><span class="pre">setup.cfg</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">package_data</span></tt> メタデータにマッチする全てのファイル。
+<a class="reference internal" href="setupscript.html#distutils-installing-package-data"><em>パッケージデータをインストールする</em></a> を参照してください。</li>
+<li><tt class="docutils literal"><span class="pre">data_files</span></tt> メタデータにマッチする全てのファイル。
+<a class="reference internal" href="setupscript.html#distutils-additional-files"><em>追加のファイルをインストールする</em></a> を参照してください。</li>
+</ul>
+<p>上記のセットで十分なこともありますが、大抵他のファイルを配布物に含めたいと思うでしょう。普通は、 <tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt> と呼ばれる
+<em>マニフェストテンプレート (manifest template)</em> を使ってこれを行います。マニフェストテンプレートは、ソース配布物に含めるファイルの正確なリストであるマニフェストファイル <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> をどうやって作成するか指示しているリストです。
+<strong class="command">sdist</strong> コマンドはこのテンプレートを処理し、書かれた指示とファイルシステム上に見つかったファイルに基づいてマニフェストファイルを作成します。</p>
+<p>自分用のマニフェストファイルを書きたいなら、その形式は簡単です: 一行あたり一つの通常ファイル (または通常ファイルに対するシンボリックリンク)
+だけを書きます。自分で <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> を提供する場合、全てを自分で指定しなければなりません:
+ただし、上で説明したデフォルトのファイルセットは、この中には含まれません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加: </span><tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> のコメントで始まるファイルは、それが生成されたものであることを表します。
+そうでないファイルは上書きされたり削除されたりしません。</p>
+<p>シンタックスリファレンスは <a class="reference internal" href="#manifest-template"><em>MANIFEST.in テンプレート</em></a> を参照してください。</p>
+</div>
+<div class="section" id="manifest-options">
+<span id="id3"></span><h2>マニフェスト (manifest) 関連のオプション<a class="headerlink" href="#manifest-options" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><strong class="command">sdist</strong> コマンドが通常行う処理の流れは、以下のようになっています:</p>
+<ul class="simple">
+<li>マニフェストファイル <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> が存在しなければ、 <tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt>
+を読み込んでマニフェストファイルを作成します</li>
+<li><tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> も <tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt> もなければ、デフォルトのファイルセットだけでできたマニフェストファイルを作成します</li>
+<li><tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt> か <tt class="file docutils literal"><span class="pre">setup.py</span></tt> が <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> より新しければ、
+<tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt> を読み込んで <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> を再生成します。</li>
+<li>(生成されたか、読み出された) <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> 内にあるファイルのリストを使ってソース配布物アーカイブを作成します</li>
+</ul>
+<p>上の動作は二種類のオプションを使って変更できます。まず、標準の &#8220;include&#8221; および &#8220;exclude&#8221; セットを無効化するには
+<em class="xref std std-option">--no-defaults</em> および <em class="xref std std-option">--no-prune</em>  を使います。</p>
+<p>第2に、単にマニフェストを (再)生成したいだけで、ソース配布物は作成したくない場合があるかもしれません:</p>
+<div class="highlight-python"><pre>python setup.py sdist --manifest-only</pre>
+</div>
+<p><em class="xref std std-option">-o</em> は <em class="xref std std-option">--manifest-only</em> のショートカットです。</p>
+</div>
+<div class="section" id="manifest-in">
+<span id="manifest-template"></span><h2>MANIFEST.in テンプレート<a class="headerlink" href="#manifest-in" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><strong class="command">sdist</strong> コマンドがビルドする配布物に含めるファイルのリストを定義するために、プロジェクトに <tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt> ファイルを追加することができます。</p>
+<p><strong class="command">sdist</strong> が実行された時、 <tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt> ファイルを探して、それを解釈して、パッケージに含めるファイルのリストを含んだ <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt>
+ファイルを生成します。</p>
+<p>This mechanism can be used when the default list of files is not enough.
+(See <a class="reference internal" href="#manifest"><em>配布するファイルを指定する</em></a>).
+この機構は、デフォルトのファイルリストが十分でないときに利用できます。
+(<a class="reference internal" href="#manifest"><em>配布するファイルを指定する</em></a> を参照)</p>
+<div class="section" id="id4">
+<h3>原則<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>マニフェストテンプレートには一行あたり一つのコマンドがあります。各コマンドはソース配布物に入れたり配布物から除外したりするファイルのセットを指定します。例えば、Distutils 自体のマニフェストテンプレートを見てみましょう:</p>
+<div class="highlight-python"><pre>include *.txt
+recursive-include examples *.txt *.py
+prune examples/sample?/build</pre>
+</div>
+<p>各行はかなり明確に意味を取れるはずです: 上の指定では、 <tt class="docutils literal"><span class="pre">*.txt</span></tt> にマッチする配布物ルート下の全てのファイル、 <tt class="file docutils literal"><span class="pre">examples</span></tt>
+ディレクトリ下にある <tt class="docutils literal"><span class="pre">*.txt</span></tt> か <tt class="docutils literal"><span class="pre">*.py</span></tt> にマッチする全てのファイルを含め、 <tt class="docutils literal"><span class="pre">examples/sample?/build</span></tt>
+にマッチする全てのファイルを除外します。これらの処理はすべて、標準的に含められるファイルセットの評価よりも <em>後に</em>
+行われるので、マニフェストテンプレートに明示的に指示をしておけば、標準セット中のファイルも除外できます。
+(<em class="xref std std-option">--no-defaults</em> オプションを設定して、標準セット自体を無効にもできます。)</p>
+<p>マニフェストテンプレート中のコマンドの順番には意味があります;  初期状態では、上で述べたようなデフォルトのファイルがあり、テンプレート中の各コマンドによって、逐次ファイルを追加したり除去したりしていいます。マニフェストテンプレートを完全に処理し終えたら、ソース配布物中に含めるべきでない以下のファイルをリストから除去します:</p>
+<ul class="simple">
+<li>Distutls の &#8220;build&#8221; (デフォルトの名前は <tt class="file docutils literal"><span class="pre">build</span></tt>) ツリー下にある全てのファイル</li>
+<li><tt class="file docutils literal"><span class="pre">RCS</span></tt>, <tt class="file docutils literal"><span class="pre">CVS</span></tt>, <tt class="file docutils literal"><span class="pre">.svn</span></tt>, <tt class="file docutils literal"><span class="pre">.hg</span></tt>, <tt class="file docutils literal"><span class="pre">.git</span></tt>, <tt class="file docutils literal"><span class="pre">.bzr</span></tt>, <tt class="file docutils literal"><span class="pre">_darcs</span></tt>
+といった名前のディレクトリ下にある全てのファイル</li>
+</ul>
+<p>こうして完全なファイルのリストができ、後で参照するためにマニフェストに書き込まれます。この内容は、ソース配布物のアーカイブを作成する際に使われます。</p>
+<p>含めるファイルのデフォルトセットは <em class="xref std std-option">--no-defaults</em> で無効化でき、標準で除外するセットは
+<em class="xref std std-option">--no-prune</em> で無効化できます。</p>
+<p>Distutils 自体のマニフェストテンプレートから、 <strong class="command">sdist</strong> コマンドがどのようにして Distutils
+ソース配布物に含めるファイルのリストを作成するか見てみましょう:</p>
+<ol class="arabic simple">
+<li><tt class="file docutils literal"><span class="pre">distutils</span></tt> ディレクトリ、および <tt class="file docutils literal"><span class="pre">distutils/command</span></tt> サブディレクトリの下にある全ての
+Python ソースファイルを含めます (これらの二つのディレクトリが、setup スクリプト下の <em class="xref std std-option">packages</em>
+オプションに記載されているからです &#8212;  <a class="reference internal" href="setupscript.html#setup-script"><em>setup スクリプトを書く</em></a> を参照してください)</li>
+<li><tt class="file docutils literal"><span class="pre">README.txt</span></tt>, <tt class="file docutils literal"><span class="pre">setup.py</span></tt>, および <tt class="file docutils literal"><span class="pre">setup.cfg</span></tt> (標準のファイルセット)
+を含めます</li>
+<li><tt class="file docutils literal"><span class="pre">test/test*.py</span></tt> (標準のファイルセット) を含めます</li>
+<li>配布物ルート下の <tt class="file docutils literal"><span class="pre">*.txt</span></tt> を含めます (この処理で、 <tt class="file docutils literal"><span class="pre">README.txt</span></tt>
+がもう一度見つかりますが、こうした冗長性は後で刈り取られます)</li>
+<li><tt class="file docutils literal"><span class="pre">examples</span></tt> 下にあるサブツリー内で <tt class="file docutils literal"><span class="pre">*.txt</span></tt> または <tt class="file docutils literal"><span class="pre">*.py</span></tt>
+にマッチする全てのファイルを含めます</li>
+<li>ディレクトリ名が <tt class="file docutils literal"><span class="pre">examples/sample?/build</span></tt> にマッチするディレクトリ以下のサブツリー内にあるファイル全てを除外します&#8212; この操作によって、上の二つのステップでリストに含められたファイルが除外されることがあるので、マニフェストテンプレート内では <tt class="docutils literal"><span class="pre">recursive-include</span></tt> コマンドの後に <tt class="docutils literal"><span class="pre">prune</span></tt> コマンドを持ってくることが重要です</li>
+<li><tt class="file docutils literal"><span class="pre">build</span></tt> ツリー全体、および <tt class="file docutils literal"><span class="pre">RCS</span></tt>, <tt class="file docutils literal"><span class="pre">CVS</span></tt>, <tt class="file docutils literal"><span class="pre">.svn</span></tt>,
+<tt class="file docutils literal"><span class="pre">.hg</span></tt>, <tt class="file docutils literal"><span class="pre">.git</span></tt>, <tt class="file docutils literal"><span class="pre">.bzr</span></tt>, <tt class="file docutils literal"><span class="pre">_darcs</span></tt> ディレクトリ全てを除外します。</li>
+</ol>
+<p>setup スクリプトと同様、マニフェストテンプレート中のディレクトリ名は常にスラッシュ区切りで表記します; Distutils は、こうしたディレクトリ名を注意深くプラットフォームでの標準的な表現に変換します。このため、マニフェストテンプレートは複数のオペレーティングシステムにわたって可搬性を持ちます。</p>
+</div>
+<div class="section" id="id5">
+<h3>コマンド<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>マニフェストテンプレートコマンド一覧:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="48%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">コマンド</th>
+<th class="head">説明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong class="command">include pat1 pat2 ...</strong></td>
+<td>リストされたパターンのどれかにマッチする全てのファイルを含める</td>
+</tr>
+<tr class="row-odd"><td><strong class="command">exclude pat1 pat2 ...</strong></td>
+<td>リストされたパターンのどれかにマッチする全てのファイルを除外する</td>
+</tr>
+<tr class="row-even"><td><strong class="command">recursive-include dir pat1 pat2
+...</strong></td>
+<td><em>dir</em> 配下の、リストされたパターンのどれかにマッチする全てのファイルを含める</td>
+</tr>
+<tr class="row-odd"><td><strong class="command">recursive-exclude dir pat1 pat2
+...</strong></td>
+<td><em>dir</em> 配下の、リストされたパターンのどれかにマッチする全てのファイルを除外する</td>
+</tr>
+<tr class="row-even"><td><strong class="command">global-include pat1 pat2 ...</strong></td>
+<td>ソースツリー内にある、リストされたパターンのどれかにマッチする全てのファイルを含める</td>
+</tr>
+<tr class="row-odd"><td><strong class="command">global-exclude pat1 pat2 ...</strong></td>
+<td>ソースツリー内にある、リストされたパターンのどれかにマッチする全てのファイルを除外する</td>
+</tr>
+<tr class="row-even"><td><strong class="command">prune dir</strong></td>
+<td><em>dir</em> 配下の全てのファイルを除外する</td>
+</tr>
+<tr class="row-odd"><td><strong class="command">graft dir</strong></td>
+<td><em>dir</em> 配下の全てのファイルを含める</td>
+</tr>
+</tbody>
+</table>
+<p>ここで使うパターンは、 Unix スタイルの &#8220;glob&#8221; パターンです。
+<tt class="docutils literal"><span class="pre">*</span></tt> は通常のファイル名文字の任意のシーケンスにマッチします。
+<tt class="docutils literal"><span class="pre">?</span></tt> は通常のファイル名文字の1文字にマッチします。
+<tt class="docutils literal"><span class="pre">[range]</span></tt> は <em>range</em> に含まれる全ての文字にマッチします (例: <tt class="docutils literal"><span class="pre">a-z</span></tt>, <tt class="docutils literal"><span class="pre">a-zA-Z</span></tt>, <tt class="docutils literal"><span class="pre">a-f0-9_.</span></tt>)
+通常のファイル名文字は、プラットフォーム依存になります。 Unix ではスラッシュ以外の全ての文字で、
+Windows ではコロンとバックスラッシュ以外の全ての文字です。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span><strong class="command">sdist</strong> は既存の生成された <tt class="file docutils literal"><span class="pre">MANIFEST</span></tt> ファイルを
+<tt class="file docutils literal"><span class="pre">MANIFEST.in</span></tt> や <tt class="file docutils literal"><span class="pre">setup.py</span></tt> の変更時刻と比較すること無しに
+再生成します。</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="builtdist.html" title="ビルド済み配布物を作成する"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="configfile.html" title="setup 設定ファイル (setup configuration file) を書く"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python モジュールの配布</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

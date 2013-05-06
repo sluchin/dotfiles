@@ -1,0 +1,505 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>26.1. bdb — デバッガーフレームワーク &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="26. デバッグとプロファイル" href="debug.html" />
+    <link rel="next" title="26.2. pdb — Python デバッガ" href="pdb.html" />
+    <link rel="prev" title="26. デバッグとプロファイル" href="debug.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pdb.html" title="26.2. pdb — Python デバッガ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="debug.html" title="26. デバッグとプロファイル"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="debug.html" accesskey="U">26. デバッグとプロファイル</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="debug.html"
+                        title="前の章へ">26. デバッグとプロファイル</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="pdb.html"
+                        title="次の章へ">26.2. <tt class="docutils literal"><span class="pre">pdb</span></tt> &#8212; Python デバッガ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/bdb.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-bdb">
+<span id="bdb"></span><h1>26.1. <a class="reference internal" href="#module-bdb" title="bdb: デバッガーフレームワーク"><tt class="xref py py-mod docutils literal"><span class="pre">bdb</span></tt></a> &#8212; デバッガーフレームワーク<a class="headerlink" href="#module-bdb" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-bdb" title="bdb: デバッガーフレームワーク"><tt class="xref py py-mod docutils literal"><span class="pre">bdb</span></tt></a> モジュールは、ブレークポイントを設定したり、デバッガー経由で実行を管理するような、基本的なデバッガー機能を提供します</p>
+<p>以下の例外が定義されています。</p>
+<dl class="exception">
+<dt id="bdb.BdbQuit">
+<em class="property">exception </em><tt class="descclassname">bdb.</tt><tt class="descname">BdbQuit</tt><a class="headerlink" href="#bdb.BdbQuit" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#bdb.Bdb" title="bdb.Bdb"><tt class="xref py py-class docutils literal"><span class="pre">Bdb</span></tt></a> クラスが、デバッガーを終了させるために投げる例外。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#module-bdb" title="bdb: デバッガーフレームワーク"><tt class="xref py py-mod docutils literal"><span class="pre">bdb</span></tt></a> モジュールは2つのクラスを定義しています。</p>
+<dl class="class">
+<dt id="bdb.Breakpoint">
+<em class="property">class </em><tt class="descclassname">bdb.</tt><tt class="descname">Breakpoint</tt><big>(</big><em>self</em>, <em>file</em>, <em>line</em><span class="optional">[</span>, <em>temporary=0</em><span class="optional">[</span>, <em>cond=None</em><span class="optional">[</span>, <em>funcname=None</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#bdb.Breakpoint" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラスはテンポラリブレークポイント、無視するカウント、無効化と再有効化、条件付きブレークポイントを実装しています。</p>
+<p>ブレークポイントは <tt class="xref py py-attr docutils literal"><span class="pre">bpbynumber</span></tt> という名前のリストで番号によりインデックスされ、
+<tt class="xref py py-attr docutils literal"><span class="pre">bplist</span></tt> により <tt class="docutils literal"><span class="pre">(file,</span> <span class="pre">line)</span></tt> の形でインデックスされます。
+<tt class="xref py py-attr docutils literal"><span class="pre">bpbynumber</span></tt> は <a class="reference internal" href="#bdb.Breakpoint" title="bdb.Breakpoint"><tt class="xref py py-class docutils literal"><span class="pre">Breakpoint</span></tt></a> クラスのインスタンスを指しています。一方 <tt class="xref py py-attr docutils literal"><span class="pre">bplist</span></tt> は、同じ行に複数のブレークポイントが設定される場合があるので、インスタンスのリストを指しています。</p>
+<p>ブレークポイントを作るとき、設定されるファイル名は正規化されていなければなりません。
+<em>funcname</em> が設定されたとき、ブレークポイントはその関数の最初の行が実行されたときにヒットカウントにカウントされます。条件付ブレークポイントは毎回カウントされます。</p>
+<p><a class="reference internal" href="#bdb.Breakpoint" title="bdb.Breakpoint"><tt class="xref py py-class docutils literal"><span class="pre">Breakpoint</span></tt></a> インスタンスは以下のメソッドを持ちます。</p>
+<dl class="method">
+<dt id="bdb.Breakpoint.deleteMe">
+<tt class="descname">deleteMe</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Breakpoint.deleteMe" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このブレークポイントをファイル/行に関連付けられたリストから削除します。このブレークポイントがその行に設定された最後のブレークポイントだった場合、そのファイル/行に対するエントリ自体を削除します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Breakpoint.enable">
+<tt class="descname">enable</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Breakpoint.enable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このブレークポイントを有効にします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Breakpoint.disable">
+<tt class="descname">disable</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Breakpoint.disable" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このブレークポイントを無効にします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Breakpoint.pprint">
+<tt class="descname">pprint</tt><big>(</big><span class="optional">[</span><em>out</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#bdb.Breakpoint.pprint" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このブレークポイントに関するすべての情報を表示します。</p>
+<ul class="simple">
+<li>ブレークポイント番号</li>
+<li>テンポラリブレークポイントかどうか</li>
+<li>ファイル/行の位置</li>
+<li>ブレークする条件</li>
+<li>次のN回無視されるか</li>
+<li>ヒットカウント</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bdb.Bdb">
+<em class="property">class </em><tt class="descclassname">bdb.</tt><tt class="descname">Bdb</tt><big>(</big><em>skip=None</em><big>)</big><a class="headerlink" href="#bdb.Bdb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#bdb.Bdb" title="bdb.Bdb"><tt class="xref py py-class docutils literal"><span class="pre">Bdb</span></tt></a> クラスは一般的なPythonデバッガーの基本クラスとして振舞います。</p>
+<p>このクラスはトレース機能の詳細を扱います。ユーザーとのインタラクションは、派生クラスが実装するべきです。標準ライブラリのデバッガクラス (<a class="reference internal" href="pdb.html#pdb.Pdb" title="pdb.Pdb"><tt class="xref py py-class docutils literal"><span class="pre">pdb.Pdb</span></tt></a>)
+がその利用例です。</p>
+<p><em>skip</em> 引数は、もし与えられたならグロブ形式のモジュール名パターンの iterable でなければなりません。デバッガはこれらのパターンのどれかにマッチするモジュールで発生したフレームにステップインしなくなります。フレームが特定のモジュールで発生したかどうかは、フレームのグローバル変数の <tt class="docutils literal"><span class="pre">__name__</span></tt> によって決定されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加: </span><em>skip</em> 引数</p>
+<p>以下の <a class="reference internal" href="#bdb.Bdb" title="bdb.Bdb"><tt class="xref py py-class docutils literal"><span class="pre">Bdb</span></tt></a> のメソッドは、通常オーバーライドする必要はありません。</p>
+<dl class="method">
+<dt id="bdb.Bdb.canonic">
+<tt class="descname">canonic</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#bdb.Bdb.canonic" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>標準化されたファイル名を取得するための補助関数。標準化されたファイル名とは、
+(大文字小文字を区別しないファイルシステムにおいて)大文字小文字を正規化し、絶対パスにしたものです。ファイル名が &#8220;&lt;&#8221; と &#8220;&gt;&#8221; で囲まれていた場合はそれを取り除いたものです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.reset">
+<tt class="descname">reset</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Bdb.reset" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-attr docutils literal"><span class="pre">botframe</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">stopframe</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">returnframe</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">quitting</span></tt>
+属性を、デバッグを始められる状態に設定します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.trace_dispatch">
+<tt class="descname">trace_dispatch</tt><big>(</big><em>frame</em>, <em>event</em>, <em>arg</em><big>)</big><a class="headerlink" href="#bdb.Bdb.trace_dispatch" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この関数は、デバッグされているフレームのトレース関数としてインストールされます。戻り値は新しいトレース関数(殆どの場合はこの関数自身)です。</p>
+<p>デフォルトの実装は、実行しようとしている <em>event</em> (文字列として渡されます) の種類に基づいてフレームのディスパッチ方法を決定します。
+<em>event</em> は次のうちのどれかです。</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&quot;line&quot;</span></tt>: 新しい行を実行しようとしています。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;call&quot;</span></tt>: 関数が呼び出されているか、別のコードブロックに入ります。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;return&quot;</span></tt>: 関数か別のコードブロックからreturnしようとしています。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;exception&quot;</span></tt>: 例外が発生しました。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;c_call&quot;</span></tt>: C関数を呼び出そうとしています。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;c_return&quot;</span></tt>: C関数からreturnしました。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;c_exception&quot;</span></tt>: C関数が例外を発生させました。</li>
+</ul>
+<p>Pythonのイベントに対しては、以下の専用の関数群が呼ばれます。Cのイベントに対しては何もしません。</p>
+<p><em>arg</em> 引数は以前のイベントに依存します。</p>
+<p>トレース関数についてのより詳しい情報は、 <a class="reference internal" href="sys.html#sys.settrace" title="sys.settrace"><tt class="xref py py-func docutils literal"><span class="pre">sys.settrace()</span></tt></a> のドキュメントを参照してください。コードとフレームオブジェクトについてのより詳しい情報は、 <a class="reference internal" href="../reference/datamodel.html#types"><em>標準型の階層</em></a>
+を参照してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.dispatch_line">
+<tt class="descname">dispatch_line</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.dispatch_line" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デバッガーが現在の行で止まるべきであれば、 <a class="reference internal" href="#bdb.Bdb.user_line" title="bdb.Bdb.user_line"><tt class="xref py py-meth docutils literal"><span class="pre">user_line()</span></tt></a> メソッド
+(サブクラスでオーバーライドされる)を呼び出します。
+<tt class="xref py py-attr docutils literal"><span class="pre">Bdb.quitting</span></tt> フラグ(<a class="reference internal" href="#bdb.Bdb.user_line" title="bdb.Bdb.user_line"><tt class="xref py py-meth docutils literal"><span class="pre">user_line()</span></tt></a> から設定できます)が設定されていた場合、
+<a class="reference internal" href="#bdb.BdbQuit" title="bdb.BdbQuit"><tt class="xref py py-exc docutils literal"><span class="pre">BdbQuit</span></tt></a> 例外を発生させます。このスコープのこれからのトレースのために、 <a class="reference internal" href="#bdb.Bdb.trace_dispatch" title="bdb.Bdb.trace_dispatch"><tt class="xref py py-meth docutils literal"><span class="pre">trace_dispatch()</span></tt></a> メソッドの参照を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.dispatch_call">
+<tt class="descname">dispatch_call</tt><big>(</big><em>frame</em>, <em>arg</em><big>)</big><a class="headerlink" href="#bdb.Bdb.dispatch_call" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デバッガーがこの関数呼び出しで止まるべきであれば、 <a class="reference internal" href="#bdb.Bdb.user_call" title="bdb.Bdb.user_call"><tt class="xref py py-meth docutils literal"><span class="pre">user_call()</span></tt></a> メソッド
+(サブクラスでオーバーライドされる)を呼び出します。
+<tt class="xref py py-attr docutils literal"><span class="pre">Bdb.quitting</span></tt> フラグ(<a class="reference internal" href="#bdb.Bdb.user_line" title="bdb.Bdb.user_line"><tt class="xref py py-meth docutils literal"><span class="pre">user_line()</span></tt></a> から設定できます)が設定されていた場合、
+<a class="reference internal" href="#bdb.BdbQuit" title="bdb.BdbQuit"><tt class="xref py py-exc docutils literal"><span class="pre">BdbQuit</span></tt></a> 例外を発生させます。このスコープのこれからのトレースのために、 <a class="reference internal" href="#bdb.Bdb.trace_dispatch" title="bdb.Bdb.trace_dispatch"><tt class="xref py py-meth docutils literal"><span class="pre">trace_dispatch()</span></tt></a> メソッドの参照を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.dispatch_return">
+<tt class="descname">dispatch_return</tt><big>(</big><em>frame</em>, <em>arg</em><big>)</big><a class="headerlink" href="#bdb.Bdb.dispatch_return" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デバッガーがこの関数からのリターンで止まるべきであれば、 <a class="reference internal" href="#bdb.Bdb.user_call" title="bdb.Bdb.user_call"><tt class="xref py py-meth docutils literal"><span class="pre">user_call()</span></tt></a> メソッド
+(サブクラスでオーバーライドされる)を呼び出します。
+<tt class="xref py py-attr docutils literal"><span class="pre">Bdb.quitting</span></tt> フラグ(<a class="reference internal" href="#bdb.Bdb.user_line" title="bdb.Bdb.user_line"><tt class="xref py py-meth docutils literal"><span class="pre">user_line()</span></tt></a> から設定できます)が設定されていた場合、
+<a class="reference internal" href="#bdb.BdbQuit" title="bdb.BdbQuit"><tt class="xref py py-exc docutils literal"><span class="pre">BdbQuit</span></tt></a> 例外を発生させます。このスコープのこれからのトレースのために、 <a class="reference internal" href="#bdb.Bdb.trace_dispatch" title="bdb.Bdb.trace_dispatch"><tt class="xref py py-meth docutils literal"><span class="pre">trace_dispatch()</span></tt></a> メソッドの参照を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.dispatch_exception">
+<tt class="descname">dispatch_exception</tt><big>(</big><em>frame</em>, <em>arg</em><big>)</big><a class="headerlink" href="#bdb.Bdb.dispatch_exception" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デバッガーがこの例外発生で止まるべきであれば、 <a class="reference internal" href="#bdb.Bdb.user_call" title="bdb.Bdb.user_call"><tt class="xref py py-meth docutils literal"><span class="pre">user_call()</span></tt></a> メソッド
+(サブクラスでオーバーライドされる)を呼び出します。
+<tt class="xref py py-attr docutils literal"><span class="pre">Bdb.quitting</span></tt> フラグ(<a class="reference internal" href="#bdb.Bdb.user_line" title="bdb.Bdb.user_line"><tt class="xref py py-meth docutils literal"><span class="pre">user_line()</span></tt></a> から設定できます)が設定されていた場合、
+<a class="reference internal" href="#bdb.BdbQuit" title="bdb.BdbQuit"><tt class="xref py py-exc docutils literal"><span class="pre">BdbQuit</span></tt></a> 例外を発生させます。このスコープのこれからのトレースのために、 <a class="reference internal" href="#bdb.Bdb.trace_dispatch" title="bdb.Bdb.trace_dispatch"><tt class="xref py py-meth docutils literal"><span class="pre">trace_dispatch()</span></tt></a> メソッドの参照を返します。</p>
+</dd></dl>
+
+<p>通常、継承クラスは以下のメソッド群をオーバーライドしません。しかし、停止やブレークポイント機能を再定義したい場合には、オーバーライドすることもあります。</p>
+<dl class="method">
+<dt id="bdb.Bdb.stop_here">
+<tt class="descname">stop_here</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.stop_here" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは <em>frame</em> がコールスタック中で <tt class="xref py py-attr docutils literal"><span class="pre">botframe</span></tt> よりも下にあるかチェックします。
+<tt class="xref py py-attr docutils literal"><span class="pre">botframe</span></tt> はデバッグを開始したフレームです。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.break_here">
+<tt class="descname">break_here</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.break_here" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは、 <em>frame</em> に属するファイル名と行に、あるいは、少なくとも現在の関数にブレークポイントがあるかどうかをチェックします。ブレークポイントがテンポラリブレークポイントだった場合、このメソッドはそのブレークポイントを削除します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.break_anywhere">
+<tt class="descname">break_anywhere</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.break_anywhere" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは、現在のフレームのファイル名の中にブレークポイントが存在するかどうかをチェックします。</p>
+</dd></dl>
+
+<p>継承クラスはデバッガー操作をするために以下のメソッド群をオーバーライドするべきです。</p>
+<dl class="method">
+<dt id="bdb.Bdb.user_call">
+<tt class="descname">user_call</tt><big>(</big><em>frame</em>, <em>argument_list</em><big>)</big><a class="headerlink" href="#bdb.Bdb.user_call" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは、呼ばれた関数の中でブレークする必要がある可能性がある場合に、
+<a class="reference internal" href="#bdb.Bdb.dispatch_call" title="bdb.Bdb.dispatch_call"><tt class="xref py py-meth docutils literal"><span class="pre">dispatch_call()</span></tt></a> から呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.user_line">
+<tt class="descname">user_line</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.user_line" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは、 <a class="reference internal" href="#bdb.Bdb.stop_here" title="bdb.Bdb.stop_here"><tt class="xref py py-meth docutils literal"><span class="pre">stop_here()</span></tt></a> か <a class="reference internal" href="#bdb.Bdb.break_here" title="bdb.Bdb.break_here"><tt class="xref py py-meth docutils literal"><span class="pre">break_here()</span></tt></a> が True を返したときに、
+<a class="reference internal" href="#bdb.Bdb.dispatch_line" title="bdb.Bdb.dispatch_line"><tt class="xref py py-meth docutils literal"><span class="pre">dispatch_line()</span></tt></a> から呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.user_return">
+<tt class="descname">user_return</tt><big>(</big><em>frame</em>, <em>return_value</em><big>)</big><a class="headerlink" href="#bdb.Bdb.user_return" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは、 <a class="reference internal" href="#bdb.Bdb.stop_here" title="bdb.Bdb.stop_here"><tt class="xref py py-meth docutils literal"><span class="pre">stop_here()</span></tt></a> が True を返したときに、 <a class="reference internal" href="#bdb.Bdb.dispatch_return" title="bdb.Bdb.dispatch_return"><tt class="xref py py-meth docutils literal"><span class="pre">dispatch_return()</span></tt></a>
+から呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.user_exception">
+<tt class="descname">user_exception</tt><big>(</big><em>frame</em>, <em>exc_info</em><big>)</big><a class="headerlink" href="#bdb.Bdb.user_exception" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは、 <a class="reference internal" href="#bdb.Bdb.stop_here" title="bdb.Bdb.stop_here"><tt class="xref py py-meth docutils literal"><span class="pre">stop_here()</span></tt></a> が True を返したときに、 <a class="reference internal" href="#bdb.Bdb.dispatch_exception" title="bdb.Bdb.dispatch_exception"><tt class="xref py py-meth docutils literal"><span class="pre">dispatch_exception()</span></tt></a>
+から呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.do_clear">
+<tt class="descname">do_clear</tt><big>(</big><em>arg</em><big>)</big><a class="headerlink" href="#bdb.Bdb.do_clear" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブレークポイントがテンポラリブレークポイントだったときに、それをどう削除するかを決定します。</p>
+<p>継承クラスはこのメソッドを実装しなければなりません。</p>
+</dd></dl>
+
+<p>継承クラスとクライアントは、ステップ状態に影響を及ぼすために以下のメソッドを呼び出すことができます。</p>
+<dl class="method">
+<dt id="bdb.Bdb.set_step">
+<tt class="descname">set_step</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Bdb.set_step" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コードの次の行でストップします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.set_next">
+<tt class="descname">set_next</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.set_next" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたフレームかそれより下(のフレーム)にある、次の行でストップします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.set_return">
+<tt class="descname">set_return</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.set_return" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたフレームから抜けるときにストップします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.set_until">
+<tt class="descname">set_until</tt><big>(</big><em>frame</em><big>)</big><a class="headerlink" href="#bdb.Bdb.set_until" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在の行番号よりも大きい行番号に到達したとき、あるいは、現在のフレームから戻るときにストップします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.set_trace">
+<tt class="descname">set_trace</tt><big>(</big><span class="optional">[</span><em>frame</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#bdb.Bdb.set_trace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>frame</em> からデバッグを開始します。 <em>frame</em> が指定されなかった場合、デバッグは呼び出し元のフレームから開始します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.set_continue">
+<tt class="descname">set_continue</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Bdb.set_continue" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブレークポイントに到達するか終了したときにストップします。もしブレークポイントが1つも無い場合、システムのトレース関数を None
+に設定します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.set_quit">
+<tt class="descname">set_quit</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Bdb.set_quit" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-attr docutils literal"><span class="pre">quitting</span></tt> 属性を True に設定します。これにより、次回の <tt class="xref py py-meth docutils literal"><span class="pre">dispatch_*()</span></tt> メソッドのどれかの呼び出しで、
+<a class="reference internal" href="#bdb.BdbQuit" title="bdb.BdbQuit"><tt class="xref py py-exc docutils literal"><span class="pre">BdbQuit</span></tt></a> 例外を発生させます。</p>
+</dd></dl>
+
+<p>継承クラスとクライアントは以下のメソッドをブレークポイント操作に利用できます。これらのメソッドは、何か悪いことがあればエラーメッセージを含む文字列を返し、すべてが順調であれば <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+<dl class="method">
+<dt id="bdb.Bdb.set_break">
+<tt class="descname">set_break</tt><big>(</big><em>filename</em>, <em>lineno</em><span class="optional">[</span>, <em>temporary=0</em><span class="optional">[</span>, <em>cond</em><span class="optional">[</span>, <em>funcname</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#bdb.Bdb.set_break" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しいブレークポイントを設定します。引数の <em>lineno</em> 行が <em>filename</em> に存在しない場合、エラーメッセージを返します。
+<em>filename</em> は、 <a class="reference internal" href="#bdb.Bdb.canonic" title="bdb.Bdb.canonic"><tt class="xref py py-meth docutils literal"><span class="pre">canonic()</span></tt></a> メソッドで説明されているような、標準形である必要があります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.clear_break">
+<tt class="descname">clear_break</tt><big>(</big><em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#bdb.Bdb.clear_break" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> の <em>lineno</em> 行にあるブレークポイントを削除します。もしブレークポイントが無かった場合、エラーメッセージを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.clear_bpbynumber">
+<tt class="descname">clear_bpbynumber</tt><big>(</big><em>arg</em><big>)</big><a class="headerlink" href="#bdb.Bdb.clear_bpbynumber" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-attr docutils literal"><span class="pre">Breakpoint.bpbynumber</span></tt> の中で <em>arg</em> のインデックスを持つブレークポイントを削除します。
+<em>arg</em> が数値でないか範囲外の場合、エラーメッセージを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.clear_all_file_breaks">
+<tt class="descname">clear_all_file_breaks</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#bdb.Bdb.clear_all_file_breaks" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> に含まれるすべてのブレークポイントを削除します。もしブレークポイントが無い場合、エラーメッセージを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.clear_all_breaks">
+<tt class="descname">clear_all_breaks</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Bdb.clear_all_breaks" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>すべてのブレークポイントを削除します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.get_break">
+<tt class="descname">get_break</tt><big>(</big><em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#bdb.Bdb.get_break" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> の <em>lineno</em> にブレークポイントが存在するかどうかをチェックします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.get_breaks">
+<tt class="descname">get_breaks</tt><big>(</big><em>filename</em>, <em>lineno</em><big>)</big><a class="headerlink" href="#bdb.Bdb.get_breaks" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> の <em>lineno</em> にあるすべてのブレークポイントを返します。ブレークポイントが存在しない場合は空のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.get_file_breaks">
+<tt class="descname">get_file_breaks</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#bdb.Bdb.get_file_breaks" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>filename</em> の中のすべてのブレークポイントを返します。ブレークポイントが存在しない場合は空のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.get_all_breaks">
+<tt class="descname">get_all_breaks</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.Bdb.get_all_breaks" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セットされているすべてのブレークポイントを返します。</p>
+</dd></dl>
+
+<p>継承クラスとクライアントは以下のメソッドを呼んでスタックトレースを表現するデータ構造を取得することができます。</p>
+<dl class="method">
+<dt id="bdb.Bdb.get_stack">
+<tt class="descname">get_stack</tt><big>(</big><em>f</em>, <em>t</em><big>)</big><a class="headerlink" href="#bdb.Bdb.get_stack" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたフレームおよび上位(呼び出し側)と下位のすべてのフレームに対するレコードのリストと、上位フレームのサイズを得ます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.format_stack_entry">
+<tt class="descname">format_stack_entry</tt><big>(</big><em>frame_lineno</em><span class="optional">[</span>, <em>lprefix=': '</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#bdb.Bdb.format_stack_entry" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">(frame,</span> <span class="pre">lineno)</span></tt> で指定されたスタックエントリに関する次のような情報を持つ文字列を返します。</p>
+<ul class="simple">
+<li>そのフレームを含むファイル名の標準形</li>
+<li>関数名、もしくは <tt class="docutils literal"><span class="pre">&quot;&lt;lambda&gt;&quot;</span></tt></li>
+<li>入力された引数</li>
+<li>戻り値</li>
+<li>(あれば)その行のコード</li>
+</ul>
+</dd></dl>
+
+<p>以下の2つのメソッドは、文字列として渡された文(<a class="reference internal" href="../glossary.html#term-statement"><em class="xref std std-term">statement</em></a>)をデバッグするもので、クライアントから利用されます。</p>
+<dl class="method">
+<dt id="bdb.Bdb.run">
+<tt class="descname">run</tt><big>(</big><em>cmd</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#bdb.Bdb.run" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/simple_stmts.html#exec"><tt class="xref std std-keyword docutils literal"><span class="pre">exec</span></tt></a> 文を利用して文を実行しデバッグします。
+<em>globals</em> はデフォルトでは <tt class="xref py py-attr docutils literal"><span class="pre">__main__.__dict__</span></tt> で、 <em>locals</em> はデフォルトでは
+<em>globals</em> です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.runeval">
+<tt class="descname">runeval</tt><big>(</big><em>expr</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#bdb.Bdb.runeval" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="functions.html#eval" title="eval"><tt class="xref py py-func docutils literal"><span class="pre">eval()</span></tt></a> 関数を利用して式を実行しデバッグします。
+<em>globals</em> と <em>locals</em> は <a class="reference internal" href="#bdb.Bdb.run" title="bdb.Bdb.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a> と同じ意味です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.runctx">
+<tt class="descname">runctx</tt><big>(</big><em>cmd</em>, <em>globals</em>, <em>locals</em><big>)</big><a class="headerlink" href="#bdb.Bdb.runctx" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>後方互換性のためのメソッドです。 <a class="reference internal" href="#bdb.Bdb.run" title="bdb.Bdb.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a> を使ってください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bdb.Bdb.runcall">
+<tt class="descname">runcall</tt><big>(</big><em>func</em>, <em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#bdb.Bdb.runcall" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>1つの関数呼び出しをデバッグし、その結果を返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>最後に、このモジュールは以下の関数を提供しています。</p>
+<dl class="function">
+<dt id="bdb.checkfuncname">
+<tt class="descclassname">bdb.</tt><tt class="descname">checkfuncname</tt><big>(</big><em>b</em>, <em>frame</em><big>)</big><a class="headerlink" href="#bdb.checkfuncname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この場所でブレークする必要があるかどうかを、ブレークポイント <em>b</em> が設定された方法に依存する方法でチェックします。</p>
+<p>ブレークポイントが行番号で設定されていた場合、この関数は <tt class="docutils literal"><span class="pre">b.line</span></tt> が、同じく引数として与えられた <em>frame</em> の中の行に一致するかどうかをチェックします。ブレークポイントが関数名で設定されていた場合、この関数は <em>frame</em> が指定された関数のものであるかどうかと、その関数の最初の行であるかどうかをチェックします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdb.effective">
+<tt class="descclassname">bdb.</tt><tt class="descname">effective</tt><big>(</big><em>file</em>, <em>line</em>, <em>frame</em><big>)</big><a class="headerlink" href="#bdb.effective" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指定されたソースコード中の行に(有効な)ブレークポイントがあるかどうかを判断します。ブレークポイントと、テンポラリブレークポイントを削除して良いかどうかを示すフラグからなるタプルを返します。マッチするブレークポイントが存在しない場合は <tt class="docutils literal"><span class="pre">(None,</span> <span class="pre">None)</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bdb.set_trace">
+<tt class="descclassname">bdb.</tt><tt class="descname">set_trace</tt><big>(</big><big>)</big><a class="headerlink" href="#bdb.set_trace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#bdb.Bdb" title="bdb.Bdb"><tt class="xref py py-class docutils literal"><span class="pre">Bdb</span></tt></a> クラスのインスタンスを使って、呼び出し元のフレームからデバッグを開始します。</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pdb.html" title="26.2. pdb — Python デバッガ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="debug.html" title="26. デバッグとプロファイル"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="debug.html" >26. デバッグとプロファイル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

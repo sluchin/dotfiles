@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.5. filecmp — ファイルおよびディレクトリの比較 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="next" title="10.6. tempfile — 一時的なファイルやディレクトリの生成" href="tempfile.html" />
+    <link rel="prev" title="10.4. statvfs — os.statvfs() で使われる定数群" href="statvfs.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tempfile.html" title="10.6. tempfile — 一時的なファイルやディレクトリの生成"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="statvfs.html" title="10.4. statvfs — os.statvfs() で使われる定数群"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" accesskey="U">10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">10.5. <tt class="docutils literal"><span class="pre">filecmp</span></tt> &#8212; ファイルおよびディレクトリの比較</a><ul>
+<li><a class="reference internal" href="#dircmp">10.5.1. <tt class="docutils literal"><span class="pre">dircmp</span></tt> クラス</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="statvfs.html"
+                        title="前の章へ">10.4. <tt class="docutils literal"><span class="pre">statvfs</span></tt> &#8212; <tt class="docutils literal"><span class="pre">os.statvfs()</span></tt> で使われる定数群</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="tempfile.html"
+                        title="次の章へ">10.6. <tt class="docutils literal"><span class="pre">tempfile</span></tt> &#8212; 一時的なファイルやディレクトリの生成</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/filecmp.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-filecmp">
+<span id="filecmp"></span><h1>10.5. <a class="reference internal" href="#module-filecmp" title="filecmp: ファイル群を効率的に比較します。"><tt class="xref py py-mod docutils literal"><span class="pre">filecmp</span></tt></a> &#8212; ファイルおよびディレクトリの比較<a class="headerlink" href="#module-filecmp" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-filecmp" title="filecmp: ファイル群を効率的に比較します。"><tt class="xref py py-mod docutils literal"><span class="pre">filecmp</span></tt></a> モジュールでは、ファイルおよびディレクトリを比較するため、様々な時間／正確性のトレードオフに関するオプションを備えた関数を定義しています。ファイルの比較については、 <tt class="xref py py-mod docutils literal"><span class="pre">differ</span></tt> モジュールも参照してください。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">最新バージョンの <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/filecmp.py?view=markup">filecmp Python ソースコード</a></p>
+</div>
+<p><a class="reference internal" href="#module-filecmp" title="filecmp: ファイル群を効率的に比較します。"><tt class="xref py py-mod docutils literal"><span class="pre">filecmp</span></tt></a> モジュールでは以下の関数を定義しています:</p>
+<dl class="function">
+<dt id="filecmp.cmp">
+<tt class="descclassname">filecmp.</tt><tt class="descname">cmp</tt><big>(</big><em>f1</em>, <em>f2</em><span class="optional">[</span>, <em>shallow</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#filecmp.cmp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前が <em>f1</em> および <em>f2</em> のファイルを比較し、二つのファイルが同じらしければ <tt class="docutils literal"><span class="pre">True</span></tt> を返し、そうでなければ <tt class="docutils literal"><span class="pre">false</span></tt> を返します。</p>
+<p><em>shallow</em> が与えられておりかつ偽でなければ、 <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> の返すシグネチャが一致するファイルは同じであると見なされます。</p>
+<p>この関数で比較されたファイルは <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> シグネチャが変更されるまで再び比較されることはありません。 <em>use_statcache</em>
+を真にすると、キャッシュ無効化機構を失敗させます &#8212; そのため、 <tt class="xref py py-mod docutils literal"><span class="pre">statcache</span></tt> のキャッシュから古いファイル stat 値が使われます。</p>
+<p>可搬性と効率のために、個の関数は外部プログラムを一切呼び出さないので注意してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="filecmp.cmpfiles">
+<tt class="descclassname">filecmp.</tt><tt class="descname">cmpfiles</tt><big>(</big><em>dir1</em>, <em>dir2</em>, <em>common</em><span class="optional">[</span>, <em>shallow</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#filecmp.cmpfiles" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>dir1</em> と <em>dir2</em> ディレクトリの中の、 <em>common</em> で指定されたファイルを比較します。</p>
+<p>ファイル名からなる3つのリスト: <em>match</em>, <em>mismatch</em>, <em>errors</em> を返します。
+<em>match</em> には双方のディレクトリで一致したファイルのリストが含まれ、
+<em>mismatch</em> にはそうでないファイル名のリストが入ります。そして <em>errors</em> は比較されなかったファイルが列挙されます。
+<em>errors</em> になるのは、片方あるいは両方のディレクトリに存在しなかった、ユーザーにそのファイルを読む権限がなかった、その他何らかの理由で比較を完了することができなかった場合です。</p>
+<p>引数 <em>shallow</em> はその意味も標準の設定も <a class="reference internal" href="#filecmp.cmp" title="filecmp.cmp"><tt class="xref py py-func docutils literal"><span class="pre">filecmp.cmp()</span></tt></a> と同じです。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">cmpfiles('a',</span> <span class="pre">'b',</span> <span class="pre">['c',</span> <span class="pre">'d/e'])</span></tt> は <tt class="docutils literal"><span class="pre">a/c</span></tt> を <tt class="docutils literal"><span class="pre">b/c</span></tt> と、
+<tt class="docutils literal"><span class="pre">a/d/e</span></tt> を <tt class="docutils literal"><span class="pre">b/d/e</span></tt> と、それぞれ比較します。 <tt class="docutils literal"><span class="pre">'c'</span></tt> と <tt class="docutils literal"><span class="pre">'d/e'</span></tt>
+はそれぞれ、返される3つのリストのいずれかに登録されます。</p>
+</dd></dl>
+
+<p>例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">filecmp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filecmp</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="s">&#39;undoc.rst&#39;</span><span class="p">,</span> <span class="s">&#39;undoc.rst&#39;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filecmp</span><span class="o">.</span><span class="n">cmp</span><span class="p">(</span><span class="s">&#39;undoc.rst&#39;</span><span class="p">,</span> <span class="s">&#39;index.rst&#39;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<div class="section" id="dircmp">
+<span id="dircmp-objects"></span><h2>10.5.1. <a class="reference internal" href="#filecmp.dircmp" title="filecmp.dircmp"><tt class="xref py py-class docutils literal"><span class="pre">dircmp</span></tt></a> クラス<a class="headerlink" href="#dircmp" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#filecmp.dircmp" title="filecmp.dircmp"><tt class="xref py py-class docutils literal"><span class="pre">dircmp</span></tt></a> のインスタンスは以下のコンストラクタで生成されます:</p>
+<dl class="class">
+<dt id="filecmp.dircmp">
+<em class="property">class </em><tt class="descclassname">filecmp.</tt><tt class="descname">dircmp</tt><big>(</big><em>a</em>, <em>b</em><span class="optional">[</span>, <em>ignore</em><span class="optional">[</span>, <em>hide</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#filecmp.dircmp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ディレクトリ <em>a</em> および <em>b</em> を比較するための新しいディレクトリ比較オブジェクトを生成します。 <em>ignore</em> は比較の際に無視するファイル名のリストで、標準の設定では <tt class="docutils literal"><span class="pre">['RCS',</span> <span class="pre">'CVS',</span> <span class="pre">'tags']</span></tt> です。 <em>hide</em> は表示しない名前のリストで、標準の設定では
+<tt class="docutils literal"><span class="pre">[os.curdir,</span> <span class="pre">os.pardir]</span></tt> です。</p>
+<p><a class="reference internal" href="#filecmp.dircmp" title="filecmp.dircmp"><tt class="xref py py-class docutils literal"><span class="pre">dircmp</span></tt></a> クラスは以下のメソッドを提供しています:</p>
+<dl class="method">
+<dt id="filecmp.dircmp.report">
+<tt class="descname">report</tt><big>(</big><big>)</big><a class="headerlink" href="#filecmp.dircmp.report" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> の間の比較結果を (<tt class="docutils literal"><span class="pre">sys.stdout</span></tt> に) 出力します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="filecmp.dircmp.report_partial_closure">
+<tt class="descname">report_partial_closure</tt><big>(</big><big>)</big><a class="headerlink" href="#filecmp.dircmp.report_partial_closure" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> およびそれらの直下にある共通のサブディレクトリ間での比較結果を出力します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="filecmp.dircmp.report_full_closure">
+<tt class="descname">report_full_closure</tt><big>(</big><big>)</big><a class="headerlink" href="#filecmp.dircmp.report_full_closure" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> およびそれらの共通のサブディレクトリ間での比較結果を (再帰的に比較して) 出力します。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#filecmp.dircmp" title="filecmp.dircmp"><tt class="xref py py-class docutils literal"><span class="pre">dircmp</span></tt></a> は、比較しているディレクトリツリーに関する様々な種類の情報を取得するために使えるような、多くの興味深い属性を提供しています。</p>
+<p><a class="reference internal" href="../reference/datamodel.html#object.__getattr__" title="object.__getattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattr__()</span></tt></a> フックを経由すると、全ての属性をのろのろと計算するため、速度上のペナルティを受けないのは計算処理の軽い属性を使ったときだけなので注意してください。</p>
+<dl class="attribute">
+<dt id="filecmp.dircmp.left_list">
+<tt class="descname">left_list</tt><a class="headerlink" href="#filecmp.dircmp.left_list" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> にあるファイルおよびサブディレクトリです。 <em>hide</em> および <em>ignore</em> でフィルタされています。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.right_list">
+<tt class="descname">right_list</tt><a class="headerlink" href="#filecmp.dircmp.right_list" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>b</em> にあるファイルおよびサブディレクトリです。 <em>hide</em> および <em>ignore</em> でフィルタされています。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.common">
+<tt class="descname">common</tt><a class="headerlink" href="#filecmp.dircmp.common" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> の両方にあるファイルおよびサブディレクトリです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.left_only">
+<tt class="descname">left_only</tt><a class="headerlink" href="#filecmp.dircmp.left_only" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> だけにあるファイルおよびサブディレクトリです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.right_only">
+<tt class="descname">right_only</tt><a class="headerlink" href="#filecmp.dircmp.right_only" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>b</em> だけにあるファイルおよびサブディレクトリです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.common_dirs">
+<tt class="descname">common_dirs</tt><a class="headerlink" href="#filecmp.dircmp.common_dirs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> の両方にあるサブディレクトリです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.common_files">
+<tt class="descname">common_files</tt><a class="headerlink" href="#filecmp.dircmp.common_files" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> の両方にあるファイルです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.common_funny">
+<tt class="descname">common_funny</tt><a class="headerlink" href="#filecmp.dircmp.common_funny" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> の両方にあり、ディレクトリ間でタイプが異なるか、 <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> がエラーを報告するような名前です。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.same_files">
+<tt class="descname">same_files</tt><a class="headerlink" href="#filecmp.dircmp.same_files" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> 両方にあり、一致するファイルです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.diff_files">
+<tt class="descname">diff_files</tt><a class="headerlink" href="#filecmp.dircmp.diff_files" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> 両方にあるが、一致しないファイルです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.funny_files">
+<tt class="descname">funny_files</tt><a class="headerlink" href="#filecmp.dircmp.funny_files" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>a</em> および <em>b</em> 両方にあるが、比較されなかったファイルです。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="filecmp.dircmp.subdirs">
+<tt class="descname">subdirs</tt><a class="headerlink" href="#filecmp.dircmp.subdirs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#filecmp.dircmp.common_dirs" title="filecmp.dircmp.common_dirs"><tt class="xref py py-attr docutils literal"><span class="pre">common_dirs</span></tt></a> のファイル名を <a class="reference internal" href="#filecmp.dircmp" title="filecmp.dircmp"><tt class="xref py py-class docutils literal"><span class="pre">dircmp</span></tt></a> オブジェクトに対応付けた辞書です。</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="tempfile.html" title="10.6. tempfile — 一時的なファイルやディレクトリの生成"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="statvfs.html" title="10.4. statvfs — os.statvfs() で使われる定数群"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" >10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

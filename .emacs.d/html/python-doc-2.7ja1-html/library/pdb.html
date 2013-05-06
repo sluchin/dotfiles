@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>26.2. pdb — Python デバッガ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="26. デバッグとプロファイル" href="debug.html" />
+    <link rel="next" title="26.4. Python プロファイラ" href="profile.html" />
+    <link rel="prev" title="26.1. bdb — デバッガーフレームワーク" href="bdb.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="profile.html" title="26.4. Python プロファイラ"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="bdb.html" title="26.1. bdb — デバッガーフレームワーク"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="debug.html" accesskey="U">26. デバッグとプロファイル</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">26.2. <tt class="docutils literal"><span class="pre">pdb</span></tt> &#8212; Python デバッガ</a></li>
+<li><a class="reference internal" href="#debugger-commands">26.3. デバッガコマンド</a></li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="bdb.html"
+                        title="前の章へ">26.1. <tt class="docutils literal docutils literal docutils literal"><span class="pre">bdb</span></tt> &#8212; デバッガーフレームワーク</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="profile.html"
+                        title="次の章へ">26.4. Python プロファイラ</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/pdb.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-pdb">
+<span id="pdb-python"></span><span id="debugger"></span><h1>26.2. <a class="reference internal" href="#module-pdb" title="pdb: 対話的インタプリタのためのPythonデバッガ。"><tt class="xref py py-mod docutils literal"><span class="pre">pdb</span></tt></a> &#8212; Python デバッガ<a class="headerlink" href="#module-pdb" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">モジュール <a class="reference internal" href="#module-pdb" title="pdb: 対話的インタプリタのためのPythonデバッガ。"><tt class="xref py py-mod docutils literal"><span class="pre">pdb</span></tt></a> はPythonプログラム用の対話的ソースコードデバッガを定義します。
+(条件付き)ブレークポイントの設定やソース行レベルでのシングルステップ実行、スタックフレームのインスペクション、ソースコードリスティングおよびいかなるスタックフレームのコンテキストにおける任意のPythonコードの評価をサポートしています。事後解析デバッギングもサポートし、プログラムの制御下で呼び出すことができます。</p>
+<p id="index-1">デバッガは拡張可能です &#8212;
+実際にはクラス <a class="reference internal" href="#pdb.Pdb" title="pdb.Pdb"><tt class="xref py py-class docutils literal"><span class="pre">Pdb</span></tt></a> として定義されています。現在これについてのドキュメントはありませんが、ソースを読めば簡単に理解できます。拡張インターフェースはモジュール <a class="reference internal" href="bdb.html#module-bdb" title="bdb: デバッガーフレームワーク"><tt class="xref py py-mod docutils literal"><span class="pre">bdb</span></tt></a> と <a class="reference internal" href="cmd.html#module-cmd" title="cmd: 行指向のコマンドインタープリタを構築"><tt class="xref py py-mod docutils literal"><span class="pre">cmd</span></tt></a> を使っています。</p>
+<p>デバッガのプロンプトは <tt class="docutils literal"><span class="pre">(Pdb)</span></tt> です。デバッガに制御された状態でプログラムを実行するための典型的な使い方は:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">mymodule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s">&#39;mymodule.test()&#39;</span><span class="p">)</span>
+<span class="go">&gt; &lt;string&gt;(0)?()</span>
+<span class="go">(Pdb) continue</span>
+<span class="go">&gt; &lt;string&gt;(1)?()</span>
+<span class="go">(Pdb) continue</span>
+<span class="go">NameError: &#39;spam&#39;</span>
+<span class="go">&gt; &lt;string&gt;(1)?()</span>
+<span class="go">(Pdb)</span>
+</pre></div>
+</div>
+<p>他のスクリプトをデバッグするために、
+<tt class="file docutils literal"><span class="pre">pdb.py</span></tt> をスクリプトとして呼び出すこともできます。例えば:</p>
+<div class="highlight-python"><pre>python -m pdb myscript.py</pre>
+</div>
+<p>スクリプトとして pdb を起動すると、デバッグ中のプログラムが異常終了した時に pdb が自動的に事後デバッグモードに入ります。事後デバッグ後 (またはプログラムの正常終了後) には、 pdb はプログラムを再起動します。自動再起動を行った場合、 pdb の状態 (ブレークポイントなど) はそのまま維持されるので、たいていの場合、プログラム終了時にデバッガも終了させるよりも便利なはずです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加: </span>事後デバッグ後の再起動機能が追加されました.</p>
+<p>実行するプログラムをデバッガで分析する典型的な使い方は:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>をデバッガで分析したい場所に挿入することです。そうすることで、コードの中の以下に続く文をステップ実行できます、そして、 <tt class="docutils literal"><span class="pre">c</span></tt> コマンドでデバッガを走らせることなく続けることもできます。</p>
+<p>クラッシュしたプログラムを調べるための典型的な使い方は:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pdb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">mymodule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mymodule</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+  File <span class="nb">&quot;./mymodule.py&quot;</span>, line <span class="m">4</span>, in <span class="n-Identifier">test</span>
+    <span class="n">test2</span><span class="p">()</span>
+  File <span class="nb">&quot;./mymodule.py&quot;</span>, line <span class="m">3</span>, in <span class="n-Identifier">test2</span>
+    <span class="k">print</span> <span class="n">spam</span>
+<span class="nc">NameError</span>: <span class="n-Identifier">spam</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">pm</span><span class="p">()</span>
+<span class="go">&gt; ./mymodule.py(3)test2()</span>
+<span class="go">-&gt; print spam</span>
+<span class="go">(Pdb)</span>
+</pre></div>
+</div>
+<p>モジュールは以下の関数を定義しています。それぞれが少しづつ違った方法でデバッガに入ります:</p>
+<dl class="function">
+<dt id="pdb.run">
+<tt class="descclassname">pdb.</tt><tt class="descname">run</tt><big>(</big><em>statement</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pdb.run" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デバッガに制御された状態で(文字列として与えられた) <em>statement</em> を実行します。デバッガプロンプトはあらゆるコードが実行される前に現れます。ブレークポイントを設定し、 <tt class="docutils literal"><span class="pre">continue</span></tt> とタイプできます。あるいは、文を <tt class="docutils literal"><span class="pre">step</span></tt> や <tt class="docutils literal"><span class="pre">next</span></tt> を使って一つづつ実行することができます
+(これらのコマンドはすべて下で説明します) 。オプションの <em>globals</em> と <em>locals</em> 引数はコードを実行する環境を指定します。デフォルトでは、モジュール <a class="reference internal" href="__main__.html#module-__main__" title="__main__: トップレベルスクリプトが実行される環境。"><tt class="xref py py-mod docutils literal"><span class="pre">__main__</span></tt></a> の辞書が使われます。
+(<a class="reference internal" href="../reference/simple_stmts.html#exec"><tt class="xref std std-keyword docutils literal"><span class="pre">exec</span></tt></a> 文または <a class="reference internal" href="functions.html#eval" title="eval"><tt class="xref py py-func docutils literal"><span class="pre">eval()</span></tt></a> 組み込み関数の説明を参照してください。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdb.runeval">
+<tt class="descclassname">pdb.</tt><tt class="descname">runeval</tt><big>(</big><em>expression</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pdb.runeval" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デバッガの制御もとで(文字列として与えられる) <em>expression</em> を評価します。
+<a class="reference internal" href="#pdb.runeval" title="pdb.runeval"><tt class="xref py py-func docutils literal"><span class="pre">runeval()</span></tt></a> がリターンしたとき、式の値を返します。その他の点では、この関数は <a class="reference internal" href="#pdb.run" title="pdb.run"><tt class="xref py py-func docutils literal"><span class="pre">run()</span></tt></a> と同様です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdb.runcall">
+<tt class="descclassname">pdb.</tt><tt class="descname">runcall</tt><big>(</big><em>function</em><span class="optional">[</span>, <em>argument</em>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pdb.runcall" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>function</em> (関数またはメソッドオブジェクト、文字列ではありません)
+を与えられた引数とともに呼び出します。
+<a class="reference internal" href="#pdb.runcall" title="pdb.runcall"><tt class="xref py py-func docutils literal"><span class="pre">runcall()</span></tt></a> がリターンしたとき、関数呼び出しが返したものは何でも返します。デバッガプロンプトは関数に入るとすぐに現れます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdb.set_trace">
+<tt class="descclassname">pdb.</tt><tt class="descname">set_trace</tt><big>(</big><big>)</big><a class="headerlink" href="#pdb.set_trace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックフレームを呼び出したところでデバッガに入ります。たとえコードが別の方法でデバッグされている最中でなくても
+(例えば、アサーションが失敗するとき)、これはプログラムの所定の場所でブレークポイントをハードコードするために役に立ちます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdb.post_mortem">
+<tt class="descclassname">pdb.</tt><tt class="descname">post_mortem</tt><big>(</big><span class="optional">[</span><em>traceback</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pdb.post_mortem" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた <em>traceback</em> オブジェクトの事後解析デバッギングに入ります。もし <em>traceback</em> が与えられなければ、その時点で取り扱っている例外のうちのひとつを使います。
+(デフォルト動作をさせるには、例外を取り扱っている最中である必要があります。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pdb.pm">
+<tt class="descclassname">pdb.</tt><tt class="descname">pm</tt><big>(</big><big>)</big><a class="headerlink" href="#pdb.pm" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="sys.html#sys.last_traceback" title="sys.last_traceback"><tt class="xref py py-data docutils literal"><span class="pre">sys.last_traceback</span></tt></a> のトレースバックの事後解析デバッギングに入ります。</p>
+</dd></dl>
+
+<p><tt class="docutils literal"><span class="pre">run*</span></tt> 関数と <a class="reference internal" href="#pdb.set_trace" title="pdb.set_trace"><tt class="xref py py-func docutils literal"><span class="pre">set_trace()</span></tt></a> は、 <a class="reference internal" href="#pdb.Pdb" title="pdb.Pdb"><tt class="xref py py-class docutils literal"><span class="pre">Pdb</span></tt></a> クラスをインスタンス化して同名のメソッドを実行することのエイリアス関数です。それ以上の機能を利用したい場合は、インスタンス化を自分でしなければなりません。</p>
+<dl class="class">
+<dt id="pdb.Pdb">
+<em class="property">class </em><tt class="descclassname">pdb.</tt><tt class="descname">Pdb</tt><big>(</big><em>completekey='tab'</em>, <em>stdin=None</em>, <em>stdout=None</em>, <em>skip=None</em><big>)</big><a class="headerlink" href="#pdb.Pdb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#pdb.Pdb" title="pdb.Pdb"><tt class="xref py py-class docutils literal"><span class="pre">Pdb</span></tt></a> はデバッガークラスです。</p>
+<p><em>completekey</em>, <em>stdin</em>, <em>stdout</em> 引数は、基底にある <a class="reference internal" href="cmd.html#cmd.Cmd" title="cmd.Cmd"><tt class="xref py py-class docutils literal"><span class="pre">cmd.Cmd</span></tt></a>
+クラスに渡されます。そちらの解説を参照してください。</p>
+<p><em>skip</em> 引数が指定された場合、 glob スタイルのモジュール名パターンの iterable
+(イテレート可能オブジェクト) でなければなりません。デバッガはこのパターンのどれかにマッチするモジュールに属するフレームにはステップ・インしません。 <a class="footnote-reference" href="#id3" id="id1">[1]</a></p>
+<p><em>skip</em> を使ってトレースする呼び出しの例:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pdb</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">Pdb</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;django.*&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加: </span><em>skip</em> 引数</p>
+<dl class="method">
+<dt id="pdb.Pdb.run">
+<tt class="descname">run</tt><big>(</big><em>statement</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pdb.Pdb.run" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="pdb.Pdb.runeval">
+<tt class="descname">runeval</tt><big>(</big><em>expression</em><span class="optional">[</span>, <em>globals</em><span class="optional">[</span>, <em>locals</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#pdb.Pdb.runeval" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="pdb.Pdb.runcall">
+<tt class="descname">runcall</tt><big>(</big><em>function</em><span class="optional">[</span>, <em>argument</em>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#pdb.Pdb.runcall" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="pdb.Pdb.set_trace">
+<tt class="descname">set_trace</tt><big>(</big><big>)</big><a class="headerlink" href="#pdb.Pdb.set_trace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>上で説明された関数のドキュメントを参照してください。</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="debugger-commands">
+<span id="id2"></span><h1>26.3. デバッガコマンド<a class="headerlink" href="#debugger-commands" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>デバッガは以下のコマンドを認識します。ほとんどのコマンドは一文字または二文字に省略することができます。例えば、 <tt class="docutils literal"><span class="pre">h(elp)</span></tt> が意味するのは、ヘルプコマンドを入力するために
+<tt class="docutils literal"><span class="pre">h</span></tt> か <tt class="docutils literal"><span class="pre">help</span></tt> のどちらか一方を使うことができるということです
+( が、 <tt class="docutils literal"><span class="pre">he</span></tt> や <tt class="docutils literal"><span class="pre">hel</span></tt> は使えず、また <tt class="docutils literal"><span class="pre">H</span></tt> や <tt class="docutils literal"><span class="pre">Help</span></tt> 、 <tt class="docutils literal"><span class="pre">HELP</span></tt> も使えません ) 。コマンドの引数は空白 ( スペースまたはタブ ) で区切られなければなりません。オプションの引数はコマンド構文の角括弧 (<tt class="docutils literal"><span class="pre">[]</span></tt>) の中に入れなければなりません。角括弧をタイプしてはいけません。コマンド構文における選択肢は垂直バー (<tt class="docutils literal"><span class="pre">|</span></tt>) で区切られます。</p>
+<p>空行を入力すると入力された直前のコマンドを繰り返します。例外: 直前のコマンドが <tt class="docutils literal"><span class="pre">list</span></tt> コマンドならば、次の11行がリストされます。</p>
+<p>デバッガが認識しないコマンドは Python 文とみなして、デバッグしているプログラムのコンテキストおいて実行されます。
+Python 文は感嘆符 (<tt class="docutils literal"><span class="pre">!</span></tt>) を前に付けることもできます。これはデバッグ中のプログラムを調査する強力な方法です。変数を変更したり関数を呼び出したりすることさえ可能です。このような文で例外が発生した場合には例外名がプリントされますが、デバッガの状態は変化しません。</p>
+<p>複数のコマンドを <tt class="docutils literal"><span class="pre">;;</span></tt> で区切って一行で入力することができます。
+(一つだけの <tt class="docutils literal"><span class="pre">;</span></tt> は使われません。なぜなら、 Python パーサへ渡される行内の複数のコマンドのための分離記号だからです。)
+コマンドを分割するために何も知的なことはしていません。たとえ引用文字列の途中であっても、入力は最初の <tt class="docutils literal"><span class="pre">;;</span></tt> 対で分割されます。</p>
+<p>デバッガはエイリアスをサポートします。エイリアスはパラメータを持つことができ、調査中のコンテキストに対して人がある程度柔軟に対応できます。</p>
+<p id="index-2">ファイル <tt class="file docutils literal"><span class="pre">.pdbrc</span></tt> はユーザのホームディレクトリか、またはカレントディレクトリにあります。それはまるでデバッガのプロンプトでタイプしたかのように読み込まれて実行されます。これは特にエイリアスのために便利です。両方のファイルが存在する場合、ホームディレクトリのものが最初に読まれ、そこに定義されているエイリアスはローカルファイルにより上書きされることがあります。</p>
+<dl class="docutils">
+<dt>h(elp) [<em>command</em>]</dt>
+<dd>引数なしでは、利用できるコマンドの一覧をプリントします。引数として <em>command</em> がある場合は、そのコマンドについてのヘルプをプリントします。
+<tt class="docutils literal"><span class="pre">help</span> <span class="pre">pdb</span></tt> は完全ドキュメンテーションファイルを表示します。環境変数 <span class="target" id="index-3"></span><tt class="xref std std-envvar docutils literal"><span class="pre">PAGER</span></tt> が定義されているならば、代わりにファイルはそのコマンドへパイプされます。
+<em>command</em> 引数が識別子でなければならないので、
+<tt class="docutils literal"><span class="pre">!</span></tt> コマンドについてのヘルプを得るためには <tt class="docutils literal"><span class="pre">help</span> <span class="pre">exec</span></tt> と入力しなければなりません。</dd>
+<dt>w(here)</dt>
+<dd>スタックの底にある最も新しいフレームと一緒にスタックトレースをプリントします。矢印はカレントフレームを指し、それがほとんどのコマンドのコンテキストを決定します。</dd>
+<dt>d(own)</dt>
+<dd>( より新しいフレームに向かって ) スタックトレース内でカレントフレームを1レベル下げます。</dd>
+<dt>u(p)</dt>
+<dd>( より古いフレームに向かって ) スタックトレース内でカレントフレームを1レベル上げます。</dd>
+<dt>b(reak) [[<em>filename</em>:]<em>lineno</em> | <em>function</em> [, <em>condition</em>]]</dt>
+<dd><p class="first"><em>lineno</em> 引数がある場合は、現在のファイルのその場所にブレークポイントを設定します。
+<em>function</em> 引数がある場合は、その関数の中の最初の実行可能文にブレークポイントを設定します。別のファイル ( まだロードされていないかもしれないもの ) のブレークポイントを指定するために、行番号はファイル名とコロンをともに先頭に付けられます。ファイルは <tt class="docutils literal"><span class="pre">sys.path</span></tt> にそって検索されます。各ブレークポイントは番号を割り当てられ、その番号を他のすべてのブレークポイントコマンドが参照することに注意してください。</p>
+<p>第二引数を指定する場合、その値は式で、その評価値が真でなければブレークポイントは有効になりません。</p>
+<p class="last">引数なしの場合は、それぞれのブレークポイントに対して、そのブレークポイントに行き当たった回数、現在の通過カウント ( ignore count ) と、もしあれば関連条件を含めてすべてのブレークポイントをリストします。</p>
+</dd>
+<dt>tbreak [[<em>filename</em>:]<em>lineno</em> | <em>function</em>[, <em>condition</em>]]</dt>
+<dd>一時的なブレークポイントで、最初にそこに達したときに自動的に取り除かれます。引数は break と同じです。</dd>
+<dt>cl(ear) [<em>filename:lineno</em> | <em>bpnumber</em> [<em>bpnumber ...</em>]]</dt>
+<dd><em>filename:lineno</em> 引数を与えると、その行にある全てのブレークポイントを解除します。スペースで区切られたブレークポイントナンバーのリストを与えると、それらのブレークポイントを解除します。引数なしの場合は、すべてのブレークポイントを解除します
+( が、はじめに確認します ) 。</dd>
+<dt>disable [<em>bpnumber</em> [<em>bpnumber ...</em>]]</dt>
+<dd>スペースで区切られたブレークポイントナンバーのリストとして与えられるブレークポイントを無効にします。ブレークポイントを無効にすると、プログラムの実行を止めることができなくなりますが、ブレークポイントの解除と違いブレークポイントのリストに残ったままになり、
+(再び)有効にすることができます。</dd>
+<dt>enable [<em>bpnumber</em> [<em>bpnumber ...</em>]]</dt>
+<dd>指定したブレークポイントを有効にします。</dd>
+<dt>ignore <em>bpnumber</em> [<em>count</em>]</dt>
+<dd>与えられたブレークポイントナンバーに通過カウントを設定します。
+count が省略されると、通過カウントは 0 に設定されます。通過カウントがゼロになったとき、ブレークポイントが機能する状態になります。ゼロでないときは、そのブレークポイントが無効にされず、どんな関連条件も真に評価されていて、ブレークポイントに来るたびに count が減らされます。</dd>
+<dt>condition <em>bpnumber</em> [<em>condition</em>]</dt>
+<dd>condition はブレークポイントが取り上げられる前に真と評価されなければならない式です。
+condition がない場合は、どんな既存の条件も取り除かれます。すなわち、ブレークポイントは無条件になります。</dd>
+<dt>commands [<em>bpnumber</em>]</dt>
+<dd><p class="first">ブレークポイントナンバー <em>bpnumber</em> にコマンドのリストを指定します。コマンドそのものはその後の行に続けます。
+&#8216;end&#8217; だけからなる行を入力することでコマンド群の終わりを示します。例を挙げます:</p>
+<div class="highlight-python"><pre>(Pdb) commands 1
+(com) print some_variable
+(com) end
+(Pdb)</pre>
+</div>
+<p>ブレークポイントからコマンドを取り除くには、 commands のあとに end だけを続けます。つまり、コマンドを一つも指定しないようにします。</p>
+<p><em>bpnumber</em> 引数が指定されない場合、最後にセットされたブレークポイントを参照することになります。</p>
+<p>ブレークポイントコマンドはプログラムを走らせ直すのに使えます。ただ continue コマンドや step、その他実行を再開するコマンドを使えば良いのです。</p>
+<p>実行を再開するコマンド
+( 現在のところ continue, step, next, return, jump, quit とそれらの省略形 ) によって、コマンドリストは終了するものと見なされます
+( コマンドにすぐ end が続いているかのように ) 。というのも実行を再開すれば ( それが単純な next や step であっても )
+別のブレークポイントに到達するかもしれないからです。そのブレークポイントにさらにコマンドリストがあれば、どちらのリストを実行すべきか状況が曖昧になります。</p>
+<p>コマンドリストの中で &#8216;silent&#8217; コマンドを使うと、ブレークポイントで停止したという通常のメッセージはプリントされません。この振る舞いは特定のメッセージを出して実行を続けるようなブレークポイントでは望ましいものでしょう。他のコマンドが何も画面出力をしなければ、そのブレークポイントに到達したというサインを見ないことになります。</p>
+<p class="last versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd>
+<dt>s(tep)</dt>
+<dd>現在の行を実行し、最初に実行可能なものがあらわれたときに
+(呼び出された関数の中か、現在の関数の次の行で) 停止します。</dd>
+<dt>n(ext)</dt>
+<dd>現在の関数の次の行に達するか、あるいは関数が返るまで実行を継続します。
+( <tt class="docutils literal"><span class="pre">next</span></tt> と <tt class="docutils literal"><span class="pre">step</span></tt> の差は <tt class="docutils literal"><span class="pre">step</span></tt> が呼び出された関数の内部で停止するのに対し、
+<tt class="docutils literal"><span class="pre">next</span></tt> は呼び出された関数を ( ほぼ ) 全速力で実行し、現在の関数内の次の行で停止するだけです。)</dd>
+<dt>unt(il)</dt>
+<dd><p class="first">行番号が現在行より大きくなるまで、もしくは、現在のフレームから戻るまで、実行を続けます。</p>
+<p class="last versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd>
+<dt>r(eturn)</dt>
+<dd>現在の関数が返るまで実行を継続します。</dd>
+<dt>c(ont(inue))</dt>
+<dd>ブレークポイントに出会うまで、実行を継続します。</dd>
+<dt>j(ump) <em>lineno</em></dt>
+<dd><p class="first">次に実行する行を指定します。最も底のフレーム中でのみ実行可能です。前に戻って実行したり、不要な部分をスキップして先の処理を実行する場合に使用します。</p>
+<p class="last">ジャンプには制限があり、例えば <a class="reference internal" href="../reference/compound_stmts.html#for"><tt class="xref std std-keyword docutils literal"><span class="pre">for</span></tt></a> ループの中には飛び込めませんし、
+<a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節の外にも飛ぶ事ができません。</p>
+</dd>
+<dt>l(ist) [<em>first</em>[, <em>last</em>]]</dt>
+<dd>現在のファイルのソースコードをリスト表示します。引数なしの場合は、現在の行の周囲を11行リストするか、または前のリストの続きを表示します。引数が一つある場合は、その行の周囲を11行表示します。引数が二つの場合は、与えられた範囲をリスト表示します。第二引数が第一引数より小さいときは、カウントと解釈されます。</dd>
+<dt>a(rgs)</dt>
+<dd>現在の関数の引数リストをプリントします。</dd>
+<dt>p <em>expression</em></dt>
+<dd>現在のコンテキストにおいて <em>expression</em> を評価し、その値をプリントします。
+(注意: <tt class="docutils literal"><span class="pre">print</span></tt> も使うことができますが、デバッガコマンドではありません
+&#8212; これは Python の <a class="reference internal" href="../reference/simple_stmts.html#print"><tt class="xref std std-keyword docutils literal"><span class="pre">print</span></tt></a> 文を実行します。)</dd>
+<dt>pp <em>expression</em></dt>
+<dd><a class="reference internal" href="pprint.html#module-pprint" title="pprint: Data pretty printer."><tt class="xref py py-mod docutils literal"><span class="pre">pprint</span></tt></a> モジュールを使って例外の値が整形されることを除いて
+<tt class="docutils literal"><span class="pre">p</span></tt> コマンドと同様です。</dd>
+<dt>alias [<em>name</em> [command]]</dt>
+<dd><p class="first"><em>name</em> という名前の <em>command</em> を実行するエイリアスを作成します。コマンドは引用符で囲まれていては <em>いけません</em> 。入れ替え可能なパラメータは <tt class="docutils literal"><span class="pre">%1</span></tt> 、 <tt class="docutils literal"><span class="pre">%2</span></tt> などで指し示され、さらに <tt class="docutils literal"><span class="pre">%*</span></tt> は全パラメータに置き換えられます。コマンドが与えられなければ、 <em>name</em> に対する現在のエイリアスを表示します。引数が与えられなければ、すべてのエイリアスがリストされます。</p>
+<p>エイリアスは入れ子になってもよく、
+pdb プロンプトで合法的にタイプできるどんなものでも含めることができます。内部 pdb コマンドをエイリアスによって上書きすることが <em>できます</em> 。そのとき、このようなコマンドはエイリアスが取り除かれるまで隠されます。エイリアス化はコマンド行の最初の語へ再帰的に適用されます。行の他のすべての語はそのままです。</p>
+<p>例として、二つの便利なエイリアスがあります
+(特に <tt class="file docutils literal"><span class="pre">.pdbrc</span></tt> ファイルに置かれたときに):</p>
+<div class="last highlight-python"><pre>#Print instance variables (usage "pi classInst")
+alias pi for k in %1.__dict__.keys(): print "%1.",k,"=",%1.__dict__[k]
+#Print instance variables in self
+alias ps pi self</pre>
+</div>
+</dd>
+<dt>unalias <em>name</em></dt>
+<dd>指定したエイリアスを削除します。</dd>
+<dt>[!]<em>statement</em></dt>
+<dd><p class="first">現在のスタックフレームのコンテキストにおいて(一行の) <em>statement</em> を実行します。文の最初の語がデバッガコマンドと共通でない場合は、感嘆符を省略することができます。グローバル変数を設定するために、同じ行に <tt class="docutils literal"><span class="pre">global</span></tt> コマンドとともに代入コマンドの前に付けることができます。:</p>
+<div class="last highlight-python"><pre>(Pdb) global list_options; list_options = ['-l']
+(Pdb)</pre>
+</div>
+</dd>
+<dt>run [<em>args</em> ...]</dt>
+<dd><p class="first">デバッグ中のプログラムを再実行します。もし引数が与えられると、
+&#8220;shlex&#8221; で分割され、結果が新しい sys.argv として使われます。ヒストリー、ブレークポイント、アクション、そして、デバッガーオプションは引き継がれます。 &#8220;restart&#8221; は &#8220;run&#8221; の別名です。</p>
+<p class="last versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd>
+<dt>q(uit)</dt>
+<dd>デバッガを終了します。実行しているプログラムは中断されます。</dd>
+</dl>
+<p class="rubric">注記</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>フレームが属するモジュールは、そのフレームのグローバルの
+<tt class="docutils literal"><span class="pre">__name__</span></tt> によって決定されます。</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="profile.html" title="26.4. Python プロファイラ"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="bdb.html" title="26.1. bdb — デバッガーフレームワーク"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="debug.html" >26. デバッグとプロファイル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

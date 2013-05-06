@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>文字列/バイトオブジェクト &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="具象オブジェクト (concrete object) レイヤ" href="concrete.html" />
+    <link rel="next" title="Unicode オブジェクトと codec" href="unicode.html" />
+    <link rel="prev" title="bytearray オブジェクト" href="bytearray.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="unicode.html" title="Unicode オブジェクトと codec"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="bytearray.html" title="bytearray オブジェクト"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" accesskey="U">具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="bytearray.html"
+                        title="前の章へ">bytearray オブジェクト</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="unicode.html"
+                        title="次の章へ">Unicode オブジェクトと codec</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/string.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="stringobjects">
+<span id="id1"></span><h1>文字列/バイトオブジェクト<a class="headerlink" href="#stringobjects" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>以下の関数では、文字列が渡されるはずのパラメタに非文字列が渡された場合に <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">これらの関数群は Python 3.x では PyBytes_* へリネームされます。移植を容易にするために、特に注釈されていない限り、 3.x で利用できる PyBytes 関数群は同等の PyString_* 関数へのエイリアスにされています。</p>
+</div>
+<span class="target" id="index-0"></span><dl class="type">
+<dt id="PyStringObject">
+<tt class="descname">PyStringObject</tt><a class="headerlink" href="#PyStringObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="structures.html#PyObject" title="PyObject"><tt class="xref c c-type docutils literal"><span class="pre">PyObject</span></tt></a> のサブタイプは Python の文字列オブジェクトを表現します。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="PyString_Type">
+<a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a> <tt class="descname">PyString_Type</tt><a class="headerlink" href="#PyString_Type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-1">この <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject"><tt class="xref c c-type docutils literal"><span class="pre">PyTypeObject</span></tt></a> のインスタンスは Python の文字列型を表現します; このオブジェクトは Python レイヤにおける
+<tt class="docutils literal"><span class="pre">str</span></tt> や <tt class="docutils literal"><span class="pre">types.StringType</span></tt> と同じです。 .</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_Check">
+int <tt class="descname">PyString_Check</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*o</em><big>)</big><a class="headerlink" href="#PyString_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>o</em> が文字列型か文字列型のサブタイプであるときに真を返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.2 で変更: </span>サブタイプを引数にとれるようになりました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_CheckExact">
+int <tt class="descname">PyString_CheckExact</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*o</em><big>)</big><a class="headerlink" href="#PyString_CheckExact" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>o</em> が文字列型で、かつ文字列型のサブタイプでないときに真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_FromString">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_FromString</tt><big>(</big>const char<em>&nbsp;*v</em><big>)</big><a class="headerlink" href="#PyString_FromString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>v</em> を値に持つ文字列オブジェクトを返します。失敗すると <em>NULL</em> を返します。パラメタ <em>v</em> は <em>NULL</em> であってはなりません;
+<em>NULL</em> かどうかはチェックしません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_FromStringAndSize">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_FromStringAndSize</tt><big>(</big>const char<em>&nbsp;*v</em>, Py_ssize_t<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#PyString_FromStringAndSize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>値が <em>v</em> で長さが <em>len</em> の新たな文字列オブジェクトを返します。失敗すると <em>NULL</em> を返します。 <em>v</em> が <em>NULL</em>
+の場合、文字列の中身は未初期化の状態になります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>len</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_FromFormat">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_FromFormat</tt><big>(</big>const char<em>&nbsp;*format</em>, ...<big>)</big><a class="headerlink" href="#PyString_FromFormat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>C 関数 <tt class="xref c c-func docutils literal"><span class="pre">printf()</span></tt> 形式の <em>format</em> 文字列と可変個の引数をとり、書式化済みの文字列長を計算した上で、書式化を行った結果を値とする Python 文字列にして返します。可変個の引数部は C のデータ型でなくてはならず、かつ <em>format</em> 文字列内の書式指定文字 (format
+character) に一致する型でなくてはなりません。利用できる書式化文字は以下の通りです:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="20%" />
+<col width="61%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">書式指定文字</th>
+<th class="head">型</th>
+<th class="head">コメント</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">%%</span></tt></td>
+<td><em>n/a</em></td>
+<td>文字 % のリテラル。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">%c</span></tt></td>
+<td>int</td>
+<td>C の整数型で表現される単一の文字。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">%d</span></tt></td>
+<td>int</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%d&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">%u</span></tt></td>
+<td>unsigned int</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%u&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">%ld</span></tt></td>
+<td>long</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%ld&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">%lu</span></tt></td>
+<td>unsigned long</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%lu&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">%lld</span></tt></td>
+<td>long long</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%lld&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">%llu</span></tt></td>
+<td>unsigned
+long long</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%llu&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">%zd</span></tt></td>
+<td>Py_ssize_t</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%zd&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">%zu</span></tt></td>
+<td>size_t</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%zu&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">%i</span></tt></td>
+<td>int</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%i&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">%x</span></tt></td>
+<td>int</td>
+<td>C の <tt class="docutils literal"><span class="pre">printf(&quot;%x&quot;)</span></tt> と全く同じ。</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">%s</span></tt></td>
+<td>char*</td>
+<td>null で終端された C の文字列。</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">%p</span></tt></td>
+<td>void*</td>
+<td>C ポインタの 16
+進表記。 <tt class="docutils literal"><span class="pre">printf(&quot;%p&quot;)</span></tt>
+とほとんど同じだが、プラットフォームにおける
+<tt class="docutils literal"><span class="pre">printf</span></tt> の定義に関わりなく先頭にリテラル
+<tt class="docutils literal"><span class="pre">0x</span></tt> が付きます。</td>
+</tr>
+</tbody>
+</table>
+<p>識別できない書式指定文字があった場合、残りの書式文字列はそのまま出力文字列にコピーされ、残りの引数は無視されます。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><cite>&#8220;%lld&#8221;</cite> と <cite>&#8220;%llu&#8221;</cite> 書式指定文字は <tt class="xref py py-const docutils literal"><span class="pre">HAVE_LONG_LONG</span></tt>
+が定義されている時だけ利用できます。</p>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span><cite>&#8220;%lld&#8221;</cite> と <cite>&#8220;%llu&#8221;</cite> のサポートが追加されました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_FromFormatV">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_FromFormatV</tt><big>(</big>const char<em>&nbsp;*format</em>, va_list<em>&nbsp;vargs</em><big>)</big><a class="headerlink" href="#PyString_FromFormatV" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><a class="reference internal" href="#PyString_FromFormat" title="PyString_FromFormat"><tt class="xref c c-func docutils literal"><span class="pre">PyString_FromFormat()</span></tt></a> と同じです。ただし、こちらの関数は二つしか引数をとりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_Size">
+Py_ssize_t <tt class="descname">PyString_Size</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*string</em><big>)</big><a class="headerlink" href="#PyString_Size" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>文字列オブジェクト <em>string</em> 内の文字列値の長さを返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を返していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_GET_SIZE">
+Py_ssize_t <tt class="descname">PyString_GET_SIZE</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*string</em><big>)</big><a class="headerlink" href="#PyString_GET_SIZE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#PyString_Size" title="PyString_Size"><tt class="xref c c-func docutils literal"><span class="pre">PyString_Size()</span></tt></a> をマクロで実装したもので、エラーチェックを行いません。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を返していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_AsString">
+char* <tt class="descname">PyString_AsString</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*string</em><big>)</big><a class="headerlink" href="#PyString_AsString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>string</em> の中身を NUL 文字終端された表現で返します。ポインタは <em>string</em> オブジェクトの内部バッファを指し、バッファのコピーを指すわけではありません。 <tt class="docutils literal"><span class="pre">PyString_FromStringAndSize(NULL,</span> <span class="pre">size)</span></tt> を使って生成した文字列でない限り、バッファ内のデータはいかなる変更もしてはなりません。この文字列をデアロケートしてはなりません。 <em>string</em> が Unicode
+オブジェクトの場合、この関数は <em>string</em> のデフォルトエンコーディング版を計算し、デフォルトエンコーディング版に対して操作を行います。
+<em>string</em> が文字列オブジェクトですらない場合、 <a class="reference internal" href="#PyString_AsString" title="PyString_AsString"><tt class="xref c c-func docutils literal"><span class="pre">PyString_AsString()</span></tt></a> は <em>NULL</em> を返して
+<a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_AS_STRING">
+char* <tt class="descname">PyString_AS_STRING</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*string</em><big>)</big><a class="headerlink" href="#PyString_AS_STRING" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#PyString_AsString" title="PyString_AsString"><tt class="xref c c-func docutils literal"><span class="pre">PyString_AsString()</span></tt></a> をマクロで実装したもので、エラーチェックを行いません。文字列オブジェクトだけをサポートします;
+Unicode オブジェクトを渡してはなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_AsStringAndSize">
+int <tt class="descname">PyString_AsStringAndSize</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*obj</em>, char<em>&nbsp;**buffer</em>, Py_ssize_t<em>&nbsp;*length</em><big>)</big><a class="headerlink" href="#PyString_AsStringAndSize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>obj</em> の中身を NUL 文字終端された表現にして、出力用の変数 <em>buffer</em> と <em>length</em> を使って返します。</p>
+<p>この関数は文字列オブジェクトと Unicode オブジェクトのどちらも入力として受理します。 Unicode オブジェクトの場合、オブジェクトをデフォルトエンコーディングでエンコードしたバージョン (default encoded version) を返します。 <em>length</em> が <em>NULL</em> の場合、値を返させるバッファには NUL 文字を入れてはなりません; NUL 文字が入っている場合、関数は <tt class="docutils literal"><span class="pre">-1</span></tt> を返し、
+<a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+<p><em>buffer</em> は <em>obj</em> の内部文字列バッファを参照し、バッファのコピーを参照するわけではありません。
+<tt class="docutils literal"><span class="pre">PyString_FromStringAndSize(NULL,</span> <span class="pre">size)</span></tt> を使って生成した文字列でない限り、バッファ内のデータはいかなる変更もしてはなりません。この文字列をデアロケートしてはなりません。</p>
+<p><em>string</em> が Unicode オブジェクトの場合、この関数は <em>string</em> のデフォルトエンコーディング版を計算し、デフォルトエンコーディング版に対して操作を行います。 <em>string</em> が文字列オブジェクトですらない場合、
+<a class="reference internal" href="#PyString_AsStringAndSize" title="PyString_AsStringAndSize"><tt class="xref c c-func docutils literal"><span class="pre">PyString_AsStringAndSize()</span></tt></a> は <tt class="docutils literal"><span class="pre">-1</span></tt> を返して <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>length</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span> <span class="pre">*</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_Concat">
+void <tt class="descname">PyString_Concat</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;**string</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*newpart</em><big>)</big><a class="headerlink" href="#PyString_Concat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい文字列オブジェクトを <em>*string</em> に作成し、 <em>newpart</em> の内容を <em>string</em> に追加します; 呼び出し側は新たな参照を所有することになります。 <em>string</em> の以前の値に対する参照は盗み取られます。新たな文字列を生成できなければ、 <em>string</em> に対する古い参照は無視され、
+<em>*string</em> の値は <em>NULL</em> に設定されます; その際、適切な例外情報が設定されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_ConcatAndDel">
+void <tt class="descname">PyString_ConcatAndDel</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;**string</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*newpart</em><big>)</big><a class="headerlink" href="#PyString_ConcatAndDel" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい文字列オブジェクトを <em>*string</em> に作成し、 <em>newpart</em> の内容を <em>string</em> に追加します。こちらのバージョンの関数は
+<em>newpart</em> への参照をデクリメントします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_PyString_Resize">
+int <tt class="descname">_PyString_Resize</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;**string</em>, Py_ssize_t<em>&nbsp;newsize</em><big>)</big><a class="headerlink" href="#_PyString_Resize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;変更不能&#8221; である文字列オブジェクトをサイズ変更する手段です。新たな文字列オブジェクトを作成するときにのみ使用してください;
+文字列がすでにコードの他の部分で使われているかもしれない場合には、この関数を使ってはなりません。入力する文字列オブジェクトの参照カウントが 1
+でない場合、この関数を呼び出すとエラーになります。左側値には、既存の文字列オブジェクトのアドレスを渡し (このアドレスには書き込み操作が起きるかもしれません)、新たなサイズを指定します。成功した場合、 <em>*string</em> はサイズ変更された文字列オブジェクトを保持し、 <tt class="docutils literal"><span class="pre">0</span></tt> が返されます; <em>*string</em> の値は、入力したときの値と異なっているかもしれません。文字列の再アロケーションに失敗した場合、
+<em>*string</em> に入っていた元の文字列オブジェクトを解放し、 <em>*string</em> を <em>NULL</em> にセットし、メモリ例外をセットし、 <tt class="docutils literal"><span class="pre">-1</span></tt>
+を返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>newsize</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_Format">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_Format</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*format</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*args</em><big>)</big><a class="headerlink" href="#PyString_Format" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>新たな文字列オブジェクトを  <em>format</em> と <em>args</em> から生成します。 <tt class="docutils literal"><span class="pre">format</span> <span class="pre">%</span> <span class="pre">args</span></tt> と似た働きです。引数 <em>args</em>
+はタプルでなければなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_InternInPlace">
+void <tt class="descname">PyString_InternInPlace</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;**string</em><big>)</big><a class="headerlink" href="#PyString_InternInPlace" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数 <em>*string</em> をインプレースで隔離 (intern) します。引数は Python 文字列オブジェクトを指すポインタへのアドレスでなくてはなりません。 <em>*string</em> と等しい、すでに隔離済みの文字列が存在する場合、そのオブジェクトを <em>*string</em> に設定します
+(かつ、元の文字列オブジェクトの参照カウントをデクリメントし、すでに隔離済みの文字列オブジェクトの参照カウントをインクリメントします)。 (補足:
+参照カウントについては沢山説明して来ましtが、この関数は参照カウント中立 (reference-count-neutral) と考えてください;
+この関数では、関数の呼び出し後にオブジェクトに対して参照の所有権を持てるのは、関数を呼び出す前にすでに所有権を持っていた場合に限ります。)</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数は 3.x では利用できず、 PyBytes エイリアスもありません。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_InternFromString">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_InternFromString</tt><big>(</big>const char<em>&nbsp;*v</em><big>)</big><a class="headerlink" href="#PyString_InternFromString" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><a class="reference internal" href="#PyString_FromString" title="PyString_FromString"><tt class="xref c c-func docutils literal"><span class="pre">PyString_FromString()</span></tt></a> と  <a class="reference internal" href="#PyString_InternInPlace" title="PyString_InternInPlace"><tt class="xref c c-func docutils literal"><span class="pre">PyString_InternInPlace()</span></tt></a> を組み合わせたもので、隔離済みの新たな文字列オブジェクトを返すか、同じ値を持つすでに隔離済みの文字列オブジェクトに対する新たな (&#8220;所有権を得た&#8221;) 参照を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数は 3.x では利用できず、 PyBytes エイリアスもありません。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_Decode">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_Decode</tt><big>(</big>const char<em>&nbsp;*s</em>, Py_ssize_t<em>&nbsp;size</em>, const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyString_Decode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>size</em> からなるエンコード済みのバッファ <em>s</em> を <em>encoding</em> の名前で登録されている codec に渡してデコードし、オブジェクトを生成します。 <em>encoding</em> および <em>errors</em> は組み込み関数 <a class="reference internal" href="../library/functions.html#unicode" title="unicode"><tt class="xref py py-func docutils literal"><span class="pre">unicode()</span></tt></a>
+に与える同名のパラメタと同じ意味を持ちます。使用する codec の検索は、 Python の codec レジストリを使って行います。codec
+が例外を送出した場合には <em>NULL</em> を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数は 3.x では利用できず、 PyBytes エイリアスもありません。</p>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_AsDecodedObject">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_AsDecodedObject</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*str</em>, const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyString_AsDecodedObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>文字列オブジェクトを <em>encoding</em> の名前で登録されている codec に渡してデコードし、Python オブジェクトを返します。 <em>encoding</em>
+および <em>errors</em> は文字列型の <tt class="xref py py-meth docutils literal"><span class="pre">encode()</span></tt> メソッドに与える同名のパラメタと同じ意味を持ちます。使用する codec の検索は、
+Python の codec レジストリを使って行います。codec が例外を送出した場合には <em>NULL</em> を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数は 3.x では利用できず、 PyBytes エイリアスもありません。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_Encode">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_Encode</tt><big>(</big>const char<em>&nbsp;*s</em>, Py_ssize_t<em>&nbsp;size</em>, const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyString_Encode" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>size</em> で指定されたサイズの <tt class="xref c c-type docutils literal"><span class="pre">char</span></tt> バッファを <em>encoding</em> の名前で登録されている codec に渡してエンコードし、
+Python オブジェクトを返します。 <em>encoding</em> および <em>errors</em> は文字列型の <tt class="xref py py-meth docutils literal"><span class="pre">encode()</span></tt>
+メソッドに与える同名のパラメタと同じ意味を持ちます。使用する codec の検索は、 Python の codec レジストリを使って行います。codec
+が例外を送出した場合には <em>NULL</em> を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数は 3.x では利用できず、 PyBytes エイリアスもありません。</p>
+</div>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>この関数は以前は <em>size</em> の型に <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を利用していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyString_AsEncodedObject">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyString_AsEncodedObject</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*str</em>, const char<em>&nbsp;*encoding</em>, const char<em>&nbsp;*errors</em><big>)</big><a class="headerlink" href="#PyString_AsEncodedObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>エンコード名 <em>encoding</em> で登録された codec を使って文字列オブジェクトをエンコードし、その結果を Python オブジェクトとして返します。 <em>encoding</em> および <em>errors</em> は文字列型の <tt class="xref py py-meth docutils literal"><span class="pre">encode()</span></tt> メソッドに与える同名のパラメタと同じ意味を持ちます。使用する codec の検索は、 Python の codec レジストリを使って行います。codec が例外を送出した場合には
+<em>NULL</em> を返します。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数は 3.x では利用できず、 PyBytes エイリアスもありません。</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="unicode.html" title="Unicode オブジェクトと codec"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="bytearray.html" title="bytearray オブジェクト"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" >具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1518 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>データモデル &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python 言語リファレンス" href="index.html" />
+    <link rel="next" title="実行モデル" href="executionmodel.html" />
+    <link rel="prev" title="字句解析" href="lexical_analysis.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="executionmodel.html" title="実行モデル"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="lexical_analysis.html" title="字句解析"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python 言語リファレンス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">データモデル</a><ul>
+<li><a class="reference internal" href="#objects">オブジェクト、値、および型</a></li>
+<li><a class="reference internal" href="#types">標準型の階層</a></li>
+<li><a class="reference internal" href="#newstyle">新スタイルと旧スタイル</a></li>
+<li><a class="reference internal" href="#specialnames">特殊メソッド名</a><ul>
+<li><a class="reference internal" href="#customization">基本的なカスタマイズ</a></li>
+<li><a class="reference internal" href="#attribute-access">属性値アクセスをカスタマイズする</a><ul>
+<li><a class="reference internal" href="#new-style-attribute-access">新しい形式のクラスのための別の属性アクセス</a></li>
+<li><a class="reference internal" href="#descriptor">デスクリプタ (descriptor) の実装</a></li>
+<li><a class="reference internal" href="#descriptor-invocation">デスクリプタを呼び出す</a></li>
+<li><a class="reference internal" href="#slots">__slots__</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#metaclasses">クラス生成をカスタマイズする</a></li>
+<li><a class="reference internal" href="#id13">インスタンスのカスタマイズとサブクラスチェック</a></li>
+<li><a class="reference internal" href="#callable-types">呼び出し可能オブジェクトをエミュレートする</a></li>
+<li><a class="reference internal" href="#sequence-types">コンテナをエミュレートする</a></li>
+<li><a class="reference internal" href="#sequence-methods">シーケンス型エミュレーションで使われるその他のメソッド</a></li>
+<li><a class="reference internal" href="#numeric-types">数値型をエミュレーションする</a></li>
+<li><a class="reference internal" href="#coercion-rule">型強制規則 (coercion rule)</a></li>
+<li><a class="reference internal" href="#with">with文とコンテキストマネージャ</a></li>
+<li><a class="reference internal" href="#old-style-special-lookup">旧スタイルクラスの特殊メソッド検索</a></li>
+<li><a class="reference internal" href="#new-style-special-lookup">新スタイルクラスの特殊メソッド検索</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="lexical_analysis.html"
+                        title="前の章へ">字句解析</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="executionmodel.html"
+                        title="次の章へ">実行モデル</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/datamodel.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="datamodel">
+<span id="id1"></span><h1>データモデル<a class="headerlink" href="#datamodel" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<div class="section" id="objects">
+<span id="id2"></span><h2>オブジェクト、値、および型<a class="headerlink" href="#objects" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p id="index-0">Python における <em class="dfn">オブジェクト (object)</em> とは、データを抽象的に表したものです。Python
+プログラムにおけるデータは全て、オブジェクトまたはオブジェクト間の関係として表されます。(ある意味では、プログラムコードもまたオブジェクトとして表されます。これはフォン・ノイマン: Von Neumann の &#8220;プログラム記憶方式コンピュータ: stored program
+computer&#8221; のモデルに適合します。)</p>
+<p id="index-1">オブジェクトはアイデンティティ値 (identity) 、型 (type) 、そして値 (value)
+を持ちます。オブジェクトが一度生成されると、そのオブジェクトの <em>アイデンティティ値</em> は決して変化することがありません; アイデンティティ値をオブジェクトのメモリ上のアドレスと考えてもかまいません。演算子 &#8216;<a class="reference internal" href="expressions.html#is"><tt class="xref std std-keyword docutils literal"><span class="pre">is</span></tt></a>&#8216; は、二つのオブジェクト間のアイデンティティ値を比較します; 関数 <a class="reference internal" href="../library/functions.html#id" title="id"><tt class="xref py py-func docutils literal"><span class="pre">id()</span></tt></a> は、オブジェクトのアイデンティティ値を表す整数 (現在の実装ではオブジェクトのメモリ上のアドレス) を返します。オブジェクトの <em class="dfn">型</em> もまた変わることがありません。  <a class="footnote-reference" href="#id21" id="id3">[1]</a> オブジェクトの型は、そのオブジェクトのサポートする操作 (&#8220;長さを持っているか？&#8221;
+など) を決定し、その型のオブジェクトが取りうる値について定義しています。 <a class="reference internal" href="../library/functions.html#type" title="type"><tt class="xref py py-func docutils literal"><span class="pre">type()</span></tt></a> 関数は、オブジェクトの型
+(型自体も一つのオブジェクトです) を返します。オブジェクトによっては、 <em>値 (value)</em> を変えることができます。値を変えることができるオブジェクトは
+<em>変更可能 (mutable)</em> であるといいます; 値を一度設定すると、その後は変えることができないオブジェクトは <em>変更不能 (immutable)</em>
+であると呼びます。 (変更不能なコンテナオブジェクトが変更可能なオブジェクトへの参照を含んでいる場合、その値は後者のオブジェクトの変更によって変わる場合があります; その場合でも、コンテナの含んでいるオブジェクトの集まりは変わらないため、コンテナは変更不能と考えます。したがって、変更不能性
+(immutability) は、厳密には変更できない値を持っていることとは違い、もっと微妙な概念です。) オブジェクトの変更可能性は型で決定されます;
+例えば、数値、文字列、およびタプルは変更不能であり、辞書やリストは変更可能です。</p>
+<p id="index-2">オブジェクトを明示的に破壊することはできません; しかし、オブジェクトに到達不能 (unreachable) になると、ガベージコレクション
+(garbage-collection) によって処理されます。実装では、ごみ収集を遅らせたり、全く行わないようにすることができます &#8212;
+到達可能なオブジェクトをごみ収集処理してしまわないかぎり、どう実装するかは実装品質の問題です。</p>
+<div class="impl-detail compound">
+<p><strong>CPython implementation detail:</strong> 現在の CPython 実装では参照カウント(reference-counting) 方式を使っており、(オプションとして) 循環参照を行っているごみオブジェクトを遅延検出します。この実装ではほとんどのオブジェクトを到達不能になると同時に処理することができますが、循環参照を含むごみオブジェクトの収集が確実に行われるよう保証しているわけではありません。循環参照を持つごみオブジェクト収集の制御については、
+<a class="reference internal" href="../library/gc.html#module-gc" title="gc: 循環検出ガベージコレクタのインターフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">gc</span></tt></a> モジュールを参照してください。
+CPython以外の実装は別の方式を使っており、CPythonも将来は別の方式を使うかもしれません。オブジェクトが到達不能になったときに即座に終了処理されることに頼らないでください (例えば、ファイルは必ず閉じてください)。</p>
+</div>
+<p>実装のトレース機能やデバッグ機能を使えば、通常は収集されてしまうようなオブジェクトを生かしておくことがあるので注意してください。また、
+&#8216;<a class="reference internal" href="compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a>...<a class="reference internal" href="compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a>&#8216; 文を使って例外を捕捉できるようにすると、オブジェクトを生かしておくことがあります。</p>
+<p>オブジェクトによっては、開かれたファイルやウィンドウといった、 &#8220;外部 (external) の&#8221; リソースに対する参照を行っています。これらのリソースは、オブジェクトがごみ収集された際に解放されるものと理解されていますが、ごみ収集が行われる保証はないので、こうしたオブジェクトでは外部リソースを明示的に解放する方法、大抵は <tt class="xref py py-meth docutils literal"><span class="pre">close()</span></tt> メソッドを提供しています。こうしたオブジェクトは明示的に
+close するよう強く奨めます。操作をする際には、&#8217;<a class="reference internal" href="compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a>...<a class="reference internal" href="compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a>&#8216; 文を使うと便利です。</p>
+<p id="index-3">他のオブジェクトに対する参照をもつオブジェクトもあります; これらは <em>コンテナ (container)</em> と呼ばれます。コンテナオブジェクトの例として、タプル、リスト、および辞書が挙げられます。オブジェクトへの参照自体がコンテナの値の一部です。ほとんどの場合、コンテナの値というと、コンテナに入っているオブジェクトの値のことを指し、それらオブジェクトのアイデンティティではありません; しかしながら、コンテナの変更可能性について述べる場合、今まさにコンテナに入っているオブジェクトのアイデンティティのことを指します。したがって、 (タプルのように)
+変更不能なオブジェクトが変更可能なオブジェクトへの参照を含む場合、その値が変化するのは変更可能なオブジェクトが変更された時、ということになります。</p>
+<p>型はオブジェクトの動作のほとんど全てに影響します。オブジェクトのアイデンティティが重要かどうかでさえ、ある意味では型に左右されます:
+変更不能な型では、新たな値を計算するような操作を行うと、実際には同じ型と値を持った既存のオブジェクトへの参照を返すことがありますが、変更可能なオブジェクトではそのような動作は起こりえません。例えば、 <tt class="docutils literal"><span class="pre">a</span> <span class="pre">=</span> <span class="pre">1;</span> <span class="pre">b</span> <span class="pre">=</span> <span class="pre">1</span></tt> とすると、 <tt class="docutils literal"><span class="pre">a</span></tt> と <tt class="docutils literal"><span class="pre">b</span></tt> は値 1 を持つ同じオブジェクトを参照するときもあるし、そうでないときもあります。これは実装に依存します。しかし、 <tt class="docutils literal"><span class="pre">c</span> <span class="pre">=</span> <span class="pre">[];</span> <span class="pre">d</span> <span class="pre">=</span> <span class="pre">[]</span></tt> とすると、
+<tt class="docutils literal"><span class="pre">c</span></tt> と <tt class="docutils literal"><span class="pre">d</span></tt> はそれぞれ二つの異なった、互いに一意な、新たに作成された空のリストを参照することが保証されています。 (<tt class="docutils literal"><span class="pre">c</span> <span class="pre">=</span> <span class="pre">d</span> <span class="pre">=</span>
+<span class="pre">[]</span></tt> とすると、 <tt class="docutils literal"><span class="pre">c</span></tt> と <tt class="docutils literal"><span class="pre">d</span></tt> の両方に同じオブジェクトを代入します)</p>
+</div>
+<div class="section" id="types">
+<span id="id4"></span><h2>標準型の階層<a class="headerlink" href="#types" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p id="index-4">以下は Python に組み込まれている型のリストです。(C、Java、または実装に使われているその他の言語で書かれた) 拡張モジュールでは、その他に新たな型を定義することができます。将来のバージョンの Python では、型の階層に新たな型 (整数を使って効率的に記憶される有理数型、など)
+を追加することができるかもしれません。</p>
+<p id="index-5">以下に説明する型のいくつかには、&#8217;特殊属性 (special attribute)&#8217;  と題された段落が連ねられています。これらの属性は実装へのアクセス手段を提供するもので、一般的な用途に利用するためのものではありません。特殊属性の定義は将来変更される可能性があります。</p>
+<dl class="docutils">
+<dt>None</dt>
+<dd><p class="first last" id="index-6">この型には単一の値しかありません。この値を持つオブジェクトはただ一つしか存在しません。このオブジェクトは組み込み名 <tt class="docutils literal"><span class="pre">None</span></tt>
+でアクセスされます。このオブジェクトは、様々な状況で値が存在しないことをしめします。例えば、明示的に値を返さない関数は <tt class="docutils literal"><span class="pre">None</span></tt>
+を返します。 <tt class="docutils literal"><span class="pre">None</span></tt> の真値 (truth value) は  偽 (false) です。</p>
+</dd>
+<dt>NotImplemented</dt>
+<dd><p class="first last" id="index-7">この型には単一の値しかありません。この値を持つオブジェクトはただ一つしか存在しません。このオブジェクトは組み込み名 <tt class="docutils literal"><span class="pre">NotImplemented</span></tt>
+でアクセスされます。数値演算に関するメソッドや拡張比較 (rich comparison) メソッドは、被演算子が該当する演算を行うための実装をもたない場合、この値を返すことがあります。(演算子によっては、インタプリタが関連のある演算を試したり、他の代替操作を行います。) 真値は真 (true) です。</p>
+</dd>
+<dt>Ellipsis</dt>
+<dd><p class="first last" id="index-8">この型には単一の値しかありません。この値を持つオブジェクトはただ一つしか存在しません。このオブジェクトは組み込み名 <tt class="docutils literal"><span class="pre">Ellipsis</span></tt>
+でアクセスされます。スライス内に <tt class="docutils literal"><span class="pre">...</span></tt> 構文がある場合に使われます。真値は真 (true)です。</p>
+</dd>
+<dt><a class="reference internal" href="../library/numbers.html#numbers.Number" title="numbers.Number"><tt class="xref py py-class docutils literal"><span class="pre">numbers.Number</span></tt></a></dt>
+<dd><p class="first" id="index-9">数値リテラルによって作成されたり、算術演算や組み込みの算術関数によって返されるオブジェクトです。数値オブジェクトは変更不能です;
+一度値が生成されると、二度と変更されることはありません。Python の数値オブジェクトはいうまでもなく数学で言うところの数値と強く関係していますが、コンピュータ内で数値を表現する際に伴う制限を受けています。</p>
+<p>Python は整数、浮動小数点数、複素数の間で区別を行っています:</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="../library/numbers.html#numbers.Integral" title="numbers.Integral"><tt class="xref py py-class docutils literal"><span class="pre">numbers.Integral</span></tt></a> (整数)</dt>
+<dd><p class="first" id="index-10">整数型は、整数(正の数および負の数)を表す数学的集合内における要素を表現する型です。</p>
+<p>以下に三つの整数型を示します:</p>
+<dl class="docutils">
+<dt>(通常の) 整数型 (plain integer)</dt>
+<dd><p class="first last" id="index-11">-2147483648 から 2147483647 までの整数を表現します (基本ワードサイズ: natural word size
+がより大きなマシンではより大きな定義域になることもあります。より小さくなることはありません。) 演算の結果が定義域を超えた値になった場合、結果は通常長整数で返されます (場合によっては、 <a class="reference internal" href="../library/exceptions.html#exceptions.OverflowError" title="exceptions.OverflowError"><tt class="xref py py-exc docutils literal"><span class="pre">OverflowError</span></tt></a> が送出されます) 。シフト演算やマスク演算のために、整数は 32 ビット以上の 2
+の補数で表されたバイナリ表現を持つ (すなわち、4294967296 の異なったビットパターン全てが異なる値を持つ) と仮定されています。</p>
+</dd>
+<dt>長整数型 (long integer)</dt>
+<dd><p class="first last" id="index-12">長整数は無限の定義域を持ち、利用可能な (仮想) メモリサイズの制限のみをうけます。長整数はシフト演算やマスク演算のためにバイナリ表現をもつものと仮定されます。負の数は符号ビットが左に無限に延びているような錯覚を与える 2 の補数表現の変型で表されます。</p>
+</dd>
+<dt>ブール型 (boolean)</dt>
+<dd><p class="first last" id="index-13">ブール型は、真値 False または True を表現します。ブール型のオブジェクトは False と True を表現する二つのオブジェクトだけです。ブール型は整数のサブタイプで、ほとんどの演算コンテキストにおいてブール型値はそれぞれ 0 または 1 のように振舞います。ただし、文字列に変換されたときのみ、それぞれ文字列 <tt class="docutils literal"><span class="pre">&quot;False&quot;</span></tt> および <tt class="docutils literal"><span class="pre">&quot;True&quot;</span></tt> が返されます。</p>
+</dd>
+</dl>
+<p class="last" id="index-14">整数表現に関する規則は、シフト演算やマスク演算において、負の整数も含めて最も有意義な解釈ができるように、かつ通常の整数と長整数との間で定義域を切り替える際にできるだけ混乱しないように決められています。すべての演算で、演算結果がオーバフローを起こさずに整数の定義域の値になる場合は、長整数を使った場合でも、被演算子に整数と長整数を混合した場合でも同じ結果になります。定義域の切り替えはプログラマに対して透過的に(意識させることなく)行われます。</p>
+</dd>
+<dt><a class="reference internal" href="../library/numbers.html#numbers.Real" title="numbers.Real"><tt class="xref py py-class docutils literal"><span class="pre">numbers.Real</span></tt></a> (<a class="reference internal" href="../library/functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>) (実数)</dt>
+<dd><p class="first last" id="index-15">この型は計算機レベルで倍精度とされている浮動小数点数を表現します。表現可能な値の範囲やオーバフローの扱いは、根底にある計算機アーキテクチャ (と C または
+Java 実装) 次第です。 Python は単精度の浮動小数点数をサポートしません; 単精度の数を使う理由は、通常プロセッサやメモリ使用量の節約ですが、こうした節約は Python でオブジェクトを扱う際のオーバヘッドに比べれば微々たるものにすぎません。従って、わざわざ浮動小数点型を 2 つも定義してPython 言語を難解にする理由はどこにもないのです。</p>
+</dd>
+<dt><a class="reference internal" href="../library/numbers.html#numbers.Complex" title="numbers.Complex"><tt class="xref py py-class docutils literal"><span class="pre">numbers.Complex</span></tt></a> (複素数)</dt>
+<dd><p class="first last" id="index-16">この型は、計算機レベルで倍精度とされている浮動小数点を 2 つ一組にして複素数を表現します。浮動小数点について述べたのと同じ性質が当てはまります。複素数
+<tt class="docutils literal"><span class="pre">z</span></tt> の実数部および虚数部は、それぞれ読み出し専用属性 <tt class="docutils literal"><span class="pre">z.real</span></tt> および <tt class="docutils literal"><span class="pre">z.imag</span></tt> で取り出すことができます。</p>
+</dd>
+</dl>
+</dd>
+<dt>シーケンス型 (sequence)</dt>
+<dd><p class="first" id="index-17">この型は、有限の順序集合 (ordered set) を表現します。要素は非負の整数でインデクス化されています。組み込み関数  <a class="reference internal" href="../library/functions.html#len" title="len"><tt class="xref py py-func docutils literal"><span class="pre">len()</span></tt></a>
+を使うと、シーケンスの要素数を返します。シーケンスの長さが <em>n</em> の場合、インデクスは 0, 1, ..., <em>n</em> -1 からなる集合です。シーケンス
+<em>a</em> の要素 <em>i</em> は <tt class="docutils literal"><span class="pre">a[i]</span></tt> で選択します。</p>
+<p id="index-18">シーケンスはスライス操作 (slice) もサポートしています: <tt class="docutils literal"><span class="pre">a[i:j]</span></tt> とすると、 <em>i</em> <tt class="docutils literal"><span class="pre">&lt;=</span></tt> <em>k</em> <tt class="docutils literal"><span class="pre">&lt;</span></tt> <em>j</em>
+であるインデクス <em>k</em> をもつ全ての要素を選択します。式表現としてスライスを用いた場合、スライスは同じ型をもつ新たなシーケンスを表します。新たなシーケンス内では、インデクス集合が 0 から始まるようにインデクスの値を振りなおします。</p>
+<p id="index-19">シーケンスによっては、第三の &#8220;ステップ (step)&#8221; パラメタを持つ &#8220;拡張スライス (extended slice)&#8221; もサポートしています:
+<tt class="docutils literal"><span class="pre">a[i:j:k]</span></tt> は、 <tt class="docutils literal"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">i</span> <span class="pre">+</span> <span class="pre">n*k</span></tt>, <em>n</em> <tt class="docutils literal"><span class="pre">&gt;=</span></tt> <tt class="docutils literal"><span class="pre">0</span></tt>  かつ <em>i</em> <tt class="docutils literal"><span class="pre">&lt;=</span></tt> <em>x</em> <tt class="docutils literal"><span class="pre">&lt;</span></tt> <em>j</em>
+であるようなインデクス <em>x</em> を持つような <em>a</em> 全ての要素を選択します。</p>
+<p>シーケンスは、変更可能なものか、そうでないかで区別されています:</p>
+<dl class="last docutils">
+<dt>変更不能なシーケンス (immutable sequence)</dt>
+<dd><p class="first" id="index-20">変更不能なシーケンス型のオブジェクトは、一度生成されるとその値を変更することができません。 (オブジェクトに他のオブジェクトへの参照が入っている場合、参照されているオブジェクトは変更可能なオブジェクトでもよく、その値は変更される可能性があります;
+しかし、変更不能なオブジェクトが直接参照しているオブジェクトの集合自体は、変更することができません。)</p>
+<p>以下の型は変更不能なシーケンス型です:</p>
+<dl class="last docutils">
+<dt>文字列型 (string)</dt>
+<dd><p class="first" id="index-21">文字列の各要素は文字 (character) です。文字型 (character type) は存在しません; 単一の文字は、要素が一つだけの文字列として表現されます。各文字は (少なくとも) 8-bit のバイト列を表現します。組み込み関数 <a class="reference internal" href="../library/functions.html#chr" title="chr"><tt class="xref py py-func docutils literal"><span class="pre">chr()</span></tt></a> および <a class="reference internal" href="../library/functions.html#ord" title="ord"><tt class="xref py py-func docutils literal"><span class="pre">ord()</span></tt></a>
+を使うと、文字と非負の整数で表されたバイト値の間で変換を行えます。0-127 の値を持つバイト値は、通常  同じ ASCII
+値をもつ文字を表現していますが、値をどう解釈するかはプログラムにゆだねられています。文字列データ型はまた、例えばファイルから読み出されたデータを記憶するといった用途で、バイト値のアレイを表現するために用いられます。</p>
+<p class="last" id="index-22">(ネイティブの文字セットが ASCIIでないシステムでは、 <a class="reference internal" href="../library/functions.html#chr" title="chr"><tt class="xref py py-func docutils literal"><span class="pre">chr()</span></tt></a>  や <a class="reference internal" href="../library/functions.html#ord" title="ord"><tt class="xref py py-func docutils literal"><span class="pre">ord()</span></tt></a> が ASCII と EBCDIC
+との間で対応付けを行っており、文字列間の比較で ASCII 順が守られる限り、文字列の内部表現として  EBCDIC
+を使ってもかまいません。誰か他にもっとましなルールをお持ちですか?)</p>
+</dd>
+<dt>Unicode 文字列型</dt>
+<dd><p class="first last" id="index-23">Unicode オブジェクトの各要素は Unicode コード単位です。 Unicode コード単位とは、単一の Unicode オブジェクトで、Unicode
+序数を表現する 16-bit または 32-bit の値を保持できるものです  (この序数の最大値は <tt class="docutils literal"><span class="pre">sys.maxunicode</span></tt>
+で与えられており、コンパイル時に Python がどう設定されているかに依存します)。 Unicode オブジェクト内にサロゲートペア (surrogate
+pair) があってもよく、Python はサロゲートペアを二つの別々の Unicode 要素として報告します。組み込み関数 <a class="reference internal" href="../library/functions.html#unichr" title="unichr"><tt class="xref py py-func docutils literal"><span class="pre">unichr()</span></tt></a>
+および <a class="reference internal" href="../library/functions.html#ord" title="ord"><tt class="xref py py-func docutils literal"><span class="pre">ord()</span></tt></a> は、コード単位と非負の整数で表された Unicode 標準 3.0 で定義された Unicode 序数との間で変換を行います。他の文字エンコード形式との相互変換は、 Unicode メソッド <tt class="xref py py-meth docutils literal"><span class="pre">encode()</span></tt>  および組み込み関数 <a class="reference internal" href="../library/functions.html#unicode" title="unicode"><tt class="xref py py-func docutils literal"><span class="pre">unicode()</span></tt></a>
+で行うことができます。</p>
+</dd>
+<dt>タプル型 (tuple)</dt>
+<dd><p class="first last" id="index-24">タプルの要素は任意の Python オブジェクトにできます。二つまたはそれ以上の要素からなるタプルは、個々の要素を表現する式をカンマで区切って構成します。単一の要素からなるタプル (単集合 &#8216;singleton&#8217;) を作るには、要素を表現する式の直後にカンマをつけます
+(単一の式だけではタプルを形成しません。これは、式をグループ化するのに丸括弧を使えるようにしなければならないからです)
+。要素の全くない丸括弧の対を作ると空のタプルになります。</p>
+</dd>
+</dl>
+</dd>
+<dt>変更可能なシーケンス型 (mutable sequence)</dt>
+<dd><p class="first" id="index-25">変更可能なシーケンスは、作成した後で変更することができます。変更可能なシーケンスでは、添字表記やスライス表記を使って指定された要素に代入を行うことができ、 <a class="reference internal" href="simple_stmts.html#del"><tt class="xref std std-keyword docutils literal"><span class="pre">del</span></tt></a> (delete) 文を使って要素を削除することができます。</p>
+<p>Python に最初から組み込まれている変更可能なシーケンス型は、今のところ二つです:</p>
+<dl class="docutils">
+<dt>リスト型 (list)</dt>
+<dd><p class="first last" id="index-26">リストの要素は任意の Python オブジェクトにできます。リストは、角括弧の中にカンマで区切られた式を並べて作ります。 (長さが 0 や 1
+のシーケンスを作るために特殊な場合分けは必要ないことに注意してください。)</p>
+</dd>
+<dt>Byte Arrays</dt>
+<dd><p class="first last" id="index-27">bytearray オブジェクトは変更可能な配列です。組み込みの <a class="reference internal" href="../library/functions.html#bytearray" title="bytearray"><tt class="xref py py-func docutils literal"><span class="pre">bytearray()</span></tt></a> コンストラクタによって作成されます。変更可能なことを除けば (つまりハッシュ化できない)、 byte array は変更不能な bytes オブジェクトと同じインターフェースと機能を提供します。</p>
+</dd>
+</dl>
+<p class="last" id="index-28">拡張モジュール <a class="reference internal" href="../library/array.html#module-array" title="array: 一様な型を持つ数値からなる空間効率のよいアレイ。"><tt class="xref py py-mod docutils literal"><span class="pre">array</span></tt></a> では、別の変更可能なシーケンス型を提供しています。</p>
+</dd>
+</dl>
+</dd>
+<dt>集合型</dt>
+<dd><p class="first" id="index-29">集合型は、順序のない、ユニークで不変なオブジェクトの有限集合を表現します。そのため、(配列の)添字を使ったインデックスアクセスはできません。ただし、イテレートは可能で、ビルトイン関数 <a class="reference internal" href="../library/functions.html#len" title="len"><tt class="xref py py-func docutils literal"><span class="pre">len()</span></tt></a> は集合の要素数を返します。集合型の一般的な使い方は、集合に属しているかの高速なテスト、シーケンスからの重複の排除、共通集合・和集合・差・対称差といった数学的な演算の計算です。</p>
+<p>集合の要素には、辞書のキーと同じ普遍性に関するルールが適用されます。数値型は通常の数値比較のルールに従うことに注意してください。もし2つの数値の比較結果が同値である(例えば、 <tt class="docutils literal"><span class="pre">1</span></tt> と <tt class="docutils literal"><span class="pre">1.0</span></tt>)なら、そのうちの1つのみを集合に含めることができます。</p>
+<p>現在、2つのビルトイン集合型があります:</p>
+<dl class="last docutils">
+<dt>Sets</dt>
+<dd><p class="first last" id="index-30">変更可能な集合型です。ビルトインの <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-func docutils literal"><span class="pre">set()</span></tt></a> コンストラクタによって作成され、 <tt class="xref py py-meth docutils literal"><span class="pre">add()</span></tt>
+などの幾つかのメソッドを利用して変更されます。</p>
+</dd>
+<dt>Frozen sets</dt>
+<dd><p class="first last" id="index-31">不変な集合型です。ビルトインの <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-func docutils literal"><span class="pre">frozenset()</span></tt></a> コンストラクタによって作成されます。
+frozenset は不変でハッシュ可能(<a class="reference internal" href="../glossary.html#term-hashable"><em class="xref std std-term">hashable</em></a>)なので、別の集合型の要素になったり、辞書のキーにすることができます。</p>
+</dd>
+</dl>
+</dd>
+<dt>マップ型 (mapping)</dt>
+<dd><p class="first" id="index-32">任意のインデクス集合でインデクス化された、有限のオブジェクトからなる集合を表現します。添字表記 <tt class="docutils literal"><span class="pre">a[k]</span></tt> は、 <tt class="docutils literal"><span class="pre">k</span></tt> でインデクス指定された要素を <tt class="docutils literal"><span class="pre">a</span></tt> から選択します; 選択された要素は式の中で使うことができ、代入や <a class="reference internal" href="simple_stmts.html#del"><tt class="xref std std-keyword docutils literal"><span class="pre">del</span></tt></a> 文の対象にすることができます。組み込み関数 <a class="reference internal" href="../library/functions.html#len" title="len"><tt class="xref py py-func docutils literal"><span class="pre">len()</span></tt></a> は、マップ内の要素数を返します。</p>
+<p>Python に最初から組み込まれているマップ型は、今のところ一つだけです:</p>
+<dl class="last docutils">
+<dt>辞書型 (dictionary)</dt>
+<dd><p class="first" id="index-33">ほとんどどんな値でもインデクスとして使えるような、有限個のオブジェクトからなる集合を表します。キー値 (key) として使えない値は、リストや辞書を含む値や、アイデンティティではなく値でオブジェクトが比較される、その他の変更可能な型です。これは、辞書型を効率的に実装する上で、キーのハッシュ値が一定であることが必要だからです。数値型をキーに使う場合、キー値は通常の数値比較における規則に従います:
+二つの値が等しくなる場合 (例えば <tt class="docutils literal"><span class="pre">1</span></tt> と <tt class="docutils literal"><span class="pre">1.0</span></tt>)、互いに同じ辞書のエントリを表すインデクスとして使うことができます。</p>
+<p>辞書は変更可能な型です; 辞書は <tt class="docutils literal"><span class="pre">{...}</span></tt> 表記で生成します (<a class="reference internal" href="expressions.html#dict"><em>辞書表現</em></a> を参照してください)。</p>
+<p class="last" id="index-34">拡張モジュール <a class="reference internal" href="../library/dbm.html#module-dbm" title="dbm: ndbmを基にした基本的なデータベースインタフェースです。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">dbm</span></tt></a> 、 <a class="reference internal" href="../library/gdbm.html#module-gdbm" title="gdbm: GNU による dbm の再実装。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">gdbm</span></tt></a> 、および <a class="reference internal" href="../library/bsddb.html#module-bsddb" title="bsddb: Berkeley DB ライブラリへのインタフェース"><tt class="xref py py-mod docutils literal"><span class="pre">bsddb</span></tt></a> では、別のマップ型を提供しています。</p>
+</dd>
+</dl>
+</dd>
+<dt>呼び出し可能型 (callable type)</dt>
+<dd><p class="first" id="index-35">関数呼び出し操作 (<a class="reference internal" href="expressions.html#calls"><em>呼び出し (call)</em></a> 参照) を行うことができる型です:</p>
+<dl class="last docutils">
+<dt>ユーザ定義関数 (user-defined function)</dt>
+<dd><p class="first" id="index-36">ユーザ定義関数オブジェクトは、関数定義を行うことで生成されます (<a class="reference internal" href="compound_stmts.html#function"><em>関数定義</em></a> 参照)。関数は、仮引数 (formal parameter) リストと同じ数の要素が入った引数リストとともに呼び出されます。</p>
+<p>特殊属性:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="68%" />
+<col width="12%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Attribute</th>
+<th class="head">Meaning</th>
+<th class="head">&nbsp;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">func_doc</span></tt></td>
+<td>関数のドキュメンテーション文字列です。ドキュメンテーションがない場合は <tt class="docutils literal"><span class="pre">None</span></tt>
+になります。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">__doc__</span></tt></td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">func_doc</span></tt> の別名です。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">func_name</span></tt></td>
+<td>関数の名前です。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">__name__</span></tt></td>
+<td><tt class="xref py py-attr docutils literal"><span class="pre">func_name</span></tt> の別名です。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">__module__</span></tt></td>
+<td>関数が定義されているモジュールの名前です。モジュール名がない場合は <tt class="docutils literal"><span class="pre">None</span></tt> になります。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">func_defaults</span></tt></td>
+<td>デフォルト値を持つ引数に対するデフォルト値が収められたタプルで、デフォルト値を持つ引数がない場合には
+<tt class="docutils literal"><span class="pre">None</span></tt> になります。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">func_code</span></tt></td>
+<td>コンパイルされた関数本体を表現するコードオブジェクトです。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">func_globals</span></tt></td>
+<td>関数のグローバル変数の入った辞書 (への参照) です
+&#8212;
+この辞書は、関数が定義されているモジュールのグローバルな名前空間を決定します。</td>
+<td>読み出し専用</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-attr docutils literal"><span class="pre">func_dict</span></tt></td>
+<td>任意の関数属性をサポートするための名前空間が収められています。</td>
+<td>書き込み可能</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-attr docutils literal"><span class="pre">func_closure</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">None</span></tt> または関数の個々の自由変数
+(引数以外の変数) に対して値を結び付けているセル
+(cell) 群からなるタプルになります。</td>
+<td>読み出し専用</td>
+</tr>
+</tbody>
+</table>
+<p>「書き込み可能」とラベルされている属性のほとんどは、代入された値の型をチェックします。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.4 で変更: </span><tt class="docutils literal"><span class="pre">func_name</span></tt> は書き込み可能になりました.</p>
+<p>関数オブジェクトはまた、任意の属性を設定したり取得したりできます。この機能は、例えば関数にメタデータを付与したい場合などに使えます。関数の get や
+set には、通常のドット表記を使います。 <em>現在の実装では、ユーザ定義の関数でのみ属性をサポートしているので
+注意して下さい。組み込み関数の属性は将来サポートする予定です。</em></p>
+<p class="last">関数定義に関するその他の情報は、関数のコードオブジェクトから得られます;  後述の内部型 (internal type) に関する説明を参照してください。</p>
+</dd>
+<dt>ユーザ定義メソッド (user-defined method)</dt>
+<dd><p class="first" id="index-38">ユーザ定義のメソッドオブジェクトは、クラスやクラスインスタンス (あるいは <tt class="docutils literal"><span class="pre">None</span></tt>) を任意の呼び出し可能オブジェクト (通常はユーザ定義関数)
+と結合し (combine) ます。</p>
+<p>読み出し専用の特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> はクラスインスタンスオブジェクトで、 <tt class="xref py py-attr docutils literal"><span class="pre">im_func</span></tt> は関数オブジェクトです;
+<tt class="xref py py-attr docutils literal"><span class="pre">im_class</span></tt> は結合メソッド (bound method) において <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt>
+が属しているクラスか、あるいは非結合メソッド (unbound method) において、要求されたメソッドを定義しているクラスです;
+<tt class="xref py py-attr docutils literal"><span class="pre">__doc__</span></tt> はメソッドのドキュメンテーション文字列 (<tt class="docutils literal"><span class="pre">im_func.__doc__</span></tt> と同じ) です;
+<tt class="xref py py-attr docutils literal"><span class="pre">__name__</span></tt> はメソッドの名前 (<tt class="docutils literal"><span class="pre">im_func.__name__</span></tt> と同じ) です; <tt class="xref py py-attr docutils literal"><span class="pre">__module__</span></tt> はメソッドが定義されているモジュールの名前になるか、モジュール名がない場合は <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.2 で変更: </span>メソッドを定義しているクラスを参照するために <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> が使われていました.</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>3.0 との前方互換性のために、 <tt class="xref py py-attr docutils literal"><span class="pre">im_func</span></tt> の代わりに <tt class="xref py py-attr docutils literal"><span class="pre">__func__</span></tt> も、
+<tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> の代わりに <tt class="xref py py-attr docutils literal"><span class="pre">__self__</span></tt> も使うことができます。</p>
+<p id="index-39">メソッドもまた、根底にある関数オブジェクトの任意の関数属性に (値の設定はできませんが) アクセスできます。</p>
+<p>クラスの属性を (おそらくクラスのインスタンスを介して) 取得する際には、その属性がユーザ定義の関数オブジェクト、非結合 (unbound) のユーザ定義メソッドオブジェクト、あるいはクラスメソッドオブジェクトであれば、ユーザ定義メソッドオブジェクトが生成されることがあります。属性がユーザ定義メソッドオブジェクトの場合、属性を取得する対象のオブジェクトが属するクラスがもとのメソッドオブジェクトが定義されているクラスと同じクラスであるか、またはそのサブクラスであれば、新たなメソッドオブジェクトだけが生成されます。それ以外の場合には、もとのメソッドオブジェクトがそのまま使われます。</p>
+<p id="index-40">クラスからユーザ定義関数オブジェクトを取得する方法でユーザ定義メソッドオブジェクトを生成すると、 <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> 属性は <tt class="docutils literal"><span class="pre">None</span></tt>
+になり、メソッドオブジェクトは非結合 (unbound)  であるといいます。クラスのインスタンスからユーザ定義関数オブジェクトを取得する方法でユーザ定義メソッドオブジェクトを生成すると、 <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> 属性はインスタンスになり、メソッドオブジェクトは結合
+(bound) であるといいます。どちらの場合も、新たなメソッドの <tt class="xref py py-attr docutils literal"><span class="pre">im_class</span></tt> 属性は、メソッドの取得が行われたクラスになり、 <tt class="xref py py-attr docutils literal"><span class="pre">im_func</span></tt> 属性はもとの関数オブジェクトになります。</p>
+<p id="index-41">クラスやインスタンスから他のユーザ定義メソッドオブジェクトを取得する方法でユーザ定義メソッドオブジェクトを生成した場合、その動作は関数オブジェクトの場合と同様ですが、新たなインスタンスの <tt class="xref py py-attr docutils literal"><span class="pre">im_func</span></tt> 属性はもとのメソッドオブジェクトの属性ではなく、新たなインスタンスの属性になります。</p>
+<p id="index-42">クラスやインスタンスからクラスメソッドオブジェクトを取得する方法でユーザ定義メソッドオブジェクトを生成した場合、 <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt>
+属性はクラス自体 (<tt class="xref py py-attr docutils literal"><span class="pre">im_class</span></tt> 属性と同じ) となり、 <tt class="xref py py-attr docutils literal"><span class="pre">im_func</span></tt> 属性はクラスメソッドの根底にある関数オブジェクトになります。</p>
+<p>非結合ユーザ定義メソッドオブジェクトの呼び出しの際には、根底にある関数 (<tt class="xref py py-attr docutils literal"><span class="pre">im_func</span></tt>) が呼び出されます。このとき、最初の引数は適切なクラス (<tt class="xref py py-attr docutils literal"><span class="pre">im_class</span></tt>) またはサブクラスのインスタンスでなければならないという制限が課されています。</p>
+<p>結合ユーザ定義メソッドオブジェクトの呼び出しの際には、根底にある関数 (<tt class="xref py py-attr docutils literal"><span class="pre">im_func</span></tt>) が呼び出されます。このとき、クラスインスタンス
+(<tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt>) が引数の先頭に挿入されます。例えば、関数 <tt class="xref py py-meth docutils literal"><span class="pre">f()</span></tt> の定義が入ったクラスを <tt class="xref py py-class docutils literal"><span class="pre">C</span></tt>
+とし、 <tt class="docutils literal"><span class="pre">x</span></tt> を <tt class="xref py py-class docutils literal"><span class="pre">C</span></tt> のインスタンスとすると、 <tt class="docutils literal"><span class="pre">x.f(1)</span></tt> の呼び出しは <tt class="docutils literal"><span class="pre">C.f(x,</span> <span class="pre">1)</span></tt> と同じになります。</p>
+<p>ユーザ定義メソッドオブジェクトがクラスオブジェクトから派生した際、 <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> に記憶されている &#8220;クラスインスタンス&#8221; はクラス自体になります。これは、 <tt class="docutils literal"><span class="pre">x.f(1)</span></tt> や <tt class="docutils literal"><span class="pre">C.f(1)</span></tt> の呼び出しが根底にある関数を <tt class="docutils literal"><span class="pre">f</span></tt> としたときの呼び出し <tt class="docutils literal"><span class="pre">f(C,1)</span></tt>
+と等価になるようにするためです。</p>
+<p class="last">関数オブジェクトから (結合または非結合の) メソッドオブジェクトへの変換は、クラスやインスタンスから属性を取り出すたびに行われるので注意してください。場合によっては、属性をローカルな変数に代入しておき、その変数を使って関数呼び出しを行うと効果的な最適化になります。また、上記の変換はユーザ定義関数に対してのみ起こるので注意してください; その他の呼び出し可能オブジェクト (および呼び出し可能でない全てのオブジェクト)
+は、変換を受けずに取り出されます。それから、クラスインスタンスの属性になっているユーザ定義関数は、結合メソッドに変換できないと知っておくことも重要です;
+結合メソッドへの変換が行われるのは、関数がクラスの一属性である場合 <em>だけ</em> です。</p>
+</dd>
+<dt>ジェネレータ関数 (generator function)</dt>
+<dd><p class="first last" id="index-43"><a class="reference internal" href="simple_stmts.html#yield"><tt class="xref std std-keyword docutils literal"><span class="pre">yield</span></tt></a> 文 (<a class="reference internal" href="simple_stmts.html#yield"><em>yield 文</em></a> 参照)
+を使う関数またはメソッドは、ジェネレータ関数(<em class="dfn">generator function</em>)
+と呼ばれます。このような関数は、呼び出された際に、常にイテレータオブジェクトを返します。このイテレータオブジェクトは関数の本体を実行するために用いられます:
+イテレータの <a class="reference internal" href="../library/functions.html#next" title="next"><tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt></a> メソッドを呼び出すと、 <a class="reference internal" href="simple_stmts.html#yield"><tt class="xref std std-keyword docutils literal"><span class="pre">yield</span></tt></a> 文で値を出力する処理まで関数の実行が行われます。関数が
+<a class="reference internal" href="simple_stmts.html#return"><tt class="xref std std-keyword docutils literal"><span class="pre">return</span></tt></a> 文を実行するか、関数を最後まで実行し終えると、 <a class="reference internal" href="../library/exceptions.html#exceptions.StopIteration" title="exceptions.StopIteration"><tt class="xref py py-exc docutils literal"><span class="pre">StopIteration</span></tt></a> 例外が送出され、イテレータが返す値の集合はそこで終わります。</p>
+</dd>
+<dt>組み込み関数 (built-in function)</dt>
+<dd><p class="first last" id="index-44">組み込み関数オブジェクトはC関数へのラッパです。組み込み関数の例は <a class="reference internal" href="../library/functions.html#len" title="len"><tt class="xref py py-func docutils literal"><span class="pre">len()</span></tt></a> や <a class="reference internal" href="../library/math.html#math.sin" title="math.sin"><tt class="xref py py-func docutils literal"><span class="pre">math.sin()</span></tt></a> (<a class="reference internal" href="../library/math.html#module-math" title="math: 数学関数(sin() など)。"><tt class="xref py py-mod docutils literal"><span class="pre">math</span></tt></a>
+は標準の組み込みモジュール) です。引数の数や型は C 関数で決定されています。読み出し専用の特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">__doc__</span></tt>
+は関数のドキュメンテーション文字列です。ドキュメンテーションがない場合は <tt class="docutils literal"><span class="pre">None</span></tt> になります; <tt class="xref py py-attr docutils literal"><span class="pre">__name__</span></tt> は関数の名前です;
+<tt class="xref py py-attr docutils literal"><span class="pre">__self__</span></tt> は <tt class="docutils literal"><span class="pre">None</span></tt> に設定されています (組み込みメソッドの節も参照してください); <tt class="xref py py-attr docutils literal"><span class="pre">__module__</span></tt>
+は、関数が定義されているモジュールの名前です。モジュール名がない場合は <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd>
+<dt>組み込みメソッド (built-in method)</dt>
+<dd><p class="first last" id="index-45">実際には組み込み関数を別の形で隠蔽したもので、こちらの場合には C 関数に渡される何らかのオブジェクトを非明示的な外部引数として持っています。組み込みメソッドの例は、 <em>alist</em> をリストオブジェクトとしたときの <tt class="docutils literal"><span class="pre">alist.append()</span></tt> です。この場合には、読み出し専用の属性 <tt class="xref py py-attr docutils literal"><span class="pre">__self__</span></tt> は <em>alist</em> で表されるオブジェクトになります。</p>
+</dd>
+<dt>クラス型 (class type)</dt>
+<dd>クラス型、あるいは &#8220;新しいクラス型 (new-style class)&#8221; や呼び出し可能オブジェクトです。クラス型オブジェクトは通常、そのクラスの新たなインスタンスを生成する際のファクトリクラスとして振舞いますが、 <a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> をオーバライドして、バリエーションを持たせることもできます。呼び出しの際に使われた引数は <a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> に渡され、さらに典型的な場合では新たなインスタンスを初期化するために
+<a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> に渡されます。</dd>
+<dt>旧クラス型 (classic class)</dt>
+<dd><p class="first last" id="index-46">(旧) クラスオブジェクトは後で詳しく説明します。クラスオブジェクトが呼び出されると、新たにクラスインスタンス (後述) が生成され、返されます。この操作には、クラスの <a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> メソッドの呼び出し  (定義されている場合) が含まれています。呼び出しの際に使われた引数は、すべて
+<a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> メソッドに渡されます。 <a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> メソッドがない場合、クラスは引数なしで呼び出さなければなりません。</p>
+</dd>
+<dt>クラスインスタンス (class instance)</dt>
+<dd>クラスインスタンスは後で詳しく説明します。クラスインスタンスはクラスが <a class="reference internal" href="#object.__call__" title="object.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">__call__()</span></tt></a> メソッドを持っている場合にのみ呼び出すことができます; <tt class="docutils literal"><span class="pre">x(arguments)</span></tt> とすると、 <tt class="docutils literal"><span class="pre">x.__call__(arguments)</span></tt> 呼び出しを短く書けます。</dd>
+</dl>
+</dd>
+<dt>モジュール (module)</dt>
+<dd><p class="first" id="index-47">モジュールは <a class="reference internal" href="simple_stmts.html#import"><tt class="xref std std-keyword docutils literal"><span class="pre">import</span></tt></a> 文で import します (<a class="reference internal" href="simple_stmts.html#import"><em>import 文</em></a> 参照)。モジュールオブジェクトは、辞書オブジェクト (モジュール内で定義されている関数が func_globals 属性で参照している辞書です)
+で実装された名前空間を持っています。属性への参照は、この辞書に対する検索 (lookup) に翻訳されます。例えば、 <tt class="docutils literal"><span class="pre">m.x</span></tt> は
+<tt class="docutils literal"><span class="pre">m.__dict__[&quot;x&quot;]</span></tt> と同じです。モジュールオブジェクトには、モジュールを初期化するために使われるコードオブジェクトは入っていません
+(一度初期化が終わればもう必要ないからです)。</p>
+<p>属性の代入を行うと、モジュールの名前空間辞書の内容を更新します。例えば、 <tt class="docutils literal"><span class="pre">m.x</span> <span class="pre">=</span> <span class="pre">1</span></tt> は <tt class="docutils literal"><span class="pre">m.__dict__[&quot;x&quot;]</span> <span class="pre">=</span> <span class="pre">1</span></tt>
+と同じです。</p>
+<p id="index-48">読み出し専用の特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">__dict__</span></tt> はモジュールの名前空間で、辞書オブジェクトです。</p>
+<div class="impl-detail compound">
+<p><strong>CPython implementation detail:</strong> CPython がモジュール辞書を削除する方法から、モジュール辞書はモジュールがスコープから外れた時、その辞書が生きた参照を持っていてさえ、削除されます。これを避けるには、辞書をコピーするか、辞書を直接使っている間、モジュールを確保してください。</p>
+</div>
+<p class="last" id="index-49">定義済みの (書き込み可能な) 属性: <tt class="xref py py-attr docutils literal"><span class="pre">__name__</span></tt> はモジュールの名前です;  <tt class="xref py py-attr docutils literal"><span class="pre">__doc__</span></tt>
+は関数のドキュメンテーション文字列です。ドキュメンテーションがない場合は <tt class="docutils literal"><span class="pre">None</span></tt> になります; モジュールがファイルからロードされた場合、
+<tt class="xref py py-attr docutils literal"><span class="pre">__file__</span></tt> はロードされたモジュールファイルのパス名です。インタプリタに静的にリンクされている C
+モジュールの場合、 <tt class="xref py py-attr docutils literal"><span class="pre">__file__</span></tt> 属性はありません; 共有ライブラリから動的にロードされた拡張モジュールの場合、この属性は共有ライブラリファイルのパス名になります。</p>
+</dd>
+<dt>クラス</dt>
+<dd><p class="first">2種類のクラス、 type (新スタイルクラス) と class object (旧スタイルクラス) の両方とも、通常はクラス定義 (<a class="reference internal" href="compound_stmts.html#class"><em>クラス定義</em></a> 参照) で生成されます。</p>
+<p>クラスは辞書で実装された名前空間を持っています。クラス属性への参照は、この辞書に対する検索 (lookup) に翻訳されます。例えば、 <tt class="docutils literal"><span class="pre">C.x</span></tt> は <tt class="docutils literal"><span class="pre">C.__dict__[&quot;x&quot;]</span></tt> と同じです。(ただし、特に新スタイルクラスにおいて、属性参照の意味を変えられる幾つかのフックがあります)</p>
+<p>属性がこの検索で見つからない場合、現在のクラスの基底クラスへと検索を続けます。旧スタイルクラスの場合、検索は深さ優先 (depth-first)、かつ基底クラスの挙げられているリスト中の左から右 (left-to-right) の順番で行われます。新スタイルクラスは、より複雑な、C3メソッド解決順序(MRO=method resolution order)
+を利用していて、複数の継承パスが共通の祖先にたどり着く「ダイアモンド継承」があっても正しく動作します。
+C3 MRO についてのより詳細な情報は、2.3リリースに付属するドキュメントにあります。
+(<a class="reference external" href="http://www.python.org/download/releases/2.3/mro/">http://www.python.org/download/releases/2.3/mro/</a>)</p>
+<p id="index-50">クラス (<tt class="xref py py-class docutils literal"><span class="pre">C</span></tt> とします) への属性参照で、要求している属性がユーザ定義関数オブジェクトや、 <tt class="xref py py-class docutils literal"><span class="pre">C</span></tt> やその基底クラスに関連付けられている非結合のユーザ定義メソッドオブジェクトである場合、 <tt class="xref py py-attr docutils literal"><span class="pre">im_class</span></tt> 属性が <tt class="xref py py-class docutils literal"><span class="pre">C</span></tt> であるような非結合ユーザ定義メソッドオブジェクトに変換されます。要求している属性がクラスメソッドオブジェクトの場合、 <tt class="xref py py-attr docutils literal"><span class="pre">im_class</span></tt> とその
+<tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> 属性がどちらも <tt class="xref py py-class docutils literal"><span class="pre">C</span></tt> であるようなユーザ定義メソッドオブジェクトに変換されます。要求している属性が静的メソッドオブジェクトの場合、静的メソッドオブジェクトでラップされたオブジェクトに変換されます。クラスから取り出した属性と実際に
+<tt class="xref py py-attr docutils literal"><span class="pre">__dict__</span></tt> に入っているものが異なるような他の場合については、  <a class="reference internal" href="#descriptors"><em>デスクリプタ (descriptor) の実装</em></a> を参照してください。
+(新スタイルクラスだけがディスクリプタをサポートしていることに注意してください)</p>
+<p id="index-51">クラス属性を代入すると、そのクラスの辞書だけが更新され、基底クラスの辞書は更新しません。</p>
+<p id="index-52">クラスオブジェクトを呼び出す (上記を参照) と、クラスインスタンスを生成します (下記を参照)。</p>
+<p class="last" id="index-53">特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">__name__</span></tt> はクラス名です; <tt class="xref py py-attr docutils literal"><span class="pre">__module__</span></tt> はクラスが定義されているモジュールの名前です;
+<tt class="xref py py-attr docutils literal"><span class="pre">__dict__</span></tt> はクラスの名前空間が入った辞書です; <tt class="xref py py-attr docutils literal"><span class="pre">__bases__</span></tt> は基底クラスの入った
+(空、あるいは単要素を取りえる)  タプルで、基底クラスリストの順番になっています; <tt class="xref py py-attr docutils literal"><span class="pre">__doc__</span></tt> はクラスのドキュメンテーション文字列です。ドキュメンテーション文字列がない場合には <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd>
+<dt>クラスインスタンス</dt>
+<dd><p class="first" id="index-54">クラスインスタンスはクラスオブジェクト (上記参照) を呼び出して生成します。クラスインスタンスは辞書で実装された名前空間を持っており、属性参照の時にはこの辞書が最初に検索されます。辞書内に属性が見つからず、かつインスタンスのクラスに該当する属性名がある場合、検索はクラス属性にまで広げられます。見つかったクラス属性がユーザ定義関数オブジェクトや、インスタンスのクラス (<tt class="xref py py-class docutils literal"><span class="pre">C</span></tt>
+とします) やその基底クラスに関連付けられている非結合のユーザ定義メソッドオブジェクトの場合、 <tt class="xref py py-attr docutils literal"><span class="pre">im_class</span></tt> 属性が <tt class="xref py py-class docutils literal"><span class="pre">C</span></tt>
+で <tt class="xref py py-attr docutils literal"><span class="pre">im_self</span></tt> 属性がインスタンスになっている結合ユーザ定義メソッドオブジェクトに変換されます。静的メソッドやクラスメソッドオブジェクトもまた、 <tt class="xref py py-class docutils literal"><span class="pre">C</span></tt> から取り出した場合と同様に変換されます; 上記の &#8220;クラス&#8221;
+を参照してください。クラスから取り出した属性と実際に <tt class="xref py py-attr docutils literal"><span class="pre">__dict__</span></tt> に入っているものが異なるような他の場合については、
+<a class="reference internal" href="#descriptors"><em>デスクリプタ (descriptor) の実装</em></a> 節を参照してください。クラス属性が見つからず、かつオブジェクトのクラスが <a class="reference internal" href="#object.__getattr__" title="object.__getattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattr__()</span></tt></a>
+メソッドを持っている場合、このメソッドを呼び出して属性名の検索を充足させます。</p>
+<p id="index-55">属性の代入や削除を行うと、インスタンスの辞書を更新しますが、クラスの辞書を更新することはありません。クラスで <a class="reference internal" href="#object.__setattr__" title="object.__setattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__setattr__()</span></tt></a> や
+<a class="reference internal" href="#object.__delattr__" title="object.__delattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__delattr__()</span></tt></a> メソッドが定義されている場合、直接インスタンスの辞書を更新する代わりにこれらのメソッドが呼び出されます。</p>
+<p id="index-56">クラスインスタンスは、ある特定の名前のメソッドを持っている場合、数値型やシーケンス型、あるいはマップ型のように振舞うことができます。
+<a class="reference internal" href="#specialnames"><em>特殊メソッド名</em></a> を参照してください。</p>
+<p class="last" id="index-57">特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">__dict__</span></tt> は属性の辞書です; <tt class="xref py py-attr docutils literal"><span class="pre">__class__</span></tt> はインスタンスのクラスです。</p>
+</dd>
+<dt>ファイル (file)</dt>
+<dd><p class="first last" id="index-58">ファイルオブジェクトは開かれたファイルを表します。ファイルオブジェクトは組み込み関数 <a class="reference internal" href="../library/functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a>  や、 <a class="reference internal" href="../library/os.html#os.popen" title="os.popen"><tt class="xref py py-func docutils literal"><span class="pre">os.popen()</span></tt></a>,
+<a class="reference internal" href="../library/os.html#os.fdopen" title="os.fdopen"><tt class="xref py py-func docutils literal"><span class="pre">os.fdopen()</span></tt></a>, および socke オブジェクトの <tt class="xref py py-meth docutils literal"><span class="pre">makefile()</span></tt> メソッド
+(その他の拡張モジュールで提供されている関数やメソッド) で生成されます。 <tt class="docutils literal"><span class="pre">sys.stdin</span></tt>, <tt class="docutils literal"><span class="pre">sys.stdout</span></tt> および
+<tt class="docutils literal"><span class="pre">sys.stderr</span></tt> といったオブジェクトは、インタプリタの標準入力、標準出力、および標準エラー出力ストリームに対応するよう初期化されます。ファイルオブジェクトに関する完全な記述については、 <a class="reference internal" href="../library/stdtypes.html#bltin-file-objects"><em>ファイルオブジェクト</em></a>
+を参照してください。</p>
+</dd>
+<dt>内部型 (internal type)</dt>
+<dd><p class="first" id="index-59">インタプリタが内部的に使っているいくつかの型は、ユーザに公開されています。これらの定義は将来のインタプリタのバージョンでは変更される可能性がありますが、ここでは記述の完全性のために触れておきます。</p>
+<dl class="docutils">
+<dt>コードオブジェクト</dt>
+<dd><p class="first" id="index-60">コードオブジェクトは <em>バイトコンパイルされた (byte-compiled)</em> 実行可能な Python コード、別名バイトコード(<a class="reference internal" href="../glossary.html#term-bytecode"><em class="xref std std-term">bytecode</em></a>)
+を表現します。コードオブジェクトと関数オブジェクトの違いは、関数オブジェクトが関数のグローバル変数 (関数を定義しているモジュールのグローバル)
+に対して明示的な参照を持っているのに対し、コードオブジェクトにはコンテキストがないということです; また、関数オブジェクトではデフォルト引数値を記憶できますが、コードオブジェクトではできません (実行時に計算される値を表現するため)。関数オブジェクトと違い、コードオブジェクトは変更不可能で、変更可能なオブジェクトへの参照を (直接、間接に関わらず) 含みません。</p>
+<p id="index-61">読み出し専用の特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">co_name</span></tt> は関数名を表します; <tt class="xref py py-attr docutils literal"><span class="pre">co_argcount</span></tt> は固定引数 (positional
+argument) の数です; <tt class="xref py py-attr docutils literal"><span class="pre">co_nlocals</span></tt> は関数が使う (引数を含めた) ローカル変数の数です;
+<tt class="xref py py-attr docutils literal"><span class="pre">co_varnames</span></tt> はローカル変数名の入ったタプルです (引数名から始まっています); <tt class="xref py py-attr docutils literal"><span class="pre">co_cellvars</span></tt>
+はネストされた関数で参照されているローカル変数の名前が入ったタプルです;  <tt class="xref py py-attr docutils literal"><span class="pre">co_freevars</span></tt> は自由変数の名前が入ったタプルです。
+<tt class="xref py py-attr docutils literal"><span class="pre">co_code</span></tt> はバイトコード列を表現している文字列です; <tt class="xref py py-attr docutils literal"><span class="pre">co_consts</span></tt> はバイトコードで使われているリテラルの入ったタプルです; <tt class="xref py py-attr docutils literal"><span class="pre">co_names</span></tt> はバイトコードで使われている名前の入ったタプルです; <tt class="xref py py-attr docutils literal"><span class="pre">co_filename</span></tt>
+はバイトコードのコンパイルが行われたファイル名です; <tt class="xref py py-attr docutils literal"><span class="pre">co_firstlineno</span></tt> は関数の最初の行番号です;
+<tt class="xref py py-attr docutils literal"><span class="pre">co_lnotab</span></tt> はバイトコードオフセットから行番号への対応付けをコード化した文字列です (詳細についてはインタプリタのソースコードを参照してください); <tt class="xref py py-attr docutils literal"><span class="pre">co_stacksize</span></tt> は関数で (ローカル変数の分も含めて) 必要なスタックサイズです;
+<tt class="xref py py-attr docutils literal"><span class="pre">co_flags</span></tt> はインタプリタ用の様々なフラグをコード化した整数です。</p>
+<p id="index-62">以下のフラグビットが <tt class="xref py py-attr docutils literal"><span class="pre">co_flags</span></tt> で定義されています:  <tt class="docutils literal"><span class="pre">0x04</span></tt> ビットは、関数が <tt class="docutils literal"><span class="pre">*arguments</span></tt> 構文を使って任意の数の固定引数を受理できる場合に立てられます; <tt class="docutils literal"><span class="pre">0x08</span></tt> ビットは、関数が <tt class="docutils literal"><span class="pre">**keywords</span></tt> 構文を使ってキーワード引数を受理できる場合に立てられます; <tt class="docutils literal"><span class="pre">0x20</span></tt> ビットは、関数がジェネレータである場合に立てられます。</p>
+<p>将来機能 (future feature) 宣言 (<tt class="docutils literal"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">division</span></tt>)
+もまた、 <tt class="xref py py-attr docutils literal"><span class="pre">co_flags</span></tt> のビットを立てることで、コードオブジェクトが特定の機能を有効にしてコンパイルされていることを示します:
+<tt class="docutils literal"><span class="pre">0x2000</span></tt> ビットは、関数が将来機能を有効にしてコンパイルされている場合に立てられます; 以前のバージョンの Python では、 <tt class="docutils literal"><span class="pre">0x10</span></tt>
+および <tt class="docutils literal"><span class="pre">0x1000</span></tt> ビットが使われていました。</p>
+<p><tt class="xref py py-attr docutils literal"><span class="pre">co_flags</span></tt> のその他のビットは将来に内部的に利用するために予約されています。</p>
+<p class="last" id="index-63">コードオブジェクトが関数を表現している場合、 <tt class="xref py py-attr docutils literal"><span class="pre">co_consts</span></tt> の最初の要素は関数のドキュメンテーション文字列になります。ドキュメンテーション文字列が定義されていない場合には  <tt class="docutils literal"><span class="pre">None</span></tt> になります。</p>
+</dd>
+</dl>
+<dl class="last docutils" id="frame-objects">
+<dt>フレーム (frame) オブジェクト</dt>
+<dd><p class="first" id="index-64">フレームオブジェクトは実行フレーム (execution frame) を表します。実行フレームはトレースバックオブジェクト内に出現します (下記参照)。</p>
+<p id="index-65">読み出し専用の特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">f_back</span></tt> は (呼び出し側にとっての)  以前のスタックフレームです。呼び出し側がスタックフレームの最下段である場合には <tt class="docutils literal"><span class="pre">None</span></tt> です; <tt class="xref py py-attr docutils literal"><span class="pre">f_code</span></tt> は現在のフレームで実行しようとしているコードオブジェクトです;
+<tt class="xref py py-attr docutils literal"><span class="pre">f_locals</span></tt>  はローカル変数を検索するために使われる辞書です; <tt class="xref py py-attr docutils literal"><span class="pre">f_globals</span></tt> はグローバル変数用です;
+<tt class="xref py py-attr docutils literal"><span class="pre">f_builtins</span></tt> は組み込みの (Python 固有の) 名前です; <tt class="xref py py-attr docutils literal"><span class="pre">f_restricted</span></tt> は、関数が制限つき実行
+(restricted execution)  モードで実行されているかどうかを示すフラグです; <tt class="xref py py-attr docutils literal"><span class="pre">f_lasti</span></tt>  は厳密な命令コード
+(コードオブジェクト中のバイトコード文字列へのインデクス) です。</p>
+<p class="last" id="index-66">書き込み可能な特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">f_trace</span></tt> が <tt class="docutils literal"><span class="pre">None</span></tt> でない場合、各ソースコード行の先頭で呼び出される関数になります;
+<tt class="xref py py-attr docutils literal"><span class="pre">f_exc_type</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">f_exc_value</span></tt>, <tt class="xref py py-attr docutils literal"><span class="pre">f_exc_traceback</span></tt>
+は、現在のフレームが以前に引き起こした例外が提供する親フレーム内でもっとも最近捕捉された例外を表します (それ以外の場合は、これらはNoneになります。);
+<tt class="xref py py-attr docutils literal"><span class="pre">f_lineno</span></tt> はフレーム中における現在の行番号です &#8212; トレース関数 (trace function)
+側でこの値に書き込みを行うと、指定した行にジャンプします (最下段の実行フレームにいるときのみ) 。デバッガでは、 f_fileno
+を書き込むことで、ジャンプ命令 (Set Next Statement 命令とも呼ばれます) を実装できます。</p>
+</dd>
+<dt>トレースバック (traceback) オブジェクト</dt>
+<dd><p class="first" id="index-67">トレースバックオブジェクトは例外のスタックトレースを表現します。トレースバックオブジェクトは例外が発生した際に生成されます。例外ハンドラを検索して実行スタックを戻っていく際、戻ったレベル毎に、トレースバックオブジェクトが現在のトレースバックの前に挿入されます。例外ハンドラに入ると、スタックトレースをプログラム側で利用できるようになります (<a class="reference internal" href="compound_stmts.html#try"><em>try 文</em></a> を参照)。トレースバックは <tt class="docutils literal"><span class="pre">sys.exc_traceback</span></tt> として得ることができ、 <tt class="docutils literal"><span class="pre">sys.exc_info()</span></tt>
+が返すタプルの三番目の要素としても得られます. インタフェースとしては後者の方が推奨されていますが、これはプログラムがマルチスレッドを使っている場合に正しく動作するからです。プログラムに適切なハンドラがない場合、スタックトレースは (うまく書式化されて)
+標準エラーストリームに書き出されます; インタプリタが対話的に実行されている場合、 <tt class="docutils literal"><span class="pre">sys.last_traceback</span></tt> として得ることもできます。</p>
+<p class="last" id="index-68">読み出し専用の特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">tb_next</span></tt> はスタックトレース内の (例外の発生しているフレームに向かって) 次のレベルです。次のレベルが存在しない場合には <tt class="docutils literal"><span class="pre">None</span></tt> になります; <tt class="xref py py-attr docutils literal"><span class="pre">tb_frame</span></tt> は現在のレベルにおける実行フレームを指します;
+<tt class="xref py py-attr docutils literal"><span class="pre">tb_lineno</span></tt> は例外の発生した行番号です; <tt class="xref py py-attr docutils literal"><span class="pre">tb_lasti</span></tt>
+は厳密な命令コードです。トレースバック内の行番号や最後に実行された命令は、 <a class="reference internal" href="compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文内で例外が発生し、かつ対応する
+<a class="reference internal" href="compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 節や <a class="reference internal" href="compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節がない場合には、フレームオブジェクト内の行番号とは異なるかもしれません。</p>
+</dd>
+<dt>スライス (slice) オブジェクト</dt>
+<dd><p class="first" id="index-69">スライスオブジェクトは <em>拡張スライス構文 (extended slice syntax)</em>
+が使われた際にスライスを表現するために使われます。拡張スライス構文とは、二つのコロンや、コンマで区切られた複数のスライスや省略符号 (ellipse)
+を使ったスライスで、例えば <tt class="docutils literal"><span class="pre">a[i:j:step]</span></tt> 、 <tt class="docutils literal"><span class="pre">a[i:j,</span> <span class="pre">k:l]</span></tt> 、あるいは <tt class="docutils literal"><span class="pre">a[...,</span> <span class="pre">i:j]</span></tt>
+です。スライスオブジェクトは組み込み関数 <a class="reference internal" href="../library/functions.html#slice" title="slice"><tt class="xref py py-func docutils literal"><span class="pre">slice()</span></tt></a> で生成されます。</p>
+<p id="index-70">読み出し専用の特殊属性: <tt class="xref py py-attr docutils literal"><span class="pre">start</span></tt> は下境界 (lower bound) です; <tt class="xref py py-attr docutils literal"><span class="pre">stop</span></tt> は上境界 (upper
+bound) です; <tt class="xref py py-attr docutils literal"><span class="pre">step</span></tt> はステップ値 (step value) です; それぞれ省略されている場合には <tt class="docutils literal"><span class="pre">None</span></tt> になります。これらの属性は任意の型の値をとることができます。</p>
+<p>スライスオブジェクトはメソッドを一つサポートします:</p>
+<dl class="last method">
+<dt id="slice.indices">
+<tt class="descclassname">slice.</tt><tt class="descname">indices</tt><big>(</big><em>self</em>, <em>length</em><big>)</big><a class="headerlink" href="#slice.indices" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは単一の整数引数 <em>length</em> を取り、 <em>length</em>  個の要素からなるシーケンスに適用した際にスライスオブジェクトから提供することになる、拡張スライスに関する情報を計算します。このメソッドは三つの整数からなるタプルを返します; それぞれ <em>start</em> および <em>stop</em>
+のインデクスと、 <em>step</em> またはスライス間の幅に対応します。インデクス値がないか、範囲外の値である場合、通常のスライスに対して一貫性のあるやりかたで扱われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+</dd>
+<dt>静的メソッド (static method) オブジェクト</dt>
+<dd>静的メソッドは、上で説明したような関数オブジェクトからメソッドオブジェクトへの変換を阻止するための方法を提供します。静的メソッドオブジェクトは他の何らかのオブジェクト、通常はユーザ定義メソッドオブジェクトを包むラッパです。静的メソッドをクラスやクラスインスタンスから取得すると、実際に返されるオブジェクトはラップされたオブジェクトになり、それ以上は変換の対象にはなりません。静的メソッドオブジェクトは通常呼び出し可能なオブジェクトをラップしますが、静的オブジェクト自体は呼び出すことができません。静的オブジェクトは組み込みコンストラクタ
+<a class="reference internal" href="../library/functions.html#staticmethod" title="staticmethod"><tt class="xref py py-func docutils literal"><span class="pre">staticmethod()</span></tt></a> で生成されます。</dd>
+<dt>クラスメソッドオブジェクト</dt>
+<dd>クラスメソッドオブジェクトは、静的メソッドオブジェクトに似て、別のオブジェクトを包むラッパであり、そのオブジェクトをクラスやクラスインスタンスから取り出す方法を代替します。このようにして取得したクラスメソッドオブジェクトの動作については、上の &#8220;ユーザ定義メソッド (user-
+defined method)&#8221; で説明されています。クラスメソッドオブジェクトは組み込みのコンストラクタ  <a class="reference internal" href="../library/functions.html#classmethod" title="classmethod"><tt class="xref py py-func docutils literal"><span class="pre">classmethod()</span></tt></a>
+で生成されます。</dd>
+</dl>
+</dd>
+</dl>
+</div>
+<div class="section" id="newstyle">
+<span id="id5"></span><h2>新スタイルと旧スタイル<a class="headerlink" href="#newstyle" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>クラスとインスタンスは好みに合わせて2種類の方法で記述することができます:
+旧スタイル(もしくはクラシックスタイル)と新スタイルです。</p>
+<p>Python 2.1以降では、ユーザが好んで指定した場合のみ旧スタイルが使用されます。 (旧スタイルの)クラスの概念と型の概念には関連性があります:
+もし <em>x</em> が旧スタイルのクラスのインスタンスだった場合、 <tt class="docutils literal"><span class="pre">x.__class__</span></tt> というコードはクラス <em>x</em> を指定しますが、
+<tt class="docutils literal"><span class="pre">type(x)</span></tt> は常に <tt class="docutils literal"><span class="pre">&lt;type'instance'&gt;</span></tt> となります。これは、すべての旧スタイルのインスタンスが、それらのクラスがどのクラスであるかにかかわらず、 <tt class="docutils literal"><span class="pre">instance</span></tt> と呼ばれる一つの内蔵型として実行されるということを反映しています。</p>
+<p>新スタイルのクラスは、クラスと型を統一するためにPython 2.2で導入されました。新スタイルのクラスはユーザ定義型と少しも変わりません。もし、 <em>x</em> が新スタイルクラスのインスタンスであった場合、 <tt class="docutils literal"><span class="pre">type(x)</span></tt> は <tt class="docutils literal"><span class="pre">x.__class__</span></tt> と同じになります。
+(ただし、これは保証されている動作ではありません。新スタイルクラスのインスタンスは、
+<tt class="docutils literal"><span class="pre">x.__class__</span></tt> で返る値をオーバーライドすることができます。)</p>
+<p>新スタイルクラスを導入する一番の理由は、メタモデルを用いた統一的なオブジェクトモデルを提供することにあります。また、ほとんどの組み込み型のサブクラスが作成できる、属性を計算するための&#8221;デスクリプタ&#8221;の導入できる等の利点があります。</p>
+<p>互換性のために、デフォルトではクラスは旧スタイルになります。新スタイルのクラスは、他の新スタイルクラス (すなわち型)を親クラスとして定義する、もしくは、他の親クラスが必要ない場合に &#8220;最上位型&#8221; <a class="reference internal" href="../library/functions.html#object" title="object"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a> を継承することで作成することができます。新スタイルクラスの動作は旧スタイルクラスの動作とは、 <a class="reference internal" href="../library/functions.html#type" title="type"><tt class="xref py py-func docutils literal"><span class="pre">type()</span></tt></a> が何を返すかといったことをはじめ、何点か重要な部分が異なります。特殊メソッドの呼び出しなど、これらの変更は新オブジェクトモデルの基盤となっています。それ以外の部分は、多重継承時のメソッドの解決順などのように、互換性の問題で以前は実装が不可能であった&#8221;修正&#8221;が新クラスに含まれています。</p>
+<p>このマニュアルは Python のクラスメカニズムに関する総合的な情報を提供しようとしていますが、新スタイルクラスについては、まだ足りない部分があるかもしれません。より詳細な情報を得たい場合は、
+<a class="reference external" href="http://www.python.org/doc/newstyle/">http://www.python.org/doc/newstyle/</a> を参照してください。</p>
+<p id="index-71">Python 3.0 では旧スタイルクラスが削除されて、新スタイルクラスが唯一のクラスになりました。</p>
+</div>
+<div class="section" id="specialnames">
+<span id="id6"></span><h2>特殊メソッド名<a class="headerlink" href="#specialnames" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p id="index-72">特殊な名前をもったメソッドを定義することで、特殊な構文 (算術演算や添え字表記、スライス表記のような) 特定の演算をクラスで実装することができます。これは、個々のクラスが Python 言語で提供されている演算子に対応した独自の振る舞いをできるようにするための、演算子のオーバロード
+(<em class="dfn">operator overloading</em>) に対する Python のアプローチです。例えば、あるクラスが <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> という名前のメソッドを定義しており、
+<tt class="docutils literal"><span class="pre">x</span></tt> がこのクラスのインスタンスであるとすると、 <tt class="docutils literal"><span class="pre">x[i]</span></tt> は旧スタイルクラスの場合 <tt class="docutils literal"><span class="pre">x.__getitem__(i)</span></tt> と、新スタイルクラスの場合 <tt class="docutils literal"><span class="pre">type(x).__getitem__(x,</span> <span class="pre">i)</span></tt> とほぼ等価になります。特に注釈のない限り、適切なメソッドが定義されていない場合にこのような演算を行おうとすると例外が送出されます。
+(発生する例外はたいてい、 <a class="reference internal" href="../library/exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a> か <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> です。)</p>
+<p>組み込み型をエミュレーションするようなクラスを実装する際には、エミューレーションの実装をモデル化しようとしているオブジェクトで意味のある範囲だけにとどめることが重要です。例えば、シーケンスによっては個々の要素の取り出し操作が意味のある操作である一方、スライスの抽出が意味をなさないことがあります。 (W3C ドキュメントオブジェクトモデルにおける <tt class="xref py py-class docutils literal"><span class="pre">NodeList</span></tt>
+インタフェースがその一例です。)</p>
+<div class="section" id="customization">
+<span id="id7"></span><h3>基本的なカスタマイズ<a class="headerlink" href="#customization" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="method">
+<dt id="object.__new__">
+<tt class="descclassname">object.</tt><tt class="descname">__new__</tt><big>(</big><em>cls</em><span class="optional">[</span>, <em>args...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#object.__new__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-73">クラス <em>cls</em> の新しいインスタンスを作るために呼び出されます。 <a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> は静的メソッドで (このメソッドは特別扱いされているので、明示的に静的メソッドと宣言する必要はありません)、インスタンスを生成するよう要求されているクラスを第一引数にとります。残りの引数はオブジェクトのコンストラクタの式 (クラスの呼び出し文) に渡されます。 <a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> の戻り値は新しいオブジェクトのインスタンス (通常は
+<em>cls</em> のインスタンス) でなければなりません。</p>
+<p>典型的な実装では、クラスの新たなインスタンスを生成するときには <tt class="docutils literal"><span class="pre">super(currentclass,</span> <span class="pre">cls).__new__(cls[,</span> <span class="pre">...])</span></tt>
+に適切な引数を指定してスーパクラスの <a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a>  メソッドを呼び出し、新たに生成されたインスタンスに必要な変更を加えてから返します。</p>
+<p><a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> が <em>cls</em> のインスタンスを返した場合、 <tt class="docutils literal"><span class="pre">__init__(self[,</span> <span class="pre">...])</span></tt> のようにしてインスタンスの
+<a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> が呼び出されます。このとき、 <em>self</em> は新たに生成されたインスタンスで、残りの引数は <a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a>
+に渡された引数と同じになります。</p>
+<p><a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> が <em>cls</em> のインスタンスを返さない場合、インスタンスの <a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> メソッドは呼び出されません。</p>
+<p><a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> の主な目的は、変更不能な型 (int, str, tuple など)
+のサブクラスでインスタンス生成をカスタマイズすることにあります。また、クラス生成をカスタマイズするために、カスタムのメタクラスでよくオーバーライドされます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__init__">
+<tt class="descclassname">object.</tt><tt class="descname">__init__</tt><big>(</big><em>self</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#object.__init__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-74">インスタンスが生成された際に呼び出されるコンストラクタ (constructor) です。引数はそのクラスのコンストラクタ式に渡した引数になります。基底クラスが <a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> メソッドを持っている場合、派生クラスの <a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> メソッドでは、例えば
+<tt class="docutils literal"><span class="pre">BaseClass.__init__(self,</span> <span class="pre">[args...])</span></tt> のように、必要ならば明示的に基底クラスの <a class="reference internal" href="#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a>
+メソッドを呼び出して、インスタンスの基底クラスに関わる部分が正しく初期化されるようにしなければなりません。コンストラクタには、値を返してはならないという特殊な制限があります; 値を返すようにすると、実行時に <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> の送出を引き起こします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__del__">
+<tt class="descclassname">object.</tt><tt class="descname">__del__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__del__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-75">インスタンスが消滅させられる際に呼び出されます。このメソッドはデストラクタ (destructor)  とも呼ばれます。基底クラスが <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドを持っている場合、派生クラスの <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドでは、必要ならば明示的に基底クラスの <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドを呼び出して、インスタンスの基底クラスに関わる部分が正しく消滅処理されるようにしなければなりません。
+<a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドでインスタンスに対する新たな参照を作ることで、インスタンスの消滅を遅らせることができます
+(とはいえ、推奨しません！)。このようにすると、新たに作成された参照がその後削除された際にもう一度 <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドが呼び出されます。インタプリタが終了する際に残っているオブジェクトに対して、 <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドが呼び出される保証はありません。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><tt class="docutils literal"><span class="pre">del</span> <span class="pre">x</span></tt> は直接 <tt class="docutils literal"><span class="pre">x.__del__()</span></tt> を呼び出しません &#8212;  前者は <tt class="docutils literal"><span class="pre">x</span></tt> への参照カウント (reference count)
+を 1 つ減らし、後者は <tt class="docutils literal"><span class="pre">x</span></tt> への参照カウントがゼロになった際にのみ呼び出されます。オブジェクトへの参照カウントがゼロになるのを妨げる可能性のあるよくある状況には、以下のようなものがあります: 複数のオブジェクト間における循環参照 (二重リンクリストや、親と子へのポインタを持つツリーデータ構造);
+例外を捕捉した関数におけるスタックフレーム上にあるオブジェクトへの参照 (<tt class="docutils literal"><span class="pre">sys.exc_traceback</span></tt> に記憶されているトレースバックが、スタックフレームを生き延びさせます); または、対話モードでハンドルされなかった例外を送出したスタックフレーム上にあるオブジェクトへの参照
+(<tt class="docutils literal"><span class="pre">sys.last_traceback</span></tt> に記憶されているトレースバックが、スタックフレームを生き延びさせます);
+最初の状況については、明示的に循環参照を壊すしか解決策はありません; 後者の二つの状況は、 <tt class="docutils literal"><span class="pre">None</span></tt> を <tt class="docutils literal"><span class="pre">sys.exc_traceback</span></tt> や
+<tt class="docutils literal"><span class="pre">sys.last_traceback</span></tt> に入れることで解決できます。ごみオブジェクトと化した循環参照は、オプションの循環参照検出機構 (cycle
+detector) が有効にされている場合 (これはデフォルトの設定です) には検出されますが、検出された循環参照を消去するのは Python レベルで
+<a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドが定義されていない場合だけです。 <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドが循環参照検出機構でどのように扱われるか、とりわけ <tt class="docutils literal"><span class="pre">garbage</span></tt> 値の記述に関しては、 <a class="reference internal" href="../library/gc.html#module-gc" title="gc: 循環検出ガベージコレクタのインターフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">gc</span></tt></a> モジュールのドキュメントを参照してください。</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last"><a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドの呼び出しが起きるのは不安定な状況下なので、
+<a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> の実行中に発生した例外は無視され、代わりに <tt class="docutils literal"><span class="pre">sys.stderr</span></tt> に警告が出力されます。また、 (例えばプログラムの実行終了による) モジュールの削除に伴って <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a>
+が呼び出される際には、 <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a>  メソッドが参照している他のグローバル変数はすでに削除されていたり、削除中(例えば、import機構のシャットダウン中)かもしれません。この理由から、 <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> メソッドでは外部の不変関係を維持する上で絶対最低限必要なことだけをすべきです。バージョン 1.5
+からは、単一のアンダースコアで始まるようなグローバル変数は、他のグローバル変数が削除される前にモジュールから削除されるように Python
+側で保証しています; これらのアンダースコア付きグローバル変数は、 <a class="reference internal" href="#object.__del__" title="object.__del__"><tt class="xref py py-meth docutils literal"><span class="pre">__del__()</span></tt></a> が呼び出された際に、import
+されたモジュールがまだ残っているか確認する上で役に立ちます。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__repr__">
+<tt class="descclassname">object.</tt><tt class="descname">__repr__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__repr__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-76">組み込み関数 <a class="reference internal" href="../library/repr.html#module-repr" title="repr: 大きさに制限のある別のrepr()の実装。"><tt class="xref py py-func docutils literal"><span class="pre">repr()</span></tt></a> や、文字列への変換 (逆クオート表記: reverse quote) の際に呼び出され、オブジェクトを表す &#8220;公式の
+(official)&#8221; 文字列を計算します。可能な場合には、この値は同じ値を持ったオブジェクトを (適切な環境で) 再生成するために使えるような有効な
+Python 式に似せるべきです。それが不可能なら、 <tt class="docutils literal"><span class="pre">&lt;...some</span> <span class="pre">useful</span> <span class="pre">description...&gt;</span></tt> 形式の文字列を返してください。戻り値は文字列オブジェクトでなければなりません。クラスが <a class="reference internal" href="#object.__repr__" title="object.__repr__"><tt class="xref py py-meth docutils literal"><span class="pre">__repr__()</span></tt></a> を定義しているが <a class="reference internal" href="#object.__str__" title="object.__str__"><tt class="xref py py-meth docutils literal"><span class="pre">__str__()</span></tt></a>
+を定義していない場合、そのクラスのインスタンスに対する &#8220;非公式の (informal)&#8221; 文字列表現が必要なときにも <a class="reference internal" href="#object.__repr__" title="object.__repr__"><tt class="xref py py-meth docutils literal"><span class="pre">__repr__()</span></tt></a>
+が使われます。</p>
+<p id="index-77">この関数はデバッグの際によく用いられるので、たくさんの情報を含み、あいまいでないような表記にすることが重要です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__str__">
+<tt class="descclassname">object.</tt><tt class="descname">__str__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__str__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-78">組み込み関数 <a class="reference internal" href="../library/functions.html#str" title="str"><tt class="xref py py-func docutils literal"><span class="pre">str()</span></tt></a> および <a class="reference internal" href="simple_stmts.html#print"><tt class="xref std std-keyword docutils literal"><span class="pre">print</span></tt></a> 文によって呼び出され、オブジェクトを表す &#8220;非公式の&#8221; 文字列を計算します。このメソッドは、有効な Python 式を返さなくても良いという点で、 <a class="reference internal" href="#object.__repr__" title="object.__repr__"><tt class="xref py py-meth docutils literal"><span class="pre">__repr__()</span></tt></a> と異なります: その代わり、より便利で分かりやすい表現を返すようにしてください。戻り値は文字列オブジェクトでなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__lt__">
+<tt class="descclassname">object.</tt><tt class="descname">__lt__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__lt__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__le__">
+<tt class="descclassname">object.</tt><tt class="descname">__le__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__le__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__eq__">
+<tt class="descclassname">object.</tt><tt class="descname">__eq__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__eq__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ne__">
+<tt class="descclassname">object.</tt><tt class="descname">__ne__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__ne__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__gt__">
+<tt class="descclassname">object.</tt><tt class="descname">__gt__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__gt__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ge__">
+<tt class="descclassname">object.</tt><tt class="descname">__ge__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__ge__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="versionadded">
+<span class="versionmodified">バージョン 2.1 で追加.</span></p>
+<p id="index-79">これらのメソッドは &#8220;拡張比較 (rich comparison)&#8221; メソッドと呼ばれ、下記の <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> に優先して呼び出されます。演算子シンボルとメソッド名の対応は以下の通りです: <tt class="docutils literal"><span class="pre">x&lt;y</span></tt> は <tt class="docutils literal"><span class="pre">x.__lt__(y)</span></tt> を呼び出します; <tt class="docutils literal"><span class="pre">x&lt;=y</span></tt> は
+<tt class="docutils literal"><span class="pre">x.__le__(y)</span></tt> を呼び出します; <tt class="docutils literal"><span class="pre">x==y</span></tt> は <tt class="docutils literal"><span class="pre">x.__eq__(y)</span></tt> を呼び出します; <tt class="docutils literal"><span class="pre">x!=y</span></tt> および
+<tt class="docutils literal"><span class="pre">x&lt;&gt;y</span></tt> は <tt class="docutils literal"><span class="pre">x.__ne__(y)</span></tt> を呼び出します; <tt class="docutils literal"><span class="pre">x&gt;y</span></tt> は <tt class="docutils literal"><span class="pre">x.__gt__(y)</span></tt> を呼び出します; <tt class="docutils literal"><span class="pre">x&gt;=y</span></tt>
+は <tt class="docutils literal"><span class="pre">x.__ge__(y)</span></tt> を呼び出します。</p>
+<p>拡張比較メソッドは、与えられた引数のペアに対する操作を実装していないときに、 <tt class="docutils literal"><span class="pre">NotImplemented</span></tt>
+というシングルトンを返すかもしれません。慣例として、正常に比較が行われたときには <tt class="docutils literal"><span class="pre">False</span></tt> か <tt class="docutils literal"><span class="pre">True</span></tt> を返します。しかし、これらのメソッドは任意の値を返すことができるので、比較演算子がブール値のコンテキスト(たとえば、 <tt class="docutils literal"><span class="pre">if</span></tt> 文の条件部分)で使われた場合、
+Python はその値に対して <a class="reference internal" href="../library/functions.html#bool" title="bool"><tt class="xref py py-func docutils literal"><span class="pre">bool()</span></tt></a> を呼び出して結果の真偽を判断します。</p>
+<p>比較演算子間には、暗黙的な論理関係はありません。すなわち、 <tt class="docutils literal"><span class="pre">x==y</span></tt> が真である場合、暗黙のうちに  <tt class="docutils literal"><span class="pre">x!=y</span></tt> が偽になるわけではありません。従って、 <a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a> を実装する際、演算子が期待通りに動作するようにするために
+<a class="reference internal" href="#object.__ne__" title="object.__ne__"><tt class="xref py py-meth docutils literal"><span class="pre">__ne__()</span></tt></a> も定義する必要があります。カスタムの比較演算をサポートしていて、辞書のキーに使うことができるハッシュ可能(<a class="reference internal" href="../glossary.html#term-hashable"><em class="xref std std-term">hashable</em></a>)
+オブジェクトを作るときの重要な注意点について、 <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a>
+のドキュメント内に書かれているので参照してください。</p>
+<p>これらのメソッドには、(左引数が演算をサポートしないが、右引数はサポートする場合に用いられるような) 鏡像となる (引数を入れ替えた)
+バージョンは存在しません; むしろ、 <a class="reference internal" href="#object.__lt__" title="object.__lt__"><tt class="xref py py-meth docutils literal"><span class="pre">__lt__()</span></tt></a> と <a class="reference internal" href="#object.__gt__" title="object.__gt__"><tt class="xref py py-meth docutils literal"><span class="pre">__gt__()</span></tt></a> は互いに鏡像であり、 <a class="reference internal" href="#object.__le__" title="object.__le__"><tt class="xref py py-meth docutils literal"><span class="pre">__le__()</span></tt></a> と
+<a class="reference internal" href="#object.__ge__" title="object.__ge__"><tt class="xref py py-meth docutils literal"><span class="pre">__ge__()</span></tt></a> 、および <a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a> と <a class="reference internal" href="#object.__ne__" title="object.__ne__"><tt class="xref py py-meth docutils literal"><span class="pre">__ne__()</span></tt></a> はそれぞれ互いに鏡像です。</p>
+<p>拡張比較メソッドの引数には型強制 (coerce) が起こりません。</p>
+<p>単一の基本演算から順序付けするための演算を自動的に生成したい場合には、
+<a class="reference internal" href="../library/functools.html#functools.total_ordering" title="functools.total_ordering"><tt class="xref py py-func docutils literal"><span class="pre">functools.total_ordering()</span></tt></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__cmp__">
+<tt class="descclassname">object.</tt><tt class="descname">__cmp__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__cmp__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-80">拡張比較 (上参照) が定義されていない場合、比較演算によって呼び出されます。
+<tt class="docutils literal"><span class="pre">self</span> <span class="pre">&lt;</span> <span class="pre">other</span></tt> である場合には負の値、 <tt class="docutils literal"><span class="pre">self</span> <span class="pre">==</span> <span class="pre">other</span></tt> ならばゼロ、
+<tt class="docutils literal"><span class="pre">self</span> <span class="pre">&gt;</span> <span class="pre">other</span></tt> であれば正の値を返さなければなりません。演算 <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> 、 <a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a>  および <a class="reference internal" href="#object.__ne__" title="object.__ne__"><tt class="xref py py-meth docutils literal"><span class="pre">__ne__()</span></tt></a> がいずれも定義されていない場合、クラスインスタンスはオブジェクトのアイデンティティ(&#8220;アドレス&#8221;) で比較されます。自作の比較演算をサポートするオブジェクトや、辞書のキーとして使えるオブジェクトを生成するには、
+<a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> に関する記述を参照してください。 (注意: <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> が例外を伝播しないという制限は Python
+1.5 から除去されました。)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__rcmp__">
+<tt class="descclassname">object.</tt><tt class="descname">__rcmp__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rcmp__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="versionchanged">
+<span class="versionmodified">バージョン 2.1 で変更: </span>もはやサポートされていません.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__hash__">
+<tt class="descclassname">object.</tt><tt class="descname">__hash__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__hash__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-81">ビルトインの <a class="reference internal" href="../library/functions.html#hash" title="hash"><tt class="xref py py-func docutils literal"><span class="pre">hash()</span></tt></a> 関数や、 <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a>, <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a>,
+<a class="reference internal" href="../library/stdtypes.html#dict" title="dict"><tt class="xref py py-class docutils literal"><span class="pre">dict</span></tt></a> のようなハッシュを使ったコレクション型の要素に対する操作から呼び出されます。 <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> は整数を返さなければなりません。このメソッドに必要な性質は、比較結果が等しいオブジェクトは同じハッシュ値を持つということです。オブジェクトを比較するときに利用する要素のそれぞれのハッシュ値を、(排他的論理和等の)
+なんらかの方法で合成することをおすすめします。</p>
+<p>クラスが <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> や <a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a> メソッドを定義していない場合、 <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a>
+メソッドも定義してはなりません; クラスが <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> または <a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a> を定義しているが、
+<a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> を定義していない場合、インスタンスを辞書のキーとして使うことはできません。クラスが変更可能なオブジェクトを定義しており、 <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a>  または <a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a>
+メソッドを実装している場合、 <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> を定義してはなりません。これは、辞書の実装においてハッシュ値が変更不能であることが要求されているからです
+(オブジェクトのハッシュ値が変化すると、キーが誤ったハッシュバケツ: hash bucket に入っていることになってしまいます)。</p>
+<p>ユーザー定義クラスはデフォルトで <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> と <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> メソッドを持っています。これらは、同一以外のすべてのオブジェクトに対して比較結果が偽になり、
+<tt class="docutils literal"><span class="pre">x.__hash__()</span></tt> は <tt class="docutils literal"><span class="pre">id(x)</span></tt> を返します。</p>
+<p>親クラスから <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> メソッドを継承して、 <a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> か <a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a>
+の意味を変更している(例えば、値ベースの同値関係から同一性ベースの同値関係に変更する)
+クラスのハッシュ値は妥当ではなくなるので、 <tt class="docutils literal"><span class="pre">__hash__</span> <span class="pre">=</span> <span class="pre">None</span></tt> をクラス定義に書く事で、明示的にハッシュ不可能であることを宣言できます。こうすると、プログラムがそのクラスのインスタンスのハッシュ値を取得しようとしたときに適切な <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> 例外を送出するようになるだけでなく、
+(<a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を発生させる <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> メソッドを持つクラスと違って)
+<tt class="docutils literal"><span class="pre">isinstance(obj,</span> <span class="pre">collections.Hashable)</span></tt> をチェックしたときに、ハッシュ不可能と判定されるようになります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span><a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> は現在では長整数オブジェクトも返せるようになりました。
+32ビット整数はこのオブジェクトのハッシュから導出されます。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>クラスのインスタンスがハッシュ不可能であることを明示的に宣言するために、
+<a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-attr docutils literal"><span class="pre">__hash__</span></tt></a> に <a class="reference internal" href="../library/constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> を設定することができるようになりました。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__nonzero__">
+<tt class="descclassname">object.</tt><tt class="descname">__nonzero__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__nonzero__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-82">真値テストや組み込み演算 <tt class="docutils literal"><span class="pre">bool()</span></tt> を実現するために呼び出されます;
+<tt class="docutils literal"><span class="pre">False</span></tt> または <tt class="docutils literal"><span class="pre">True</span></tt> か、等価な整数値 <tt class="docutils literal"><span class="pre">0</span></tt>
+または <tt class="docutils literal"><span class="pre">1</span></tt> を返さなければなりません。このメソッドが定義されていない場合、 <a class="reference internal" href="#object.__len__" title="object.__len__"><tt class="xref py py-meth docutils literal"><span class="pre">__len__()</span></tt></a>
+が定義されていれば呼び出され、その結果が nonzero であれば真になります。
+<a class="reference internal" href="#object.__len__" title="object.__len__"><tt class="xref py py-meth docutils literal"><span class="pre">__len__()</span></tt></a> と <a class="reference internal" href="#object.__nonzero__" title="object.__nonzero__"><tt class="xref py py-meth docutils literal"><span class="pre">__nonzero__()</span></tt></a> のどちらもクラスで定義されていない場合、そのクラスのインスタンスはすべて真の値を持つものとみなされます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__unicode__">
+<tt class="descclassname">object.</tt><tt class="descname">__unicode__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__unicode__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-83">組み込み関数 <a class="reference internal" href="../library/functions.html#unicode" title="unicode"><tt class="xref py py-func docutils literal"><span class="pre">unicode()</span></tt></a> を実現するために呼び出されます。Unicode オブジェクトを返さなければなりません。このメソッドが定義されていなければ、文字列への変換が試みられ、その結果がデフォルトの文字エンコードを用いて Unicode に変換されます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="attribute-access">
+<span id="id8"></span><h3>属性値アクセスをカスタマイズする<a class="headerlink" href="#attribute-access" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>以下のメソッドを定義して、クラスインスタンスへの属性値アクセス ( 属性値の使用、属性値への代入、 <tt class="docutils literal"><span class="pre">x.name</span></tt> の削除) の意味をカスタマイズすることができます。</p>
+<dl class="method">
+<dt id="object.__getattr__">
+<tt class="descclassname">object.</tt><tt class="descname">__getattr__</tt><big>(</big><em>self</em>, <em>name</em><big>)</big><a class="headerlink" href="#object.__getattr__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>属性値の検索を行った結果、通常の場所に属性値が見つからなかった場合 (すなわち、 <tt class="docutils literal"><span class="pre">self</span></tt> のインスタンス属性でなく、かつクラスツリーにも見つからなかった場合) に呼び出されます。このメソッドは (計算された) 属性値を返すか、 <a class="reference internal" href="../library/exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a>
+例外を送出しなければなりません。</p>
+<p id="index-84">通常のメカニズムを介して属性値が見つかった場合、 <a class="reference internal" href="#object.__getattr__" title="object.__getattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattr__()</span></tt></a>
+は呼び出されないので注意してください。(これは、 <a class="reference internal" href="#object.__getattr__" title="object.__getattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattr__()</span></tt></a>  と <a class="reference internal" href="#object.__setattr__" title="object.__setattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__setattr__()</span></tt></a>
+の間に意図的に導入された非対称性です。)
+これは、効率性のためと、こうしなければ <a class="reference internal" href="#object.__getattr__" title="object.__getattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattr__()</span></tt></a> がインスタンスの他の属性値にアクセスする方法がなくなるためです。少なくともインスタンス変数に対しては、値をインスタンスの属性値辞書に挿入しないようにして (代わりに他のオブジェクトに挿入することで)
+属性値が完全に制御されているように見せかけられることに注意してください。新スタイルクラスで実際に完全な制御を行う方法は、以下の
+<a class="reference internal" href="#object.__getattribute__" title="object.__getattribute__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattribute__()</span></tt></a> メソッドを参照してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__setattr__">
+<tt class="descclassname">object.</tt><tt class="descname">__setattr__</tt><big>(</big><em>self</em>, <em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#object.__setattr__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>属性値への代入が試みられた際に呼び出されます。このメソッドは通常の代入メカニズム (すなわち、インスタンス辞書への値の代入) の代わりに呼び出されます。
+<em>name</em> は属性名で、 <em>value</em> はその属性に代入する値です。</p>
+<p id="index-85"><a class="reference internal" href="#object.__setattr__" title="object.__setattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__setattr__()</span></tt></a> の中でインスタンス属性値への代入が必要な場合、単に <tt class="docutils literal"><span class="pre">self.name</span> <span class="pre">=</span> <span class="pre">value</span></tt> としてはなりません
+&#8212;  このようにすると、自分自身に対する再帰呼び出しがおきてしまいます。その代わりに、インスタンス属性の辞書に値を挿入してください。例えば、 <tt class="docutils literal"><span class="pre">self.__dict__[name]</span> <span class="pre">=</span> <span class="pre">value</span></tt> とします。新しい形式のクラスでは、インスタンス辞書にアクセスするのではなく、基底クラスのメソッドを同じ属性名で呼び出します。例えば、 <tt class="docutils literal"><span class="pre">object.__setattr__(self,</span> <span class="pre">name,</span> <span class="pre">value)</span></tt> とします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__delattr__">
+<tt class="descclassname">object.</tt><tt class="descname">__delattr__</tt><big>(</big><em>self</em>, <em>name</em><big>)</big><a class="headerlink" href="#object.__delattr__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#object.__setattr__" title="object.__setattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__setattr__()</span></tt></a> に似ていますが、代入ではなく値の削除を行います。このメソッドを実装するのは、オブジェクトにとって <tt class="docutils literal"><span class="pre">del</span>
+<span class="pre">obj.name</span></tt> が意味がある場合だけにしなければなりません。</p>
+</dd></dl>
+
+<div class="section" id="new-style-attribute-access">
+<span id="id9"></span><h4>新しい形式のクラスのための別の属性アクセス<a class="headerlink" href="#new-style-attribute-access" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>以下のメソッドは新しい形式のクラス (new-style class) のみに適用されます。</p>
+<dl class="method">
+<dt id="object.__getattribute__">
+<tt class="descclassname">object.</tt><tt class="descname">__getattribute__</tt><big>(</big><em>self</em>, <em>name</em><big>)</big><a class="headerlink" href="#object.__getattribute__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>クラスのインスタンスに対する属性アクセスを実装するために、無条件に呼び出されます。クラスが <a class="reference internal" href="#object.__getattr__" title="object.__getattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattr__()</span></tt></a> も定義している場合、 <a class="reference internal" href="#object.__getattr__" title="object.__getattr__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattr__()</span></tt></a> は、 <a class="reference internal" href="#object.__getattribute__" title="object.__getattribute__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattribute__()</span></tt></a> で明示的に呼び出すか、
+<a class="reference internal" href="../library/exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a> 例外を送出しない限り呼ばれません。このメソッドは (計算された) 属性値を返すか、 <a class="reference internal" href="../library/exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a> 例外を送出します。このメソッドが再帰的に際限なく呼び出されてしまうのを防ぐため、実装の際には常に、必要な属性全てへのアクセスで、例えば
+<tt class="docutils literal"><span class="pre">object.__getattribute__(self,</span> <span class="pre">name)</span></tt> のように基底クラスのメソッドを同じ属性名を使って呼び出さなければなりません。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">ビルトイン関数や言語構文により暗黙的に特殊メソッドが検索されるときは、このメソッドの呼び出しはバイパスされるでしょう。
+<a class="reference internal" href="#new-style-special-lookup"><em>新スタイルクラスの特殊メソッド検索</em></a> を参照してください。</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="descriptor">
+<span id="descriptors"></span><h4>デスクリプタ (descriptor) の実装<a class="headerlink" href="#descriptor" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>以下のメソッドは、このメソッド含むクラス (いわゆる
+<em>ディスクリプタ(descriptor)</em> クラス) のインスタンスが
+<em>オーナ (owner)</em> クラスに存在するときにのみ適用されます。
+(ディスクリプタは、オーナのクラス辞書か、その親のいずれかのクラス辞書になければなりません。)
+以下の例での &#8220;属性&#8221; は、名前がオーナクラスの <tt class="xref py py-attr docutils literal"><span class="pre">__dict__</span></tt> のプロパティ (porperty) のキーであるような属性を指します。</p>
+<dl class="method">
+<dt id="object.__get__">
+<tt class="descclassname">object.</tt><tt class="descname">__get__</tt><big>(</big><em>self</em>, <em>instance</em>, <em>owner</em><big>)</big><a class="headerlink" href="#object.__get__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オーナクラスやの属性を取得する (クラス属性へのアクセス) 際や、オーナクラスのインスタンスの属性を取得する (インスタンス属性へのアクセス)
+場合に呼び出されます。 <em>owner</em> は常にオーナクラスです。一方、 <em>instance</em> は属性へのアクセスを仲介するインスタンスか属性が <em>owner</em>
+を介してアクセスされる場合は <tt class="docutils literal"><span class="pre">None</span></tt> になります。このメソッドは (計算された) 属性値を返すか、 <a class="reference internal" href="../library/exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a>
+例外を送出しなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__set__">
+<tt class="descclassname">object.</tt><tt class="descname">__set__</tt><big>(</big><em>self</em>, <em>instance</em>, <em>value</em><big>)</big><a class="headerlink" href="#object.__set__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オーナクラスのインスタンス <em>instance</em> 上の属性を新たな値 <em>value</em> に設定する際に呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__delete__">
+<tt class="descclassname">object.</tt><tt class="descname">__delete__</tt><big>(</big><em>self</em>, <em>instance</em><big>)</big><a class="headerlink" href="#object.__delete__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>オーナクラスのインスタンス <em>instance</em> 上の属性を削除する際に呼び出されます。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="descriptor-invocation">
+<span id="id10"></span><h4>デスクリプタを呼び出す<a class="headerlink" href="#descriptor-invocation" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>一般にデスクリプタとは、特殊な &#8220;束縛に関する動作 (binding behaviour)&#8221;  をもつオブジェクト属性のことです。デスクリプタは、デスクリプタプロトコル (descriptor protocol) のメソッド:  <a class="reference internal" href="#object.__get__" title="object.__get__"><tt class="xref py py-meth docutils literal"><span class="pre">__get__()</span></tt></a>, <a class="reference internal" href="#object.__set__" title="object.__set__"><tt class="xref py py-meth docutils literal"><span class="pre">__set__()</span></tt></a>, および
+<a class="reference internal" href="#object.__delete__" title="object.__delete__"><tt class="xref py py-meth docutils literal"><span class="pre">__delete__()</span></tt></a> を使って、属性アクセスをオーバライドしているものです。これらのメソッドのいずれかがオブジェクトに対して定義されている場合、オブジェクトはデスクリプタであるといいます。</p>
+<p>属性アクセスのデフォルトの動作は、オブジェクトの辞書から値を取り出したり、値を設定したり、削除したりするというものです。例えば、 <tt class="docutils literal"><span class="pre">a.x</span></tt> による属性の検索では、まず <tt class="docutils literal"><span class="pre">a.__dict__['x']</span></tt> 、次に  <tt class="docutils literal"><span class="pre">type(a).__dict__['x']</span></tt> 、そして <tt class="docutils literal"><span class="pre">type(a)</span></tt>
+の基底クラスでメタクラスでないものに続く、といった具合に連鎖が起こります。</p>
+<p>しかしながら、検索対象となる値が、デスクリプタメソッドのいずれかを定義しているオブジェクトの属性値である場合、Python はデフォルトの動作をオーバライドして、デスクリプタメソッドの方を呼び出します。</p>
+<p>前後する呼び出し連鎖の中のどこでデスクリプタメソッドが呼び出されるかは、どのデスクリプタメソッドが定義されているかと、どうやってデスクリプタメソッドが呼ばれるかに依存します。デスクリプタは新しい形式のオブジェクトやクラス (<a class="reference internal" href="../library/functions.html#object" title="object"><tt class="xref py py-class docutils literal"><span class="pre">object()</span></tt></a> や <a class="reference internal" href="../library/functions.html#type" title="type"><tt class="xref py py-class docutils literal"><span class="pre">type()</span></tt></a>
+をサブクラス化したもの) だけに対して呼び出されるので注意してください。</p>
+<p>デスクリプタ呼び出しの基点となるのは、属性名への束縛 (binding) 、すなわち <tt class="docutils literal"><span class="pre">a.x</span></tt> です。引数がどのようにデスクリプタに結合されるかは
+<tt class="docutils literal"><span class="pre">a</span></tt> に依存します:</p>
+<dl class="docutils">
+<dt>直接呼出し (Direct Call)</dt>
+<dd>最も単純で、かつめったに使われない呼び出し操作は、コード中で直接デスクリプタメソッドの呼び出し:  <tt class="docutils literal"><span class="pre">x.__get__(a)</span></tt> を行うというものです。</dd>
+<dt>インスタンス束縛 (Instance Binding)</dt>
+<dd>新しい形式のクラスのインスタンスに対する束縛では、 <tt class="docutils literal"><span class="pre">a.x</span></tt> は呼び出し:  <tt class="docutils literal"><span class="pre">type(a).__dict__['x'].__get__(a,</span>
+<span class="pre">type(a))</span></tt> に変換されます。</dd>
+<dt>クラス束縛 (Class Binding)</dt>
+<dd>新しい形式のクラスに対する束縛では、 <tt class="docutils literal"><span class="pre">A.x</span></tt> は呼び出し: <tt class="docutils literal"><span class="pre">A.__dict__['x'].__get__(None,</span> <span class="pre">A)</span></tt> に変換されます。</dd>
+<dt>スーパクラス束縛 (Super Binding)</dt>
+<dd><tt class="docutils literal"><span class="pre">a</span></tt> が <a class="reference internal" href="../library/functions.html#super" title="super"><tt class="xref py py-class docutils literal"><span class="pre">super</span></tt></a> のインスタンスである場合、束縛 <tt class="docutils literal"><span class="pre">super(B,</span> <span class="pre">obj).m()</span></tt> を行うとまず <tt class="docutils literal"><span class="pre">A</span></tt> 、続いて
+<tt class="docutils literal"><span class="pre">B</span></tt> に対して <tt class="docutils literal"><span class="pre">obj.__class_.__mro__</span></tt> を検索し、次に呼び出し: <tt class="docutils literal"><span class="pre">A.__dict__['m'].__get__(obj,</span>
+<span class="pre">obj.__class__)</span></tt> でデスクリプタを呼び出します。</dd>
+</dl>
+<p>インスタンス束縛では、デスクリプタ呼び出しの優先順位はどのデスクリプタが定義されているかに依存します。データデスクリプタは、 <a class="reference internal" href="#object.__get__" title="object.__get__"><tt class="xref py py-meth docutils literal"><span class="pre">__get__()</span></tt></a> と <a class="reference internal" href="#object.__set__" title="object.__set__"><tt class="xref py py-meth docutils literal"><span class="pre">__set__()</span></tt></a> 、 <a class="reference internal" href="#object.__delete__" title="object.__delete__"><tt class="xref py py-meth docutils literal"><span class="pre">__delete__()</span></tt></a> の任意の組合せを定義することができます。
+<a class="reference internal" href="#object.__get__" title="object.__get__"><tt class="xref py py-meth docutils literal"><span class="pre">__get__()</span></tt></a> が定義されない場合には、その属性にアクセスすると、そのオブジェクトのインスタンス辞書にその値がある場合を除けば、デスクリプタオブジェクト自身が返ってきます。デスクリプタが <a class="reference internal" href="#object.__set__" title="object.__set__"><tt class="xref py py-meth docutils literal"><span class="pre">__set__()</span></tt></a> と <a class="reference internal" href="#object.__delete__" title="object.__delete__"><tt class="xref py py-meth docutils literal"><span class="pre">__delete__()</span></tt></a> またはそのどちらかを定義していれば、データデスクリプタとなります; もし両方とも定義しなければ、非データデスクリプタです。通常、データデスクリプタでは、 <a class="reference internal" href="#object.__get__" title="object.__get__"><tt class="xref py py-meth docutils literal"><span class="pre">__get__()</span></tt></a> と <a class="reference internal" href="#object.__set__" title="object.__set__"><tt class="xref py py-meth docutils literal"><span class="pre">__set__()</span></tt></a> を定義し、一方、非データデスクリプタには <a class="reference internal" href="#object.__get__" title="object.__get__"><tt class="xref py py-meth docutils literal"><span class="pre">__get__()</span></tt></a> メソッドしかありません。インスタンス辞書内で属性値が再定義されても、データデスクリプタは常にこの値をオーバライドします。対照的に、非データデスクリプタの場合には、属性値はインスタンス側でオーバライドされます。</p>
+<p>(<a class="reference internal" href="../library/functions.html#staticmethod" title="staticmethod"><tt class="xref py py-func docutils literal"><span class="pre">staticmethod()</span></tt></a> や <a class="reference internal" href="../library/functions.html#classmethod" title="classmethod"><tt class="xref py py-func docutils literal"><span class="pre">classmethod()</span></tt></a> を含む) Python
+メソッドは、非データデスクリプタとして実装されています。その結果、インスタンスではメソッドを再定義したりオーバライドできます。このことにより、個々のインスタンスが同じクラスの他のインスタンスと互いに異なる動作を獲得することができます。</p>
+<p><a class="reference internal" href="../library/functions.html#property" title="property"><tt class="xref py py-func docutils literal"><span class="pre">property()</span></tt></a> 関数はデータデスクリプタとして実装されています。従って、インスタンスはあるプロパティの動作をオーバライドすることができません。</p>
+</div>
+<div class="section" id="slots">
+<span id="id11"></span><h4>__slots__<a class="headerlink" href="#slots" title="このヘッドラインへのパーマリンク">¶</a></h4>
+<p>デフォルトでは、新旧どちらのクラスも、属性の記憶領域として使うための辞書を持っています。この仕様は、ほとんどインスタンス変数を持たないようなオブジェクトの場合には記憶領域の無駄遣いになります。記憶領域の消費量は、大量のインスタンスを生成する際には深刻です。</p>
+<p>このデフォルトの設定は、新たな形式のクラス定義において <em>__slots__</em> を定義することでオーバライドできます。 <em>__slots_</em> 宣言はインスタンス変数のシーケンスを受け取ります。各々のインスタンス上には、各変数の値を記憶するのにちょうど必要な量だけの記憶領域を確保します。各々のインスタンスに対して
+<em>__dict__</em> が生成されることがないので、記憶領域が節約されます。</p>
+<dl class="data">
+<dt id="__slots__">
+<tt class="descname">__slots__</tt><a class="headerlink" href="#__slots__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このクラス変数には、文字列、反復可能オブジェクト、あるいはインスタンスが用いる変数名を表す文字列からなるシーケンスを代入することができます。この変数が新しい形式のクラスで定義されている場合、 <em>__slots__</em> は、各インスタンスに対して宣言された変数に必要な記憶領域を確保し、
+<em>__dict__</em> と <em>__weakref__</em> が自動的に生成されないようにします。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<p><em>__slots__</em> を利用する際の注意</p>
+<ul>
+<li><p class="first"><em>__slots__</em> を持たないクラスから継承する場合、 <em>__dict__</em> 属性は常にアクセス可能なので、サブクラスで <em>__slots__</em> を定義しても意味がありません。</p>
+</li>
+<li><p class="first"><em>__dict__</em> 変数がない場合、 <em>__slots__</em> に列挙されていない新たな変数をインスタンスに代入することはできません。列挙されていない変数名を使って代入しようとした場合、 <a class="reference internal" href="../library/exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a> が送出されます。新たな変数を動的に代入したいのなら、 <em>__slots__</em> を宣言する際に <tt class="docutils literal"><span class="pre">'__dict__'</span></tt> を変数名のシーケンスに追加してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>これまでは、 <tt class="docutils literal"><span class="pre">'__dict__'</span></tt> を <em>__slots__</em> 宣言に追加しても、インスタンス変数名として他にリストされていない
+新たな属性の代入はできませんでした。</p>
+</li>
+<li><p class="first"><em>__slots__</em> を定義しているクラスの各インスタンスに <em>__weakref__</em> 変数がない場合、インスタンスに対する弱参照 (weak
+reference) はサポートされません。弱参照のサポートが必要なら、 <em>__slots__</em> を宣言する際に <tt class="docutils literal"><span class="pre">'__weakref__'</span></tt>
+を変数名のシーケンスに追加してください。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span>これまでは、 <tt class="docutils literal"><span class="pre">'__weakref__'</span></tt> を <em>__slots__</em> 宣言に追加しても、弱参照のサポートを有効にできませんでした。</p>
+</li>
+<li><p class="first"><em>__slots__</em> は、クラスのレベルで各変数に対するデスクリプタ  (<a class="reference internal" href="#descriptors"><em>デスクリプタ (descriptor) の実装</em></a> を参照) を使って実装されます。その結果、
+<em>__slots__</em> に定義されているインスタンス変数のデフォルト値はクラス属性を使って設定できなくなっています; そうしないと、デスクリプタによる代入をクラス属性が上書きしてしまうからです。</p>
+</li>
+<li><p class="first"><em>__slots__</em> 宣言が動作するのは、定義が行われたクラスだけに限られています。その結果、サブクラスでは、 <em>__slots__</em> を定義しない限り
+<em>__dict__</em> を持つことになります。</p>
+</li>
+<li><p class="first">あるクラスで、基底クラスですでに定義されているスロットを定義した場合、基底クラスのスロットで定義されているインスタンス変数は
+(デスクリプタを基底クラスから直接取得しない限り) アクセスできなくなります。これにより、プログラムの趣意が不定になってしまいます。将来は、この問題を避けるために何らかのチェックが追加されるかもしれません。</p>
+</li>
+<li><p class="first">空でない <em>__slots__</em> は、 <a class="reference internal" href="../library/functions.html#long" title="long"><tt class="xref py py-class docutils literal"><span class="pre">long</span></tt></a> 、 <a class="reference internal" href="../library/functions.html#str" title="str"><tt class="xref py py-class docutils literal"><span class="pre">str</span></tt></a> 、および <a class="reference internal" href="../library/functions.html#tuple" title="tuple"><tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></a> といった、&#8221;可変長
+(variable-length)&#8221; の組み込み型から派生したクラスでは動作しません。</p>
+</li>
+<li><p class="first"><em>__slots__</em> には、文字列でない反復可能オブジェクトを代入することができます。辞書型も使うことができます; しかし将来、辞書の各キーに相当する値に何らかの特殊な意味が割り当てられるかもしれません。</p>
+</li>
+<li><p class="first"><em>__class__</em> への代入は、両方のクラスが同じ <em>__slots__</em> を持っているときのみ動作します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>以前は、新旧どちらかのクラスが <em>__slots__</em> を持っていたら <em>__class__</em> への代入は
+エラーを発生していました。</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="metaclasses">
+<span id="id12"></span><h3>クラス生成をカスタマイズする<a class="headerlink" href="#metaclasses" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>デフォルトでは、新スタイルクラスは <a class="reference internal" href="../library/functions.html#type" title="type"><tt class="xref py py-func docutils literal"><span class="pre">type()</span></tt></a> を使って構築されます。クラス定義が別の名前空間に読み込まれ、クラス名は
+<tt class="docutils literal"><span class="pre">type(name,</span> <span class="pre">bases,</span> <span class="pre">dict)</span></tt> の結果に結合されます。</p>
+<p>クラス定義が読み込まれる際、 <em>__metaclass__</em> が定義されていれば、 <a class="reference internal" href="../library/functions.html#type" title="type"><tt class="xref py py-func docutils literal"><span class="pre">type()</span></tt></a> の代わりに <em>__metaclass__</em>
+が指している呼び出し可能オブジェクトが呼び出されます。これによって、</p>
+<ul class="simple">
+<li>クラスが生成される前にクラス辞書を変更する</li>
+<li>他のクラスのインスタンスを返す &#8211; 本質的にはファクトリ関数の役割を果たす</li>
+</ul>
+<p>といった、クラス生成のプロセスを監視したり置き換えたりするクラスや関数を書くことができます。</p>
+<p>これらのステップは、メタクラスの <a class="reference internal" href="#object.__new__" title="object.__new__"><tt class="xref py py-meth docutils literal"><span class="pre">__new__()</span></tt></a> メソッドで実行されなければなりません。
+&#8211; このメソッドから他の属性を持ったクラスを作るには、 <tt class="xref py py-meth docutils literal"><span class="pre">type.__new__()</span></tt> を呼び出すことができます。次の例ではクラスを生成する前に新しい要素をクラス辞書に追加しています。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">metacls</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="nb">dict</span><span class="p">[</span><span class="s">&#39;foo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;metacls was here&#39;</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">mcs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>もちろん、他のクラスメソッドをオーバーライドする(または新しいメソッドを追加する)こともできます。例えば、カスタムの <a class="reference internal" href="#object.__call__" title="object.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">__call__()</span></tt></a> メソッドをメタクラスに定義して、新しいインスタンスを常には造らないといったカスタムの動作を実装できます。</p>
+<dl class="data">
+<dt id="__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#__metaclass__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この変数は <tt class="docutils literal"><span class="pre">name</span></tt> 、 <tt class="docutils literal"><span class="pre">bases</span></tt> 、および <tt class="docutils literal"><span class="pre">dict</span></tt> を引数として取るような任意の呼び出し可能オブジェクトにできます。クラス生成の際、組み込みの <a class="reference internal" href="../library/functions.html#type" title="type"><tt class="xref py py-func docutils literal"><span class="pre">type()</span></tt></a> の代わりに、指定された呼び出しオブジェクトが呼び出されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<p>以下に優先順で並んだ規則によって、適切なメタクラスが決定されます:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">dict['__metaclass__']</span></tt> があればそれを使います。</li>
+<li>それ以外の場合で、最低でも一つ基底クラスを持っているなら、基底クラスのメタクラス (<em>__class__</em> 属性を探し、なければ基底クラスの型)
+を使います。</li>
+<li>それ以外の場合で、__metaclass__ という名前のグローバル変数があれば、それをつかいます。</li>
+<li>それ以外の場合には、旧スタイルのメタクラス (types.ClassType)  を使います。</li>
+</ul>
+<p>メタクラスは限りない潜在的利用価値を持っています。これまで試されてきたアイデアには、ログ記録、インタフェースのチェック、自動デリゲーション、自動プロパティ生成、プロキシ、フレームワーク、そして自動リソースロック／同期といったものがあります。</p>
+</div>
+<div class="section" id="id13">
+<h3>インスタンスのカスタマイズとサブクラスチェック<a class="headerlink" href="#id13" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+<p>以下のメソッドは組み込み関数 <a class="reference internal" href="../library/functions.html#isinstance" title="isinstance"><tt class="xref py py-func docutils literal"><span class="pre">isinstance()</span></tt></a> と <a class="reference internal" href="../library/functions.html#issubclass" title="issubclass"><tt class="xref py py-func docutils literal"><span class="pre">issubclass()</span></tt></a> のデフォルトの動作を上書きするのに利用します。</p>
+<p>特に、 <a class="reference internal" href="../library/abc.html#abc.ABCMeta" title="abc.ABCMeta"><tt class="xref py py-class docutils literal"><span class="pre">abc.ABCMeta</span></tt></a> メタクラスは、抽象基底クラス (ABCs) を&#8221;仮想基底クラス (virtual base classes)&#8221; として、他の ABC を含む、任意のクラスや (組み込み型を含む) 型に追加するために、これらのメソッドを実装しています。</p>
+<dl class="method">
+<dt id="class.__instancecheck__">
+<tt class="descclassname">class.</tt><tt class="descname">__instancecheck__</tt><big>(</big><em>self</em>, <em>instance</em><big>)</big><a class="headerlink" href="#class.__instancecheck__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>instance</em> が (直接、または間接的に) <em>class</em> のインスタンスと考えられる場合に true を返します。定義されていれば、 <tt class="docutils literal"><span class="pre">isinstance(instance,</span> <span class="pre">class)</span></tt> の実装のために呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="class.__subclasscheck__">
+<tt class="descclassname">class.</tt><tt class="descname">__subclasscheck__</tt><big>(</big><em>self</em>, <em>subclass</em><big>)</big><a class="headerlink" href="#class.__subclasscheck__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>subclass</em> が (直接、または間接的に) <em>class</em> のサブクラスと考えられる場合に true を返します。定義されていれば、 <tt class="docutils literal"><span class="pre">issubclass(subclass,</span> <span class="pre">class)</span></tt> の実装のために呼び出されます。</p>
+</dd></dl>
+
+<p>なお、これらのメソッドは、クラスの型 (メタクラス) 上で検索されます。実際のクラスにクラスメソッドとして定義することはできません。これは、インスタンスそれ自体がクラスであるこの場合にのみ、インスタンスに呼び出される特殊メソッドの検索と一貫しています。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><span class="target" id="index-86"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-3119"><strong>PEP 3119</strong></a> - Introducing Abstract Base Classes</dt>
+<dd><tt class="xref py py-meth docutils literal"><span class="pre">__instancecheck__()</span></tt> と <tt class="xref py py-meth docutils literal"><span class="pre">__subclasscheck__()</span></tt> を通して、
+<a class="reference internal" href="../library/functions.html#isinstance" title="isinstance"><tt class="xref py py-func docutils literal"><span class="pre">isinstance()</span></tt></a> と <a class="reference internal" href="../library/functions.html#issubclass" title="issubclass"><tt class="xref py py-func docutils literal"><span class="pre">issubclass()</span></tt></a> の動作をカスタマイズする仕様が、言語に抽象基底クラス (<a class="reference internal" href="../library/abc.html#module-abc" title="abc: PEP 3119 に基づいた抽象基底クラス"><tt class="xref py py-mod docutils literal"><span class="pre">abc</span></tt></a> モジュールを参照してください) を追加するという背景に基いた動機づけとともに載っています。</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="callable-types">
+<span id="id14"></span><h3>呼び出し可能オブジェクトをエミュレートする<a class="headerlink" href="#callable-types" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<dl class="method">
+<dt id="object.__call__">
+<tt class="descclassname">object.</tt><tt class="descname">__call__</tt><big>(</big><em>self</em><span class="optional">[</span>, <em>args...</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#object.__call__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-87">インスタンスが関数として &#8220;呼ばれた&#8221; 際に呼び出されます; このメソッドが定義されている場合、 <tt class="docutils literal"><span class="pre">x(arg1,</span> <span class="pre">arg2,</span> <span class="pre">...)</span></tt> は
+<tt class="docutils literal"><span class="pre">x.__call__(arg1,</span> <span class="pre">arg2,</span> <span class="pre">...)</span></tt> を短く書いたものになります。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="sequence-types">
+<span id="id15"></span><h3>コンテナをエミュレートする<a class="headerlink" href="#sequence-types" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>以下のメソッドを定義して、コンテナオブジェクトを実装することができます。コンテナは通常、(リストやタプルのような) シーケンスや、(辞書のような)
+マップ型を指しますが、他のコンテナも同じように表現することができます。最初の一連のメソッドは、シーケンスをエミュレートしたり、マップ型をエミュレートするために使われます; その違いとして、シーケンスの場合には、キーとして許されているのが、シーケンスの長さが <em>N</em> であるときの <tt class="docutils literal"><span class="pre">0</span> <span class="pre">&lt;=</span>
+<span class="pre">k</span> <span class="pre">&lt;</span> <span class="pre">N</span></tt> なる整数 <em>k</em> か、あるいは要素の範囲を表すスライスオブジェクトでなければならないということです。
+(後方互換性のため、 <a class="reference internal" href="#object.__getslice__" title="object.__getslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__getslice__()</span></tt></a> (以下参照) を定義して、拡張されていない単純なスライスを扱うようにもできます。)</p>
+<p>変更可能なシーケンスでは、Python の標準リストオブジェクトのように、メソッド <tt class="xref py py-meth docutils literal"><span class="pre">append()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">count()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">index()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">extend()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">insert()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">pop()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">remove()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">reverse()</span></tt>,および <tt class="xref py py-meth docutils literal"><span class="pre">sort()</span></tt> を提供しなければなりません。</p>
+<p>マップ型でも、Python の標準辞書オブジェクトのように、 <tt class="xref py py-meth docutils literal"><span class="pre">keys()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">values()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">items()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">has_key()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">clear()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">setdefault()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">iterkeys()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">itervalues()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">iteritems()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">pop()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">popitem()</span></tt>,
+<a class="reference internal" href="../library/copy.html#module-copy" title="copy: 浅いコピーおよび深いコピー操作。"><tt class="xref py py-meth docutils literal"><span class="pre">copy()</span></tt></a>,および <tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt> といったメソッドをマップ型で提供するよう推奨しています。
+<a class="reference internal" href="../library/userdict.html#module-UserDict" title="UserDict: 辞書オブジェクトのためのクラスラッパー。"><tt class="xref py py-mod docutils literal"><span class="pre">UserDict</span></tt></a> モジュールでは、これらのメソッドを <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a>, <a class="reference internal" href="#object.__setitem__" title="object.__setitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__setitem__()</span></tt></a>,
+<a class="reference internal" href="#object.__delitem__" title="object.__delitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__delitem__()</span></tt></a>,および <tt class="xref py py-meth docutils literal"><span class="pre">keys()</span></tt> といった基本セットから作成する上で役に立つ <tt class="xref py py-class docutils literal"><span class="pre">DictMixin</span></tt>
+クラスを提供しています。</p>
+<p>最後に、シーケンス型では以下に述べるメソッド群 <a class="reference internal" href="#object.__add__" title="object.__add__"><tt class="xref py py-meth docutils literal"><span class="pre">__add__()</span></tt></a>, <a class="reference internal" href="#object.__radd__" title="object.__radd__"><tt class="xref py py-meth docutils literal"><span class="pre">__radd__()</span></tt></a>,
+<a class="reference internal" href="#object.__iadd__" title="object.__iadd__"><tt class="xref py py-meth docutils literal"><span class="pre">__iadd__()</span></tt></a>, <a class="reference internal" href="#object.__mul__" title="object.__mul__"><tt class="xref py py-meth docutils literal"><span class="pre">__mul__()</span></tt></a>, <a class="reference internal" href="#object.__rmul__" title="object.__rmul__"><tt class="xref py py-meth docutils literal"><span class="pre">__rmul__()</span></tt></a>,および <a class="reference internal" href="#object.__imul__" title="object.__imul__"><tt class="xref py py-meth docutils literal"><span class="pre">__imul__()</span></tt></a>  を定義して、
+(シーケンス間の結合を意味する) 加算操作と (要素の繰り返しを意味する) 乗算操作を実装しなければなりません;  <a class="reference internal" href="#object.__coerce__" title="object.__coerce__"><tt class="xref py py-meth docutils literal"><span class="pre">__coerce__()</span></tt></a>
+や、その他の数値演算子を定義してはなりません。</p>
+<p>マップでもシーケンスでも、 <tt class="docutils literal"><span class="pre">in</span></tt> 演算子が有効利用できるように <a class="reference internal" href="#object.__contains__" title="object.__contains__"><tt class="xref py py-meth docutils literal"><span class="pre">__contains__()</span></tt></a>
+メソッドの定義を推奨します; マップ型では、 <tt class="docutils literal"><span class="pre">in</span></tt> は <tt class="xref py py-meth docutils literal"><span class="pre">has_key()</span></tt> と等価でなければなりません; シーケンスでは、シーケンス内の値にわたって検索を行わなければなりません。さらに、マップでもシーケンスでも、コンテナ内にわたる反復操作ができるようにするため、
+<a class="reference internal" href="#object.__iter__" title="object.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a> を実装するよう勧めます; マップ型の場合、 <a class="reference internal" href="#object.__iter__" title="object.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a> は <tt class="xref py py-meth docutils literal"><span class="pre">iterkeys()</span></tt>
+と等価でなければなりません; シーケンスの場合、シーケンス内の値にわたって反復操作を行わなければなりません。</p>
+<dl class="method">
+<dt id="object.__len__">
+<tt class="descclassname">object.</tt><tt class="descname">__len__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__len__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-88">組み込み関数 <a class="reference internal" href="../library/functions.html#len" title="len"><tt class="xref py py-func docutils literal"><span class="pre">len()</span></tt></a> を実現するために呼び出されます。オブジェクトの長さを <tt class="docutils literal"><span class="pre">&gt;=</span></tt> 0 である整数で返さなければなりません。また、オブジェクトが <a class="reference internal" href="#object.__nonzero__" title="object.__nonzero__"><tt class="xref py py-meth docutils literal"><span class="pre">__nonzero__()</span></tt></a>  メソッドを定義しておらず、 <a class="reference internal" href="#object.__len__" title="object.__len__"><tt class="xref py py-meth docutils literal"><span class="pre">__len__()</span></tt></a>
+メソッドがゼロを返す場合には、ブール演算コンテキストでは偽であるとみなされます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__getitem__">
+<tt class="descclassname">object.</tt><tt class="descname">__getitem__</tt><big>(</big><em>self</em>, <em>key</em><big>)</big><a class="headerlink" href="#object.__getitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-89"><tt class="docutils literal"><span class="pre">self[key]</span></tt> の値評価 (evaluation) を実現するために呼び出されます。シーケンスの場合、キーとして整数とスライスオブジェクトを受理できなければなりません。  (シーケンス型をエミュレートする場合)  負のインデクスの解釈は
+<a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> メソッド次第となります。 <em>key</em> が不適切な型であった場合、 <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a>
+を送出してもかまいません; (負のインデクス値に対して何らかの解釈を行った上で) <em>key</em> がシーケンスのインデクス集合外の値である場合、
+<a class="reference internal" href="../library/exceptions.html#exceptions.IndexError" title="exceptions.IndexError"><tt class="xref py py-exc docutils literal"><span class="pre">IndexError</span></tt></a> を送出しなければなりません。マップ型の場合は、 <em>key</em> に誤りがある場合（コンテナに含まれていない場合）、
+<a class="reference internal" href="../library/exceptions.html#exceptions.IndexError" title="exceptions.IndexError"><tt class="xref py py-exc docutils literal"><span class="pre">IndexError</span></tt></a> を送出しなければなりません。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last"><a class="reference internal" href="compound_stmts.html#for"><tt class="xref std std-keyword docutils literal"><span class="pre">for</span></tt></a> ループでは、シーケンスの終端を正しく検出できるようにするために、不正なインデクスに対して <a class="reference internal" href="../library/exceptions.html#exceptions.IndexError" title="exceptions.IndexError"><tt class="xref py py-exc docutils literal"><span class="pre">IndexError</span></tt></a>
+が送出されるものと期待しています。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__setitem__">
+<tt class="descclassname">object.</tt><tt class="descname">__setitem__</tt><big>(</big><em>self</em>, <em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#object.__setitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">self[key]</span></tt> に対する代入を実現するために呼び出されます。 <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> と同じ注意事項があてはまります。このメソッドを実装できるのは、あるキーに対する値の変更をサポートしているか、新たなキーを追加できるようなマップの場合と、ある要素を置き換えることができるシーケンスの場合だけです。不正な <em>key</em> に対しては、 <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> メソッドと同様の例外の送出を行わなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__delitem__">
+<tt class="descclassname">object.</tt><tt class="descname">__delitem__</tt><big>(</big><em>self</em>, <em>key</em><big>)</big><a class="headerlink" href="#object.__delitem__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">self[key]</span></tt> の削除を実現するために呼び出されます。 <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> と同じ注意事項があてはまります。このメソッドを実装できるのは、キーの削除をサポートしているマップの場合と、要素を削除できるシーケンスの場合だけです。不正な <em>key</em>
+に対しては、 <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> メソッドと同様の例外の送出を行わなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__iter__">
+<tt class="descclassname">object.</tt><tt class="descname">__iter__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__iter__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このメソッドは、コンテナに対してイテレータが要求された際に呼び出されます。このメソッドは、コンテナ内の全てのオブジェクトにわたる反復処理ができるような、新たなイテレータオブジェクトを返さなければなりません。マップの場合、コンテナ内のキーに渡る反復処理でなければならず、かつ <tt class="xref py py-meth docutils literal"><span class="pre">iterkeys()</span></tt> によって利用できなければなりません。</p>
+<p>イテレータオブジェクトでもこのメソッドを実装する必要があります; イテレータの場合、自分自身を返さなければなりません。イテレータオブジェクトに関するより詳細な情報は、 <a class="reference internal" href="../library/stdtypes.html#typeiter"><em>イテレータ型</em></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__reversed__">
+<tt class="descclassname">object.</tt><tt class="descname">__reversed__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__reversed__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../library/functions.html#reversed" title="reversed"><tt class="xref py py-func docutils literal"><span class="pre">reversed()</span></tt></a> ビルトイン関数が逆方向イテレーションを実装するために、(存在すれば)呼び出します。コンテナ内の全要素を逆順にイテレートする、新しいイテレータを返すべきです。</p>
+</dd></dl>
+
+<p>メンバシップテスト演算子 (<a class="reference internal" href="expressions.html#in"><tt class="xref std std-keyword docutils literal"><span class="pre">in</span></tt></a> および <a class="reference internal" href="expressions.html#not-in"><tt class="xref std std-keyword docutils literal"><span class="pre">not</span> <span class="pre">in</span></tt></a>) は通常、シーケンスに渡る反復処理を使って実装されます。しかし、コンテナオブジェクトで以下の特殊メソッドを定義して、より効率的な実装を行ったり、オブジェクトがシーケンスでなくてもよいようにできます。</p>
+<dl class="method">
+<dt id="object.__contains__">
+<tt class="descclassname">object.</tt><tt class="descname">__contains__</tt><big>(</big><em>self</em>, <em>item</em><big>)</big><a class="headerlink" href="#object.__contains__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メンバシップテスト演算を実現するために呼び出されます。 <em>item</em> が <em>self</em> 内に存在する場合には真を、そうでない場合には偽を返さなければなりません。マップオブジェクトの場合、値やキーと値の組ではなく、キーに対するメンバシップテストを考えなければなりません。</p>
+<p><a class="reference internal" href="#object.__contains__" title="object.__contains__"><tt class="xref py py-meth docutils literal"><span class="pre">__contains__()</span></tt></a> を定義しないオブジェクトに対しては、メンバシップテストはまず、
+<a class="reference internal" href="#object.__iter__" title="object.__iter__"><tt class="xref py py-meth docutils literal"><span class="pre">__iter__()</span></tt></a> を使った反復を試みます、次に古いシーケンス反復プロトコル
+<a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> を使います、
+<a class="reference internal" href="expressions.html#membership-test-details"><em>言語レファレンスのこの節</em></a> を参照して下さい。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="sequence-methods">
+<span id="id16"></span><h3>シーケンス型エミュレーションで使われるその他のメソッド<a class="headerlink" href="#sequence-methods" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>以下のオプションとなるメソッドを定義して、シーケンスオブジェクトをより高度にエミュレーションできます。変更不能なシーケンスのメソッドでは、
+<a class="reference internal" href="#object.__getslice__" title="object.__getslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__getslice__()</span></tt></a> が定義できるだけです; 変更可能なシーケンスでは三つのメソッド全てを定義できます。</p>
+<dl class="method">
+<dt id="object.__getslice__">
+<tt class="descclassname">object.</tt><tt class="descname">__getslice__</tt><big>(</big><em>self</em>, <em>i</em>, <em>j</em><big>)</big><a class="headerlink" href="#object.__getslice__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p class="deprecated">
+<span class="versionmodified">バージョン 2.0 で撤廃: </span>スライスオブジェクトは <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> メソッドのパラメタとしてサポートするようになりました。
+(しかし、現在の CPython はいまだに <a class="reference internal" href="#object.__getslice__" title="object.__getslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__getslice__()</span></tt></a> を実装しています。
+なので、派生クラスでスライスを実装する場合は、このメソッドをオーバーライドしなければなりません。)</p>
+<p><tt class="docutils literal"><span class="pre">self[i:j]</span></tt> の値評価を実現するために呼び出されます。返されるオブジェクトは <em>self</em> と同じ型でなければなりません。スライス表記で
+<em>i</em> や <em>j</em> がない場合には、それぞれゼロや <tt class="docutils literal"><span class="pre">sys.maxint</span></tt> に置き換えられるので注意してください。スライスに負のインデクスが用いられた場合、シーケンスの長さがインデクス値に加算されます。インスタンスが <a class="reference internal" href="#object.__len__" title="object.__len__"><tt class="xref py py-meth docutils literal"><span class="pre">__len__()</span></tt></a> メソッドを実装していない場合には、 <a class="reference internal" href="../library/exceptions.html#exceptions.AttributeError" title="exceptions.AttributeError"><tt class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></tt></a> が送出されます。この計算の結果、インデクス値が負でなくなるという保証はありません。シーケンスの長さよりも大きなインデクス値は修正されません。 <a class="reference internal" href="#object.__getslice__" title="object.__getslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__getslice__()</span></tt></a> が定義されていない場合、代わりにスライスオブジェクトが生成されて <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> に渡されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__setslice__">
+<tt class="descclassname">object.</tt><tt class="descname">__setslice__</tt><big>(</big><em>self</em>, <em>i</em>, <em>j</em>, <em>sequence</em><big>)</big><a class="headerlink" href="#object.__setslice__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">self[i:j]</span></tt> への代入を実現するために呼び出されます。 <em>i</em> および <em>j</em> に関しては、 <a class="reference internal" href="#object.__getslice__" title="object.__getslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__getslice__()</span></tt></a>
+と同じ注釈があてはまります。</p>
+<p>このメソッドは撤廃されています。 <a class="reference internal" href="#object.__setslice__" title="object.__setslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__setslice__()</span></tt></a> がないか、 <tt class="docutils literal"><span class="pre">self[i:j:k]</span></tt> 形式の拡張スライスの場合には、 <a class="reference internal" href="#object.__setslice__" title="object.__setslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__setslice__()</span></tt></a> が呼ばれる代わりにスライスオブジェクトが生成され、 <a class="reference internal" href="#object.__setitem__" title="object.__setitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__setitem__()</span></tt></a> に渡されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__delslice__">
+<tt class="descclassname">object.</tt><tt class="descname">__delslice__</tt><big>(</big><em>self</em>, <em>i</em>, <em>j</em><big>)</big><a class="headerlink" href="#object.__delslice__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">self[i:j]</span></tt> の削除を実現するために呼び出されます。 <em>i</em> および <em>j</em> に関しては、 <a class="reference internal" href="#object.__getslice__" title="object.__getslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__getslice__()</span></tt></a>
+と同じ注釈があてはまります。</p>
+<p>このメソッドは撤廃されています。 <a class="reference internal" href="#object.__delslice__" title="object.__delslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__delslice__()</span></tt></a> がないか、 <tt class="docutils literal"><span class="pre">self[i:j:k]</span></tt> 形式の拡張スライスの場合には、 <a class="reference internal" href="#object.__delslice__" title="object.__delslice__"><tt class="xref py py-meth docutils literal"><span class="pre">__delslice__()</span></tt></a> が呼ばれる代わりにスライスオブジェクトが生成され、 <a class="reference internal" href="#object.__delitem__" title="object.__delitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__delitem__()</span></tt></a> に渡されます。</p>
+</dd></dl>
+
+<p>これらのメソッドは、単一のコロンを使った単一のスライスで、かつスライスメソッドが利用できるときにだけ呼び出されることに注意してください。拡張スライス表記を含んでいるスライス表記や、スライスメソッドがない場合、 <a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> 、
+<a class="reference internal" href="#object.__setitem__" title="object.__setitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__setitem__()</span></tt></a> 、あるいは <a class="reference internal" href="#object.__delitem__" title="object.__delitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__delitem__()</span></tt></a> がスライスオブジェクトを引数として呼び出されます。</p>
+<p>以下の例は、プログラムやモジュールを以前のバージョンの Python に対して互換性を持たせる方法を示したものです (<a class="reference internal" href="#object.__getitem__" title="object.__getitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__getitem__()</span></tt></a> 、
+<a class="reference internal" href="#object.__setitem__" title="object.__setitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__setitem__()</span></tt></a> 、および <a class="reference internal" href="#object.__delitem__" title="object.__delitem__"><tt class="xref py py-meth docutils literal"><span class="pre">__delitem__()</span></tt></a> は引数としてスライスオブジェクトをサポートするものと仮定します):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyClass</span><span class="p">:</span>
+    <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="o">...</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c"># They won&#39;t be defined if version is at least 2.0 final</span>
+
+        <span class="k">def</span> <span class="nf">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">):]</span>
+        <span class="k">def</span> <span class="nf">__setslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">):]</span> <span class="o">=</span> <span class="n">seq</span>
+        <span class="k">def</span> <span class="nf">__delslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">):]</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../library/functions.html#max" title="max"><tt class="xref py py-func docutils literal"><span class="pre">max()</span></tt></a> を呼び出していることに注意してください; この呼び出し <tt class="xref py py-meth docutils literal"><span class="pre">__*slice__()</span></tt>
+メソッド呼び出される前に、負のインデクス値を処理しておくために必要です。負のインデクス値が使われた場合、 <tt class="xref py py-meth docutils literal"><span class="pre">__*item__()</span></tt>
+メソッドは与えられた値をそのまま使いますが、 <tt class="xref py py-meth docutils literal"><span class="pre">__*slice__()</span></tt> メソッドは &#8220;調理済みの (cooked)&#8221;
+形式になったインデクス値を受け取ります。負のインデクス値が使われると、メソッドを呼び出す前に、常にシーケンスの長さをインデクス値に加算します
+(加算してもまだ負の値となっていてもかまいません); これは、組み込みシーケンス型における慣習的な負のインデクス処理方法で、
+<tt class="xref py py-meth docutils literal"><span class="pre">__*item__()</span></tt> メソッドでも同様の処理を行うよう期待しています。しかし、ここではすでに負のインデクス値の処理を行っているので、負のインデクスを渡すべきではありません; インデクス値は、 <tt class="xref py py-meth docutils literal"><span class="pre">__*item__()</span></tt>
+メソッドに渡される前に、シーケンスのインデクス集合の境界に制限されていなければなりません。 <tt class="docutils literal"><span class="pre">max(0,</span> <span class="pre">i)</span></tt>
+を呼び出せば、適切な値を返すので便利です。</p>
+</div>
+<div class="section" id="numeric-types">
+<span id="id17"></span><h3>数値型をエミュレーションする<a class="headerlink" href="#numeric-types" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>以下のメソッドを定義して、数値型オブジェクトをエミュレートすることができます。特定の種類の数値型ではサポートされていないような演算に対応するメソッド
+(非整数の数値に対するビット単位演算など) は、未定義のままにしておかなければなりません。</p>
+<dl class="method">
+<dt id="object.__add__">
+<tt class="descclassname">object.</tt><tt class="descname">__add__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__add__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__sub__">
+<tt class="descclassname">object.</tt><tt class="descname">__sub__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__sub__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__mul__">
+<tt class="descclassname">object.</tt><tt class="descname">__mul__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__mul__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__floordiv__">
+<tt class="descclassname">object.</tt><tt class="descname">__floordiv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__floordiv__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__mod__">
+<tt class="descclassname">object.</tt><tt class="descname">__mod__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__mod__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__divmod__">
+<tt class="descclassname">object.</tt><tt class="descname">__divmod__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__divmod__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__pow__">
+<tt class="descclassname">object.</tt><tt class="descname">__pow__</tt><big>(</big><em>self</em>, <em>other</em><span class="optional">[</span>, <em>modulo</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#object.__pow__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__lshift__">
+<tt class="descclassname">object.</tt><tt class="descname">__lshift__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__lshift__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rshift__">
+<tt class="descclassname">object.</tt><tt class="descname">__rshift__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rshift__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__and__">
+<tt class="descclassname">object.</tt><tt class="descname">__and__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__and__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__xor__">
+<tt class="descclassname">object.</tt><tt class="descname">__xor__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__xor__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__or__">
+<tt class="descclassname">object.</tt><tt class="descname">__or__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__or__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-90">これらのメソッドは、二項算術演算 (<tt class="docutils literal"><span class="pre">+</span></tt>, <tt class="docutils literal"><span class="pre">-</span></tt>, <tt class="docutils literal"><span class="pre">*</span></tt>, <tt class="docutils literal"><span class="pre">//</span></tt>, <tt class="docutils literal"><span class="pre">%</span></tt>, <a class="reference internal" href="../library/functions.html#divmod" title="divmod"><tt class="xref py py-func docutils literal"><span class="pre">divmod()</span></tt></a>,
+<a class="reference internal" href="../library/functions.html#pow" title="pow"><tt class="xref py py-func docutils literal"><span class="pre">pow()</span></tt></a>, <tt class="docutils literal"><span class="pre">**</span></tt>, <tt class="docutils literal"><span class="pre">&lt;&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&amp;</span></tt>, <tt class="docutils literal"><span class="pre">^</span></tt>, <tt class="docutils literal"><span class="pre">|</span></tt>) を実現するために呼び出されます。例えば、式 <tt class="docutils literal"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></tt> の場合、 <em>x</em> が <a class="reference internal" href="#object.__add__" title="object.__add__"><tt class="xref py py-meth docutils literal"><span class="pre">__add__()</span></tt></a> メソッドをもつクラスのインスタンスであれば、 <tt class="docutils literal"><span class="pre">x.__add__(y)</span></tt>
+が呼び出されます。 <a class="reference internal" href="#object.__divmod__" title="object.__divmod__"><tt class="xref py py-meth docutils literal"><span class="pre">__divmod__()</span></tt></a> メソッドは、 <a class="reference internal" href="#object.__floordiv__" title="object.__floordiv__"><tt class="xref py py-meth docutils literal"><span class="pre">__floordiv__()</span></tt></a> と <a class="reference internal" href="#object.__mod__" title="object.__mod__"><tt class="xref py py-meth docutils literal"><span class="pre">__mod__()</span></tt></a>
+を使った場合と等価にならなければなりません;  <a class="reference internal" href="#object.__truediv__" title="object.__truediv__"><tt class="xref py py-meth docutils literal"><span class="pre">__truediv__()</span></tt></a> (下記参照) と関連づける必要はありません。組み込みの三項演算子バージョンの関数 <a class="reference internal" href="../library/functions.html#pow" title="pow"><tt class="xref py py-func docutils literal"><span class="pre">pow()</span></tt></a> をサポートする場合には、 <a class="reference internal" href="#object.__pow__" title="object.__pow__"><tt class="xref py py-meth docutils literal"><span class="pre">__pow__()</span></tt></a>
+は、オプションとなる第三の引数を受け取れなくてはなりません。</p>
+<p>こらのメソッドが渡された引き数に対する操作を提供していない場合には、 <tt class="docutils literal"><span class="pre">NotImplemented</span></tt> を送出しなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__div__">
+<tt class="descclassname">object.</tt><tt class="descname">__div__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__div__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__truediv__">
+<tt class="descclassname">object.</tt><tt class="descname">__truediv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__truediv__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>除算演算 (<tt class="docutils literal"><span class="pre">/</span></tt>) は、これらのメソッドで実現されています。 <a class="reference internal" href="#object.__truediv__" title="object.__truediv__"><tt class="xref py py-meth docutils literal"><span class="pre">__truediv__()</span></tt></a> は、 <tt class="docutils literal"><span class="pre">__future__.division</span></tt>
+が有効であるときに使われます。それ以外の場合には <a class="reference internal" href="#object.__div__" title="object.__div__"><tt class="xref py py-meth docutils literal"><span class="pre">__div__()</span></tt></a> が使われますs。二つのメソッドのうち一方しか定義されていなければ、オブジェクトは他方の演算コンテキストをサポートしなくなります; このとき、 <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a>
+が送出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__radd__">
+<tt class="descclassname">object.</tt><tt class="descname">__radd__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__radd__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rsub__">
+<tt class="descclassname">object.</tt><tt class="descname">__rsub__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rsub__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rmul__">
+<tt class="descclassname">object.</tt><tt class="descname">__rmul__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rmul__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rdiv__">
+<tt class="descclassname">object.</tt><tt class="descname">__rdiv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rdiv__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rtruediv__">
+<tt class="descclassname">object.</tt><tt class="descname">__rtruediv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rtruediv__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rfloordiv__">
+<tt class="descclassname">object.</tt><tt class="descname">__rfloordiv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rfloordiv__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rmod__">
+<tt class="descclassname">object.</tt><tt class="descname">__rmod__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rmod__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rdivmod__">
+<tt class="descclassname">object.</tt><tt class="descname">__rdivmod__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rdivmod__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rpow__">
+<tt class="descclassname">object.</tt><tt class="descname">__rpow__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rpow__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rlshift__">
+<tt class="descclassname">object.</tt><tt class="descname">__rlshift__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rlshift__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rrshift__">
+<tt class="descclassname">object.</tt><tt class="descname">__rrshift__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rrshift__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rand__">
+<tt class="descclassname">object.</tt><tt class="descname">__rand__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rand__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__rxor__">
+<tt class="descclassname">object.</tt><tt class="descname">__rxor__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__rxor__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ror__">
+<tt class="descclassname">object.</tt><tt class="descname">__ror__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__ror__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-91">これらのメソッドは二項算術演算 (<tt class="docutils literal"><span class="pre">+</span></tt>, <tt class="docutils literal"><span class="pre">-</span></tt>, <tt class="docutils literal"><span class="pre">*</span></tt>, <tt class="docutils literal"><span class="pre">/</span></tt>, <tt class="docutils literal"><span class="pre">%</span></tt>, <a class="reference internal" href="../library/functions.html#divmod" title="divmod"><tt class="xref py py-func docutils literal"><span class="pre">divmod()</span></tt></a>, <a class="reference internal" href="../library/functions.html#pow" title="pow"><tt class="xref py py-func docutils literal"><span class="pre">pow()</span></tt></a>,
+<tt class="docutils literal"><span class="pre">**</span></tt>, <tt class="docutils literal"><span class="pre">&lt;&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&amp;</span></tt>, <tt class="docutils literal"><span class="pre">^</span></tt>, <tt class="docutils literal"><span class="pre">|</span></tt>)  を実現しますが、メソッド呼び出しが行われる被演算子が逆転して
+(reflected, swapped: 入れ替えられて) います。これらの関数は、左側の被演算子が対応する演算をサポートしておらずかつ両者の演算子が異なる場合にのみ呼び出されます。 <a class="footnote-reference" href="#id22" id="id18">[2]</a></p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">x</span> <span class="pre">-</span> <span class="pre">y</span></tt> の式を評価する場合、 <em>y</em> が <a class="reference internal" href="#object.__rsub__" title="object.__rsub__"><tt class="xref py py-meth docutils literal"><span class="pre">__rsub__()</span></tt></a> メソッドを持つクラスのインスタンスであって、しかも
+<tt class="docutils literal"><span class="pre">x.__sub__(y)</span></tt> が <em>NotImplemented</em> を返す場合には、 <tt class="docutils literal"><span class="pre">y.__rsub__(x)</span></tt> が呼び出されます。</p>
+<p id="index-92">ただし、三項演算子 <a class="reference internal" href="../library/functions.html#pow" title="pow"><tt class="xref py py-func docutils literal"><span class="pre">pow()</span></tt></a> が <a class="reference internal" href="#object.__rpow__" title="object.__rpow__"><tt class="xref py py-meth docutils literal"><span class="pre">__rpow__()</span></tt></a> を呼ぶことはないので注意してください
+(型強制の規則が非常に難解になるからです)。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">右側の被演算子の型が左側の被演算子の型のサブクラスであり、このサブクラスであるメソッドに対する逆転メソッドが定義されている場合には、左側の被演算子の非逆転メソッドが呼ばれる前に、このメソッドが呼ばれます。この振る舞いにより、サブクラスが親の操作をオーバーライドすることが可能になります。</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__iadd__">
+<tt class="descclassname">object.</tt><tt class="descname">__iadd__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__iadd__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__isub__">
+<tt class="descclassname">object.</tt><tt class="descname">__isub__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__isub__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__imul__">
+<tt class="descclassname">object.</tt><tt class="descname">__imul__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__imul__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__idiv__">
+<tt class="descclassname">object.</tt><tt class="descname">__idiv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__idiv__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__itruediv__">
+<tt class="descclassname">object.</tt><tt class="descname">__itruediv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__itruediv__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ifloordiv__">
+<tt class="descclassname">object.</tt><tt class="descname">__ifloordiv__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__ifloordiv__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__imod__">
+<tt class="descclassname">object.</tt><tt class="descname">__imod__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__imod__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ipow__">
+<tt class="descclassname">object.</tt><tt class="descname">__ipow__</tt><big>(</big><em>self</em>, <em>other</em><span class="optional">[</span>, <em>modulo</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#object.__ipow__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ilshift__">
+<tt class="descclassname">object.</tt><tt class="descname">__ilshift__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__ilshift__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__irshift__">
+<tt class="descclassname">object.</tt><tt class="descname">__irshift__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__irshift__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__iand__">
+<tt class="descclassname">object.</tt><tt class="descname">__iand__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__iand__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ixor__">
+<tt class="descclassname">object.</tt><tt class="descname">__ixor__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__ixor__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__ior__">
+<tt class="descclassname">object.</tt><tt class="descname">__ior__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__ior__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これらのメソッドは、累算算術代入 (augmented arithmetic assignments, <tt class="docutils literal"><span class="pre">+=</span></tt>, <tt class="docutils literal"><span class="pre">-=</span></tt>, <tt class="docutils literal"><span class="pre">*=</span></tt>,
+<tt class="docutils literal"><span class="pre">/=</span></tt>, <tt class="docutils literal"><span class="pre">//=</span></tt>, <tt class="docutils literal"><span class="pre">%=</span></tt>, <tt class="docutils literal"><span class="pre">**=</span></tt>, <tt class="docutils literal"><span class="pre">&lt;&lt;=</span></tt>, <tt class="docutils literal"><span class="pre">&gt;&gt;=</span></tt>, <tt class="docutils literal"><span class="pre">&amp;=</span></tt>, <tt class="docutils literal"><span class="pre">^=</span></tt>, <tt class="docutils literal"><span class="pre">|=</span></tt>) を実現するために呼び出されます。これらのメソッドは、演算をその場で(<em>self</em> を変更する形で) 行うよう試み、その結果(変更された <em>self</em> またはその代わりのもの)を返さなければなりません。特定のメソッドが定義されていない場合、その累算算術演算は通常のメソッドで代用されます。例えば、 <tt class="docutils literal"><span class="pre">x</span> <span class="pre">+=</span> <span class="pre">y</span></tt> を評価する際、 <em>x</em> が <a class="reference internal" href="#object.__iadd__" title="object.__iadd__"><tt class="xref py py-meth docutils literal"><span class="pre">__iadd__()</span></tt></a> メソッドを持つクラスのインスタンスであれば、 <tt class="docutils literal"><span class="pre">x.__iadd__(y)</span></tt>
+が呼び出されます。逆に、 <em>x</em> が <tt class="xref py py-meth docutils literal"><span class="pre">__iadd()</span></tt> メソッドを持たないクラスのインスタンスであれば、 <tt class="docutils literal"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></tt>
+の評価と同じように <tt class="docutils literal"><span class="pre">x.__add__(y)</span></tt> および <tt class="docutils literal"><span class="pre">y.__radd__(x)</span></tt> を考慮します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__neg__">
+<tt class="descclassname">object.</tt><tt class="descname">__neg__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__neg__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__pos__">
+<tt class="descclassname">object.</tt><tt class="descname">__pos__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__pos__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__abs__">
+<tt class="descclassname">object.</tt><tt class="descname">__abs__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__abs__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__invert__">
+<tt class="descclassname">object.</tt><tt class="descname">__invert__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__invert__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-93">単項算術演算 (<tt class="docutils literal"><span class="pre">-</span></tt>, <tt class="docutils literal"><span class="pre">+</span></tt>, <a class="reference internal" href="../library/functions.html#abs" title="abs"><tt class="xref py py-func docutils literal"><span class="pre">abs()</span></tt></a> および <tt class="docutils literal"><span class="pre">~</span></tt>) を実現するために呼び出されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__complex__">
+<tt class="descclassname">object.</tt><tt class="descname">__complex__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__complex__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__int__">
+<tt class="descclassname">object.</tt><tt class="descname">__int__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__int__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__long__">
+<tt class="descclassname">object.</tt><tt class="descname">__long__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__long__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__float__">
+<tt class="descclassname">object.</tt><tt class="descname">__float__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__float__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-94">組み込み関数 <a class="reference internal" href="../library/functions.html#complex" title="complex"><tt class="xref py py-func docutils literal"><span class="pre">complex()</span></tt></a>, <a class="reference internal" href="../library/functions.html#int" title="int"><tt class="xref py py-func docutils literal"><span class="pre">int()</span></tt></a>, <a class="reference internal" href="../library/functions.html#long" title="long"><tt class="xref py py-func docutils literal"><span class="pre">long()</span></tt></a>, および <a class="reference internal" href="../library/functions.html#float" title="float"><tt class="xref py py-func docutils literal"><span class="pre">float()</span></tt></a>
+を実現するために呼び出されます。適切な型の値を返さなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__oct__">
+<tt class="descclassname">object.</tt><tt class="descname">__oct__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__oct__" title="この定義へのパーマリンク">¶</a></dt>
+<dt id="object.__hex__">
+<tt class="descclassname">object.</tt><tt class="descname">__hex__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__hex__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-95">組み込み関数 <a class="reference internal" href="../library/functions.html#oct" title="oct"><tt class="xref py py-func docutils literal"><span class="pre">oct()</span></tt></a> および <a class="reference internal" href="../library/functions.html#hex" title="hex"><tt class="xref py py-func docutils literal"><span class="pre">hex()</span></tt></a> を実現するために呼び出されます。文字列型を返さなければなりません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__index__">
+<tt class="descclassname">object.</tt><tt class="descname">__index__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__index__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../library/operator.html#operator.index" title="operator.index"><tt class="xref py py-func docutils literal"><span class="pre">operator.index()</span></tt></a> を実装するために呼び出されます。また、（スライシング）のように Python が整数オブジェクトを必要とする場合には何処でも呼び出されます。整数（int もしくは long）を返す必要があります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__coerce__">
+<tt class="descclassname">object.</tt><tt class="descname">__coerce__</tt><big>(</big><em>self</em>, <em>other</em><big>)</big><a class="headerlink" href="#object.__coerce__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>&#8220;型混合モード (mixed-mode)&#8221; での数値間の算術演算を実現するために呼び出されます。 <em>self</em> と <em>other</em> を共通の数値型に変換して、
+2 要素のタプルにして返すか、不可能な場合には <tt class="docutils literal"><span class="pre">None</span></tt> を返さなければなりません。共通の型が <tt class="docutils literal"><span class="pre">other</span></tt> の型になる場合、 <tt class="docutils literal"><span class="pre">None</span></tt>
+を返すだけで十分です。この場合、インタプリタはもう一方のオブジェクトを調べて型強制を行おうとするからです (とはいえ、もう一方の値の型が実装上変更できない場合には、ここで <em>self</em> を <em>other</em> の型に変換しておいた方が便利です)。戻り値に <tt class="docutils literal"><span class="pre">NotImplemented</span></tt> を使うのは、
+<tt class="docutils literal"><span class="pre">None</span></tt> を返すのと同じです。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="coercion-rule">
+<span id="coercion-rules"></span><h3>型強制規則 (coercion rule)<a class="headerlink" href="#coercion-rule" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>本節では、型強制 (coercion) に関する規則について記述します。プログラム言語が進化するにつれ、型強制規則について正確に記述するのは難しくなってゆきます; 従って、あるバージョンのある実装について記述するのは望ましくありません。その代わりに、型強制に関する非公式的なガイドラインを示しておきます。 Python 3.0 からは、型強制がサポートされなくなる予定です。</p>
+<ul>
+<li><p class="first">% 演算子の左被演算子が文字列か Unicode オブジェクトの場合、型強制は起きず、文字列としての書式化操作が呼び出されます。</p>
+</li>
+<li><p class="first">型強制演算の定義はもはや推奨されていません。型強制を定義していない混合型 (mixed-mode) 演算は、もとの引数をそのまま演算操作に渡すようになっています。</p>
+</li>
+<li><p class="first">新しい形式のクラス (<a class="reference internal" href="../library/functions.html#object" title="object"><tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></a> から派生したもの) が、二項演算子に対して <a class="reference internal" href="#object.__coerce__" title="object.__coerce__"><tt class="xref py py-meth docutils literal"><span class="pre">__coerce__()</span></tt></a>
+メソッドを呼び出すことはありません。; <a class="reference internal" href="#object.__coerce__" title="object.__coerce__"><tt class="xref py py-meth docutils literal"><span class="pre">__coerce__()</span></tt></a> が呼び出されるのは、組み込み関数 <a class="reference internal" href="../library/functions.html#coerce" title="coerce"><tt class="xref py py-func docutils literal"><span class="pre">coerce()</span></tt></a>
+が呼び出されたときだけです。</p>
+</li>
+<li><p class="first">事実上、 <tt class="docutils literal"><span class="pre">NotImplemented</span></tt> を返す演算子は、全く実装されていないものとして扱われます。</p>
+</li>
+<li><p class="first">以下の説明では、 <tt class="xref py py-meth docutils literal"><span class="pre">__op__()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">__rop__()</span></tt> は、演算子に相当する一般的なメソッド名を表すために使われます;
+<tt class="xref py py-meth docutils literal"><span class="pre">__iop__()</span></tt>  はインプレース演算子を表します。例えば、演算子 &#8216;<tt class="docutils literal"><span class="pre">+</span></tt>&#8216; の場合、 <a class="reference internal" href="#object.__add__" title="object.__add__"><tt class="xref py py-meth docutils literal"><span class="pre">__add__()</span></tt></a> および
+<a class="reference internal" href="#object.__radd__" title="object.__radd__"><tt class="xref py py-meth docutils literal"><span class="pre">__radd__()</span></tt></a> がそれぞれ左右の被演算子用の二項演算子として使われ、 <a class="reference internal" href="#object.__iadd__" title="object.__iadd__"><tt class="xref py py-meth docutils literal"><span class="pre">__iadd__()</span></tt></a> がインプレース演算用の演算子として使われる、といった具合です。</p>
+</li>
+<li><p class="first">オブジェクト <em>x</em> および <em>y</em> に対して、まず <tt class="docutils literal"><span class="pre">x.__op__(y)</span></tt> が試されます。この演算が実装されていないか、 <tt class="docutils literal"><span class="pre">NotImplemented</span></tt> を返す場合、次に <tt class="docutils literal"><span class="pre">y.__rop__(x)</span></tt> が試されます。この演算も実装されていないか、 <tt class="docutils literal"><span class="pre">NotImplemented</span></tt> を返すなら、 <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> 例外が送出されます。ただし、以下の例外があるので参照してください:</p>
+</li>
+<li><p class="first">前項に対する例外: 左被演算子が組み込み型や新スタイルクラスのインスタンスであり、かつ右被演算子が左被演算子と同じクラスか適切なサブクラスのインスタンスであり、さらに親クラスの <tt class="xref py py-meth docutils literal"><span class="pre">__rop__()</span></tt> メソッドをオーバライドしている場合、左被演算子の <tt class="xref py py-meth docutils literal"><span class="pre">__op__()</span></tt> メソッドを試す
+<em>前に</em> 右被演算子の <tt class="xref py py-meth docutils literal"><span class="pre">__rop__()</span></tt> が試されます。これは、サブクラス側で二項演算子を完全にオーバライドできるようにするためです。そうしなければ、常に左被演算子の <tt class="xref py py-meth docutils literal"><span class="pre">__op__()</span></tt> メソッドが右被演算子を受理してしまいます:
+あるクラスのインスタンスが被演算子になるとされている場合、そのサブクラスのインスタンスもまた受理可能だからです。</p>
+</li>
+<li><p class="first">双方の被演算子が型強制を定義している場合、型強制は被演算子の型の <tt class="xref py py-meth docutils literal"><span class="pre">__op__()</span></tt> や <tt class="xref py py-meth docutils literal"><span class="pre">__rop__()</span></tt> メソッドが呼び出される前に呼び出され、それより早くなることはありません。型強制の結果、型強制を行うことになったいずれの被演算子とも異なる型が返された場合、返されたオブジェクトの新たな型を使って、この過程が部分的に再度行われます。</p>
+</li>
+<li><p class="first">(&#8216;<tt class="docutils literal"><span class="pre">+=</span></tt>&#8216; のような) インプレース型の演算子を用いる際、左被演算子が <tt class="xref py py-meth docutils literal"><span class="pre">__iop__()</span></tt> を実装していれば、 <tt class="xref py py-meth docutils literal"><span class="pre">__iop__()</span></tt>
+が呼び出され、型強制は一切行われません。演算が <tt class="xref py py-meth docutils literal"><span class="pre">__op__()</span></tt> かつ/または <tt class="xref py py-meth docutils literal"><span class="pre">__rop__()</span></tt>
+に帰着した場合、通常の型強制規則が適用されます。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></tt> において、 <em>x</em> が結合 (concatenation) 演算を実装しているシーケンスであれば、シーケンスの結合が実行されます。</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">x</span> <span class="pre">*</span> <span class="pre">y</span></tt> において、一方の演算子が繰り返し (repeat) 演算を実装しているシーケンスであり、かつ他方が整数 (<a class="reference internal" href="../library/functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>
+または  <a class="reference internal" href="../library/functions.html#long" title="long"><tt class="xref py py-class docutils literal"><span class="pre">long</span></tt></a>) である場合、シーケンスの繰り返しが実行されます。</p>
+</li>
+<li><p class="first">(<a class="reference internal" href="#object.__eq__" title="object.__eq__"><tt class="xref py py-meth docutils literal"><span class="pre">__eq__()</span></tt></a> などのメソッドで実装されている) 拡張比較は、決して型強制を行いません。(<a class="reference internal" href="#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> で実装されている)
+三値比較 (three-way comparison) は、他の二項演算子で行われているのと同じ条件で型強制を受けます。</p>
+</li>
+<li><p class="first">現在の実装では、組み込み数値型 <a class="reference internal" href="../library/functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a>, <a class="reference internal" href="../library/functions.html#long" title="long"><tt class="xref py py-class docutils literal"><span class="pre">long</span></tt></a>, <a class="reference internal" href="../library/functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>
+および <a class="reference internal" href="../library/functions.html#complex" title="complex"><tt class="xref py py-class docutils literal"><span class="pre">complex</span></tt></a> は型強制を行いません;
+これらの型は全て、関数 <a class="reference internal" href="../library/functions.html#coerce" title="coerce"><tt class="xref py py-func docutils literal"><span class="pre">coerce()</span></tt></a> から利用するための <a class="reference internal" href="#object.__coerce__" title="object.__coerce__"><tt class="xref py py-meth docutils literal"><span class="pre">__coerce__()</span></tt></a> メソッドを実装しています。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更.</span></p>
+</li>
+</ul>
+</div>
+<div class="section" id="with">
+<span id="context-managers"></span><h3>with文とコンテキストマネージャ<a class="headerlink" href="#with" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<p>コンテキストマネージャ(<em class="dfn">context manager</em>) とは、 <a class="reference internal" href="compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文の実行時にランタイムコンテキストを定義するオブジェクトです。コンテキストマネージャは、コードブロックを実行するために必要な入り口および出口の処理を扱います。コンテキストマネージャは通常、
+<a class="reference internal" href="compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文（ <a class="reference internal" href="compound_stmts.html#with"><em>with 文</em></a> の章を参照）により起動されますが、これらのメソッドを直接呼び出すことで起動することもできます。</p>
+<p id="index-96">コンテキストマネージャの代表的な使い方としては、様々なグローバル情報の保存および更新、リソースのロックとアンロック、ファイルのオープンとクローズなどが挙げられます。</p>
+<p>コンテキストマネージャについてのさらなる情報については、 <a class="reference internal" href="../library/stdtypes.html#typecontextmanager"><em>コンテキストマネージャ型</em></a> を参照してください。</p>
+<dl class="method">
+<dt id="object.__enter__">
+<tt class="descclassname">object.</tt><tt class="descname">__enter__</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#object.__enter__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンテキストマネージャのの入り口で実行される処理です。 <a class="reference internal" href="compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文は、文の <a class="reference internal" href="compound_stmts.html#as"><tt class="xref std std-keyword docutils literal"><span class="pre">as</span></tt></a> 節で規定された値を返すこのメソッドを呼び出します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="object.__exit__">
+<tt class="descclassname">object.</tt><tt class="descname">__exit__</tt><big>(</big><em>self</em>, <em>exc_type</em>, <em>exc_value</em>, <em>traceback</em><big>)</big><a class="headerlink" href="#object.__exit__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンテキストマネージャの出口で実行される処理です。パラメータは、コンテキストが終了した原因となった例外について説明しています。コンテキストが例外を送出せず終了した場合は、全ての引き数に <a class="reference internal" href="../library/constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> が設定されます。</p>
+<p>もし、例外が送出され、かつメソッドが例外を抑制したい場合（すなわち、例外が伝播されるのを防ぎたい場合）、このメソッドは True を返す必要があります。そうでなければ、このメソッドの終了後、例外は通常通り伝播することになります。</p>
+<p><a class="reference internal" href="#object.__exit__" title="object.__exit__"><tt class="xref py py-meth docutils literal"><span class="pre">__exit__()</span></tt></a> メソッドは受け取った例外を再度送出すべきではありません。これは、呼び出し側の責任でおこなってください。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt><span class="target" id="index-97"></span><a class="pep reference external" href="http://www.python.org/dev/peps/pep-0343"><strong>PEP 0343</strong></a> - The &#8220;with&#8221; statement</dt>
+<dd>Python の <a class="reference internal" href="compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文の仕様、背景、および例が記載されています。</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="old-style-special-lookup">
+<span id="id19"></span><h3>旧スタイルクラスの特殊メソッド検索<a class="headerlink" href="#old-style-special-lookup" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>旧スタイルクラスにおいて、特殊メソッドは常に他のメソッドや属性と同じ方法で検索されます。これは、メソッドが <tt class="docutils literal"><span class="pre">x.__getitem__(i)</span></tt> のように明示的に検索された時も、
+<tt class="docutils literal"><span class="pre">x[i]</span></tt> のように暗黙的に検索された時も同じです。</p>
+<p>これにより、1つの旧スタイルクラスの異なるインスタンスが、それぞれ別の適切な特殊属性を持っている場合、異なる動作をすることになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">C</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c1</span><span class="o">.</span><span class="n">__len__</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c2</span><span class="o">.</span><span class="n">__len__</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span>
+<span class="go">9</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="new-style-special-lookup">
+<span id="id20"></span><h3>新スタイルクラスの特殊メソッド検索<a class="headerlink" href="#new-style-special-lookup" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>新スタイルクラスでは、特殊メソッドの暗黙的な呼び出しは、オブジェクトインスタンスの辞書ではなく、
+type の辞書で定義されているときにのみ正しく動作することが保証されます。この動作は、以下のコードが(旧スタイルクラスの同等な例と異なり)例外を発生させる理由です。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">__len__</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">&lt;module&gt;</span>
+<span class="nc">TypeError</span>: <span class="n-Identifier">object of type &#39;C&#39; has no len()</span>
+</pre></div>
+</div>
+<p>この動作の背景となる理由は、 <a class="reference internal" href="#object.__hash__" title="object.__hash__"><tt class="xref py py-meth docutils literal"><span class="pre">__hash__()</span></tt></a> と <a class="reference internal" href="#object.__repr__" title="object.__repr__"><tt class="xref py py-meth docutils literal"><span class="pre">__repr__()</span></tt></a> といった
+type オブジェクトを含むすべてのオブジェクトで定義されている特殊メソッドにあります。これらのメソッドの暗黙の検索が通常の検索プロセスを使った場合、
+type オブジェクト自体に対して実行されたときに失敗してしまいます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mf">1.</span><span class="n">__hash__</span><span class="p">()</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">int</span><span class="o">.</span><span class="n">__hash__</span><span class="p">()</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">&lt;module&gt;</span>
+<span class="nc">TypeError</span>: <span class="n-Identifier">descriptor &#39;__hash__&#39; of &#39;int&#39; object needs an argument</span>
+</pre></div>
+</div>
+<p>クラスの非結合メソッドをこのようにして実行しようとすることは、
+&#8216;metaclass confusion&#8217; と呼ばれることもあり、特殊メソッドを検索するときはインスタンスをバイパスすることで回避されます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">__hash__</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">__hash__</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">==</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>正確性のためにインスタンス属性をスキップするのに加えて、特殊メソッド検索はオブジェクトのメタクラスを含めて、 <a class="reference internal" href="#object.__getattribute__" title="object.__getattribute__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattribute__()</span></tt></a>
+メソッドもバイパスします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="k">def</span> <span class="nf">__getattribute__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="gp">... </span>      <span class="k">print</span> <span class="s">&quot;Metaclass getattribute invoked&quot;</span>
+<span class="gp">... </span>      <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">C</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">Meta</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="mi">10</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__getattribute__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&quot;Class getattribute invoked&quot;</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="nb">object</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">=</span> <span class="n">C</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span><span class="o">.</span><span class="n">__len__</span><span class="p">()</span>                 <span class="c"># Explicit lookup via instance</span>
+<span class="go">Class getattribute invoked</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">__len__</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>          <span class="c"># Explicit lookup via type</span>
+<span class="go">Metaclass getattribute invoked</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>                      <span class="c"># Implicit lookup</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+<p>このように <a class="reference internal" href="#object.__getattribute__" title="object.__getattribute__"><tt class="xref py py-meth docutils literal"><span class="pre">__getattribute__()</span></tt></a> 機構をバイパスすることで、特殊メソッドの扱いに関するある程度の自由度(特殊メソッドはインタプリタから確実に実行されるためにクラスオブジェクトに設定 <em>しなければならない。</em>)と引き換えに、インタープリタを高速化するための大きな余地を手に入れています。</p>
+<p class="rubric">注記</p>
+<table class="docutils footnote" frame="void" id="id21" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[1]</a></td><td>特定の条件が満たされた場合、オブジェクトの type を変更することが <em>できます</em> 。これは、正しく扱われなかった場合にとても奇妙な動作を引き起こすので、一般的には良い考えではありません。</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id22" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id18">[2]</a></td><td>同じ型の操作に対しては、(<a class="reference internal" href="#object.__add__" title="object.__add__"><tt class="xref py py-meth docutils literal"><span class="pre">__add__()</span></tt></a> のような)逆転できないメソッドが失敗した時と同じような想定のもと処理されます。これは、逆転したメソッドを呼び出すことができないからです。</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="executionmodel.html" title="実行モデル"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="lexical_analysis.html" title="字句解析"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 言語リファレンス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

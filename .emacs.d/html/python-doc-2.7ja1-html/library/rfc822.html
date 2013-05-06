@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>18.11. rfc822 — RFC 2822 準拠のメールヘッダ読み出し &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="18. インターネット上のデータの操作" href="netdata.html" />
+    <link rel="next" title="18.12. base64 — RFC 3548: Base16, Base32, Base64 データの符号化" href="base64.html" />
+    <link rel="prev" title="18.10. multifile — 個別の部分を含んだファイル群のサポート" href="multifile.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="base64.html" title="18.12. base64 — RFC 3548: Base16, Base32, Base64 データの符号化"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="multifile.html" title="18.10. multifile — 個別の部分を含んだファイル群のサポート"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="netdata.html" accesskey="U">18. インターネット上のデータの操作</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">18.11. <tt class="docutils literal"><span class="pre">rfc822</span></tt> &#8212; RFC 2822 準拠のメールヘッダ読み出し</a><ul>
+<li><a class="reference internal" href="#message">18.11.1. Message オブジェクト</a></li>
+<li><a class="reference internal" href="#addresslist">18.11.2. AddressList オブジェクト</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="multifile.html"
+                        title="前の章へ">18.10. <tt class="docutils literal docutils literal docutils literal"><span class="pre">multifile</span></tt> &#8212; 個別の部分を含んだファイル群のサポート</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="base64.html"
+                        title="次の章へ">18.12. <tt class="docutils literal docutils literal docutils literal"><span class="pre">base64</span></tt> &#8212; RFC 3548: Base16, Base32, Base64 データの符号化</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/rfc822.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-rfc822">
+<span id="rfc822-rfc-2822"></span><h1>18.11. <a class="reference internal" href="#module-rfc822" title="rfc822: RFC 2822 形式のメールメッセージを解釈します。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rfc822</span></tt></a> &#8212; RFC 2822 準拠のメールヘッダ読み出し<a class="headerlink" href="#module-rfc822" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="deprecated">
+<span class="versionmodified">バージョン 2.3 で撤廃: </span><a class="reference internal" href="#module-rfc822" title="rfc822: RFC 2822 形式のメールメッセージを解釈します。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rfc822</span></tt></a> モジュールを使うよりも  <a class="reference internal" href="email.html#module-email" title="email: 電子メールのメッセージを解析、操作および生成を支援するパッケージ。 これには MIME 文書もふくまれる。"><tt class="xref py py-mod docutils literal"><span class="pre">email</span></tt></a> パッケージを使うべきです。
+このモジュールは以前のバージョンとの互換性のために保守されているにすぎません。
+Python 3.0 ではこのモジュールは削除されました。</p>
+<p>このモジュールでは、インターネット標準 <span class="target" id="index-0"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> <a class="footnote-reference" href="#id2" id="id1">[1]</a> で定義されている
+&#8220;電子メールメッセージ&#8221; を表現するクラス、 <a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> を定義しています。このメッセージはメッセージヘッダ群とメッセージボディの集まりからなります。このモジュールではまた、ヘルパークラス  <span class="target" id="index-1"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> アドレス群を解釈するための
+<a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> クラスを定義しています。
+<span class="target" id="index-2"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> メッセージ固有の構文に関する情報は RFC を参照してください。</p>
+<p id="index-3"><a class="reference internal" href="mailbox.html#module-mailbox" title="mailbox: 様々な形式のメールボックス操作"><tt class="xref py py-mod docutils literal"><span class="pre">mailbox</span></tt></a> モジュールでは、多くのエンドユーザメールプログラムによって生成されるメールボックスを読み出すためのクラスを提供しています。</p>
+<dl class="class">
+<dt id="rfc822.Message">
+<em class="property">class </em><tt class="descclassname">rfc822.</tt><tt class="descname">Message</tt><big>(</big><em>file</em><span class="optional">[</span>, <em>seekable</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#rfc822.Message" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスは入力オブジェクトをパラメタに与えてインスタンス化します。入力オブジェクトのメソッドのうち、Message が依存するのは <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a> だけです; 通常のファイルオブジェクトは適格です。インスタンス化を行うと、入力オブジェクトからデリミタ行
+(通常は空行 1 行) に到達するまでヘッダを読み出し、それらをインスタンス中に保持します。ヘッダの後のメッセージ本体は読み出しません。</p>
+<p>このクラスは <a class="reference internal" href="readline.html#module-readline" title="readline: Python のための GNU readline サポート。 (Unix)"><tt class="xref py py-meth docutils literal"><span class="pre">readline()</span></tt></a> メソッドをサポートする任意の入力オブジェクトを扱うことができます。入力オブジェクトが seek および
+tell できる場合、 <a class="reference internal" href="#rfc822.Message.rewindbody" title="rfc822.Message.rewindbody"><tt class="xref py py-meth docutils literal"><span class="pre">rewindbody()</span></tt></a> メソッドが動作します。また、不正な行データを入力ストリームにプッシュバックできます。入力オブジェクトが seek できない一方で、入力行をプッシュバックする <tt class="xref py py-meth docutils literal"><span class="pre">unread()</span></tt>
+メソッドを持っている場合、 <a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> は不正な行データにこのプッシュバックを使います。こうして、このクラスはバッファされているストリームから来るメッセージを解釈するのに使うことができます。</p>
+<p>オプションの <em>seekable</em> 引数は、 <tt class="xref c c-func docutils literal"><span class="pre">lseek()</span></tt> システムコールが動作しないと分かるまでは <tt class="xref c c-func docutils literal"><span class="pre">tell()</span></tt>
+がバッファされたデータを無視するような、ある種の stdio ライブラリで回避手段として提供されています。可搬性を最大にするために、socket
+オブジェクトによって生成されたファイルのような、seek できないオブジェクトを渡す際には、最初に <tt class="xref py py-meth docutils literal"><span class="pre">tell()</span></tt> が呼び出されないようにするために
+seekable 引数をゼロに設定すべきです。</p>
+<p>ファイルとして読み出された入力行データは CR-LF と単一の改行 (line feed) のどちらで終端されていてもかまいません;
+行データを記憶する前に、終端の CR-LF は単一の改行と置き換えられます。</p>
+<p>ヘッダに対するマッチは全て大小文字に依存しません。例えば、 <tt class="docutils literal"><span class="pre">m['From']</span></tt> 、 <tt class="docutils literal"><span class="pre">m['from']</span></tt> 、および <tt class="docutils literal"><span class="pre">m['FROM']</span></tt>
+は全て同じ結果になります。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="rfc822.AddressList">
+<em class="property">class </em><tt class="descclassname">rfc822.</tt><tt class="descname">AddressList</tt><big>(</big><em>field</em><big>)</big><a class="headerlink" href="#rfc822.AddressList" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><span class="target" id="index-4"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2833.html"><strong>RFC 2833</strong></a> アドレスをカンマで区切ったものとして解釈される単一の文字列パラメタを使って、 <a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> ヘルパークラスをインスタンス化することができます。 (パラメタ <tt class="docutils literal"><span class="pre">None</span></tt> は空のリストを表します。)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfc822.quote">
+<tt class="descclassname">rfc822.</tt><tt class="descname">quote</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#rfc822.quote" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>str</em> 中のバックスラッシュが 2 つのバックスラッシュに置き換えられ、二重引用符がバックスラッシュ付きの二重引用符に置き換えられた、新たな文字列を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfc822.unquote">
+<tt class="descclassname">rfc822.</tt><tt class="descname">unquote</tt><big>(</big><em>str</em><big>)</big><a class="headerlink" href="#rfc822.unquote" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>str</em> の <em>逆クオートされた</em> 新たな文字列を返します。 <em>str</em> が二重引用符で囲われていた場合、二重引用符を剥ぎ取ります。同様に、 <em>str</em>
+が三角括弧で囲われていた場合にも剥ぎ取ります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfc822.parseaddr">
+<tt class="descclassname">rfc822.</tt><tt class="descname">parseaddr</tt><big>(</big><em>address</em><big>)</big><a class="headerlink" href="#rfc822.parseaddr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em class="mailheader">To</em> や <em class="mailheader">Cc</em> といった、アドレスが入っているフィールドの値 <em>address</em>
+を解析し、含まれている &#8220;実名 (realname)&#8221; 部分および &#8220;電子メールアドレス&#8221; 部分に分けます。それらの情報からなるタプルを返します。解析が失敗した場合には 2 要素のタプル  <tt class="docutils literal"><span class="pre">(None,</span> <span class="pre">None)</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfc822.dump_address_pair">
+<tt class="descclassname">rfc822.</tt><tt class="descname">dump_address_pair</tt><big>(</big><em>pair</em><big>)</big><a class="headerlink" href="#rfc822.dump_address_pair" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rfc822.parseaddr" title="rfc822.parseaddr"><tt class="xref py py-meth docutils literal"><span class="pre">parseaddr()</span></tt></a> の逆で、 <tt class="docutils literal"><span class="pre">(realname,</span> <span class="pre">email_address)</span></tt>  形式の 2
+要素のタプルをとり、 <em class="mailheader">To</em> や <em class="mailheader">Cc</em> ヘッダに適した文字列値を返します。 <em>pair</em>
+の最初の要素が真値をとらない場合、二つ目の要素をそのまま返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfc822.parsedate">
+<tt class="descclassname">rfc822.</tt><tt class="descname">parsedate</tt><big>(</big><em>date</em><big>)</big><a class="headerlink" href="#rfc822.parsedate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><span class="target" id="index-5"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> の規則に従っている日付を解析しようと試みます。しかしながら、メイラによっては <span class="target" id="index-6"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> で指定されているような書式に従わないため、そのような場合には <tt class="xref py py-func docutils literal"><span class="pre">parsedata()</span></tt>  は正しい日付を推測しようと試みます。 <em>date</em> は <tt class="docutils literal"><span class="pre">'Mon,</span> <span class="pre">20</span>
+<span class="pre">Nov</span> <span class="pre">1995</span> <span class="pre">19:12:08</span> <span class="pre">-0500'</span></tt> のような <span class="target" id="index-7"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> 様式の日付を収めた文字列です。日付の解析に成功した場合、
+<a class="reference internal" href="#rfc822.parsedate" title="rfc822.parsedate"><tt class="xref py py-func docutils literal"><span class="pre">parsedate()</span></tt></a> は <a class="reference internal" href="time.html#time.mktime" title="time.mktime"><tt class="xref py py-func docutils literal"><span class="pre">time.mktime()</span></tt></a> にそのまま渡すことができるような 9 要素のタプルを返します;
+そうでない場合には <tt class="docutils literal"><span class="pre">None</span></tt> を返します。結果のインデックス 6、7、および 8 は有用な情報ではありません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfc822.parsedate_tz">
+<tt class="descclassname">rfc822.</tt><tt class="descname">parsedate_tz</tt><big>(</big><em>date</em><big>)</big><a class="headerlink" href="#rfc822.parsedate_tz" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rfc822.parsedate" title="rfc822.parsedate"><tt class="xref py py-func docutils literal"><span class="pre">parsedate()</span></tt></a> と同じ機能を実現しますが、 <tt class="docutils literal"><span class="pre">None</span></tt> または 10 要素のタプルを返します; 最初の 9 要素は
+<a class="reference internal" href="time.html#time.mktime" title="time.mktime"><tt class="xref py py-func docutils literal"><span class="pre">time.mktime()</span></tt></a> に直接渡すことができるようなタプルで、 10 番目の要素はその日のタイムゾーンにおける UTC
+(グリニッチ標準時の公式名称) からのオフセットです。(タイムゾーンオフセットの符号は、同じタイムゾーンにおける <tt class="docutils literal"><span class="pre">time.timezone</span></tt>
+変数の符号と反転しています; 後者の変数が POSIX 標準に従っている一方、このモジュールは <span class="target" id="index-8"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> に従っているからです。) 入力文字列がタイムゾーン情報を持たない場合、タプルの最後の要素は <tt class="docutils literal"><span class="pre">None</span></tt> になります。結果のインデックス 6、7、および 8 は有用な情報ではありません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="rfc822.mktime_tz">
+<tt class="descclassname">rfc822.</tt><tt class="descname">mktime_tz</tt><big>(</big><em>tuple</em><big>)</big><a class="headerlink" href="#rfc822.mktime_tz" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="xref py py-func docutils literal"><span class="pre">parsedata_tz()</span></tt> が返す 10 要素のタプルを UTC タイムスタンプに変換します。タプル内のタイムゾーン要素が <tt class="docutils literal"><span class="pre">None</span></tt>
+の場合、地域の時刻を表しているものと家庭します。些細な欠陥: この関数はまず最初の 8 要素を地域における時刻として変換し、次にタイムゾーンの違いに対する補償を行います; これにより、夏時間の切り替え日前後でちょっとしたエラーが生じるかもしれません。通常の利用に関しては心配ありません。</p>
+</dd></dl>
+
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<dl class="last docutils">
+<dt>Module <a class="reference internal" href="email.html#module-email" title="email: 電子メールのメッセージを解析、操作および生成を支援するパッケージ。 これには MIME 文書もふくまれる。"><tt class="xref py py-mod docutils literal"><span class="pre">email</span></tt></a></dt>
+<dd>網羅的な電子メール処理パッケージです; <a class="reference internal" href="#module-rfc822" title="rfc822: RFC 2822 形式のメールメッセージを解釈します。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">rfc822</span></tt></a> モジュールを代替します。</dd>
+<dt>Module <a class="reference internal" href="mailbox.html#module-mailbox" title="mailbox: 様々な形式のメールボックス操作"><tt class="xref py py-mod docutils literal"><span class="pre">mailbox</span></tt></a></dt>
+<dd>エンドユーザのメールプログラムによって生成される、様々な mailbox 形式を読み出すためのクラス群。</dd>
+<dt>Module <a class="reference internal" href="mimetools.html#module-mimetools" title="mimetools: MIME-スタイルのメッセージ本体を解析するためのツール。 (撤廃)"><tt class="xref py py-mod docutils literal"><span class="pre">mimetools</span></tt></a></dt>
+<dd>MIME エンコードされたメッセージを処理する <a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">rfc822.Message</span></tt></a> のサブクラス。</dd>
+</dl>
+</div>
+<div class="section" id="message">
+<span id="message-objects"></span><h2>18.11.1. Message オブジェクト<a class="headerlink" href="#message" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスは以下のメソッドを持っています:</p>
+<dl class="method">
+<dt id="rfc822.Message.rewindbody">
+<tt class="descclassname">Message.</tt><tt class="descname">rewindbody</tt><big>(</big><big>)</big><a class="headerlink" href="#rfc822.Message.rewindbody" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージ本体の先頭を seek します。このメソッドはファイルオブジェクトが seek 可能である場合にのみ動作します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.isheader">
+<tt class="descclassname">Message.</tt><tt class="descname">isheader</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#rfc822.Message.isheader" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ある行が正しい <span class="target" id="index-9"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> ヘッダである場合、その行の正規化されたフィールド名 (インデクス指定の際に使われる辞書キー) を返します;
+そうでない場合 <tt class="docutils literal"><span class="pre">None</span></tt> を返します (解析をここで一度中断し、行データを入力ストリームに押し戻すことを意味します)。このメソッドをサブクラスで上書きすると便利なことがあります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.islast">
+<tt class="descclassname">Message.</tt><tt class="descname">islast</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#rfc822.Message.islast" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた line が Message の区切りとなるデリミタであった場合に真を返します。このデリミタ行は消費され、ファイルオブジェクトの読み位置はその直後になります。標準ではこのメソッドは単にその行が空行かどうかをチェックしますが、サブクラスで上書きすることもできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.iscomment">
+<tt class="descclassname">Message.</tt><tt class="descname">iscomment</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#rfc822.Message.iscomment" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた行全体を無視し、単に読み飛ばすときに真を返します。標準では、これは控えメソッド (stub) であり、常に <tt class="docutils literal"><span class="pre">False</span></tt> を返しますが、サブクラスで上書きすることもできます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getallmatchingheaders">
+<tt class="descclassname">Message.</tt><tt class="descname">getallmatchingheaders</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#rfc822.Message.getallmatchingheaders" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> に一致するヘッダからなる行のリストがあれば、それらを全て返します。各物理行は連続した行内容であるか否かに関わらず別々のリスト要素になります。 <em>name</em> に一致するヘッダがない場合、空のリストを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getfirstmatchingheader">
+<tt class="descclassname">Message.</tt><tt class="descname">getfirstmatchingheader</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#rfc822.Message.getfirstmatchingheader" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> に一致する最初のヘッダと、その行に連続する (複数) 行からなる行データのリストを返します。 <em>name</em> に一致するヘッダがない場合
+<tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getrawheader">
+<tt class="descclassname">Message.</tt><tt class="descname">getrawheader</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#rfc822.Message.getrawheader" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> に一致する最初のヘッダにおけるコロン以降のテキストが入った単一の文字列を返します。このテキストには、先頭の空白、末尾の改行、また後続の行がある場合には途中の改行と空白が含まれます。 <em>name</em> に一致するヘッダが存在しない場合には <tt class="docutils literal"><span class="pre">None</span></tt>  を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getheader">
+<tt class="descclassname">Message.</tt><tt class="descname">getheader</tt><big>(</big><em>name</em><span class="optional">[</span>, <em>default</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#rfc822.Message.getheader" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>name</em> に一致する最後のヘッダから先頭および末尾の空白を剥ぎ取った単一の文字列を返します。途中にある空白は剥ぎ取られません。オプションの
+<em>default</em> 引数は、 <em>name</em> に一致するヘッダが存在しない場合に、別のデフォルト値を返すように指定するために使われます。デフォルトは <tt class="docutils literal"><span class="pre">None</span></tt> です。パースされたヘッダを得る方法としてはこれが好ましいでしょう。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.get">
+<tt class="descclassname">Message.</tt><tt class="descname">get</tt><big>(</big><em>name</em><span class="optional">[</span>, <em>default</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#rfc822.Message.get" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>正規の辞書との互換性をより高めるための <a class="reference internal" href="#rfc822.Message.getheader" title="rfc822.Message.getheader"><tt class="xref py py-meth docutils literal"><span class="pre">getheader()</span></tt></a> の別名 (alias) です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getaddr">
+<tt class="descclassname">Message.</tt><tt class="descname">getaddr</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#rfc822.Message.getaddr" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">getheader(name)</span></tt> が返した文字列を解析して、 <tt class="docutils literal"><span class="pre">(full</span> <span class="pre">name,</span> <span class="pre">email</span> <span class="pre">address)</span></tt> からなるペアを返します。
+<em>name</em> に一致するヘッダが無い場合、 <tt class="docutils literal"><span class="pre">(None,</span> <span class="pre">None)</span></tt> が返されます; そうでない場合、 <em>full name</em> および <em>address</em>
+は (空文字列をとりうる) 文字列になります。</p>
+<p>例: <em>m</em> に最初の <em class="mailheader">From</em> ヘッダに文字列 <tt class="docutils literal"><span class="pre">'jack&#64;cwi.nl</span> <span class="pre">(Jack</span> <span class="pre">Jansen)'</span></tt> が入っている場合、
+<tt class="docutils literal"><span class="pre">m.getaddr('From')</span></tt> はペア <tt class="docutils literal"><span class="pre">('Jack</span> <span class="pre">Jansen',</span> <span class="pre">'jack&#64;cwi.nl')</span></tt> になります。また、
+<tt class="docutils literal"><span class="pre">'Jack</span> <span class="pre">Jansen</span> <span class="pre">&lt;jack&#64;cwi.nl&gt;'</span></tt> であっても、全く同じ結果になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getaddrlist">
+<tt class="descclassname">Message.</tt><tt class="descname">getaddrlist</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#rfc822.Message.getaddrlist" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">getaddr(list)</span></tt> に似ていますが、複数のメールアドレスからなるリストが入ったヘッダ (例えば <em class="mailheader">To</em> ヘッダ) を解析し、 <tt class="docutils literal"><span class="pre">(full</span> <span class="pre">name,</span> <span class="pre">email</span> <span class="pre">address)</span></tt> のペアからなるリストを (たとえヘッダには一つしかアドレスが入っていなかったとしても) 返します。 <em>name</em> に一致するヘッダが無かった場合、空のリストを返します。</p>
+<p>指定された名前に一致する複数のヘッダが存在する場合 (例えば、複数の <em class="mailheader">Cc</em> ヘッダが存在する場合)、全てのアドレスを解析します。指定されたヘッダが連続する行に収められている場合も解析されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getdate">
+<tt class="descclassname">Message.</tt><tt class="descname">getdate</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#rfc822.Message.getdate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rfc822.Message.getheader" title="rfc822.Message.getheader"><tt class="xref py py-meth docutils literal"><span class="pre">getheader()</span></tt></a> を使ってヘッダを取得して解析し、 <a class="reference internal" href="time.html#time.mktime" title="time.mktime"><tt class="xref py py-func docutils literal"><span class="pre">time.mktime()</span></tt></a> と互換な 9 要素のタプルにします;  フィールド
+6、7、および 8 は有用な値ではないので注意して下さい。 <em>name</em> に一致するヘッダが存在しなかったり、ヘッダが解析不能であった場合、 <tt class="docutils literal"><span class="pre">None</span></tt>
+を返します。</p>
+<p>日付の解析は妖術のようなものであり、全てのヘッダが標準に従っているとは限りません。このメソッドは多くの発信源から集められた膨大な数の電子メールでテストされており、正しく動作することが分かっていますが、間違った結果を出力してしまう可能性はまだあります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.Message.getdate_tz">
+<tt class="descclassname">Message.</tt><tt class="descname">getdate_tz</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#rfc822.Message.getdate_tz" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rfc822.Message.getheader" title="rfc822.Message.getheader"><tt class="xref py py-meth docutils literal"><span class="pre">getheader()</span></tt></a> を使ってヘッダを取得して解析し、10 要素のタプルにします; 最初の 9 要素は <a class="reference internal" href="time.html#time.mktime" title="time.mktime"><tt class="xref py py-func docutils literal"><span class="pre">time.mktime()</span></tt></a>
+と互換性のあるタプルを形成し、10 番目の要素はその日におけるタイムゾーンの UTC からのオフセットを与える数字になります。 <a class="reference internal" href="#rfc822.Message.getdate" title="rfc822.Message.getdate"><tt class="xref py py-meth docutils literal"><span class="pre">getdate()</span></tt></a>
+と同様に、 <em>name</em> に一致するヘッダがなかったり、解析不能であった場合、 <tt class="docutils literal"><span class="pre">None</span></tt> を返します。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスはまた、限定的なマップ型のインタフェースを持っています。すなわち: <tt class="docutils literal"><span class="pre">m[name]</span></tt> は
+<tt class="docutils literal"><span class="pre">m.getheader(name)</span></tt> に似ていますが、一致するヘッダがない場合 <a class="reference internal" href="exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を送出します; <tt class="docutils literal"><span class="pre">len(m)</span></tt> 、
+<tt class="docutils literal"><span class="pre">m.get(name[,</span> <span class="pre">default])</span></tt> 、 <tt class="docutils literal"><span class="pre">name</span> <span class="pre">in</span> <span class="pre">m</span></tt>, <tt class="docutils literal"><span class="pre">m.keys()</span></tt> 、 <tt class="docutils literal"><span class="pre">m.values()</span></tt>
+<tt class="docutils literal"><span class="pre">m.items()</span></tt> 、および <tt class="docutils literal"><span class="pre">m.setdefault(name[,</span> <span class="pre">default])</span></tt> は期待通りに動作します。ただし <tt class="xref py py-meth docutils literal"><span class="pre">setdefault()</span></tt> は標準の設定値として空文字列をとります。 <a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスはまた、マップ型への書き込みを行えるインタフェース <tt class="docutils literal"><span class="pre">m[name]</span> <span class="pre">=</span> <span class="pre">value</span></tt> および <tt class="docutils literal"><span class="pre">del</span> <span class="pre">m[name]</span></tt> をサポートしています。
+<a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> オブジェクトでは、 <tt class="xref py py-meth docutils literal"><span class="pre">clear()</span></tt> 、 <a class="reference internal" href="copy.html#module-copy" title="copy: 浅いコピーおよび深いコピー操作。"><tt class="xref py py-meth docutils literal"><span class="pre">copy()</span></tt></a> 、 <tt class="xref py py-meth docutils literal"><span class="pre">popitem()</span></tt> 、あるいは
+<tt class="xref py py-meth docutils literal"><span class="pre">update()</span></tt> といったマップ型インタフェースのメソッドはサポートしていません。 (<tt class="xref py py-meth docutils literal"><span class="pre">get()</span></tt> および
+<tt class="xref py py-meth docutils literal"><span class="pre">setdefault()</span></tt> のサポートは Python 2.2 でしか追加されていません。)</p>
+<p>最後に、 <a class="reference internal" href="#rfc822.Message" title="rfc822.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> インスタンスはいくつかの public なインスタンス変数を持っています:</p>
+<dl class="attribute">
+<dt id="rfc822.Message.headers">
+<tt class="descclassname">Message.</tt><tt class="descname">headers</tt><a class="headerlink" href="#rfc822.Message.headers" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ヘッダ行のセット全体が、(setitem を呼び出して変更されない限り)  読み出された順番に入れられたリストです。各行は末尾の改行を含んでいます。ヘッダを終端する空行はリストに含まれません。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfc822.Message.fp">
+<tt class="descclassname">Message.</tt><tt class="descname">fp</tt><a class="headerlink" href="#rfc822.Message.fp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インスタンス化の際に渡されたファイルまたはファイル類似オブジェクトです。この値はメッセージ本体を読み出すために使うことができます。</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="rfc822.Message.unixfrom">
+<tt class="descclassname">Message.</tt><tt class="descname">unixfrom</tt><a class="headerlink" href="#rfc822.Message.unixfrom" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>メッセージに Unix <tt class="docutils literal"><span class="pre">From</span></tt> 行がある場合はその行、そうでなければ空文字列になります。この値は例えば <tt class="docutils literal"><span class="pre">mbox</span></tt> 形式のメールボックスファイルのような、あるコンテキスト中のメッセージを再生成するために必要です。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="addresslist">
+<span id="addresslist-objects"></span><h2>18.11.2. AddressList オブジェクト<a class="headerlink" href="#addresslist" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> インスタンスは以下のメソッドを持ちます:</p>
+<dl class="method">
+<dt id="rfc822.AddressList.__len__">
+<tt class="descclassname">AddressList.</tt><tt class="descname">__len__</tt><big>(</big><big>)</big><a class="headerlink" href="#rfc822.AddressList.__len__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アドレスリスト中のアドレスの数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.AddressList.__str__">
+<tt class="descclassname">AddressList.</tt><tt class="descname">__str__</tt><big>(</big><big>)</big><a class="headerlink" href="#rfc822.AddressList.__str__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アドレスリストの正規化 (canonicalize) された文字列表現を返します。アドレスはカンマで分割された &#8220;name&#8221; &lt;<a class="reference external" href="mailto:host&#37;&#52;&#48;domain">host<span>&#64;</span>domain</a>&gt;
+形式になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.AddressList.__add__">
+<tt class="descclassname">AddressList.</tt><tt class="descname">__add__</tt><big>(</big><em>alist</em><big>)</big><a class="headerlink" href="#rfc822.AddressList.__add__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの <a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> 被演算子中の双方に含まれるアドレスについて、重複を除いた (集合和の) 全てのアドレスを含む新たな
+<a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> インスタンスを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.AddressList.__iadd__">
+<tt class="descclassname">AddressList.</tt><tt class="descname">__iadd__</tt><big>(</big><em>alist</em><big>)</big><a class="headerlink" href="#rfc822.AddressList.__iadd__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rfc822.AddressList.__add__" title="rfc822.AddressList.__add__"><tt class="xref py py-meth docutils literal"><span class="pre">__add__()</span></tt></a> のインプレース演算版です; <a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a>  インスタンスと右側値 <em>alist</em>
+との集合和をとり、その結果をインスタンス自体と置き換えます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.AddressList.__sub__">
+<tt class="descclassname">AddressList.</tt><tt class="descname">__sub__</tt><big>(</big><em>alist</em><big>)</big><a class="headerlink" href="#rfc822.AddressList.__sub__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>左側値の <a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> インスタンスのアドレスのうち、右側値中に含まれていないもの全てを含む (集合差分の) 新たな
+<a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> インスタンスを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rfc822.AddressList.__isub__">
+<tt class="descclassname">AddressList.</tt><tt class="descname">__isub__</tt><big>(</big><em>alist</em><big>)</big><a class="headerlink" href="#rfc822.AddressList.__isub__" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#rfc822.AddressList.__sub__" title="rfc822.AddressList.__sub__"><tt class="xref py py-meth docutils literal"><span class="pre">__sub__()</span></tt></a> のインプレース演算版で、 <em>alist</em> にも含まれているアドレスを削除します。</p>
+</dd></dl>
+
+<p>最後に、 <a class="reference internal" href="#rfc822.AddressList" title="rfc822.AddressList"><tt class="xref py py-class docutils literal"><span class="pre">AddressList</span></tt></a> インスタンスは public なインスタンス変数を一つ持ちます:</p>
+<dl class="attribute">
+<dt id="rfc822.AddressList.addresslist">
+<tt class="descclassname">AddressList.</tt><tt class="descname">addresslist</tt><a class="headerlink" href="#rfc822.AddressList.addresslist" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アドレスあたり一つの文字列ペアで構成されるタプルからなるリストです。各メンバ中では、最初の要素は正規化された名前部分で、二つ目は実際の配送アドレス
+(<tt class="docutils literal"><span class="pre">'&#64;'</span></tt> で分割されたユーザ名と  ホスト.ドメインからなるペア) です。</p>
+</dd></dl>
+
+<p class="rubric">注記</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>このモジュールはもともと <span class="target" id="index-10"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc822.html"><strong>RFC 822</strong></a> に適合していたので、そういう名前になっています。その後、 <span class="target" id="index-11"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> が <span class="target" id="index-12"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc822.html"><strong>RFC 822</strong></a>
+に対する更新としてリリースされました。このモジュールは <span class="target" id="index-13"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc2822.html"><strong>RFC 2822</strong></a> 適合であり、特に <span class="target" id="index-14"></span><a class="rfc reference external" href="http://tools.ietf.org/html/rfc822.html"><strong>RFC 822</strong></a>
+からの構文や意味付けに対する変更がなされています。</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="base64.html" title="18.12. base64 — RFC 3548: Base16, Base32, Base64 データの符号化"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="multifile.html" title="18.10. multifile — 個別の部分を含んだファイル群のサポート"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="netdata.html" >18. インターネット上のデータの操作</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

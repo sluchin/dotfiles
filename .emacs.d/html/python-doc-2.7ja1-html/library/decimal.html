@@ -1,0 +1,1930 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>9.4. decimal — 10進固定及び浮動小数点数の算術演算 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="9. 数値と数学モジュール" href="numeric.html" />
+    <link rel="next" title="9.5. fractions — 有理数" href="fractions.html" />
+    <link rel="prev" title="9.3. cmath — 複素数のための数学関数" href="cmath.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fractions.html" title="9.5. fractions — 有理数"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="cmath.html" title="9.3. cmath — 複素数のための数学関数"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="numeric.html" accesskey="U">9. 数値と数学モジュール</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">9.4. <tt class="docutils literal"><span class="pre">decimal</span></tt> &#8212; 10進固定及び浮動小数点数の算術演算</a><ul>
+<li><a class="reference internal" href="#quick-start-tutorial">9.4.1. Quick-start Tutorial</a></li>
+<li><a class="reference internal" href="#decimal">9.4.2. Decimal オブジェクト</a><ul>
+<li><a class="reference internal" href="#logical-operands-label">9.4.2.1. 論理引数</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context">9.4.3. Context オブジェクト</a></li>
+<li><a class="reference internal" href="#decimal-signals">9.4.4. シグナル</a></li>
+<li><a class="reference internal" href="#decimal-notes">9.4.5. 浮動小数点数に関する注意</a><ul>
+<li><a class="reference internal" href="#id4">9.4.5.1. 精度を上げて丸め誤差を抑制する</a></li>
+<li><a class="reference internal" href="#id5">9.4.5.2. 特殊値</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decimal-threads">9.4.6. スレッドを使った処理</a></li>
+<li><a class="reference internal" href="#decimal-recipes">9.4.7. レシピ</a></li>
+<li><a class="reference internal" href="#decimal-faq">9.4.8. Decimal FAQ</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="cmath.html"
+                        title="前の章へ">9.3. <tt class="docutils literal docutils literal"><span class="pre">cmath</span></tt> &#8212; 複素数のための数学関数</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="fractions.html"
+                        title="次の章へ">9.5. <tt class="docutils literal"><span class="pre">fractions</span></tt> &#8212; 有理数</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/decimal.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-decimal">
+<span id="decimal-10"></span><h1>9.4. <a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> &#8212; 10進固定及び浮動小数点数の算術演算<a class="headerlink" href="#module-decimal" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+<p><a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールは10進の浮動小数点算術をサポートします。
+<a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> には、 <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>
+データ型に比べて、以下のような利点があります:</p>
+<ul>
+<li><p class="first">Decimal は「人々を念頭にデザインされた浮動小数点を元にしており、必然的に最も重要な指針があります &#8211; コンピュータは人々が学校で習った算術と同じように動作する算術を提供しなければならない」 &#8211; 10進数演算仕様より</p>
+</li>
+<li><p class="first">10進数を正確に表現できます。 <tt class="xref py py-const docutils literal"><span class="pre">1.1</span></tt> や <tt class="xref py py-const docutils literal"><span class="pre">2.2</span></tt> のような数は、2 進数の浮動小数点型では正しく表現できません。エンドユーザは普通、 2
+進数における <tt class="docutils literal"><span class="pre">1.1</span> <span class="pre">+</span> <span class="pre">2.2</span></tt> の近似値が <tt class="xref py py-const docutils literal"><span class="pre">3.3000000000000003</span></tt>
+だからといって、そのように表示してほしいとは考えないものです。</p>
+</li>
+<li><p class="first">値の正確さは算術にも及びます。10進の浮動小数点による計算では、
+<tt class="docutils literal"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.1</span> <span class="pre">-</span> <span class="pre">0.3</span></tt> は厳密にゼロに等しくなります。 2
+進浮動小数点では <tt class="xref py py-const docutils literal"><span class="pre">5.5511151231257827e-017</span></tt> になってしまいます。ゼロに近い値とはいえ、この誤差は数値間の等価性テストの信頼性を阻害します。また、誤差が蓄積されることもあります。こうした理由から、数値間の等価性を厳しく保たねばならないようなアプリケーションを考えるなら、10進数による数値表現が望ましいということになります。</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールでは、有効桁数の表記が取り入れられており、例えば <tt class="docutils literal"><span class="pre">1.30</span> <span class="pre">+</span> <span class="pre">1.20</span></tt> は <tt class="xref py py-const docutils literal"><span class="pre">2.50</span></tt>
+になります。すなわち、末尾のゼロは有効数字を示すために残されます。こうした仕様は通貨計算を行うアプリケーションでは慣例です。乗算の場合、「教科書的な」アプローチでは、乗算の被演算子すべての桁数を使います。例えば、 <tt class="docutils literal"><span class="pre">1.3</span> <span class="pre">*</span> <span class="pre">1.2</span></tt> は <tt class="xref py py-const docutils literal"><span class="pre">1.56</span></tt> になり、
+<tt class="docutils literal"><span class="pre">1.30</span> <span class="pre">*</span> <span class="pre">1.20</span></tt> は <tt class="xref py py-const docutils literal"><span class="pre">1.5600</span></tt> になります。</p>
+</li>
+<li><p class="first">ハードウェアによる 2 進浮動小数点表現と違い、 <a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a>
+モジュールでは計算精度をユーザが変更できます(デフォルトでは 28
+桁です)。この桁数はほとんどの問題解決に十分な大きさです:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.142857&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">28</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.1428571428571428571428571429&#39;)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">2進と10進の浮動小数点は、いずれも広く公開されている標準仕様のもとに実装されています。組み込みの浮動小数点型では、標準仕様で提唱されている機能のほんのささやかな部分を利用できるにすぎませんが、 <a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a>
+では標準仕様が要求している全ての機能を利用できます。必要に応じて、プログラマは値の丸めやシグナル処理を完全に制御できます。この中には全ての不正確な操作を例外でブロックして正確な算術を遵守させるオプションもあります。</p>
+</li>
+<li><p class="first">decimal モジュールは「偏見なく、正確な丸めなしの十進算術(固定小数点算術と呼ばれることもある)と丸めありの浮動小数点数算術」(10進数演算仕様より引用)をサポートするようにデザインされました。</p>
+</li>
+</ul>
+<p>このモジュールは、10進数型、算術コンテキスト (context for arithmetic)、そしてシグナル (signal) という三つの概念を中心に設計されています、</p>
+<p>10進数型は変更不可能な型です。この型には符号部、仮数部、そして指数部があります。有効桁数を残すために、仮数部の末尾にあるゼロの切り詰めは行われません。
+<a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> では、 <tt class="xref py py-const docutils literal"><span class="pre">Infinity</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">-Infinity</span></tt>, および
+<tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> といった特殊な値も定義されています。標準仕様では <tt class="xref py py-const docutils literal"><span class="pre">-0</span></tt> と <tt class="xref py py-const docutils literal"><span class="pre">+0</span></tt> も区別しています。</p>
+<p>算術コンテキストとは、精度や値丸めの規則、指数部の制限を決めている環境です。この環境では、演算結果を表すためのフラグや、演算上発生した特定のシグナルを例外として扱うかどうかを決めるトラップイネーブラも定義しています。丸め規則には <tt class="xref py py-const docutils literal"><span class="pre">ROUND_CEILING</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">ROUND_DOWN</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">ROUND_FLOOR</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_DOWN</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_EVEN</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_UP</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">ROUND_UP</span></tt>,
+および <tt class="xref py py-const docutils literal"><span class="pre">ROUND_05UP</span></tt> があります。</p>
+<p>シグナルとは、演算の過程で生じる例外的条件です。個々のシグナルは、アプリケーションそれぞれの要求に従って、無視されたり、単なる情報とみなされたり、例外として扱われたりします。
+<a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールには、 <a class="reference internal" href="#decimal.Clamped" title="decimal.Clamped"><tt class="xref py py-const docutils literal"><span class="pre">Clamped</span></tt></a>,
+<a class="reference internal" href="#decimal.InvalidOperation" title="decimal.InvalidOperation"><tt class="xref py py-const docutils literal"><span class="pre">InvalidOperation</span></tt></a>, <a class="reference internal" href="#decimal.DivisionByZero" title="decimal.DivisionByZero"><tt class="xref py py-const docutils literal"><span class="pre">DivisionByZero</span></tt></a>, <a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-const docutils literal"><span class="pre">Inexact</span></tt></a>,
+<a class="reference internal" href="#decimal.Rounded" title="decimal.Rounded"><tt class="xref py py-const docutils literal"><span class="pre">Rounded</span></tt></a>, <a class="reference internal" href="#decimal.Subnormal" title="decimal.Subnormal"><tt class="xref py py-const docutils literal"><span class="pre">Subnormal</span></tt></a>, <a class="reference internal" href="#decimal.Overflow" title="decimal.Overflow"><tt class="xref py py-const docutils literal"><span class="pre">Overflow</span></tt></a>,
+および <a class="reference internal" href="#decimal.Underflow" title="decimal.Underflow"><tt class="xref py py-const docutils literal"><span class="pre">Underflow</span></tt></a> といったシグナルがあります。</p>
+<p>各シグナルには、フラグとトラップイネーブラがあります。演算上何らかのシグナルに遭遇すると、フラグは 1 にセットされてゆきます。このとき、もしトラップイネーブラが 1 にセットされていれば、例外を送出します。フラグの値は膠着型 (sticky) なので、演算によるフラグの変化をモニタしたければ、予めフラグをリセットしておかねばなりません。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<ul class="last simple">
+<li>IBM による汎用10進演算仕様、 <a class="reference external" href="http://speleotrove.com/decimal/">The General Decimal Arithmetic Specification</a> 。</li>
+<li>IEEE 標準化仕様 854-1987, <a class="reference external" href="http://754r.ucbtest.org/standards/854.pdf">IEEE 854 に関する非公式のテキスト</a> 。</li>
+</ul>
+</div>
+<div class="section" id="quick-start-tutorial">
+<span id="decimal-tutorial"></span><h2>9.4.1. Quick-start Tutorial<a class="headerlink" href="#quick-start-tutorial" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>普通、 <a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> を使うときには、モジュールを import し、現在の演算コンテキストを <a class="reference internal" href="#decimal.getcontext" title="decimal.getcontext"><tt class="xref py py-func docutils literal"><span class="pre">getcontext()</span></tt></a> で調べ、必要に応じて精度や丸めを設定し、演算エラーのトラップを有効にします:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span>
+<span class="go">Context(prec=28, rounding=ROUND_HALF_EVEN, Emin=-999999999, Emax=999999999,</span>
+<span class="go">        capitals=1, flags=[], traps=[Overflow, DivisionByZero,</span>
+<span class="go">        InvalidOperation])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">7</span>       <span class="c"># 新たな精度を設定</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> のインスタンスは、整数、文字列、浮動小数点数、またはタプルから構成できます。整数や浮動小数点数からの構成は、整数や浮動小数点数の値を正確に変換します。 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> は
+&#8220;数値ではない (Not a Number)&#8221; を表す <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> や正負の
+<tt class="xref py py-const docutils literal"><span class="pre">Infinity</span></tt> (無限大)、 <tt class="xref py py-const docutils literal"><span class="pre">-0</span></tt> といった特殊な値も表現できます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">28</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">Decimal(&#39;10&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.14&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.14&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mf">3.14</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.140000000000000124344978758017532527446746826171875&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">Decimal(&#39;3.14&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="go">Decimal(&#39;1.41421356237&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;0.5&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;1.414213562373095048801688724&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;NaN&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;NaN&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;-Infinity&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;-Infinity&#39;)</span>
+</pre></div>
+</div>
+<p>新たな <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> 型数値の有効桁数は入力した数の桁数だけで決まります。演算コンテキストにおける精度や値丸めの設定が影響するのは算術操作の中だけです。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.0&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.0&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.1415926535&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.1415926535&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.1415926535&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;2.7182818285&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;5.85987&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">rounding</span> <span class="o">=</span> <span class="n">ROUND_UP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.1415926535&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;2.7182818285&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;5.85988&#39;)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> 型数値はほとんどの場面で Python の他の機能とうまくやりとりできます。 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a>
+浮動小数点小劇場 (flying circus) を示しましょう:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">Decimal</span><span class="p">,</span> <span class="s">&#39;1.34 1.87 3.45 2.35 1.00 0.03 9.25&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">Decimal(&#39;9.25&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">min</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.03&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">[Decimal(&#39;0.03&#39;), Decimal(&#39;1.00&#39;), Decimal(&#39;1.34&#39;), Decimal(&#39;1.87&#39;),</span>
+<span class="go"> Decimal(&#39;2.35&#39;), Decimal(&#39;3.45&#39;), Decimal(&#39;9.25&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">Decimal(&#39;19.29&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">&#39;1.34&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">1.34</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>     <span class="c"># round() は値をまず二進の浮動小数点数に変換します</span>
+<span class="go">1.3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">*</span> <span class="mi">5</span>
+<span class="go">Decimal(&#39;6.70&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span>
+<span class="go">Decimal(&#39;2.5058&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c</span> <span class="o">%</span> <span class="n">a</span>
+<span class="go">Decimal(&#39;0.77&#39;)</span>
+</pre></div>
+</div>
+<p>いくつかの数学的関数も Decimal には用意されています:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">28</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+<span class="go">Decimal(&#39;1.414213562373095048801688724&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+<span class="go">Decimal(&#39;2.718281828459045235360287471&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;10&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ln</span><span class="p">()</span>
+<span class="go">Decimal(&#39;2.302585092994045684017991455&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;10&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">log10</span><span class="p">()</span>
+<span class="go">Decimal(&#39;1&#39;)</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">quantize()</span></tt> メソッドは位を固定して数値を丸めます。このメソッドは、計算結果を固定の桁数で丸めることがよくある、通貨を扱うアプリケーションで便利です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;7.325&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;.01&#39;</span><span class="p">),</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_DOWN</span><span class="p">)</span>
+<span class="go">Decimal(&#39;7.32&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;7.325&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;1.&#39;</span><span class="p">),</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_UP</span><span class="p">)</span>
+<span class="go">Decimal(&#39;8&#39;)</span>
+</pre></div>
+</div>
+<p>前述のように、 <a class="reference internal" href="#decimal.getcontext" title="decimal.getcontext"><tt class="xref py py-func docutils literal"><span class="pre">getcontext()</span></tt></a> 関数を使うと現在の演算コンテキストにアクセスでき、設定を変更できます。ほとんどのアプリケーションはこのアプローチで十分です。</p>
+<p>より高度な作業を行う場合、 <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-func docutils literal"><span class="pre">Context()</span></tt></a> コンストラクタを使って別の演算コンテキストを作っておくと便利なことがあります。別の演算コンテキストをアクティブにしたければ、 <a class="reference internal" href="#decimal.setcontext" title="decimal.setcontext"><tt class="xref py py-func docutils literal"><span class="pre">setcontext()</span></tt></a> を使います。</p>
+<p><tt class="xref py py-mod docutils literal"><span class="pre">Decimal</span></tt> モジュールでは、標準仕様に従って、すぐ利用できる二つの標準コンテキスト、 <a class="reference internal" href="#decimal.BasicContext" title="decimal.BasicContext"><tt class="xref py py-const docutils literal"><span class="pre">BasicContext</span></tt></a> および
+<a class="reference internal" href="#decimal.ExtendedContext" title="decimal.ExtendedContext"><tt class="xref py py-const docutils literal"><span class="pre">ExtendedContext</span></tt></a> を提供しています。後者はほとんどのトラップが有効になっており、とりわけデバッグの際に便利です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">myothercontext</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">prec</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_HALF_DOWN</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">setcontext</span><span class="p">(</span><span class="n">myothercontext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.142857142857142857142857142857142857142857142857142857142857&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ExtendedContext</span>
+<span class="go">Context(prec=9, rounding=ROUND_HALF_EVEN, Emin=-999999999, Emax=999999999,</span>
+<span class="go">        capitals=1, flags=[], traps=[])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">setcontext</span><span class="p">(</span><span class="n">ExtendedContext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.142857143&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">Decimal(&#39;Infinity&#39;)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">setcontext</span><span class="p">(</span><span class="n">BasicContext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;pyshell#143&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">-toplevel-</span>
+    <span class="n">Decimal</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nc">DivisionByZero</span>: <span class="n-Identifier">x / 0</span>
+</pre></div>
+</div>
+<p>演算コンテキストには、演算中に遭遇した例外的状況をモニタするためのシグナルフラグがあります。フラグが一度セットされると、明示的にクリアするまで残り続けます。そのため、フラグのモニタを行いたいような演算の前には <tt class="xref py py-meth docutils literal"><span class="pre">clear_flags()</span></tt> メソッドでフラグをクリアしておくのがベストです。 :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">setcontext</span><span class="p">(</span><span class="n">ExtendedContext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">clear_flags</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">355</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">113</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.14159292&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span>
+<span class="go">Context(prec=9, rounding=ROUND_HALF_EVEN, Emin=-999999999, Emax=999999999,</span>
+<span class="go">        capitals=1, flags=[Rounded, Inexact], traps=[])</span>
+</pre></div>
+</div>
+<p><em>flags</em> エントリから、 <tt class="xref py py-const docutils literal"><span class="pre">Pi</span></tt> の有理数による近似値が丸められた
+(コンテキスト内で決められた精度を超えた桁数が捨てられた) ことと、計算結果が厳密でない (無視された桁の値に非ゼロのものがあった) ことがわかります。</p>
+<p>コンテキストの <tt class="xref py py-attr docutils literal"><span class="pre">traps</span></tt> フィールドに入っている辞書を使うと、個々のトラップをセットできます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">setcontext</span><span class="p">(</span><span class="n">ExtendedContext</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">Decimal(&#39;Infinity&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">traps</span><span class="p">[</span><span class="n">DivisionByZero</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;pyshell#112&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">-toplevel-</span>
+    <span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nc">DivisionByZero</span>: <span class="n-Identifier">x / 0</span>
+</pre></div>
+</div>
+<p>ほとんどのプログラムでは、開始時に一度だけ現在の演算コンテキストを修正します。また、多くのアプリケーションでは、データから <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a>
+への変換はループ内で一度だけキャストして行います。コンテキストを設定し、
+<a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> オブジェクトを生成できたら、ほとんどのプログラムは他の Python 数値型と全く変わらないかのように <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> を操作できます。</p>
+</div>
+<div class="section" id="decimal">
+<span id="decimal-decimal"></span><h2>9.4.2. Decimal オブジェクト<a class="headerlink" href="#decimal" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="class">
+<dt id="decimal.Decimal">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Decimal</tt><big>(</big><span class="optional">[</span><em>value</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>value</em> に基づいて新たな <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> オブジェクトを構築します。</p>
+<p><em>value</em> は整数、文字列、タプル、 <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> および他の <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a>
+オブジェクトにできます。
+<em>value</em> を指定しない場合、 <tt class="docutils literal"><span class="pre">Decimal(&quot;0&quot;)</span></tt> を返します。
+<em>value</em> が文字列の場合、先頭と末尾の空白を取り除いた後には以下の
+10進数文字列の文法に従わねばなりません:</p>
+<div class="highlight-python"><pre>sign           ::=  '+' | '-'
+digit          ::=  '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+indicator      ::=  'e' | 'E'
+digits         ::=  digit [digit]...
+decimal-part   ::=  digits '.' [digits] | ['.'] digits
+exponent-part  ::=  indicator [sign] digits
+infinity       ::=  'Infinity' | 'Inf'
+nan            ::=  'NaN' [digits] | 'sNaN' [digits]
+numeric-value  ::=  decimal-part [exponent-part] | infinity
+numeric-string ::=  [sign] numeric-value | [sign] nan</pre>
+</div>
+<p><em>value</em> をユニコード文字列にした場合、他のユニコード数字も上の <tt class="docutils literal"><span class="pre">digit</span></tt>
+の場所に使うことができます。つまり各書記体系における(アラビア-インド系やデーヴァナーガリーなど)の数字や、全角数字０(<tt class="docutils literal"><span class="pre">u'\uff10'</span></tt>)から９(<tt class="docutils literal"><span class="pre">u'\uff19'</span></tt>)までなどです。</p>
+<p><em>value</em> を <a class="reference internal" href="functions.html#tuple" title="tuple"><tt class="xref py py-class docutils literal"><span class="pre">tuple</span></tt></a> にする場合、タプルは三つの要素を持ち、それぞれ符号 (正なら <tt class="xref py py-const docutils literal"><span class="pre">0</span></tt> 、負なら <tt class="xref py py-const docutils literal"><span class="pre">1</span></tt>)、仮数部を表す数字のタプル、そして指数を表す整数でなければなりません。例えば、 <tt class="docutils literal"><span class="pre">Decimal((0,</span> <span class="pre">(1,</span> <span class="pre">4,</span> <span class="pre">1,</span> <span class="pre">4),</span> <span class="pre">-3))</span></tt> は
+<tt class="docutils literal"><span class="pre">Decimal('1.414')</span></tt> を返します。</p>
+<p><em>value</em> を <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> にする場合、2進浮動小数点数値が損失なく正確に等価な Decimal に変換されます。この変換はしばしば 53 桁以上の精度を要求します。例えば、 <tt class="docutils literal"><span class="pre">Decimal(float('1.1'))</span></tt> は
+<tt class="docutils literal"><span class="pre">Decimal('1.100000000000000088817841970012523233890533447265625')</span></tt>
+に変換されます。</p>
+<p><em>context</em> に指定した精度 (precision) は、オブジェクトが記憶する桁数には影響しません。桁数は <em>value</em> に指定した桁数だけから決定されます。例えば、演算コンテキストに指定された精度が 3 桁しかなくても、<tt class="docutils literal"><span class="pre">Decimal('3.00000')</span></tt> は 5 つのゼロを全て記憶します。</p>
+<p><em>context</em> 引数の目的は、 <em>value</em> が正しくない形式の文字列であった場合に行う処理を決めることにあります;
+演算コンテキストが <a class="reference internal" href="#decimal.InvalidOperation" title="decimal.InvalidOperation"><tt class="xref py py-const docutils literal"><span class="pre">InvalidOperation</span></tt></a> をトラップするようになっていれば、例外を送出します。それ以外の場合には、コンストラクタは値が <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> の <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> を返します。</p>
+<p>一度生成すると、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> オブジェクトは変更不能 (immutable)
+になります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>文字列から Decimal インスタンスを生成する際に先頭と末尾の空白が許されることになりました。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span>このコンストラクタの引数は、 <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> インスタンスにもできるようになりました。</p>
+<p>10進浮動小数点オブジェクトは、 <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> や <a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> のような他の組み込み型と多くの点で似ています。通常の数学演算や特殊メソッドを適用できます。また、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> オブジェクトはコピーでき、pickle 化でき、print で出力でき、辞書のキーにでき、集合の要素にでき、比較、保存、他の型 (<a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a>
+や <a class="reference internal" href="functions.html#long" title="long"><tt class="xref py py-class docutils literal"><span class="pre">long</span></tt></a>) への型強制を行えます。</p>
+<p>Decimal オブジェクトは一般に、算術演算で浮動小数点数と組み合わせることができません。例えば、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> に <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> を足そうとすると、
+<a class="reference internal" href="exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> が送出されます。ただしこの規則には例外があります。
+<a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> インスタンス <tt class="docutils literal"><span class="pre">x</span></tt> と <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンス <tt class="docutils literal"><span class="pre">y</span></tt>
+を比較する比較演算子です。この例外がなかったとすると、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> と
+<a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> インスタンスの比較は、リファレンスマニュアルの
+<a class="reference internal" href="../reference/expressions.html#expressions"><em>式 (expression)</em></a> 節で記述されている、異なる型のオブジェクトを比較するときの一般の規則に従うことになり、紛らわしい結果につながります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.7 で変更: </span><a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> インスタンス <tt class="docutils literal"><span class="pre">x</span></tt> と <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンス <tt class="docutils literal"><span class="pre">y</span></tt>
+の比較は、 <tt class="docutils literal"><span class="pre">x</span></tt> と <tt class="docutils literal"><span class="pre">y</span></tt> の値に基づく結果を返すようになりました。
+以前のバージョンでは、どんな <a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> インスタンス <tt class="docutils literal"><span class="pre">x</span></tt> と
+どんな <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンス <tt class="docutils literal"><span class="pre">y</span></tt> に対しても、
+<tt class="docutils literal"><span class="pre">x</span> <span class="pre">&lt;</span> <span class="pre">y</span></tt> は同じ(任意の) 結果を返していました。</p>
+<p>こうした標準的な数値型の特性の他に、10進浮動小数点オブジェクトには様々な特殊メソッドがあります:</p>
+<dl class="method">
+<dt id="decimal.Decimal.adjusted">
+<tt class="descname">adjusted</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.adjusted" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>仮数部の先頭の一桁だけが残るように右側の数字を追い出す桁シフトを行い、その結果の指数部を返します:
+<tt class="docutils literal"><span class="pre">Decimal('321e+5').adjusted()</span></tt> なら 7 です。最上桁の小数点からの相対位置を調べる際に使います。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.as_tuple">
+<tt class="descname">as_tuple</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.as_tuple" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数値を表現するための名前付きタプル(<a class="reference internal" href="../glossary.html#term-named-tuple"><em class="xref std std-term">named tuple</em></a>):
+<tt class="docutils literal"><span class="pre">(sign,</span> <span class="pre">digittuple,</span> <span class="pre">exponent)</span></tt> を返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>名前付きタプルを使用するようになりました。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.canonical">
+<tt class="descname">canonical</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.canonical" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数の標準的(canonical)エンコーディングを返します。現在のところ、
+<tt class="xref py py-class docutils literal"><span class="pre">Deciaml</span></tt> インスタンスのエンコーディングは常に標準的なので、この操作は引数に手を加えずに返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.compare">
+<tt class="descname">compare</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.compare" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの Decimal インスタンスを比較します。この演算は通常の比較メソッド
+<a class="reference internal" href="../reference/datamodel.html#object.__cmp__" title="object.__cmp__"><tt class="xref py py-meth docutils literal"><span class="pre">__cmp__()</span></tt></a> と同じように振る舞いますが、整数でなく Decimal
+インスタンスを返すところと、両方の引数が NaN だったときに結果としても
+NaN を返すところが異なります。:</p>
+<div class="highlight-python"><pre>a or b is a NaN ==&gt; Decimal("NaN")
+a &lt; b           ==&gt; Decimal("-1")
+a == b          ==&gt; Decimal("0")
+a &gt; b           ==&gt; Decimal("1")</pre>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.compare_signal">
+<tt class="descname">compare_signal</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.compare_signal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この演算は <a class="reference internal" href="#decimal.Decimal.compare" title="decimal.Decimal.compare"><tt class="xref py py-meth docutils literal"><span class="pre">compare()</span></tt></a> とほとんど同じですが、全ての NaN がシグナルを送るところが異なります。すなわち、どちらの比較対象も発信
+(signaling) NaN でないならば無言(quiet) NaN である比較対象があたかも発信 NaN であるかのように扱われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.compare_total">
+<tt class="descname">compare_total</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#decimal.Decimal.compare_total" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの対象を数値によらず抽象表現によって比較します。 <a class="reference internal" href="#decimal.Decimal.compare" title="decimal.Decimal.compare"><tt class="xref py py-meth docutils literal"><span class="pre">compare()</span></tt></a>
+に似ていますが、結果は <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> に全順序を与えます。この順序づけによると、数値的に等しくても異なった表現を持つ二つの
+<a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンスの比較は等しくなりません:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;12.0&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">compare_total</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;12&#39;</span><span class="p">))</span>
+<span class="go">Decimal(&#39;-1&#39;)</span>
+</pre></div>
+</div>
+<p>無言 NaN と発信 NaN もこの全順序に位置付けられます。この関数の結果は、もし比較対象が同じ表現を持つならば <tt class="docutils literal"><span class="pre">Decimal('0')</span></tt>
+であり、一つめの比較対象が二つめより下位にあれば <tt class="docutils literal"><span class="pre">Decimal('-1')</span></tt> 、上位にあれば <tt class="docutils literal"><span class="pre">Decimal('1')</span></tt> です。全順序の詳細については仕様を参照してください。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.compare_total_mag">
+<tt class="descname">compare_total_mag</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#decimal.Decimal.compare_total_mag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの対象を <a class="reference internal" href="#decimal.Decimal.compare_total" title="decimal.Decimal.compare_total"><tt class="xref py py-meth docutils literal"><span class="pre">compare_total()</span></tt></a> のように数値によらず抽象表現によって比較しますが、両者の符号を無視します。 <tt class="docutils literal"><span class="pre">x.compare_total_mag(y)</span></tt>
+は <tt class="docutils literal"><span class="pre">x.copy_abs().compare_total(y.copy_abs())</span></tt> と等価です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.conjugate">
+<tt class="descname">conjugate</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.conjugate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>self を返すだけです。このメソッドは十進演算仕様に適合するためだけのものです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.copy_abs">
+<tt class="descname">copy_abs</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.copy_abs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数の絶対値を返します。この演算はコンテキストに影響されず、静かです。すなわち、フラグは変更されず、丸めは行われません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.copy_negate">
+<tt class="descname">copy_negate</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.copy_negate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数の符号を変えて返します。この演算はコンテキストに影響されず、静かです。すなわち、フラグは変更されず、丸めは行われません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.copy_sign">
+<tt class="descname">copy_sign</tt><big>(</big><em>other</em><big>)</big><a class="headerlink" href="#decimal.Decimal.copy_sign" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最初の演算対象のコピーに二つめと同じ符号を付けて返します。たとえば:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;2.3&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy_sign</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;-1.5&#39;</span><span class="p">))</span>
+<span class="go">Decimal(&#39;-2.3&#39;)</span>
+</pre></div>
+</div>
+<p>この演算はコンテキストに影響されず、静かです。すなわち、フラグは変更されず、丸めは行われません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.exp">
+<tt class="descname">exp</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.exp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられた数での(自然)指数関数 <tt class="docutils literal"><span class="pre">e**x</span></tt> の値を返します。結果は <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_EVEN</span></tt> 丸めモードで正しく丸められます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+<span class="go">Decimal(&#39;2.718281828459045235360287471&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">321</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+<span class="go">Decimal(&#39;2.561702493119680037517373933E+139&#39;)</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.from_float">
+<tt class="descname">from_float</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#decimal.Decimal.from_float" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>浮動小数点数を正確に小数に変換するクラスメソッドです。</p>
+<p>なお、 <cite>Decimal.from_float(0.1)</cite> は <cite>Decimal(&#8216;0.1&#8217;)</cite> と同じではありません。
+0.1 は二進浮動小数点数で正確に表せないので、その値は表現できる最も近い値、 <cite>0x1.999999999999ap-4</cite> として記憶されます。浮動小数点数での等価な値は
+<cite>0.1000000000000000055511151231257827021181583404541015625</cite> です。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">Python 2.7 以降では、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンスは
+<a class="reference internal" href="functions.html#float" title="float"><tt class="xref py py-class docutils literal"><span class="pre">float</span></tt></a> から直接構成することも出来ます。</p>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="o">.</span><span class="n">from_float</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.1000000000000000055511151231257827021181583404541015625&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="o">.</span><span class="n">from_float</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s">&#39;nan&#39;</span><span class="p">))</span>
+<span class="go">Decimal(&#39;NaN&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="o">.</span><span class="n">from_float</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s">&#39;inf&#39;</span><span class="p">))</span>
+<span class="go">Decimal(&#39;Infinity&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="o">.</span><span class="n">from_float</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s">&#39;-inf&#39;</span><span class="p">))</span>
+<span class="go">Decimal(&#39;-Infinity&#39;)</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.fma">
+<tt class="descname">fma</tt><big>(</big><em>other</em>, <em>third</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.fma" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>融合積和(fused multiply-add)です。self*other+third を途中結果の積
+self*other で丸めを行わずに計算して返します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fma</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">Decimal(&#39;11&#39;)</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_canonical">
+<tt class="descname">is_canonical</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_canonical" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が標準的(canonical)ならば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返し、そうでなければ
+<a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。現在のところ、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> のインスタンスは常に標準的なのでこのメソッドの結果はいつでも <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_finite">
+<tt class="descname">is_finite</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_finite" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が有限の数値ならば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、無限大か NaN ならば <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a>
+を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_infinite">
+<tt class="descname">is_infinite</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_infinite" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が正または負の無限大ならば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでなければ <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a>
+を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_nan">
+<tt class="descname">is_nan</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_nan" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が(無言か発信かは問わず) NaN であれば
+<a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでなければ <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_normal">
+<tt class="descname">is_normal</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_normal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が <em>正規(normal)</em> のゼロでない有限数値で調整された指数が <em>Emin</em>
+以上ならば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。引数がゼロ、非正規(subnormal)、無限大または NaN であれば <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a>
+を返します。ここでの <em>正規</em> という用語は標準的な(canonical)値を作り出すために使われる
+<a class="reference internal" href="#decimal.Decimal.normalize" title="decimal.Decimal.normalize"><tt class="xref py py-meth docutils literal"><span class="pre">normalize()</span></tt></a> メソッドにおける意味合いとは異なりますので注意して下さい。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_qnan">
+<tt class="descname">is_qnan</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_qnan" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が無言 NaN であれば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでなければ <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a>
+を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_signed">
+<tt class="descname">is_signed</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_signed" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数に負の符号がついていれば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでなければ <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a>
+を返します。注意すべきはゼロや NaN なども符号を持ち得ることです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_snan">
+<tt class="descname">is_snan</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_snan" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が発信 NaN であれば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでなければ
+<a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_subnormal">
+<tt class="descname">is_subnormal</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_subnormal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が非正規数(subnormal)であれば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでなければ
+<a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。非正規な数値とは、ゼロでなく、有限で、調整された指数が <em>Emin</em> 未満のものを指します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.is_zero">
+<tt class="descname">is_zero</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.is_zero" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が(正または負の)ゼロであれば <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を、そうでなければ
+<a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.ln">
+<tt class="descname">ln</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.ln" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>演算対象の自然対数(底 e の対数)を返します。結果は <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_EVEN</span></tt> 丸めモードで正しく丸められます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.log10">
+<tt class="descname">log10</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.log10" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>演算対象の常用対数(底 10 の対数)を返します。結果は <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_EVEN</span></tt> 丸めモードで正しく丸められます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.logb">
+<tt class="descname">logb</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.logb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>非零の数値については、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンスとして調整された指数を返します。演算対象がゼロだった場合、 <tt class="docutils literal"><span class="pre">Decimal('-Infinity')</span></tt>
+が返され <a class="reference internal" href="#decimal.DivisionByZero" title="decimal.DivisionByZero"><tt class="xref py py-const docutils literal"><span class="pre">DivisionByZero</span></tt></a> フラグが送出されます。演算対象が無限大だった場合、 <tt class="docutils literal"><span class="pre">Decimal('Infinity')</span></tt> が返されます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.logical_and">
+<tt class="descname">logical_and</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.logical_and" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Decimal.logical_and" title="decimal.Decimal.logical_and"><tt class="xref py py-meth docutils literal"><span class="pre">logical_and()</span></tt></a> は二つの <em>論理引数</em> (<a class="reference internal" href="#logical-operands-label"><em>論理引数</em></a>
+参照)を取る論理演算です。結果は二つの引数の数字ごとの <tt class="docutils literal"><span class="pre">and</span></tt> です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.logical_invert">
+<tt class="descname">logical_invert</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.logical_invert" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Decimal.logical_invert" title="decimal.Decimal.logical_invert"><tt class="xref py py-meth docutils literal"><span class="pre">logical_invert()</span></tt></a> は論理演算です。結果は引数の数字ごとの反転です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.logical_or">
+<tt class="descname">logical_or</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.logical_or" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Decimal.logical_or" title="decimal.Decimal.logical_or"><tt class="xref py py-meth docutils literal"><span class="pre">logical_or()</span></tt></a> は二つの <em>論理引数</em> (<a class="reference internal" href="#logical-operands-label"><em>論理引数</em></a>
+参照)を取る論理演算です。結果は二つの引数の数字ごとの <tt class="docutils literal"><span class="pre">or</span></tt> です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.logical_xor">
+<tt class="descname">logical_xor</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.logical_xor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Decimal.logical_xor" title="decimal.Decimal.logical_xor"><tt class="xref py py-meth docutils literal"><span class="pre">logical_xor()</span></tt></a> は二つの <em>論理引数</em> (<a class="reference internal" href="#logical-operands-label"><em>論理引数</em></a>
+参照)を取る論理演算です。結果は二つの引数の数字ごとの排他的論理和です。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.max">
+<tt class="descname">max</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.max" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">max(self,</span> <span class="pre">other)</span></tt> と同じですが、値を返す前に現在のコンテキストに即した丸め規則を適用します。また、  <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt>
+に対して、(コンテキストの設定と、発信か無言どちらのタイプであるかに応じて) シグナルを発行するか無視します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.max_mag">
+<tt class="descname">max_mag</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.max_mag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Decimal.max" title="decimal.Decimal.max"><tt class="xref py py-meth docutils literal"><span class="pre">max()</span></tt></a> メソッドに似ていますが、比較は絶対値で行われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.min">
+<tt class="descname">min</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.min" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">min(self,</span> <span class="pre">other)</span></tt> と同じですが、値を返す前に現在のコンテキストに即した丸め規則を適用します。また、  <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt>
+に対して、(コンテキストの設定と、発信か無言どちらのタイプであるかに応じて) シグナルを発行するか無視します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.min_mag">
+<tt class="descname">min_mag</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.min_mag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Decimal.min" title="decimal.Decimal.min"><tt class="xref py py-meth docutils literal"><span class="pre">min()</span></tt></a> メソッドに似ていますが、比較は絶対値で行われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.next_minus">
+<tt class="descname">next_minus</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.next_minus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたコンテキスト(またはコンテキストが渡されなければ現スレッドのコンテキスト)において表現可能な、操作対象より小さい最大の数を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.next_plus">
+<tt class="descname">next_plus</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.next_plus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>与えられたコンテキスト(またはコンテキストが渡されなければ現スレッドのコンテキスト)において表現可能な、操作対象より大きい最小の数を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.next_toward">
+<tt class="descname">next_toward</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.next_toward" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの比較対象が等しくなければ、一つめの対象に最も近く二つめの対象へ近付く方向の数を返します。もし両者が数値的に等しければ、二つめの対象の符号を採った一つめの対象のコピーを返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.normalize">
+<tt class="descname">normalize</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.normalize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数値を正規化 (normalize) して、右端に連続しているゼロを除去し、
+<tt class="xref py py-const docutils literal"><span class="pre">Decimal('0')</span></tt> と同じ結果はすべて
+<tt class="xref py py-const docutils literal"><span class="pre">Decimal('0e0')</span></tt> に変換します。同じクラスの値から基準表現を生成する際に用います。たとえば、
+<tt class="docutils literal"><span class="pre">Decimal('32.100')</span></tt> と <tt class="docutils literal"><span class="pre">Decimal('0.321000e+2')</span></tt> の正規化は、いずれも同じ値
+<tt class="docutils literal"><span class="pre">Decimal('32.1')</span></tt> になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.number_class">
+<tt class="descname">number_class</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.number_class" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>操作対象の <em>クラス</em> を表す文字列を返します。返されるのは以下の10種類のいずれかです。</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&quot;-Infinity&quot;</span></tt>, 負の無限大であることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;-Normal&quot;</span></tt>, 負の通常数であることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;-Subnormal&quot;</span></tt>, 負の非正規数であることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;-Zero&quot;</span></tt>, 負のゼロであることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;+Zero&quot;</span></tt>, 正のゼロであることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;+Subnormal&quot;</span></tt>, 正の非正規数であることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;+Normal&quot;</span></tt>, 正の通常数であることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;+Infinity&quot;</span></tt>, 正の無限大であることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;NaN&quot;</span></tt>, 無言(quiet) NaN (Not a Number) であることを示します。</li>
+<li><tt class="docutils literal"><span class="pre">&quot;sNaN&quot;</span></tt>, 発信(signaling) NaN であることを示します。</li>
+</ul>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.quantize">
+<tt class="descname">quantize</tt><big>(</big><em>exp</em><span class="optional">[</span>, <em>rounding</em><span class="optional">[</span>, <em>context</em><span class="optional">[</span>, <em>watchexp</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.quantize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つめの操作対象と同じ指数を持つように丸めを行った、一つめの操作対象と等しい値を返します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;1.41421356&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;1.000&#39;</span><span class="p">))</span>
+<span class="go">Decimal(&#39;1.414&#39;)</span>
+</pre></div>
+</div>
+<p>他の操作と違い、打ち切り(quantize)操作後の係数の長さが精度を越えた場合には、
+<a class="reference internal" href="#decimal.InvalidOperation" title="decimal.InvalidOperation"><tt class="xref py py-const docutils literal"><span class="pre">InvalidOperation</span></tt></a> がシグナルされます。これによりエラー条件がない限り打ち切られた指数が常に右側の引数と同じになることが保証されます。</p>
+<p>同様に、他の操作と違い、 quantize は Underflow を、たとえ結果が非正規になったり不正確になったとしても、シグナルしません。</p>
+<p>二つ目の演算対象の指数が一つ目のそれよりも大きければ丸めが必要かもしれません。この場合、丸めモードは以下のように決められます。
+<tt class="docutils literal"><span class="pre">rounding</span></tt> 引数が与えられていればそれが使われます。そうでなければ <tt class="docutils literal"><span class="pre">context</span></tt> 引数で決まります。どちらの引数も渡されなければ現在のスレッドのコンテキストの丸めモードが使われます。</p>
+<p><em>watchexp</em> が (default) に設定されている場合、処理結果の指数が <tt class="xref py py-attr docutils literal"><span class="pre">Emax</span></tt> よりも大きい場合や <tt class="xref py py-attr docutils literal"><span class="pre">Etiny</span></tt> よりも小さい場合にエラーを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.radix">
+<tt class="descname">radix</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Decimal.radix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">Decimal(10)</span></tt> つまり <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> クラスがその全ての算術を実行する基数を返します。仕様との互換性のために取り入れられています。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.remainder_near">
+<tt class="descname">remainder_near</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.remainder_near" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュロを計算し、正負のモジュロのうちゼロに近い値を返します。たとえば、 <tt class="docutils literal"><span class="pre">Decimal(10).remainder_near(6)</span></tt> は
+<tt class="docutils literal"><span class="pre">Decimal('4')</span></tt> よりもゼロに近い値 <tt class="docutils literal"><span class="pre">Decimal('-2')</span></tt> を返します。</p>
+<p>ゼロからの差が同じ場合には、 <em>self</em> と同じ符号を持った方を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.rotate">
+<tt class="descname">rotate</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.rotate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>一つめの演算対象の数字を二つめので指定された量だけ巡回(rotate)した結果を返します。二つめの演算対象は -precision から precision までの範囲の整数でなければなりません。この二つめの演算対象の絶対値が何桁ずらすかを決めます。そしてもし正の数ならば巡回の方向は左に、そうでなければ右になります。一つめの演算対象の仮数部は必要ならば精度いっぱいまでゼロで埋められます。符号と指数は変えられません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.same_quantum">
+<tt class="descname">same_quantum</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.same_quantum" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>self</em> と <em>other</em> が同じ指数を持っているか、あるいは双方とも <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> である場合に真を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.scaleb">
+<tt class="descname">scaleb</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.scaleb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つめの演算対象で調整された指数の一つめの演算対象を返します。同じことですが、一つめの演算対象を <tt class="docutils literal"><span class="pre">10**other</span></tt> 倍したものを返します。二つめの演算対象は整数でなければなりません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.shift">
+<tt class="descname">shift</tt><big>(</big><em>other</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.shift" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>一つめの演算対象の数字を二つめので指定された量だけシフトした結果を返します。二つめの演算対象は -precision から precision までの範囲の整数でなければなりません。この二つめの演算対象の絶対値が何桁ずらすかを決めます。そしてもし正の数ならばシフトの方向は左に、そうでなければ右になります。一つめの演算対象の係数は必要ならば精度いっぱいまでゼロで埋められます。符号と指数は変えられません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.sqrt">
+<tt class="descname">sqrt</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.sqrt" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>平方根を精度いっぱいまで求めます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.to_eng_string">
+<tt class="descname">to_eng_string</tt><big>(</big><span class="optional">[</span><em>context</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.to_eng_string" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数値を工学で用いられる形式 (工学表記; enginnering notation)
+の文字列に変換します。</p>
+<p>工学表記では指数は 3 の倍数になります。従って、最大で 3 桁までの数字が基数の小数部に現れます。たとえば、 <tt class="docutils literal"><span class="pre">Decimal('123E+1')</span></tt> は
+<tt class="docutils literal"><span class="pre">Decimal('1.23E+3')</span></tt> に変換されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.to_integral">
+<tt class="descname">to_integral</tt><big>(</big><span class="optional">[</span><em>rounding</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.to_integral" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-const docutils literal"><span class="pre">Inexact</span></tt></a> や <a class="reference internal" href="#decimal.Rounded" title="decimal.Rounded"><tt class="xref py py-const docutils literal"><span class="pre">Rounded</span></tt></a> といったシグナルを出さずに最近傍の整数に値を丸めます。 <em>rounding</em> が指定されていれば適用されます; それ以外の場合、値丸めの方法は <em>context</em> の設定か現在のコンテキストの設定になります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.to_integral_exact">
+<tt class="descname">to_integral_exact</tt><big>(</big><span class="optional">[</span><em>rounding</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.to_integral_exact" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最近傍の整数に値を丸め、丸めが起こった場合には <a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-const docutils literal"><span class="pre">Inexact</span></tt></a>
+または <a class="reference internal" href="#decimal.Rounded" title="decimal.Rounded"><tt class="xref py py-const docutils literal"><span class="pre">Rounded</span></tt></a> のシグナルを適切に出します。丸めモードは以下のように決められます。
+<tt class="docutils literal"><span class="pre">rounding</span></tt> 引数が与えられていればそれが使われます。そうでなければ <tt class="docutils literal"><span class="pre">context</span></tt> 引数で決まります。どちらの引数も渡されなければ現在のスレッドのコンテキストの丸めモードが使われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Decimal.to_integral_value">
+<tt class="descname">to_integral_value</tt><big>(</big><span class="optional">[</span><em>rounding</em><span class="optional">[</span>, <em>context</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Decimal.to_integral_value" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-const docutils literal"><span class="pre">Inexact</span></tt></a> や <a class="reference internal" href="#decimal.Rounded" title="decimal.Rounded"><tt class="xref py py-const docutils literal"><span class="pre">Rounded</span></tt></a> といったシグナルを出さずに最近傍の整数に値を丸めます。 <em>rounding</em> が指定されていれば適用されます; それ以外の場合、値丸めの方法は <em>context</em> の設定か現在のコンテキストの設定になります。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><tt class="docutils literal"><span class="pre">to_integral</span></tt> から <tt class="docutils literal"><span class="pre">to_integral_value</span></tt> に改名されました。
+古い名前も互換性のために残されています。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="logical-operands-label">
+<span id="id1"></span><h3>9.4.2.1. 論理引数<a class="headerlink" href="#logical-operands-label" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">logical_and()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">logical_invert()</span></tt>, <tt class="xref py py-meth docutils literal"><span class="pre">logical_or()</span></tt>, および
+<tt class="xref py py-meth docutils literal"><span class="pre">logical_xor()</span></tt> メソッドはその引数が <em>論理引数</em> であると想定しています。
+<em>論理引数</em> とは <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンスで指数と符号は共にゼロであり、各桁の数字が <tt class="xref py py-const docutils literal"><span class="pre">0</span></tt> か <tt class="xref py py-const docutils literal"><span class="pre">1</span></tt> であるものです。</p>
+</div>
+</div>
+<div class="section" id="context">
+<span id="decimal-context"></span><h2>9.4.3. Context オブジェクト<a class="headerlink" href="#context" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>コンテキスト (context) とは、算術演算における環境設定です。コンテキストは計算精度を決定し、値丸めの方法を設定し、シグナルのどれが例外になるかを決め、指数の範囲を制限しています。</p>
+<p>多重スレッドで処理を行う場合には各スレッドごとに現在のコンテキストがあり、 <a class="reference internal" href="#decimal.getcontext" title="decimal.getcontext"><tt class="xref py py-func docutils literal"><span class="pre">getcontext()</span></tt></a> や <a class="reference internal" href="#decimal.setcontext" title="decimal.setcontext"><tt class="xref py py-func docutils literal"><span class="pre">setcontext()</span></tt></a> といった関数でアクセスしたり設定変更できます:</p>
+<dl class="function">
+<dt id="decimal.getcontext">
+<tt class="descclassname">decimal.</tt><tt class="descname">getcontext</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.getcontext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アクティブなスレッドの現在のコンテキストを返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="decimal.setcontext">
+<tt class="descclassname">decimal.</tt><tt class="descname">setcontext</tt><big>(</big><em>c</em><big>)</big><a class="headerlink" href="#decimal.setcontext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>アクティブなスレッドのコンテキストを <em>c</em> に設定します。</p>
+</dd></dl>
+
+<p>Python 2.5 から、 <a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文と <a class="reference internal" href="#decimal.localcontext" title="decimal.localcontext"><tt class="xref py py-func docutils literal"><span class="pre">localcontext()</span></tt></a> 関数を使って実行するコンテキストを一時的に変更することもできるようになりました。</p>
+<dl class="function">
+<dt id="decimal.localcontext">
+<tt class="descclassname">decimal.</tt><tt class="descname">localcontext</tt><big>(</big><span class="optional">[</span><em>c</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.localcontext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>with 文の入口でアクティブなスレッドのコンテキストを <em>c</em> のコピーに設定し、with 文を抜ける時に元のコンテキストに復旧する、コンテキストマネージャを返します。コンテキストが指定されなければ、現在のコンテキストのコピーが使われます。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<p>たとえば、以下のコードでは精度を42桁に設定し、計算を実行し、そして元のコンテキストに復帰します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">localcontext</span>
+
+<span class="k">with</span> <span class="n">localcontext</span><span class="p">()</span> <span class="k">as</span> <span class="n">ctx</span><span class="p">:</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">42</span>   <span class="c"># 高精度の計算を実行</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">calculate_something</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <span class="o">+</span><span class="n">s</span>  <span class="c"># 最終的な結果をデフォルトの精度に丸める</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>新たなコンテキストは、以下で説明する <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> コンストラクタを使って生成できます。その他にも、 <a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールでは作成済みのコンテキストを提供しています:</p>
+<dl class="class">
+<dt id="decimal.BasicContext">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">BasicContext</tt><a class="headerlink" href="#decimal.BasicContext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>汎用10進演算仕様で定義されている標準コンテキストの一つです。精度は 9 桁に設定されています。丸め規則は <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_UP</span></tt>
+です。すべての演算結果フラグはクリアされています。
+<a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-const docutils literal"><span class="pre">Inexact</span></tt></a>, <a class="reference internal" href="#decimal.Rounded" title="decimal.Rounded"><tt class="xref py py-const docutils literal"><span class="pre">Rounded</span></tt></a>, <a class="reference internal" href="#decimal.Subnormal" title="decimal.Subnormal"><tt class="xref py py-const docutils literal"><span class="pre">Subnormal</span></tt></a>
+を除く全ての演算エラートラップが有効 (例外として扱う) になっています。</p>
+<p>多くのトラップが有効になっているので、デバッグの際に便利なコンテキストです。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.ExtendedContext">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">ExtendedContext</tt><a class="headerlink" href="#decimal.ExtendedContext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>汎用10進演算仕様で定義されている標準コンテキストの一つです。精度は 9 桁に設定されています。丸め規則は <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_EVEN</span></tt>
+です。すべての演算結果フラグはクリアされています。トラップは全て無効(演算中に一切例外を送出しない) になっています。</p>
+<p>トラップが無効になっているので、エラーの伴う演算結果を <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> や
+<tt class="xref py py-const docutils literal"><span class="pre">Infinity</span></tt> にし、例外を送出しないようにしたいアプリケーションに向いたコンテキストです。このコンテキストを使うと、他の場合にはプログラムが停止してしまうような状況があっても実行を完了させられます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.DefaultContext">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">DefaultContext</tt><a class="headerlink" href="#decimal.DefaultContext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> コンストラクタが新たなコンテキストを作成するさいに雛形にするコンテキストです。このコンテキストのフィールド (精度の設定など)
+を変更すると、 <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> コンストラクタが生成する新たなコンテキストに影響を及ぼします。</p>
+<p>このコンテキストは、主に多重スレッド環境で便利です。スレッドを開始する前に何らかのフィールドを変更しておくと、システム全体のデフォルト設定に効果を及ぼせます。スレッドを開始した後にフィールドを変更すると競合条件を抑制するためにスレッドを同期化せねばならないので推奨しません。</p>
+<p>単一スレッドの環境では、このコンテキストを使わないよう薦めます。下で述べるように明示的にコンテキストを作成してください。</p>
+<p>デフォルトの値は精度 28 桁、丸め規則 <tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_EVEN</span></tt> で、トラップ
+<a class="reference internal" href="#decimal.Overflow" title="decimal.Overflow"><tt class="xref py py-const docutils literal"><span class="pre">Overflow</span></tt></a>, <a class="reference internal" href="#decimal.InvalidOperation" title="decimal.InvalidOperation"><tt class="xref py py-const docutils literal"><span class="pre">InvalidOperation</span></tt></a>, および <a class="reference internal" href="#decimal.DivisionByZero" title="decimal.DivisionByZero"><tt class="xref py py-const docutils literal"><span class="pre">DivisionByZero</span></tt></a>
+が有効になっています。</p>
+</dd></dl>
+
+<p>上に挙げた三つのコンテキストに加え、 <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> コンストラクタを使って新たなコンテキストを生成できます。</p>
+<dl class="class">
+<dt id="decimal.Context">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Context</tt><big>(</big><em>prec=None</em>, <em>rounding=None</em>, <em>traps=None</em>, <em>flags=None</em>, <em>Emin=None</em>, <em>Emax=None</em>, <em>capitals=1</em><big>)</big><a class="headerlink" href="#decimal.Context" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新たなコンテキストを生成します。あるフィールドが定義されていないか <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a>
+であれば、 <a class="reference internal" href="#decimal.DefaultContext" title="decimal.DefaultContext"><tt class="xref py py-const docutils literal"><span class="pre">DefaultContext</span></tt></a> からデフォルト値をコピーします。
+<em>flags</em> フィールドが設定されていいか <a class="reference internal" href="constants.html#None" title="None"><tt class="xref py py-const docutils literal"><span class="pre">None</span></tt></a> の場合には、全てのフラグがクリアされます。</p>
+<p><em>prec</em> フィールドは正の整数で、コンテキストにおける算術演算の計算精度を設定します。</p>
+<p><em>rounding</em> は、</p>
+<ul>
+<li><p class="first"><tt class="xref py py-const docutils literal"><span class="pre">ROUND_CEILING</span></tt> (<tt class="xref py py-const docutils literal"><span class="pre">Infinity</span></tt> 寄りの値にする),</p>
+</li>
+<li><p class="first"><tt class="xref py py-const docutils literal"><span class="pre">ROUND_DOWN</span></tt> (ゼロ寄りの値にする),</p>
+</li>
+<li><p class="first"><tt class="xref py py-const docutils literal"><span class="pre">ROUND_FLOOR</span></tt> (<tt class="xref py py-const docutils literal"><span class="pre">-Infinity</span></tt> 寄りの値にする),</p>
+</li>
+<li><p class="first"><tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_DOWN</span></tt> (最近値のうちゼロ寄りの値にする),</p>
+</li>
+<li><p class="first"><tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_EVEN</span></tt> (最近値のうち偶数値を優先する),</p>
+</li>
+<li><p class="first"><tt class="xref py py-const docutils literal"><span class="pre">ROUND_HALF_UP</span></tt> (最近値のうちゼロから遠い値にする),</p>
+</li>
+<li><p class="first"><tt class="xref py py-const docutils literal"><span class="pre">ROUND_UP</span></tt> (ゼロから遠い値にする), または</p>
+</li>
+<li><dl class="first docutils">
+<dt><tt class="xref py py-const docutils literal"><span class="pre">ROUND_05UP</span></tt> (ゼロに向かって丸めた後の最小の桁が 0 か 5</dt>
+<dd><p class="first last">ならばゼロから遠い値にし、そうでなければゼロにする)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>のいずれかです。</p>
+<p><em>traps</em> および <em>flags</em> フィールドには、セットしたいシグナルを列挙します。一般的に、新たなコンテキストを作成するときにはトラップだけを設定し、フラグはクリアしておきます。</p>
+<p><em>Emin</em> および <em>Emax</em> フィールドには、指数範囲の外側限界値を整数で指定します。</p>
+<p><em>capitals</em> フィールドは <tt class="xref py py-const docutils literal"><span class="pre">0</span></tt> または <tt class="xref py py-const docutils literal"><span class="pre">1</span></tt> (デフォルト)
+にします。 <tt class="xref py py-const docutils literal"><span class="pre">1</span></tt> に設定すると、指数記号を大文字 <tt class="xref py py-const docutils literal"><span class="pre">E</span></tt> で出力します。それ以外の場合には  <tt class="xref py py-const docutils literal"><span class="pre">Decimal('6.02e+23')</span></tt>
+のように <tt class="xref py py-const docutils literal"><span class="pre">e</span></tt> を使います。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><tt class="xref py py-const docutils literal"><span class="pre">ROUND_05UP</span></tt> 丸めモードが追加されました。</p>
+<p><a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> クラスでは、いくつかの汎用のメソッドの他、現在のコンテキストで算術演算を直接行うためのメソッドを数多く定義しています。加えて、 <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> の各メソッドについて(<tt class="xref py py-meth docutils literal"><span class="pre">adjusted()</span></tt> および
+<tt class="xref py py-meth docutils literal"><span class="pre">as_tuple()</span></tt> メソッドを例外として)対応する <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>
+のメソッドが存在します。たとえば、 <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> インスタンス  <tt class="docutils literal"><span class="pre">C</span></tt>
+と <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> インスタンス <tt class="docutils literal"><span class="pre">x</span></tt> に対して、 <tt class="docutils literal"><span class="pre">C.exp(x)</span></tt> は
+<tt class="docutils literal"><span class="pre">x.exp(context=C)</span></tt> と等価です。それぞれの <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a> メソッドは、Decimal インスタンスが受け付けられるところならどこでも、Python の整数 (<a class="reference internal" href="functions.html#int" title="int"><tt class="xref py py-class docutils literal"><span class="pre">int</span></tt></a> または <a class="reference internal" href="functions.html#long" title="long"><tt class="xref py py-class docutils literal"><span class="pre">long</span></tt></a> のインスタンス) を受け付けます。</p>
+<dl class="method">
+<dt id="decimal.Context.clear_flags">
+<tt class="descname">clear_flags</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Context.clear_flags" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>フラグを全て <tt class="xref py py-const docutils literal"><span class="pre">0</span></tt> にリセットします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Context.copy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンテキストの複製を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.copy_decimal">
+<tt class="descname">copy_decimal</tt><big>(</big><em>num</em><big>)</big><a class="headerlink" href="#decimal.Context.copy_decimal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Decimal インスタンス num のコピーを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.create_decimal">
+<tt class="descname">create_decimal</tt><big>(</big><em>num</em><big>)</big><a class="headerlink" href="#decimal.Context.create_decimal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>self</em> をコンテキストとする新たな Decimal インスタンスを <em>num</em> から生成します。
+<a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> コンストラクタと違い、数値を変換する際にコンテキストの精度、値丸め方法、フラグ、トラップを適用します。</p>
+<p>定数値はしばしばアプリケーションの要求よりも高い精度を持っているため、このメソッドが役に立ちます。また、値丸めを即座に行うため、例えば以下のように、入力値に値丸めを行わないために合計値にゼロの加算を追加するだけで結果が変わってしまうといった、現在の精度よりも細かい値の影響が紛れ込む問題を防げるという恩恵もあります。以下の例は、丸められていない入力を使うということは和にゼロを加えると結果が変わり得るという見本です :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.4445&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;1.0023&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;4.45&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.4445&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;1.0023&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;4.44&#39;)</span>
+</pre></div>
+</div>
+<p>このメソッドは IBM 仕様の to-number 演算を実装したものです。引数が文字列の場合、前や後ろに余計な空白を付けることは許されません。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.create_decimal_from_float">
+<tt class="descname">create_decimal_from_float</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#decimal.Context.create_decimal_from_float" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>浮動小数点数 <em>f</em> から新しい Decimal インスタンスを生成しますが、
+<em>self</em> をコンテキストとして丸めます。 <a class="reference internal" href="#decimal.Decimal.from_float" title="decimal.Decimal.from_float"><tt class="xref py py-meth docutils literal"><span class="pre">Decimal.from_float()</span></tt></a>
+クラスメソッドとは違い、変換にコンテキストの精度、丸めメソッド、フラグ、そしてトラップが適用されます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">prec</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_DOWN</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">create_decimal_from_float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.1415&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">prec</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">traps</span><span class="o">=</span><span class="p">[</span><span class="n">Inexact</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">create_decimal_from_float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+    <span class="o">...</span>
+<span class="nc">Inexact</span>: <span class="n-Identifier">None</span>
+</pre></div>
+</div>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.7 で追加.</span></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.Etiny">
+<tt class="descname">Etiny</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Context.Etiny" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">Emin</span> <span class="pre">-</span> <span class="pre">prec</span> <span class="pre">+</span> <span class="pre">1</span></tt> に等しい値を返します。演算結果の劣化が起こる桁の最小値です。アンダーフローが起きた場合、指数は <a class="reference internal" href="#decimal.Context.Etiny" title="decimal.Context.Etiny"><tt class="xref py py-const docutils literal"><span class="pre">Etiny</span></tt></a> に設定されます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.Etop">
+<tt class="descname">Etop</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Context.Etop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">Emax</span> <span class="pre">-</span> <span class="pre">prec</span> <span class="pre">+</span> <span class="pre">1</span></tt> に等しい値を返します。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> を使った処理を行う場合、通常は <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a>
+インスタンスを生成して、算術演算を適用するというアプローチをとります。演算はアクティブなスレッドにおける現在のコンテキストの下で行われます。もう一つのアプローチは、コンテキストのメソッドを使った特定のコンテキスト下での計算です。コンテキストのメソッドは
+<a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> クラスのメソッドに似ているので、ここでは簡単な説明にとどめます。</p>
+<dl class="method">
+<dt id="decimal.Context.abs">
+<tt class="descname">abs</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.abs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> の絶対値を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.add">
+<tt class="descname">add</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.add" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> と <em>y</em> の和を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.canonical">
+<tt class="descname">canonical</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.canonical" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>同じ Decimal オブジェクト <em>x</em> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.compare">
+<tt class="descname">compare</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.compare" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの値を数値として比較します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.compare_signal">
+<tt class="descname">compare_signal</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.compare_signal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの演算対象の値を数値として比較します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.compare_total">
+<tt class="descname">compare_total</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.compare_total" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの演算対象を抽象的な表現を使って比較します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.compare_total_mag">
+<tt class="descname">compare_total_mag</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.compare_total_mag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの演算対象を抽象的な表現を使い符号を無視して比較します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.copy_abs">
+<tt class="descname">copy_abs</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.copy_abs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> のコピーの符号を 0 にセットして返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.copy_negate">
+<tt class="descname">copy_negate</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.copy_negate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> のコピーの符号を反転して返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.copy_sign">
+<tt class="descname">copy_sign</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.copy_sign" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>y</em> から <em>x</em> に符号をコピーします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.divide">
+<tt class="descname">divide</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.divide" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> を <em>y</em> で除算した値を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.divide_int">
+<tt class="descname">divide_int</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.divide_int" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> を <em>y</em> で除算した値を整数に切り捨てて返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.divmod">
+<tt class="descname">divmod</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.divmod" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの数値間の除算を行い、結果の整数部を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.exp">
+<tt class="descname">exp</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.exp" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><cite>e ** x</cite> を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.fma">
+<tt class="descname">fma</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="headerlink" href="#decimal.Context.fma" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> を <em>y</em> 倍したものに <em>z</em> を加えて返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_canonical">
+<tt class="descname">is_canonical</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_canonical" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が標準的(canonical)ならば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_finite">
+<tt class="descname">is_finite</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_finite" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が有限ならば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_infinite">
+<tt class="descname">is_infinite</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_infinite" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が無限ならば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_nan">
+<tt class="descname">is_nan</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_nan" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が NaN か sNaN であれば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_normal">
+<tt class="descname">is_normal</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_normal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が通常の数ならば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_qnan">
+<tt class="descname">is_qnan</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_qnan" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が無言 NaN であれば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_signed">
+<tt class="descname">is_signed</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_signed" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が負の数であれば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_snan">
+<tt class="descname">is_snan</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_snan" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が発信 NaN であれば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_subnormal">
+<tt class="descname">is_subnormal</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_subnormal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> が非正規数であれば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.is_zero">
+<tt class="descname">is_zero</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.is_zero" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> がゼロであれば True を返します。そうでなければ False です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.ln">
+<tt class="descname">ln</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.ln" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> の自然対数(底 e の対数)を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.log10">
+<tt class="descname">log10</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.log10" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> の底 10 の対数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.logb">
+<tt class="descname">logb</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.logb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>演算対象の MSD の大きさの指数部を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.logical_and">
+<tt class="descname">logical_and</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.logical_and" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>それぞれの桁に論理演算 <em>and</em> を当てはめます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.logical_invert">
+<tt class="descname">logical_invert</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.logical_invert" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> の全ての桁を反転させます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.logical_or">
+<tt class="descname">logical_or</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.logical_or" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>それぞれの桁に論理演算 <em>or</em> を当てはめます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.logical_xor">
+<tt class="descname">logical_xor</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.logical_xor" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>それぞれの桁に論理演算 <em>xor</em> を当てはめます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.max">
+<tt class="descname">max</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.max" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの値を数値として比較し、大きいほうを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.max_mag">
+<tt class="descname">max_mag</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.max_mag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>値を符号を無視して数値として比較します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.min">
+<tt class="descname">min</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.min" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの値を数値として比較し、小さいほうを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.min_mag">
+<tt class="descname">min_mag</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.min_mag" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>値を符号を無視して数値として比較します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.minus">
+<tt class="descname">minus</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.minus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python における単項マイナス演算子に対応する演算です。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.multiply">
+<tt class="descname">multiply</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.multiply" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> と <em>y</em> の積を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.next_minus">
+<tt class="descname">next_minus</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.next_minus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> より小さい最大の表現可能な数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.next_plus">
+<tt class="descname">next_plus</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.next_plus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> より大きい最小の表現可能な数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.next_toward">
+<tt class="descname">next_toward</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.next_toward" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> に <em>y</em> の方向に向かって最も近い数を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.normalize">
+<tt class="descname">normalize</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.normalize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> をもっとも単純な形にします。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.number_class">
+<tt class="descname">number_class</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.number_class" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> のクラスを指し示すものを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.plus">
+<tt class="descname">plus</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.plus" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python における単項のプラス演算子に対応する演算です。コンテキストにおける精度や値丸めを適用するので、等値 (identity) 演算とは <em>違います</em> 。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.power">
+<tt class="descname">power</tt><big>(</big><em>x</em>, <em>y</em><span class="optional">[</span>, <em>modulo</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#decimal.Context.power" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">x</span></tt> の <tt class="docutils literal"><span class="pre">y</span></tt> 乗を計算します。 <em>modulo</em> が指定されていればモジュロを取ります。</p>
+<p>二引数であれば <tt class="docutils literal"><span class="pre">x**y</span></tt> を計算します。 <tt class="docutils literal"><span class="pre">x</span></tt> が負であれば
+<tt class="docutils literal"><span class="pre">y</span></tt> は整でなければなりません。結果は <tt class="docutils literal"><span class="pre">y</span></tt> が整であって結果が有限になり &#8216;precision&#8217;
+桁で正確に表現できるのでなければ不正確になります。その結果は現スレッドのコンテキストの丸めモードを使って正しく丸められます。</p>
+<p>三引数であれば <tt class="docutils literal"><span class="pre">(x**y)</span> <span class="pre">%</span> <span class="pre">modulo</span></tt> を計算します。この形式の場合、以下の制限が引数に掛かります:</p>
+<blockquote>
+<div><ul class="simple">
+<li>全ての引数は整</li>
+<li><tt class="docutils literal"><span class="pre">y</span></tt> は非負でなければならない</li>
+<li><tt class="docutils literal"><span class="pre">x</span></tt> と <tt class="docutils literal"><span class="pre">y</span></tt> の少なくともどちらかはゼロでない</li>
+<li><tt class="docutils literal"><span class="pre">modulo</span></tt> は非零で大きくても &#8216;precision&#8217; 桁</li>
+</ul>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">Context.power(x,</span> <span class="pre">y,</span> <span class="pre">modulo)</span></tt> で得られる値は <tt class="docutils literal"><span class="pre">(x**y)</span> <span class="pre">%</span> <span class="pre">modulo</span></tt>
+を精度無制限で計算して得られるものと同じ値ですが、より効率的に計算されます。結果の指数は <tt class="docutils literal"><span class="pre">x</span></tt>, <tt class="docutils literal"><span class="pre">y</span></tt>, <tt class="docutils literal"><span class="pre">modulo</span></tt> の指数に関係なくゼロです。この計算は常に正確です。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><tt class="docutils literal"><span class="pre">x**y</span></tt> 形式で <tt class="docutils literal"><span class="pre">y</span></tt> が非整数で構わないことになった。
+三引数バージョンに対するより厳格な要求。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.quantize">
+<tt class="descname">quantize</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.quantize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> に値丸めを適用し、指数を <em>y</em> にした値を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.radix">
+<tt class="descname">radix</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Context.radix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>単に 10 を返します。何せ十進ですから :)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.remainder">
+<tt class="descname">remainder</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.remainder" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>整数除算の剰余を返します。</p>
+<p>剰余がゼロでない場合、符号は割られる数の符号と同じになります。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.remainder_near">
+<tt class="descname">remainder_near</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.remainder_near" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">x</span> <span class="pre">-</span> <span class="pre">y</span> <span class="pre">*</span> <span class="pre">n</span></tt> を返します。ここで <em>n</em> は <tt class="docutils literal"><span class="pre">x</span> <span class="pre">/</span> <span class="pre">y</span></tt> の正確な値に一番近い整数です
+(この結果が 0 ならばその符号は <em>x</em> の符号と同じです)。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.rotate">
+<tt class="descname">rotate</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.rotate" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> の <em>y</em> 回巡回したコピーを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.same_quantum">
+<tt class="descname">same_quantum</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.same_quantum" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>self</em> と <em>other</em> が同じ指数を持っているか、あるいは双方とも <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> である場合に真を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.scaleb">
+<tt class="descname">scaleb</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.scaleb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>一つめの演算対象の指数部に二つめの値を加えたものを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.shift">
+<tt class="descname">shift</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.shift" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> を <em>y</em> 回シフトしたコピーを返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.sqrt">
+<tt class="descname">sqrt</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.sqrt" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> の平方根を精度いっぱいまで求めます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.subtract">
+<tt class="descname">subtract</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#decimal.Context.subtract" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>x</em> と <em>y</em> の間の差を返します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.to_eng_string">
+<tt class="descname">to_eng_string</tt><big>(</big><big>)</big><a class="headerlink" href="#decimal.Context.to_eng_string" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>工学表記で文字列に変換します。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.to_integral">
+<tt class="descname">to_integral</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.to_integral" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>最近傍の整数に値を丸めます。</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="decimal.Context.to_sci_string">
+<tt class="descname">to_sci_string</tt><big>(</big><em>x</em><big>)</big><a class="headerlink" href="#decimal.Context.to_sci_string" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数値を科学表記で文字列に変換します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="decimal-signals">
+<span id="id2"></span><h2>9.4.4. シグナル<a class="headerlink" href="#decimal-signals" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>シグナルは、計算中に生じた様々なエラー条件を表現します。各々のシグナルは一つのコンテキストフラグと一つのトラップイネーブラに対応しています。</p>
+<p>コンテキストフラグは、該当するエラー条件に遭遇するたびにセットされます。演算後にフラグを調べれば、演算に関する情報
+(例えば計算が厳密だったかどうか) がわかります。フラグを調べたら、次の計算を始める前にフラグを全てクリアするようにしてください。</p>
+<p>あるコンテキストのトラップイネーブラがあるシグナルに対してセットされている場合、該当するエラー条件が生じると Python の例外を送出します。例えば、 <a class="reference internal" href="#decimal.DivisionByZero" title="decimal.DivisionByZero"><tt class="xref py py-class docutils literal"><span class="pre">DivisionByZero</span></tt></a> が設定されていると、エラー条件が生じた際に <a class="reference internal" href="#decimal.DivisionByZero" title="decimal.DivisionByZero"><tt class="xref py py-exc docutils literal"><span class="pre">DivisionByZero</span></tt></a>
+例外を送出します。</p>
+<dl class="class">
+<dt id="decimal.Clamped">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Clamped</tt><a class="headerlink" href="#decimal.Clamped" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>値の表現上の制限に沿わせるために指数部が変更されたことを通知します。</p>
+<p>通常、クランプ (clamp) は、指数部がコンテキストにおける指数桁の制限値
+<tt class="xref py py-attr docutils literal"><span class="pre">Emin</span></tt> および <tt class="xref py py-attr docutils literal"><span class="pre">Emax</span></tt> を越えた場合に発生します。可能な場合には、係数部にゼロを加えた表現に合わせて指数部を減らします。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.DecimalException">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">DecimalException</tt><a class="headerlink" href="#decimal.DecimalException" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>他のシグナルの基底クラスで、 <a class="reference internal" href="exceptions.html#exceptions.ArithmeticError" title="exceptions.ArithmeticError"><tt class="xref py py-exc docutils literal"><span class="pre">ArithmeticError</span></tt></a> のサブクラスです。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.DivisionByZero">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">DivisionByZero</tt><a class="headerlink" href="#decimal.DivisionByZero" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>有限値をゼロで除算したときのシグナルです。</p>
+<p>除算やモジュロ除算、数を負の値で累乗した場合に起きることがあります。このシグナルをトラップしない場合、演算結果は <tt class="xref py py-const docutils literal"><span class="pre">Infinity</span></tt> または
+<tt class="xref py py-const docutils literal"><span class="pre">-Infinity</span></tt> になり、その符号は演算に使った入力に基づいて決まります。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.Inexact">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Inexact</tt><a class="headerlink" href="#decimal.Inexact" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>値の丸めによって演算結果から厳密さが失われたことを通知します。</p>
+<p>このシグナルは値丸め操作中にゼロでない桁を無視した際に生じます。演算結果は値丸め後の値です。シグナルのフラグやトラップは、演算結果の厳密さが失われたことを検出するために使えるだけです。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.InvalidOperation">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">InvalidOperation</tt><a class="headerlink" href="#decimal.InvalidOperation" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>無効な演算が実行されたことを通知します。</p>
+<p>ユーザが有意な演算結果にならないような操作を要求したことを示します。このシグナルをトラップしない場合、 <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> を返します。このシグナルの発生原因として考えられるのは、以下のような状況です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">Infinity</span> <span class="o">-</span> <span class="n">Infinity</span>
+<span class="mi">0</span> <span class="o">*</span> <span class="n">Infinity</span>
+<span class="n">Infinity</span> <span class="o">/</span> <span class="n">Infinity</span>
+<span class="n">x</span> <span class="o">%</span> <span class="mi">0</span>
+<span class="n">Infinity</span> <span class="o">%</span> <span class="n">x</span>
+<span class="n">x</span><span class="o">.</span><span class="n">_rescale</span><span class="p">(</span> <span class="n">non</span><span class="o">-</span><span class="n">integer</span> <span class="p">)</span>
+<span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="mi">0</span> <span class="o">**</span> <span class="mi">0</span>
+<span class="n">x</span> <span class="o">**</span> <span class="p">(</span><span class="n">non</span><span class="o">-</span><span class="n">integer</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">**</span> <span class="n">Infinity</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.Overflow">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Overflow</tt><a class="headerlink" href="#decimal.Overflow" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>数値オーバフローを示すシグナルです。</p>
+<p>このシグナルは、値丸めを行った後の指数部が <tt class="xref py py-attr docutils literal"><span class="pre">Emax</span></tt> より大きいことを示します。シグナルをトラップしない場合、演算結果は値丸めのモードにより、表現可能な最大の数値になるように内側へ引き込んで丸めを行った値か、
+<tt class="xref py py-const docutils literal"><span class="pre">Infinity</span></tt> になるように外側に丸めた値のいずれかになります。いずれの場合も、 <a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-class docutils literal"><span class="pre">Inexact</span></tt></a> および <a class="reference internal" href="#decimal.Rounded" title="decimal.Rounded"><tt class="xref py py-class docutils literal"><span class="pre">Rounded</span></tt></a> が同時にシグナルされます。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.Rounded">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Rounded</tt><a class="headerlink" href="#decimal.Rounded" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>情報が全く失われていない場合も含み、値丸めが起きたときのシグナルです。</p>
+<p>このシグナルは、値丸めによって桁がなくなると常に発生します。なくなった桁がゼロ (例えば <tt class="xref py py-const docutils literal"><span class="pre">5.00</span></tt> を丸めて <tt class="xref py py-const docutils literal"><span class="pre">5.0</span></tt>
+になった場合) であってもです。このシグナルをトラップしなければ、演算結果をそのまま返します。このシグナルは有効桁数の減少を検出する際に使います。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.Subnormal">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Subnormal</tt><a class="headerlink" href="#decimal.Subnormal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>値丸めを行う前に指数部が <tt class="xref py py-attr docutils literal"><span class="pre">Emin</span></tt> より小さかったことを示すシグナルです。</p>
+<p>演算結果が微小である場合 (指数が小さすぎる場合) に発生します。このシグナルをトラップしなければ、演算結果をそのまま返します。</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="decimal.Underflow">
+<em class="property">class </em><tt class="descclassname">decimal.</tt><tt class="descname">Underflow</tt><a class="headerlink" href="#decimal.Underflow" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>演算結果が値丸めによってゼロになった場合に生じる数値アンダフローです。</p>
+<p>演算結果が微小なため、値丸めによってゼロになった場合に発生します。
+<a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-class docutils literal"><span class="pre">Inexact</span></tt></a> および <a class="reference internal" href="#decimal.Subnormal" title="decimal.Subnormal"><tt class="xref py py-class docutils literal"><span class="pre">Subnormal</span></tt></a>
+シグナルも同時に発生します。</p>
+</dd></dl>
+
+<p>これらのシグナルの階層構造をまとめると、以下の表のようになります:</p>
+<div class="highlight-python"><pre>exceptions.ArithmeticError(exceptions.StandardError)
+    DecimalException
+        Clamped
+        DivisionByZero(DecimalException, exceptions.ZeroDivisionError)
+        Inexact
+            Overflow(Inexact, Rounded)
+            Underflow(Inexact, Rounded, Subnormal)
+        InvalidOperation
+        Rounded
+        Subnormal</pre>
+</div>
+</div>
+<div class="section" id="decimal-notes">
+<span id="id3"></span><h2>9.4.5. 浮動小数点数に関する注意<a class="headerlink" href="#decimal-notes" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<div class="section" id="id4">
+<h3>9.4.5.1. 精度を上げて丸め誤差を抑制する<a class="headerlink" href="#id4" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p>10進浮動小数点数を使うと、10進数表現による誤差を抑制できます
+(<tt class="xref py py-const docutils literal"><span class="pre">0.1</span></tt> を正確に表現できるようになります); しかし、ゼロでない桁が一定の精度を越えている場合には、演算によっては依然として値丸めによる誤差を引き起こします。 Knuth は、十分でない計算精度の下で値丸めを伴う浮動小数点演算を行った結果、加算の結合則や分配則における恒等性が崩れてしまう例を二つ示しています:</p>
+<div class="highlight-python"><pre># Examples from Seminumerical Algorithms, Section 4.2.2.
+&gt;&gt;&gt; from decimal import Decimal, getcontext
+&gt;&gt;&gt; getcontext().prec = 8
+
+&gt;&gt;&gt; u, v, w = Decimal(11111113), Decimal(-11111111), Decimal('7.51111111')
+&gt;&gt;&gt; (u + v) + w
+Decimal('9.5111111')
+&gt;&gt;&gt; u + (v + w)
+Decimal('10')
+
+&gt;&gt;&gt; u, v, w = Decimal(20000), Decimal(-6), Decimal('6.0000003')
+&gt;&gt;&gt; (u*v) + (u*w)
+Decimal('0.01')
+&gt;&gt;&gt; u * (v+w)
+Decimal('0.0060000')</pre>
+</div>
+<p><a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールでは、最下桁を失わないように十分に計算精度を広げることで、上で問題にしたような恒等性をとりもどせます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">11111113</span><span class="p">),</span> <span class="n">Decimal</span><span class="p">(</span><span class="o">-</span><span class="mi">11111111</span><span class="p">),</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;7.51111111&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">u</span> <span class="o">+</span> <span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">w</span>
+<span class="go">Decimal(&#39;9.51111111&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">+</span> <span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="n">w</span><span class="p">)</span>
+<span class="go">Decimal(&#39;9.51111111&#39;)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">20000</span><span class="p">),</span> <span class="n">Decimal</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">),</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;6.0000003&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">u</span><span class="o">*</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">u</span><span class="o">*</span><span class="n">w</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.0060000&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">u</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span><span class="o">+</span><span class="n">w</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.0060000&#39;)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h3>9.4.5.2. 特殊値<a class="headerlink" href="#id5" title="このヘッドラインへのパーマリンク">¶</a></h3>
+<p><a class="reference internal" href="#module-decimal" title="decimal: 汎用10進数演算仕様 (General Decimal Arithmetic Specification) の実装。"><tt class="xref py py-mod docutils literal"><span class="pre">decimal</span></tt></a> モジュールの数体系では、 <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">sNaN</span></tt>,
+<tt class="xref py py-const docutils literal"><span class="pre">-Infinity</span></tt>, <tt class="xref py py-const docutils literal"><span class="pre">Infinity</span></tt>, および二つのゼロ、 <tt class="xref py py-const docutils literal"><span class="pre">+0</span></tt>
+と <tt class="xref py py-const docutils literal"><span class="pre">-0</span></tt> といった特殊な値を提供しています。</p>
+<p>無限大 (Infinity) は <tt class="docutils literal"><span class="pre">Decimal('Infinity')</span></tt> で直接構築できます。また、 <a class="reference internal" href="#decimal.DivisionByZero" title="decimal.DivisionByZero"><tt class="xref py py-exc docutils literal"><span class="pre">DivisionByZero</span></tt></a> をトラップせずにゼロで除算を行った場合にも出てきます。同様に、 <a class="reference internal" href="#decimal.Overflow" title="decimal.Overflow"><tt class="xref py py-exc docutils literal"><span class="pre">Overflow</span></tt></a> シグナルをトラップしなければ、表現可能な最大の数値の制限を越えた値を丸めたときに出てきます。</p>
+<p>無限大には符号があり (アフィン: affine であり)、算術演算に使用でき、非常に巨大で不確定の(indeterminate)値として扱われます。例えば、無限大に何らかの定数を加算すると、演算結果は別の無限大になります。</p>
+<p>演算によっては結果が不確定になるものがあり、 <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> を返します。ただし、 <a class="reference internal" href="#decimal.InvalidOperation" title="decimal.InvalidOperation"><tt class="xref py py-exc docutils literal"><span class="pre">InvalidOperation</span></tt></a> シグナルをトラップするようになっていれば例外を送出します。</p>
+<p>例えば、 <tt class="docutils literal"><span class="pre">0/0</span></tt> は <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> を返します。 <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> は「非数値 (not a number)」を表します。このような <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> は暗黙のうちに生成され、一度生成されるとそれを他の計算にも流れてゆき、関係する個々の演算全てが個別の <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> を返すようになります。この挙動は、たまに入力値が欠けるような状況で一連の計算を行う際に便利です &#8212; 特定の計算に対しては無効な結果を示すフラグを立てつつ計算を進められるからです。</p>
+<p>一方、 <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> の変種である <tt class="xref py py-const docutils literal"><span class="pre">sNaN</span></tt> は関係する全ての演算で演算後にシグナルを送出します。 <tt class="xref py py-const docutils literal"><span class="pre">sNaN</span></tt> は、無効な演算結果に対して特別な処理を行うために計算を停止する必要がある場合に便利です。</p>
+<p>Python の比較演算は <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> が関わってくると少し驚くようなことがあります。等価性のテストの一方の対象が無言または発信 <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> である場合いつでも
+<a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> を返し(たとえ <tt class="docutils literal"><span class="pre">Decimal('NaN')==Decimal('NaN')</span></tt> でも)、一方で不等価をテストするといつでも <a class="reference internal" href="constants.html#True" title="True"><tt class="xref py py-const docutils literal"><span class="pre">True</span></tt></a> を返します。二つの Decimal を <tt class="docutils literal"><span class="pre">&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&lt;=</span></tt>, <tt class="docutils literal"><span class="pre">&gt;</span></tt> または <tt class="docutils literal"><span class="pre">&gt;=</span></tt> を使って比較する試みは一方が <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> である場合には <a class="reference internal" href="#decimal.InvalidOperation" title="decimal.InvalidOperation"><tt class="xref py py-exc docutils literal"><span class="pre">InvalidOperation</span></tt></a> シグナルを誘発し、このシグナルをトラップしなければ結果は <a class="reference internal" href="constants.html#False" title="False"><tt class="xref py py-const docutils literal"><span class="pre">False</span></tt></a> に終わります。汎用10進演算仕様は直接の比較の振る舞いについて定めていないことに注意しておきましょう。ここでの <tt class="xref py py-const docutils literal"><span class="pre">NaN</span></tt> が関係する比較ルールは IEEE 854 標準から持ってきました
+(section 5.7 の Table 3 を見て下さい)。厳格に標準遵守を貫くなら、 <tt class="xref py py-meth docutils literal"><span class="pre">compare()</span></tt> および <tt class="xref py py-meth docutils literal"><span class="pre">compare-signal()</span></tt>
+メソッドを代わりに使いましょう。</p>
+<p>アンダフローの起きた計算は、符号付きのゼロ (signed zero) を返すことがあります。符号は、より高い精度で計算を行った結果の符号と同じになります。符号付きゼロの大きさはやはりゼロなので、正のゼロと負のゼロは等しいとみなされ、符号は単なる参考にすぎません。</p>
+<p>二つの符号付きゼロが区別されているのに等価であることに加えて、異なる精度におけるゼロの表現はまちまちなのに、値は等価とみなされるということがあります。これに慣れるには多少時間がかかります。正規化浮動小数点表現に目が慣れてしまうと、以下の計算でゼロに等しい値が返っているとは即座に分かりません:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;Infinity&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0E-1000000026&#39;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="decimal-threads">
+<span id="id6"></span><h2>9.4.6. スレッドを使った処理<a class="headerlink" href="#decimal-threads" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>関数 <a class="reference internal" href="#decimal.getcontext" title="decimal.getcontext"><tt class="xref py py-func docutils literal"><span class="pre">getcontext()</span></tt></a> は、スレッド毎に別々の <a class="reference internal" href="#decimal.Context" title="decimal.Context"><tt class="xref py py-class docutils literal"><span class="pre">Context</span></tt></a>
+オブジェクトにアクセスします。別のスレッドコンテキストを持つということは、複数のスレッドが互いに影響を及ぼさずに
+(<tt class="docutils literal"><span class="pre">getcontext.prec=10</span></tt> のような) 変更を適用できるということです。</p>
+<p>同様に、<a class="reference internal" href="#decimal.setcontext" title="decimal.setcontext"><tt class="xref py py-func docutils literal"><span class="pre">setcontext()</span></tt></a> 関数は自動的に引数のコンテキストを現在のスレッドのコンテキストに設定します。</p>
+<p><a class="reference internal" href="#decimal.getcontext" title="decimal.getcontext"><tt class="xref py py-func docutils literal"><span class="pre">getcontext()</span></tt></a> を呼び出す前に <a class="reference internal" href="#decimal.setcontext" title="decimal.setcontext"><tt class="xref py py-func docutils literal"><span class="pre">setcontext()</span></tt></a> が呼び出されていなければ、現在のスレッドで使うための新たなコンテキストを生成するために <a class="reference internal" href="#decimal.getcontext" title="decimal.getcontext"><tt class="xref py py-func docutils literal"><span class="pre">getcontext()</span></tt></a> が自動的に呼び出されます。</p>
+<p>新たなコンテキストは、<em>DefaultContext</em> と呼ばれる雛形からコピーされます。アプリケーションを通じて全てのスレッドに同じ値を使うようにデフォルトを設定したければ、<em>DefaultContext</em>
+オブジェクトを直接変更します。
+<a class="reference internal" href="#decimal.getcontext" title="decimal.getcontext"><tt class="xref py py-func docutils literal"><span class="pre">getcontext()</span></tt></a> を呼び出すスレッド間で競合条件が生じないようにするため、<em>DefaultContext</em>
+への変更はいかなるスレッドを開始するよりも <em>前に</em> 行わねばなりません。以下に例を示します:</p>
+<div class="highlight-python"><pre># スレッドを立ち上げる前にアプリケーションにわたるデフォルトを設定
+DefaultContext.prec = 12
+DefaultContext.rounding = ROUND_DOWN
+DefaultContext.traps = ExtendedContext.traps.copy()
+DefaultContext.traps[InvalidOperation] = 1
+setcontext(DefaultContext)
+
+# その後でスレッドを開始
+t1.start()
+t2.start()
+t3.start()
+ . . .</pre>
+</div>
+</div>
+<div class="section" id="decimal-recipes">
+<span id="id7"></span><h2>9.4.7. レシピ<a class="headerlink" href="#decimal-recipes" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> クラスの利用を実演している例をいくつか示します。これらはユーティリティ関数としても利用できます:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">moneyfmt</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">curr</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span>
+             <span class="n">pos</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">neg</span><span class="o">=</span><span class="s">&#39;-&#39;</span><span class="p">,</span> <span class="n">trailneg</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decimal を通貨表現の文字列に変換します。</span>
+
+<span class="sd">    places:  小数点以下の値を表すのに必要な桁数</span>
+<span class="sd">    curr:    符号の前に置く通貨記号 (オプションで、空でもかまいません)</span>
+<span class="sd">    sep:     桁のグループ化に使う記号、オプションです (コンマ、ピリオド、</span>
+<span class="sd">             スペース、または空)</span>
+<span class="sd">    dp:      小数点 (コンマまたはピリオド)</span>
+<span class="sd">             小数部がゼロの場合には空にできます。</span>
+<span class="sd">    pos:     正数の符号オプション: &#39;+&#39;, 空白または空文字列</span>
+<span class="sd">    neg:     負数の符号オプション: &#39;-&#39;, &#39;(&#39;, 空白または空文字列</span>
+<span class="sd">    trailneg:後置マイナス符号オプション:  &#39;-&#39;, &#39;)&#39;, 空白または空文字列</span>
+
+<span class="sd">    &gt;&gt;&gt; d = Decimal(&#39;-1234567.8901&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; moneyfmt(d, curr=&#39;$&#39;)</span>
+<span class="sd">    &#39;-$1,234,567.89&#39;</span>
+<span class="sd">    &gt;&gt;&gt; moneyfmt(d, places=0, sep=&#39;.&#39;, dp=&#39;&#39;, neg=&#39;&#39;, trailneg=&#39;-&#39;)</span>
+<span class="sd">    &#39;1.234.568-&#39;</span>
+<span class="sd">    &gt;&gt;&gt; moneyfmt(d, curr=&#39;$&#39;, neg=&#39;(&#39;, trailneg=&#39;)&#39;)</span>
+<span class="sd">    &#39;($1,234,567.89)&#39;</span>
+<span class="sd">    &gt;&gt;&gt; moneyfmt(Decimal(123456789), sep=&#39; &#39;)</span>
+<span class="sd">    &#39;123 456 789.00&#39;</span>
+<span class="sd">    &gt;&gt;&gt; moneyfmt(Decimal(&#39;-0.02&#39;), neg=&#39;&lt;&#39;, trailneg=&#39;&gt;&#39;)</span>
+<span class="sd">    &#39;&lt;0.02&gt;&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="n">places</span>      <span class="c"># 2 places --&gt; &#39;0.01&#39;</span>
+    <span class="n">sign</span><span class="p">,</span> <span class="n">digits</span><span class="p">,</span> <span class="n">exp</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">as_tuple</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">digits</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">digits</span><span class="p">)</span>
+    <span class="n">build</span><span class="p">,</span> <span class="nb">next</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">,</span> <span class="n">digits</span><span class="o">.</span><span class="n">pop</span>
+    <span class="k">if</span> <span class="n">sign</span><span class="p">:</span>
+        <span class="n">build</span><span class="p">(</span><span class="n">trailneg</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">places</span><span class="p">):</span>
+        <span class="n">build</span><span class="p">(</span><span class="nb">next</span><span class="p">()</span> <span class="k">if</span> <span class="n">digits</span> <span class="k">else</span> <span class="s">&#39;0&#39;</span><span class="p">)</span>
+    <span class="n">build</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">digits</span><span class="p">:</span>
+        <span class="n">build</span><span class="p">(</span><span class="s">&#39;0&#39;</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">digits</span><span class="p">:</span>
+        <span class="n">build</span><span class="p">(</span><span class="nb">next</span><span class="p">())</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">digits</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">build</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>
+    <span class="n">build</span><span class="p">(</span><span class="n">curr</span><span class="p">)</span>
+    <span class="n">build</span><span class="p">(</span><span class="n">neg</span> <span class="k">if</span> <span class="n">sign</span> <span class="k">else</span> <span class="n">pos</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">pi</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;現在の精度まで円周率を計算します。</span>
+
+<span class="sd">    &gt;&gt;&gt; print pi()</span>
+<span class="sd">    3.141592653589793238462643383</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">+=</span> <span class="mi">2</span>  <span class="c"># 中間ステップのための余分の数字</span>
+    <span class="n">three</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>      <span class="c"># 普通の float に対する &quot;three=3.0&quot; の代わり</span>
+    <span class="n">lasts</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">na</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">da</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">three</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">24</span>
+    <span class="k">while</span> <span class="n">s</span> <span class="o">!=</span> <span class="n">lasts</span><span class="p">:</span>
+        <span class="n">lasts</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">na</span> <span class="o">=</span> <span class="n">n</span><span class="o">+</span><span class="n">na</span><span class="p">,</span> <span class="n">na</span><span class="o">+</span><span class="mi">8</span>
+        <span class="n">d</span><span class="p">,</span> <span class="n">da</span> <span class="o">=</span> <span class="n">d</span><span class="o">+</span><span class="n">da</span><span class="p">,</span> <span class="n">da</span><span class="o">+</span><span class="mi">32</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">t</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">-=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="o">+</span><span class="n">s</span>               <span class="c"># 単項のプラスで新しい精度に変換します</span>
+
+<span class="k">def</span> <span class="nf">exp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;e の x 乗を返します。結果の型は入力の型と同じです。</span>
+
+<span class="sd">    &gt;&gt;&gt; print exp(Decimal(1))</span>
+<span class="sd">    2.718281828459045235360287471</span>
+<span class="sd">    &gt;&gt;&gt; print exp(Decimal(2))</span>
+<span class="sd">    7.389056098930650227230427461</span>
+<span class="sd">    &gt;&gt;&gt; print exp(2.0)</span>
+<span class="sd">    7.38905609893</span>
+<span class="sd">    &gt;&gt;&gt; print exp(2+0j)</span>
+<span class="sd">    (7.38905609893+0j)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">+=</span> <span class="mi">2</span>
+    <span class="n">i</span><span class="p">,</span> <span class="n">lasts</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">fact</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">s</span> <span class="o">!=</span> <span class="n">lasts</span><span class="p">:</span>
+        <span class="n">lasts</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">fact</span> <span class="o">*=</span> <span class="n">i</span>
+        <span class="n">num</span> <span class="o">*=</span> <span class="n">x</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">fact</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">-=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="o">+</span><span class="n">s</span>
+
+<span class="k">def</span> <span class="nf">cos</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;x ラジアンの余弦を返します。</span>
+
+<span class="sd">    &gt;&gt;&gt; print cos(Decimal(&#39;0.5&#39;))</span>
+<span class="sd">    0.8775825618903727161162815826</span>
+<span class="sd">    &gt;&gt;&gt; print cos(0.5)</span>
+<span class="sd">    0.87758256189</span>
+<span class="sd">    &gt;&gt;&gt; print cos(0.5+0j)</span>
+<span class="sd">    (0.87758256189+0j)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">+=</span> <span class="mi">2</span>
+    <span class="n">i</span><span class="p">,</span> <span class="n">lasts</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">fact</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">s</span> <span class="o">!=</span> <span class="n">lasts</span><span class="p">:</span>
+        <span class="n">lasts</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="n">fact</span> <span class="o">*=</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">num</span> <span class="o">*=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+        <span class="n">sign</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">fact</span> <span class="o">*</span> <span class="n">sign</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">-=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="o">+</span><span class="n">s</span>
+
+<span class="k">def</span> <span class="nf">sin</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;x ラジアンの正弦を返します。</span>
+
+<span class="sd">    &gt;&gt;&gt; print sin(Decimal(&#39;0.5&#39;))</span>
+<span class="sd">    0.4794255386042030002732879352</span>
+<span class="sd">    &gt;&gt;&gt; print sin(0.5)</span>
+<span class="sd">    0.479425538604</span>
+<span class="sd">    &gt;&gt;&gt; print sin(0.5+0j)</span>
+<span class="sd">    (0.479425538604+0j)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">+=</span> <span class="mi">2</span>
+    <span class="n">i</span><span class="p">,</span> <span class="n">lasts</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">fact</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">sign</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">s</span> <span class="o">!=</span> <span class="n">lasts</span><span class="p">:</span>
+        <span class="n">lasts</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="n">fact</span> <span class="o">*=</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">num</span> <span class="o">*=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
+        <span class="n">sign</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">fact</span> <span class="o">*</span> <span class="n">sign</span>
+    <span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">-=</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="o">+</span><span class="n">s</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="decimal-faq">
+<span id="id8"></span><h2>9.4.8. Decimal FAQ<a class="headerlink" href="#decimal-faq" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>Q. <tt class="docutils literal"><span class="pre">decimal.Decimal('1234.5')</span></tt> などと打ち込むのは煩わしいのですが、対話式インタプリタを使う際にタイプ量を少なくする方法はありませんか?</p>
+<p>A. コンストラクタを1文字に縮める人もいるようです。 :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">D</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">D</span><span class="p">(</span><span class="s">&#39;1.23&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">D</span><span class="p">(</span><span class="s">&#39;3.45&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;4.68&#39;)</span>
+</pre></div>
+</div>
+<p>Q. 小数点以下2桁の固定小数点数のアプリケーションの中で、いくつかの入力が余計な桁を保持しているのでこれを丸めなければなりません。その他のものに余計な桁はなくそのまま使えます。どのメソッドを使うのがいいでしょうか?</p>
+<p>A. <tt class="xref py py-meth docutils literal"><span class="pre">quantize()</span></tt> メソッドで固定した桁に丸められます。
+<a class="reference internal" href="#decimal.Inexact" title="decimal.Inexact"><tt class="xref py py-const docutils literal"><span class="pre">Inexact</span></tt></a> トラップを設定しておけば、確認にも有用です。
+:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">TWOPLACES</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">**</span> <span class="o">-</span><span class="mi">2</span>       <span class="c"># Decimal(&#39;0.01&#39;) と同じ</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># 小数点以下2桁に丸める</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.214&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">TWOPLACES</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.21&#39;)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="c"># 小数点以下2桁を越える桁を保持していないことの確認</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.21&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">TWOPLACES</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">Context</span><span class="p">(</span><span class="n">traps</span><span class="o">=</span><span class="p">[</span><span class="n">Inexact</span><span class="p">]))</span>
+<span class="go">Decimal(&#39;3.21&#39;)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.214&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">TWOPLACES</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">Context</span><span class="p">(</span><span class="n">traps</span><span class="o">=</span><span class="p">[</span><span class="n">Inexact</span><span class="p">]))</span>
+<span class="gt">Traceback (most recent call last):</span>
+   <span class="c">...</span>
+<span class="nc">Inexact</span>: <span class="n-Identifier">None</span>
+</pre></div>
+</div>
+<p>Q. 正当な2桁の入力が得られたとして、その正当性をアプリケーション実行中も変わらず保ち続けるにはどうすればいいでしょうか?</p>
+<p>A. 加減算あるいは整数との乗算のような演算は自動的に固定小数点を守ります。その他の除算や整数以外の乗算などは小数点以下の桁を変えてしまいますので実行後は
+<tt class="xref py py-meth docutils literal"><span class="pre">quantize()</span></tt> ステップが必要です。:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;102.72&#39;</span><span class="p">)</span>           <span class="c"># Initial fixed-point values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.17&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span>                           <span class="c"># Addition preserves fixed-point</span>
+<span class="go">Decimal(&#39;105.89&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span>
+<span class="go">Decimal(&#39;99.55&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">*</span> <span class="mi">42</span>                          <span class="c"># So does integer multiplication</span>
+<span class="go">Decimal(&#39;4314.24&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">TWOPLACES</span><span class="p">)</span>     <span class="c"># Must quantize non-integer multiplication</span>
+<span class="go">Decimal(&#39;325.62&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">b</span> <span class="o">/</span> <span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">TWOPLACES</span><span class="p">)</span>     <span class="c"># And quantize division</span>
+<span class="go">Decimal(&#39;0.03&#39;)</span>
+</pre></div>
+</div>
+<p>固定小数点のアプリケーションを開発する際は、 <tt class="xref py py-meth docutils literal"><span class="pre">quantize()</span></tt>
+の段階を扱う関数を定義しておくと便利です :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">TWOPLACES</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">div</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fp</span><span class="o">=</span><span class="n">TWOPLACES</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">mul</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>                       <span class="c"># 自動的に固定点を保つ</span>
+<span class="go">Decimal(&#39;325.62&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">div</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+<span class="go">Decimal(&#39;0.03&#39;)</span>
+</pre></div>
+</div>
+<p>Q. 一つの値に対して多くの表現方法があります。
+<tt class="xref py py-const docutils literal"><span class="pre">200</span></tt> と <tt class="xref py py-const docutils literal"><span class="pre">200.000</span></tt> と <tt class="xref py py-const docutils literal"><span class="pre">2E2</span></tt> と
+<tt class="xref py py-const docutils literal"><span class="pre">02E+4</span></tt> は全て同じ値で違った精度の数です。これらをただ一つの正規化された値に変換することはできますか?</p>
+<p>A. <tt class="xref py py-meth docutils literal"><span class="pre">normalize()</span></tt> メソッドは全ての等しい値をただ一つの表現に直します。 :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">values</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">Decimal</span><span class="p">,</span> <span class="s">&#39;200 200.000 2E2 .02E+4&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+<span class="go">[Decimal(&#39;2E+2&#39;), Decimal(&#39;2E+2&#39;), Decimal(&#39;2E+2&#39;), Decimal(&#39;2E+2&#39;)]</span>
+</pre></div>
+</div>
+<p>Q. ある種の10進数値はいつも指数表記で表示されます。指数表記以外の表示にする方法はありますか?</p>
+<p>A. 値によっては、指数表記だけが有効桁数を表せる表記法なのです。たとえば、 <tt class="xref py py-const docutils literal"><span class="pre">5.0E+3</span></tt> を <tt class="xref py py-const docutils literal"><span class="pre">5000</span></tt> と表してしまうと、値は変わりませんが元々の2桁という有効数字が反映されません。</p>
+<p>もしアプリケーションが有効数字の追跡を等閑視するならば、指数部や末尾のゼロを取り除き、有効数字を忘れ、しかし値を変えずにおくことは容易です:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">remove_exponent</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Remove exponent and trailing zeros.</span>
+
+<span class="sd">    &gt;&gt;&gt; remove_exponent(Decimal(&#39;5E+3&#39;))</span>
+<span class="sd">    Decimal(&#39;5000&#39;)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">to_integral</span><span class="p">()</span> <span class="k">else</span> <span class="n">d</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Q. 普通の float を <a class="reference internal" href="#decimal.Decimal" title="decimal.Decimal"><tt class="xref py py-class docutils literal"><span class="pre">Decimal</span></tt></a> に変換できますか?</p>
+<p>A. はい。どんな 2 進浮動小数点数も Decimal として正確に表現できます。ただし、正確な変換は直感的に考えたよりも多い桁になることがあります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+<span class="go">Decimal(&#39;3.141592653589793115997963468544185161590576171875&#39;)</span>
+</pre></div>
+</div>
+<p>Q. 複雑な計算の中で、精度不足や丸めの異常で間違った結果になっていないことをどうやって保証すれば良いでしょうか?</p>
+<p>A. decimal モジュールでは検算は容易です。一番良い方法は、大きめの精度や様々な丸めモードで再計算してみることです。大きく異なった結果が出てきたら、精度不足や丸めの問題や悪条件の入力、または数値計算的に不安定なアルゴリズムを示唆しています。</p>
+<p>Q. コンテキストの精度は計算結果には適用されていますが入力には適用されていないようです。様々に異なる精度の入力値を混ぜて計算する時に注意すべきことはありますか?</p>
+<p>A. はい。原則として入力値は正確であると見做しておりそれらの値を使った計算も同様です。結果だけが丸められます。入力の強みは &#8220;what you type
+is what you get&#8221; (打ち込んだ値が得られる値)という点にあります。入力が丸められないということを忘れていると結果が奇妙に見えるというのは弱点です。 :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.104&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;2.104&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;5.21&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;3.104&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;0.000&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;2.104&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;5.20&#39;)</span>
+</pre></div>
+</div>
+<p>解決策は精度を上げるかまたは単項のプラス演算子を使って入力の丸めを強制することです。 :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">+</span><span class="n">Decimal</span><span class="p">(</span><span class="s">&#39;1.23456789&#39;</span><span class="p">)</span>      <span class="c"># 単項のプラスで丸めを引き起こします</span>
+<span class="go">Decimal(&#39;1.23&#39;)</span>
+</pre></div>
+</div>
+<p>もしくは、入力を <a class="reference internal" href="#decimal.Context.create_decimal" title="decimal.Context.create_decimal"><tt class="xref py py-meth docutils literal"><span class="pre">Context.create_decimal()</span></tt></a> を使って生成時に丸めてしまうこともできます。 :</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Context</span><span class="p">(</span><span class="n">prec</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_DOWN</span><span class="p">)</span><span class="o">.</span><span class="n">create_decimal</span><span class="p">(</span><span class="s">&#39;1.2345678&#39;</span><span class="p">)</span>
+<span class="go">Decimal(&#39;1.2345&#39;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fractions.html" title="9.5. fractions — 有理数"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="cmath.html" title="9.3. cmath — 複素数のための数学関数"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="numeric.html" >9. 数値と数学モジュール</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

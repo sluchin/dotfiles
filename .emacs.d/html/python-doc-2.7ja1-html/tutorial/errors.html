@@ -1,0 +1,444 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>8. エラーと例外 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="Python チュートリアル" href="index.html" />
+    <link rel="next" title="9. クラス" href="classes.html" />
+    <link rel="prev" title="7. 入力と出力" href="inputoutput.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="classes.html" title="9. クラス"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="inputoutput.html" title="7. 入力と出力"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" accesskey="U">Python チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">8. エラーと例外</a><ul>
+<li><a class="reference internal" href="#tut-syntaxerrors">8.1. 構文エラー</a></li>
+<li><a class="reference internal" href="#tut-exceptions">8.2. 例外</a></li>
+<li><a class="reference internal" href="#tut-handling">8.3. 例外を処理する</a></li>
+<li><a class="reference internal" href="#tut-raising">8.4. 例外を送出する</a></li>
+<li><a class="reference internal" href="#tut-userexceptions">8.5. ユーザ定義の例外</a></li>
+<li><a class="reference internal" href="#tut-cleanup">8.6. クリーンアップ動作を定義する</a></li>
+<li><a class="reference internal" href="#tut-cleanup-with">8.7. 定義済みクリーンアップ処理</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="inputoutput.html"
+                        title="前の章へ">7. 入力と出力</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="classes.html"
+                        title="次の章へ">9. クラス</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/errors.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tut-errors">
+<span id="id1"></span><h1>8. エラーと例外<a class="headerlink" href="#tut-errors" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>これまでエラーメッセージについては簡単に触れるだけでしたが、チュートリアル中の例を自分で試していたら、実際にいくつかのエラーメッセージを見ていることでしょう。エラーには (少なくとも) 二つのはっきり異なる種類があります。それは <em>構文エラー (syntax error)</em> と <em>例外 (exception)</em> です。</p>
+<div class="section" id="tut-syntaxerrors">
+<span id="id2"></span><h2>8.1. 構文エラー<a class="headerlink" href="#tut-syntaxerrors" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>構文エラーは構文解析エラー (parsing error) としても知られており、 Python を勉強している間に最もよく遭遇する問題の一つでしょう。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="bp">True</span> <span class="k">print</span> <span class="s">&#39;Hello world&#39;</span>
+<span class="go">  File &quot;&lt;stdin&gt;&quot;, line 1, in ?</span>
+<span class="go">    while True print &#39;Hello world&#39;</span>
+<span class="go">                   ^</span>
+<span class="go">SyntaxError: invalid syntax</span>
+</pre></div>
+</div>
+<p>パーサは違反の起きている行を表示し、小さな「矢印」を表示して、行中でエラーが検出された最初の位置を示します。エラーは矢印の <em>直前の</em> トークンでひき起こされています (または、少なくともそこで検出されています)。上記の例では、エラーは <a class="reference internal" href="../reference/simple_stmts.html#print"><tt class="xref std std-keyword docutils literal"><span class="pre">print</span></tt></a> で検出されています。コロン (<tt class="docutils literal"><span class="pre">':'</span></tt>) がその前に無いからです。入力がスクリプトから来ている場合は、どこを見ればよいか分かるようにファイル名と行番号が出力されます。</p>
+</div>
+<div class="section" id="tut-exceptions">
+<span id="id3"></span><h2>8.2. 例外<a class="headerlink" href="#tut-exceptions" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>たとえ文や式が構文的に正しくても、実行しようとしたときにエラーが発生するかもしれません。実行中に検出されたエラーは <em>例外 (exception)</em> と呼ばれ、常に致命的とは限りません。これから、 Python プログラムで例外をどのように扱うかを学んでいきます。ほとんどの例外はプログラムで処理されず、以下に示されるようなメッセージになります。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">10</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">0</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+<span class="nc">ZeroDivisionError</span>: <span class="n-Identifier">integer division or modulo by zero</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">4</span> <span class="o">+</span> <span class="n">spam</span><span class="o">*</span><span class="mi">3</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+<span class="nc">NameError</span>: <span class="n-Identifier">name &#39;spam&#39; is not defined</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s">&#39;2&#39;</span> <span class="o">+</span> <span class="mi">2</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+<span class="nc">TypeError</span>: <span class="n-Identifier">cannot concatenate &#39;str&#39; and &#39;int&#39; objects</span>
+</pre></div>
+</div>
+<p>エラーメッセージの最終行は何が起こったかを示しています。例外は様々な型 (type) で起こり、その型がエラーメッセージの一部として出力されます。上の例での型は <a class="reference internal" href="../library/exceptions.html#exceptions.ZeroDivisionError" title="exceptions.ZeroDivisionError"><tt class="xref py py-exc docutils literal"><span class="pre">ZeroDivisionError</span></tt></a>, <a class="reference internal" href="../library/exceptions.html#exceptions.NameError" title="exceptions.NameError"><tt class="xref py py-exc docutils literal"><span class="pre">NameError</span></tt></a>, <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> です。例外型として出力される文字列は、発生した例外の組み込み名です。これは全ての組み込み例外について成り立ちますが、ユーザ定義の例外では
+(成り立つようにするのは有意義な慣習ですが) 必ずしも成り立ちません。標準例外の名前は組み込みの識別子です (予約語ではありません)。</p>
+<p>残りの行は例外の詳細で、その例外の型と何が起きたかに依存します。</p>
+<p>エラーメッセージの先頭部分では、例外が発生した実行コンテキスト (context) を、スタックのトレースバック (stack traceback) の形式で示しています。一般には、この部分にはソースコード行をリストしたトレースバックが表示されます。しかし、標準入力から読み取られたコードは表示されません。</p>
+<p><a class="reference internal" href="../library/exceptions.html#bltin-exceptions"><em>組み込み例外</em></a> には、組み込み例外とその意味がリストされています。</p>
+</div>
+<div class="section" id="tut-handling">
+<span id="id4"></span><h2>8.3. 例外を処理する<a class="headerlink" href="#tut-handling" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>例外を選別して処理するようなプログラムを書くことができます。以下の例を見てください。この例では、有効な文字列が入力されるまでユーザに入力を促しますが、ユーザがプログラムに (<tt class="kbd docutils literal"><span class="pre">Control-C</span></tt> か、またはオペレーティングシステムがサポートしている何らかのキーを使って)
+割り込みをかけてプログラムを中断させることができるようにしています。ユーザが生成した割り込みは、 <a class="reference internal" href="../library/exceptions.html#exceptions.KeyboardInterrupt" title="exceptions.KeyboardInterrupt"><tt class="xref py py-exc docutils literal"><span class="pre">KeyboardInterrupt</span></tt></a>
+例外が送出されることで通知されるということに注意してください。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Please enter a number: &quot;</span><span class="p">))</span>
+<span class="gp">... </span>        <span class="k">break</span>
+<span class="gp">... </span>    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&quot;Oops!  That was no valid number.  Try again...&quot;</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文は下記のように動作します。</p>
+<ul class="simple">
+<li>まず、 <em>try 節 (try clause)</em> (キーワード <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> と <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> の間の文)
+が実行されます。</li>
+</ul>
+<ul class="simple">
+<li>何も例外が発生しなければ、 <em>except 節</em> をスキップして <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文の実行を終えます。</li>
+</ul>
+<ul class="simple">
+<li>try 節内の実行中に例外が発生すると、その節の残りは飛ばされます。次に、例外型が <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> キーワードの後に指定されている例外に一致する場合、except 節が実行された後、 <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文の後ろへ実行が継続されます。</li>
+</ul>
+<ul class="simple">
+<li>もしも except 節で指定された例外と一致しない例外が発生すると、その例外は
+<a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文の外側に渡されます。例外に対するハンドラ (handler、処理部)
+がどこにもなければ、 <em>処理されない例外 (unhandled exception)</em> となり、上記に示したようなメッセージを出して実行を停止します。</li>
+</ul>
+<p>一つの <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文に複数の except 節を設けて、さまざまな例外に対するハンドラを指定することができます。同時に一つ以上のハンドラが実行されることはありません。ハンドラは対応する try 節内で発生した例外だけを処理し、同じ try 節内の別の例外ハンドラで起きた例外は処理しません。
+except 節には複数の例外を丸括弧で囲ったタプルにして渡すことができます。例えば以下のようにします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">...</span> <span class="k">except</span> <span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NameError</span><span class="p">):</span>
+<span class="o">...</span>     <span class="k">pass</span>
+</pre></div>
+</div>
+<p>最後の except 節では例外名を省いて、ワイルドカード (wildcard、総称記号)
+にすることができます。ワイルドカードの except 節は非常に注意して使ってください。というのは、ワイルドカードは通常のプログラムエラーをたやすく隠してしまうからです！ワイルドカードの except 節はエラーメッセージを出力した後に例外を再送出する
+(関数やメソッドの呼び出し側が同様にして例外を処理できるようにする) 用途にも使えます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;myfile.txt&#39;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="p">(</span><span class="n">errno</span><span class="p">,</span> <span class="n">strerror</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&quot;I/O error({0}): {1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">errno</span><span class="p">,</span> <span class="n">strerror</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Could not convert data to an integer.&quot;</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Unexpected error:&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">raise</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> ... <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 文には、オプションで <em>else 節 (else clause)</em>
+を設けることができます。
+<a class="reference internal" href="../reference/compound_stmts.html#else"><tt class="xref std std-keyword docutils literal"><span class="pre">else</span></tt></a> 節を設ける場合、全ての <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 節よりも後ろに置かねばなりません。
+<a class="reference internal" href="../reference/compound_stmts.html#else"><tt class="xref std std-keyword docutils literal"><span class="pre">else</span></tt></a> 節は try 節で全く例外が送出されなかったときに実行されるコードを書くのに役立ちます。例えば次のようにします。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;cannot open&#39;</span><span class="p">,</span> <span class="n">arg</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">arg</span><span class="p">,</span> <span class="s">&#39;has&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()),</span> <span class="s">&#39;lines&#39;</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>追加のコードを追加するのは <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 節の後ろよりも <a class="reference internal" href="../reference/compound_stmts.html#else"><tt class="xref std std-keyword docutils literal"><span class="pre">else</span></tt></a>
+節の方がよいでしょう。なぜなら、そうすることで <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> ...
+<a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 文で保護したいコードから送出されたもの以外の例外を偶然に捕捉してしまうという事態を避けられるからです。</p>
+<p>例外が発生するとき、例外は関連付けられた値を持つことができます。この値は例外の <em>引数 (argument)</em> とも呼ばれます。引数の有無および引数の型は、例外の型に依存します。</p>
+<p>except 節では、例外名 (または例外名タプル) の後に変数を指定することができます。この変数は例外インスタンスに結び付けられており、 <tt class="docutils literal"><span class="pre">instance.args</span></tt> に例外インスタンス生成時の引数が入っています。例外インスタンスには <a class="reference internal" href="../reference/datamodel.html#object.__str__" title="object.__str__"><tt class="xref py py-meth docutils literal"><span class="pre">__str__()</span></tt></a> が定義されており、 <tt class="docutils literal"><span class="pre">.args</span></tt>
+を参照しなくても引数を直接印字できるように利便性が図られています。</p>
+<p>必要なら、例外を送出する前にインスタンス化して、任意の属性を追加できます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;spam&#39;</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">inst</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="k">print</span> <span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>     <span class="c"># 例外インスタンス</span>
+<span class="gp">... </span>   <span class="k">print</span> <span class="n">inst</span><span class="o">.</span><span class="n">args</span>      <span class="c"># .args に記憶されている引数</span>
+<span class="gp">... </span>   <span class="k">print</span> <span class="n">inst</span>           <span class="c"># __str__ により引数を直接出力できる</span>
+<span class="gp">... </span>   <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">inst</span>          <span class="c"># __getitem__ により引数を直接アンパックできる</span>
+<span class="gp">... </span>   <span class="k">print</span> <span class="s">&#39;x =&#39;</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">... </span>   <span class="k">print</span> <span class="s">&#39;y =&#39;</span><span class="p">,</span> <span class="n">y</span>
+<span class="gp">...</span>
+<span class="go">&lt;type &#39;exceptions.Exception&#39;&gt;</span>
+<span class="go">(&#39;spam&#39;, &#39;eggs&#39;)</span>
+<span class="go">(&#39;spam&#39;, &#39;eggs&#39;)</span>
+<span class="go">x = spam</span>
+<span class="go">y = eggs</span>
+</pre></div>
+</div>
+<p>例外が引数を持っていれば、それは処理されない例外のメッセージの最後の部分
+(「詳細説明」) に出力されます。</p>
+<p>例外ハンドラは、 try 節の直接内側で発生した例外を処理するだけではなく、その try 節から (たとえ間接的にでも) 呼び出された関数の内部で発生した例外も処理します。例えば</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">this_fails</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">0</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">this_fails</span><span class="p">()</span>
+<span class="gp">... </span><span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">,</span> <span class="n">detail</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;Handling run-time error:&#39;</span><span class="p">,</span> <span class="n">detail</span>
+<span class="gp">...</span>
+<span class="go">Handling run-time error: integer division or modulo by zero</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tut-raising">
+<span id="id5"></span><h2>8.4. 例外を送出する<a class="headerlink" href="#tut-raising" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="../reference/simple_stmts.html#raise"><tt class="xref std std-keyword docutils literal"><span class="pre">raise</span></tt></a> 文を使って、特定の例外を発生させることができます。例えば、</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s">&#39;HiThere&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+<span class="nc">NameError</span>: <span class="n-Identifier">HiThere</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../reference/simple_stmts.html#raise"><tt class="xref std std-keyword docutils literal"><span class="pre">raise</span></tt></a> は送出したい例外を引数として取ります。これは例外クラス(<tt class="xref py py-class docutils literal"><span class="pre">Exception</span></tt> を継承したクラス)か、例外クラスのインスタンスです。</p>
+<p>例外が発生したかどうかを判定したいだけで、その例外を処理するつもりがなければ、単純な形式の <a class="reference internal" href="../reference/simple_stmts.html#raise"><tt class="xref std std-keyword docutils literal"><span class="pre">raise</span></tt></a> 文を使って例外を再送出させることができます。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s">&#39;HiThere&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;An exception flew by!&#39;</span>
+<span class="gp">... </span>    <span class="k">raise</span>
+<span class="gp">...</span>
+<span class="go">An exception flew by!</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">2</span>, in <span class="n-Identifier">?</span>
+<span class="nc">NameError</span>: <span class="n-Identifier">HiThere</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tut-userexceptions">
+<span id="id6"></span><h2>8.5. ユーザ定義の例外<a class="headerlink" href="#tut-userexceptions" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>プログラム上で新しい例外クラスを作成することで、独自の例外を指定することができます
+(Python のクラスについては <a class="reference internal" href="classes.html#tut-classes"><em>クラス</em></a> 参照)。例外は、典型的に <a class="reference internal" href="../library/exceptions.html#exceptions.Exception" title="exceptions.Exception"><tt class="xref py py-exc docutils literal"><span class="pre">Exception</span></tt></a> クラスから、直接または間接的に派生したものです。例を示します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span> <span class="n">MyError</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">MyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;My exception occurred, value:&#39;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">value</span>
+<span class="gp">...</span>
+<span class="go">My exception occurred, value: 4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">raise</span> <span class="n">MyError</span><span class="p">(</span><span class="s">&#39;oops!&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+<span class="nc">__main__.MyError</span>: <span class="n-Identifier">&#39;oops!&#39;</span>
+</pre></div>
+</div>
+<p>この例では <tt class="xref py py-class docutils literal"><span class="pre">Exception</span></tt> のデフォルト <a class="reference internal" href="../reference/datamodel.html#object.__init__" title="object.__init__"><tt class="xref py py-meth docutils literal"><span class="pre">__init__()</span></tt></a> がオーバーライドされています。新しい振る舞いでは、単に <em>value</em> 属性を作ります。これは、デフォルトの <em>args</em> 属性を作成する振る舞いを置き換えています。</p>
+<p>例外クラスでは、普通のクラスができることなら何でも定義することができますが、通常は単純なものにしておきます。大抵は、いくつかの属性だけを提供し、例外が発生したときにハンドラがエラーに関する情報を取り出せるようにする程度にとどめます。複数の別個の例外を送出するようなモジュールを作成する際には、そのモジュールで定義されている例外の基底クラスを作成するのが一般的なプラクティスです。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Error</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for exceptions in this module.&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">InputError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised for errors in the input.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        expr -- input expression in which the error occurred</span>
+<span class="sd">        msg  -- explanation of the error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+
+<span class="k">class</span> <span class="nc">TransitionError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when an operation attempts a state transition that&#39;s not</span>
+<span class="sd">    allowed.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        prev -- state at beginning of transition</span>
+<span class="sd">        next -- attempted new state</span>
+<span class="sd">        msg  -- explanation of why the specific transition is not allowed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prev</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">prev</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="nb">next</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span>
+</pre></div>
+</div>
+<p>ほとんどの例外は、標準の例外の名前付けと同様に、 &#8220;Error&#8221; で終わる名前で定義されています。</p>
+<p>多くの標準モジュールでは、モジュールで定義されている関数内で発生する可能性のあるエラーを報告させるために、独自の例外を定義しています。クラスについての詳細な情報は <a class="reference internal" href="classes.html#tut-classes"><em>クラス</em></a> 章で提供されています。</p>
+</div>
+<div class="section" id="tut-cleanup">
+<span id="id7"></span><h2>8.6. クリーンアップ動作を定義する<a class="headerlink" href="#tut-cleanup" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p><a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文にはもう一つオプションの節があります。この節はクリーンアップ動作を定義するためのもので、どんな状況でも必ず実行されます。例を示します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">raise</span> <span class="ne">KeyboardInterrupt</span>
+<span class="gp">... </span><span class="k">finally</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;Goodbye, world!&#39;</span>
+<span class="gp">...</span>
+<span class="go">Goodbye, world!</span>
+<span class="nc">KeyboardInterrupt</span>
+</pre></div>
+</div>
+<p><em>finally 節 (finally clause)</em> は、例外が発生したかどうかに関わらず、
+<a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文を抜ける前に常に実行されます。
+<a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 節の中で例外が発生して、 <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 節で処理されていない場合、または <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 節か <a class="reference internal" href="../reference/compound_stmts.html#else"><tt class="xref std std-keyword docutils literal"><span class="pre">else</span></tt></a>
+節で例外が発生した場合は、 <a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節を実行した後、その例外を再送出します。
+<a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節はまた、 <a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 節から <a class="reference internal" href="../reference/simple_stmts.html#break"><tt class="xref std std-keyword docutils literal"><span class="pre">break</span></tt></a>
+文や  <a class="reference internal" href="../reference/simple_stmts.html#continue"><tt class="xref std std-keyword docutils literal"><span class="pre">continue</span></tt></a> 文、 <a class="reference internal" href="../reference/simple_stmts.html#return"><tt class="xref std std-keyword docutils literal"><span class="pre">return</span></tt></a> 文経由で抜ける際にも、
+&#8220;抜ける途中で&#8221; 実行されます。より複雑な例です (<a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 節や <a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節が同じ
+<a class="reference internal" href="../reference/compound_stmts.html#try"><tt class="xref std std-keyword docutils literal"><span class="pre">try</span></tt></a> 文の中にあって、 Python 2.5 以降で動作します)。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">divide</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">y</span>
+<span class="gp">... </span>    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&quot;division by zero!&quot;</span>
+<span class="gp">... </span>    <span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&quot;result is&quot;</span><span class="p">,</span> <span class="n">result</span>
+<span class="gp">... </span>    <span class="k">finally</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">print</span> <span class="s">&quot;executing finally clause&quot;</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">divide</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">result is 2</span>
+<span class="go">executing finally clause</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">divide</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">division by zero!</span>
+<span class="go">executing finally clause</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">divide</span><span class="p">(</span><span class="s">&quot;2&quot;</span><span class="p">,</span> <span class="s">&quot;1&quot;</span><span class="p">)</span>
+<span class="go">executing finally clause</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n-Identifier">?</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">3</span>, in <span class="n-Identifier">divide</span>
+<span class="nc">TypeError: unsupported operand type(s) for /</span>: <span class="n-Identifier">&#39;str&#39; and &#39;str&#39;</span>
+</pre></div>
+</div>
+<p>見てわかるとおり、 <a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節はどの場合にも実行されています。文字列を割り算することで発生した <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> は <a class="reference internal" href="../reference/compound_stmts.html#except"><tt class="xref std std-keyword docutils literal"><span class="pre">except</span></tt></a> 節で処理されていないので、 <a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節実行後に再度送出されています。</p>
+<p>実世界のアプリケーションでは、 <a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節は(ファイルやネットワーク接続などの)外部リソースを、利用が成功したかどうかにかかわらず解放するために便利です。</p>
+</div>
+<div class="section" id="tut-cleanup-with">
+<span id="id8"></span><h2>8.7. 定義済みクリーンアップ処理<a class="headerlink" href="#tut-cleanup-with" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>オブジェクトのなかには、その利用の成否にかかわらず、不要になった際に実行される標準的なクリーンアップ処理が定義されているものがあります。以下の、ファイルをオープンして内容を画面に表示する例をみてください。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s">&quot;myfile.txt&quot;</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">line</span>
+</pre></div>
+</div>
+<p>このコードの問題点は、コードが実行された後に不定の時間ファイルを開いたままでいることです。これは単純なスクリプトでは問題になりませんが、大きなアプリケーションでは問題になりえます。
+<a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 文はファイルのようなオブジェクトが常に、即座に正しくクリーンアップされることを保証します。</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&quot;myfile.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">line</span>
+</pre></div>
+</div>
+<p>この文が実行されたあとで、たとえ行の処理中に問題があったとしても、ファイル <em>f</em> は常に close されます。他の定義済みクリーンアップ処理を持つオブジェクトについては、それぞれのドキュメントで示されます。</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="classes.html" title="9. クラス"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="inputoutput.html" title="7. 入力と出力"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python チュートリアル</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

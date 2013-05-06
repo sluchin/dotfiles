@@ -1,0 +1,1033 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>31.12. dis — Python バイトコードの逆アセンブラ &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="31. Python言語サービス" href="language.html" />
+    <link rel="next" title="31.13. pickletools — pickle 開発者のためのツール群" href="pickletools.html" />
+    <link rel="prev" title="31.11. compileall — Python ライブラリをバイトコンパイル" href="compileall.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pickletools.html" title="31.13. pickletools — pickle 開発者のためのツール群"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="compileall.html" title="31.11. compileall — Python ライブラリをバイトコンパイル"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" accesskey="U">31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">31.12. <tt class="docutils literal"><span class="pre">dis</span></tt> &#8212; Python バイトコードの逆アセンブラ</a><ul>
+<li><a class="reference internal" href="#python">31.12.1. Python バイトコード命令</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="compileall.html"
+                        title="前の章へ">31.11. <tt class="docutils literal docutils literal"><span class="pre">compileall</span></tt> &#8212; Python ライブラリをバイトコンパイル</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="pickletools.html"
+                        title="次の章へ">31.13. <tt class="docutils literal docutils literal"><span class="pre">pickletools</span></tt> &#8212; pickle 開発者のためのツール群</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/dis.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-dis">
+<span id="dis-python"></span><h1>31.12. <a class="reference internal" href="#module-dis" title="dis: Python バイトコードの逆アセンブラ。"><tt class="xref py py-mod docutils literal"><span class="pre">dis</span></tt></a> &#8212; Python バイトコードの逆アセンブラ<a class="headerlink" href="#module-dis" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p><a class="reference internal" href="#module-dis" title="dis: Python バイトコードの逆アセンブラ。"><tt class="xref py py-mod docutils literal"><span class="pre">dis</span></tt></a> モジュールは CPython バイトコード (<a class="reference internal" href="../glossary.html#term-bytecode"><em class="xref std std-term">bytecode</em></a>) を逆アセンブルすることでバイトコードの解析をサポートします。このモジュールが入力として受け取る CPython バイトコードはファイル <tt class="file docutils literal"><span class="pre">Include/opcode.h</span></tt> に定義されており、コンパイラとインタプリタが使用しています。</p>
+<div class="admonition- admonition seealso">
+<p class="first admonition-title">参考</p>
+<p class="last">Latest version of the <a class="reference external" href="http://svn.python.org/view/python/branches/release27-maint/Lib/dis.py?view=markup">dis module Python source code</a></p>
+</div>
+<div class="impl-detail compound">
+<p><strong>CPython implementation detail:</strong> バイトコードは CPython インタプリタの実装詳細です! Python のバージョン間でバイトコードの追加や、削除、変更がないという保証はありません。このモジュールを使用することによって Python の異なる VM または異なるリリースの間で動作すると考えるべきではありません。</p>
+</div>
+<p>例: 以下の関数 <tt class="xref py py-func docutils literal"><span class="pre">myfunc()</span></tt> を考えると</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">myfunc</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><tt class="xref py py-func docutils literal"><span class="pre">myfunc()</span></tt> の逆アセンブル結果を得るために次のコマンドを使うことができます</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">myfunc</span><span class="p">)</span>
+<span class="go">  2           0 LOAD_GLOBAL              0 (len)</span>
+<span class="go">              3 LOAD_FAST                0 (alist)</span>
+<span class="go">              6 CALL_FUNCTION            1</span>
+<span class="go">              9 RETURN_VALUE</span>
+</pre></div>
+</div>
+<p>(&#8220;2&#8221;は行番号です)。</p>
+<p><a class="reference internal" href="#module-dis" title="dis: Python バイトコードの逆アセンブラ。"><tt class="xref py py-mod docutils literal"><span class="pre">dis</span></tt></a> モジュールは次の関数と定数を定義します:</p>
+<dl class="function">
+<dt id="dis.dis">
+<tt class="descclassname">dis.</tt><tt class="descname">dis</tt><big>(</big><span class="optional">[</span><em>bytesource</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#dis.dis" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>bytesource</em> オブジェクトを逆アセンブルします。
+<em>bytesource</em> はモジュール、クラス、関数、あるいはコードオブジェクトのいずれかを示します。モジュールに対しては、すべての関数を逆アセンブルします。クラスに対しては、すべてのメソッドを逆アセンブルします。単一のコード列に対しては、バイトコード命令ごとに 1 行を出力します。オブジェクトが与えられない場合は、最後のトレースバックを逆アセンブルします。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dis.distb">
+<tt class="descclassname">dis.</tt><tt class="descname">distb</tt><big>(</big><span class="optional">[</span><em>tb</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#dis.distb" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>トレースバックのスタックの先頭の関数を逆アセンブルします。
+Noneが渡された場合は最後のトレースバックを使います。例外を引き起こした命令が表示されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dis.disassemble">
+<tt class="descclassname">dis.</tt><tt class="descname">disassemble</tt><big>(</big><em>code</em><span class="optional">[</span>, <em>lasti</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#dis.disassemble" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コードオブジェクトを逆アセンブルします。
+<em>lasti</em> が与えられた場合は、最後の命令を示します。出力は次のようなカラムに分割されます:</p>
+<ol class="arabic simple">
+<li>各行の最初の命令に対する行番号。</li>
+<li>現在の命令。 <tt class="docutils literal"><span class="pre">--&gt;</span></tt> として示されます。</li>
+<li>ラベル付けされた命令。 <tt class="docutils literal"><span class="pre">&gt;&gt;</span></tt> とともに表示されます。</li>
+<li>命令のアドレス。</li>
+<li>命令コード名。</li>
+<li>命令パラメタ。</li>
+<li>パラメタの解釈を括弧で囲んだもの。</li>
+</ol>
+<p>パラメタの解釈は、ローカル変数とグローバル変数の名前、定数の値、分岐先、比較命令を認識します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dis.disco">
+<tt class="descclassname">dis.</tt><tt class="descname">disco</tt><big>(</big><em>code</em><span class="optional">[</span>, <em>lasti</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#dis.disco" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="#dis.disassemble" title="dis.disassemble"><tt class="xref py py-func docutils literal"><span class="pre">disassemble()</span></tt></a> の別名。よりタイプしやすく、以前の
+Python リリースと互換性があります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dis.findlinestarts">
+<tt class="descclassname">dis.</tt><tt class="descname">findlinestarts</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#dis.findlinestarts" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>このジェネレータ関数は、コードオブジェクト <em>code</em> の <tt class="docutils literal"><span class="pre">co_firstlineno</span></tt> と
+<tt class="docutils literal"><span class="pre">co_lnotab</span></tt> 属性を使い、ソースコード内の行が始まる場所であるオフセットを求めます。これらは <tt class="docutils literal"><span class="pre">(offset,</span> <span class="pre">lineno)</span></tt> の対として生成されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="dis.findlabels">
+<tt class="descclassname">dis.</tt><tt class="descname">findlabels</tt><big>(</big><em>code</em><big>)</big><a class="headerlink" href="#dis.findlabels" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ジャンプ先であるコードオブジェクト <em>code</em> のすべてのオフセットを求め、これらのオフセットのリストを返します。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.opname">
+<tt class="descclassname">dis.</tt><tt class="descname">opname</tt><a class="headerlink" href="#dis.opname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>命令コード名のリスト。バイトコードをインデクスに使って参照できます。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.opmap">
+<tt class="descclassname">dis.</tt><tt class="descname">opmap</tt><a class="headerlink" href="#dis.opmap" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>命令コード名をバイトコードに対応づける辞書。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.cmp_op">
+<tt class="descclassname">dis.</tt><tt class="descname">cmp_op</tt><a class="headerlink" href="#dis.cmp_op" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>すべての比較命令の名前のリスト。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.hasconst">
+<tt class="descclassname">dis.</tt><tt class="descname">hasconst</tt><a class="headerlink" href="#dis.hasconst" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>定数パラメタを持つバイトコードのリスト。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.hasfree">
+<tt class="descclassname">dis.</tt><tt class="descname">hasfree</tt><a class="headerlink" href="#dis.hasfree" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>自由変数にアクセスするバイトコードのリスト。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.hasname">
+<tt class="descclassname">dis.</tt><tt class="descname">hasname</tt><a class="headerlink" href="#dis.hasname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>名前によって属性にアクセスするバイトコードのリスト。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.hasjrel">
+<tt class="descclassname">dis.</tt><tt class="descname">hasjrel</tt><a class="headerlink" href="#dis.hasjrel" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>相対ジャンプ先を持つバイトコードのリスト。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.hasjabs">
+<tt class="descclassname">dis.</tt><tt class="descname">hasjabs</tt><a class="headerlink" href="#dis.hasjabs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>絶対ジャンプ先を持つバイトコードのリスト。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.haslocal">
+<tt class="descclassname">dis.</tt><tt class="descname">haslocal</tt><a class="headerlink" href="#dis.haslocal" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ローカル変数にアクセスするバイトコードのリスト。</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="dis.hascompare">
+<tt class="descclassname">dis.</tt><tt class="descname">hascompare</tt><a class="headerlink" href="#dis.hascompare" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブール命令のバイトコードのリスト。</p>
+</dd></dl>
+
+<div class="section" id="python">
+<span id="bytecodes"></span><h2>31.12.1. Python バイトコード命令<a class="headerlink" href="#python" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>現在 Python コンパイラは次のバイトコード命令を生成します。</p>
+<dl class="opcode">
+<dt id="opcode-STOP_CODE">
+<tt class="descname">STOP_CODE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-STOP_CODE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>コンパイラにコードの終わりを知らせます。インタプリタでは使われません。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-NOP">
+<tt class="descname">NOP</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-NOP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>なにもしないコード。バイトコードオプティマイザでプレースホルダとして使われます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-POP_TOP">
+<tt class="descname">POP_TOP</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-POP_TOP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックの先頭 (TOS) の要素を取り除きます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-ROT_TWO">
+<tt class="descname">ROT_TWO</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-ROT_TWO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックの先頭の 2 つの要素を入れ替えます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-ROT_THREE">
+<tt class="descname">ROT_THREE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-ROT_THREE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックの二番目と三番目の要素の位置を 1 つ上げ、先頭を三番目へ下げます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-ROT_FOUR">
+<tt class="descname">ROT_FOUR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-ROT_FOUR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックの二番目、三番目および四番目の位置を 1 つ上げ、先頭を四番目に下げます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DUP_TOP">
+<tt class="descname">DUP_TOP</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-DUP_TOP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックの先頭にある参照の複製を作ります。</p>
+</dd></dl>
+
+<p>単項命令はスタックの先頭を取り出して操作を適用し、結果をスタックへプッシュし戻します。</p>
+<dl class="opcode">
+<dt id="opcode-UNARY_POSITIVE">
+<tt class="descname">UNARY_POSITIVE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-UNARY_POSITIVE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">+TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-UNARY_NEGATIVE">
+<tt class="descname">UNARY_NEGATIVE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-UNARY_NEGATIVE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">-TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-UNARY_NOT">
+<tt class="descname">UNARY_NOT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-UNARY_NOT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">not</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-UNARY_CONVERT">
+<tt class="descname">UNARY_CONVERT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-UNARY_CONVERT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">`TOS`</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-UNARY_INVERT">
+<tt class="descname">UNARY_INVERT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-UNARY_INVERT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">~TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-GET_ITER">
+<tt class="descname">GET_ITER</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-GET_ITER" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">iter(TOS)</span></tt> に対応します。</p>
+</dd></dl>
+
+<p>二項命令はスタックの先頭 (TOS) と先頭から二番目の要素をスタックから取り除きます。命令を実行し、スタックへ結果をプッシュし戻します。</p>
+<dl class="opcode">
+<dt id="opcode-BINARY_POWER">
+<tt class="descname">BINARY_POWER</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_POWER" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">**</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_MULTIPLY">
+<tt class="descname">BINARY_MULTIPLY</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_MULTIPLY" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">*</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_DIVIDE">
+<tt class="descname">BINARY_DIVIDE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_DIVIDE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">division</span></tt> が有効でないときの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">/</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_FLOOR_DIVIDE">
+<tt class="descname">BINARY_FLOOR_DIVIDE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_FLOOR_DIVIDE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">//</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_TRUE_DIVIDE">
+<tt class="descname">BINARY_TRUE_DIVIDE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_TRUE_DIVIDE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">division</span></tt> が有効なときの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">/</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_MODULO">
+<tt class="descname">BINARY_MODULO</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_MODULO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">%</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_ADD">
+<tt class="descname">BINARY_ADD</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_ADD" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">+</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_SUBTRACT">
+<tt class="descname">BINARY_SUBTRACT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_SUBTRACT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">-</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_SUBSCR">
+<tt class="descname">BINARY_SUBSCR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_SUBSCR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1[TOS]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_LSHIFT">
+<tt class="descname">BINARY_LSHIFT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_LSHIFT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">&lt;&lt;</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_RSHIFT">
+<tt class="descname">BINARY_RSHIFT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_RSHIFT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">&gt;&gt;</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_AND">
+<tt class="descname">BINARY_AND</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_AND" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">&amp;</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_XOR">
+<tt class="descname">BINARY_XOR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_XOR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">^</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BINARY_OR">
+<tt class="descname">BINARY_OR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BINARY_OR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">|</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<p>インプレース命令は TOS と TOS1 を取り除いて結果をスタックへプッシュするという点で二項命令と似ています。しかし、TOS1 がインプレース命令をサポートしている場合には操作が直接 TOS1 に行われます。また、操作結果の TOS は (常に同じというわけではありませんが) 元の TOS1 と同じオブジェクトになることが多いです。</p>
+<dl class="opcode">
+<dt id="opcode-INPLACE_POWER">
+<tt class="descname">INPLACE_POWER</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_POWER" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">**</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_MULTIPLY">
+<tt class="descname">INPLACE_MULTIPLY</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_MULTIPLY" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">*</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_DIVIDE">
+<tt class="descname">INPLACE_DIVIDE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_DIVIDE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">division</span></tt> が有効でないときのインプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">/</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_FLOOR_DIVIDE">
+<tt class="descname">INPLACE_FLOOR_DIVIDE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_FLOOR_DIVIDE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">//</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_TRUE_DIVIDE">
+<tt class="descname">INPLACE_TRUE_DIVIDE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_TRUE_DIVIDE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">from</span> <span class="pre">__future__</span> <span class="pre">import</span> <span class="pre">division</span></tt> が有効なときのインプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">/</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_MODULO">
+<tt class="descname">INPLACE_MODULO</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_MODULO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">%</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_ADD">
+<tt class="descname">INPLACE_ADD</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_ADD" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">+</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_SUBTRACT">
+<tt class="descname">INPLACE_SUBTRACT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_SUBTRACT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">-</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_LSHIFT">
+<tt class="descname">INPLACE_LSHIFT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_LSHIFT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">&lt;&lt;</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_RSHIFT">
+<tt class="descname">INPLACE_RSHIFT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_RSHIFT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">&gt;&gt;</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_AND">
+<tt class="descname">INPLACE_AND</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_AND" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">&amp;</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_XOR">
+<tt class="descname">INPLACE_XOR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_XOR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">^</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-INPLACE_OR">
+<tt class="descname">INPLACE_OR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-INPLACE_OR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>インプレースの <tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1</span> <span class="pre">|</span> <span class="pre">TOS</span></tt> に対応します。</p>
+</dd></dl>
+
+<p>スライス命令コードは最大 3 つのパラメタを取ります。</p>
+<dl class="opcode">
+<dt id="opcode-SLICE+0">
+<tt class="descname">SLICE+0</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-SLICE+0" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS[:]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SLICE+1">
+<tt class="descname">SLICE+1</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-SLICE+1" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1[TOS:]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SLICE+2">
+<tt class="descname">SLICE+2</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-SLICE+2" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS1[:TOS]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SLICE+3">
+<tt class="descname">SLICE+3</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-SLICE+3" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span> <span class="pre">=</span> <span class="pre">TOS2[TOS1:TOS]</span></tt> に対応します。</p>
+</dd></dl>
+
+<p>スライス代入はさらにもう 1 つのパラメタを必要とします。他の文と同じく、これらはスタックに何もプッシュしません。</p>
+<dl class="opcode">
+<dt id="opcode-STORE_SLICE+0">
+<tt class="descname">STORE_SLICE+0</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-STORE_SLICE+0" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS[:]</span> <span class="pre">=</span> <span class="pre">TOS1</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_SLICE+1">
+<tt class="descname">STORE_SLICE+1</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-STORE_SLICE+1" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS1[TOS:]</span> <span class="pre">=</span> <span class="pre">TOS2</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_SLICE+2">
+<tt class="descname">STORE_SLICE+2</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-STORE_SLICE+2" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS1[:TOS]</span> <span class="pre">=</span> <span class="pre">TOS2</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_SLICE+3">
+<tt class="descname">STORE_SLICE+3</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-STORE_SLICE+3" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS2[TOS1:TOS]</span> <span class="pre">=</span> <span class="pre">TOS3</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_SLICE+0">
+<tt class="descname">DELETE_SLICE+0</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-DELETE_SLICE+0" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">del</span> <span class="pre">TOS[:]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_SLICE+1">
+<tt class="descname">DELETE_SLICE+1</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-DELETE_SLICE+1" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">del</span> <span class="pre">TOS1[TOS:]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_SLICE+2">
+<tt class="descname">DELETE_SLICE+2</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-DELETE_SLICE+2" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">del</span> <span class="pre">TOS1[:TOS]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_SLICE+3">
+<tt class="descname">DELETE_SLICE+3</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-DELETE_SLICE+3" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">del</span> <span class="pre">TOS2[TOS1:TOS]</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_SUBSCR">
+<tt class="descname">STORE_SUBSCR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-STORE_SUBSCR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS1[TOS]</span> <span class="pre">=</span> <span class="pre">TOS2</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_SUBSCR">
+<tt class="descname">DELETE_SUBSCR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-DELETE_SUBSCR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">del</span> <span class="pre">TOS1[TOS]</span></tt> に対応します。</p>
+</dd></dl>
+
+<p>その他の命令コード。</p>
+<dl class="opcode">
+<dt id="opcode-PRINT_EXPR">
+<tt class="descname">PRINT_EXPR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-PRINT_EXPR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>対話モードのための式文に対応します。TOS はスタックから取り除かれ表示されます。非対話モードにおいては、式文は <tt class="docutils literal"><span class="pre">POP_STACK</span></tt> で終了しています。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-PRINT_ITEM">
+<tt class="descname">PRINT_ITEM</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-PRINT_ITEM" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">sys.stdout</span></tt> に束縛されたファイル互換オブジェクトに対して TOS を出力します。
+<a class="reference internal" href="../reference/simple_stmts.html#print"><tt class="xref std std-keyword docutils literal"><span class="pre">print</span></tt></a> 文の各要素に対してこのような命令が一つずつあります。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-PRINT_ITEM_TO">
+<tt class="descname">PRINT_ITEM_TO</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-PRINT_ITEM_TO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">PRINT_ITEM</span></tt> と似ていますが、TOS から二番目の要素を TOS にあるファイル互換オブジェクトへ出力します。これは拡張 print 文で使われます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-PRINT_NEWLINE">
+<tt class="descname">PRINT_NEWLINE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-PRINT_NEWLINE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">sys.stdout</span></tt> へ改行を表示します。これは <a class="reference internal" href="../reference/simple_stmts.html#print"><tt class="xref std std-keyword docutils literal"><span class="pre">print</span></tt></a> 文がコンマで終わっていない場合に <a class="reference internal" href="../reference/simple_stmts.html#print"><tt class="xref std std-keyword docutils literal"><span class="pre">print</span></tt></a> 文の最後の命令として生成されます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-PRINT_NEWLINE_TO">
+<tt class="descname">PRINT_NEWLINE_TO</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-PRINT_NEWLINE_TO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">PRINT_NEWLINE</span></tt> と似ていますが、TOSのファイル互換オブジェクトに改行を表示します。これは拡張 print 文で使われます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BREAK_LOOP">
+<tt class="descname">BREAK_LOOP</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BREAK_LOOP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/simple_stmts.html#break"><tt class="xref std std-keyword docutils literal"><span class="pre">break</span></tt></a> 文によってループを終了します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-CONTINUE_LOOP">
+<tt class="descname">CONTINUE_LOOP</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#opcode-CONTINUE_LOOP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/simple_stmts.html#continue"><tt class="xref std std-keyword docutils literal"><span class="pre">continue</span></tt></a> 文によってループを継続します。
+<em>target</em> はジャンプするアドレスです (アドレスは <tt class="docutils literal"><span class="pre">FOR_ITER</span></tt> 命令でなければなりません)。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LIST_APPEND">
+<tt class="descname">LIST_APPEND</tt><big>(</big><em>i</em><big>)</big><a class="headerlink" href="#opcode-LIST_APPEND" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">list.append(TOS[-i],</span> <span class="pre">TOS)</span></tt> を呼びます。リスト内包表記を実装するために使われます。要素が取り除かれる間、リストオブジェクトはスタックに残るので、ループの反復をさらに行えます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_LOCALS">
+<tt class="descname">LOAD_LOCALS</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-LOAD_LOCALS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>現在のスコープのローカルな名前空間 (locals) への参照をスタックにプッシュします。これはクラス定義のためのコードで使われます:
+クラス本体が評価された後、locals はクラス定義へ渡されます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-RETURN_VALUE">
+<tt class="descname">RETURN_VALUE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-RETURN_VALUE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>関数の呼び出し元へ TOS を返します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-YIELD_VALUE">
+<tt class="descname">YIELD_VALUE</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-YIELD_VALUE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span></tt> をポップし、それをジェネレータ (<a class="reference internal" href="../glossary.html#term-generator"><em class="xref std std-term">generator</em></a>) から yield します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-IMPORT_STAR">
+<tt class="descname">IMPORT_STAR</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-IMPORT_STAR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">'_'</span></tt> で始まっていないすべてのシンボルをモジュール TOS から直接ローカル名前空間へロードします。モジュールはすべての名前をロードした後にポップされます。この命令コードは <tt class="docutils literal"><span class="pre">from</span> <span class="pre">module</span> <span class="pre">import</span> <span class="pre">*</span></tt> に対応します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-EXEC_STMT">
+<tt class="descname">EXEC_STMT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-EXEC_STMT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">exec</span> <span class="pre">TOS2,TOS1,TOS</span></tt> に対応します。コンパイラは指定されなかったオプションのパラメタを <tt class="docutils literal"><span class="pre">None</span></tt> で埋めます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-POP_BLOCK">
+<tt class="descname">POP_BLOCK</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-POP_BLOCK" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブロックスタックからブロックを一つ取り除きます。フレームごとにブロックのスタックがあり、ネストしたループや try 文などを表しています。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-END_FINALLY">
+<tt class="descname">END_FINALLY</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-END_FINALLY" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/compound_stmts.html#finally"><tt class="xref std std-keyword docutils literal"><span class="pre">finally</span></tt></a> 節を終了します。インタプリタは例外を再送出しなければならないかどうか、あるいは、関数から return して外側の次のブロックに続くかどうかを再度判断します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BUILD_CLASS">
+<tt class="descname">BUILD_CLASS</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-BUILD_CLASS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しいクラスオブジェクトを作成します。TOSはメソッド辞書、TOS1は基底クラスの名前のタプル、TOS2はクラス名です。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SETUP_WITH">
+<tt class="descname">SETUP_WITH</tt><big>(</big><em>delta</em><big>)</big><a class="headerlink" href="#opcode-SETUP_WITH" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この命令コードは、with ブロックが開始する前にいくつかの命令を行います。まず、コンテキストマネージャから <a class="reference internal" href="../reference/datamodel.html#object.__exit__" title="object.__exit__"><tt class="xref py py-meth docutils literal"><span class="pre">__exit__()</span></tt></a> をロードし、後から <a class="reference internal" href="#opcode-WITH_CLEANUP"><tt class="xref std std-opcode docutils literal"><span class="pre">WITH_CLEANUP</span></tt></a> で使うためにスタックにプッシュします。そして、 <a class="reference internal" href="../reference/datamodel.html#object.__enter__" title="object.__enter__"><tt class="xref py py-meth docutils literal"><span class="pre">__enter__()</span></tt></a> が呼び出され、 <em>delta</em> を指す
+finally ブロックがプッシュされます。最後に、enter メソッドを呼び出した結果がスタックにプッシュされます。次の命令コードはこれを無視
+(<a class="reference internal" href="#opcode-POP_TOP"><tt class="xref std std-opcode docutils literal"><span class="pre">POP_TOP</span></tt></a>) するか、変数に保存 (<a class="reference internal" href="#opcode-STORE_FAST"><tt class="xref std std-opcode docutils literal"><span class="pre">STORE_FAST</span></tt></a>,
+<tt class="xref std std-opcode docutils literal"><span class="pre">STORE_NAME</span></tt>, または <a class="reference internal" href="#opcode-UNPACK_SEQUENCE"><tt class="xref std std-opcode docutils literal"><span class="pre">UNPACK_SEQUENCE</span></tt></a>) します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-WITH_CLEANUP">
+<tt class="descname">WITH_CLEANUP</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-WITH_CLEANUP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../reference/compound_stmts.html#with"><tt class="xref std std-keyword docutils literal"><span class="pre">with</span></tt></a> 式ブロックを抜けるときに、スタックをクリーンアップします。スタックの先頭は 1&#8211;3 個の値で、それらはなぜ/どのように finally 節に到達したかを表しています:</p>
+<ul class="simple">
+<li>TOP = <tt class="docutils literal"><span class="pre">None</span></tt></li>
+<li>(TOP, SECOND) = (<tt class="docutils literal"><span class="pre">WHY_{RETURN,CONTINUE}</span></tt>), retval</li>
+<li>TOP = <tt class="docutils literal"><span class="pre">WHY_*</span></tt>; no retval below it</li>
+<li>(TOP, SECOND, THIRD) = exc_info()</li>
+</ul>
+<p>これらの値の下には、コンテキストマネージャーの <a class="reference internal" href="../reference/datamodel.html#object.__exit__" title="object.__exit__"><tt class="xref py py-meth docutils literal"><span class="pre">__exit__()</span></tt></a> 結合メソッド
+(bound method) である EXIT があります。</p>
+<p>最後のケースでは、 <tt class="docutils literal"><span class="pre">EXIT(TOP,</span> <span class="pre">SECOND,</span> <span class="pre">THIRD)</span></tt> が呼ばれ、それ以外では
+<tt class="docutils literal"><span class="pre">EXIT(None,</span> <span class="pre">None,</span> <span class="pre">None)</span></tt> が呼ばれます。</p>
+<p>EXIT はスタックから取り除かれ、その上の値は順序を維持したまま残されます。加えて、スタックが例外処理中であることを示し、 <em>かつ</em> 関数呼び出しが <em>true</em> 値を返した場合、
+<tt class="docutils literal"><span class="pre">END_FINALLY</span></tt> が例外を再送出することを防ぐため、この情報は削除されます (&#8220;zapped&#8221;)。
+(しかし、 non-local goto は再開されます)</p>
+</dd></dl>
+
+<p>以下の命令コードはすべて引数を必要とします。引数は 2 バイトで、最上位バイトが後になります。</p>
+<blockquote>
+<div><tt class="docutils literal"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">TOS</span></tt> に対応します。
+<em>namei</em> はコードオブジェクトの属性 <tt class="xref py py-attr docutils literal"><span class="pre">co_names</span></tt> における <em>name</em> のインデクスです。コンパイラは可能ならば <tt class="docutils literal"><span class="pre">STORE_FAST</span></tt> または <tt class="docutils literal"><span class="pre">STORE_GLOBAL</span></tt> を使おうとします。</div></blockquote>
+<dl class="opcode">
+<dt id="opcode-DELETE_NAME">
+<tt class="descname">DELETE_NAME</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-DELETE_NAME" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">del</span> <span class="pre">name</span></tt> に対応します。 <em>namei</em> はコードオブジェクトの <tt class="xref py py-attr docutils literal"><span class="pre">co_names</span></tt> 属性へのインデクスです。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-UNPACK_SEQUENCE">
+<tt class="descname">UNPACK_SEQUENCE</tt><big>(</big><em>count</em><big>)</big><a class="headerlink" href="#opcode-UNPACK_SEQUENCE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS を <em>count</em> 個の個別の値にアンパックして、右から左の順にスタックに置きます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DUP_TOPX">
+<tt class="descname">DUP_TOPX</tt><big>(</big><em>count</em><big>)</big><a class="headerlink" href="#opcode-DUP_TOPX" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>count</em> 個の要素を順番を保ちながら複製します。実装上の制限から、 <em>count</em> は 1以上 から 5 以下でなければなりません。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_ATTR">
+<tt class="descname">STORE_ATTR</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-STORE_ATTR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS.name</span> <span class="pre">=</span> <span class="pre">TOS1</span></tt> に対応します。 <em>namei</em> は <tt class="xref py py-attr docutils literal"><span class="pre">co_names</span></tt> における名前のインデクスです。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_ATTR">
+<tt class="descname">DELETE_ATTR</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-DELETE_ATTR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">del</span> <span class="pre">TOS.name</span></tt> に対応します。 <tt class="xref py py-attr docutils literal"><span class="pre">co_names</span></tt> へのインデクスとして <em>namei</em> を使います。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_GLOBAL">
+<tt class="descname">STORE_GLOBAL</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-STORE_GLOBAL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">STORE_NAME</span></tt> と同じように動作しますが、 name をグローバルとして保存します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_GLOBAL">
+<tt class="descname">DELETE_GLOBAL</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-DELETE_GLOBAL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">DELETE_NAME</span></tt> と同じように動作しますが、グローバルの name を削除します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_CONST">
+<tt class="descname">LOAD_CONST</tt><big>(</big><em>consti</em><big>)</big><a class="headerlink" href="#opcode-LOAD_CONST" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">co_consts[consti]</span></tt> をスタックにプッシュします。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_NAME">
+<tt class="descname">LOAD_NAME</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-LOAD_NAME" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">co_names[namei]</span></tt> に関連付けられた値をスタックにプッシュします。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BUILD_TUPLE">
+<tt class="descname">BUILD_TUPLE</tt><big>(</big><em>count</em><big>)</big><a class="headerlink" href="#opcode-BUILD_TUPLE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックから <em>count</em> 個の要素を消費してタプルを作り出し、できたタプルをスタックにプッシュします。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BUILD_LIST">
+<tt class="descname">BUILD_LIST</tt><big>(</big><em>count</em><big>)</big><a class="headerlink" href="#opcode-BUILD_LIST" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">BUILD_TUPLE</span></tt> と同じように動作しますが、リストを作り出します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BUILD_MAP">
+<tt class="descname">BUILD_MAP</tt><big>(</big><em>count</em><big>)</big><a class="headerlink" href="#opcode-BUILD_MAP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>スタックに新しい辞書オブジェクトをプッシュします。辞書は <em>count</em> 個のエントリを持つサイズに設定されます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_ATTR">
+<tt class="descname">LOAD_ATTR</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-LOAD_ATTR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS を <tt class="docutils literal"><span class="pre">getattr(TOS,</span> <span class="pre">co_names[namei])</span></tt> と入れ替えます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-COMPARE_OP">
+<tt class="descname">COMPARE_OP</tt><big>(</big><em>opname</em><big>)</big><a class="headerlink" href="#opcode-COMPARE_OP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ブール命令を実行します。命令名は <tt class="docutils literal"><span class="pre">cmp_op[opname]</span></tt> にあります。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-IMPORT_NAME">
+<tt class="descname">IMPORT_NAME</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-IMPORT_NAME" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>モジュール <tt class="docutils literal"><span class="pre">co_names[namei]</span></tt> をインポートします。
+TOS と TOS1 がポップされ、 <a class="reference internal" href="functions.html#__import__" title="__import__"><tt class="xref py py-func docutils literal"><span class="pre">__import__()</span></tt></a> の <em>fromlist</em> と <em>level</em> 引数になります。モジュールオブジェクトはスタックへプッシュされます。現在の名前空間は影響されません:
+適切な import 文のためには、後続の <tt class="docutils literal"><span class="pre">STORE_FAST</span></tt> 命令が名前空間を変更します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-IMPORT_FROM">
+<tt class="descname">IMPORT_FROM</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-IMPORT_FROM" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS にあるモジュールから属性 <tt class="docutils literal"><span class="pre">co_names[namei]</span></tt> をロードします。作成されたオブジェクトはスタックにプッシュされ、後続の <tt class="docutils literal"><span class="pre">STORE_FAST</span></tt> 命令によって保存されます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-JUMP_FORWARD">
+<tt class="descname">JUMP_FORWARD</tt><big>(</big><em>delta</em><big>)</big><a class="headerlink" href="#opcode-JUMP_FORWARD" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バイトコードカウンタを <em>delta</em> だけ増加させます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-POP_JUMP_IF_TRUE">
+<tt class="descname">POP_JUMP_IF_TRUE</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#opcode-POP_JUMP_IF_TRUE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS が真ならば、バイトコードカウンタを <em>target</em> に設定します。
+TOS はポップされます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-POP_JUMP_IF_FALSE">
+<tt class="descname">POP_JUMP_IF_FALSE</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#opcode-POP_JUMP_IF_FALSE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS が偽ならば、バイトコードカウンタを <em>target</em> に設定します。
+TOS はポップされます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-JUMP_IF_TRUE_OR_POP">
+<tt class="descname">JUMP_IF_TRUE_OR_POP</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#opcode-JUMP_IF_TRUE_OR_POP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS が真ならば、バイトコードカウンタを <em>target</em> に設定し、TOS はスタックに残されます。そうでない (TOS が偽) なら、TOS はポップされます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-JUMP_IF_FALSE_OR_POP">
+<tt class="descname">JUMP_IF_FALSE_OR_POP</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#opcode-JUMP_IF_FALSE_OR_POP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS が偽ならば、バイトコードカウンタを <em>target</em> に設定し、TOS はスタックに残されます。そうでない (TOS が真) なら、TOS はポップされます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-JUMP_ABSOLUTE">
+<tt class="descname">JUMP_ABSOLUTE</tt><big>(</big><em>target</em><big>)</big><a class="headerlink" href="#opcode-JUMP_ABSOLUTE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>バイトコードカウンタを <em>target</em> に設定します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-FOR_ITER">
+<tt class="descname">FOR_ITER</tt><big>(</big><em>delta</em><big>)</big><a class="headerlink" href="#opcode-FOR_ITER" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">TOS</span></tt> はイテレータです。その <tt class="xref py py-meth docutils literal"><span class="pre">next()</span></tt> メソッドを呼び出します。新しい値が yield された場合は、それをスタックにプッシュします (イテレータはその下に残されます)。イテレータの呼び出しで要素が尽きたことが示された場合は、 <tt class="docutils literal"><span class="pre">TOS</span></tt> がポップされます。そして、バイトコードカウンタが <em>delta</em> だけ増やされます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_GLOBAL">
+<tt class="descname">LOAD_GLOBAL</tt><big>(</big><em>namei</em><big>)</big><a class="headerlink" href="#opcode-LOAD_GLOBAL" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">co_names[namei]</span></tt> という名前のグローバルをスタック上にロードします。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SETUP_LOOP">
+<tt class="descname">SETUP_LOOP</tt><big>(</big><em>delta</em><big>)</big><a class="headerlink" href="#opcode-SETUP_LOOP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ループのためのブロックをブロックスタックにプッシュします。ブロックは現在の命令から <em>delta</em> バイトの大きさを占めます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SETUP_EXCEPT">
+<tt class="descname">SETUP_EXCEPT</tt><big>(</big><em>delta</em><big>)</big><a class="headerlink" href="#opcode-SETUP_EXCEPT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>try-except 節から try ブロックをブロックスタックにプッシュします。
+<em>delta</em> は最初の except ブロックを指します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SETUP_FINALLY">
+<tt class="descname">SETUP_FINALLY</tt><big>(</big><em>delta</em><big>)</big><a class="headerlink" href="#opcode-SETUP_FINALLY" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>try-except 節から try ブロックをブロックスタックにプッシュします。
+<em>delta</em> は finally ブロックを指します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_MAP">
+<tt class="descname">STORE_MAP</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-STORE_MAP" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>key, value のペアを辞書に格納します。
+key と value をポップする一方、辞書はスタックに残されます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_FAST">
+<tt class="descname">LOAD_FAST</tt><big>(</big><em>var_num</em><big>)</big><a class="headerlink" href="#opcode-LOAD_FAST" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ローカルな <tt class="docutils literal"><span class="pre">co_varnames[var_num]</span></tt> への参照をスタックにプッシュします。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_FAST">
+<tt class="descname">STORE_FAST</tt><big>(</big><em>var_num</em><big>)</big><a class="headerlink" href="#opcode-STORE_FAST" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>TOS をローカルな <tt class="docutils literal"><span class="pre">co_varnames[var_num]</span></tt> の中に保存します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-DELETE_FAST">
+<tt class="descname">DELETE_FAST</tt><big>(</big><em>var_num</em><big>)</big><a class="headerlink" href="#opcode-DELETE_FAST" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ローカルな <tt class="docutils literal"><span class="pre">co_varnames[var_num]</span></tt> を削除します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_CLOSURE">
+<tt class="descname">LOAD_CLOSURE</tt><big>(</big><em>i</em><big>)</big><a class="headerlink" href="#opcode-LOAD_CLOSURE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セルと自由変数の記憶領域のスロット <em>i</em> に含まれるセルへの参照をプッシュします。
+<em>i</em> が <em>co_cellvars</em> の長さより小さければ、変数の名前は <tt class="docutils literal"><span class="pre">co_cellvars[i]</span></tt> です。そうでなければ <tt class="docutils literal"><span class="pre">co_freevars[i</span> <span class="pre">-</span> <span class="pre">len(co_cellvars)]</span></tt> です。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-LOAD_DEREF">
+<tt class="descname">LOAD_DEREF</tt><big>(</big><em>i</em><big>)</big><a class="headerlink" href="#opcode-LOAD_DEREF" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セルと自由変数の記憶領域のスロット <em>i</em> に含まれるセルをロードします。セルが持つオブジェクトへの参照をスタックにプッシュします。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-STORE_DEREF">
+<tt class="descname">STORE_DEREF</tt><big>(</big><em>i</em><big>)</big><a class="headerlink" href="#opcode-STORE_DEREF" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セルと自由変数の記憶領域のスロット <em>i</em> に含まれるセルへTOSを保存します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-SET_LINENO">
+<tt class="descname">SET_LINENO</tt><big>(</big><em>lineno</em><big>)</big><a class="headerlink" href="#opcode-SET_LINENO" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この命令コードは廃止されました。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-RAISE_VARARGS">
+<tt class="descname">RAISE_VARARGS</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-RAISE_VARARGS" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>例外を発生させます。 <em>argc</em> は raise 文へ与えるパラメタの数を 0 から 3 の範囲で示します。ハンドラは TOS2 をトレースバック、TOS1 をパラメタ、TOS を例外として探します。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-CALL_FUNCTION">
+<tt class="descname">CALL_FUNCTION</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-CALL_FUNCTION" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>関数を呼び出します。 <em>argc</em> の下位バイトは位置パラメタの数を、上位バイトはキーワードパラメタの数を示します。スタック上では、最初にキーワードパラメタが見つかります。それぞれのキーワード引数に対しては、値がキーより上に来ます。スタック上のキーワードパラメタの下に位置パラメタがあり、最も右のパラメタが先頭になります。スタック上のパラメタの下には、呼び出される関数オブジェクトが置かれます。すべての関数引数をポップし、関数自体もスタックから取り除き、戻り値をプッシュします。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-MAKE_FUNCTION">
+<tt class="descname">MAKE_FUNCTION</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-MAKE_FUNCTION" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい関数オブジェクトをスタックにプッシュします。
+TOS は関数に関連付けられたコードです。関数オブジェクトは TOS の下にある <em>argc</em> デフォルトパラメタをもつように定義されます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-MAKE_CLOSURE">
+<tt class="descname">MAKE_CLOSURE</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-MAKE_CLOSURE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>新しい関数オブジェクトを作り出し、その <em>func_closure</em> スロットを設定し、スタックにプッシュします。
+TOS は関数に関連付けられたコードで、TOS1 はクロージャの自由変数に対するセルを格納したタプルです。関数はセルの前にある <em>argc</em> デフォルトパラメタも持っています。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-BUILD_SLICE">
+<tt class="descname">BUILD_SLICE</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-BUILD_SLICE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-0">スライスオブジェクトをスタックにプッシュします。 <em>argc</em> は2あるいは3でなければなりません。
+2 ならば <tt class="docutils literal"><span class="pre">slice(TOS1,</span> <span class="pre">TOS)</span></tt> がプッシュされます。
+3 ならば <tt class="docutils literal"><span class="pre">slice(TOS2,</span> <span class="pre">TOS1,</span> <span class="pre">TOS)</span></tt> がプッシュされます。これ以上の情報については、 <a class="reference internal" href="functions.html#slice" title="slice"><tt class="xref py py-func docutils literal"><span class="pre">slice()</span></tt></a> 組み込み関数を参照してください。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-EXTENDED_ARG">
+<tt class="descname">EXTENDED_ARG</tt><big>(</big><em>ext</em><big>)</big><a class="headerlink" href="#opcode-EXTENDED_ARG" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>デフォルトの 2 バイトに収まりきらない大きな引数を持つあらゆる命令コードの前に置かれます。
+<em>ext</em> は追加の 2 バイトを保持し、後続の命令コードの引数と組み合わされます。それらは 4 バイト引数を構成し、 <em>ext</em> はその最上位バイトです。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-CALL_FUNCTION_VAR">
+<tt class="descname">CALL_FUNCTION_VAR</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-CALL_FUNCTION_VAR" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>関数を呼び出します。 <em>argc</em> は <tt class="docutils literal"><span class="pre">CALL_FUNCTION</span></tt> と同じように解釈されます。スタックの先頭の要素は可変引数リストを含んでおり、その後にキーワード引数と位置引数が続きます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-CALL_FUNCTION_KW">
+<tt class="descname">CALL_FUNCTION_KW</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-CALL_FUNCTION_KW" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>関数を呼び出します。 <em>argc</em> は <tt class="docutils literal"><span class="pre">CALL_FUNCTION</span></tt> と同じように解釈されます。スタックの先頭の要素はキーワード引数辞書を含んでおり、その後に明示的なキーワード引数と位置引数が続きます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-CALL_FUNCTION_VAR_KW">
+<tt class="descname">CALL_FUNCTION_VAR_KW</tt><big>(</big><em>argc</em><big>)</big><a class="headerlink" href="#opcode-CALL_FUNCTION_VAR_KW" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>関数を呼び出します。 <em>argc</em> は <tt class="docutils literal"><span class="pre">CALL_FUNCTION</span></tt> と同じように解釈されます。スタックの先頭の要素はキーワード引数辞書を含んでおり、その後に変数引数のタプルが続き、さらに明示的なキーワード引数と位置引数が続きます。</p>
+</dd></dl>
+
+<dl class="opcode">
+<dt id="opcode-HAVE_ARGUMENT">
+<tt class="descname">HAVE_ARGUMENT</tt><big>(</big><em></em><big>)</big><a class="headerlink" href="#opcode-HAVE_ARGUMENT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>これは実際の命令コードではありません。引数を取らない命令コード <tt class="docutils literal"><span class="pre">&lt;</span> <span class="pre">HAVE_ARGUMENT</span></tt>  と、引数を取る命令コード <tt class="docutils literal"><span class="pre">&gt;=</span> <span class="pre">HAVE_ARGUMENT</span></tt> の分割行を表します。</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="pickletools.html" title="31.13. pickletools — pickle 開発者のためのツール群"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="compileall.html" title="31.11. compileall — Python ライブラリをバイトコンパイル"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="language.html" >31. Python言語サービス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

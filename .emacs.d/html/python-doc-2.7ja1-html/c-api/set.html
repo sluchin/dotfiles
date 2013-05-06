@@ -1,0 +1,289 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>集合オブジェクト (Set Objects) &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="具象オブジェクト (concrete object) レイヤ" href="concrete.html" />
+    <link rel="next" title="コードオブジェクト" href="code.html" />
+    <link rel="prev" title="DateTime オブジェクト" href="datetime.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="コードオブジェクト"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="datetime.html" title="DateTime オブジェクト"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" accesskey="U">具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="datetime.html"
+                        title="前の章へ">DateTime オブジェクト</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="code.html"
+                        title="次の章へ">コードオブジェクト</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/set.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="set-objects">
+<span id="setobjects"></span><h1>集合オブジェクト (Set Objects)<a class="headerlink" href="#set-objects" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p class="versionadded" id="index-0">
+<span class="versionmodified">バージョン 2.5 で追加.</span></p>
+<p>このセクションでは <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> と <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> の公開 API について詳しく述べます。以降で説明していない機能は、抽象オブジェクトプロトコル ( <a class="reference internal" href="object.html#PyObject_CallMethod" title="PyObject_CallMethod"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_CallMethod()</span></tt></a>,
+<a class="reference internal" href="object.html#PyObject_RichCompareBool" title="PyObject_RichCompareBool"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_RichCompareBool()</span></tt></a>, <a class="reference internal" href="object.html#PyObject_Hash" title="PyObject_Hash"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_Hash()</span></tt></a>,
+<a class="reference internal" href="object.html#PyObject_Repr" title="PyObject_Repr"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_Repr()</span></tt></a>, <a class="reference internal" href="object.html#PyObject_IsTrue" title="PyObject_IsTrue"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_IsTrue()</span></tt></a>, <a class="reference internal" href="object.html#PyObject_Print" title="PyObject_Print"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_Print()</span></tt></a>,
+<a class="reference internal" href="object.html#PyObject_GetIter" title="PyObject_GetIter"><tt class="xref c c-func docutils literal"><span class="pre">PyObject_GetIter()</span></tt></a> を含む) か抽象数値プロトコル ( <a class="reference internal" href="number.html#PyNumber_Add" title="PyNumber_Add"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_Add()</span></tt></a>,
+<a class="reference internal" href="number.html#PyNumber_Subtract" title="PyNumber_Subtract"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_Subtract()</span></tt></a>, <a class="reference internal" href="number.html#PyNumber_Or" title="PyNumber_Or"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_Or()</span></tt></a>, <a class="reference internal" href="number.html#PyNumber_Xor" title="PyNumber_Xor"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_Xor()</span></tt></a>,
+<a class="reference internal" href="number.html#PyNumber_InPlaceAdd" title="PyNumber_InPlaceAdd"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_InPlaceAdd()</span></tt></a>, <a class="reference internal" href="number.html#PyNumber_InPlaceSubtract" title="PyNumber_InPlaceSubtract"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_InPlaceSubtract()</span></tt></a>,
+<a class="reference internal" href="number.html#PyNumber_InPlaceOr" title="PyNumber_InPlaceOr"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_InPlaceOr()</span></tt></a>, <a class="reference internal" href="number.html#PyNumber_InPlaceXor" title="PyNumber_InPlaceXor"><tt class="xref c c-func docutils literal"><span class="pre">PyNumber_InPlaceXor()</span></tt></a> を含む) を使って利用できます。</p>
+<dl class="type">
+<dt id="PySetObject">
+<tt class="descname">PySetObject</tt><a class="headerlink" href="#PySetObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="structures.html#PyObject" title="PyObject"><tt class="xref c c-type docutils literal"><span class="pre">PyObject</span></tt></a> を継承した型は、 <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> と <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> 両方の内部データを保存するのに用いられます。 <a class="reference internal" href="dict.html#PyDictObject" title="PyDictObject"><tt class="xref c c-type docutils literal"><span class="pre">PyDictObject</span></tt></a>
+と同じように、小さい集合(set)に対しては(タプルのように)固定サイズであり、そうでない集合に対しては(リストと同じように)可変長のメモリブロックを用います。この構造体のどのフィールドも、非公開で変更される可能性があると考えて下さい。すべてのアクセスは、構造体の中の値を直接操作するのではなく、ドキュメントされた API を用いて行うべきです。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="PySet_Type">
+<a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a> <tt class="descname">PySet_Type</tt><a class="headerlink" href="#PySet_Type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject"><tt class="xref c c-type docutils literal"><span class="pre">PyTypeObject</span></tt></a> のインスタンスは、Python の <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> 型を表します。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="PyFrozenSet_Type">
+<a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a> <tt class="descname">PyFrozenSet_Type</tt><a class="headerlink" href="#PyFrozenSet_Type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject"><tt class="xref c c-type docutils literal"><span class="pre">PyTypeObject</span></tt></a> のインスタンスは、Python の <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> 型を表します。</p>
+</dd></dl>
+
+<p>以降の型チェックマクロはすべての Python オブジェクトに対するポインタに対して動作します。同様に、コンストラクタはすべてのイテレート可能な Python オブジェクトに対して動作します。</p>
+<dl class="function">
+<dt id="PySet_Check">
+int <tt class="descname">PySet_Check</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PySet_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>p</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> かそのサブタイプのオブジェクトであるときに真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyFrozenSet_Check">
+int <tt class="descname">PyFrozenSet_Check</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyFrozenSet_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>p</em> が <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> かそのサブタイプのオブジェクトであるときに真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyAnySet_Check">
+int <tt class="descname">PyAnySet_Check</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyAnySet_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>p</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> か <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> 、あるいはそのサブタイプのオブジェクトであれば、true を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyAnySet_CheckExact">
+int <tt class="descname">PyAnySet_CheckExact</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyAnySet_CheckExact" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>p</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> か <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> のどちらかのオブジェクトであるときに true を返します。サブタイプのオブジェクトは含みません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyFrozenSet_CheckExact">
+int <tt class="descname">PyFrozenSet_CheckExact</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyFrozenSet_CheckExact" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>p</em> が <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> のオブジェクトであるときに true を返します。サブタイプのオブジェクトは含みません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PySet_New">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PySet_New</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*iterable</em><big>)</big><a class="headerlink" href="#PySet_New" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>iterable</em> が返すオブジェクトを含む新しい <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> を返します。 <em>iterable</em> が <em>NULL</em>
+のときは、空の set を返します。成功したら新しい set を、失敗したら <em>NULL</em> を返します。 <em>iterable</em> がイテレート可能で無い場合は、
+<a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。このコンストラクタは set をコピーするときにも使えます。 (<tt class="docutils literal"><span class="pre">c=set(s)</span></tt>)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyFrozenSet_New">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyFrozenSet_New</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*iterable</em><big>)</big><a class="headerlink" href="#PyFrozenSet_New" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>iterable</em> が返すオブジェクトを含む新しい <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> を返します。 <em>iterable</em> が <em>NULL</em>
+のときは、空の frozenset を返します。 <em>iterable</em> がイテレート可能で無い場合は、 <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>完全に新しい <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> オブジェクトを返すことが保証されるように
+なりました。以前は、大きさがゼロの frozenset はシングルトンでした。
+これは新しい frozenset を <tt class="xref py py-meth docutils literal"><span class="pre">PySet_Add()</span></tt> を使って作成するためです。</p>
+</dd></dl>
+
+<p>以降の関数やマクロは、 <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> と <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> とそのサブタイプのインスタンスに対して利用できます。</p>
+<dl class="function">
+<dt id="PySet_Size">
+Py_ssize_t <tt class="descname">PySet_Size</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*anyset</em><big>)</big><a class="headerlink" href="#PySet_Size" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p id="index-1"><a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> や <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> のオブジェクトの長さを返します。 <tt class="docutils literal"><span class="pre">len(anyset)</span></tt> と同じです。
+<em>anyset</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> 、 <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> 及びそのサブタイプのオブジェクトで無い場合は、 <tt class="xref py py-exc docutils literal"><span class="pre">PyExc_SystemError</span></tt> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.5 で変更: </span>これらの関数は以前は <tt class="xref c c-type docutils literal"><span class="pre">int</span></tt> を返していました。
+この変更により、 64bit システムを正しくサポートするには修正が必要になります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PySet_GET_SIZE">
+Py_ssize_t <tt class="descname">PySet_GET_SIZE</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*anyset</em><big>)</big><a class="headerlink" href="#PySet_GET_SIZE" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>エラーチェックを行わない、 <a class="reference internal" href="#PySet_Size" title="PySet_Size"><tt class="xref c c-func docutils literal"><span class="pre">PySet_Size()</span></tt></a> のマクロ形式。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PySet_Contains">
+int <tt class="descname">PySet_Contains</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*anyset</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*key</em><big>)</big><a class="headerlink" href="#PySet_Contains" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>見つかったら 1 を、見つからなかったら 0 を、エラーが発生したときは -1 を返します。 Python の <a class="reference internal" href="../reference/datamodel.html#object.__contains__" title="object.__contains__"><tt class="xref py py-meth docutils literal"><span class="pre">__contains__()</span></tt></a>
+メソッドと違って、この関数は非ハッシュ set を一時 frozenset に自動で変換しません。
+<em>key</em> がハッシュ可能で無い場合、 <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。 <em>anyset</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a>,
+<a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> 及びそのサブタイプのオブジェクトで無い場合は <tt class="xref py py-exc docutils literal"><span class="pre">PyExc_SystemError</span></tt> を送出します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PySet_Add">
+int <tt class="descname">PySet_Add</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*set</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*key</em><big>)</big><a class="headerlink" href="#PySet_Add" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> のインスタンスに <em>key</em> を追加します。 <a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> のインスタンスに使わないで下さい。成功したら 0 を、失敗したら -1 を返します。 <em>key</em> がハッシュ可能でないなら、 <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。
+set を大きくする余裕が無い場合は、 <a class="reference internal" href="../library/exceptions.html#exceptions.MemoryError" title="exceptions.MemoryError"><tt class="xref py py-exc docutils literal"><span class="pre">MemoryError</span></tt></a> を送出します。
+<em>set</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> とそのサブタイプのインスタンスで無い場合は、 <a class="reference internal" href="../library/exceptions.html#exceptions.SystemError" title="exceptions.SystemError"><tt class="xref py py-exc docutils literal"><span class="pre">SystemError</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span><a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> やそのサブタイプのインスタンスに対して利用できる
+ようになりました。
+<a class="reference internal" href="tuple.html#PyTuple_SetItem" title="PyTuple_SetItem"><tt class="xref c c-func docutils literal"><span class="pre">PyTuple_SetItem()</span></tt></a> のように、新しい frozenset を他のコードに渡す
+まえに内容を追加するためのに使うことができます。</p>
+</dd></dl>
+
+<p>以降の関数は、 <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> とそのサブタイプに対して利用可能です。
+<a class="reference internal" href="../library/stdtypes.html#frozenset" title="frozenset"><tt class="xref py py-class docutils literal"><span class="pre">frozenset</span></tt></a> とそのサブタイプには利用できません。</p>
+<dl class="function">
+<dt id="PySet_Discard">
+int <tt class="descname">PySet_Discard</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*set</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*key</em><big>)</big><a class="headerlink" href="#PySet_Discard" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>見つかって削除したら 1 を返します。見つからなかったら何もせずに 0 を返します。エラーが発生したら -1 を返します。
+key が無くても <a class="reference internal" href="../library/exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を送出しません。 <em>key</em> がハッシュ不可能であれば <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。
+Python の <tt class="xref py py-meth docutils literal"><span class="pre">discard()</span></tt> メソッドと違って、この関数は非ハッシュ set を一時 frozenset に変換しません。
+<em>set</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> とそのサブタイプのインスタンスで無いときは、 <tt class="xref py py-exc docutils literal"><span class="pre">PyExc_SystemError</span></tt> を送出します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PySet_Pop">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PySet_Pop</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*set</em><big>)</big><a class="headerlink" href="#PySet_Pop" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>set</em> の中の要素のどれかに対する新しい参照を返し、そのオブジェクトを <em>set</em> から削除します。失敗したら <em>NULL</em> を返します。
+set が空の場合には <a class="reference internal" href="../library/exceptions.html#exceptions.KeyError" title="exceptions.KeyError"><tt class="xref py py-exc docutils literal"><span class="pre">KeyError</span></tt></a> を送出します。 <em>set</em> が <a class="reference internal" href="../library/stdtypes.html#set" title="set"><tt class="xref py py-class docutils literal"><span class="pre">set</span></tt></a> とそのサブタイプのインスタンスで無い場合は、
+<a class="reference internal" href="../library/exceptions.html#exceptions.SystemError" title="exceptions.SystemError"><tt class="xref py py-exc docutils literal"><span class="pre">SystemError</span></tt></a> を送出します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PySet_Clear">
+int <tt class="descname">PySet_Clear</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*set</em><big>)</big><a class="headerlink" href="#PySet_Clear" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>set を空にします。</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="code.html" title="コードオブジェクト"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="datetime.html" title="DateTime オブジェクト"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" >具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

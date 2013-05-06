@@ -1,0 +1,430 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>10.1. os.path — 共通のパス名操作 &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="next" title="10.2. fileinput — 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。" href="fileinput.html" />
+    <link rel="prev" title="10. ファイルとディレクトリへのアクセス" href="filesys.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fileinput.html" title="10.2. fileinput — 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="filesys.html" title="10. ファイルとディレクトリへのアクセス"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" accesskey="U">10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="filesys.html"
+                        title="前の章へ">10. ファイルとディレクトリへのアクセス</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="fileinput.html"
+                        title="次の章へ">10.2. <tt class="docutils literal docutils literal"><span class="pre">fileinput</span></tt> &#8212; 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/library/os.path.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-os.path">
+<span id="os-path"></span><h1>10.1. <a class="reference internal" href="#module-os.path" title="os.path: Operations on pathnames."><tt class="xref py py-mod docutils literal"><span class="pre">os.path</span></tt></a> &#8212; 共通のパス名操作<a class="headerlink" href="#module-os.path" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">このモジュールには、パス名を操作する便利な関数が定義されています。ファイルの読み書きに関しては、 <a class="reference internal" href="functions.html#open" title="open"><tt class="xref py py-func docutils literal"><span class="pre">open()</span></tt></a> 、ファイルシステムへのアクセスに関しては、 <a class="reference internal" href="os.html#module-os" title="os: 雑多なオペレーティングシステムインタフェース。"><tt class="xref py py-mod docutils literal"><span class="pre">os</span></tt></a> モジュールを参照下さい。</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">これらの関数の多くは Windows の一律命名規則 (UNCパス名) を正しくサポートしていません。 <a class="reference internal" href="#os.path.splitunc" title="os.path.splitunc"><tt class="xref py py-func docutils literal"><span class="pre">splitunc()</span></tt></a> と <a class="reference internal" href="#os.path.ismount" title="os.path.ismount"><tt class="xref py py-func docutils literal"><span class="pre">ismount()</span></tt></a> は正しく
+UNC パス名を操作できます。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p>OSによって異なるパスの決まりがあるので、標準ライブラリにはこのモジュールの幾つかのバージョンが含まれています。 <a class="reference internal" href="#module-os.path" title="os.path: Operations on pathnames."><tt class="xref py py-mod docutils literal"><span class="pre">os.path</span></tt></a> モジュールは常に現在
+Pythonが動作しているOSに適したパスモジュールで、ローカルのパスを扱うのに適しています。各々のモジュールをインポートして <em>常に</em> 一つのフォーマットを利用することも可能です。これらは全て同じインタフェースを持っています。:</p>
+<ul class="last simple">
+<li><tt class="xref py py-mod docutils literal"><span class="pre">posixpath</span></tt> for UNIX-style paths</li>
+<li><tt class="xref py py-mod docutils literal"><span class="pre">ntpath</span></tt> for Windows paths</li>
+<li><a class="reference internal" href="macpath.html#module-macpath" title="macpath: Mac OS 9 のパス操作関数"><tt class="xref py py-mod docutils literal"><span class="pre">macpath</span></tt></a> for old-style MacOS paths</li>
+<li><tt class="xref py py-mod docutils literal"><span class="pre">os2emxpath</span></tt> for OS/2 EMX paths</li>
+</ul>
+</div>
+<dl class="function">
+<dt id="os.path.abspath">
+<tt class="descclassname">os.path.</tt><tt class="descname">abspath</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.abspath" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> の標準化された絶対パスを返します。たいていのプラットフォームでは、 <tt class="docutils literal"><span class="pre">normpath(join(os.getcwd(),</span> <span class="pre">path))</span></tt> と同じ結果になります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.basename">
+<tt class="descclassname">os.path.</tt><tt class="descname">basename</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.basename" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名 <em>path</em> の末尾のファイル名を返します。これは <tt class="docutils literal"><span class="pre">split(path)</span></tt>
+で返されるペアの2番目の要素です。この関数が返す値は Unix の
+<strong class="program">basename</strong> とは異なります; Unix の <strong class="program">basename</strong> は
+<tt class="docutils literal"><span class="pre">'/foo/bar/'</span></tt> に対して <tt class="docutils literal"><span class="pre">'bar'</span></tt> を返しますが、 <a class="reference internal" href="#os.path.basename" title="os.path.basename"><tt class="xref py py-func docutils literal"><span class="pre">basename()</span></tt></a>
+は空文字列 (<tt class="docutils literal"><span class="pre">''</span></tt>) を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.commonprefix">
+<tt class="descclassname">os.path.</tt><tt class="descname">commonprefix</tt><big>(</big><em>list</em><big>)</big><a class="headerlink" href="#os.path.commonprefix" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パスの <em>list</em> の中の共通する最長のプレフィックスを (パス名の1文字1
+文字を判断して) 返します。もし <em>list</em> が空なら、空文字列 (<tt class="docutils literal"><span class="pre">''</span></tt>) を返します。これは一度に1文字を扱うため、不正なパスを返すことがあるかもしれませんので注意して下さい。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.dirname">
+<tt class="descclassname">os.path.</tt><tt class="descname">dirname</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.dirname" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス <em>path</em> のディレクトリ名を返します。これは <tt class="docutils literal"><span class="pre">split(path)</span></tt> で返されるペアの最初の要素です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.exists">
+<tt class="descclassname">os.path.</tt><tt class="descname">exists</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.exists" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> が存在するなら、 <tt class="docutils literal"><span class="pre">True</span></tt> を返します。壊れたシンボリックリンクについては <tt class="docutils literal"><span class="pre">False</span></tt> を返します。いくつかのプラットフォームでは、たとえ <em>path</em> が物理的に存在していたとしても、リクエストされたファイルに対する <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> の実行が許可されなければこの関数が
+<tt class="docutils literal"><span class="pre">False</span></tt> を返すことがあります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.lexists">
+<tt class="descclassname">os.path.</tt><tt class="descname">lexists</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.lexists" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> が存在するパスなら <tt class="docutils literal"><span class="pre">True</span></tt> を返す。壊れたシンボリックリンクについては <tt class="docutils literal"><span class="pre">True</span></tt> を返します。
+<a class="reference internal" href="os.html#os.lstat" title="os.lstat"><tt class="xref py py-func docutils literal"><span class="pre">os.lstat()</span></tt></a> がない環境では <a class="reference internal" href="#os.path.exists" title="os.path.exists"><tt class="xref py py-func docutils literal"><span class="pre">exists()</span></tt></a> と同じです。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.4 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.expanduser">
+<tt class="descclassname">os.path.</tt><tt class="descname">expanduser</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.expanduser" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Unix 、および、 Windows では、与えられた引数の先頭のパス要素 <tt class="docutils literal"><span class="pre">~</span></tt>
+、または <tt class="docutils literal"><span class="pre">~user</span></tt> を、 <em>user</em> のホームディレクトリのパスに置き換えて返します。</p>
+<p id="index-1">Unix では、先頭の <tt class="docutils literal"><span class="pre">~</span></tt> は、環境変数 <span class="target" id="index-2"></span><tt class="xref std std-envvar docutils literal"><span class="pre">HOME</span></tt> が設定されているならその値に置き換えられます。そうでなければ、現在のユーザのホームディレクトリをビルトインモジュール <a class="reference internal" href="pwd.html#module-pwd" title="pwd: パスワードデータベースへのアクセスを提供する (getpwnam() など)。 (Unix)"><tt class="xref py py-mod docutils literal"><span class="pre">pwd</span></tt></a> を使ってパスワードディレクトリから探して置き換えます。先頭の <tt class="docutils literal"><span class="pre">~user</span></tt> については、直接パスワードディレクトリから探します。</p>
+<p>Windows では <tt class="docutils literal"><span class="pre">~</span></tt> だけがサポートされ、環境変数 <span class="target" id="index-3"></span><tt class="xref std std-envvar docutils literal"><span class="pre">HOME</span></tt> または
+<span class="target" id="index-4"></span><tt class="xref std std-envvar docutils literal"><span class="pre">HOMEDRIVE</span></tt> と <span class="target" id="index-5"></span><tt class="xref std std-envvar docutils literal"><span class="pre">HOMEPATH</span></tt> の組み合わせで置き換えられます。</p>
+<p>もし置き換えに失敗したり、引数のパスがチルダで始まっていなかったら、パスをそのまま返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.expandvars">
+<tt class="descclassname">os.path.</tt><tt class="descname">expandvars</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.expandvars" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数のパスの環境変数を展開して返します。引数の中の <tt class="docutils literal"><span class="pre">$name</span></tt> または
+<tt class="docutils literal"><span class="pre">${name}</span></tt> のような形式の文字列は環境変数、 <em>name</em> に置き換えられます。不正な変数名や存在しない変数名の場合には変換されず、そのまま返します。</p>
+<p>Windows では、 <tt class="docutils literal"><span class="pre">$name</span></tt> や <tt class="docutils literal"><span class="pre">${name}</span></tt> の形式に加えて、 <tt class="docutils literal"><span class="pre">%name%</span></tt>
+の形式もサポートされています。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.getatime">
+<tt class="descclassname">os.path.</tt><tt class="descname">getatime</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.getatime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> に最後にアクセスした時刻を、エポック (<a class="reference internal" href="time.html#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-mod docutils literal"><span class="pre">time</span></tt></a> モジュールを参照下さい) からの経過時間を示す秒数で返します。ファイルが存在しなかったりアクセスできない場合は <a class="reference internal" href="os.html#os.error" title="os.error"><tt class="xref py py-exc docutils literal"><span class="pre">os.error</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span><a class="reference internal" href="os.html#os.stat_float_times" title="os.stat_float_times"><tt class="xref py py-func docutils literal"><span class="pre">os.stat_float_times()</span></tt></a> が True を返す場合、戻り値は浮動小数
+点値となります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.getmtime">
+<tt class="descclassname">os.path.</tt><tt class="descname">getmtime</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.getmtime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> の最終更新時刻を、エポック (<a class="reference internal" href="time.html#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-mod docutils literal"><span class="pre">time</span></tt></a> モジュールを参照下さい) からの経過時間を示す秒数で返します。ファイルが存在しなかったりアクセスできない場合は <a class="reference internal" href="os.html#os.error" title="os.error"><tt class="xref py py-exc docutils literal"><span class="pre">os.error</span></tt></a> を送出します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.3 で変更: </span><a class="reference internal" href="os.html#os.stat_float_times" title="os.stat_float_times"><tt class="xref py py-func docutils literal"><span class="pre">os.stat_float_times()</span></tt></a> が True を返す場合、戻り値は浮動小数点値となります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.getctime">
+<tt class="descclassname">os.path.</tt><tt class="descname">getctime</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.getctime" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>システムによって、ファイルの最終変更時刻 (Unix のようなシステム) や作成時刻 (Windows のようなシステム) をシステムの ctime で返します。戻り値はエポック (<a class="reference internal" href="time.html#module-time" title="time: 時刻データへのアクセスと変換"><tt class="xref py py-mod docutils literal"><span class="pre">time</span></tt></a> モジュールを参照下さい) からの経過秒数を示す数値です。ファイルが存在しなかったりアクセスできない場合は <a class="reference internal" href="os.html#os.error" title="os.error"><tt class="xref py py-exc docutils literal"><span class="pre">os.error</span></tt></a> を送出します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.getsize">
+<tt class="descclassname">os.path.</tt><tt class="descname">getsize</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.getsize" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイル <em>path</em> のサイズをバイト数で返します。ファイルが存在しなかったりアクセスできない場合は <a class="reference internal" href="os.html#os.error" title="os.error"><tt class="xref py py-exc docutils literal"><span class="pre">os.error</span></tt></a> を送出します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.5.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.isabs">
+<tt class="descclassname">os.path.</tt><tt class="descname">isabs</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.isabs" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> が絶対パスなら、 <tt class="docutils literal"><span class="pre">True</span></tt> を返します。すなわち、 Unix ではスラッシュで始まり、 Windows ではドライブレターに続く (バック) スラッシュで始まる場合です。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.isfile">
+<tt class="descclassname">os.path.</tt><tt class="descname">isfile</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.isfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> が存在する正しいファイルなら、 <em>True</em> を返します。シンボリックリンクの場合にはその実体をチェックするので、同じパスに対して
+<a class="reference internal" href="#os.path.islink" title="os.path.islink"><tt class="xref py py-func docutils literal"><span class="pre">islink()</span></tt></a> と <a class="reference internal" href="#os.path.isfile" title="os.path.isfile"><tt class="xref py py-func docutils literal"><span class="pre">isfile()</span></tt></a> の両方が <em>True</em> を返すことがあります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.isdir">
+<tt class="descclassname">os.path.</tt><tt class="descname">isdir</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.isdir" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> が存在するなら、 <tt class="docutils literal"><span class="pre">True</span></tt> を返します。シンボリックリンクの場合にはその実体をチェックするので、同じパスに対して <a class="reference internal" href="#os.path.islink" title="os.path.islink"><tt class="xref py py-func docutils literal"><span class="pre">islink()</span></tt></a>
+と <a class="reference internal" href="#os.path.isdir" title="os.path.isdir"><tt class="xref py py-func docutils literal"><span class="pre">isdir()</span></tt></a> の両方が <em>True</em> を返すことがあります。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.islink">
+<tt class="descclassname">os.path.</tt><tt class="descname">islink</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.islink" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> がシンボリックリンクなら、 <tt class="docutils literal"><span class="pre">True</span></tt> を返します。シンボリックリンクがサポートされていないプラットフォームでは、常に <tt class="docutils literal"><span class="pre">False</span></tt>
+を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.ismount">
+<tt class="descclassname">os.path.</tt><tt class="descname">ismount</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.ismount" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名 <em>path</em> がマウントポイント <em class="dfn">mount point</em> (ファイルシステムの中で異なるファイルシステムがマウントされているところ) なら、
+<tt class="docutils literal"><span class="pre">True</span></tt> を返します:
+この関数は <em>path</em> の親ディレクトリである <tt class="file docutils literal"><span class="pre">path/..</span></tt> が <em>path</em>
+と異なるデバイス上にあるか、あるいは <tt class="file docutils literal"><span class="pre">path/..</span></tt> と <em>path</em> が同じデバイス上の同じ i-node を指しているかをチェックします &#8212; これによって全ての Unix と POSIX 標準でマウントポイントが検出できます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.join">
+<tt class="descclassname">os.path.</tt><tt class="descname">join</tt><big>(</big><em>path1</em><span class="optional">[</span>, <em>path2</em><span class="optional">[</span>, <em>...</em><span class="optional">]</span><span class="optional">]</span><big>)</big><a class="headerlink" href="#os.path.join" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>1 つあるいはそれ以上のパスの要素をうまく結合します。付け加える要素に絶対パスがあれば、それより前の要素は (Windows ではドライブ名があればそれも含めて) 全て破棄され、以降の要素を結合します。戻り値は
+<em>path1</em> と省略可能な <em>path2</em> 以降を結合したもので、 <em>path2</em> が空文字列でないなら、ディレクトリの区切り文字 (<tt class="docutils literal"><span class="pre">os.sep</span></tt>) が各要素の間に挿入されます。
+Windows では各ドライブに対してカレントディレクトリがあるので、
+<tt class="docutils literal"><span class="pre">os.path.join(&quot;c:&quot;,</span> <span class="pre">&quot;foo&quot;)</span></tt> によって、 <tt class="file docutils literal"><span class="pre">c:\foo</span></tt> ではなく、ドライブ <tt class="file docutils literal"><span class="pre">C:</span></tt> 上のカレントディレクトリからの相対パス
+(<tt class="file docutils literal"><span class="pre">c:foo</span></tt>) が返されます。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.normcase">
+<tt class="descclassname">os.path.</tt><tt class="descname">normcase</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.normcase" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名の大文字、小文字をシステムの標準にします。 Unix と Mac OS X
+ではそのまま返します。大文字、小文字を区別しないファイルシステムではパス名を小文字に変換します。
+Windows では、スラッシュをバックスラッシュに変換します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.normpath">
+<tt class="descclassname">os.path.</tt><tt class="descname">normpath</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.normpath" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名を標準化します。余分な区切り文字や上位レベル参照を削除し、
+<tt class="docutils literal"><span class="pre">A//B</span></tt> 、 <tt class="docutils literal"><span class="pre">A/B/</span></tt> 、 <tt class="docutils literal"><span class="pre">A/./B</span></tt> 、 <tt class="docutils literal"><span class="pre">A/foo/../B</span></tt> が全て <tt class="docutils literal"><span class="pre">A/B</span></tt>
+になるようにします。大文字、小文字は標準化しません (それには <a class="reference internal" href="#os.path.normcase" title="os.path.normcase"><tt class="xref py py-func docutils literal"><span class="pre">normcase()</span></tt></a> を使って下さい) 。 Windows では、スラッシュをバックスラッシュに変換します。パスがシンボリックリンクを含んでいるかによって意味が変わることに注意してください。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.realpath">
+<tt class="descclassname">os.path.</tt><tt class="descname">realpath</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.realpath" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パスの中のシンボリックリンク (もしそれが当該オペレーティングシステムでサポートされていれば)を取り除いて、標準化したパスを返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.relpath">
+<tt class="descclassname">os.path.</tt><tt class="descname">relpath</tt><big>(</big><em>path</em><span class="optional">[</span>, <em>start</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#os.path.relpath" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>カレントディレクトリ、または、オプション引数の <em>start</em> から、
+<em>path</em> への相対ファイルパスを返します。</p>
+<p><em>start</em> のデフォルト値は <a class="reference internal" href="os.html#os.curdir" title="os.curdir"><tt class="xref py py-attr docutils literal"><span class="pre">os.curdir</span></tt></a> です。</p>
+<p>利用可能:  Windows 、 Unix</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.6 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.samefile">
+<tt class="descclassname">os.path.</tt><tt class="descname">samefile</tt><big>(</big><em>path1</em>, <em>path2</em><big>)</big><a class="headerlink" href="#os.path.samefile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>2つの引数であるパス名が同じファイルあるいはディレクトリを指していれば (同じデバイスナンバーと i-node ナンバーで示されていれば) 、
+<tt class="docutils literal"><span class="pre">True</span></tt> を返します。どちらかのパス名で <a class="reference internal" href="os.html#os.stat" title="os.stat"><tt class="xref py py-func docutils literal"><span class="pre">os.stat()</span></tt></a> の呼び出しに失敗した場合には、例外が発生します。</p>
+<p>利用可能: Unix</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.sameopenfile">
+<tt class="descclassname">os.path.</tt><tt class="descname">sameopenfile</tt><big>(</big><em>fp1</em>, <em>fp2</em><big>)</big><a class="headerlink" href="#os.path.sameopenfile" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>ファイルディスクリプタ <em>fp1</em> と <em>fp2</em> が同じファイルを指していたら、
+<tt class="docutils literal"><span class="pre">True</span></tt> を返します。利用可能: Unix</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.samestat">
+<tt class="descclassname">os.path.</tt><tt class="descname">samestat</tt><big>(</big><em>stat1</em>, <em>stat2</em><big>)</big><a class="headerlink" href="#os.path.samestat" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>stat タプル <em>stat1</em> と <em>stat2</em> が同じファイルを指していたら、
+<tt class="docutils literal"><span class="pre">True</span></tt> を返します。これらのタプルは <tt class="xref py py-func docutils literal"><span class="pre">fstat()</span></tt> 、 <tt class="xref py py-func docutils literal"><span class="pre">lstat()</span></tt> や <a class="reference internal" href="stat.html#module-stat" title="stat: os.stat()、os.lstat() および os.fstat() の返す内容を解釈するためのユーティリティ群。"><tt class="xref py py-func docutils literal"><span class="pre">stat()</span></tt></a> で返されたものでかまいません。この関数は、 <a class="reference internal" href="#os.path.samefile" title="os.path.samefile"><tt class="xref py py-func docutils literal"><span class="pre">samefile()</span></tt></a> と <a class="reference internal" href="#os.path.sameopenfile" title="os.path.sameopenfile"><tt class="xref py py-func docutils literal"><span class="pre">sameopenfile()</span></tt></a> で使われるのと同様なものを背後に実装しています。</p>
+<p>利用可能: Unix</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.split">
+<tt class="descclassname">os.path.</tt><tt class="descname">split</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.split" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名 <em>path</em> を <tt class="docutils literal"><span class="pre">(head,</span> <span class="pre">tail)</span></tt> のペアに分割します。 <em>tail</em> はパスの構成要素の末尾で、 <em>head</em> はそれより前の部分です。
+<em>tail</em> はスラッシュを含みません; もし <em>path</em> の最後にスラッシュがあれば、 <em>tail</em> は空文字列になります。もし <em>path</em> にスラッシュがなければ、 <em>head</em> は空文字列になります。
+<em>path</em> が空文字列なら、 <em>head</em> と <em>tail</em> のどちらも空文字列になります。 <em>head</em> の末尾のスラッシュは、 <em>head</em> がルートディレクトリ (1つ以上のスラッシュのみ) でない限り、取り除かれます。
+<tt class="docutils literal"><span class="pre">join(head,</span> <span class="pre">tail)</span></tt> の結果は常に <em>path</em> と同じ場所を示すパスになりますが、文字列としては異なるかもしれません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.splitdrive">
+<tt class="descclassname">os.path.</tt><tt class="descname">splitdrive</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.splitdrive" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名 <em>path</em> を <tt class="docutils literal"><span class="pre">(drive,</span> <span class="pre">tail)</span></tt> のペアに分割します。 <em>drive</em> はドライブ名か、空文字列です。ドライブ名を使用しないシステムでは、 <em>drive</em> は常に空文字列です。全ての場合に <tt class="docutils literal"><span class="pre">drive</span> <span class="pre">+</span> <span class="pre">tail</span></tt> は <em>path</em> と等しくなります。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 1.3 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.splitext">
+<tt class="descclassname">os.path.</tt><tt class="descname">splitext</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.splitext" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名 <em>path</em> を <tt class="docutils literal"><span class="pre">(root,</span> <span class="pre">ext)</span></tt> のペアにします。 <tt class="docutils literal"><span class="pre">root</span> <span class="pre">+</span> <span class="pre">ext</span> <span class="pre">==</span>
+<span class="pre">path</span></tt> になります。
+<em>ext</em> は空文字列か1つのピリオドで始まり、多くても1つのピリオドを含みます。ベースネームを導出するピリオドは無視されます。 ;  <tt class="docutils literal"><span class="pre">splitext('.cshrc')</span></tt>
+は、 <tt class="docutils literal"><span class="pre">('.cshrc',</span> <span class="pre">'')</span></tt> を返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.6 で変更: </span>以前のバージョンでは、最初の文字がピリオドであった場合、空の
+root を生成していました。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.splitunc">
+<tt class="descclassname">os.path.</tt><tt class="descname">splitunc</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#os.path.splitunc" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>パス名 <em>path</em> をペア <tt class="docutils literal"><span class="pre">(unc,</span> <span class="pre">rest)</span></tt> に分割します。ここで <em>unc</em> は (<tt class="docutils literal"><span class="pre">r'\\host\mount'</span></tt> のような) UNC マウントポイント、そして <em>rest</em> は (<tt class="docutils literal"><span class="pre">r'\path\file.ext'</span></tt> のような) パスの残りの部分です。ドライブ名を含むパスでは常に <em>unc</em> が空文字列になります。</p>
+<p>利用可能: Windows</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="os.path.walk">
+<tt class="descclassname">os.path.</tt><tt class="descname">walk</tt><big>(</big><em>path</em>, <em>visit</em>, <em>arg</em><big>)</big><a class="headerlink" href="#os.path.walk" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>path</em> をルートとする各ディレクトリに対して (もし <em>path</em> がディレクトリなら <em>path</em> も含みます) 、 <tt class="docutils literal"><span class="pre">(arg,</span> <span class="pre">dirname,</span> <span class="pre">names)</span></tt> を引数として関数 <em>visit</em> を呼び出します。引数 <em>dirname</em> は訪れたディレクトリを示し、引数 <em>names</em> はそのディレクトリ内のファイルのリスト
+(<tt class="docutils literal"><span class="pre">os.listdir(dirname)</span></tt> で得られる) です。関数 <em>visit</em> によって <em>names</em> を変更して、 <em>dirname</em> 以下の対象となるディレクトリのセットを変更することもできます。例えば、あるディレクトリツリーだけ関数を適用しないなど。 (<em>names</em> で参照されるオブジェクトは、 <a class="reference internal" href="../reference/simple_stmts.html#del"><tt class="xref std std-keyword docutils literal"><span class="pre">del</span></tt></a> あるいはスライスを使って正しく変更しなければなりません。)</p>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">ディレクトリへのシンボリックリンクはサブディレクトリとして扱われないので、 <a class="reference internal" href="#os.path.walk" title="os.path.walk"><tt class="xref py py-func docutils literal"><span class="pre">walk()</span></tt></a> による操作対象とはされません。ディレクトリへのシンボリックリンクを操作対象とするには、
+<tt class="docutils literal"><span class="pre">os.path.islink(file)</span></tt> と <tt class="docutils literal"><span class="pre">os.path.isdir(file)</span></tt>
+で識別して、 <a class="reference internal" href="#os.path.walk" title="os.path.walk"><tt class="xref py py-func docutils literal"><span class="pre">walk()</span></tt></a> で必要な操作を実行しなければなりません。</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">ノート</p>
+<p class="last">この関数は廃止予定で、 3.0 では削除されました。 <a class="reference internal" href="os.html#os.walk" title="os.walk"><tt class="xref py py-func docutils literal"><span class="pre">os.walk()</span></tt></a>
+が残っています。</p>
+</div>
+</dd></dl>
+
+<dl class="data">
+<dt id="os.path.supports_unicode_filenames">
+<tt class="descclassname">os.path.</tt><tt class="descname">supports_unicode_filenames</tt><a class="headerlink" href="#os.path.supports_unicode_filenames" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>任意のユニコード文字列を (ファイルシステムの制限内で) ファイルネームに使うことが可能なら、真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.3 で追加.</span></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="fileinput.html" title="10.2. fileinput — 複数の入力ストリームをまたいだ行の繰り返し処理をサポートする。"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="filesys.html" title="10. ファイルとディレクトリへのアクセス"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python 標準ライブラリ</a> &raquo;</li>
+          <li><a href="filesys.html" >10. ファイルとディレクトリへのアクセス</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

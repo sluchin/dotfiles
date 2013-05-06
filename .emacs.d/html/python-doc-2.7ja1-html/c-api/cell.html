@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>セルオブジェクト (cell object) &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="具象オブジェクト (concrete object) レイヤ" href="concrete.html" />
+    <link rel="next" title="ジェネレータオブジェクト" href="gen.html" />
+    <link rel="prev" title="Cオブジェクト (CObject)" href="cobject.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="gen.html" title="ジェネレータオブジェクト"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="cobject.html" title="Cオブジェクト (CObject)"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" accesskey="U">具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="cobject.html"
+                        title="前の章へ">Cオブジェクト (CObject)</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="gen.html"
+                        title="次の章へ">ジェネレータオブジェクト</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/cell.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cell-object">
+<span id="cell-objects"></span><h1>セルオブジェクト (cell object)<a class="headerlink" href="#cell-object" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>&#8220;セル (cell)&#8221; オブジェクトは、複数のスコープから参照される変数群を実装するために使われます。セルは各変数について作成され、各々の値を記憶します;
+この値を参照する各スタックフレームにおけるローカル変数には、そのスタックフレームの外側で同じ値を参照しているセルに対する参照が入ります。セルで表現された値にアクセスすると、セルオブジェクト自体の代わりにセル内の値が使われます。このセルオブジェクトを使った間接参照
+(dereference) は、インタプリタによって生成されたバイトコード内でサポートされている必要があります;
+セルオブジェクトにアクセスした際に、自動的に間接参照は起こりません。上記以外の状況では、セルオブジェクトは役に立たないはずです。</p>
+<dl class="type">
+<dt id="PyCellObject">
+<tt class="descname">PyCellObject</tt><a class="headerlink" href="#PyCellObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セルオブジェクトに使われる C 構造体です。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="PyCell_Type">
+<a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a> <tt class="descname">PyCell_Type</tt><a class="headerlink" href="#PyCell_Type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セルオブジェクトに対応する型オブジェクトです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCell_Check">
+int <tt class="descname">PyCell_Check</tt><big>(</big>ob<big>)</big><a class="headerlink" href="#PyCell_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>ob</em> がセルオブジェクトの場合に真を返します; <em>ob</em> は <em>NULL</em> であってはなりません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCell_New">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCell_New</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*ob</em><big>)</big><a class="headerlink" href="#PyCell_New" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>値 <em>ob</em> の入った新たなセルオブジェクトを生成して返します。引数を <em>NULL</em> にしてもかまいません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCell_Get">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCell_Get</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*cell</em><big>)</big><a class="headerlink" href="#PyCell_Get" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>cell</em> の内容を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCell_GET">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyCell_GET</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*cell</em><big>)</big><a class="headerlink" href="#PyCell_GET" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p><em>cell</em> の内容を返しますが、 <em>cell</em> が非 <em>NULL</em> でかつセルオブジェクトであるかどうかチェックしません。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCell_Set">
+int <tt class="descname">PyCell_Set</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*cell</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*value</em><big>)</big><a class="headerlink" href="#PyCell_Set" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セルオブジェクト <em>cell</em> の内容を <em>value</em> に設定します。この関数は現在のセルの全ての内容に対する参照を解放します。 <em>value</em> は
+<em>NULL</em> でもかまいません。 <em>cell</em> は非 <em>NULL</em> でなければなりません; もし <em>cell</em> がセルオブジェクトでない場合、 <tt class="docutils literal"><span class="pre">-1</span></tt>
+を返します。成功すると <tt class="docutils literal"><span class="pre">0</span></tt> を返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyCell_SET">
+void <tt class="descname">PyCell_SET</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*cell</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*value</em><big>)</big><a class="headerlink" href="#PyCell_SET" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>セルオブジェクト <em>cell</em> の値を <em>value</em> に設定します。参照カウントに対する変更はなく、安全のためのチェックは何も行いません; <em>cell</em>
+は非 <em>NULL</em> でなければならず、かつセルオブジェクトでなければなりません。</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="gen.html" title="ジェネレータオブジェクト"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="cobject.html" title="Cオブジェクト (CObject)"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" >具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

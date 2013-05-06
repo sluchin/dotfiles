@@ -1,0 +1,213 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>弱参照オブジェクト (weak reference object) &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="具象オブジェクト (concrete object) レイヤ" href="concrete.html" />
+    <link rel="next" title="カプセル (Capsules)" href="capsule.html" />
+    <link rel="prev" title="スライスオブジェクト (slice object)" href="slice.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="capsule.html" title="カプセル (Capsules)"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="slice.html" title="スライスオブジェクト (slice object)"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" accesskey="U">具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="slice.html"
+                        title="前の章へ">スライスオブジェクト (slice object)</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="capsule.html"
+                        title="次の章へ">カプセル (Capsules)</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/weakref.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="weak-reference-object">
+<span id="weakrefobjects"></span><h1>弱参照オブジェクト (weak reference object)<a class="headerlink" href="#weak-reference-object" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p>Python は <em>弱参照</em> を第一級オブジェクト (first-class object)
+としてサポートします。弱参照を直接実装する二種類の固有のオブジェクト型があります。第一は単純な参照オブジェクトで、第二はオリジナルのオブジェクトに対して可能な限りプロキシとして振舞うオブジェクトです。</p>
+<dl class="function">
+<dt id="PyWeakref_Check">
+int <tt class="descname">PyWeakref_Check</tt><big>(</big>ob<big>)</big><a class="headerlink" href="#PyWeakref_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>ob</em> が参照オブジェクトかプロキシオブジェクトの場合に真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyWeakref_CheckRef">
+int <tt class="descname">PyWeakref_CheckRef</tt><big>(</big>ob<big>)</big><a class="headerlink" href="#PyWeakref_CheckRef" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>ob</em> が参照オブジェクトの場合に真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyWeakref_CheckProxy">
+int <tt class="descname">PyWeakref_CheckProxy</tt><big>(</big>ob<big>)</big><a class="headerlink" href="#PyWeakref_CheckProxy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>ob</em> がプロキシオブジェクトの場合に真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyWeakref_NewRef">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyWeakref_NewRef</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*ob</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*callback</em><big>)</big><a class="headerlink" href="#PyWeakref_NewRef" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>ob</em> に対する弱参照オブジェクトを返します。この関数は常に新たな参照を返しますが、必ずしも新たなオブジェクトを作る保証はありません;
+既存の参照オブジェクトが返されることもあります。第二のパラメタ <em>callback</em> は呼び出し可能オブジェクトで、 <em>ob</em>
+がガーベジコレクションされた際に通知を受け取ります; <em>callback</em> は弱参照オブジェクト自体を単一のパラメタとして受け取ります。 <em>callback</em>
+は <tt class="docutils literal"><span class="pre">None</span></tt> や <em>NULL</em> にしてもかまいません。 <em>ob</em> が弱参照できないオブジェクトの場合や、 <em>callback</em>
+が呼び出し可能オブジェクト、 <tt class="docutils literal"><span class="pre">None</span></tt> 、 <em>NULL</em> のいずれでもない場合は、 <em>NULL</em> を返して <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyWeakref_NewProxy">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyWeakref_NewProxy</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*ob</em>, <a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*callback</em><big>)</big><a class="headerlink" href="#PyWeakref_NewProxy" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p><em>ob</em> に対する弱参照プロキシオブジェクトを返します。この関数は常に新たな参照を返しますが、必ずしも新たなオブジェクトを作る保証はありません;
+既存の参照オブジェクトが返されることもあります。第二のパラメタ <em>callback</em> は呼び出し可能オブジェクトで、 <em>ob</em>
+がガーベジコレクションされた際に通知を受け取ります; <em>callback</em> は弱参照オブジェクト自体を単一のパラメタとして受け取ります。 <em>callback</em>
+は <tt class="docutils literal"><span class="pre">None</span></tt> や <em>NULL</em> にしてもかまいません。 <em>ob</em> が弱参照できないオブジェクトの場合や、 <em>callback</em>
+が呼び出し可能オブジェクト、 <tt class="docutils literal"><span class="pre">None</span></tt> 、 <em>NULL</em> のいずれでもない場合は、 <em>NULL</em> を返して <a class="reference internal" href="../library/exceptions.html#exceptions.TypeError" title="exceptions.TypeError"><tt class="xref py py-exc docutils literal"><span class="pre">TypeError</span></tt></a> を送出します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyWeakref_GetObject">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyWeakref_GetObject</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*ref</em><big>)</big><a class="headerlink" href="#PyWeakref_GetObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p>弱参照 <em>ref</em> が参照しているオブジェクトを返します。被参照オブジェクトがすでに存続していない場合、 <tt class="xref py py-const docutils literal"><span class="pre">Py_None</span></tt> を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+<div class="admonition warning">
+<p class="first admonition-title">警告</p>
+<p class="last">この関数は参照先オブジェクトの <strong>借り物の参照</strong> を返します。そのため、そのオブジェクトを利用している間そのオブジェクトが破棄されないことが判っている場合を除き、常に <a class="reference internal" href="refcounting.html#Py_INCREF" title="Py_INCREF"><tt class="xref c c-func docutils literal"><span class="pre">Py_INCREF()</span></tt></a> を呼び出すべきです。</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyWeakref_GET_OBJECT">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyWeakref_GET_OBJECT</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*ref</em><big>)</big><a class="headerlink" href="#PyWeakref_GET_OBJECT" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: Borrowed reference.</em><p><a class="reference internal" href="#PyWeakref_GetObject" title="PyWeakref_GetObject"><tt class="xref c c-func docutils literal"><span class="pre">PyWeakref_GetObject()</span></tt></a> に似ていますが、マクロで実装されていて、エラーチェックを行いません。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="capsule.html" title="カプセル (Capsules)"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="slice.html" title="スライスオブジェクト (slice object)"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" >具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>

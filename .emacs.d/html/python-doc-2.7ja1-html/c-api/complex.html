@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>浮動小数点オブジェクト (complex number object) &mdash; Python 2.7ja1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.7ja1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/translations.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Python 2.7ja1 documentation 内を検索"
+          href="../_static/opensearch.xml"/>
+    <link rel="author" title="このドキュメントについて" href="../about.html" />
+    <link rel="copyright" title="著作権" href="../copyright.html" />
+    <link rel="top" title="Python 2.7ja1 documentation" href="../index.html" />
+    <link rel="up" title="具象オブジェクト (concrete object) レイヤ" href="concrete.html" />
+    <link rel="next" title="bytearray オブジェクト" href="bytearray.html" />
+    <link rel="prev" title="浮動小数点型オブジェクト (floating point object)" href="float.html" />
+    <link rel="shortcut icon" type="image/png" href="../_static/py.png" />
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/_jp.js"></script>
+    
+ 
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             accesskey="I">索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="bytearray.html" title="bytearray オブジェクト"
+             accesskey="N">次へ</a> |</li>
+        <li class="right" >
+          <a href="float.html" title="浮動小数点型オブジェクト (floating point object)"
+             accesskey="P">前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" accesskey="U">具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../contents.html">目次</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">浮動小数点オブジェクト (complex number object)</a><ul>
+<li><a class="reference internal" href="#c">C 構造体としての複素数</a></li>
+<li><a class="reference internal" href="#python">Python オブジェクトとしての複素数型</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>前のトピックへ</h4>
+  <p class="topless"><a href="float.html"
+                        title="前の章へ">浮動小数点型オブジェクト (floating point object)</a></p>
+  <h4>次のトピックへ</h4>
+  <p class="topless"><a href="bytearray.html"
+                        title="次の章へ">bytearray オブジェクト</a></p>
+  <h3>このページ</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/c-api/complex.txt"
+           rel="nofollow">ソースコードを表示</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>クイック検索</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="検索" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    モジュール、クラス、または関数名を入力してください
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="complex-number-object">
+<span id="complexobjects"></span><h1>浮動小数点オブジェクト (complex number object)<a class="headerlink" href="#complex-number-object" title="このヘッドラインへのパーマリンク">¶</a></h1>
+<p id="index-0">Python の複素数オブジェクトは、 C API 側から見ると二つの別個の型として実装されています: 一方は Python プログラムに対して公開されている Python のオブジェクトで、他方は実際の複素数値を表現する C の構造体です。 API では、これら双方を扱う関数を提供しています。</p>
+<div class="section" id="c">
+<h2>C 構造体としての複素数<a class="headerlink" href="#c" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<p>複素数の C 構造体を引数として受理したり、戻り値として返したりする関数は、ポインタ渡しを行うのではなく <em>値渡し</em> を行うので注意してください。これは
+API 全体を通して一貫しています。</p>
+<dl class="type">
+<dt id="Py_complex">
+<tt class="descname">Py_complex</tt><a class="headerlink" href="#Py_complex" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>Python 複素数オブジェクトの値の部分に対応する C の構造体です。複素数オブジェクトを扱うほとんどの関数は、この型の構造体を場合に応じて入力や出力として使います。構造体は以下のように定義されています:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+   <span class="kt">double</span> <span class="n">real</span><span class="p">;</span>
+   <span class="kt">double</span> <span class="n">imag</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">Py_complex</span><span class="p">;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="_Py_c_sum">
+<a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a> <tt class="descname">_Py_c_sum</tt><big>(</big><a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;left</em>, <a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;right</em><big>)</big><a class="headerlink" href="#_Py_c_sum" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの複素数の和を C の <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型で返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_Py_c_diff">
+<a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a> <tt class="descname">_Py_c_diff</tt><big>(</big><a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;left</em>, <a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;right</em><big>)</big><a class="headerlink" href="#_Py_c_diff" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの複素数の差を C の <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型で返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_Py_c_neg">
+<a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a> <tt class="descname">_Py_c_neg</tt><big>(</big><a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;complex</em><big>)</big><a class="headerlink" href="#_Py_c_neg" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>複素数 <em>complex</em> の符号反転 C の <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型で返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_Py_c_prod">
+<a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a> <tt class="descname">_Py_c_prod</tt><big>(</big><a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;left</em>, <a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;right</em><big>)</big><a class="headerlink" href="#_Py_c_prod" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの複素数の積を C の <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型で返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_Py_c_quot">
+<a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a> <tt class="descname">_Py_c_quot</tt><big>(</big><a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;dividend</em>, <a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;divisor</em><big>)</big><a class="headerlink" href="#_Py_c_quot" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>二つの複素数の商を C の <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型で返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_Py_c_pow">
+<a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a> <tt class="descname">_Py_c_pow</tt><big>(</big><a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;num</em>, <a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;exp</em><big>)</big><a class="headerlink" href="#_Py_c_pow" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>指数 <em>exp</em> の <em>num</em> 乗を C の <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型で返します。</p>
+</dd></dl>
+
+</div>
+<div class="section" id="python">
+<h2>Python オブジェクトとしての複素数型<a class="headerlink" href="#python" title="このヘッドラインへのパーマリンク">¶</a></h2>
+<dl class="type">
+<dt id="PyComplexObject">
+<tt class="descname">PyComplexObject</tt><a class="headerlink" href="#PyComplexObject" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="structures.html#PyObject" title="PyObject"><tt class="xref c c-type docutils literal"><span class="pre">PyObject</span></tt></a> のサブタイプは Python の複素数オブジェクトを表現します。</p>
+</dd></dl>
+
+<dl class="var">
+<dt id="PyComplex_Type">
+<a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject">PyTypeObject</a> <tt class="descname">PyComplex_Type</tt><a class="headerlink" href="#PyComplex_Type" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>この <a class="reference internal" href="type.html#PyTypeObject" title="PyTypeObject"><tt class="xref c c-type docutils literal"><span class="pre">PyTypeObject</span></tt></a> のインスタンスは Python の複素数型を表現します。
+Pythonの <tt class="docutils literal"><span class="pre">complex</span></tt> や <tt class="docutils literal"><span class="pre">types.ComplexType</span></tt> と同じオブジェクトです。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyComplex_Check">
+int <tt class="descname">PyComplex_Check</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyComplex_Check" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が <a class="reference internal" href="#PyComplexObject" title="PyComplexObject"><tt class="xref c c-type docutils literal"><span class="pre">PyComplexObject</span></tt></a> 型か <a class="reference internal" href="#PyComplexObject" title="PyComplexObject"><tt class="xref c c-type docutils literal"><span class="pre">PyComplexObject</span></tt></a> 型のサブタイプのときに真を返します。</p>
+<p class="versionchanged">
+<span class="versionmodified">バージョン 2.2 で変更: </span>サブタイプを引数にとれるようになりました.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyComplex_CheckExact">
+int <tt class="descname">PyComplex_CheckExact</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*p</em><big>)</big><a class="headerlink" href="#PyComplex_CheckExact" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>引数が <a class="reference internal" href="#PyComplexObject" title="PyComplexObject"><tt class="xref c c-type docutils literal"><span class="pre">PyComplexObject</span></tt></a> 型で、かつ <a class="reference internal" href="#PyComplexObject" title="PyComplexObject"><tt class="xref c c-type docutils literal"><span class="pre">PyComplexObject</span></tt></a> 型のサブタイプでないときに真を返します。</p>
+<p class="versionadded">
+<span class="versionmodified">バージョン 2.2 で追加.</span></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyComplex_FromCComplex">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyComplex_FromCComplex</tt><big>(</big><a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a><em>&nbsp;v</em><big>)</big><a class="headerlink" href="#PyComplex_FromCComplex" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>C の <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型から Python の複素数値を生成します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyComplex_FromDoubles">
+<a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a>* <tt class="descname">PyComplex_FromDoubles</tt><big>(</big>double<em>&nbsp;real</em>, double<em>&nbsp;imag</em><big>)</big><a class="headerlink" href="#PyComplex_FromDoubles" title="この定義へのパーマリンク">¶</a></dt>
+<dd><em class="refcount">Return value: New reference.</em><p>新たな <a class="reference internal" href="#PyComplexObject" title="PyComplexObject"><tt class="xref c c-type docutils literal"><span class="pre">PyComplexObject</span></tt></a> オブジェクトを <em>real</em> と <em>imag</em> から生成します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyComplex_RealAsDouble">
+double <tt class="descname">PyComplex_RealAsDouble</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*op</em><big>)</big><a class="headerlink" href="#PyComplex_RealAsDouble" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>op</em> の実数部分を C の <tt class="xref c c-type docutils literal"><span class="pre">double</span></tt> 型で返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyComplex_ImagAsDouble">
+double <tt class="descname">PyComplex_ImagAsDouble</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*op</em><big>)</big><a class="headerlink" href="#PyComplex_ImagAsDouble" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p><em>op</em> の虚数部分を C の <tt class="xref c c-type docutils literal"><span class="pre">double</span></tt> 型で返します。</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="PyComplex_AsCComplex">
+<a class="reference internal" href="#Py_complex" title="Py_complex">Py_complex</a> <tt class="descname">PyComplex_AsCComplex</tt><big>(</big><a class="reference internal" href="structures.html#PyObject" title="PyObject">PyObject</a><em>&nbsp;*op</em><big>)</big><a class="headerlink" href="#PyComplex_AsCComplex" title="この定義へのパーマリンク">¶</a></dt>
+<dd><p>複素数値 <em>op</em> から <a class="reference internal" href="#Py_complex" title="Py_complex"><tt class="xref c c-type docutils literal"><span class="pre">Py_complex</span></tt></a> 型を生成します。</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>ナビゲーション</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="総合索引"
+             >索引</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Pythonモジュール索引"
+             >モジュール</a> |</li>
+        <li class="right" >
+          <a href="bytearray.html" title="bytearray オブジェクト"
+             >次へ</a> |</li>
+        <li class="right" >
+          <a href="float.html" title="浮動小数点型オブジェクト (floating point object)"
+             >前へ</a> |</li>
+        <li><img src="../_static/py.png" alt=""
+                 style="vertical-align: middle; margin-top: -1px"/></li>
+        <li><a href="../index.html">Python 2.7ja1 documentation</a> &raquo;</li>
+
+          <li><a href="index.html" >Python/C API リファレンスマニュアル</a> &raquo;</li>
+          <li><a href="concrete.html" >具象オブジェクト (concrete object) レイヤ</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; <a href="../copyright.html">Copyright</a> 1990-2011, Python Software Foundation.
+      最終更新: 2011-12-26
+      このドキュメントは <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2pre/02cb752c6a9e で生成しました。
+    </div>
+  </body>
+</html>
