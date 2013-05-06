@@ -528,7 +528,7 @@
           (message "no file: %s" html)))))
   (when (fboundp 'w3m-devhelp-command)
     (dolist (pg '("glib" "gtk3" "gdk3" "gio" "gobject" "libxml2"))
-      (let ((cmd (intern (format "w3m-devhelp-%s" pg))))
+      (let ((cmd (intern (format "w3m-%s-manual" pg))))
         (defalias cmd
           `(lambda ()
              (interactive)
