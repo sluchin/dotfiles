@@ -506,20 +506,21 @@
 ;;; Html マニュアル
 (when (locate-library "w3m")
   ;; Devhelp マニュアル
-  (defun w3m-devhelp-command (cmd)
+  (defun devhelp-command (cmd)
     "Devhelp command."
     (when (fboundp 'w3m-goto-url-new-session)
       (let ((html (format "/usr/share/gtk-doc/html/%s/index.html" cmd)))
         (if (file-readable-p html)
             (w3m-goto-url-new-session (concat "file:/" html))
           (message "no file: %s" html)))))
-  (when (fboundp 'w3m-devhelp-command)
+  (when (fboundp 'devhelp-command)
     (dolist (pg '("glib" "gtk3" "gdk3" "gio" "gobject" "libxml2"))
-      (let ((cmd (intern (format "w3m-%s-manual" pg))))
+      (let ((cmd (intern (format "%s-manual" pg))))
         (defalias cmd
           `(lambda ()
+             "Devhelp."
              (interactive)
-             (w3m-devhelp-command ,pg))))))
+             (devhelp-command ,pg))))))
 
   ;; Devhelp
   ;; sudo apt-get install devhelp
@@ -533,9 +534,20 @@
         (call-interactively 'gtk-lookup-symbol)))
     (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
 
+  ;; STL マニュアル
+  ;; sudo apt-get install stl-manual
+  (defun stl-manual ()
+    "STL manual."
+    (interactive)
+    (when (fboundp 'w3m-goto-url-new-session)
+      (let ((html "/usr/share/doc/stl-manual/html/index.html"))
+        (if (file-readable-p html)
+            (w3m-goto-url-new-session (concat "file:/" html))
+          (message "no file: %s" html)))))
+
   ;; Python マニュアル
   ;; sudo apt-get install python2.7-doc
-  (defun w3m-python-manual ()
+  (defun python-manual ()
     "Python manual."
     (interactive)
     (when (fboundp 'w3m-goto-url-new-session)
@@ -545,7 +557,8 @@
           (message "no file: %s" html)))))
 
   ;; Python 日本語マニュアル
-  (defun w3m-python-ja-manual ()
+  ;; http://keihanna.dl.sourceforge.jp/pythonjp/54307/python-doc-2.7ja1-html.tar.gz
+  (defun python-ja-manual ()
     "Python japanese manual."
     (interactive)
     (when (fboundp 'w3m-goto-url-new-session)
@@ -557,7 +570,7 @@
 
   ;; Haskell マニュアル
   ;; sudo apt-get install ghc-doc
-  (defun w3m-haskell-manual ()
+  (defun haskell-manual ()
     "Haskell manual."
     (interactive)
     (when (fboundp 'w3m-goto-url-new-session)
@@ -668,7 +681,47 @@
         (progn
           (isearch-update-ring
            (buffer-substring-no-properties (mark) (point)))
-          (deactivate-mark)))))
+          (deactivate-mark))))
+
+  (eval-after-load "isearch"
+    '(progn
+       ;; moccur キーバインド
+       (when (fboundp 'moccur-mode-edit-set-key)
+         (moccur-mode-edit-set-key))
+       ;; isearch マッチ行一覧作成
+       (when (boundp 'isearch-mode-map)
+         (define-key isearch-mode-map (kbd "M-s o") 'isearch-occur))
+       (message "Loading %s (isearch)...done" this-file-name))))
+
+;; color-moccur
+;; (install-elisp-from-emacswiki "color-moccur.el")
+(when (locate-library "color-moccur")
+  (autoload 'occur-by-moccur "color-moccur"
+    "multi-buffer occur (grep) mode." t)
+  (autoload 'isearch-moccur "color-moccur"
+    "Invoke `moccur' from isearch within `current-buffer'." t)
+  (autoload 'isearch-moccur-all "color-moccur"
+    "Invoke `moccur' from isearch in all buffers." t)
+  (autoload 'moccur-mode-edit-set-key "color-moccur"
+    "Set key bindings." t)
+
+  (when (boundp 'isearch-mode-map)
+    (define-key isearch-mode-map (kbd "M-o") 'isearch-moccur)
+    (define-key isearch-mode-map (kbd "M-O") 'isearch-moccur-all))
+  (define-key global-map (kbd "C-x C-m") 'occur-by-moccur)
+
+  (eval-after-load "color-moccur"
+    '(progn
+       ;; スペースに区切られた複数の単語にマッチ
+       (when (boundp 'moccur-split-word)
+         (setq moccur-split-word t))
+       (message "Loading %s (color-moccur)...done" this-file-name))))
+
+;; moccur-edit
+;; (install-elisp-from-emacswiki "moccur-edit.el")
+(when (locate-library "moccur-edit")
+  (autoload 'moccur-edit-mode-in "moccur-edit"
+    "Apply replaces to multiple files." t))
 
 ;; migemo
 ;; sudo apt-get install migemo cmigemo
@@ -3002,20 +3055,6 @@
         (let ((char (read-char-choice prompt chars)))
           (call-interactively (car (cdr (cdr (assq char lst)))))))))
   (define-key global-map (kbd "C-c 3") 'w3m-choice)
-
-  ;; stl-manual を閲覧する
-  ;; sudo apt-get install stl-manual
-  (defun stl-manual ()
-    "Browse stl-manual."
-    (interactive)
-    (when (fboundp 'w3m-browse-url)
-      (let ((dir "/usr/share/doc/stl-manual/html"))
-        (if (and (file-directory-p dir) (file-readable-p dir))
-            (w3m-browse-url
-             (concat "file://"
-                     (file-name-as-directory (expand-file-name dir))
-                     "index.html"))
-          (message "Directory does not exist: %s" dir)))))
 
   (eval-after-load "w3m"
     '(progn
