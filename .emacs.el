@@ -503,20 +503,7 @@
        (set-face-foreground 'woman-unknown "blue")
        (message "Loading %s (woman)...done" this-file-name))))
 
-;;; Devhelp
-;; sudo apt-get install devhelp
-;; (install-elisp "ftp://download.tuxfamily.org/user42/gtk-look.el")
-(when (and (locate-library "info")
-           (locate-library "gtk-look"))
-  (autoload 'gtk-lookup-symbol "gtk-look" "lookup Gtk and Gnome documentation." t)
-  (defun w3m-gtk-lookup ()
-    "Gtk lookup for w3m."
-    (interactive)
-    (let ((browse-url-browser-function 'w3m-browse-url))
-      (call-interactively 'gtk-lookup-symbol)))
-  (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
-
-;; Html マニュアル
+;;; Html マニュアル
 (when (locate-library "w3m")
   ;; Devhelp マニュアル
   (defun w3m-devhelp-command (cmd)
@@ -533,6 +520,19 @@
           `(lambda ()
              (interactive)
              (w3m-devhelp-command ,pg))))))
+
+  ;; Devhelp
+  ;; sudo apt-get install devhelp
+  ;; (install-elisp "ftp://download.tuxfamily.org/user42/gtk-look.el"
+  (when (locate-library "gtk-look")
+    (autoload 'gtk-lookup-symbol "gtk-look" "lookup Gtk and Gnome documentation." t)
+    (defun w3m-gtk-lookup ()
+      "Gtk lookup for w3m."
+      (interactive)
+      (let ((browse-url-browser-function 'w3m-browse-url))
+        (call-interactively 'gtk-lookup-symbol)))
+    (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
+
   ;; Python マニュアル
   ;; sudo apt-get install python2.7-doc
   (defun w3m-python-manual ()
@@ -543,6 +543,8 @@
         (if (file-readable-p html)
             (w3m-goto-url-new-session (concat "file:/" html))
           (message "no file: %s" html)))))
+
+  ;; Python 日本語マニュアル
   (defun w3m-python-ja-manual ()
     "Python japanese manual."
     (interactive)
@@ -552,6 +554,7 @@
         (if (file-readable-p html)
             (w3m-goto-url-new-session (concat "file:/" html))
           (message "no file: %s" html)))))
+
   ;; Haskell マニュアル
   ;; sudo apt-get install ghc-doc
   (defun w3m-haskell-manual ()
@@ -3474,8 +3477,11 @@
                (boundp 'ac-auto-start))
       ;; auto-complete-mode をトグルする
       (if auto-complete-mode
-          (auto-complete-mode -1)
+          (progn
+            (auto-complete-mode -1)
+            (remove-hook 'c-mode-common-hook 'auto-complete-mode))
         (auto-complete-mode 1)
+        (add-hook 'c-mode-common-hook 'auto-complete-mode)
         (let* ((default (cdr (assq 'auto-complete-mode minor-mode-alist))))
           (setcar default " α")))
       ;; ac-auto-start の設定
@@ -3552,15 +3558,15 @@
     (interactive "DDirectory: ")
     (let ((default-directory dir)
           (compile-command
-            (cond ((or (eq major-mode 'c-mode)
-                       (eq major-mode 'c++mode))
-                   "make -k ")
-                  ((eq major-mode 'java-mode)
-                   (concat "javac "
-                           (file-name-nondirectory (buffer-file-name))))
-                  (t compile-command))))
+           (cond ((or (eq major-mode 'c-mode)
+                      (eq major-mode 'c++mode))
+                  "make -k ")
+                 ((eq major-mode 'java-mode)
+                  (concat "javac "
+                          (file-name-nondirectory (buffer-file-name))))
+                 (t compile-command))))
       (call-interactively 'compile)))
-  (define-key global-map (kbd "C-c c") 'compile-directory)
+  (define-key mode-specific-map "c" 'compile-directory)
 
   (eval-after-load "compile"
     '(progn
@@ -3601,7 +3607,7 @@
              (add-to-list 'cmd "make -k")
              (apply 'compilation-start cmd))))
 
-       ;; C-c c でコンパイル
+       ;; コンパイルキーバインド
        (when (boundp 'compilation-mode-map)
          (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
          (define-key compilation-mode-map (kbd "m") 'recompile-make))
@@ -3705,8 +3711,13 @@
 
 (add-hook 'c-mode-hook
           (lambda ()
+            ;; インデント
             (when (fboundp 'c-set-style)
               (c-set-style "k&r"))
+            ;; TODO, FIXME, BUG, XXX を強調表示
+            (font-lock-add-keywords
+             nil
+             '(("\\( TODO\\| FIXME\\| BUG\\| XXX\\)" 1 font-lock-warning-face t)))
             (when (and (require 'auto-complete nil t)
                        (require 'auto-complete-config nil t))
                   (add-ac-sources  '(ac-source-dictionary
