@@ -492,7 +492,7 @@
        ;; キャッシュを作成 (更新は C-u を付ける)
        (when (boundp 'woman-cache-filename)
          (setq woman-cache-filename
-               (expand-file-name "~/.emacs.d/woman_cache.el")))
+               (expand-file-name "~/woman_cache.el")))
        ;; 新たにフレームは作らない
        (when (boundp 'woman-use-own-frame)
          (setq woman-use-own-frame nil))
@@ -1698,7 +1698,7 @@
                       (substring (symbol-name major-mode) 0 -5)
                       "] %^{Title} %U\n%a\n%i%?\n"))
              (org-remember-templates
-              (list (list "CodeReading" ?r string file "Code Reading"))))
+              `(("CodeReading" ?r ,string ,file "Code Reading"))))
         (message "org-remember-code-reading: %s" file)
         (when (fboundp 'org-remember)
           (org-remember)))))
@@ -1731,26 +1731,26 @@
                                      (if (file-readable-p book-tmpl)
                                          (format "%%[%s]" book-tmpl) "") "\n")))
            (setq org-remember-templates
-                 (list (list "Todo"    ?t
-                             "** TODO %^{Title}\n%?\nAdded: %U\n"
-                             nil "Tasks")
-                       (list "Bug"     ?b
-                             "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
-                             nil "Tasks")
-                       (list "Idea"    ?i
-                             "** %^{Idea} %U\n%i%?\n" nil "Ideas")
-                       (list "Journal" ?j
-                             "** %^{Head Line} %U\n%i%?\n"
-                             journal-file "Inbox")
-                       (list "Emacs"   ?e
-                             "** %^{Title} %U\n%a\n%i%?\n"
-                             emacs-file "Emacs")
-                       (list "Memo"    ?m
-                             "** %^{Title} %U\n%a\n%i%?\n"
-                             memo-file "Memo")
-                       (list "Private" ?p
-                             "** %^{Topic} %U \n%i%?\n" private-file "Private")
-                       (list "Book"    ?k book-string book-file "Books")))))
+                 `(("Todo"    ?t
+                    "** TODO %^{Title}\n%?\nAdded: %U\n"
+                    nil "Tasks")
+                   ("Bug"     ?b
+                    "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
+                    nil "Tasks")
+                   ("Idea"    ?i
+                    "** %^{Idea} %U\n%i%?\n" nil "Ideas")
+                   ("Journal" ?j
+                    "** %^{Head Line} %U\n%i%?\n"
+                    ,journal-file "Inbox")
+                   ("Emacs"   ?e
+                    "** %^{Title} %U\n%a\n%i%?\n"
+                    ,emacs-file "Emacs")
+                   ("Memo"    ?m
+                    "** %^{Title} %U\n%a\n%i%?\n"
+                    ,memo-file "Memo")
+                   ("Private" ?p
+                    "** %^{Topic} %U \n%i%?\n" ,private-file "Private")
+                   ("Book"    ?k ,book-string ,book-file "Books")))))
        (when (fboundp 'org-remember-insinuate) ; 初期化
          (org-remember-insinuate))
        (message "Loading %s (org-remember)...done" this-file-name))))
@@ -1986,7 +1986,19 @@
 ;; (install-elisp-from-emacswiki "syslog-mode.el")
 (when (locate-library "syslog-mode")
   (autoload 'syslog-mode "syslog-mode" "Mode for viewing system logfiles" t)
-  (add-to-list 'auto-mode-alist '("/var/log.*\\'" . syslog-mode)))
+  (add-to-list
+   'auto-mode-alist
+   '("/var/log/.*\\|\\(messages\\|syslog\\|local[0-9]+\\)\\(\\.[1-9]+\\)?\\(\\.gz\\)?$"
+     . syslog-mode))
+
+  ;; 折り返しをしない
+  (add-hook 'syslog-mode-hook
+            (lambda () (setq truncate-lines t)))
+
+  (eval-after-load "syslog-mode"
+    '(progn
+       (when (locate-library "color-syslog")
+         (load "color-syslog")))))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
@@ -3748,41 +3760,46 @@
       (unless (member source ac-sources)
         (add-to-list 'ac-sources source)))))
 
-(add-hook 'c-mode-hook
-          (lambda ()
-            ;; インデント
-            (when (fboundp 'c-set-style)
-              (c-set-style "k&r"))
-            ;; TODO, FIXME, BUG, XXX を強調表示
-            (font-lock-add-keywords
-             nil
-             '(("\\( TODO\\| FIXME\\| BUG\\| XXX\\)" 1 font-lock-warning-face t)))
-            (when (and (require 'auto-complete nil t)
-                       (require 'auto-complete-config nil t))
-                  (add-ac-sources  '(ac-source-dictionary
-                                     ac-source-words-in-buffer
-                                     ac-source-words-in-same-mode-buffers
-                                     ac-source-filename
-                                     ac-source-files-in-current-dir)))
-            (when (require 'auto-complete-clang nil t)
-              (when (boundp 'ac-clang-prefix-header)
-                (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
-              (when (boundp 'ac-clang-flags)
-                (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
-              (add-ac-sources '(ac-source-clang)))
-            (when (require 'cedet nil t)
-              (when (fboundp 'global-ede-mode)
-                (global-ede-mode 1)))
-            (when (require 'semantic nil t)
-              (add-ac-sources '(ac-source-semantic-raw
-                                ac-source-semantic)))
-            (when (require 'semantic-load nil t)
-              (when (fboundp 'semantic-load--enable-code-helpers)
-                (semantic-load--enable-code-helpers)))
-            (when (locate-library "gtags")
-              (add-ac-sources '(ac-source-gtags)))
-            (when (boundp 'ac-sources)
-              (message "ac-sources: %s" ac-sources))))
+(when (locate-library "cc-mode")
+  (font-lock-add-keywords
+   'c-mode
+   ;; TODO, FIXME を強調表示
+   '(("\\( TODO\\| FIXME\\| XXX\\| BUG\\):" 1 font-lock-warning-face prepend)
+     ;; if 文の後ろの = を警告表示
+     ("\\<if\\>"
+      ("[^!<>=]\\(=\\)[^=]" nil nil (1 font-lock-warning-face)))))
+
+  (add-hook 'c-mode-hook
+            (lambda ()
+              ;; インデント
+              (when (fboundp 'c-set-style)
+                (c-set-style "k&r"))
+              (when (and (require 'auto-complete nil t)
+                         (require 'auto-complete-config nil t))
+                (add-ac-sources  '(ac-source-dictionary
+                                   ac-source-words-in-buffer
+                                   ac-source-words-in-same-mode-buffers
+                                   ac-source-filename
+                                   ac-source-files-in-current-dir)))
+              (when (require 'auto-complete-clang nil t)
+                (when (boundp 'ac-clang-prefix-header)
+                  (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
+                (when (boundp 'ac-clang-flags)
+                  (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
+                (add-ac-sources '(ac-source-clang)))
+              (when (require 'cedet nil t)
+                (when (fboundp 'global-ede-mode)
+                  (global-ede-mode 1)))
+              (when (require 'semantic nil t)
+                (add-ac-sources '(ac-source-semantic-raw
+                                  ac-source-semantic)))
+              (when (require 'semantic-load nil t)
+                (when (fboundp 'semantic-load--enable-code-helpers)
+                  (semantic-load--enable-code-helpers)))
+              (when (locate-library "gtags")
+                (add-ac-sources '(ac-source-gtags)))
+              (when (boundp 'ac-sources)
+                (message "ac-sources: %s" ac-sources)))))
 
 ;;; CEDET
 (when (locate-library "info")
