@@ -216,21 +216,46 @@
   (setq mode-line-format
         (delete (assoc 'which-func-mode mode-line-format)
                 mode-line-format))
+
   ;; 24.3.1 から
   (when (boundp 'mode-line-misc-info)
     (setq mode-line-misc-info
           (delete (assoc 'which-func-mode mode-line-misc-info)
                   mode-line-misc-info)))
+
   (setq-default header-line-format '(which-func-mode ("" which-func-format)))
   ;; 色
   (set-face-foreground 'which-func "chocolate1")
   (set-face-bold-p 'which-func t)
+
+  ;; ヘッダラインとモードラインをトグルする
+  (defun toggle-header-which-func ()
+    "Toggle header-line and mode-ine"
+    (if (member '(which-func-mode ("" which-func-format)) mode-line-format)
+        (progn
+          ;; ヘッダラインに表示
+          (setq header-line-format '(which-func-mode ("" which-func-format)))
+          ;; モードラインを非表示
+          (setq mode-line-format
+                (delete (assoc 'which-func-mode mode-line-format)
+                        mode-line-format)))
+      ;; モードラインに表示
+      (add-to-list 'mode-line-format '(which-func-mode ("" which-func-format)))
+      ;; ヘッダラインを非表示
+      (setq header-line-format "")
+      (when (and (fboundp 'tabbar-line)
+                 (boundp 'tabbar-mode)
+                 tabbar-mode)
+        (setq header-line-format '(:eval (tabbar-line))))))
+
   ;; M-1 で関数名表示をトグルする
   (when (fboundp ' which-function-mode)
     (defun toggle-which-func-mode ()
       (interactive)
       (if which-function-mode
           (which-function-mode -1)
+        (when (fboundp 'toggle-header-which-func)
+          (toggle-header-which-func))
         (which-function-mode 1)))
     (define-key global-map (kbd "M-1") 'toggle-which-func-mode)))
 
@@ -993,6 +1018,14 @@
 ;; 間違えて気づかないことがあるので, C-S-t に変更する
 (define-key global-map (kbd "C-t") nil)
 (define-key global-map (kbd "C-S-t") 'transpose-chars)
+
+;; C-z をウィンドウの切り替えに割り当てる
+(defun other-window-or-split ()
+  (interactive)
+  (when (one-window-p)
+    (split-window-horizontally))
+  (other-window 1))
+(global-set-key (kbd "C-z") 'other-window-or-split)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
@@ -3515,6 +3548,21 @@
   (exec-tags-command
    "ctags-exuberant" "-e" "-V" "-L" "-" "--exclude=*/undohist/!*.el"))
 
+;;; 関数一覧表示
+;; (install-elisp "http://www.bookshelf.jp/elc/summarye.el")
+(when (locate-library "summarye")
+  (autoload 'se/make-summary-buffer "summarye"
+    "list up matched strings from a buffer, and display them in summary buffer" t))
+
+;; wget -O- http://www.ne.jp/asahi/love/suna/pub/soft/navi.el/file/navi.1.43.tar.gz | tar xfz -
+(when (locate-library "navi")
+  (autoload 'navi "navi" "List function declaration and jump to it." t)
+  (defun call-navi ()
+    "Display and jump functions."
+    (interactive)
+    (when (fboundp 'navi)
+      (navi (buffer-name)))))
+
 ;;; オートコンプリート
 ;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
 (when (locate-library "auto-complete")
@@ -3608,6 +3656,7 @@
   (defun compile-directory (dir)
     (interactive "DDirectory: ")
     (let ((default-directory dir)
+          (split-width-threshold 100000) ; 上下分割したい (デフォルト: 160)
           (compile-command
            (cond ((or (eq major-mode 'c-mode)
                       (eq major-mode 'c++mode))
