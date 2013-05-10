@@ -2026,7 +2026,12 @@
 
   ;; 折り返しをしない
   (add-hook 'syslog-mode-hook
-            (lambda () (setq truncate-lines t)))
+            (lambda ()
+              (when (boundp 'truncate-lines)
+                (setq truncate-lines t))
+              (when (boundp 'font-lock-string-face)
+                (set (make-local-variable 'font-lock-string-face) nil)
+                (setq font-lock-string-face nil))))
 
   (eval-after-load "syslog-mode"
     '(progn
@@ -3710,7 +3715,7 @@
        ;; コンパイルキーバインド
        (when (boundp 'compilation-mode-map)
          (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
-         (define-key compilation-mode-map (kbd "m") 'recompile-make))
+         (define-key compilation-mode-map (kbd "c") 'recompile-make))
        (message "Loading %s (compile)...done" this-file-name))))
 
 ;;; 略語から定型文を入力する
