@@ -35,7 +35,7 @@
 
 (defgroup syslog-ext nil
   "Extension syslog-mode"
-  :group 'emacs)
+  :group 'syslog)
 
 (eval-when-compile (require 'syslog-mode))
 (eval-when-compile (require 'filecache))
