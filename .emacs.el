@@ -1023,9 +1023,12 @@
 (defun other-window-or-split ()
   (interactive)
   (when (one-window-p)
-    (split-window-horizontally))
+    (split-window-vertically))
   (other-window 1))
-(global-set-key (kbd "C-z") 'other-window-or-split)
+(define-key global-map (kbd "C-z") 'other-window-or-split)
+
+;; 行番号へ移動 (デフォルト: M-g g)
+(define-key global-map (kbd "M-g") 'goto-line)
 
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
@@ -1898,8 +1901,8 @@
   (define-key global-map (kbd "<f12>") 'recentf-open-files))
 
 ;;; 矩形選択
-;; M-x cua-mode
-;; <C-enter> で矩形選択モード
+;; (cua-mode)
+;; 矩形選択モード <C-enter>
 (when (locate-library "cua-base")
   (autoload 'cua-mode "cua-base" "Toggle Common User Access style editing" t)
 
@@ -1910,15 +1913,22 @@
          (setq cua-enable-cua-keys nil))
        (message "Loading %s (cua-base)...done" this-file-name))))
 
-;;; Anything
-;; (auto-install-batch "anything")
-(when (locate-library "anything-config")
-  (autoload 'anything-recentf "anything-config"
-    "Preconfigured `anything' for `recentf'." t)
-  (autoload 'anything-for-files "anything-config"
-    "Preconfigured `anything' for opening files." t)
-  (define-key global-map (kbd "C-c a f") 'anything-recentf)
-  (define-key global-map (kbd "C-c a b") 'anything-for-files))
+;; filecache
+(when (locate-library "filecache")
+  (autoload 'file-cache-minibuffer-complete "filecache"
+    "Complete a filename in the minibuffer using a preloaded cache." t)
+  (autoload 'file-cache-add-directory-recursively "filecache"
+    "Adds DIR and any subdirectories to the file-cache." t)
+  (when (fboundp 'file-cache-add-directory-list)
+    (file-cache-add-directory-list (list "~" "~/bin")))
+  (when (boundp 'file-cache-filter-regexps)
+    (setq file-cache-filter-regexps
+          (append '("\\.svn/.*" "\\.git/.*")
+                  file-cache-filter-regexps))
+    (when (boundp 'minibuffer-local-completion-map)
+      (define-key minibuffer-local-completion-map
+        (kbd "M-c") 'file-cache-minibuffer-complete)))
+  (define-key global-map (kbd "C-c r") 'file-cache-add-directory-recursively))
 
 ;;; ここまで標準 lisp
 
@@ -2007,36 +2017,40 @@
   (when (fboundp 'undohist-initialize)
     (undohist-initialize)))
 
-;;; CVS モード
+;;; CSV
 ;; (install-elisp "http://bzr.savannah.gnu.org/lh/emacs/elpa/download/head:/csvmode.el-20120312160844-puljoum8kcsf2xcu-2/csv-mode.el")
 (when (locate-library "csv-mode")
   (add-to-list 'auto-mode-alist '("\\.[Cc][Ss][Vv]\\'" . csv-mode))
   (autoload 'csv-mode "csv-mode"
     "Major mode for editing comma-separated value files." t))
 
-;; syslog モード
+;;; シスログ
 ;; (install-elisp-from-emacswiki "hide-lines.el")
 ;; (install-elisp-from-emacswiki "syslog-mode.el")
 (when (locate-library "syslog-mode")
-  (autoload 'syslog-mode "syslog-mode" "Mode for viewing system logfiles" t)
+  (autoload 'syslog-mode "syslog-mode" "Mode for viewing system logfiles." t)
   (add-to-list
    'auto-mode-alist
    '("/var/log/.*\\|\\(messages\\|syslog\\|local[0-9]+\\)\\(\\.[1-9]+\\)?\\(\\.gz\\)?$"
      . syslog-mode))
 
-  ;; 折り返しをしない
   (add-hook 'syslog-mode-hook
             (lambda ()
+              ;; 折り返しをしない
               (when (boundp 'truncate-lines)
                 (setq truncate-lines t))
+              ;; 文字列の色を無効にする
               (when (boundp 'font-lock-string-face)
                 (set (make-local-variable 'font-lock-string-face) nil)
                 (setq font-lock-string-face nil))))
 
-  (eval-after-load "syslog-mode"
-    '(progn
-       (when (locate-library "color-syslog")
-         (load "color-syslog")))))
+  (when (locate-library "syslog-ext")
+    (autoload 'syslog-open-file-move-line "syslog-ext" "Extension syslog-mode" t)
+    (eval-after-load "syslog-mode"
+      '(progn
+         (when (boundp 'syslog-mode-map)
+           (define-key syslog-mode-map (kbd "f") 'syslog-open-file-move-line))
+         (message "Loading %s (syslog-mode)...done" this-file-name)))))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
@@ -2132,6 +2146,41 @@
 ;;; ミニバッファで isearch を使えるようにする
 ;; (install-elisp "http://www.sodan.org/~knagano/emacs/minibuf-isearch/minibuf-isearch.el")
 (eval-and-compile (require 'minibuf-isearch nil t))
+
+;;; Anything
+;; (auto-install-batch "anything")
+(when (locate-library "anything-config")
+  (autoload 'anything-recentf "anything-config"
+    "Preconfigured `anything' for `recentf'." t)
+  (autoload 'anything-for-files "anything-config"
+    "Preconfigured `anything' for opening files." t)
+  (autoload 'anything-filelist "anything-config"
+    "Preconfigured `anything' to open files instantly." t)
+  (define-key global-map (kbd "C-c a f") 'anything-recentf)
+  (define-key global-map (kbd "C-c a b") 'anything-for-files)
+  (define-key global-map (kbd "C-c a l") 'anything-filelist)
+  (defun anything-choice ()
+    "Anything choice."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?f "recentf(f)"  anything-recentf)
+                   (?b "files(b)"    anything-for-files)
+                   (?l "filelist(l)" anything-filelist)))
+            (prompt "Anything: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let* ((char (read-char-choice prompt chars))
+               (func (car (cdr (cdr (assq char lst))))))
+          (call-interactively func)))))
+  (define-key global-map (kbd "C-c a") 'anything-choice)
+  (eval-after-load "anything-config"
+    '(progn
+       (when (boundp 'anything-c-filelist-file-name)
+         (setq anything-c-filelist-file-name "~/.filelist"))
+       (when (boundp 'anything-grep-candidates-fast-directory-regexp)
+         (setq anything-grep-candidates-fast-directory-regexp "^/tmp")))))
 
 ;;; タブ
 ;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
