@@ -2117,7 +2117,10 @@
     (eval-after-load "syslog-mode"
       '(progn
          (when (boundp 'syslog-mode-map)
-           (define-key syslog-mode-map (kbd "f") 'syslog-open-file-move-line))
+           (define-key syslog-mode-map (kbd "f")
+             (lambda ()
+               (let ((split-width-threshold 100000)) ; 上下分割のみ (デフォルト: 160))
+               (syslog-open-file-move-line)))))
          (message "Loading %s (syslog-mode)...done" this-file-name)))))
 
 ;;; 使わないバッファを自動的に消す
@@ -3792,7 +3795,7 @@
   (defun compile-directory (dir)
     (interactive "DDirectory: ")
     (let ((default-directory dir)
-          (split-width-threshold 100000) ; 上下分割したい (デフォルト: 160)
+          (split-width-threshold 100000) ; 上下分割のみ (デフォルト: 160)
           (compile-command
            (cond ((or (eq major-mode 'c-mode)
                       (eq major-mode 'c++mode))
@@ -3807,19 +3810,21 @@
   (eval-after-load "compile"
     '(progn
        ;; 保存するときに聞かない
-       (when (boundp 'compilation-asc-abount-save)
+       (when (boundp 'compilation-ask-about-save)
          (setq compilation-ask-about-save nil))
        ;; コンパイル結果をスクロールさせる
        (when (boundp 'compilation-scroll-output)
          (setq compilation-scroll-output t))
+       ;; ウィンドウの高さ
        (when (boundp 'compilation-window-height)
          (setq compilation-window-height 20))
+       ;; 環境変数
        (when (boundp 'compilation-environment)
          (setq compilation-environment "LC_ALL=C"))
+       ;; 日本語対応
        (add-to-list
         'compilation-error-regexp-alist-alist
         '(gcc-ja "^\\([\x20-\x7E]+\\):\\([0-9]+\\): \\(エラー\\|警告\\)" 1 2 nil nil))
-
        (add-to-list 'compilation-error-regexp-alist 'gcc-ja)
 
        (defadvice compilation-find-file
@@ -3827,6 +3832,7 @@
          (message "compilation-find-file: %s %s %s"
                   (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2)))
 
+       ;; 再コンパイル (make clean all)
        (defun recompile-make-clean-all ()
          "Make clean for compilation-mode."
          (interactive)
@@ -3835,6 +3841,7 @@
              (add-to-list 'cmd "make clean all")
              (apply 'compilation-start cmd))))
 
+       ;; 再コンパイル (make -k)
        (defun recompile-make()
          "Make clean for compilation-mode."
          (interactive)
@@ -3843,7 +3850,7 @@
              (add-to-list 'cmd "make -k")
              (apply 'compilation-start cmd))))
 
-       ;; コンパイルキーバインド
+       ;; キーバインド
        (when (boundp 'compilation-mode-map)
          (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
          (define-key compilation-mode-map (kbd "c") 'recompile-make))
