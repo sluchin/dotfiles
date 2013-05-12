@@ -71,6 +71,50 @@
       (buffer-substring-no-properties (region-beginning) (region-end))
     (thing-at-point 'word)))
 
+;; ディレクトリ配下すべてのファイルをリストにする
+(defun recursive-directory (dir &optional exclude)
+  "Make file list under directory."
+  (let (files)
+    (unless (listp dir)
+      (setq dir (list dir)))
+    (dolist (file dir)
+      (if (file-directory-p file)
+          (setq files
+                (append
+                 files
+                 (recursive-directory
+                  (let (recursive)
+                    (dolist (f (directory-files file t))
+                      (unless (string-match "/\\.$\\|/\\.\\.$" f)
+                        (add-to-list 'recursive f)))
+                    recursive) exclude)))
+        (if (or (null exclude)
+                (not (string-match exclude file)))
+            (add-to-list 'files file))))
+    files))
+
+;; ディレクトリ配下すべてのファイルを表示
+(defun print-files (dir)
+  "Print files for directory."
+  (interactive "DDirectory: ")
+  (let* ((default "\\\.elc$")
+         (exclude (read-regexp
+                   (format "exclude(%S): " default) default t)))
+    (message "exclude: %S" exclude)
+    (dolist (file
+             (recursive-directory dir exclude))
+      (message "%s" file))))
+
+;; ファイルリスト作成
+(defun make-filelist (filelist dirs &optional exclude)
+  "Make file list."
+  (message "exclude: %S" exclude)
+  (with-temp-buffer
+    (dolist (dir dirs)
+      (dolist (file (recursive-directory dir exclude))
+        (insert (concat file "\n"))))
+    (write-file filelist)))
+
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
@@ -668,12 +712,36 @@
 (auto-compression-mode 1)
 
 ;;; ブックマーク
+;; デフォルト
 ;; C-x r m (bookmark-set)
 ;; C-x r l (bookmark-bmenu-list)
-;; ブックマークを変更したら即保存する
+;; C-x r b (bookmark-jump)
 (when (locate-library "bookmark")
+  (autoload 'bookmark-set "bookmark"
+    "Set a bookmark named NAME at the current location." t)
+  (autoload 'bookmark-bmenu-list "bookmark"
+    "Display a list of existing bookmarks." t)
+  (autoload 'bookmark-jump "bookmark"
+    "Jump to bookmark BOOKMARK (a point in some file)." t)
+  (defun bookmark-choice ()
+    "Bookmark choice."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?f "set(m)"  bookmark-set)
+                   (?l "list(l)" bookmark-bmenu-list)
+                   (?b "jump(b)"  bookmark-jump)))
+            (prompt "Bookmark: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let* ((char (read-char-choice prompt chars))
+               (func (car (cdr (cdr (assq char lst))))))
+          (call-interactively func)))))
+  (define-key global-map (kbd "C-c r") 'bookmark-choice)
   (eval-after-load "bookmark"
     '(progn
+       ;; ブックマークを変更したら即保存する
        (when (boundp 'bookmark-save-flag)
          (setq bookmark-save-flag t))
        (message "Loading %s (bookmark)...done" this-file-name))))
@@ -1928,7 +1996,7 @@
     (when (boundp 'minibuffer-local-completion-map)
       (define-key minibuffer-local-completion-map
         (kbd "M-c") 'file-cache-minibuffer-complete)))
-  (define-key global-map (kbd "C-c r") 'file-cache-add-directory-recursively))
+  (define-key global-map (kbd "C-c C-r") 'file-cache-add-directory-recursively))
 
 ;;; ここまで標準 lisp
 
@@ -2156,9 +2224,6 @@
     "Preconfigured `anything' for opening files." t)
   (autoload 'anything-filelist "anything-config"
     "Preconfigured `anything' to open files instantly." t)
-  (define-key global-map (kbd "C-c a f") 'anything-recentf)
-  (define-key global-map (kbd "C-c a b") 'anything-for-files)
-  (define-key global-map (kbd "C-c a l") 'anything-filelist)
   (defun anything-choice ()
     "Anything choice."
     (interactive)
@@ -2175,6 +2240,23 @@
                (func (car (cdr (cdr (assq char lst))))))
           (call-interactively func)))))
   (define-key global-map (kbd "C-c a") 'anything-choice)
+
+  (defun anything-make-filelist ()
+    "Make file list."
+    (interactive)
+    (let ((conf-file "~/.emacs.d/conf/filelist-dir.el")
+          lst)
+      (if (file-readable-p conf-file)
+          (with-temp-buffer
+            (insert-file-contents conf-file)
+            (setq lst (read (current-buffer))))
+        (setq lst '("~/")))
+      (let* ((dirs (read (read-string
+                          "Dirlist: "
+                          (format "%s" (car (cdr lst)))))))
+        (make-filelist "~/.filelist" dirs
+                       "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$"))))
+
   (eval-after-load "anything-config"
     '(progn
        (when (boundp 'anything-c-filelist-file-name)
@@ -4307,7 +4389,7 @@
     ;; 閉じカッコの前の空白削除
     (while (re-search-forward "[ ]+)" nil t)
       (replace-match ")")
-2      (message "[%d] replace-match (`)')...done" (line-number-at-pos)))
+      (message "[%d] replace-match (`)')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 閉じカッコと次のブレスの間の空白挿入
     (while (re-search-forward "){" nil t)
@@ -4336,26 +4418,6 @@
       (c-indent-defun)
       (message "c-indent-defun...done"))
     (message "execute-indent...done")))
-
-;; ディレクトリ配下すべてのファイルをリストにする
-(defun recursive-directory (dir)
-  "Make file list under directory."
-  (let (files)
-    (unless (listp dir)
-      (setq dir (list dir)))
-    (dolist (file dir)
-      (if (file-directory-p file)
-          (setq files
-                (append
-                 files
-                 (recursive-directory
-                  (let (recursive)
-                    (dolist (f (directory-files file t))
-                      (unless (string-match "/\\.$\\|/\\.\\.$" f)
-                        (add-to-list 'recursive f)))
-                    recursive))))
-        (add-to-list 'files file)))
-    files))
 
 ;;; ディレクトリ配下すべてのファイルをインデント
 (defun indent-all (dir)

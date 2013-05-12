@@ -5,6 +5,7 @@
 
 ;; Author: Tetsuya Higashi
 
+;;; Setting
 ;; (autoload 'pomodoro-start
 ;;   "pomodoro-technique" "Start pomodoro timer." t)
 ;; (autoload 'pomodoro-restart
@@ -25,7 +26,7 @@
 ;; (define-key global-map (kbd "C-c p t") 'pomodoro-save-time)
 ;; (define-key global-map (kbd "C-c p q") 'pomodoro-stop)
 
-;; Code:
+;;; Code:
 
 (eval-and-compile (require 'org nil t))
 
