@@ -42,7 +42,7 @@
     (unless (assq (ad-get-arg 0) benchmark-alist)
       (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time)))))
 
-;; require 時間表示
+;;; require 時間表示
 (defun print-require-benchmark ()
   "Print benchmark."
   (interactive)
@@ -52,7 +52,7 @@
       (message "%-18s %.6f" (car alist) (cdr alist)))
     (message "%-18s %.6f" "all" all)))
 
-;; ロード履歴の表示
+;;; ロード履歴の表示
 (defun print-load-file ()
   "Print load-history."
   (interactive)
@@ -64,14 +64,14 @@
         (setq all (+ all bytes))))
     (message "%.6fM (%d)" (/ (/ all 1024.0) 1024.0) all)))
 
-;; リージョンまたはワードを返却
+;;; リージョンまたはワードを返却
 (defun region-or-word ()
   "Return region or word"
   (if mark-active
       (buffer-substring-no-properties (region-beginning) (region-end))
     (thing-at-point 'word)))
 
-;; ディレクトリ配下すべてのファイルをリストにする
+;;; ディレクトリ配下すべてのファイルをリストにする
 (defun recursive-directory (dir &optional exclude)
   "Make file list under directory."
   (let (files)
@@ -94,7 +94,7 @@
             (add-to-list 'files file))))
     files))
 
-;; ディレクトリ配下すべてのファイルを表示
+;;; ディレクトリ配下すべてのファイルを表示
 (defun print-files (dir)
   "Print files for directory."
   (interactive "DDirectory: ")
@@ -106,7 +106,7 @@
              (recursive-directory dir exclude))
       (message "%s" file))))
 
-;; ファイルリスト作成
+;;; ファイルリスト作成
 (defun make-filelist (filelist dirs &optional exclude)
   "Make file list."
   (message "exclude: %S" exclude)
@@ -176,6 +176,7 @@
                 "~/.emacs.d/cedet/common"
                 "~/.emacs.d/cedet/ede"
                 "~/.emacs.d/cedet/semantic"
+                "~/.emacs.d/cedet/speedbar"
                 "~/.emacs.d/auto-install") load-path))
 
 ;;; 初期画面を表示しない
@@ -439,9 +440,6 @@
 
   (eval-after-load "info"
     '(progn
-       ;; info+
-       ;; (install-elisp-from-emacswiki "info+.el")
-       (require 'info+ nil t)
        ;; ヘッダラインを使用しない
        (when (boundp 'Info-use-header-line)
          (setq Info-use-header-line nil))
@@ -1284,7 +1282,7 @@
                   (date (format-time-string "%Y%m%d%H%M%S")))
              (mapc (lambda (file)
                      (let* ((ext (file-name-extension file))
-                            (backup 
+                            (backup
                              (format "%s_%s%s"
                                      (file-name-sans-extension file)
                                      date
@@ -1469,7 +1467,7 @@
          "Toggle whitespace."
          (interactive)
          (when (boundp 'diff-switches)
-           (dolist (option (list "-w" "-b" "-B" "-E" ))
+           (dolist (option (list "-w" "-b" "-B" "-E"))
              (if (member option diff-switches)
                  (setq diff-switches (remove option diff-switches))
                (add-to-list 'diff-switches option)))
@@ -1654,8 +1652,6 @@
   (interactive) (find-file "~/.emacs.d/org/reference-card.org"))
 
 ;; org-mode 日本語 info
-;; 目次ファイルに以下を追加 (find-file "/sudo::/usr/share/info/dir")
-;; * Org Mode Ja: (org-ja).    Outline-based notes management and organizer (Japanese).
 (when (locate-library "info")
   (defun org-ja-info (&optional node)
     "Read documentation for Org-mode japanese in the info system."
@@ -1747,7 +1743,7 @@
        (when (boundp 'org-directory)           ; ディレクトリ
          (setq org-directory (catch 'found (find-directory "org")))
          (message "org-directory: %s" org-directory))
-       (when (boundp 'org-default-notes-file) ; ファイル名
+       (when (boundp 'org-default-notes-file)  ; ファイル名
          (setq org-default-notes-file
                (concat (file-name-as-directory org-directory) "agenda.org"))
          (message "org-default-notes-file: %s" org-default-notes-file))
@@ -1925,12 +1921,12 @@
     (around recentf-open-files-action-no-kill (widget &rest _ignore)
             activate compile)
     (when (eval-when-compile (require 'cl nil t))
-      (defsubst kill-buffer-orig () nil)
-      (letf* (((symbol-function 'kill-buffer-orig) (symbol-function 'kill-buffer))
+      (defsubst kill-buffer-original () nil)
+      (letf* (((symbol-function 'kill-buffer-original) (symbol-function 'kill-buffer))
               ((symbol-function 'kill-buffer)
                (lambda (&optional b)
                  (if (string= (buffer-name b) (format "*%s*" recentf-menu-title))
-                     nil (kill-buffer-orig b)))))
+                     nil (kill-buffer-original b)))))
         ad-do-it)
       ;; tabbar-mode を有効
       (when (fboundp 'tabbar-mode)
@@ -1982,7 +1978,7 @@
          (setq cua-enable-cua-keys nil))
        (message "Loading %s (cua-base)...done" this-file-name))))
 
-;; filecache
+;;; filecache
 (when (locate-library "filecache")
   (autoload 'file-cache-minibuffer-complete "filecache"
     "Complete a filename in the minibuffer using a preloaded cache." t)
@@ -2009,7 +2005,7 @@
         (insert-file-contents file)
         (setq file-cache-alist (read (current-buffer))))))
 
-  ;; 選択する
+  ;; 選択して実行する
   (defun file-cache-choice ()
     "Filecache choice."
     (interactive)
@@ -2040,7 +2036,7 @@
          (file-cache-add-directory-list (list "~" "~/bin")))
        (when (boundp 'file-cache-filter-regexps)
          (setq file-cache-filter-regexps
-               (append '("\\.svn/.*" "\\.git/.*")
+               (append '("CVS/.*" "\\.svn/.*" "\\.git/.*")
                        file-cache-filter-regexps))))))
 
 ;;; ここまで標準 lisp
@@ -2070,15 +2066,13 @@
          (auto-install-compatibility-setup))
        (message "Loading %s (auto-install)...done" this-file-name))))
 
-;;; ミニバッファの入力補完
-;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/completing-help.el")
-(when (locate-library "completing-help")
-  (autoload 'completing-help-mode "completing-help"
-    "Toggle a facility to display information on completions." t)
-  (autoload 'turn-on-completing-help-mode "completing-help"
-    "Turn on a facility to display information on completions." t)
-  (autoload 'turn-off-completing-help-mode "completing-help"
-    "Turn off a facility to display information of completions." t))
+;;; info+
+;; (install-elisp-from-emacswiki "info+.el")
+(when (locate-library "info")
+  (eval-after-load "info"
+    '(progn
+       (when (require 'info+ nil t)
+         (message "Loading %s (info+)...done" this-file-name)))))
 
 ;;; マニュアルと info (iman)
 ;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/iman.el")
@@ -2092,6 +2086,16 @@
        (when (boundp 'iman-Man-index-command-and-args)
          (setq iman-Man-index-command-and-args '("man" "-k" "[a-z]")))
        (message "Loading %s (iman)...done" this-file-name))))
+
+;;; ミニバッファの入力補完
+;; (install-elisp "http://homepage1.nifty.com/bmonkey/emacs/elisp/completing-help.el")
+(when (locate-library "completing-help")
+  (autoload 'completing-help-mode "completing-help"
+    "Toggle a facility to display information on completions." t)
+  (autoload 'turn-on-completing-help-mode "completing-help"
+    "Turn on a facility to display information on completions." t)
+  (autoload 'turn-off-completing-help-mode "completing-help"
+    "Turn off a facility to display information of completions." t))
 
 ;;; 単語選択 (デフォルト: M-@)
 ;; (install-elisp-from-emacswiki "thing-opt.el")
@@ -3501,7 +3505,7 @@
          "Toggle whitespace."
          (interactive)
          (when (boundp 'magit-diff-options)
-           (dolist (option (list "-w" "-b" "-B" "-E" ))
+           (dolist (option (list "-w" "-b" "-B" "-E"))
              (if (member option magit-diff-options)
                  (setq magit-diff-options (remove option magit-diff-options))
                (add-to-list 'magit-diff-options option)))
@@ -3530,7 +3534,7 @@
          (when (boundp 'svn-status-default-diff-arguments)
            (if (member "-x" svn-status-default-diff-arguments)
                (setq svn-status-default-diff-arguments
-                     '("--diff-cmd" "diff" ))
+                     '("--diff-cmd" "diff"))
              (setq svn-status-default-diff-arguments
                    '("--diff-cmd" "diff" "-x" "-wbup"))))
          (revert-buffer))
@@ -4434,8 +4438,8 @@
       (message "[%d] replace-match (`)')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 閉じカッコと次のブレスの間の空白挿入
-    (while (re-search-forward "){" nil t)
-      (replace-match ") {")
+    (while (re-search-forward "\\((.*\\)){" nil t)
+      (replace-match (concat (match-string 1) ") {"))
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; ^M 削除
