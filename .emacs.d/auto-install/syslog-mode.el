@@ -1,27 +1,151 @@
-;;; syslog-mode.el --- Mode for viewing system logfiles
+;;; syslog-mode.el --- Major-mode for viewing log files
+
+;; Filename: syslog-mode.el
+;; Description: Major-mode for viewing log files
+;; Author: Harley Gorrell <harley@mahalito.net>
+;; Maintainer: Joe Bloggs <vapniks@yahoo.com>
+;; Created: 2003-03-17 18:50:12 Harley Gorrell
+;; Version: 1.8
+;; Last-Updated: 2013-05-13 03:21:46
+;;           By: Joe Bloggs
+;; URL: https://github.com/vapniks/syslog-mode
+;; Keywords: unix
+;; Compatibility: GNU Emacs 24.3.1
+;; Package-Requires:  ((hide-lines "20121214"))
 ;;
-;; ~harley/share/emacs/pkg/syslog-mode.el ---
+;; Features that might be required by this library:
 ;;
-;; $Id: syslog-mode.el,v 1.7 2003/03/17 18:50:12 harley Exp $
+;; hide-lines cl ido
 ;;
 
-;; Author:    Harley Gorrell <harley@mahalito.net>
-;; URL:       http://www.mahalito.net/~harley/elisp/syslog-mode.el
-;; License:   GPL v2
-;; Keywords:  syslog, emacs
+;;; This file is NOT part of GNU Emacs
 
+;;; License
+;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; version 2
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.
+;; If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary: 
+;;
 ;;; Commentary:
 ;; * Handy functions for looking at system logs.
 ;; * Fontifys the date and su messages.
 
-;;; History:
-;; 20-Mar-2013    Christian Giménez
-;;    Added more keywords for font-lock.
-;;  2003-03-16 : Updated URL and contact info.
-;; 21-Mar-2013    Joe Bloggs
+;;; Keybindings
+;; "C-down" : syslog-boot-start
+;; "R"      : revert-buffer
+;; "/"      : syslog-filter-lines
+;; "g"      : show-all-invisible
+;; "h r"    : highlight-regexp
+;; "h p"    : highlight-phrase
+;; "h l"    : highlight-lines-matching-regexp
+;; "h u"    : unhighlight-regexp
+;; "C-/"    : syslog-filter-dates
+;; "D"      : open dired buffer in log directory (`syslog-log-file-directory')
+;; "j"      : ffap
+;; "<"      : syslog-previous-file
+;; ">"      : syslog-next-file
+;; "o"      : syslog-open-files
+;; "q"      : quit-window
+
+;;; Commands:
+;;
+;; Below are complete command list:
+;;
+;;  `syslog-open-files'
+;;    Open consecutive log files in same buffer.
+;;  `syslog-previous-file'
+;;    Open the previous logfile backup, or the next one if a prefix arg is used.
+;;  `syslog-next-file'
+;;    Open the next logfile.
+;;  `syslog-filter-lines'
+;;    Restrict buffer to lines matching regexp.
+;;  `syslog-filter-dates'
+;;    Restrict buffer to lines between dates.
+;;  `syslog-mode'
+;;    Major mode for working with system logs.
+;;  `syslog-boot-start'
+;;    Jump forward in the log to when the system booted.
+;;
+
+
+;;; Customizable Options:
+;;
+;; Below are customizable option list:
+;;
+;;  `syslog-datetime-regexp'
+;;    A regular expression matching the date-time at the beginning of each line in the log file.
+;;    default = "^[a-z]\\{3\\} [0-9]\\{1,2\\} \\([0-9]\\{2\\}:\\)\\{2\\}[0-9]\\{2\\} "
+;;  `syslog-log-file-directory'
+;;    The directory in which log files are stored.
+;;    default = "/var/log/"
+;;  `syslog-ip-face'
+;;    Face for IPs
+;;    default = (quote ((t :underline t :slant italic ...)))
+;;  `syslog-hour-face'
+;;    Face for IPs
+;;    default = (quote ((t :weight bold :inherit font-lock-type-face)))
+;;  `syslog-error-face'
+;;    Face for IPs
+;;    default = (quote ((t :weight bold :foreground "red")))
+;;  `syslog-warn-face'
+;;    Face for IPs
+;;    default = (quote ((t :weight bold :foreground "goldenrod")))
+;;  `syslog-info-face'
+;;    Face for IPs
+;;    default = (quote ((t :weight bold :foreground "deep sky blue")))
+;;  `syslog-debug-face'
+;;    Face for IPs
+;;    default = (quote ((t :weight bold :foreground "medium spring green")))
+;;  `syslog-su-face'
+;;    Face for IPs
+;;    default = (quote ((t :weight bold :foreground "firebrick")))
+;;
+;; All of the above can customized by:
+;;      M-x customize-group RET syslog-mode RET
+;;
+
+;;; Installation:
+;;
+;; Put syslog-mode.el in a directory in your load-path, e.g. ~/.emacs.d/
+;; You can add a directory to your load-path with the following line in ~/.emacs
+;; (add-to-list 'load-path (expand-file-name "~/elisp"))
+;; where ~/elisp is the directory you want to add 
+;; (you don't need to do this for ~/.emacs.d - it's added by default).
+;;
+;; Add the following to your ~/.emacs startup file.
+;;
+;; (require 'syslog-mode)
+
+
+
+;;; Change log:
+;;	
+;; 21-03-2013    Joe Bloggs
 ;;    Added functions and keybindings for filtering
 ;;    lines by regexps or dates, and for highlighting,
 ;;    and quick key for find-file-at-point
+;;
+;; 20-03-2013    Christian Giménez
+;;    Added more keywords for font-lock.
+;;
+;; 16-03-2003 : Updated URL and contact info.
+
+;;; Acknowledgements:
+;;
+;;  Harley Gorrell  (Author)
+;;  Christian Giménez
+;;
 
 ;; If anyone wants to make changes please fork the following github repo: https://github.com/vapniks/syslog-mode
 
@@ -31,7 +155,7 @@
 
 ;;; Require
 (require 'hide-lines)
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'ido)
 
 ;;; Code:
@@ -350,8 +474,10 @@ looks like syslog.  It will also turn enable fontification for `syslog-mode'."
 
 ;; done loading
 (run-hooks 'syslog-mode-load-hook)
+
 (provide 'syslog-mode)
 
 ;;; syslog-mode.el ends here
 
+;;; (magit-push)
 ;;; (yaoddmuse-post "EmacsWiki" "syslog-mode.el" (buffer-name) (buffer-string) "update")
