@@ -18,6 +18,7 @@
 ;;      . syslog-mode))
 ;;   (add-hook 'syslog-mode-hook
 ;;             (lambda ()
+;;               (require 'syslog-ext nil t)
 ;;               (when (boundp 'truncate-lines)
 ;;                 (setq truncate-lines t))
 ;;               (when (boundp 'font-lock-string-face)
@@ -28,8 +29,10 @@
 ;;     (eval-after-load "syslog-mode"
 ;;       '(progn
 ;;          (when (boundp 'syslog-mode-map)
-;;            (define-key syslog-mode-map (kbd "f") 'syslog-open-file-move-line))
-;;          (message "Loading %s (syslog-mode)...done" this-file-name)))))
+;;            (define-key syslog-mode-map (kbd "f")
+;;              (lambda ()
+;;                (let ((split-width-threshold 100000)) ; 上下分割のみ (デフォルト: 160))
+;;                (syslog-open-file-move-line)))))))))
 
 ;;; Code
 

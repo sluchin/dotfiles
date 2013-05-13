@@ -2104,6 +2104,7 @@
 
   (add-hook 'syslog-mode-hook
             (lambda ()
+              (require 'syslog-ext nil t)
               ;; 折り返しをしない
               (when (boundp 'truncate-lines)
                 (setq truncate-lines t))
@@ -2315,6 +2316,7 @@
                          ((string= "*compilation*" (buffer-name b)) b)
                          ((string= "*haskell*" (buffer-name b)) b)
                          ((string= "*w3m*" (buffer-name b)) b)
+                         ((string= "*grep*" (buffer-name b)) b)
                          ((string-match
                            "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
                          ((string-match
