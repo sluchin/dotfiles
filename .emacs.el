@@ -2062,7 +2062,7 @@
 ;; (install-elisp-from-emacswiki "grep-edit.el")
 ;; 編集後 C-c C-e, C-x s !
 (when (locate-library "grep-edit")
-  (add-hook 'grep-mode
+  (add-hook 'grep-mode-hook
             (lambda () (require 'grep-edit nil t))))
 
 ;;; リドゥ
