@@ -1988,7 +1988,7 @@
     "Adds DIR and any subdirectories to the file-cache." t)
 
   ;; リストをファイルに保存
-  (defun file-cache-save (file)
+  (defun file-cache-save-to-file (file)
     "Save filecache."
     (interactive "FFilename: ")
     (when (boundp 'file-cache-alist)
@@ -1997,24 +1997,34 @@
         (write-file file))))
 
   ;; リカバリ
-  (defun file-cache-recovery (file)
-    "Recovery filecache."
+  (defun file-cache-recovery-from-file (file)
+    "Recovery filecache from file."
     (interactive "fFilename: ")
     (when (boundp 'file-cache-alist)
       (with-temp-buffer
         (insert-file-contents file)
         (setq file-cache-alist (read (current-buffer))))))
 
+  ;; ファイルからディレクトリリストを読み込む
+  (defun file-cache-add-dir-from-file (file)
+    "Add directory list from file."
+    (interactive "fFilename: ")
+    (when (fboundp 'file-cache-add-directory-list)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (file-cache-add-directory-list (read (current-buffer))))))
+
   ;; 選択して実行する
   (defun file-cache-choice ()
     "Filecache choice."
     (interactive)
     (when (fboundp 'read-char-choice)
-      (let ((lst '((?a "add(a)"      file-cache-add-directory-recursively)
-                   (?s "save(s)"     file-cache-save)
-                   (?r "recovery(r)" file-cache-recovery)
+      (let ((lst '((?a "add dir(a)"  file-cache-add-directory-recursively)
+                   (?f "add dirs(f)" file-cache-add-dir-from-file)
+                   (?s "save(s)"     file-cache-save-to-file)
+                   (?r "recovery(r)" file-cache-recovery-from-file)
                    (?d "clear(d)"    file-cache-clear-cache)))
-            (prompt "Filecache: ")
+            (prompt "filecache: ")
             chars)
         (dolist (l lst)
           (setq prompt (concat prompt (car (cdr l)) " "))
@@ -2762,7 +2772,7 @@
        ;; バイトコンパイルしないファイル
        (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
          (setq auto-async-byte-compile-exclude-files-regexp
-               "\\(/junk/\\)\\|\\(/woman_cache.el$\\)\\|\\(filecache.el$\\)"))
+               "/junk/\\|cache\\|dirlist\\|filelist"))
        (message "Loading %s (auto-async-byte-compile)...done" this-file-name))))
 
 ;;; *Help* にメモを書き込む
