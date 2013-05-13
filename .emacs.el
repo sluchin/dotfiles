@@ -85,7 +85,8 @@
                  (recursive-directory
                   (let (recursive)
                     (dolist (f (directory-files file t))
-                      (unless (string-match "/\\.$\\|/\\.\\.$" f)
+                      (unless (or (string-match "/\\.$\\|/\\.\\.$" f)
+                                  (file-symlink-p f))
                         (add-to-list 'recursive f)))
                     recursive) exclude)))
         (if (or (null exclude)
@@ -99,7 +100,7 @@
   (interactive "DDirectory: ")
   (let* ((default "\\\.elc$")
          (exclude (read-regexp
-                   (format "exclude(%S): " default) default t)))
+                   (format "exclude(%S): " default) default)))
     (message "exclude: %S" exclude)
     (dolist (file
              (recursive-directory dir exclude))
@@ -1987,16 +1988,60 @@
     "Complete a filename in the minibuffer using a preloaded cache." t)
   (autoload 'file-cache-add-directory-recursively "filecache"
     "Adds DIR and any subdirectories to the file-cache." t)
-  (when (fboundp 'file-cache-add-directory-list)
-    (file-cache-add-directory-list (list "~" "~/bin")))
-  (when (boundp 'file-cache-filter-regexps)
-    (setq file-cache-filter-regexps
-          (append '("\\.svn/.*" "\\.git/.*")
-                  file-cache-filter-regexps))
-    (when (boundp 'minibuffer-local-completion-map)
-      (define-key minibuffer-local-completion-map
-        (kbd "M-c") 'file-cache-minibuffer-complete)))
-  (define-key global-map (kbd "C-c C-r") 'file-cache-add-directory-recursively))
+  (autoload 'file-cache-clear-cache "filecache"
+    "Adds DIR and any subdirectories to the file-cache." t)
+
+  ;; リストをファイルに保存
+  (defun file-cache-save (file)
+    "Save filecache."
+    (interactive "FFilename: ")
+    (when (boundp 'file-cache-alist)
+      (with-temp-buffer
+        (insert (format "%S" file-cache-alist))
+        (write-file file))))
+
+  ;; リカバリ
+  (defun file-cache-recovery (file)
+    "Recovery filecache."
+    (interactive "fFilename: ")
+    (when (boundp 'file-cache-alist)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (setq file-cache-alist (read (current-buffer))))))
+
+  ;; 選択する
+  (defun file-cache-choice ()
+    "Filecache choice."
+    (interactive)
+    (when (fboundp 'read-char-choice)
+      (let ((lst '((?a "add(a)"      file-cache-add-directory-recursively)
+                   (?s "save(s)"     file-cache-save)
+                   (?r "recovery(r)" file-cache-recovery)
+                   (?d "clear(d)"    file-cache-clear-cache)))
+            (prompt "Filecache: ")
+            chars)
+        (dolist (l lst)
+          (setq prompt (concat prompt (car (cdr l)) " "))
+          (add-to-list 'chars (car l)))
+        (let* ((char (read-char-choice prompt chars))
+               (func (car (cdr (cdr (assq char lst))))))
+          (call-interactively func)))))
+
+  ;; キーバインド
+  (when (boundp 'minibuffer-local-completion-map)
+    (define-key minibuffer-local-completion-map
+      (kbd "M-c") 'file-cache-minibuffer-complete))
+
+  (define-key global-map (kbd "C-c C-f") 'file-cache-choice)
+
+  (eval-after-load "filecache"
+    '(progn
+       (when (fboundp 'file-cache-add-directory-list)
+         (file-cache-add-directory-list (list "~" "~/bin")))
+       (when (boundp 'file-cache-filter-regexps)
+         (setq file-cache-filter-regexps
+               (append '("\\.svn/.*" "\\.git/.*")
+                       file-cache-filter-regexps))))))
 
 ;;; ここまで標準 lisp
 
@@ -2095,8 +2140,8 @@
 ;;; シスログ
 ;; (install-elisp-from-emacswiki "hide-lines.el")
 ;; (install-elisp-from-emacswiki "syslog-mode.el")
-(when (locate-library "syslog-mode")
-  (autoload 'syslog-mode "syslog-mode" "Mode for viewing system logfiles." t)
+(when (locate-library "syslog-ext")
+  (autoload 'syslog-mode "syslog-ext" "Mode for viewing system logfiles." t)
   (add-to-list
    'auto-mode-alist
    '("/var/log/.*\\|\\(messages\\|syslog\\|local[0-9]+\\)\\(\\.[1-9]+\\)?\\(\\.gz\\)?$"
@@ -2104,25 +2149,13 @@
 
   (add-hook 'syslog-mode-hook
             (lambda ()
-              (require 'syslog-ext nil t)
               ;; 折り返しをしない
               (when (boundp 'truncate-lines)
                 (setq truncate-lines t))
               ;; 文字列の色を無効にする
               (when (boundp 'font-lock-string-face)
                 (set (make-local-variable 'font-lock-string-face) nil)
-                (setq font-lock-string-face nil))))
-
-  (when (locate-library "syslog-ext")
-    (autoload 'syslog-open-file-move-line "syslog-ext" "Extension syslog-mode" t)
-    (eval-after-load "syslog-mode"
-      '(progn
-         (when (boundp 'syslog-mode-map)
-           (define-key syslog-mode-map (kbd "f")
-             (lambda ()
-               (let ((split-width-threshold 100000)) ; 上下分割のみ (デフォルト: 160))
-               (syslog-open-file-move-line)))))
-         (message "Loading %s (syslog-mode)...done" this-file-name)))))
+                (setq font-lock-string-face nil)))))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
@@ -2725,7 +2758,7 @@
        ;; バイトコンパイルしないファイル
        (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
          (setq auto-async-byte-compile-exclude-files-regexp
-               "\\(/junk/\\)\\|\\(/woman_cache.el$\\)"))
+               "\\(/junk/\\)\\|\\(/woman_cache.el$\\)\\|\\(filecache.el$\\)"))
        (message "Loading %s (auto-async-byte-compile)...done" this-file-name))))
 
 ;;; *Help* にメモを書き込む
