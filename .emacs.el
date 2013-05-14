@@ -1917,13 +1917,13 @@
     (around recentf-open-files-action-no-kill (widget &rest _ignore)
             activate compile)
     (ad-enable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill)
-    (ad-activate 'kill-buffer)
+    (ad-activate 'kill-buffer)   ; 有効化
     ad-do-it
+    (ad-deactivate 'kill-buffer) ; 無効化
+    (ad-disable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill)
     ;; tabbar-mode を有効
     (when (fboundp 'tabbar-mode)
-      (tabbar-mode 1))
-    (ad-deactivate 'kill-buffer)
-    (ad-disable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill))
+      (tabbar-mode 1)))
 
   ;; .recentf のバックアップファイルをつくらない
   (defadvice write-file
