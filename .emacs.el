@@ -2164,14 +2164,17 @@
    '("/var/log/.*\\|\\(messages\\|syslog\\|local[0-9]+\\)\\(\\.[1-9]+\\)?\\(\\.gz\\)?$"
      . syslog-mode))
 
+  ;; 上下分割のみ (デフォルト: 160)
+  (defadvice syslog-open-file-move-line
+    (around syslog-mode-width activate compile)
+    (let ((split-width-threshold 100000))
+      ad-do-it))
+
   (add-hook 'syslog-mode-hook
             (lambda ()
               ;; 折り返しをしない
               (when (boundp 'truncate-lines)
                 (setq truncate-lines t))
-              ;; 上下分割のみ (デフォルト: 160)
-              (when (boundp 'split-width-threshold)
-                (set (make-local-variable 'split-width-threshold) 100000))
               ;; 文字列の色を無効にする
               (when (boundp 'font-lock-string-face)
                 (set (make-local-variable 'font-lock-string-face) nil)))))
