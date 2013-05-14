@@ -1917,11 +1917,11 @@
               (message "Can not open `%s'" file)))))
 
   ;; recentf バッファを kill しない
+  (defsubst kill-buffer-original () nil)
   (defadvice recentf-open-files-action
     (around recentf-open-files-action-no-kill (widget &rest _ignore)
             activate compile)
     (when (eval-when-compile (require 'cl nil t))
-      (defsubst kill-buffer-original () nil)
       (letf* (((symbol-function 'kill-buffer-original) (symbol-function 'kill-buffer))
               ((symbol-function 'kill-buffer)
                (lambda (&optional b)
