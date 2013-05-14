@@ -1917,20 +1917,23 @@
               (message "Can not open `%s'" file)))))
 
   ;; recentf バッファを kill しない
-  (defsubst kill-buffer-original () nil)
+  (defadvice kill-buffer
+    (around kill-buffer-recentf-no-kill (&optional buffer)
+            disable compile)
+    (unless (string= (buffer-name (ad-get-arg 0))
+                     (format "*%s*" recentf-menu-title))
+      ad-do-it))
   (defadvice recentf-open-files-action
     (around recentf-open-files-action-no-kill (widget &rest _ignore)
             activate compile)
-    (when (eval-when-compile (require 'cl nil t))
-      (letf* (((symbol-function 'kill-buffer-original) (symbol-function 'kill-buffer))
-              ((symbol-function 'kill-buffer)
-               (lambda (&optional b)
-                 (if (string= (buffer-name b) (format "*%s*" recentf-menu-title))
-                     nil (kill-buffer-original b)))))
-        ad-do-it)
-      ;; tabbar-mode を有効
-      (when (fboundp 'tabbar-mode)
-        (tabbar-mode 1))))
+    (ad-enable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill)
+    (ad-activate 'kill-buffer)
+    ad-do-it
+    ;; tabbar-mode を有効
+    (when (fboundp 'tabbar-mode)
+      (tabbar-mode 1))
+    (ad-deactivate 'kill-buffer)
+    (ad-disable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill))
 
   ;; .recentf のバックアップファイルをつくらない
   (defadvice write-file
@@ -3427,6 +3430,7 @@
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
   (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t)
+  (defalias 'mt 'multi-term)
 
   (eval-after-load "multi-term"
     '(progn
