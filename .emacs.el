@@ -2169,10 +2169,12 @@
               ;; 折り返しをしない
               (when (boundp 'truncate-lines)
                 (setq truncate-lines t))
+              ;; 上下分割のみ (デフォルト: 160)
+              (when (boundp 'split-width-threshold)
+                (set (make-local-variable 'split-width-threshold) 100000))
               ;; 文字列の色を無効にする
               (when (boundp 'font-lock-string-face)
-                (set (make-local-variable 'font-lock-string-face) nil)
-                (setq font-lock-string-face nil)))))
+                (set (make-local-variable 'font-lock-string-face) nil)))))
 
 ;;; 使わないバッファを自動的に消す
 ;; (install-elisp-from-emacswiki "tempbuf.el")
