@@ -1993,7 +1993,7 @@
   ;; リストをファイルに保存
   (defun file-cache-save-to-file (file)
     "Save filecache."
-    (interactive "FFilename: ")
+    (interactive "FSave to file: ")
     (when (boundp 'file-cache-alist)
       (with-temp-buffer
         (insert (format "%S" file-cache-alist))
@@ -2002,7 +2002,7 @@
   ;; リカバリ
   (defun file-cache-recovery-from-file (file)
     "Recovery filecache from file."
-    (interactive "fFilename: ")
+    (interactive "fDir and File alist from file: ")
     (when (boundp 'file-cache-alist)
       (with-temp-buffer
         (insert-file-contents file)
@@ -2011,7 +2011,7 @@
   ;; ファイルからディレクトリリストを読み込む
   (defun file-cache-add-dir-from-file (file)
     "Add directory list from file."
-    (interactive "fFilename: ")
+    (interactive "fDir list from file: ")
     (when (fboundp 'file-cache-add-directory-list)
       (with-temp-buffer
         (insert-file-contents file)

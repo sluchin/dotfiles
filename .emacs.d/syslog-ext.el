@@ -365,8 +365,13 @@ With prefix arg: remove lines between dates."
   (setq mode-name "syslog")
   (setq major-mode 'syslog-mode)
   (use-local-map syslog-mode-map)
-  (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults '(syslog-font-lock-keywords))
+  (when (fboundp 'hl-line-mode)
+    (hl-line-mode 1))
+  (set-face-background 'highlight "gray10")
+  (set-face-foreground 'highlight nil)
+  (set-face-underline 'highlight t)
+  (when (boundp 'font-lock-defaults)
+    (set (make-local-variable 'font-lock-defaults) '(syslog-font-lock-keywords)))
   (when (fboundp 'toggle-read-only)
     (toggle-read-only 1))
   (run-hooks 'syslog-mode-hook))
@@ -385,6 +390,7 @@ With prefix arg: remove lines between dates."
     (goto-char pt)
     (cons file line)))
 
+(defvar syslog-overlay-list nil)
 (defun syslog-open-file-move-line ()
   "Open file and move line."
   (interactive)
@@ -399,8 +405,24 @@ With prefix arg: remove lines between dates."
           (with-current-buffer (find-file-other-window fullpath)
             (goto-char (point-min))
             (forward-line (1- (string-to-number line)))
+            (let ((bop (point)) ol)
+              (move-end-of-line nil)
+              (setq ol (make-overlay bop (point)))
+              (push ol syslog-overlay-list)
+              (overlay-put ol 'face '(background-color . "dark slate gray")))
+            (move-beginning-of-line nil)
+            (when (fboundp 'hl-line-mode)
+              (hl-line-mode 1))
             (select-window window)))
         (message "not found: %s" file)))))
+
+(defun syslog-delete-overlay ()
+  "Delete overlay."
+  (interactive)
+  (if syslog-overlay-list
+      (dolist (ol syslog-overlay-list)
+        (delete-overlay ol))
+    (setq syslog-overlay-list nil)))
 
 ;;; Setup functions
 (defun syslog-add-hooks ()
