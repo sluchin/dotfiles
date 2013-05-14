@@ -116,6 +116,19 @@
         (insert (concat file "\n"))))
     (write-file filelist)))
 
+;;; 選択してコマンド実行する
+(defun execute-choice-from-list (prompt lst)
+  "Execute choice from list."
+  (when (fboundp 'read-char-choice)
+    (let ((pstring prompt)
+          chars)
+      (dolist (l lst)
+        (setq pstring (concat pstring (car (cdr l)) " "))
+        (add-to-list 'chars (car l)))
+      (let* ((char (read-char-choice pstring chars))
+             (func (car (cdr (cdr (assq char lst))))))
+        (call-interactively func)))))
+
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
@@ -722,22 +735,17 @@
     "Display a list of existing bookmarks." t)
   (autoload 'bookmark-jump "bookmark"
     "Jump to bookmark BOOKMARK (a point in some file)." t)
+
   (defun bookmark-choice ()
     "Bookmark choice."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?f "set(m)"  bookmark-set)
-                   (?l "list(l)" bookmark-bmenu-list)
-                   (?b "jump(b)"  bookmark-jump)))
-            (prompt "Bookmark: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let* ((char (read-char-choice prompt chars))
-               (func (car (cdr (cdr (assq char lst))))))
-          (call-interactively func)))))
+    (execute-choice-from-list
+     "bookmark: "
+     '((?m "set(m)"  bookmark-set)
+       (?l "list(l)" bookmark-bmenu-list)
+       (?b "jump(b)"  bookmark-jump))))
   (define-key global-map (kbd "C-c r") 'bookmark-choice)
+
   (eval-after-load "bookmark"
     '(progn
        ;; ブックマークを変更したら即保存する
@@ -993,18 +1001,12 @@
 (defun firefox-vlc-choice ()
   "Firefox search."
   (interactive)
-  (when (fboundp 'read-char-choice)
-    (let ((lst '((?g "google(g)"    firefox-google-search)
-                 (?w "wikipedia(w)" firefox-wikipedia-search)
-                 (?u "url(u)"       firefox-url-at-point)
-                 (?v "vlc(v)"       vlc-url-at-point)))
-          (prompt "Open at ?: ")
-          chars)
-      (dolist (l lst)
-        (setq prompt (concat prompt (car (cdr l)) " "))
-        (add-to-list 'chars (car l)))
-      (let ((char (read-char-choice prompt chars)))
-        (call-interactively (car (cdr (cdr (assq char lst)))))))))
+  (execute-choice-from-list
+   "Open at ?: "
+   '((?g "google(g)"    firefox-google-search)
+     (?w "wikipedia(w)" firefox-wikipedia-search)
+     (?u "url(u)"       firefox-url-at-point)
+     (?v "vlc(v)"       vlc-url-at-point))))
 (define-key global-map (kbd "C-c f") 'firefox-vlc-choice)
 
 ;; デスクトップ復元
@@ -1579,17 +1581,11 @@
   (defun calendar-datetime-choice ()
     "Calendar and insert date choice."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?d "calendar(d)" calendar)
-                   (?t "date(t)"     insert-date)
-                   (?T "datetime(T)" insert-date-time)))
-            (prompt "Calendar ?: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let ((char (read-char-choice prompt chars)))
-          (call-interactively (car (cdr (cdr (assq char lst)))))))))
+    (execute-choice-from-list
+     "Calendar ?: "
+     '((?d "calendar(d)" calendar)
+       (?t "date(t)"     insert-date)
+       (?T "datetime(T)" insert-date-time))))
   (define-key global-map (kbd "C-c d") 'calendar-datetime-choice)
 
   (eval-after-load "calendar"
@@ -1864,21 +1860,15 @@
   (defun org-choice ()
     "org-mode choice."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?a "agenda(a)"    org-agenda)
-                   (?r "rmember(r)"   org-remember)
-                   (?c "coding(c)"    org-remember-code-reading)
-                   (?s "storelink(s)" org-store-link)
-                   (?i "iswitchb(i)"  org-iswitchb)
-                   (?d "dired(d)"     org-dired)
-                   (?k "kill(k)"      org-kill-buffer)))
-            (prompt "org-mode: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let ((char (read-char-choice prompt chars)))
-          (call-interactively (car (cdr (cdr (assq char lst)))))))))
+    (execute-choice-from-list
+     "org-mode: "
+     '((?a "agenda(a)"    org-agenda)
+       (?r "rmember(r)"   org-remember)
+       (?c "coding(c)"    org-remember-code-reading)
+       (?s "storelink(s)" org-store-link)
+       (?i "iswitchb(i)"  org-iswitchb)
+       (?d "dired(d)"     org-dired)
+       (?k "kill(k)"      org-kill-buffer))))
   (define-key global-map (kbd "C-c o") 'org-choice))
 
 ;;; ファイル内のカーソル位置を記録する
@@ -1989,6 +1979,8 @@
     "Adds DIR and any subdirectories to the file-cache." t)
   (autoload 'file-cache-clear-cache "filecache"
     "Adds DIR and any subdirectories to the file-cache." t)
+  (autoload 'file-cache-add-directory-list "filecache"
+    "Add DIRECTORY-LIST (a list of directory names) to the file cache." t)
 
   ;; リストをファイルに保存
   (defun file-cache-save-to-file (file)
@@ -2021,27 +2013,19 @@
   (defun file-cache-choice ()
     "Filecache choice."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?a "add dir(a)"  file-cache-add-directory-recursively)
-                   (?f "add dirs(f)" file-cache-add-dir-from-file)
-                   (?s "save(s)"     file-cache-save-to-file)
-                   (?r "recovery(r)" file-cache-recovery-from-file)
-                   (?d "clear(d)"    file-cache-clear-cache)))
-            (prompt "filecache: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let* ((char (read-char-choice prompt chars))
-               (func (car (cdr (cdr (assq char lst))))))
-          (call-interactively func)))))
+    (execute-choice-from-list
+     "filecache: "
+     '((?a "add dir(a)"  file-cache-add-directory-recursively)
+       (?f "add dirs(f)" file-cache-add-dir-from-file)
+       (?s "save(s)"     file-cache-save-to-file)
+       (?r "recovery(r)" file-cache-recovery-from-file)
+       (?d "clear(d)"    file-cache-clear-cache))))
+  (define-key global-map (kbd "C-c C-f") 'file-cache-choice)
 
-  ;; キーバインド
+  ;; ミニバッファで補完
   (when (boundp 'minibuffer-local-completion-map)
     (define-key minibuffer-local-completion-map
       (kbd "M-c") 'file-cache-minibuffer-complete))
-
-  (define-key global-map (kbd "C-c C-f") 'file-cache-choice)
 
   (eval-after-load "filecache"
     '(progn
@@ -2049,7 +2033,7 @@
          (file-cache-add-directory-list (list "~" "~/bin")))
        (when (boundp 'file-cache-filter-regexps)
          (setq file-cache-filter-regexps
-               (append '("CVS/.*" "\\.svn/.*" "\\.git/.*")
+               (append '("CVS" "\\.svn" "\\.git")
                        file-cache-filter-regexps))))))
 
 ;;; ここまで標準 lisp
@@ -2283,22 +2267,6 @@
     "Preconfigured `anything' for opening files." t)
   (autoload 'anything-filelist "anything-config"
     "Preconfigured `anything' to open files instantly." t)
-  (defun anything-choice ()
-    "Anything choice."
-    (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?f "recentf(f)"  anything-recentf)
-                   (?b "files(b)"    anything-for-files)
-                   (?l "filelist(l)" anything-filelist)))
-            (prompt "Anything: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let* ((char (read-char-choice prompt chars))
-               (func (car (cdr (cdr (assq char lst))))))
-          (call-interactively func)))))
-  (define-key global-map (kbd "C-c a") 'anything-choice)
 
   (defun anything-make-filelist ()
     "Make file list."
@@ -2315,6 +2283,16 @@
                           (format "%s" (car (cdr lst)))))))
         (make-filelist "~/.filelist" dirs
                        "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$"))))
+
+  (defun anything-choice ()
+    "Anything choice."
+    (interactive)
+    (execute-choice-from-list
+     "anything: "
+     '((?f "recentf(f)"  anything-recentf)
+       (?b "files(b)"    anything-for-files)
+       (?l "filelist(l)" anything-filelist))))
+  (define-key global-map (kbd "C-c a") 'anything-choice)
 
   (eval-after-load "anything-config"
     '(progn
@@ -2831,21 +2809,15 @@
   (defun pomodoro-choice ()
     "Pomodoro choice."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?o "start(o)"    pomodoro-start)
-                   (?r "restart(r)"  pomodoro-restart)
-                   (?i "reset(i)"    pomodoro-reset)
-                   (?p "pause(p)"    pomodoro-pause)
-                   (?s "save(s)"     pomodoro-save)
-                   (?t "savetime(t)" pomodoro-save-time)
-                   (?q "stop(q)"     pomodoro-stop)))
-            (prompt "Pomodoro: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let ((char (read-char-choice prompt chars)))
-          (call-interactively (car (cdr (cdr (assq char lst)))))))))
+    (execute-choice-from-list
+     "Pomodoro: "
+     '((?o "start(o)"    pomodoro-start)
+       (?r "restart(r)"  pomodoro-restart)
+       (?i "reset(i)"    pomodoro-reset)
+       (?p "pause(p)"    pomodoro-pause)
+       (?s "save(s)"     pomodoro-save)
+       (?t "savetime(t)" pomodoro-save-time)
+       (?q "stop(q)"     pomodoro-stop))))
   (define-key global-map (kbd "C-c p") 'pomodoro-choice)
 
   (eval-after-load "pomodoro-technique"
@@ -3284,17 +3256,11 @@
   (defun w3m-choice ()
     "w3m search."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?g "google(g)"    w3m-search-google)
-                   (?w "wikipedia(w)" w3m-search-wikipedia)
-                   (?u "url(u)"       w3m-url-at-point)))
-            (prompt "w3m: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let ((char (read-char-choice prompt chars)))
-          (call-interactively (car (cdr (cdr (assq char lst)))))))))
+    (execute-choice-from-list
+     "w3m: "
+     '((?g "google(g)"    w3m-search-google)
+       (?w "wikipedia(w)" w3m-search-wikipedia)
+       (?u "url(u)"       w3m-url-at-point))))
   (define-key global-map (kbd "C-c 3") 'w3m-choice)
 
   (eval-after-load "w3m"
@@ -3358,24 +3324,17 @@
 
   ;; 選択して evernote を起動
   (defun evernote-choice ()
-    "Evernote."
+    "Evernote choice."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?c "create(c)"  evernote-create-note)
-                   (?o "open(o)"    evernote-open-note)
-                   (?s "search(s)"  evernote-search-notes)
-                   (?S "saved(S)"   evernote-do-saved-search)
-                   (?w "write(w)"   evernote-write-note)
-                   (?p "region(p)"  evernote-post-region)
-                   (?b "browser(b)" evernote-browser)))
-            (prompt "Evernote: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let* ((char (read-char-choice prompt chars))
-               (func (car (cdr (cdr (assq char lst))))))
-          (call-interactively func)))))
+    (execute-choice-from-list
+     "evernote: "
+     '((?c "create(c)"  evernote-create-note)
+       (?o "open(o)"    evernote-open-note)
+       (?s "search(s)"  evernote-search-notes)
+       (?S "saved(S)"   evernote-do-saved-search)
+       (?w "write(w)"   evernote-write-note)
+       (?p "region(p)"  evernote-post-region)
+       (?b "browser(b)" evernote-browser))))
   (define-key global-map (kbd "C-c e") 'evernote-choice)
 
   (eval-after-load "evernote-mode"
@@ -3483,24 +3442,17 @@
   (defun vc-choice ()
     "Version control."
     (interactive)
-    (when (fboundp 'read-char-choice)
-      (let ((lst '((?d "status(d)" vc-dir)
-                   (?l "log(l)"    vc-print-log)
-                   (?= "diff(=)"   vc-diff)
-                   (?v "commit(v)" vc-next-action)
-                   (?+ "update(+)" vc-update)
-                   (?i "add(i)"    vc-register)
-                   (?u "revert(u)" vc-revert)
-                   (?g "blame(g)"  vc-annotate)
-                   (?~ "cat(~)"    vc-revision-other-window)))
-            (prompt "VC: ")
-            chars)
-        (dolist (l lst)
-          (setq prompt (concat prompt (car (cdr l)) " "))
-          (add-to-list 'chars (car l)))
-        (let* ((char (read-char-choice prompt chars))
-               (func (car (cdr (cdr (assq char lst))))))
-          (call-interactively func)))))
+    (execute-choice-from-list
+     "vc: "
+     '((?d "status(d)" vc-dir)
+       (?l "log(l)"    vc-print-log)
+       (?= "diff(=)"   vc-diff)
+       (?v "commit(v)" vc-next-action)
+       (?+ "update(+)" vc-update)
+       (?i "add(i)"    vc-register)
+       (?u "revert(u)" vc-revert)
+       (?g "blame(g)"  vc-annotate)
+       (?~ "cat(~)"    vc-revision-other-window))))
   (define-key global-map (kbd "C-c v") 'vc-choice))
 
 ;; magit の設定
@@ -3657,21 +3609,15 @@
        (defun gtags-choice ()
          "Gtags search."
          (interactive)
-         (when (fboundp 'read-char-choice)
-           (let ((lst '((?d "tag(d)"     gtags-find-tag)
-                        (?r "rtag(r)"    gtags-find-rtag)
-                        (?s "symbol(s)"  gtags-find-symbol)
-                        (?g "grep(g)"    gtags-find-with-grep)
-                        (?p "pattern(p)" gtags-find-pattern)
-                        (?P "file(P)"    gtags-find-file)
-                        (?f "parse(f)"   gtags-parse-file)))
-                 (prompt "gtags: ")
-                 chars)
-             (dolist (l lst)
-               (setq prompt (concat prompt (car (cdr l)) " "))
-               (add-to-list 'chars (car l)))
-             (let ((char (read-char-choice prompt chars)))
-               (call-interactively (car (cdr (cdr (assq char lst)))))))))
+         (execute-choice-from-list
+          "gtags: "
+          '((?d "tag(d)"     gtags-find-tag)
+            (?r "rtag(r)"    gtags-find-rtag)
+            (?s "symbol(s)"  gtags-find-symbol)
+            (?g "grep(g)"    gtags-find-with-grep)
+            (?p "pattern(p)" gtags-find-pattern)
+            (?P "file(P)"    gtags-find-file)
+            (?f "parse(f)"   gtags-parse-file))))
 
        ;; キーバインド
        (when (boundp 'gtags-mode-map)
