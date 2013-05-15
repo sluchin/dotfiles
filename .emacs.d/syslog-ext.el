@@ -124,50 +124,59 @@
 
 (defface syslog-filename-face
   '((t (:weight bold :foreground "gold")))
-  "Face for process number."
+  "Face for file name."
   :group 'syslog)
 (defvar syslog-filename-face 'syslog-filename-face)
 
 (defface syslog-linenum-face
   '((t (:weight bold :foreground "pink")))
-  "Face for process number."
+  "Face for line number."
   :group 'syslog)
 (defvar syslog-linenum-face 'syslog-linenum-face)
 
 (defface syslog-funcname-face
-  '((t (:weight bold :foreground "orange")))
-  "Face for process number."
+  '((t (:weight bold :foreground "white" :background "dark slate gray")))
+  "Face for func name."
   :group 'syslog)
 (defvar syslog-funcname-face 'syslog-funcname-face)
 
+(defface syslog-message-face
+  '((t (:foreground "white")))
+  "Face for message."
+  :group 'syslog)
+(defvar syslog-message-face 'syslog-message-face)
+
+(defface syslog-errno-error-face
+  '((t (:weight bold :foreground "white" :background "red")))
+  "Face for errno."
+  :group 'syslog)
+(defvar syslog-errno-error-face 'syslog-errno-error-face)
+
+(defface syslog-errno-face
+  '((t (:weight bold :foreground "white" :background "blue")))
+  "Face for errno."
+  :group 'syslog)
+(defvar syslog-errno-face 'syslog-errno-face)
+
 (defvar syslog-font-lock-keywords
-  '(("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (1 syslog-month-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (2 syslog-day-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (3 syslog-time-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (4 syslog-machine-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (5 syslog-process-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (6 syslog-procnum-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (8 syslog-filename-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (9 syslog-linenum-face append))
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (11 syslog-funcname-face append))
-    ;; Hours: 17:36:00
-    ("\\(?:^\\|[[:space:]]\\)\\([[:digit:]]\\{1,2\\}:[[:digit:]]\\{1,2\\}\\(:[[:digit:]]\\{1,2\\}\\)?\\)\\(?:$\\|[[:space:]]\\)" . (1 syslog-hour-face append))
-    ;; Date
-    ("\\(?:^\\|[[:space:]]\\)\\([[:digit:]]\\{1,2\\}/[[:digit:]]\\{1,2\\}/[[:digit:]]\\{2,4\\}\\)\\(?:$\\|[[:space:]]\\)" . (1 syslog-hour-face append))
-    ;; Dates: May  9 15:52:34
-    ;;("^\\(\\(?:[[:alpha:]]\\{3\\}\\)?[[:space:]]*[[:alpha:]]\\{3\\}\\s-+[0-9]+\\s-+[0-9:]+\\)" (1 font-lock-type-face t))
-    ;; Su events
-    ("\\(su:.*$\\)" . (1 syslog-su-face t))
-    ("\\(sudo:.*$\\)" . (1 syslog-su-face t))
-    ("\\[[^]]*\\]" . 'font-lock-comment-face)
-    ;; IPs
-    ("[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}" (0 syslog-ip-face append))
-    ("[Ee][Rr][Rr]\\(?:[Oo][Rr]\\)?" . (0 syslog-error-face append))
-    ("[Ii][Nn][Ff][Oo]" . (0 syslog-info-face append))
-    ("STARTUP" . (0 syslog-info-face append))
-    ("CMD" . (0 syslog-info-face append))
-    (" [Ww][Aa][Rr][Nn]\\(?:[Ii][Nn][Gg]\\)?" . (0 syslog-warn-face append))
-    (" [Dd][Ee][Bb][Uu][Gg]" . (0 syslog-debug-face append))
+  '(;; May
+    ("^\\([[:alpha:]]\\{3\\}\\) " . (1 syslog-month-face append))
+    ;; May 13
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) " . (2 syslog-day-face append))
+    ;; May 13 15:21:48
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) " . (3 syslog-time-face append))
+    ;; May 13 15:21:48 machine
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) " . (4 syslog-machine-face append))
+    ;; May 13 15:21:48 machine process[procnum]:
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: " . (5 syslog-process-face append))
+    ;; May 13 15:21:48 machine process[procnum]:
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: " . (6 syslog-procnum-face append))
+    ;; May 13 15:21:48 machine process[procnum]: filename[line]:
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? " . (8 syslog-filename-face append))
+    ;; May 13 15:21:48 machine process[procnum]: filename[line]:
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? " . (9 syslog-linenum-face append))
+    ;; May 13 15:21:48 machine process[procnum]: filename[line]: funcname:
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? " . (11 syslog-funcname-face append))
     ("(EE)" . (0 syslog-error-face append))
     ("(WW)" . (0 syslog-warn-face append))
     ("(II)" . (0 syslog-info-face append))
@@ -176,7 +185,31 @@
     ("(--)" . (0 syslog-debug-face append))
     ("(\\*\\*)" . (0 syslog-debug-face append))
     ("(==)" . (0 syslog-debug-face append))
-    ("(\\+\\+)" . (0 syslog-debug-face append)))
+    ("(\\+\\+)" . (0 syslog-debug-face append))
+    ;; May 13 15:21:48 machine process[procnum]: filename[line]: funcname: (--) message
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? \\(\\(.*\\):\\)? " . (13 syslog-message-face append))
+    ;; Success(0)
+    ("\\(Success(0)[ ]?$\\)" . (1 syslog-errno-face append))
+    ;; not Success(0)
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? \\(\\(.*\\):\\)? \\(\\(.*([0-9]+)[ ]?$\\)\\)" . (15 syslog-errno-error-face append))
+    ;; Hours: 17:36:00
+    ("\\(?:^\\|[[:space:]]\\)\\([[:digit:]]\\{1,2\\}:[[:digit:]]\\{1,2\\}\\(:[[:digit:]]\\{1,2\\}\\)?\\)\\(?:$\\|[[:space:]]\\)" . (1 syslog-hour-face append))
+    ;; Date
+    ("\\(?:^\\|[[:space:]]\\)\\([[:digit:]]\\{1,2\\}/[[:digit:]]\\{1,2\\}/[[:digit:]]\\{2,4\\}\\)\\(?:$\\|[[:space:]]\\)" . (1 syslog-hour-face append))
+    ;; Dates: May  9 15:52:34
+    ;;("^\\(\\(?:[[:alpha:]]\\{3\\}\\)?[[:space:]]*[[:alpha:]]\\{3\\}\\s-+[0-9]+\\s-+[0-9:]+\\)" (1 font-lock-type-face t))
+    ;; Su events
+    ("\\( su:.*$\\)" . (1 syslog-su-face append))
+    ("\\( sudo:.*$\\)" . (1 syslog-su-face append))
+    ("\\[[^]]*\\]" . 'font-lock-comment-face)
+    ;; IPs
+    ("[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}" (0 syslog-ip-face append))
+    ("[Ee][Rr][Rr]\\(?:[Oo][Rr]\\)?" . (0 syslog-error-face append))
+    ("[Ii][Nn][Ff][Oo]" . (0 syslog-info-face append))
+    ("STARTUP" . (0 syslog-info-face append))
+    ("CMD" . (0 syslog-info-face append))
+    (" [Ww][Aa][Rr][Nn]\\(?:[Ii][Nn][Gg]\\)?" . (0 syslog-warn-face append))
+    (" [Dd][Ee][Bb][Uu][Gg]" . (0 syslog-debug-face append)))
   "Expressions to hilight in `syslog-mode'.")
 
 (defvar syslog-mode-hook nil
@@ -207,6 +240,7 @@
     (define-key map (kbd "h p") 'highlight-phrase)
     (define-key map (kbd "h l") 'highlight-lines-matching-regexp)
     (define-key map (kbd "h u") 'unhighlight-regexp)
+    (define-key map (kbd "h i") 'syslog-highlight)
     (define-key map (kbd "C-/") 'syslog-filter-dates)
     (define-key map "D" (lambda nil (interactive) (dired syslog-log-file-directory)))
     (define-key map "j" 'ffap)
@@ -367,16 +401,18 @@ With prefix arg: remove lines between dates."
   (when (fboundp 'hl-line-mode)
     (hl-line-mode 1)))
 
-(defun syslog-highlight ()
+(defun syslog-highlight (column)
   " Highlight syslog."
-  (interactive)
+  (interactive "sColumn: ")
+  (setq mark-ring-max 100000)
   (save-excursion
     (goto-char (point-min))
     (let (bop eop string lst ol)
       (while (not (eobp))
         (move-beginning-of-line nil)
-        (let ((space 0))
-          (while (and (not (eolp)) (<= space 4))
+        (let ((space 1)
+              (col (string-to-number column)))
+          (while (and (not (eolp)) (< space col))
             (search-forward " ")
             (setq space (1+ space))))
         (setq bop (point))
@@ -384,9 +420,11 @@ With prefix arg: remove lines between dates."
         (setq eop (1- (point)))
         (unless (eolp)
           (setq string (buffer-substring bop eop))
-          (message "string: %s" string)
           (when string
             (unless (and lst (assoc-string string lst))
+              (message "%s" string)
+              (goto-char bop)
+              (push-mark)
               (setq ol (make-overlay bop eop))
               (push ol syslog-overlay-list)
               (overlay-put ol 'face '(background-color . "dark slate gray")))
