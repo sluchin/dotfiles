@@ -185,6 +185,9 @@
 (defvar syslog-mode-load-hook nil
   "*Hook to run when `syslog-mode' is loaded.")
 
+(defvar syslog-overlay-list nil
+  "Overlay list.")
+
 ;;;###autoload
 (defvar syslog-setup-on-load nil
   "*If not nil setup syslog mode on load by running syslog-add-hooks.")
@@ -355,26 +358,40 @@ With prefix arg: remove lines between dates."
             keeptime (funcall intime-p (syslog-date-to-time (match-string 0) t))))
     (if dodelete (add-invisible-overlay start-position (point-max)))))
 
-;;;###autoload
-(defun syslog-mode ()
-  "Major mode for working with system logs.
-
-\\{syslog-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (setq mode-name "syslog")
-  (setq major-mode 'syslog-mode)
-  (use-local-map syslog-mode-map)
+(defun set-hl-line ()
+  (require 'hl-line nil t)
+  (defface hlline-face '((t (:background "gray20" :underline "yellow")))
+    "Face to use for `hl-line-face'." :group 'hl-line)
+  (when (boundp 'hl-line-face)
+    (set (make-local-variable 'hl-line-face) '(hlline-face)))
   (when (fboundp 'hl-line-mode)
-    (hl-line-mode 1))
-  (set-face-background 'highlight "gray10")
-  (set-face-foreground 'highlight nil)
-  (set-face-underline 'highlight t)
-  (when (boundp 'font-lock-defaults)
-    (set (make-local-variable 'font-lock-defaults) '(syslog-font-lock-keywords)))
-  (when (fboundp 'toggle-read-only)
-    (toggle-read-only 1))
-  (run-hooks 'syslog-mode-hook))
+    (hl-line-mode 1)))
+
+(defun syslog-highlight ()
+  " Highlight syslog."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let (bop eop string lst ol)
+      (while (not (eobp))
+        (move-beginning-of-line nil)
+        (let ((space 0))
+          (while (and (not (eolp)) (<= space 4))
+            (search-forward " ")
+            (setq space (1+ space))))
+        (setq bop (point))
+        (search-forward " ")
+        (setq eop (1- (point)))
+        (unless (eolp)
+          (setq string (buffer-substring bop eop))
+          (message "string: %s" string)
+          (when string
+            (unless (and lst (assoc-string string lst))
+              (setq ol (make-overlay bop eop))
+              (push ol syslog-overlay-list)
+              (overlay-put ol 'face '(background-color . "dark slate gray")))
+            (add-to-list 'lst string)))
+        (forward-line 1)))))
 
 (defun syslog-get-filename-line ()
   "Get list for filename[line]."
@@ -390,7 +407,6 @@ With prefix arg: remove lines between dates."
     (goto-char pt)
     (cons file line)))
 
-(defvar syslog-overlay-list nil)
 (defun syslog-open-file-move-line ()
   "Open file and move line."
   (interactive)
@@ -411,8 +427,7 @@ With prefix arg: remove lines between dates."
               (push ol syslog-overlay-list)
               (overlay-put ol 'face '(background-color . "dark slate gray")))
             (move-beginning-of-line nil)
-            (when (fboundp 'hl-line-mode)
-              (hl-line-mode 1))
+            (set-hl-line)
             (select-window window)))
         (message "not found: %s" file)))))
 
@@ -421,8 +436,25 @@ With prefix arg: remove lines between dates."
   (interactive)
   (if syslog-overlay-list
       (dolist (ol syslog-overlay-list)
-        (delete-overlay ol))
+        (when (overlayp ol)
+          (delete-overlay ol)))
     (setq syslog-overlay-list nil)))
+
+;;;###autoload
+(defun syslog-mode ()
+  "Major mode for working with system logs.
+\\{syslog-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (setq mode-name "syslog")
+  (setq major-mode 'syslog-mode)
+  (use-local-map syslog-mode-map)
+  (set-hl-line)
+  (when (boundp 'font-lock-defaults)
+    (set (make-local-variable 'font-lock-defaults) '(syslog-font-lock-keywords)))
+  (when (fboundp 'toggle-read-only)
+    (toggle-read-only 1))
+  (run-hooks 'syslog-mode-hook))
 
 ;;; Setup functions
 (defun syslog-add-hooks ()
