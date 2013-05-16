@@ -712,9 +712,6 @@
 ;;; シンボリックリンクを実名にする
 (setq find-file-visit-truename t)
 
-;;; ミニバッファを再帰的に呼び出せるようにする
-(setq enable-recursive-minibuffers t)
-
 ;;; eval した結果を全部表示
 ;; (デフォルト: length=4 level=12)
 (setq eval-expression-print-length nil)
