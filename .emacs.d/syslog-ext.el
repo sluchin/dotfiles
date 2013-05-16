@@ -189,9 +189,9 @@
     ;; May 13 15:21:48 machine process[procnum]: filename[line]: funcname: (--) message
     ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? \\(\\(.*\\):\\)? " . (13 syslog-message-face append))
     ;; Success(0)
-    ("\\(Success(0)[ ]?$\\)" . (1 syslog-errno-face append))
+    ("\\(Success(0)$\\)" . (1 syslog-errno-face append))
     ;; not Success(0)
-    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? \\(\\(.*\\):\\)? \\(\\(.*([0-9]+)[ ]?$\\)\\)" . (15 syslog-errno-error-face append))
+    ("^\\([[:alpha:]]\\{3\\}\\) \\([ 1-3][0-9]\\) \\([0-9].:[0-9].:[0-9].\\) \\(.*?\\) \\(.*?\\)\\[\\([0-9]+\\)\\]: \\(\\(.*?\\)\\[\\([0-9]+\\)\\]:\\)? \\(\\(.*?\\):\\)? \\(\\(.*\\):\\)? \\(\\(.*([0-9]+)$\\)\\)" . (15 syslog-errno-error-face append))
     ;; Hours: 17:36:00
     ("\\(?:^\\|[[:space:]]\\)\\([[:digit:]]\\{1,2\\}:[[:digit:]]\\{1,2\\}\\(:[[:digit:]]\\{1,2\\}\\)?\\)\\(?:$\\|[[:space:]]\\)" . (1 syslog-hour-face append))
     ;; Date
@@ -203,11 +203,11 @@
     ("\\( sudo:.*$\\)" . (1 syslog-su-face append))
     ("\\[[^]]*\\]" . 'font-lock-comment-face)
     ;; IPs
-    ("[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}" (0 syslog-ip-face append))
-    ("[Ee][Rr][Rr]\\(?:[Oo][Rr]\\)?" . (0 syslog-error-face append))
-    ("[Ii][Nn][Ff][Oo]" . (0 syslog-info-face append))
-    ("STARTUP" . (0 syslog-info-face append))
-    ("CMD" . (0 syslog-info-face append))
+    (" [[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}\\.[[:digit:]]\\{1,3\\}" (0 syslog-ip-face append))
+    (" [Ee][Rr][Rr]\\(?:[Oo][Rr]\\)?" . (0 syslog-error-face append))
+    (" [Ii][Nn][Ff][Oo]" . (0 syslog-info-face append))
+    (" STARTUP" . (0 syslog-info-face append))
+    (" CMD" . (0 syslog-info-face append))
     (" [Ww][Aa][Rr][Nn]\\(?:[Ii][Nn][Gg]\\)?" . (0 syslog-warn-face append))
     (" [Dd][Ee][Bb][Uu][Gg]" . (0 syslog-debug-face append)))
   "Expressions to hilight in `syslog-mode'.")
