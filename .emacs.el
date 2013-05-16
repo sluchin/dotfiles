@@ -129,6 +129,21 @@
              (func (car (cdr (cdr (assq char lst))))))
         (call-interactively func)))))
 
+;;; ディレクトリ配下すべての実行ファイルをコピー
+(defun copy-executable-files ()
+  "Print files for directory."
+  (interactive)
+  (let ((source (read-directory-name "source (directory): "))
+        (copy (read-directory-name "copy (directory): ")))
+    (unless (file-exists-p copy)
+      (make-directory copy))
+    (when (file-directory-p copy)
+      (dolist (file
+               (recursive-directory source))
+        (when (file-executable-p file)
+          (copy-file file copy t)
+          (message "%s" file))))))
+
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
