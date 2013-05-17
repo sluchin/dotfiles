@@ -820,8 +820,7 @@
   (when (boundp 'isearch-mode-map)
     (define-key isearch-mode-map (kbd "M-o") 'isearch-moccur)
     (define-key isearch-mode-map (kbd "M-O") 'isearch-moccur-all))
-  (define-key global-map (kbd "C-x C-m") 'occur-by-moccur)
-
+  (define-key global-map (kbd "C-x C-o") 'occur-by-moccur)
   (eval-after-load "color-moccur"
     '(progn
        ;; スペースに区切られた複数の単語にマッチ
@@ -2381,8 +2380,8 @@
                          ;; それ以外は表示
                          (t b)))
                       (buffer-list)))))
-       (define-key tabbar-mode-map (kbd "<C-S-right>") 'tabbar-forward-tab)
-       (define-key tabbar-mode-map (kbd "<C-S-left>") 'tabbar-backward-tab)
+       (define-key tabbar-mode-map (kbd "C-.") 'tabbar-forward-tab)
+       (define-key tabbar-mode-map (kbd "C-,") 'tabbar-backward-tab)
        (message "Loading %s (tabbar)...done" this-file-name))))
 
 ;;; 2chビューア (navi2ch)
@@ -3982,6 +3981,9 @@
               ;; インデント
               (when (fboundp 'c-set-style)
                 (c-set-style "k&r"))
+              (setq-default c-basic-offset 4      ; 基本インデント量 4
+                            tab-width 4           ; タブ幅 4
+                            indent-tabs-mode nil) ; スペース
               (when (and (require 'auto-complete nil t)
                          (require 'auto-complete-config nil t))
                 (add-ac-sources  '(ac-source-dictionary
@@ -4506,8 +4508,9 @@
                     (when (eq major-mode 'c-mode)
                       (when (fboundp 'c-set-style)
                         (c-set-style "k&r"))
-                      (when (boundp 'indent-tabs-mode)
-                        (setq indent-tabs-mode nil)))
+                      (setq-default c-basic-offset 4       ; 基本インデント量 4
+                                    tab-width 4            ; タブ幅 4
+                                    indent-tabs-mode nil)) ; スペース
                     ;; インデント
                     (execute-indent)
                     (save-buffer)
