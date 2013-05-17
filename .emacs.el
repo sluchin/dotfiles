@@ -4388,7 +4388,7 @@
       (untabify (point-min) (point-max))
       (message "untabify...done"))
     (goto-char (point-min))
-    ;; if, else if, for, while のカッコの次は空白をいれる
+    ;; if, else if, for, while のカッコの前は空白をいれる
     (while (re-search-forward
             "\\(if\\|else if\\|for\\|while\\)\\((\\)" nil t)
       (replace-match (concat (match-string 1) " ("))
