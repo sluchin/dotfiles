@@ -2998,6 +2998,10 @@
                 (setq show-trailing-whitespace nil))))
     (add-hook 'mew-message-mode-hook hook)
     (add-hook 'mew-virtual-mode-hook hook))
+  ;; サマリモード色付け
+  ;; mew-fancy-summary.el (ソース contrib の中)
+  (when (locate-library "mew-fancy-summary")
+    (add-hook 'mew-init-hook (lambda () (require 'mew-fancy-summary nil t))))
 
   ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY." t)
@@ -4158,6 +4162,9 @@
             (lambda ()
               (when (fboundp 'c-set-style)
                 (c-set-style "java"))
+              (setq-default c-basic-offset 4       ; 基本インデント量 4
+                            tab-width 4            ; タブ幅 4
+                            indent-tabs-mode nil) ; スペース
               (when (boundp 'c-auto-newline)
                 (setq c-auto-newline t))
               (when (boundp 'ajc-tag-file)
@@ -4421,6 +4428,18 @@
       (replace-match (concat (match-string 1) ") {"))
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
+    ;; = の前の空白挿入
+    (while (re-search-forward "\\([^=!<> ]\\)=" nil t)
+      (replace-match (concat (match-string 1) " ="))
+      (message "[%d] replace-match (`%s =')...done"
+               (line-number-at-pos) (match-string 1)))
+    (goto-char (point-min))
+    ;; = の後ろの空白挿入
+    (while (re-search-forward "\\([=]\\)\\([^ ]\\)" nil t)
+      (replace-match (concat (match-string 1) " " (match-string 2)))
+      (message "[%d] replace-match (`%s %s')...done"
+               (line-number-at-pos) (match-string 1) (match-string 2)))
+    (goto-char (point-min))
     ;; ^M 削除
     (while (re-search-forward "$" nil t)
       (replace-match "")
@@ -4470,11 +4489,12 @@
               (when (eq major-mode 'c-mode)
                 (when (fboundp 'c-set-style)
                   (c-set-style "k&r"))
-                (when (boundp 'indent-tabs-mode)
-                  (setq indent-tabs-mode nil)))
-              ;; インデント
-              (execute-indent)
-              (save-buffer)
+                (setq-default c-basic-offset 4       ; 基本インデント量 4
+                              tab-width 4            ; タブ幅 4
+                              indent-tabs-mode nil)) ; スペース
+            ;; インデント
+            (execute-indent)
+            (save-buffer)
               (message "kill-buffer: %s" (current-buffer))
               (kill-buffer (current-buffer)))))))))
 
