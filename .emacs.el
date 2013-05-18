@@ -3402,13 +3402,13 @@
 ;; zsh に設定
 ;; (install-elisp-from-emacswiki "multi-term.el")
 ;; zsh info
-(defun zsh-info (&optional node)
-  "Read documentation for zsh in the info system."
-  (interactive) (info (format "(zsh)%s" (or node ""))))
+(when (locate-library "info")
+  (defun zsh-info (&optional node)
+    "Read documentation for zsh in the info system."
+    (interactive) (info (format "(zsh)%s" (or node "")))))
 
 (when (locate-library "multi-term")
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
-  (autoload 'multi-term-next "multi-term" "Go to the next term buffer." t)
   (defalias 'mt 'multi-term)
 
   (eval-after-load "multi-term"
@@ -3416,7 +3416,7 @@
        (when (boundp 'multi-term-program)   ; zsh を使う
          (setq multi-term-program "zsh"))
        (when (boundp 'term-unbind-key-list) ; バインドしないキーリスト
-         (setq term-unbind-key-list '("C-x" "C-c" "<ESC>")))
+         (setq term-unbind-key-list '("C-x" "C-c")))
        (when (boundp 'term-bind-key-alist)  ; バインドするキーリスト
          (setq term-bind-key-alist
                '(("C-c C-c" . term-interrupt-subjob)
@@ -3430,7 +3430,9 @@
                  ("M-N" . term-send-backward-kill-word)
                  ("M-r" . term-send-reverse-search-history)
                  ("M-," . term-send-input)
-                 ("M-." . comint-dynamic-complete))))
+                 ("M-." . comint-dynamic-complete)
+                 ("<M-right>" . multi-term-next)
+                 ("<M-left>" . multi-term-prev))))
        (message "Loading %s (multi-term)...done" this-file-name))))
 
 ;; term+
