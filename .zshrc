@@ -11,7 +11,7 @@ RPROMPT='[%~] '
 setopt auto_cd
 setopt auto_remove_slash
 setopt auto_name_dirs
-setopt extendid_history
+setopt extended_history
 setopt hist_ignore_dups
 setopt hist_ignore_space
 setopt prompt_subst
