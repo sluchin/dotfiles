@@ -3527,7 +3527,7 @@
                    '("--diff-cmd" "diff" "-x" "-wbup"))))
          (revert-buffer))
        (when (boundp 'svn-status-diff-mode-map)
-         (define-key svn-status-diff-mode-map (kbd "M-w") 'magit-toggle-whitespace))
+         (define-key svn-status-diff-mode-map (kbd "M-w") 'psvn-toggle-whitespace))
        (message "Loading %s (psvn)...done" this-file-name))))
 
 ;;; タグ検索
@@ -4400,24 +4400,24 @@
     ;; if, else if, for, while のカッコの前は空白をいれる
     (while (re-search-forward
             "\\(if\\|else if\\|for\\|while\\)\\((\\)" nil t)
-      (replace-match (concat (match-string 1) " ("))
+      (replace-match (concat (match-string 1) " (") nil t)
       (message "[%d] replace-match (` (')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; else if, else と次のブレスの間に空白をいれる
     (while (re-search-forward
             "\\(else if[ ]*(.*)\\|else\\)\\({\\)" nil t)
-      (replace-match (concat (match-string 1) " {"))
+      (replace-match (concat (match-string 1) " {") nil t)
       (message "[%d] replace-match (` {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; else if, else と次のブレスの間に空白をいれる
     (while (re-search-forward
             "\\(}\\)\\(else if\\|else\\)" nil t)
-      (replace-match (concat "} " (match-string 2)))
+      (replace-match (concat "} " (match-string 1)) nil t)
       (message "[%d] replace-match (`} ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 開きカッコの次の空白削除
-    (while (re-search-forward "\\([^\\\\]\\)([ ]+" nil t)
-      (replace-match (concat (match-string 1) "("))
+    (while (re-search-forward "([ ]+" nil t)
+      (replace-match "(")
       (message "[%d] replace-match (`(')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 閉じカッコの前の空白削除
@@ -4427,20 +4427,20 @@
     (goto-char (point-min))
     ;; 閉じカッコと次のブレスの間の空白挿入
     (while (re-search-forward "\\((.*\\)){" nil t)
-      (replace-match (concat (match-string 1) ") {"))
+      (replace-match (concat (match-string 1) ") {") nil t)
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の前の空白挿入
-    (while (re-search-forward "\\([^=!<> ]\\)=" nil t)
-      (replace-match (concat (match-string 1) " ="))
+    (while (re-search-forward "\\([^=!<>+- ]\\)=" nil t)
+      (replace-match (concat (match-string 1) " =") nil t)
       (message "[%d] replace-match (`%s =')...done"
                (line-number-at-pos) (match-string 1)))
     (goto-char (point-min))
     ;; = の後ろの空白挿入
-    (while (re-search-forward "\\([=]\\)\\([^ ]\\)" nil t)
-      (replace-match (concat (match-string 1) " " (match-string 2)))
-      (message "[%d] replace-match (`%s %s')...done"
-               (line-number-at-pos) (match-string 1) (match-string 2)))
+    (while (re-search-forward "=\\([^= ]\\)" nil t)
+      (replace-match (concat "= " (match-string 1)) nil t)
+      (message "[%d] replace-match (`= %s')...done"
+               (line-number-at-pos) (match-string 1)))
     (goto-char (point-min))
     ;; ^M 削除
     (while (re-search-forward "$" nil t)
@@ -4480,7 +4480,7 @@
                  (not (file-directory-p file))
                  (file-readable-p file)
                  (file-writable-p file))
-        (when (string-match ".*\\.\\(el$\\)\\|[hc]$" file)
+        (when (string-match ".*\\.[hc]$" file)
           (message "file: %s" file)
           ;; バックアップ
           (copy-file file (concat file backup) t)
