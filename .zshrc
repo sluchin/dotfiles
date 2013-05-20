@@ -5,24 +5,19 @@ autoload -U compinit && compinit
 autoload -Uz vcs_info
 autoload -Uz add-zsh-hook
 autoload -Uz is-at-least
-autoload -Uz colors
+autoload -Uz colors && colors
 
 case ${UID} in
-    0) # root
-        PROMPT_MARK="#"
-        ;;
-    *)
-        PROMPT_MARK="%%"
-        ;;
+    0) PROMPT_MARK="#" ;;
+    *) PROMPT_MARK="%%" ;;
 esac
 
 PROMPT="%{$fg[red]%}[%*] %n${PROMPT_MARK}%{$reset_color%} "
 RPROMPT="%1(v|%{$fg[green]%}(%1v%3(v|%{$fg[red]%}:%3v|)%2(v|%{$fg[yellow]%}⚡|)%{$fg[green]%})%{$reset_color%}|)%{$bg[magenta]$fg[white]%}[ %~ ]%{$reset_color%}"
 SPROMPT="%{$fg[red]%}%r is correct? [n,y,a,e]:%{$reset_color%} "
 
-if [ -n "${REMOTEHOST}${SSH_CONNECTION}" ]; then
-    PROMPT="%{$fg[white]%}${HOST%%.*}%{$reset_color%} ${PROMPT}"
-fi
+[ -n "${REMOTEHOST}${SSH_CONNECTION}" ] &&
+    PROMPT="%{$fg[white]%}${HOST%%.*}%{$reset_color%} ${PROMPT} "
 
 HISTSIZE=100000
 SAVEHIST=100000
