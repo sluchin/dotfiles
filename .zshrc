@@ -50,6 +50,10 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
+# stty
+stty stop undef
+
+# bindkey
 bindkey -e
 
 zstyle ':completion:*' format '%BCompleting %d%b'

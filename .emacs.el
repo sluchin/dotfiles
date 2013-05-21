@@ -957,44 +957,41 @@
            (forward-list arg))
           (t (self-insert-command arg)))))
 
-;; firefox で開く
+;; デフォルトブラウザ で開く
 ;; グーグル検索
-(defun firefox-google-search ()
-  "Search google in firefox."
+(defun default-browser-google-search ()
+  "Search google in default browser."
   (interactive)
-  (if (executable-find "firefox")
-      (let* ((region (region-or-word))
-             (string (read-string "Google search: " region t region)))
-        (browse-url (concat "https://www.google.co.jp/search?q="
-                            string
-                            "&ie=utf-8&oe=utf-8&hl=ja")))
-    (message "not found firefox")))
+  (let* ((region (region-or-word))
+         (string (read-string "Google search: " region t region))
+         (browse-url-browser-function 'browse-url-default-browser))
+    (browse-url (concat "https://www.google.co.jp/search?q="
+                        string
+                        "&ie=utf-8&oe=utf-8&hl=ja"))))
 
 ;; ウィキペディア検索
-(defun firefox-wikipedia-search ()
-  "Search wikipedia in firefox."
+(defun default-browser-wikipedia-search ()
+  "Search wikipedia in default-browser."
   (interactive)
-  (if (executable-find "firefox")
-      (let* ((region (region-or-word))
-             (string (read-string "Wikipedia search: " region t region)))
-        (browse-url (concat "https://ja.wikipedia.org/wiki/" string)))
-    (message "not found firefox")))
+  (let* ((region (region-or-word))
+         (string (read-string "Wikipedia search: " region t region))
+         (browse-url-browser-function 'browse-url-default-browser))
+    (browse-url (concat "https://ja.wikipedia.org/wiki/" string))))
 
 ;; URL を開く
-(defun firefox-url-at-point ()
-  "Browse url in firefox."
+(defun default-browser-url-at-point ()
+  "Browse url in default browser."
   (interactive)
-  (if (executable-find "firefox")
-      (let (alist)
-        (setq alist (append alist (bounds-of-thing-at-point 'url)))
-        (let* ((region (if (null alist) nil
-                         (buffer-substring-no-properties (car alist)
-                                                         (cdr alist))))
-               (string (read-string "URL: " region t region)))
-          (if (equal string "")
-              (message "no url")
-            (start-process "firefox" nil "firefox" string))))
-    (message "not found firefox")))
+  (let ((browse-url-browser-function 'browse-url-default-browser)
+        alist)
+    (setq alist (append alist (bounds-of-thing-at-point 'url)))
+    (let* ((region (if (null alist) nil
+                     (buffer-substring-no-properties (car alist)
+                                                     (cdr alist))))
+           (url (read-string "URL: " region t region)))
+      (if (equal url "")
+          (message "no url")
+        (browse-url url)))))
 
 ;; vlc で URL を開く
 (defun vlc-url-at-point ()
@@ -1008,17 +1005,17 @@
                                                          (cdr url-region)))))
     (message "not found vlc")))
 
-;; 選択して firefox で検索または vlc で開く
-(defun firefox-vlc-choice ()
-  "Firefox search."
+;; 選択して デフォルトブラウザ で検索または vlc で開く
+(defun default-browser-or-vlc-choice ()
+  "Default browser search or vlc."
   (interactive)
   (execute-choice-from-list
    "Open at ?: "
-   '((?g "google(g)"    firefox-google-search)
-     (?w "wikipedia(w)" firefox-wikipedia-search)
-     (?u "url(u)"       firefox-url-at-point)
+   '((?g "google(g)"    default-browser-google-search)
+     (?w "wikipedia(w)" default-browser-wikipedia-search)
+     (?u "url(u)"       default-browser-url-at-point)
      (?v "vlc(v)"       vlc-url-at-point))))
-(define-key global-map (kbd "C-c f") 'firefox-vlc-choice)
+(define-key global-map (kbd "C-c f") 'default-browser-or-vlc-choice)
 
 ;; デスクトップ復元
 (defun desktop-recover ()
@@ -3411,6 +3408,14 @@
   (autoload 'multi-term "multi-term" "Emacs terminal emulator." t)
   (defalias 'mt 'multi-term)
 
+  ;; 前方検索
+  ;; 画面の停止に割り当てられているため stty stop undef する
+  (defun term-send-forward-search-history ()
+    "Search history forward."
+    (interactive)
+    (when (fboundp 'term-send-raw-string)
+      (term-send-raw-string "\C-s")))
+
   (eval-after-load "multi-term"
     '(progn
        (when (boundp 'multi-term-program)   ; zsh を使う
@@ -3420,6 +3425,10 @@
        (when (boundp 'term-bind-key-alist)  ; バインドするキーリスト
          (setq term-bind-key-alist
                '(("C-c C-c" . term-interrupt-subjob)
+                 ("C-p" . previous-line)
+                 ("C-n" . next-line)
+                 ("C-s" . isearch-forward)
+                 ("C-r" . isearch-backward)
                  ("C-m" . term-send-raw)
                  ("M-f" . term-send-forward-word)
                  ("M-b" . term-send-backward-word)
@@ -3429,6 +3438,7 @@
                  ("M-M" . term-send-forward-kill-word)
                  ("M-N" . term-send-backward-kill-word)
                  ("M-r" . term-send-reverse-search-history)
+                 ("M-s" . term-send-forward-search-history)
                  ("M-," . term-send-input)
                  ("M-." . comint-dynamic-complete)
                  ("<M-right>" . multi-term-next)
