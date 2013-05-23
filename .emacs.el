@@ -3449,7 +3449,9 @@
 ;; M-x term または M-x ansi-term で起動
 (when (locate-library "term+")
   (add-hook 'term-mode-hook
-            (lambda () (require 'term+ nil t))))
+            (lambda ()
+              (require 'term+ nil t)
+              (setq show-trailing-whitespace nil))))
 
 ;;; ここまで拡張 lisp
 
