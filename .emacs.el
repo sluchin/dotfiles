@@ -1894,7 +1894,7 @@
   (when (boundp 'recentf-max-menu-items)  ; メニュー表示最大数
     (setq recentf-max-menu-items 30))
   (when (boundp 'recentf-max-saved-items) ; 保持するファイル最大数
-    (setq recentf-max-saved-items 300))
+    (setq recentf-max-saved-items 100000))
   (when (boundp 'recentf-auto-cleanup)    ; クリーンアップしない
     (setq recentf-auto-cleanup 'never))
   (when (boundp 'recentf-exclude)         ; 除外するファイル
