@@ -3998,10 +3998,15 @@
             (lambda ()
               ;; インデント
               (when (fboundp 'c-set-style)
-                (c-set-style "k&r"))
-              (setq-default c-basic-offset 4      ; 基本インデント量 4
-                            tab-width 4           ; タブ幅 4
-                            indent-tabs-mode nil) ; スペース
+                (let (c-basic-offset)
+                  (c-set-style "k&r" nil)))
+              (when (boundp 'c-basic-offset)   ; 基本インデント量 4
+                (setq c-basic-offset 4)
+                (message "c-basic-offset=%d" c-basic-offset))
+              (when (boundp 'tab-width)        ; タブ幅 4
+                (setq tab-width 4))
+              (when (boundp 'indent-tabs-mode) ; スペース
+                (setq indent-tabs-mode nil))
               (when (and (require 'auto-complete nil t)
                          (require 'auto-complete-config nil t))
                 (add-ac-sources  '(ac-source-dictionary
@@ -4174,11 +4179,17 @@
 
   (add-hook 'java-mode-hook
             (lambda ()
+              ;; インデント
               (when (fboundp 'c-set-style)
-                (c-set-style "java"))
-              (setq-default c-basic-offset 4       ; 基本インデント量 4
-                            tab-width 4            ; タブ幅 4
-                            indent-tabs-mode nil) ; スペース
+                (let (c-basic-offset)
+                  (c-set-style "java" nil)))
+              (when (boundp 'c-basic-offset)   ; 基本インデント量 4
+                (setq c-basic-offset 4)
+                (message "c-basic-offset=%d" c-basic-offset))
+              (when (boundp 'tab-width)        ; タブ幅 4
+                (setq tab-width 4))
+              (when (boundp 'indent-tabs-mode) ; スペース
+                (setq indent-tabs-mode nil))
               (when (boundp 'c-auto-newline)
                 (setq c-auto-newline t))
               (when (boundp 'ajc-tag-file)
@@ -4225,8 +4236,17 @@
 
   (add-hook 'malabar-mode-hook
             (lambda ()
+              ;; インデント
               (when (fboundp 'c-set-style)
-                (c-set-style "java"))
+                (let (c-basic-offset)
+                  (c-set-style "java" nil)))
+              (when (boundp 'c-basic-offset)   ; 基本インデント量 4
+                (setq c-basic-offset 4)
+                (message "c-basic-offset=%d" c-basic-offset))
+              (when (boundp 'tab-width)        ; タブ幅 4
+                (setq tab-width 4))
+              (when (boundp 'indent-tabs-mode) ; スペース
+                (setq indent-tabs-mode nil))
               (when (boundp 'c-auto-newline)
                 (setq c-auto-newline t))
               (require 'auto-complete nil t)
@@ -4402,6 +4422,18 @@
 (defun execute-indent ()
   "Execute indent."
   (interactive)
+  (when (eq major-mode 'c-mode)
+    ;; インデント
+    (when (fboundp 'c-set-style)
+      (let (c-basic-offset)
+        (c-set-style "k&r" nil)))
+    (when (boundp 'c-basic-offset)   ; 基本インデント量 4
+      (setq c-basic-offset 4)
+      (message "c-basic-offset=%d" c-basic-offset))
+    (when (boundp 'tab-width)        ; タブ幅 4
+      (setq tab-width 4))
+    (when (boundp 'indent-tabs-mode) ; スペース
+      (setq indent-tabs-mode nil)))
   (save-excursion
     (goto-char (point-min))
     ;; タブをスペースにする
@@ -4443,16 +4475,14 @@
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の前の空白挿入
-    (while (re-search-forward "\\([^=!<>+- ]\\)=" nil t)
+    (while (re-search-forward "\\([^ =!<>+-\\*/]\\)=" nil t)
       (replace-match (concat (match-string 1) " =") nil t)
-      (message "[%d] replace-match (`%s =')...done"
-               (line-number-at-pos) (match-string 1)))
+      (message "[%d] replace-match (` =')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の後ろの空白挿入
     (while (re-search-forward "=\\([^= ]\\)" nil t)
       (replace-match (concat "= " (match-string 1)) nil t)
-      (message "[%d] replace-match (`= %s')...done"
-               (line-number-at-pos) (match-string 1)))
+      (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; ^M 削除
     (while (re-search-forward "$" nil t)
@@ -4500,12 +4530,6 @@
             (save-window-excursion
               (find-file file)
               (switch-to-buffer (file-name-nondirectory file))
-              (when (eq major-mode 'c-mode)
-                (when (fboundp 'c-set-style)
-                  (c-set-style "k&r"))
-                (setq-default c-basic-offset 4       ; 基本インデント量 4
-                              tab-width 4            ; タブ幅 4
-                              indent-tabs-mode nil)) ; スペース
             ;; インデント
             (execute-indent)
             (save-buffer)
@@ -4539,12 +4563,6 @@
                   (save-window-excursion
                     (find-file file)
                     (switch-to-buffer (file-name-nondirectory file))
-                    (when (eq major-mode 'c-mode)
-                      (when (fboundp 'c-set-style)
-                        (c-set-style "k&r"))
-                      (setq-default c-basic-offset 4       ; 基本インデント量 4
-                                    tab-width 4            ; タブ幅 4
-                                    indent-tabs-mode nil)) ; スペース
                     ;; インデント
                     (execute-indent)
                     (save-buffer)
