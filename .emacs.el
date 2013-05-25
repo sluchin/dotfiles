@@ -1092,17 +1092,17 @@
 (define-key global-map (kbd "C-S-k") 'just-one-space)
 
 ;; 文字を入れ替える
-;; 間違えて気づかないことがあるので, C-S-t に変更する
+;; C-S-t に変更 (デフォルト: C-t)
 (define-key global-map (kbd "C-t") nil)
 (define-key global-map (kbd "C-S-t") 'transpose-chars)
 
-;; C-z をウィンドウの切り替えに割り当てる
+;; C-t をウィンドウの切り替えに割り当てる
 (defun other-window-or-split ()
   (interactive)
   (when (one-window-p)
     (split-window-vertically))
   (other-window 1))
-(define-key global-map (kbd "C-z") 'other-window-or-split)
+(define-key global-map (kbd "C-t") 'other-window-or-split)
 
 ;; 行番号へ移動 (デフォルト: M-g g)
 (define-key global-map (kbd "M-g") 'goto-line)
