@@ -304,7 +304,7 @@
 
   ;; ヘッダラインとモードラインをトグルする
   (defun toggle-header-which-func ()
-    "Toggle header-line and mode-ine"
+    "Toggle header-line and mode-ine."
     (if (member '(which-func-mode ("" which-func-format)) mode-line-format)
         (progn
           ;; ヘッダラインに表示
@@ -325,6 +325,7 @@
   ;; M-1 で関数名表示をトグルする
   (when (fboundp ' which-function-mode)
     (defun toggle-which-func-mode ()
+      "Toggle which-func-mode."
       (interactive)
       (if which-function-mode
           (which-function-mode -1)
@@ -619,7 +620,7 @@
 
   ;; Devhelp
   ;; sudo apt-get install devhelp
-  ;; (install-elisp "ftp://download.tuxfamily.org/user42/gtk-look.el"
+  ;; (install-elisp "ftp://download.tuxfamily.org/user42/gtk-look.el")
   (when (locate-library "gtk-look")
     (autoload 'gtk-lookup-symbol "gtk-look" "lookup Gtk and Gnome documentation." t)
     (defun w3m-gtk-lookup ()
@@ -918,7 +919,7 @@
         (setq lst (append lst (list m)))))
     (setq mark-ring lst))
   (message "%s - %s" (point) mark-ring))
-(define-key global-map (kbd "M-2") 'delete-mark-ring)
+(define-key global-map (kbd "M-3") 'delete-mark-ring)
 
 ;; mark-ring を全削除
 (defun clear-mark-ring ()
@@ -3387,7 +3388,6 @@
               (setq show-trailing-whitespace nil))))
 
 ;; multi-term
-;; zsh に設定
 ;; (install-elisp-from-emacswiki "multi-term.el")
 ;; zsh info
 (when (locate-library "info")
@@ -3409,7 +3409,7 @@
 
   (eval-after-load "multi-term"
     '(progn
-       (when (boundp 'multi-term-program)   ; zsh を使う
+       (when (boundp 'multi-term-program)   ; zsh に設定
          (setq multi-term-program "zsh"))
        (when (boundp 'term-unbind-key-list) ; バインドしないキーリスト
          (setq term-unbind-key-list '("C-x" "C-c")))
@@ -3715,7 +3715,8 @@
 ;; (install-elisp "http://www.bookshelf.jp/elc/summarye.el")
 (when (locate-library "summarye")
   (autoload 'se/make-summary-buffer "summarye"
-    "list up matched strings from a buffer, and display them in summary buffer" t))
+    "list up matched strings from a buffer, and display them in summary buffer" t)
+  (define-key global-map (kbd "M-2") 'se/make-summary-buffer))
 
 ;; wget -O- http://www.ne.jp/asahi/love/suna/pub/soft/navi.el/file/navi.1.43.tar.gz | tar xfz -
 (when (locate-library "navi")
