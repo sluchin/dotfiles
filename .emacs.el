@@ -609,14 +609,13 @@
         (if (file-readable-p html)
             (w3m-goto-url-new-session (concat "file:/" html))
           (message "no file: %s" html)))))
-  (when (fboundp 'devhelp-command)
-    (dolist (pg '("glib" "gtk3" "gdk3" "gio" "gobject" "libxml2"))
-      (let ((cmd (intern (format "%s-manual" pg))))
-        (defalias cmd
-          `(lambda ()
-             "Devhelp."
-             (interactive)
-             (devhelp-command ,pg))))))
+  (dolist (pg '("glib" "gtk3" "gdk3" "gio" "gobject" "libxml2"))
+    (let ((cmd (intern (format "%s-manual" pg))))
+      (defalias cmd
+        `(lambda ()
+           "Devhelp."
+           (interactive)
+           (devhelp-command ,pg)))))
 
   ;; Devhelp
   ;; sudo apt-get install devhelp
@@ -1167,27 +1166,15 @@
     "Read documentation for Dired japanese in the info system."
     (interactive) (info "(emacs-ja)Dired")))
 
-;; dired でコマンドを実行する関数定義
-(defun dired-run-command (command)
-  "Open file in command."
-  (if (executable-find command)
-      (when (and (fboundp 'dired-run-shell-command)
-                 (fboundp 'dired-get-filename))
-        (let ((file (dired-get-filename)))
-          (if (and (file-directory-p file) (not (string= command "vlc")))
-              (message "%s is a directory" (file-name-nondirectory file))
-            (when (y-or-n-p (format "Open `%s' %s "
-                                    command (file-name-nondirectory file)))
-              (dired-run-shell-command (concat command " " file " &"))))))
-    (message "not found: %s" command)))
-
 ;; dired 設定
 (when (locate-library "dired")
   (autoload 'dired "dired"
     "Edit directory DIRNAME--delete, rename, print, etc." t)
   ;; 拡張機能を有効にする
-  (add-hook 'dired-load-hook (lambda () (load "dired-x")))
-  (add-hook 'dired-load-hook (lambda () (load "ls-lisp")))
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (require 'dired-x nil t)
+              (require 'ls-lisp nil t)))
   ;; ゴミ箱に移動する
   (add-hook 'dired-mode-hook
             (lambda ()
@@ -1220,22 +1207,26 @@
        (when (boundp 'wdired-confirm-overwrite)
          (setq wdired-confirm-overwrite nil))
 
-       ;; firefox で開く
-       (defun dired-run-firefox ()
-         "Run firefox."
-         (interactive) (dired-run-command "firefox"))
-       ;; libreoffice で開く
-       (defun dired-run-libreoffice ()
-         "Run libreoffice."
-         (interactive) (dired-run-command "libreoffice"))
-       ;; evince で開く
-       (defun dired-run-evince ()
-         "Run evince."
-         (interactive) (dired-run-command "evince"))
-       ;; vlc で開く
-       (defun dired-run-vlc ()
-         "Run vlc."
-         (interactive) (dired-run-command "vlc"))
+       ;; コマンド実行
+       (defun dired-run-command (command)
+         "Open file in command."
+         (if (executable-find command)
+             (when (and (fboundp 'dired-run-shell-command)
+                        (fboundp 'dired-get-filename))
+               (let ((file (dired-get-filename)))
+                 (if (and (file-directory-p file) (not (string= command "vlc")))
+                     (message "%s is a directory" (file-name-nondirectory file))
+                   (when (y-or-n-p (format "Open `%s' %s "
+                                           command (file-name-nondirectory file)))
+                     (dired-run-shell-command (concat command " " file " &"))))))
+           (message "not found: %s" command)))
+       (dolist (pg '("firefox" "libreoffice" "evince" "vlc"))
+         (let ((cmd (intern (format "dired-run-%s" pg))))
+           (defalias cmd
+             `(lambda ()
+                "Run command."
+                (interactive)
+                (dired-run-command ,pg)))))
 
        ;; w3m で開く
        (defun dired-w3m-find-file ()
@@ -1323,23 +1314,23 @@
 
        (when (boundp 'dired-mode-map)
          ;; firefox で開く
-         (define-key dired-mode-map (kbd "C-f") 'dired-run-firefox)
+         (define-key dired-mode-map (kbd "f") 'dired-run-firefox)
          ;; libreoffice で開く
-         (define-key dired-mode-map (kbd "C-l") 'dired-run-libreoffice)
+         (define-key dired-mode-map (kbd "M-l") 'dired-run-libreoffice)
          ;; evince で開く
-         (define-key dired-mode-map (kbd "C-e") 'dired-run-evince)
+         (define-key dired-mode-map (kbd "e") 'dired-run-evince)
          ;; vlc で開く
-         (define-key dired-mode-map (kbd "C-v") 'dired-run-vlc)
+         (define-key dired-mode-map (kbd "M-p") 'dired-run-vlc)
          ;; w3m で開く
-         (define-key dired-mode-map (kbd "C-3") 'dired-w3m-find-file)
+         (define-key dired-mode-map (kbd "M-3") 'dired-w3m-find-file)
          ;; tar + gzip で圧縮
-         (define-key dired-mode-map (kbd "C-z") 'dired-do-tar-gzip)
+         (define-key dired-mode-map (kbd "z") 'dired-do-tar-gzip)
          ;; バックアップファイル
          (define-key dired-mode-map (kbd "b") 'dired-make-backup)
          ;; 文字コードをトグルする
          (define-key dired-mode-map (kbd "c") 'dired-file-name-jp)
          ;; kill する
-         (define-key dired-mode-map (kbd "k") 'dired-kill-buffer)
+         (define-key dired-mode-map (kbd "M-k") 'dired-kill-buffer)
          ;; 編集可能にする
          (when (locate-library "wdired")
            (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
