@@ -962,9 +962,9 @@
 (defun default-browser-google-search ()
   "Search google in default browser."
   (interactive)
-  (let* ((region (region-or-word))
-         (string (read-string "Google search: " region t region))
-         (browse-url-browser-function 'browse-url-default-browser))
+  (let* ((browse-url-browser-function 'browse-url-default-browser)
+         (region (region-or-word))
+         (string (read-string "Google search: " region t region)))
     (browse-url (concat "https://www.google.co.jp/search?q="
                         string
                         "&ie=utf-8&oe=utf-8&hl=ja"))))
@@ -973,25 +973,24 @@
 (defun default-browser-wikipedia-search ()
   "Search wikipedia in default-browser."
   (interactive)
-  (let* ((region (region-or-word))
-         (string (read-string "Wikipedia search: " region t region))
-         (browse-url-browser-function 'browse-url-default-browser))
+  (let* ((browse-url-browser-function 'browse-url-default-browser)
+         (region (region-or-word))
+         (string (read-string "Wikipedia search: " region t region)))
     (browse-url (concat "https://ja.wikipedia.org/wiki/" string))))
 
 ;; URL を開く
 (defun default-browser-url-at-point ()
   "Browse url in default browser."
   (interactive)
-  (let ((browse-url-browser-function 'browse-url-default-browser)
-        alist)
-    (setq alist (append alist (bounds-of-thing-at-point 'url)))
-    (let* ((region (if (null alist) nil
-                     (buffer-substring-no-properties (car alist)
-                                                     (cdr alist))))
-           (url (read-string "URL: " region t region)))
-      (if (equal url "")
-          (message "no url")
-        (browse-url url)))))
+  (let* ((browse-url-browser-function 'browse-url-default-browser)
+         (alist (bounds-of-thing-at-point 'url))
+         (region (if (null alist) nil
+                   (buffer-substring-no-properties (car alist)
+                                                   (cdr alist))))
+         (url (read-string "URL: " region t region)))
+    (if (equal url "")
+        (message "no url")
+      (browse-url url))))
 
 ;; vlc で URL を開く
 (defun vlc-url-at-point ()
@@ -3246,15 +3245,14 @@
     "Browse url in w3m."
     (interactive)
     (when (fboundp 'w3m-goto-url-new-session)
-      (let (alist)
-        (setq alist (append alist (bounds-of-thing-at-point 'url)))
-        (let* ((region (if (null alist) nil
-                         (buffer-substring-no-properties (car alist)
-                                                         (cdr alist))))
-               (string (read-string "URL: " region t region)))
-          (if (equal string "")
-              (message "no url")
-            (w3m-goto-url-new-session string))))))
+      (let* ((alist (bounds-of-thing-at-point 'url))
+             (region (if (null alist) nil
+                       (buffer-substring-no-properties (car alist)
+                                                       (cdr alist))))
+             (url (read-string "URL: " region t region)))
+        (if (equal url "")
+            (message "no url")
+          (w3m-goto-url-new-session url)))))
 
   ;; 選択して w3m で検索
   (defun w3m-choice ()
@@ -3584,20 +3582,15 @@
        (defvar gtags-libpath nil "Library directory of language.")
        (make-variable-buffer-local 'gtags-libpath)
 
-       ;; ローカルバッファ変数にパスを設定する関数定義
-       ;; sudo apt-get install linux-source-3.2.0
-       ;; sudo apt-get install eglibc-source
+       ;; ローカルバッファ変数にパスを設定
        (defun set-gtags-libpath ()
          "Set gtags-libpath."
          (let (path-string
-               (dirs (cond
-                      ((eq major-mode 'c-mode)
-                       '("/usr/include"
-                         "/usr/include/libxml2/libxml"
-                         "/usr/src/glibc"
-                         "/usr/src/linux-source"))
-                      ((eq major-mode 'c++-mode)
-                       '("/usr/include")))))
+               (dirs '("/usr/include"
+                       "/usr/include/libxml2/libxml" ; libxml2-dev
+                       "/usr/include/event2"         ; libevent-dev
+                       "/usr/src/glibc"              ; eglibc-source
+                       "/usr/src/linux-source")))    ; linux-source-3.2.0
            (dolist (dir dirs)
              (if (file-readable-p (concat (file-name-as-directory dir) "GTAGS"))
                  (setq path-string (concat path-string dir ":"))
