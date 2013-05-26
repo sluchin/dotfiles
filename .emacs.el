@@ -3875,33 +3875,35 @@
        (message "Loading %s (compile)...done" this-file-name))))
 
 ;;; 略語から定型文を入力する
-;; [new] git clone https://github.com/capitaomorte/yasnippet.git
-;; [old] wget -O- http://yasnippet.googlecode.com/files/yasnippet-0.6.1c.tar.bz2 | tar xfj -
-;; [old] (install-elisp-from-emacswiki "yasnippet-config.el")
+;; git clone https://github.com/capitaomorte/yasnippet.git
 (when (locate-library "yasnippet")
   ;; F5 で yasnippet をトグルする
-  (defun toggle-yas/minor-mode ()
+  (defun toggle-yas-minor-mode ()
     "Toggle yas/minor-mode"
     (interactive)
     (require 'yasnippet nil t)
-    (when (and (fboundp 'yas/minor-mode)
-               (boundp 'yas/minor-mode))
-      (if yas/minor-mode
-          (yas/minor-mode -1)
-        (yas/minor-mode 1)
-        (let* ((default (cdr (assq 'yas/minor-mode minor-mode-alist))))
+    (when (and (fboundp 'yas-minor-mode)
+               (boundp 'yas-minor-mode))
+      (if yas-minor-mode
+          (yas-minor-mode -1)
+        (yas-minor-mode 1)
+        (let* ((default (cdr (assq 'yas-minor-mode minor-mode-alist))))
           (setcar default " υ")))))
-  (define-key global-map (kbd "<f5>") 'toggle-yas/minor-mode)
+  (define-key global-map (kbd "<f5>") 'toggle-yas-minor-mode)
 
   (eval-after-load "yasnippet"
     '(progn
-       (when (fboundp 'yas--initialize) ; 初期化
-         (yas--initialize))
-       (when (boundp 'yas-snippet-dirs) ; スニペットディクトリ
-         (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                                  "~/.emacs.d/yasnippet/snippets"))
-         (mapc 'yas-load-directory yas-snippet-dirs)
-         (message "Loading %s (yasnippet)...done" this-file-name)))))
+       ;; 選択して タグ検索
+       (defun yasnippet-choice ()
+         "Yasnippet choice command."
+         (interactive)
+         (execute-choice-from-list
+          "yasnippet: "
+          '((?i "insert(i)"  yas-insert-snippet)
+            (?n "new(n)"     yas-new-snippet)
+            (?v "visit(v)"   yas-visit-snippet-file))))
+       (define-key yas-minor-mode-map (kbd "C-c y") 'yasnippet-choice)
+       (message "Loading %s (yasnippet)...done" this-file-name))))
 
 ;;; Emacs Lisp
 ;; ミニバッファにヘルプ表示
