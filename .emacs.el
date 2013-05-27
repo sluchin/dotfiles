@@ -204,6 +204,7 @@
                 "~/.emacs.d/cedet/common"
                 "~/.emacs.d/cedet/ede"
                 "~/.emacs.d/cedet/semantic"
+                "~/.emacs.d/cedet/semantic/bovine"
                 "~/.emacs.d/cedet/speedbar"
                 "~/.emacs.d/auto-install") load-path))
 
@@ -2104,6 +2105,56 @@
   (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
 
 ;;; 検索
+;; コマンド
+;; (install-elisp-from-emacswiki "igrep.el")
+(when (locate-library "igrep")
+  (autoload 'igrep "igrep"
+    "*Run `grep` PROGRAM to match REGEX in FILES..." t)
+  (autoload 'igrep-find "igrep"
+    "*Run `grep` via `find`..." t)
+  (autoload 'igrep-visited-files "igrep"
+    "*Run `grep` ... on all visited files." t)
+  (autoload 'dired-do-igrep "igrep"
+    "*Run `grep` on the marked (or next prefix ARG) files." t)
+  (autoload 'dired-do-igrep-find "igrep"
+    "*Run `grep` via `find` on the marked (or next prefix ARG) directories." t)
+  (autoload 'Buffer-menu-igrep "igrep"
+    "*Run `grep` on the files visited in buffers marked with '>'." t)
+  (autoload 'igrep-insinuate "igrep"
+    "Define `grep' aliases for the corresponding `igrep' commands." t)
+  (autoload 'grep "igrep"
+    "*Run `grep` PROGRAM to match REGEX in FILES..." t)
+  '(when (and (fboundp 'igrep-define)
+             (fboundp 'igrep-use-zgrep)
+             (fboundp 'igrep-regex-option)
+             (fboundp 'igrep-find-define)
+             (fboundp 'lgrep))
+    (igrep-define lgrep
+                  (igrep-use-zgrep nil)
+                  (igrep-regex-option "-Ou8"))
+    (igrep-find-define lgrep
+                       (igrep-use-zgrep nil)
+                       (igrep-regex-option "-Ou8")))
+  (eval-after-load "igrep"
+    '(progn
+       ;;(require 'grep-a-lot nil t)
+       (igrep-define lgrep
+                     (igrep-use-zgrep nil)
+                     (igrep-regex-option "-n -0u8"))
+       (igrep-find-define lgrep
+                          (igrep-use-zgrep nil)
+                          (igrep-regex-option "-n -0u8")))))
+
+;; 複数のバッファを使う
+;; (install-elisp-from-emacswiki "grep-a-lot.el")
+(when (locate-library "grep-a-lot")
+  (add-hook 'grep-mode-hook
+            (lambda () (require 'grep-a-lot nil t)))
+  (eval-after-load "grep-a-lot"
+    '(progn
+       (grep-a-lot-advise igrep))))
+
+;; 編集
 ;; (install-elisp-from-emacswiki "grep-edit.el")
 ;; 編集後 C-c C-e, C-x s !
 (when (locate-library "grep-edit")
@@ -2348,7 +2399,7 @@
                          ((string= "*compilation*" (buffer-name b)) b)
                          ((string= "*haskell*" (buffer-name b)) b)
                          ((string= "*w3m*" (buffer-name b)) b)
-                         ((string= "*grep*" (buffer-name b)) b)
+                         ((string-match "*[i]?grep*" (buffer-name b)) b)
                          ((string-match
                            "\\*GTAGS SELECT\\*.*" (buffer-name b)) b)
                          ((string-match
@@ -3746,12 +3797,14 @@
 
   (eval-after-load "auto-complete"
     '(progn
+       ;; モードライン短縮表示
        (let* ((default (cdr (assq 'auto-complete-mode minor-mode-alist))))
          (setcar default " α"))
-       (let ((file "~/.emacs.d/auto-complete/dict"))
+       ;; ディレクトリ設定 
+       (let ((dir "~/.emacs.d/auto-complete/dict"))
          (when (and (boundp 'ac-dictionary-directories)
-                    (file-readable-p file))
-           (add-to-list 'ac-dictionary-directories file)))
+                    (file-readable-p dir))
+           (add-to-list 'ac-dictionary-directories dir)))
        (when (boundp 'ac-comphist-file)    ; ソースファイル
          (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
        (when (fboundp 'ac-config-default)  ; デフォルト設定にする
@@ -3884,8 +3937,6 @@
     "Toggle yas/minor-mode"
     (interactive)
     (require 'yasnippet nil t)
-    ;; (when (fboundp 'yas--initialize)
-    ;;   (yas--initialize))
     (when (and (fboundp 'yas-minor-mode)
                (boundp 'yas-minor-mode))
       (if yas-minor-mode
@@ -3895,6 +3946,7 @@
 
   (eval-after-load "yasnippet"
     '(progn
+       ;; モードライン短縮表示
        (let* ((default (cdr (assq 'yas-minor-mode minor-mode-alist))))
          (setcar default " υ"))
        ;; 選択して タグ検索
