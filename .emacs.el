@@ -1095,13 +1095,13 @@
 (define-key global-map (kbd "C-t") nil)
 (define-key global-map (kbd "C-S-t") 'transpose-chars)
 
-;; C-t をウィンドウの切り替えに割り当てる
+;; ウィンドウ移動
 (defun other-window-or-split ()
   (interactive)
   (when (one-window-p)
     (split-window-vertically))
   (other-window 1))
-(define-key global-map (kbd "C-t") 'other-window-or-split)
+(define-key global-map (kbd "<f10>") 'other-window-or-split)
 
 ;; 行番号へ移動 (デフォルト: M-g g)
 (define-key global-map (kbd "M-g") 'goto-line)
@@ -3737,9 +3737,7 @@
             (auto-complete-mode -1)
             (remove-hook 'c-mode-common-hook 'auto-complete-mode))
         (auto-complete-mode 1)
-        (add-hook 'c-mode-common-hook 'auto-complete-mode)
-        (let* ((default (cdr (assq 'auto-complete-mode minor-mode-alist))))
-          (setcar default " α")))
+        (add-hook 'c-mode-common-hook 'auto-complete-mode))
       ;; ac-auto-start の設定
       (when (not (eq n nil))
         (setq ac-auto-start n)
@@ -3748,6 +3746,8 @@
 
   (eval-after-load "auto-complete"
     '(progn
+       (let* ((default (cdr (assq 'auto-complete-mode minor-mode-alist))))
+         (setcar default " α"))
        (let ((file "~/.emacs.d/auto-complete/dict"))
          (when (and (boundp 'ac-dictionary-directories)
                     (file-readable-p file))
@@ -3877,22 +3877,26 @@
 ;;; 略語から定型文を入力する
 ;; git clone https://github.com/capitaomorte/yasnippet.git
 (when (locate-library "yasnippet")
+  ;; (autoload 'yas--initialize "yasnippet"
+  ;;   "For backward compatibility, enable `yas-minor-mode' globally." t)
   ;; F5 で yasnippet をトグルする
   (defun toggle-yas-minor-mode ()
     "Toggle yas/minor-mode"
     (interactive)
     (require 'yasnippet nil t)
+    ;; (when (fboundp 'yas--initialize)
+    ;;   (yas--initialize))
     (when (and (fboundp 'yas-minor-mode)
                (boundp 'yas-minor-mode))
       (if yas-minor-mode
           (yas-minor-mode -1)
-        (yas-minor-mode 1)
-        (let* ((default (cdr (assq 'yas-minor-mode minor-mode-alist))))
-          (setcar default " υ")))))
+        (yas-minor-mode 1))))
   (define-key global-map (kbd "<f5>") 'toggle-yas-minor-mode)
 
   (eval-after-load "yasnippet"
     '(progn
+       (let* ((default (cdr (assq 'yas-minor-mode minor-mode-alist))))
+         (setcar default " υ"))
        ;; 選択して タグ検索
        (defun yasnippet-choice ()
          "Yasnippet choice command."
@@ -3902,7 +3906,8 @@
           '((?i "insert(i)"  yas-insert-snippet)
             (?n "new(n)"     yas-new-snippet)
             (?v "visit(v)"   yas-visit-snippet-file))))
-       (define-key yas-minor-mode-map (kbd "C-c y") 'yasnippet-choice)
+       (when (boundp 'yas-minor-mode-map)
+         (define-key yas-minor-mode-map (kbd "C-c y") 'yasnippet-choice))
        (message "Loading %s (yasnippet)...done" this-file-name))))
 
 ;;; Emacs Lisp
@@ -4462,12 +4467,12 @@
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の前の空白挿入
-    (while (re-search-forward "\\([^ =!<>+-\\*/]\\)=" nil t)
-      (replace-match (concat (match-string 1) " =") nil t)
+    (while (re-search-forward "\\([^ =!<>+-\\*/&\\|^]\\)=\\([^%]\\)" nil t)
+      (replace-match (concat (match-string 1) " =" (match-string 2)) nil t)
       (message "[%d] replace-match (` =')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の後ろの空白挿入
-    (while (re-search-forward "=\\([^= ]\\)" nil t)
+    (while (re-search-forward "=\\([^ =%]\\)" nil t)
       (replace-match (concat "= " (match-string 1)) nil t)
       (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
     (goto-char (point-min))
