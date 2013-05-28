@@ -1910,9 +1910,11 @@
   (defadvice kill-buffer
     (around kill-buffer-recentf-no-kill (&optional buffer)
             disable compile)
-    (unless (string= (buffer-name (ad-get-arg 0))
-                     (format "*%s*" recentf-menu-title))
+    (when (and (bufferp (ad-get-arg 0))
+               (not (string= (buffer-name (ad-get-arg 0))
+                             (format "*%s*" recentf-menu-title))))
       ad-do-it))
+
   (defadvice recentf-open-files-action
     (around recentf-open-files-action-no-kill (widget &rest _ignore)
             activate compile)
@@ -3955,7 +3957,8 @@
          (interactive)
          (execute-choice-from-list
           "yasnippet: "
-          '((?i "insert(i)"  yas-insert-snippet)
+          '((?r "reloaad(r)" yas-reload-all)
+            (?i "insert(i)"  yas-insert-snippet)
             (?n "new(n)"     yas-new-snippet)
             (?v "visit(v)"   yas-visit-snippet-file))))
        (when (boundp 'yas-minor-mode-map)
@@ -4519,12 +4522,12 @@
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の前の空白挿入
-    (while (re-search-forward "\\([^ =!<>+-\\*/&\\|^]\\)=\\([^%]\\)" nil t)
+    (while (re-search-forward "\\([^ =!<>+-\\*/&\\|^]\\)=\\([^%\\[]\\)" nil t)
       (replace-match (concat (match-string 1) " =" (match-string 2)) nil t)
       (message "[%d] replace-match (` =')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の後ろの空白挿入
-    (while (re-search-forward "=\\([^ =%]\\)" nil t)
+    (while (re-search-forward "=\\([^ =%\\[]\\)" nil t)
       (replace-match (concat "= " (match-string 1)) nil t)
       (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
     (goto-char (point-min))
