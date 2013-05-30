@@ -4512,12 +4512,12 @@
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の前の空白挿入
-    (while (re-search-forward "\\([^ =!<>+-\\*/&\\|^]\\)=\\([^%\\[]\\)" nil t)
+    (while (re-search-forward "\\([^ =!<>+-\\*/&\\|^(]\\)=\\([^%\\[])\\)" nil t)
       (replace-match (concat (match-string 1) " =" (match-string 2)) nil t)
       (message "[%d] replace-match (` =')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の後ろの空白挿入
-    (while (re-search-forward "=\\([^ =%\\[]\\)" nil t)
+    (while (re-search-forward "=\\([^ =%\\[])\\)" nil t)
       (replace-match (concat "= " (match-string 1)) nil t)
       (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
     (goto-char (point-min))
