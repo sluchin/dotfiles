@@ -1480,7 +1480,7 @@
                      diff-switches))
            (message "diff-switches %s" diff-switches)))
        (when (boundp 'diff-mode-map)
-         (define-key diff-mode-map (kbd "M-w") 'diff-toggle-whitespace))
+         (define-key diff-mode-map (kbd "M-r") 'diff-toggle-whitespace))
        (message "Loading %s (diff)...done" this-file-name))))
 
 ;; Ediff Control Panel 専用のフレームを作成しない
@@ -2126,26 +2126,16 @@
     "Define `grep' aliases for the corresponding `igrep' commands." t)
   (autoload 'grep "igrep"
     "*Run `grep` PROGRAM to match REGEX in FILES..." t)
-  '(when (and (fboundp 'igrep-define)
-             (fboundp 'igrep-use-zgrep)
-             (fboundp 'igrep-regex-option)
-             (fboundp 'igrep-find-define)
-             (fboundp 'lgrep))
-    (igrep-define lgrep
-                  (igrep-use-zgrep nil)
-                  (igrep-regex-option "-Ou8"))
-    (igrep-find-define lgrep
-                       (igrep-use-zgrep nil)
-                       (igrep-regex-option "-Ou8")))
+
   (eval-after-load "igrep"
     '(progn
        ;;(require 'grep-a-lot nil t)
        (igrep-define lgrep
                      (igrep-use-zgrep nil)
-                     (igrep-regex-option "-n -0u8"))
+                     (igrep-regex-option "-Ou8"))
        (igrep-find-define lgrep
                           (igrep-use-zgrep nil)
-                          (igrep-regex-option "-n -0u8")))))
+                          (igrep-regex-option "-Ou8")))))
 
 ;; 複数のバッファを使う
 ;; (install-elisp-from-emacswiki "grep-a-lot.el")
@@ -3555,7 +3545,7 @@
              (magit-refresh))
            (message "magit-diff-options %s" magit-diff-options)))
        (when (boundp 'magit-mode-map)
-         (define-key magit-mode-map (kbd "M-w") 'magit-toggle-whitespace))
+         (define-key magit-mode-map (kbd "M-r") 'magit-toggle-whitespace))
        (message "Loading %s (magit)...done" this-file-name))))
 
 ;; psvn の設定
@@ -3581,7 +3571,7 @@
                    '("--diff-cmd" "diff" "-x" "-wbup"))))
          (revert-buffer))
        (when (boundp 'svn-status-diff-mode-map)
-         (define-key svn-status-diff-mode-map (kbd "M-w") 'psvn-toggle-whitespace))
+         (define-key svn-status-diff-mode-map (kbd "M-r") 'psvn-toggle-whitespace))
        (message "Loading %s (psvn)...done" this-file-name))))
 
 ;;; タグ検索
