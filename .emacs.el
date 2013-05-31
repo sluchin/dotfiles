@@ -3883,7 +3883,10 @@
          (setq compilation-window-height 20))
        ;; 環境変数
        (when (boundp 'compilation-environment)
-         (setq compilation-environment "LC_ALL=C"))
+         (setq compilation-environment
+               '("LC_ALL=C"
+                 "COMPILE_PATH=/usr/lib/gcc/i686-linux-gnu/4.6/:/usr/bin"
+                 "LIBRARY_PATH=/usr/lib/gcc/i686-linux-gnu/4.6")))
        ;; 日本語対応
        (add-to-list
         'compilation-error-regexp-alist-alist
@@ -3916,7 +3919,8 @@
        ;; キーバインド
        (when (boundp 'compilation-mode-map)
          (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
-         (define-key compilation-mode-map (kbd "c") 'recompile-make))
+         (define-key compilation-mode-map (kbd "c") 'recompile-make)
+         (define-key compilation-mode-map (kbd "k") 'kill-compilation))
        (message "Loading %s (compile)...done" this-file-name))))
 
 ;;; 略語から定型文を入力する
