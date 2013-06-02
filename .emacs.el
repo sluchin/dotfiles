@@ -1701,7 +1701,7 @@
                (fboundp 'dired-omit-mode))
       (dired-omit-mode 1)))
 
-  (defun org-kill-buffer ()
+  (defun kill-org-all-buffer ()
     "Kill org-mode buffer."
     (interactive)
     (when (and (require 'org nil t)
@@ -1815,8 +1815,7 @@
     '(progn
        ;; テンプレート
        (when (boundp 'org-remember-templates)
-         (let* ((setq org-tags-overlay)
-                (dir (file-name-as-directory org-directory))
+         (let* ((dir (file-name-as-directory org-directory))
                 (book-tmpl "~/.emacs.d/org/templates/book.txt")
                 (journal-file (concat dir "journal.org"))
                 (emacs-file (concat dir "emacs.org"))
@@ -2127,9 +2126,23 @@
   (autoload 'grep "igrep"
     "*Run `grep` PROGRAM to match REGEX in FILES..." t)
 
+  (defun kill-grep-all-buffer ()
+    "Kill grep buffer."
+    (interactive)
+    (save-excursion
+      (save-window-excursion
+        (dolist (buffer (buffer-list))
+          (switch-to-buffer buffer)
+          (when (or (eq major-mode 'igrep-mode)
+                    (string-match
+                     "\\(\\*.*grep.*\\*\\)"
+                     (buffer-name buffer)))
+            (message "kill buffer: %s (%s)" buffer major-mode)
+            (when (buffer-live-p buffer)
+              (kill-buffer buffer)))))))
+
   (eval-after-load "igrep"
     '(progn
-       ;;(require 'grep-a-lot nil t)
        (igrep-define lgrep
                      (igrep-use-zgrep nil)
                      (igrep-regex-option "-Ou8"))
@@ -2142,6 +2155,7 @@
 (when (locate-library "grep-a-lot")
   (add-hook 'grep-mode-hook
             (lambda () (require 'grep-a-lot nil t)))
+
   (eval-after-load "grep-a-lot"
     '(progn
        (grep-a-lot-advise igrep))))
