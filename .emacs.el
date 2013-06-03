@@ -168,7 +168,7 @@
               (delete-file file)))))
     (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)))
 
-;; git clone
+;; レポジトリ更新
 (defun update-repositories ()
   "git clone. bm, magit and others."
   (interactive)
@@ -179,7 +179,7 @@
                    ("twittering-mode" "git://github.com/hayamiz/twittering-mode.git")
                    ("yasnippet" "https://github.com/capitaomorte/yasnippet.git")
                    ("auto-complete-clang" "git://github.com/brianjcj/auto-complete-clang.git")))
-            (tmp "*Messages*"))
+            (mes "*Messages*"))
         (if (file-directory-p base)
             (progn
               (dolist (l lst)
@@ -188,11 +188,12 @@
                        (concat (file-name-as-directory dir) ".git"))
                       (progn
                         (cd dir)
-                        (call-process "git" nil tmp nil "pull")
+                        (call-process "git" nil mes nil "pull")
                         (message "git pull (%s)...done" (car l)))
                     (cd base)
-                    (call-process "git" nil tmp nil "clone" (car (cdr l)))
-                    (message "git clone (%s)...done" (car (cdr l)))))))
+                    (call-process "git" nil mes nil "clone" (car (cdr l)))
+                    (message "git clone (%s)...done" (car (cdr l))))))
+              (message "update-repositories...done"))
           (message "not directory %s" base)))
     (message "not found `git'")))
 
@@ -205,17 +206,17 @@
              (base (expand-file-name "~/.emacs.d"))
              (dir (concat (file-name-as-directory base) "emacswikipages"))
              (repo "svn://svn.sv.gnu.org/emacswiki/emacswikipages")
-             (tmp "*Messages*"))
+             (mes "*Messages*"))
         (if (file-directory-p base)
             (progn
               (if (file-directory-p
                    (concat (file-name-as-directory dir) ".svn"))
                   (progn
                     (cd dir)
-                    (call-process "svn" nil tmp nil "up")
+                    (call-process "svn" nil mes nil "up")
                     (message "svn up (%s)...done" dir))
                 (cd base)
-                (call-process "svn" nil tmp nil "co" repo)
+                (call-process "svn" nil mes nil "co" repo)
                 (message "svn co (%s)...done" repo)))
           (message "not directory %s" base)))
     (message "not found `svn'")))
