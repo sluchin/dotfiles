@@ -178,7 +178,11 @@
                    ("magit" "git://github.com/magit/magit.git")
                    ("twittering-mode" "git://github.com/hayamiz/twittering-mode.git")
                    ("yasnippet" "https://github.com/capitaomorte/yasnippet.git")
-                   ("auto-complete-clang" "git://github.com/brianjcj/auto-complete-clang.git")))
+                   ("tomatinho" "git://github.com/konr/tomatinho.git")
+                   ("auto-complete-clang" "git://github.com/brianjcj/auto-complete-clang.git")
+                   ("ajc-java-complete" "git://github.com/jixiuf/ajc-java-complete.git")
+                   ("yasnippet-java-mode" "https://github.com/nekop/yasnippet-java-mode.git")
+                   ("malabar-mode" "git://github.com/espenhw/malabar-mode.git")))
             (mes "*Messages*"))
         (if (file-directory-p base)
             (progn
@@ -735,14 +739,12 @@
              (fboundp 'server-start))
     (unless (server-running-p) (server-start))))
 
-;;; 番号付バックアップファイルを作る
-(setq version-control t)
-
-;;; 確認しないで古いものを消す
-(setq delete-old-versions t)
-
-;;; バージョン管理下のファイルもつくる
-(setq vc-make-backup-files t)
+;;; バックアップファイル
+(setq version-control t)      ; 番号付ファイル
+(setq kept-new-versions 5)    ; 新しいバージョン
+(setq kept-old-versions 5)    ; 古いバージョン
+(setq delete-old-versions t)  ; 確認しない
+(setq vc-make-backup-files t) ; バージョン管理下
 
 ;;; 検索時大文字小文字の区別をする
 (setq-default case-fold-search nil)
@@ -1873,6 +1875,7 @@
                 (journal-file (concat dir "journal.org"))
                 (emacs-file (concat dir "emacs.org"))
                 (memo-file (concat dir "memo.org"))
+                (shopping-file (concat dir "shopping.org"))
                 (book-file (concat dir "book.org"))
                 (private-file (concat dir "private.org"))
                 (book-string (concat "** %^{Brief Description} "
@@ -1880,26 +1883,29 @@
                                      (if (file-readable-p book-tmpl)
                                          (format "%%[%s]" book-tmpl) "") "\n")))
            (setq org-remember-templates
-                 `(("Todo"    ?t
+                 `(("Todo"     ?t
                     "** TODO %^{Title}\n%?\nAdded: %U\n"
                     nil "Tasks")
-                   ("Bug"     ?b
+                   ("Bug"      ?b
                     "** TODO %^{Title} %U  :bug:\n%i%?\n%a\n"
                     nil "Tasks")
-                   ("Idea"    ?i
+                   ("Idea"     ?i
                     "** %^{Idea} %U\n%i%?\n" nil "Ideas")
-                   ("Journal" ?j
+                   ("Journal"  ?j
                     "** %^{Head Line} %U\n%i%?\n"
                     ,journal-file "Inbox")
-                   ("Emacs"   ?e
-                    "** %^{Title} %U\n%a\n%i%?\n"
+                   ("Emacs"    ?e
+                    "** %^{Title} %U\n%i%?\n"
                     ,emacs-file "Emacs")
-                   ("Memo"    ?m
-                    "** %^{Title} %U\n%a\n%i%?\n"
+                   ("Memo"     ?m
+                    "** %^{Title} %U\n%i%?\n"
                     ,memo-file "Memo")
-                   ("Private" ?p
+                   ("Shopping" ?s
+                    "** %^{Title} %U\n%i%?\n"
+                    ,shopping-file "Shopping")
+                   ("Private"  ?p
                     "** %^{Topic} %U \n%i%?\n" ,private-file "Private")
-                   ("Book"    ?k ,book-string ,book-file "Books")))))
+                   ("Book"     ?k ,book-string ,book-file "Books")))))
        (when (fboundp 'org-remember-insinuate) ; 初期化
          (org-remember-insinuate))
        (message "Loading %s (org-remember)...done" this-file-name))))
