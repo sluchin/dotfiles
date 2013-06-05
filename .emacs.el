@@ -89,9 +89,9 @@
                                   (file-symlink-p f))
                         (add-to-list 'recursive f)))
                     recursive) exclude)))
-        (if (or (null exclude)
-                (not (string-match exclude file)))
-            (add-to-list 'files file))))
+        (when (or (null exclude)
+                  (not (string-match exclude file)))
+          (add-to-list 'files file))))
     files))
 
 ;;; ディレクトリ配下すべてのファイルを表示
@@ -173,7 +173,8 @@
   "git clone. bm, magit and others."
   (interactive)
   (if (executable-find "git")
-      (let ((base (expand-file-name "~/.emacs.d"))
+      (let (default-directory
+            (base (expand-file-name "~/.emacs.d"))
             (lst '(("bm" "git://github.com/joodland/bm.git")
                    ("magit" "git://github.com/magit/magit.git")
                    ("twittering-mode" "git://github.com/hayamiz/twittering-mode.git")
@@ -206,7 +207,8 @@
   "git clone. bm and magit."
   (interactive)
   (if (executable-find "svn")
-      (let* ((system-time-locale "ja_JP.utf8")
+      (let* (default-directory
+             (system-time-locale "ja_JP.utf8")
              (base (expand-file-name "~/.emacs.d"))
              (dir (concat (file-name-as-directory base) "emacswikipages"))
              (repo "svn://svn.sv.gnu.org/emacswiki/emacswikipages")
@@ -3917,31 +3919,21 @@
                        auto-insert-alist)))
        (message "Loading %s (autoinsert)...done" this-file-name))))
 
+;;; コンパイル (compilation-mode)
+;; (install-elisp-from-emacswiki "compile-.el")
+;; (install-elisp-from-emacswiki "compile+.el")
 (when (locate-library "compile")
   (autoload 'compile "compile" "Compile for compilation-mode." t)
+  (add-hook 'compilation-mode-hook (lambda () (require 'compile+ nil t)))
 
-  ;; クリーン
-  (defun make-clean ()
-    "make clean command."
-    (interactive)
-    (let ((compile-command "make clean"))
-      (call-interactively 'compile)))
-
-  ;; ディレクトリ指定してコンパイル
-  (defun compile-directory (dir)
-    (interactive "DDirectory: ")
-    (let ((default-directory dir)
-          (split-width-threshold 100000) ; 上下分割のみ (デフォルト: 160)
-          (compile-command
-           (cond ((or (eq major-mode 'c-mode)
-                      (eq major-mode 'c++mode))
-                  "make -k ")
-                 ((eq major-mode 'java-mode)
-                  (concat "javac "
-                          (file-name-nondirectory (buffer-file-name))))
-                 (t compile-command))))
-      (call-interactively 'compile)))
-  (define-key mode-specific-map "c" 'compile-directory)
+  ;; コンパイル
+  (defadvice compile
+    (around compile-directory (command &optional comint) activate compile)
+    (let ((split-width-threshold 100000) ; 上下分割のみ (デフォルト: 160)
+          (default-directory (read-directory-name
+                              "Directory: " default-directory nil nil nil)))
+      ad-do-it))
+  (define-key mode-specific-map "c" 'compile)
 
   (eval-after-load "compile"
     '(progn
@@ -3991,9 +3983,9 @@
 
        ;; キーバインド
        (when (boundp 'compilation-mode-map)
-         (define-key compilation-mode-map (kbd "a") 'recompile-make-clean-all)
-         (define-key compilation-mode-map (kbd "c") 'recompile-make)
-         (define-key compilation-mode-map (kbd "k") 'kill-compilation))
+         (define-key compilation-mode-map (kbd "M-a") 'recompile-make-clean-all)
+         (define-key compilation-mode-map (kbd "M-c") 'recompile-make)
+         (define-key compilation-mode-map (kbd "M-k") 'kill-compilation))
        (message "Loading %s (compile)...done" this-file-name))))
 
 ;;; 略語から定型文を入力する
