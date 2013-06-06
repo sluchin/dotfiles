@@ -183,7 +183,8 @@
                    ("auto-complete-clang" "git://github.com/brianjcj/auto-complete-clang.git")
                    ("ajc-java-complete" "git://github.com/jixiuf/ajc-java-complete.git")
                    ("yasnippet-java-mode" "https://github.com/nekop/yasnippet-java-mode.git")
-                   ("malabar-mode" "git://github.com/espenhw/malabar-mode.git")))
+                   ("malabar-mode" "git://github.com/espenhw/malabar-mode.git")
+                   ("haskell-mode" "git://github.com/haskell/haskell-mode.git")))
             (mes "*Messages*"))
         (if (file-directory-p base)
             (progn
@@ -260,6 +261,7 @@
                 "~/.emacs.d/malabar-mode/lisp"
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
+                "~/.emacs.d/haskell-mode"
                 "~/.emacs.d/cedet/common"
                 "~/.emacs.d/cedet/ede"
                 "~/.emacs.d/cedet/semantic"
@@ -4043,6 +4045,57 @@
        (when (boundp 'eldoc-echo-area-use-multiline-p)
          (setq eldoc-echo-area-use-multiline-p t))
        (message "Loading %s (eldoc-extension)...done" this-file-name))))
+
+;;; scheme モード
+;; sudo apt-get install gauche gauche-dev gauche-doc
+(when (locate-library "info")
+  (defun gauche-ja-info (&optional node)
+    "Read documentation for zsh in the info system."
+    (interactive) (info (format "(gauche-refj.info)%s" (or node "")))))
+
+(when (locate-library "cmuscheme")
+  (autoload 'scheme-mode "cmuscheme" "Major mode for Scheme." t)
+  (autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
+
+  (eval-after-load "cmuscheme"
+    '(progn
+       (when (boundp 'scheme-program-name)
+         (setq scheme-program-name "gosh -i"))
+       (when (boundp 'process-coding-system-alist)
+         (setq process-coding-system-alist
+               (cons '("gosh" utf-8 . utf-8) process-coding-system-alist))))))
+
+;;; haskell モード
+;; git clone git://github.com/haskell/haskell-mode.git
+;; sudo apt-get install libgmp-dev libgmp3c2
+;; wget http://www.haskell.org/ghc/dist/7.6.3/ghc-7.6.3-i386-unknown-linux.tar.bz2
+;;   ./configure; make install
+;; wget http://hackage.haskell.org/packages/archive/cabal-install/1.16.0.2/cabal-install-1.16.0.2.tar.gz
+;;   GHC=/usr/local/bin/ghc GHC_PKG=/usr/local/bin/ghc-pkg sh bootstrap.sh
+;; PATH=$PATH:$HOME/.cabal/bin
+;; cabal update
+;; cabal install ghc-mod
+(when (and (locate-library "haskell-mode")
+           (locate-library "haskell-cabal"))
+  (autoload 'haskell-mode "haskell-mode" "A Haskell editing mode." t)
+  (autoload 'literate-haskell-mode "literate-haskell-mode"
+    "As `haskell-mode' but for literate scripts." t)
+  (autoload 'haskell-cabal "haskell-cabal" "Support for Cabal packages." t)
+
+  ;; 拡張子追加
+  (add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode))
+  (add-to-list 'auto-mode-alist '("\\.lhs$" . literate-haskell-mode))
+  (add-to-list 'auto-mode-alist '("\\.cabal\\'" . haskell-cabal-mode))
+  ;; シェバン追加
+  (add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
+  (add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode)
+  ;; 実行パス追加
+  (add-to-list 'exec-path (concat (getenv "HOME") "/.cabal/bin")))
+
+  (eval-after-load "haskell-mode"
+    '(progn
+       (when (fboundp 'ghc-init)
+         (ghc-init)))))
 
 ;;; nXML モード
 (when (locate-library "nxml-mode")
