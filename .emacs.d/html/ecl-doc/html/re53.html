@@ -1,0 +1,76 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>trace</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch23.html#ansi.environment.dict" title="23.1. Dictionary"><link rel="prev" href="re52.html" title="disassemble"><link rel="next" href="ch23s02.html" title="23.2. C Reference"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">trace</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re52.html">Prev</a> </td><th width="60%" align="center">23.1. Dictionary</th><td width="20%" align="right"> <a accesskey="n" href="ch23s02.html">Next</a></td></tr></table><hr></div><div class="refentry" title="trace"><a name="ansi.environment.trace"></a><div class="titlepage"></div>
+   <div class="refnamediv"><h2>Name</h2><p>
+    <code class="function">trace</code>
+     — Follow execution of functions
+   </p></div>
+
+   <a class="indexterm" name="idp1713016"></a><a class="indexterm" name="idp1713376"></a><a class="indexterm" name="idp1713504"></a><a class="indexterm" name="idp1714064"></a><a class="indexterm" name="idp1714424"></a><a class="indexterm" name="idp1714552"></a><a class="indexterm" name="idp1715120"></a><a class="indexterm" name="idp1715480"></a><div class="refsynopsisdiv" title="Synopsis"><h2>Synopsis</h2>
+    <div class="funcsynopsis">
+     <p>
+      <code class="funcdef">(trace</code>
+       <var class="pdparam">function-name</var>*)
+     </p>
+    </div>
+    <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>function-name</code></em></span></p></td><td><p>
+       </p><pre class="synopsis">{<em class="replaceable"><code>symbol</code></em> | (<em class="replaceable"><code>symbol</code></em> [<em class="replaceable"><code>option</code></em> <em class="replaceable"><code>form</code></em>]*)}</pre><p>
+      </p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>symbol</code></em></span></p></td><td><p>A symbol which is bound to a function in the global
+      environment. Not evaluated.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>option</code></em></span></p></td><td><p>One of <span class="symbol">:BREAK</span>,
+      <span class="symbol">:BREAK-AFTER</span>, <span class="symbol">:COND-BEFORE</span>,
+      <span class="symbol">:COND-AFTER</span>, <span class="symbol">:COND</span>,
+      <span class="symbol">:PRINT</span>, <span class="symbol">:PRINT-AFTER</span>,
+      <span class="symbol">:STEP</span></p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>form</code></em></span></p></td><td><p>A lisp form evaluated in an special
+      environment.</p></td></tr><tr><td><p><span class="term">returns</span></p></td><td><p>List of symbols with traced functions.</p></td></tr></tbody></table></div>
+   </div>
+
+   <div class="refsect1" title="Macro"><a name="idp1724368"></a><h2>Macro</h2>
+    
+
+    <p>Causes one or more functions to be traced. Each
+    <em class="replaceable"><code>function-name</code></em> can be a symbol which is bound to
+    a function, or a list containing that symbol plus additional options. If
+    the function bound to that symbol is called, information about the
+    argumetns and output of this function will be printed. Trace options will
+    modify the amount of information and when it is printed.</p>
+
+    <p>Not that if the function is called from another function compiled in
+    the same file, tracing might not be enabled. If this is the case, to
+    enable tracing, recompile the caller with a <code class="literal">notinline</code>
+    declaration for the called function.</p>
+
+    <p><code class="function">trace</code> returns a name list of those functions
+    that were traced by the call to trace.  If no
+    <em class="replaceable"><code>function-name</code></em> is given, <code class="literal">trace</code>
+    simply returns a name list of all the currently traced functions.</p>
+
+    <p>Trace options cause the normal printout to be suppressed, or cause
+    extra information to be printed. Each option is a pair of an option keyword
+    and a value form. If an already traced function is traced again, any new
+    options replace the old options and a warning might be printed. The lisp
+    <em class="replaceable"><code>form</code></em> accompanying the option is evaluated in an
+    environment where <em class="replaceable"><code>sys::arglist</code></em> is contains the
+    list of arguments to the function.</p>
+
+    <p>The following options are defined:</p>
+    <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><span class="symbol">:cond</span>, </span><span class="term"><span class="symbol">:cond-before</span>, </span><span class="term"><span class="symbol">:cond-after</span></span></p></td><td>
+       <p>If <span class="symbol">:cond-before</span> is specified, then
+       <code class="function">trace</code> does nothing unless
+       <em class="replaceable"><code>form</code></em> evaluates to true at the time of the
+       call. <span class="symbol">:cond-after</span> is similar, but suppresses the
+       initial printout, and is tested when the function returns.
+       <span class="symbol">:cond</span> tries both before and after.</p>
+      </td></tr><tr><td><p><span class="term"><span class="symbol">:step</span></span></p></td><td>
+       <p>If <em class="replaceable"><code>form</code></em> evaluates to true, the stepper
+       is entered.</p>
+      </td></tr><tr><td><p><span class="term"><span class="symbol">:break</span>, </span><span class="term"><span class="symbol">:break-after</span></span></p></td><td>
+       <p>If specified, and <em class="replaceable"><code>form</code></em> evaluates to
+       true, then the debugger is invoked at the start of the function or at
+       the end of the function according to the respective option.</p>
+      </td></tr><tr><td><p><span class="term"><span class="symbol">:print</span>, </span><span class="term"><span class="symbol">:print-after</span></span></p></td><td>
+       <p>In addition to the usual printout, the result of evaluating
+       <em class="replaceable"><code>form</code></em> is printed at the start of the function
+       or at the end of the function, depending on the option. Multiple print
+       options cause multiple values to be output, in the order in which they
+       were introduced.</p>
+      </td></tr></tbody></table></div>
+   </div>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re52.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch23.html#ansi.environment.dict">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch23s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">disassemble</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 23.2. C Reference</td></tr></table></div></body></html>

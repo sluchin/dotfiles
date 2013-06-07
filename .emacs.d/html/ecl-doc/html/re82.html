@@ -1,0 +1,37 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ext:storage-exhausted</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch28s06.html" title="5.6. Memory Management Reference"><link rel="prev" href="re81.html" title="ext:stack-overflow"><link rel="next" href="re83.html" title="ext:get-finalizer"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="classname">ext:storage-exhausted</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re81.html">Prev</a> </td><th width="60%" align="center">5.6. Memory Management Reference</th><td width="20%" align="right"> <a accesskey="n" href="re83.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ext:storage-exhausted"><a name="ref.memory.storage-exhausted"></a><div class="titlepage"></div>
+ <div class="refnamediv"><h2>Name</h2><p>
+  <code class="classname">ext:storage-exhausted</code>
+   — Memory overflow condition.
+ </p></div>
+
+ <div class="refsynopsisdiv" title="Class Precedence List"><h2>Class Precedence List</h2>
+  
+  <p>
+    <code class="classname">ext:storage-exhausted</code>,
+    <code class="classname">storage-condition</code>,
+    <code class="classname">serious-condition</code>,
+    <code class="classname">condition</code>,
+    <code class="classname">t</code>
+  </p>
+ </div>
+ 
+
+ <div class="refsect1" title="Description"><a name="idp2144512"></a><h2>Description</h2>
+  
+  <p>This condition is signaled when <span class="application">ECL</span> exhausts the
+  <code class="varname">ext:heap-size</code> limit from <a class="xref" href="re86.html#table.memory.limits" title="Table 5.1. Customizable memory limits">Table 5.1</a>. In handling this condition <span class="application">ECL</span> follows
+  this logic</p>
+  <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>If the heap size limit was set to 0 (that is no limit), but
+   there is some free space in the safety region <span class="application">ECL</span> frees this space and
+   issues a non-restartable error. The user may jump to an outer point or
+   quit.</p></li><li class="listitem"><p>If the heap size had a finite limit, <span class="application">ECL</span> offers the user
+   the chance to resize it, issuing a restartable condition. The user may at
+   this point use <code class="code">(ext:set-limit 'ext:heap-size 0)</code> to remove the
+   heap limit and avoid further messages, or use the <code class="code">(continue)</code>
+   restart to let <span class="application">ECL</span> enlarge the heap by some amount.</p></li><li class="listitem"><p>Independently of the heap size limit, if <span class="application">ECL</span> finds that
+   ther is no space to free or to grow, <span class="application">ECL</span> simply quits. There will be no
+   chance to do some cleanup because there is no way to cons any additional
+   data.</p></li></ul></div>
+ </div>
+
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re81.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch28s06.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re83.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="classname">ext:stack-overflow</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">ext:get-finalizer</code></td></tr></table></div></body></html>

@@ -1,0 +1,68 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ecl_va_arg</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch04s04.html" title="4.4. C Reference"><link rel="prev" href="re07.html" title="ecl_symbol_value"><link rel="next" href="re09.html" title="ecl_nth_value, ecl_nvalues"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ecl_va_arg</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re07.html">Prev</a> </td><th width="60%" align="center">4.4. C Reference</th><td width="20%" align="right"> <a accesskey="n" href="re09.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ecl_va_arg"><a name="ref.ecl_va_arg"></a><div class="titlepage"></div>
+    <div class="refnamediv"><h2>Name</h2><p>
+      <code class="function">ecl_va_arg</code>
+       — Accepting a variable number of arguments
+    </p></div>
+
+    <a class="indexterm" name="idp260352"></a><a class="indexterm" name="idp260688"></a><a class="indexterm" name="idp261064"></a><div class="refsynopsisdiv" title="Macros"><h2>Macros</h2>
+      
+
+      <pre class="synopsis"><span class="type">typedef struct { ... } ecl_va_list[1];</span></pre>
+
+      <div class="funcsynopsis">
+	<p>
+	  
+	  <code class="funcdef"><b class="fsfunc">ecl_va_start</b>(</code>
+	  ecl_va_list <var class="pdparam">arglist</var>, 
+	  <var class="pdparam">last_argument</var>, 
+	  <var class="pdparam">narg</var>, 
+	  <var class="pdparam">n_ordinary</var><code>)</code>;
+	</p>
+      </div>
+
+      <div class="funcsynopsis">
+	<p>
+	  
+	  <code class="funcdef">cl_object <b class="fsfunc">ecl_va_arg</b>(</code>
+	  ecl_va_list <var class="pdparam">arglist</var><code>)</code>;
+	</p>
+      </div>
+
+      <div class="funcsynopsis">
+	<p>
+	  
+	  <code class="funcdef">cl_object <b class="fsfunc">ecl_va_end</b>(</code>
+	  ecl_va_list <var class="pdparam">arglist</var><code>)</code>;
+	</p>
+      </div>
+    </div>
+
+    <div class="refsect1" title="Description"><a name="idp267016"></a><h2>Description</h2>
+      
+
+      <p>The macros above are used to code a function that accepts an arbitrary number of arguments. We will describe them in a practical example</p>
+      <pre class="programlisting">
+cl_object my_plus(cl_narg narg, cl_object required1, ...)
+{
+    cl_env_ptr env = ecl_process_env();
+    cl_object other_value;
+    ecl_va_list varargs;
+    ecl_va_start(varargs, required1, narg, 1);
+    while (narg &gt; 1) {
+        cl_object other_value = ecl_va_arg(varargs);
+	required1 = ecl_plus(required1, other_value);
+    }
+    ecl_va_end(varargs);
+    ecl_return1(env, required1);
+}
+      </pre>
+
+      <p>The first thing to do is to declare the variable that will hold the arguments. This is <em class="replaceable"><code>varargs</code></em> in our example and it has the type <span class="type">ecl_va_list</span>.</p>
+
+      <p>This arguments list is initialized with the <code class="function">ecl_va_start</code> macro, based on the supplied number of arguments, <em class="replaceable"><code>narg</code></em>, the number of required arguments which are passed as ordinary C arguments (1 in this case), the last such ordinary arguments, <em class="replaceable"><code>required</code></em>, and the buffer for the argument list, <em class="replaceable"><code>varargs</code></em>.</p>
+
+      <p>Once <em class="replaceable"><code>varargs</code></em> has been initialized, we can retrieve these values one by one using <code class="function">ecl_va_arg</code>. Note that the returned value always has the type <span class="type">cl_object</span>, for it is always a Common Lisp object.</p>
+
+      <p>The last statement before returning the output of the function is <code class="function">ecl_va_end</code>. This macro performs any required cleanup and should never be omitted.</p>
+    </div>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re07.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04s04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re09.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ecl_symbol_value</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">ecl_nth_value</code>, <code class="function">ecl_nvalues</code></td></tr></table></div></body></html>

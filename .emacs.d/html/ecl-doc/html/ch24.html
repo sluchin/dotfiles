@@ -1,0 +1,59 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 1. System building</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="pt02.html" title="Part II. Extensions and Libraries"><link rel="prev" href="pt02.html" title="Part II. Extensions and Libraries"><link rel="next" href="ch24s02.html" title="1.2. System definition files"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 1. System building</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="pt02.html">Prev</a> </td><th width="60%" align="center">Part II. Extensions and Libraries</th><td width="20%" align="right"> <a accesskey="n" href="ch24s02.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 1. System building"><div class="titlepage"><div><div><h2 class="title"><a name="ext.asdf"></a>Chapter 1. System building</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch24.html#ext.asdf.intro">1.1. Introduction</a></span></dt><dt><span class="section"><a href="ch24s02.html">1.2. System definition files</a></span></dt><dt><span class="section"><a href="ch24s03.html">1.3. Practical examples</a></span></dt><dt><span class="section"><a href="ch24s04.html">1.4. ASDF Reference</a></span></dt><dd><dl><dt><span class="refentrytitle"><a href="re55.html"><code class="function">asdf:make-build</code></a></span><span class="refpurpose"> — Block-build an <span class="application">ASDF</span> system definition</span></dt><dt><span class="refentrytitle"><a href="re56.html"><code class="function">asdf:load-fasl-op</code></a></span><span class="refpurpose"> — Compile and load one ore more libraries using unified <acronym class="acronym">FASL</acronym></span></dt></dl></dd></dl></div>
+ 
+
+ <div class="section" title="1.1. Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.asdf.intro"></a>1.1. Introduction</h2></div></div></div>
+  
+
+  <p>A typical application will consist of multiple lisp files that have to
+  be compiled and which will probably be linked to additional, third party
+  libraries, either written themselves in Common Lisp or shipped as foreign C
+  or C++ dynamically or statically linked lirbaries. Not only loading these
+  files into a running <span class="application">ECL</span> can be a slow process in some platforms, but
+  shipping code in the form of multiple binaries and a script to load them is
+  far from optimal.</p>
+
+  <p>Traditionally, Common Lisp implemenations have provided a function to
+  save the dump all data from a running Lisp process into a file. The result
+  was called the Lisp image and could be shipped to other version compatible
+  implementations.Nowadays, having less control of the systems it runs in, a Lisp
+  implementation must work very hard to dump memory images and be able to load
+  and execute them afterwards.</p>
+
+  <p><span class="application">ECL</span> has chosen to avoid this process entirely. Instead, we conceive
+  five different portable models for building and shippin your programs. The
+  models, described in <a class="xref" href="ch24.html#table.make-build" title="Table 1.1. Code distribution models">Table 1.1</a>, enumerate the
+  different kinds of files that <span class="application">ECL</span> can portably produce. To get one or more
+  of the products mentioned in the table, you may resort to a low level
+  <acronym class="acronym">API</acronym> described in <a class="xref" href="pt03.html" title="Part III. Internals">Part III</a>. However, we recommend a simpler way based on
+  using System Definition Files to describe the structure of your project and
+  let <span class="application">ECL</span> build the desired target for you. This approach is described in the
+  following sections.</p>
+
+  <div class="table"><a name="table.make-build"></a><p class="title"><b>Table 1.1. Code distribution models</b></p><div class="table-contents">
+   
+   <table summary="Code distribution models" border="1"><colgroup><col><col><col><col></colgroup><thead><tr><th>Model</th><th>Description</th><th><span class="symbol">:TYPE</span></th><th><span class="symbol">:MONOLITHIC</span></th></tr></thead><tbody><tr><td>Source code</td><td><p>You distribute your programs in source code form. This is
+      the easiest and most portable way, but not the fastest
+      one.</p></td><td>NA</td><td>NA</td></tr><tr><td><acronym class="acronym">FASL</acronym> or loadable file</td><td><p>Best suited for development. You translate all lisp code to
+      C and link it against possibly other C/C++ libraries to obtain a single
+      binary file with extension <code class="filename">.fas</code>, like the compiled
+      files you obtain from using <code class="function">compile-file</code>. This
+      "unified" <acronym class="acronym">FASL</acronym> can be loaded a startup time to add new functionality to
+      the <span class="application">ECL</span> environment.</p></td><td><span class="symbol">:FASL</span></td><td><span class="symbol">T</span>/<span class="symbol">NIL</span></td></tr><tr><td>Standalone program</td><td><p>Product shipping for final user. You translate all your lisp
+      code to C using the <span class="application">ECL</span> compiler. The final object files can be linked
+      against other C/C++ libraries to obtain a standalone executable.</p></td><td><span class="symbol">:PROGRAM</span></td><td>T</td></tr><tr><td>Statically linked library</td><td><p>For embedding purposes. You translate all your lisp code to
+      C and combine the resulting object files into a single library with
+      <code class="filename">.a</code> or <code class="filename">.lib</code> extension. You can
+      distribute this library to other people and the final users can utilize
+      these libraries to build standalone programs.</p></td><td><span class="symbol">:LIB</span></td><td><span class="symbol">T</span>/<span class="symbol">NIL</span></td></tr><tr><td>Dynamically linked library</td><td><p>For embedding purposes. Similar to a statically linked
+      library, but it is loaded at run time by the operating system and can be
+      shared by more than one instance of a program.</p></td><td><span class="symbol">:LIB</span></td><td><span class="symbol">T</span>/<span class="symbol">NIL</span></td></tr></tbody></table>
+  </div></div><br class="table-break">
+
+ </div>
+
+ 
+
+ 
+
+ 
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="pt02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="pt02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch24s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Part II. Extensions and Libraries </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 1.2. System definition files</td></tr></table></div></body></html>

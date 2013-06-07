@@ -1,0 +1,92 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>2.5. Arrays</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch33.html" title="Chapter 2. Manipulating Lisp objects"><link rel="prev" href="ch33s04.html" title="2.4. Characters"><link rel="next" href="ch33s06.html" title="2.6. Strings"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.5. Arrays</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch33s04.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Manipulating Lisp objects</th><td width="20%" align="right"> <a accesskey="n" href="ch33s06.html">Next</a></td></tr></table><hr></div><div class="section" title="2.5. Arrays"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-Arrays"></a>2.5. Arrays</h2></div></div></div>
+  
+  <p>An array is an aggregate of data of a common type, which can be accessed with
+  one or more nonnegative indices. <span class="application">ECL</span> stores arrays as a C structure with a
+  pointer to the region of memory which contains the actual data. The cell
+  of an array datatype varies depending on whether it is a vector, a bytevector,
+  a multidimensional array or a string.</p>
+  <p>If <em class="replaceable"><code>x</code></em> contains a vector, you can access the following fields:</p>
+  <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><code class="literal">x-&gt;vector.elttype</code></span></p></td><td>
+     <p>The type of the elements of the vector.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;vector.dim</code></span></p></td><td>
+     <p>The maximum number of elements.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;vector.fillp</code></span></p></td><td>
+     <p>Actual number of elements in the vector or "fill pointer".</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;vector.self</code></span></p></td><td>
+     <p>Union of pointers of different types. You should choose the right pointer
+     depending on <code class="literal">x-&gt;vector.elltype</code></p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;vector.hasfillp</code></span></p></td><td>
+     <p>Whether <code class="literal">x-&gt;vector.fillp</code> can be smaller than <code class="literal">x-&gt;vector.dim</code>.</p>
+    </td></tr></tbody></table></div>
+  <p>If <em class="replaceable"><code>x</code></em> contains a multidimensional array, the cell elements become</p>
+  <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><code class="literal">x-&gt;array.elttype</code></span></p></td><td>
+     <p>The type of the elements of the array.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;array.dim</code></span></p></td><td>
+     <p>Number of elements in the array.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;array.rank</code></span></p></td><td>
+     <p>Number of dimensions of the array.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;array.dims[]</code></span></p></td><td>
+     <p>Array with the dimensions of the array. The elements range from
+     <code class="literal">x-&gt;array.dim[0]</code> to <code class="literal">x-&gt;array.dim[x-&gt;array.rank-1]</code>.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;array.self</code></span></p></td><td>
+     <p>Union of pointers to the actual data. You should choose the right pointer
+     depending on <code class="literal">x-&gt;array.elltype</code>.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;array.rank</code></span></p></td><td>
+     <p>Whether <code class="literal">x-&gt;vector.fillp</code> can be smaller than <code class="literal">x-&gt;vector.dim</code>.</p>
+    </td></tr></tbody></table></div>
+  <p class="continues">Bitvectors and strings are treated separately.</p>
+  <p>Each array is of an specialized type which is the type of the elements of the
+  array. <span class="application">ECL</span> has arrays only a few following specialized types, and for each
+  of these types there is a C integer which is the corresponding value of
+  <code class="literal">x-&gt;array.elttype</code> or <code class="literal">x-&gt;vector.elttype</code>. We list those types
+  together with the C constant that denotes that type:</p>
+  <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>T</code></em></span></p></td><td>
+     <p><code class="literal">aet_object</code></p>
+    </td></tr><tr><td><p><span class="term"><em class="replaceable"><code>CHARACTER</code></em></span></p></td><td>
+     <p><code class="literal">aet_ch</code></p>
+    </td></tr><tr><td><p><span class="term"><em class="replaceable"><code>FIXNUM</code></em></span></p></td><td>
+     <p><code class="literal">aet_fix</code></p>
+    </td></tr><tr><td><p><span class="term"><em class="replaceable"><code>BIT</code></em></span></p></td><td>
+     <p><code class="literal">aet_bit</code></p>
+    </td></tr><tr><td><p><span class="term"><em class="replaceable"><code>SINGLE-FLOAT</code></em></span></p></td><td>
+     <p><code class="literal">aet_sf</code></p>
+    </td></tr><tr><td><p><span class="term"><em class="replaceable"><code>DOUBLE-FLOAT</code></em></span></p></td><td>
+     <p><code class="literal">aet_df</code></p>
+    </td></tr></tbody></table></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2521520"></a> Function: <span class="returnvalue">cl_elttype</span> <code class="function">array_elttype</code> (<span class="type">cl_object</span> <code class="varname">o</code>)</pre>
+   <p>Returns the element type of the array <em class="replaceable"><code>o</code></em>, which can be a string, a
+   bitvector, vector, or a multidimensional array. For example, the code
+   <code class="literal">array_elttype(c_string_to_object("\"AAA\""))</code> returns <code class="literal">aet_ch</code>,
+   while the <code class="literal">array_elttype(c_string_to_object("#(A B C)"))</code> returns
+   <code class="literal">aet_object</code>.</p>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2524824"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">aref</code> (<span class="type">cl_object</span> <code class="varname">array</code>, <span class="type">cl_index</span> <code class="varname">index</code>)</pre>
+   <pre class="screen"><a class="indexterm" name="idp2526768"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">aset</code> (<span class="type">cl_object</span> <code class="varname">array</code>, <span class="type">cl_index</span> <code class="varname">index</code>, <span class="type">cl_object</span> <code class="varname">value</code>)</pre>
+   <p>These functions are used to retrieve and set the elements of an array. The
+   elements are accessed with one index, <em class="replaceable"><code>index</code></em>, as in the lisp function
+   <code class="literal">ROW-MAJOR-AREF</code>. For example</p>
+   <pre class="screen">
+    cl_object array = c_string_to_object("#2A((1 2) (3 4))");
+    cl_object x = aref(array, 3);
+    cl_print(1, x);	/* Outputs 4 */
+    aset(array, 3, MAKE_FIXNUM(5));
+    cl_print(1, array); /* Outputs #2A((1 2) (3 5)) */
+   </pre>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2530672"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">aref1</code> (<span class="type">cl_object</span> <code class="varname">vector</code>, <span class="type">cl_index</span> <code class="varname">index</code>)</pre>
+   <pre class="screen"><a class="indexterm" name="idp2532680"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">aset1</code> (<span class="type">cl_object</span> <code class="varname">vector</code>, <span class="type">cl_index</span> <code class="varname">index</code>, <span class="type">cl_object</span> <code class="varname">value</code>)</pre>
+   <p>These functions are similar to <code class="literal">aref</code> and <code class="literal">aset</code>, but they operate on
+   vectors.</p>
+   <pre class="screen">
+    cl_object array = c_string_to_object("#(1 2 3 4)");
+    cl_object x = aref1(array, 3);
+    cl_print(1, x);	/* Outputs 4 */
+    aset1(array, 3, MAKE_FIXNUM(5));
+    cl_print(1, array); /* Outputs #(1 2 3 5) */
+   </pre>
+  </blockquote></div>
+  
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch33s04.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch33.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch33s06.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.4. Characters </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.6. Strings</td></tr></table></div></body></html>

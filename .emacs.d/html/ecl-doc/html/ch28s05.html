@@ -1,0 +1,25 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>5.5. Finalization</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch28.html" title="Chapter 5. Memory Management"><link rel="prev" href="ch28s04.html" title="5.4. Memory Conditions"><link rel="next" href="ch28s06.html" title="5.6. Memory Management Reference"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.5. Finalization</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch28s04.html">Prev</a> </td><th width="60%" align="center">Chapter 5. Memory Management</th><td width="20%" align="right"> <a accesskey="n" href="ch28s06.html">Next</a></td></tr></table><hr></div><div class="section" title="5.5. Finalization"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.memory.finalization"></a>5.5. Finalization</h2></div></div></div>
+   
+
+   <p>As we all know, Common-Lisp relies on garbage collection for deleting
+   unreachable objects. However, it makes no provision for the equivalent of a
+   C++ Destructor function that should be called when the object is eliminated
+   by the garbage collector. The equivalent of such methods in a garbage
+   collected environment is normally called a <span class="emphasis"><em>finalizer</em></span>.</p>
+
+   <p><span class="application">ECL</span> includes a simple implementation of finalizers which makes the
+   following promises.</p>
+   <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The finalizer can be any lisp function, let it be compiled
+    or interpreter.</p></li><li class="listitem"><p>Finalizers are not invoked during garbage
+    collection. Instead, if an unreachable object is found to have an
+    associated finalizer, it is pushed into a list and <span class="emphasis"><em>before the
+    next garbage collection cycle</em></span>, the finalizer will be
+    invoked. </p></li><li class="listitem"><p>If the finalizer is invoked and it makes the object
+    reachable, for instance, by assigning it to a variable, it will not be
+    destroyed, but it will have no longer a finalizer associated to
+    it.</p></li><li class="listitem"><p><span class="application">ECL</span> will strive to call finalizers before the environment
+    is closed and the program is finished, but this mechanism may fail when
+    exiting in a non ordinary way.</p></li></ul></div>
+
+   <p>The implementation is based on two functions, <a class="link" href="re85.html" title="ext:set-finalizer"><span class="symbol">ext:set-finalizer</span></a> and <a class="link" href="re83.html" title="ext:get-finalizer"><span class="symbol">ext:get-finalizer</span></a>, which allow setting and querying the finalizer functions for certain objects.</p>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch28s04.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch28.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch28s06.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">5.4. Memory Conditions </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.6. Memory Management Reference</td></tr></table></div></body></html>

@@ -1,0 +1,44 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>3.3. Foreign objects</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch26.html" title="Chapter 3. Foreign Function Interface"><link rel="prev" href="ch26s02.html" title="3.2. Two kinds of FFI"><link rel="next" href="ch26s04.html" title="3.4. Higher level interfaces"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.3. Foreign objects</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch26s02.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Foreign Function Interface</th><td width="20%" align="right"> <a accesskey="n" href="ch26s04.html">Next</a></td></tr></table><hr></div><div class="section" title="3.3. Foreign objects"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.ffi.objects"></a>3.3. Foreign objects</h2></div></div></div>
+  
+
+  <p>While the foreign function invocation protocols differ strongly between
+  platforms and implementations, foreign objects are pretty easy to handle
+  portably. For <span class="application">ECL</span>, a foreign object is just a bunch of bytes stored in
+  memory. The lisp object for a foreign object encapsulates several bits of
+  information:
+  </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>A list or a symbol specifying the C type of the
+   object.</p></li><li class="listitem"><p>The pointer to the region of memory where data is
+   stored.</p></li><li class="listitem"><p>A flag determining whether <span class="application">ECL</span> can automatically manage
+   that piece of memory and deallocated when no longer in
+   use.</p></li></ul></div>
+
+  <p>A foreign object may contain many different kinds of data: integers,
+  floating point numbers, C structures, unions, etc. The actual type of the
+  object is stored in a list or a symbol which is understood by the higher
+  level interface (<a class="xref" href="ch26s04.html" title="3.4. Higher level interfaces">Section 3.4</a>).</p>
+
+  <p>The most important component of the object is the memory region where
+  data is stored. By default <span class="application">ECL</span> assumes that the user will perform automatic
+  managment of this memory, deleting the object when it is no longer
+  needed. The first reason is that this block may have been allocated by a
+  foreign routine using <code class="function">malloc()</code>, or
+  <code class="function">mmap()</code>, or statically, by referring to a C constant. The
+  second reason is that foreign functions may store references to this memory
+  which <span class="application">ECL</span> is not aware of and, in order to keep these references valid,
+  <span class="application">ECL</span> should not attempt to automatically destroy the object.</p>
+
+  <p>In many cases, however, it is desirable to automatically destroy
+  foreign objects once they have been used. The higher level interfaces <a class="link" href="pt04.html" title="Part IV. UFFI Reference"><span class="application">UFFI</span></a>
+  and <span class="application">CFFI</span> provide tools for doing this. For instance, in the following
+  example adapted from the <a class="link" href="pt04.html" title="Part IV. UFFI Reference"><span class="application">UFFI</span></a> documentation, the string
+  <code class="varname">NAME</code> is automatically deallocated</p>
+<pre class="programlisting">(def-function "gethostname" 
+  ((name (* :unsigned-char))
+   (len :int))
+  :returning :int)
+
+(if (zerop (c-gethostname (uffi:char-array-to-pointer name) 256))
+    (format t "Hostname: ~S" (ffi:convert-from-foreign-string name))
+    (error "gethostname() failed."))
+</pre>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch26s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch26.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch26s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.2. Two kinds of FFI </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.4. Higher level interfaces</td></tr></table></div></body></html>

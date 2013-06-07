@@ -1,0 +1,54 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>CL_UNWIND_PROTECT</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch31s02.html" title="8.2. Embedding Reference"><link rel="prev" href="re89.html" title="CL_CATCH_ALL"><link rel="next" href="re91.html" title="cl_boot"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">CL_UNWIND_PROTECT</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re89.html">Prev</a> </td><th width="60%" align="center">8.2. Embedding Reference</th><td width="20%" align="right"> <a accesskey="n" href="re91.html">Next</a></td></tr></table><hr></div><div class="refentry" title="CL_UNWIND_PROTECT"><a name="ref.embed.cl_unwind_protect"></a><div class="titlepage"></div>
+ <div class="refnamediv"><h2>Name</h2><p>
+  <code class="function">CL_UNWIND_PROTECT</code>
+   — Create a protected region.
+ </p></div>
+
+ <div class="refsynopsisdiv" title="C Macro"><h2>C Macro</h2>
+  
+<pre class="programlisting">
+  cl_env_ptr env = ecl_process_env();
+  CL_UNWIND_PROTECT_BEGIN(env) {
+    /*
+     * Code that is protected. Uncaught lisp conditions, THROW,
+     * signals such as SIGSEGV and SIGBUS may cause jump to
+     * this region.
+     */
+  } CL_UNWIND_PROTECT_EXIT {
+    /*
+     * If the exception, lisp condition or other control transfer
+     * is caught, this code is executed. After this code, the
+     * process will jump to the original destination of the
+     * THROW, GOTO or other control statement that was interrupted.
+     */
+  } CL_UNWIND_PROTECT_END
+  /*
+   * We only exit here if NO nonlocal jump was interrupted.
+   */
+</pre>
+ </div>
+
+ <div class="refsect1" title="Description"><a name="idp2259944"></a><h2>Description</h2>
+  
+
+   <p>When embedding <span class="application">ECL</span> it is normally advisable to set up an
+   unwind-protect frame to avoid the embedded lisp code to perform arbitary
+   transfers of control. Furthermore, the unwind protect form will be
+   used in at least in the following ocasions:</p>
+   <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+     <p>In a normal program exit, caused by <code class="function">ext:quit</code>,
+     <span class="application">ECL</span> unwinds up to the outermost frame, which may be an <a class="xref" href="re89.html" title="CL_CATCH_ALL"><code class="function">CL_CATCH_ALL</code></a> or <a class="xref" href="re90.html" title="CL_UNWIND_PROTECT"><code class="function">CL_UNWIND_PROTECT</code></a> macro.</p>
+    </li></ul></div>
+
+   <p>Besides this, normal mechanisms for exit, such as
+   <code class="function">ext:quit</code>, and uncaught exceptions, such as serious
+   signals (<a class="xref" href="ch30s02.html#ext.signals.synchronous" title="7.2.1. Synchronous signals">Section 7.2.1</a>), are best handled using
+   unwind-protect blocks.</p>
+ </div>
+
+ <div class="refsect1" title="See also"><a name="idp2263960"></a><h2>See also</h2>
+  
+
+  <p><a class="xref" href="re89.html" title="CL_CATCH_ALL"><code class="function">CL_CATCH_ALL</code></a></p>
+ </div>
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re89.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch31s02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re91.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">CL_CATCH_ALL</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">cl_boot</code></td></tr></table></div></body></html>

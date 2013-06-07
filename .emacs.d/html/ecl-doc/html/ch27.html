@@ -1,0 +1,42 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 4. Multithreading</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="pt02.html" title="Part II. Extensions and Libraries"><link rel="prev" href="re66.html" title="ffi:c-inline"><link rel="next" href="ch27s02.html" title="4.2. Multithreading Reference"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 4. Multithreading</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re66.html">Prev</a> </td><th width="60%" align="center">Part II. Extensions and Libraries</th><td width="20%" align="right"> <a accesskey="n" href="ch27s02.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 4. Multithreading"><div class="titlepage"><div><div><h2 class="title"><a name="ext.mp"></a>Chapter 4. Multithreading</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch27.html#ext.mp.threads">4.1. Tasks, threads or processes</a></span></dt><dt><span class="section"><a href="ch27s02.html">4.2. Multithreading Reference</a></span></dt><dd><dl><dt><span class="refentrytitle"><a href="re67.html"><code class="function">mp:all-processes</code></a></span><span class="refpurpose"> — Return the list of active processes.</span></dt><dt><span class="refentrytitle"><a href="re68.html"><code class="function">mp:exit-process</code></a></span><span class="refpurpose"> — Exit the task from which it is invoked.</span></dt><dt><span class="refentrytitle"><a href="re69.html"><code class="function">mp:interrupt-process</code></a></span><span class="refpurpose"> — Interrupt a task.</span></dt><dt><span class="refentrytitle"><a href="re70.html"><code class="function">mp:get-lock</code></a></span><span class="refpurpose"> — Try to obtain a lock.</span></dt><dt><span class="refentrytitle"><a href="re71.html"><code class="function">mp:giveup-lock</code></a></span><span class="refpurpose"> — Release a lock we have obtained before.</span></dt><dt><span class="refentrytitle"><a href="re72.html"><code class="function">mp:make-lock</code></a></span><span class="refpurpose"> — Create a new lock.</span></dt><dt><span class="refentrytitle"><a href="re73.html"><code class="function">mp:make-process</code></a></span><span class="refpurpose"> — Create a new thread.</span></dt><dt><span class="refentrytitle"><a href="re74.html"><code class="function">mp:process-active-p</code></a></span><span class="refpurpose"> — Determine whether a task is running.</span></dt><dt><span class="refentrytitle"><a href="re75.html"><code class="function">mp:process-enable</code></a></span><span class="refpurpose"> — Start up a task which was not running.</span></dt><dt><span class="refentrytitle"><a href="re76.html"><code class="function">mp:process-kill</code></a></span><span class="refpurpose"> — Try to stop a running task.</span></dt><dt><span class="refentrytitle"><a href="re77.html"><code class="function">mp:process-name</code></a></span><span class="refpurpose"> — Return the name of a task.</span></dt><dt><span class="refentrytitle"><a href="re78.html"><code class="function">mp:process-preset</code></a></span><span class="refpurpose"> — Associate a function to a process.</span></dt><dt><span class="refentrytitle"><a href="re79.html"><code class="function">mp:process-run-function</code></a></span><span class="refpurpose"> — Create a task and execute a function in it.</span></dt><dt><span class="refentrytitle"><a href="re80.html"><code class="function">mp:with-lock</code></a></span><span class="refpurpose"> — Synchronize a piece of code between different tasks.</span></dt></dl></dd></dl></div>
+  
+
+  <div class="section" title="4.1. Tasks, threads or processes"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.mp.threads"></a>4.1. Tasks, threads or processes</h2></div></div></div>
+   
+
+   <p>On most platforms, <span class="application">ECL</span> supports native multithreading. That means
+   there can be several tasks executing lisp code on parallel and sharing
+   memory, variables and files. The interface for multitasting in <span class="application">ECL</span>, like
+   those of most other implementations, is based on a set of functions and
+   types that resemble the multiprocessing capabilities of old Lisp Machines.
+   </p>
+
+   <p>This backward compatibility is why tasks or threads are called
+   "processes". However, they should not be confused with operating system
+   processes, which are made of programs running in separate contexts and
+   without access to each other's memory.</p>
+
+   <p>The implementation of threads in <span class="application">ECL</span> is purely native and based on
+   Posix Threads wherever avaiable. The use of native threads has
+   advantanges. For instance, they allow for non-blocking file operations,
+   so that while one task is reading a file, a different one is performing
+   a computation.</p>
+
+   <p>As mentioned above, tasks share the same memory, as well as the set of
+   open files and sockets. This manifests on two features. First of all,
+   different tasks can operate on the same lisp objects, reading and writing
+   their slots, or manipulating the same arrays. Second, while threads share
+   global variables, constants and function definitions they can also have
+   thread-local bindings to special variables that are not seen by other
+   tasks.</p>
+
+   <p>The fact that different tasks have access to the same set of data
+   allows both for flexibility and a greater risk. In order to control access
+   to different resources, <span class="application">ECL</span> provides the user with locks, as explained in
+   the next section.</p>
+
+  </div>
+
+  
+
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re66.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="pt02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch27s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ffi:c-inline</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 4.2. Multithreading Reference</td></tr></table></div></body></html>

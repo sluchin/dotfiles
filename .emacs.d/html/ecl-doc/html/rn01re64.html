@@ -1,0 +1,40 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ext:system</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="rn01.html" title="OS Reference"><link rel="prev" href="rn01re63.html" title="ext:run-program"><link rel="next" href="ch26.html" title="Chapter 3. Foreign Function Interface"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ext:system</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="rn01re63.html">Prev</a> </td><th width="60%" align="center">OS Reference</th><td width="20%" align="right"> <a accesskey="n" href="ch26.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ext:system"><a name="ref.system"></a><div class="titlepage"></div>
+  <div class="refnamediv"><h2>Name</h2><p>
+   <code class="function">ext:system</code>
+    — Invoke a command using the shell.
+  </p></div>
+
+  <div class="refsynopsisdiv" title="Function"><h2>Function</h2>
+   
+   <div class="funcsynopsis">
+    <p>
+     <code class="funcdef">(ext:system</code>
+      <var class="pdparam">command</var>)
+    </p>
+   </div>
+   <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>command</code></em></span></p></td><td><p>A string</p></td></tr><tr><td><p><span class="term">returns</span></p></td><td><p>An integer (0-255) with the exit code of the
+     program</p></td></tr></tbody></table></div>
+  </div>
+
+  <div class="refsect1" title="Description"><a name="idp1922328"></a><h2>Description</h2>
+   
+
+   <p>This function executes a command in the shell. In Unix systems,
+   typically the environment variable <span class="symbol">SHELL</span> determines which
+   program will be invoked, while in Windows <span class="command"><strong>CMD.EXE</strong></span> is
+   used. The string may thus be any valid command that the shell accepts and
+   in can contain higher level elements such as input/output
+   redirection.</p>
+
+   <p>As an example, the following function uses an external editor to
+   modify a lisp file and, if successful, loads the changed sources:</p>
+   <pre class="programlisting">
+(defun edit (filename)
+  (let* ((editor #+windows "notepad.exe"
+                 #-windows "/usr/bin/emacs")
+    (command (concatenate 'string editor " " filename)))
+    (when (zerop (ext:system command))
+    (load filename))))
+   </pre>
+  </div>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="rn01re63.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="rn01.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch26.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ext:run-program</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 3. Foreign Function Interface</td></tr></table></div></body></html>

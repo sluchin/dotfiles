@@ -1,0 +1,76 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ext:without-interrupts</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch30s05.html" title="7.5. Signals Reference"><link rel="prev" href="re87.html" title="ext:with-interrupts"><link rel="next" href="ch31.html" title="Chapter 8. Embedding ECL"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ext:without-interrupts</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re87.html">Prev</a> </td><th width="60%" align="center">7.5. Signals Reference</th><td width="20%" align="right"> <a accesskey="n" href="ch31.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ext:without-interrupts"><a name="ref.signals.without-interrupts"></a><div class="titlepage"></div>
+  <div class="refnamediv"><h2>Name</h2><p>
+    <code class="function">ext:without-interrupts</code>
+     — Execute code without being interrupted.
+  </p></div>
+
+  <div class="refsynopsisdiv" title="Macro"><h2>Macro</h2>
+    
+    <div class="funcsynopsis">
+      <p>
+        <code class="funcdef">(ext:without-interrupts</code>
+         &amp;body body)
+      </p>
+    </div>
+  </div>
+
+  <div class="refsect1" title="Description"><a name="idp2239512"></a><h2>Description</h2>
+    
+
+    <p>Executes the given body with all interrupts disabled. This
+    macro is compatible with the one in <span class="application">SBCL</span> and as such it also
+    defines three other local macros
+    <code class="function">ext:allow-with-interrupts</code>,
+    <code class="function">ext:with-local-interrupts</code> and
+    <code class="function">ext:with-restored-interrupts</code>.</p>
+
+    <p>Deferrable interrupts include most blockable POSIX signals,
+    and <code class="function">mp:interrupt-process</code>. Does not interfere
+    with garbage collection, and does not inhibit scheduling of other
+    threads.</p>
+
+    <p>This macro binds <code class="function">allow-with-interrupts</code>,
+    <code class="function">with-local-interrupts</code> and
+    <code class="function">with-restored-interrupts</code> as a local
+    macros.</p>
+
+    <p><code class="function">ext:with-restored-interrupts</code> executes
+    the body with interrupts enabled if and only if the
+    <code class="function">ext:without-interrupts</code> was in an environment
+    in which interrupts were allowed.</p>
+
+    <p><code class="function">ext:allow-with-interrupts</code> allows the
+    <code class="function">ext:with-interrupts</code> to take effect during the
+    dynamic scope of its body, unless there is an outer
+    <code class="function">ext:without-interrupts</code> without a
+    corresponding
+    <code class="function">ext:allow-with-interrupts</code>.</p>
+
+    <p><code class="function">ext:with-local-interrupts</code> executes its
+    body with interrupts enabled provided that for there is an
+    <code class="function">ext:allow-with-interrupts</code> for every
+    <code class="function">ext:without-interrupts</code> surrounding the current
+    one. <code class="function">ext:with-local-interrupts</code> is equivalent
+    to:</p>
+<pre class="programlisting">
+  (allow-with-interrupts (with-interrupts ...))
+</pre>
+
+    <p>Care must be taken not to let either
+    <code class="function">ext:allow-with-interrupts</code> or
+    <code class="function">ext:with-local-interrupts</code> appear in a function
+    that escapes from inside the
+    <code class="function">ext:without-interrupts</code> in:</p>
+<pre class="programlisting">
+  (without-interrupts
+    ;; The body of the lambda would be executed with WITH-INTERRUPTS allowed
+    ;; regardless of the interrupt policy in effect when it is called.
+    (lambda () (allow-with-interrupts ...)))
+
+  (without-interrupts
+    ;; The body of the lambda would be executed with interrupts enabled
+    ;; regardless of the interrupt policy in effect when it is called.
+    (lambda () (with-local-interrupts ...)))
+</pre>
+  </div>
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re87.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch30s05.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch31.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ext:with-interrupts</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 8. Embedding <span class="application">ECL</span></td></tr></table></div></body></html>

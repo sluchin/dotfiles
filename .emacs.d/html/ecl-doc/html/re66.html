@@ -1,0 +1,92 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ffi:c-inline</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch26s05.html" title="3.5. FFI Reference"><link rel="prev" href="re65.html" title="ffi:clines"><link rel="next" href="ch27.html" title="Chapter 4. Multithreading"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ffi:c-inline</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re65.html">Prev</a> </td><th width="60%" align="center">3.5. FFI Reference</th><td width="20%" align="right"> <a accesskey="n" href="ch27.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ffi:c-inline"><a name="ref.c-inline"></a><div class="titlepage"></div>
+   <div class="refnamediv"><h2>Name</h2><p>
+    <code class="function">ffi:c-inline</code>
+     — Inline C code in a lisp form.
+   </p></div>
+
+   <a class="indexterm" name="idp1984592"></a><a class="indexterm" name="idp1984952"></a><div class="refsynopsisdiv" title="Special form"><h2>Special form</h2>
+    
+    <div class="funcsynopsis">
+     <p>
+      <code class="funcdef">(ffi:c-inline</code>
+       (<var class="pdparam">lisp-value</var>*) 
+       (<var class="pdparam">c-type</var>*) 
+       <var class="pdparam">return-type</var> 
+       <var class="pdparam">C-code</var> 
+       &amp;key 
+       <var class="pdparam">one-liner</var> 
+       <var class="pdparam">side-effects</var>)
+     </p>
+    </div>
+    <table border="0" summary="Simple list" class="simplelist"><tr><td><em class="replaceable"><code>lisp-value</code></em></td><td>A lisp expression, evaluated.</td></tr><tr><td><em class="replaceable"><code>c-type</code></em></td><td>A valid <acronym class="acronym">FFI</acronym> type.</td></tr><tr><td><em class="replaceable"><code>return-type</code></em></td><td>A valid <acronym class="acronym">FFI</acronym> type or <code class="code">(VALUES)</code>.</td></tr><tr><td><em class="replaceable"><code>C-code</code></em></td><td>A string with valid C code plus some valid escape forms.</td></tr><tr><td><em class="replaceable"><code>one-liner</code></em></td><td>A boolean, defaults to <span class="symbol">NIL</span>.</td></tr><tr><td><em class="replaceable"><code>side-effects</code></em></td><td>A boolean, defaults to <span class="symbol">T</span>.</td></tr><tr><td>returns</td><td>One or more lisp values.</td></tr></table>
+   </div>
+
+   <div class="refsect1" title="Description"><a name="idp1993976"></a><h2>Description</h2>
+    
+
+    <p>This is an special form which can be only used in compiled code and
+    whose purpose is to execute some C code getting and returning values from
+    and to the lisp environment.</p>
+
+    <p>The first argument to <code class="function">ffi:c-inline</code> is a list of
+    lisp forms. These forms are going to be evaluated and their lisp values
+    will be transformed to the corresponding C types denoted by
+    <em class="replaceable"><code>c-type</code></em>.</p>
+
+    <p>The input values are used to create a valid C expression using the
+    template in <em class="replaceable"><code>C-code</code></em>. This is a string of
+    arbitrary size which mixes C expressions with two kind of
+    escape forms.</p>
+
+    <p>The first kind of escape form are made of a hash and a letter or a
+    number, as in: <code class="code">#0</code>, <code class="code">#1</code>, ..., until
+    <code class="code">#z</code>. These codes are replaced by the corresponding input
+    values. The second kind of escape form has the format <code class="code">@(return
+    [<span class="optional">n</span>])</code>, it can be used as lvalue in a C expression
+    and it is used to set the n-th output value of the
+    <code class="function">ffi:c-inline</code> form.</p>
+
+    <p>When the parameter <em class="replaceable"><code>one-liner</code></em> is true, then
+    the C template must be a simple C statement that outputs a value. In this
+    case the use of <code class="code">@(return)</code> is not allowed. When the parameter
+    <em class="replaceable"><code>one-liner</code></em> is false, then the C template may be a
+    more complicated block form, with braces, conditionals, loops and spanning
+    multiple lines. In this case the output of the form can only be set using
+    <code class="code">@(return)</code>.</p>
+
+    <p>Note that the conversion between lisp arguments and
+    <acronym class="acronym">FFI</acronym> types is automatic. Note also that
+    <code class="function">et:c-inline</code> cannot be used in interpreted or
+    bytecompiled code!</p>
+   </div>
+
+   <div class="refsect1" title="Examples"><a name="idp2000424"></a><h2>Examples</h2>
+    
+
+    <p>The following example implements the transcendental function
+    <code class="function">SIN</code> using the C equivalent</p>
+    <pre class="programlisting">(ffi:c-lines "#include &lt;math.h&gt;")
+(defun mysin (x)
+  (ffi:c-inline (x) (:double) :double "sin(#0)" :one-liner t :side-effects nil))</pre>
+
+    <p>This function can also be implemented using the
+    <code class="code">@(return)</code> form as follows:</p>
+    <pre class="programlisting">(defun mysin (x)
+  (ffi:c-inline (x) (:double) :double "@(return)=sin(#0);" :side-effects nil))</pre>
+
+    <p>The following example is slightly more complicated as it involves
+    loops and two output values:</p>
+    <pre class="programlisting">(defun sample (x)
+  (ffi:c-inline (n1 n2) (:int :int) (values :int :int) "{
+    int n1 = #0, n2 = #1, out1 = 0, out2 = 1;
+    while (n1 &lt;= n2) {
+      out1 += n1;
+      out2 *= n1;
+      n1++;
+    }
+    @(return 0)= out1;
+    @(return 1)= out2;
+    }"
+   :side-effects nil))</pre>
+   </div>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re65.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch26s05.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch27.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ffi:clines</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 4. Multithreading</td></tr></table></div></body></html>

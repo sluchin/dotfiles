@@ -1,0 +1,55 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>2.3. Integers</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch33.html" title="Chapter 2. Manipulating Lisp objects"><link rel="prev" href="ch33s02.html" title="2.2. Constructing objects"><link rel="next" href="ch33s04.html" title="2.4. Characters"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.3. Integers</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch33s02.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Manipulating Lisp objects</th><td width="20%" align="right"> <a accesskey="n" href="ch33s04.html">Next</a></td></tr></table><hr></div><div class="section" title="2.3. Integers"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-Integers"></a>2.3. Integers</h2></div></div></div>
+  
+  <p>Common-Lisp distinguishes two types of integer types: bignums and fixnums. A
+  fixnum is a small integer, which ideally occupies only a word of memory and
+  which is between the values <em class="replaceable"><code>MOST-NEGATIVE-FIXNUM</code></em> and
+  <em class="replaceable"><code>MOST-POSITIVE-FIXNUM</code></em>. A bignum is any integer which is not a fixnum and
+  it is only constrained by the amount of memory available to represent it.</p>
+  <p>In <span class="application">ECL</span> a fixnum is an integer that, together with the tag bits, fits in a
+  word of memory. The size of a word, and thus the size of a fixnum, varies from
+  one architecture to another, and you should refer to the types and constants in
+  the <code class="filename">ecl.h</code> header to make sure that your C extensions are portable.
+  All other integers are stored as bignums, they are not immediate objects, they
+  take up a variable amount of memory and the GNU Multiprecision Library is
+  required to create, manipulate and calculate with them.</p>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2460048"></a> C type: <span class="structname">cl_fixnum</span></pre>
+   <p>This is a C signed integer type capable of holding a whole fixnum without any
+   loss of precision. The opposite is not true, and you may create a
+   <code class="literal">cl_fixnum</code> which exceeds the limits of a fixnum and should be stored as a
+   bignum.</p>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2461528"></a> C type: <span class="structname">cl_index</span></pre>
+   <p>This is a C unsigned integer type capable of holding a nonnegative fixnum without
+   loss of precision. Typically, a <code class="literal">cl_index</code> is used as an index into an array,
+   or into a proper list, etc.</p>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2463016"></a> Constant: <code class="varname">MOST_NEGATIVE_FIXNUM</code></pre>
+   <pre class="screen"><a class="indexterm" name="idp2463696"></a> Constant: <code class="varname">MOST_POSITIVE_FIXNUM</code></pre>
+   <p>These constants mark the limits of a fixnum.</p>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2464864"></a> Function: <span class="returnvalue">bool</span> <code class="function">FIXNUM_MINUSP</code> (<span class="type">cl_object</span> <code class="varname">o</code>)</pre>
+   <pre class="screen"><a class="indexterm" name="idp2466296"></a> Function: <span class="returnvalue">bool</span> <code class="function">FIXNUM_PLUSP</code> (<span class="type">cl_object</span> <code class="varname">o</code>)</pre>
+   <p>These functions perform the checks (<em class="replaceable"><code>o</code></em> &lt; 0) and (0 &lt;= <em class="replaceable"><code>o</code></em>),
+   respectively.</p>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2468672"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">MAKE_FIXNUM</code> (<span class="type">cl_fixnum</span> <code class="varname">n</code>)</pre>
+   <pre class="screen"><a class="indexterm" name="idp2470184"></a> Function: <span class="returnvalue">cl_fixnum</span> <code class="function">fix</code> (<span class="type">cl_object</span> <code class="varname">o</code>)</pre>
+   <p><code class="literal">MAKE_FIXNUM</code> and <code class="literal">fix</code> convert from an integer to a lisp object
+   of fixnum type and vice versa. These functions no not check their arguments.</p>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2472576"></a> Function: <span class="returnvalue">cl_fixnum</span> <code class="function">fixint</code> (<span class="type">cl_object</span> <code class="varname">o</code>)</pre>
+   <p>Converts a lisp fixnum to a C integer of the appropriate size. Signals an error
+   if <em class="replaceable"><code>o</code></em> is not of fixnum type.</p>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2474856"></a> Function: <span class="returnvalue">cl_index</span> <code class="function">fixnnint</code> (<span class="type">cl_object</span> <code class="varname">o</code>)</pre>
+   <p>Similar to <code class="literal">fixint</code> but also ensures that <em class="replaceable"><code>o</code></em> is not negative.</p>
+  </blockquote></div>
+  
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch33s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch33.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch33s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.2. Constructing objects </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.4. Characters</td></tr></table></div></body></html>

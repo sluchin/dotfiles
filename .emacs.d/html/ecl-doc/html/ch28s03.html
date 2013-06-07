@@ -1,0 +1,30 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>5.3. Memory limits</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch28.html" title="Chapter 5. Memory Management"><link rel="prev" href="ch28s02.html" title="5.2. Boehm-Weiser garbage collector"><link rel="next" href="ch28s04.html" title="5.4. Memory Conditions"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.3. Memory limits</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch28s02.html">Prev</a> </td><th width="60%" align="center">Chapter 5. Memory Management</th><td width="20%" align="right"> <a accesskey="n" href="ch28s04.html">Next</a></td></tr></table><hr></div><div class="section" title="5.3. Memory limits"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.memory.limits"></a>5.3. Memory limits</h2></div></div></div>
+   
+
+   <p>Beginning with version 9.2.1, <span class="application">ECL</span> operates a tighter control of the
+   resources it uses. In particular, it features explicit limits in the four
+   stacks and in the amount of live data. These limits are optional, can be
+   changed at run time, but they allow users to better control the
+   evolution of a program, handling memory and stack overflow gracefully via
+   the Common Lisp condition system.</p>
+
+   <p>The customizable limits are listed in <a class="xref" href="re86.html#table.memory.limits" title="Table 5.1. Customizable memory limits">Table 5.1</a>, but they need a careful description.</p>
+   <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="varname">ext:heap-size</code> limits the total amount of
+    memory which is available for lisp objects. This is the memory used when
+    you create conses, arrays, structures, etc.</p></li><li class="listitem"><p><code class="varname">ext:c-stack</code> controls the size of the
+    stack for compiled code, including <span class="application">ECL</span>'s library itself. This limit is
+    less stringent than the others. For instance, when code is compiled with
+    low safety settings, checks for this stack limit are usually omitted, for
+    performance reasons.</p></li><li class="listitem"><p><code class="varname">ext:binding-stack</code> controls the number of
+    nested bindings for special variables. The current value is usually safe
+    enough, unless you have deep recursive functions that bind special
+    variables, which is not really a good idea.</p></li><li class="listitem"><p><code class="varname">ext:frame-stack</code> controls the number of
+    nested blocks, tagbody and other control structures. It affects both
+    interpreted and compiled code, but quite often compiled code optimizes away
+    these stack frames, saving memory and not being affected by this
+    limit.</p></li><li class="listitem"><p><code class="varname">ext:lisp-stack</code> controls the size of the
+    interpreter stack. It only affects interpreted code.</p></li></ul></div>
+
+   <p>If you look at <a class="xref" href="re86.html#table.memory.limits" title="Table 5.1. Customizable memory limits">Table 5.1</a>, some of these limits may seem very stringent, but they exist to allow detecting and correcting both stack and memory overflow conditions. Larger values can be set systematically either in the <code class="filename">~/.eclrc</code> initialization file, or using the command line options from the table.</p>
+
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch28s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch28.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch28s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">5.2. Boehm-Weiser garbage collector </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.4. Memory Conditions</td></tr></table></div></body></html>

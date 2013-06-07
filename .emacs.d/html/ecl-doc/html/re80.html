@@ -1,0 +1,48 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>mp:with-lock</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch27s02.html" title="4.2. Multithreading Reference"><link rel="prev" href="re79.html" title="mp:process-run-function"><link rel="next" href="ch28.html" title="Chapter 5. Memory Management"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">mp:with-lock</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re79.html">Prev</a> </td><th width="60%" align="center">4.2. Multithreading Reference</th><td width="20%" align="right"> <a accesskey="n" href="ch28.html">Next</a></td></tr></table><hr></div><div class="refentry" title="mp:with-lock"><a name="ref.mp.with-lock"></a><div class="titlepage"></div>
+ <div class="refnamediv"><h2>Name</h2><p>
+  <code class="function">mp:with-lock</code>
+   — Synchronize a piece of code between different tasks.
+ </p></div>
+ 
+ <div class="refsynopsisdiv" title="Macro"><h2>Macro</h2>
+  
+  <div class="funcsynopsis">
+   <p>
+    <code class="funcdef">(mp::with-lock</code>
+     (<var class="pdparam">lock</var>) 
+     <var class="pdparam">&amp;body</var> 
+     <var class="pdparam">body</var>)
+   </p>
+  </div>
+ </div>
+
+ <div class="refsect1" title="Description"><a name="idp2103568"></a><h2>Description</h2>
+  
+
+  <p>It grabs a lock, executes a piece of lisp code and releases the lock at
+  the end. The inner forms are protected so that when any condition is
+  signalled the lock is released.</p>
+ </div>
+
+ <div class="refsect1" title="Example"><a name="idp2104408"></a><h2>Example</h2>
+  
+
+  <p>Ensure each task increments the counter properly. The lock is
+  required because INCF is not an atomic operation.</p>
+<pre class="programlisting">
+(defvar *counter* 0)
+(defvar *counter-lock* (mp:make-lock :name 'counter))
+
+(flet ((task (name)
+        (loop while (&lt;= *counter* 10)
+	      do (progn
+                   (sleep 1)
+	           (with-lock (*counter-lock*)
+                     (format t "~%;;; ~A counts ~D" name *counter*)
+		     (terpri)
+                     (incf *counter*))))))
+  (mp:process-run-function 'ana #'task 'ana)
+  (mp:process-run-function 'jose #'task 'jose))
+</pre>
+ </div>
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re79.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch27s02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch28.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">mp:process-run-function</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 5. Memory Management</td></tr></table></div></body></html>

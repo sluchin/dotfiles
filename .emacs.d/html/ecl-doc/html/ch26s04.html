@@ -1,0 +1,127 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>3.4. Higher level interfaces</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch26.html" title="Chapter 3. Foreign Function Interface"><link rel="prev" href="ch26s03.html" title="3.3. Foreign objects"><link rel="next" href="ch26s05.html" title="3.5. FFI Reference"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.4. Higher level interfaces</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch26s03.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Foreign Function Interface</th><td width="20%" align="right"> <a accesskey="n" href="ch26s05.html">Next</a></td></tr></table><hr></div><div class="section" title="3.4. Higher level interfaces"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.ffi.uffi.and.cffi"></a>3.4. Higher level interfaces</h2></div></div></div>
+  
+
+  <p>Up to now we have only discussed vague ideas about how a <span class="application">FFI</span> works,
+  but you are probably more interested on how to actually code all these things
+  in lisp. You have here three possibilities:</p>
+  <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+    <p><span class="application">ECL</span> supplies a high level interface which is compatible with
+    <a class="link" href="pt04.html" title="Part IV. UFFI Reference"><span class="application">UFFI</span></a>. Code designed for this library should run mostly unchanged with
+    <span class="application">ECL</span>.</p>
+   </li><li class="listitem">
+    <p>The <span class="application">CFFI</span> library features a mostly complete backend for <span class="application">ECL</span>. This
+    is however a work in progress, as the fact that <span class="application">CFFI</span> allows for calling
+    arbitrary functions without declaring them causes some troubles with
+    <span class="application">ECL</span>.</p>
+   </li><li class="listitem">
+    <p><span class="application">ECL</span>'s own low level interface. Only to be used if <span class="application">ECL</span> is your
+    deployment platform. It features some powerful constructs that allow you to
+    merge arbitrary C code with lisp (<a class="xref" href="re66.html" title="ffi:c-inline"><code class="function">ffi:c-inline</code></a> and <a class="xref" href="re65.html" title="ffi:clines"><code class="function">ffi:clines</code></a>).</p>
+   </li></ul></div>
+
+  <p>In the following two subsections we will discuss two practical examples
+  of using the native <a class="link" href="pt04.html" title="Part IV. UFFI Reference"><span class="application">UFFI</span></a> and the <span class="application">CFFI</span> library.</p>
+
+  <div class="section" title="3.4.1. UFFI example"><div class="titlepage"><div><div><h3 class="title"><a name="ext.ffi.uffi-example"></a>3.4.1. UFFI example</h3></div></div></div>
+   
+
+   <p>The example below shows how to use <a class="link" href="pt04.html" title="Part IV. UFFI Reference"><span class="application">UFFI</span></a> in an application. There are
+   several important ingredients:
+   </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>You need to specify the libraries you use and do it at the
+    toplevel, so that the compiler may include them at link
+    time.</p></li><li class="listitem"><p>Every function you will use has to be declared using
+    <code class="function">uffi:def-function</code>.</p></li></ul></div><p>
+   </p>
+<pre class="programlisting">
+#|
+Build and load this module with (compile-file "uffi.lsp" :load t)
+|#
+;;
+;; This toplevel statement notifies the compiler that we will
+;; need this shared library at runtime. We do not need this
+;; statement in windows.
+;;
+#-(or ming32 windows)
+(uffi:load-foreign-library #+darwin "/usr/lib/libm.dylib"
+			   #-darwin "/usr/lib/libm.so")
+;;
+;; With this other statement, we import the C function sin(),
+;; which operates on IEEE doubles.
+;;
+(uffi:def-function ("sin" c-sin) ((arg :double))
+                   :returning :double)
+;;
+;; We now use this function and compare with the lisp version.
+;;
+(format t "~%Lisp sin:~t~d~%C sin:~t~d~%Difference:~t~d"
+	(sin 1.0d0) (c-sin 1.0d0) (- (sin 1.0d0) (c-sin 1.0d0)))
+</pre>
+  </div>
+
+  <div class="section" title="3.4.2. CFFI example"><div class="titlepage"><div><div><h3 class="title"><a name="ext.ffi.cffi-example"></a>3.4.2. CFFI example</h3></div></div></div>
+   
+
+   <p>The <span class="application">CFFI</span> library is an independent project and it is not shipped
+   with <span class="application">ECL</span>. If you wish to use it you can go to their <a class="ulink" href="http://www.common-lisp.net/cffi/" target="_top">homepage</a>, download the code
+   and build it using <span class="application">ASDF</span>.</p>
+
+   <p><span class="application">CFFI</span> differs slightly from <a class="link" href="pt04.html" title="Part IV. UFFI Reference"><span class="application">UFFI</span></a> in that functions may be used even
+   without being declared beforehand. This poses a few problems to the <span class="application">ECL</span>
+   backend, but hopefully these should have been solved in the latest
+   releases.</p>
+<pre class="programlisting">
+#|
+Build and load this module with (compile-file "cffi.lsp" :load t)
+|#
+;;
+;; This toplevel statement notifies the compiler that we will
+;; need this shared library at runtime. We do not need this
+;; statement in windows.
+;;
+#-(or ming32 windows)
+(cffi:load-foreign-library #+darwin "/usr/lib/libm.dylib"
+			   #-darwin "/usr/lib/libm.so")
+;;
+;; With this other statement, we import the C function sin(),
+;; which operates on IEEE doubles.
+;;
+(cffi:defcfun ("sin" c-sin) :double '(:double))
+;;
+;; We now use this function and compare with the lisp version.
+;;
+(format t "~%Lisp sin:~t~d~%C sin:~t~d~%Difference:~t~d"
+	(sin 1.0d0) (c-sin 1.0d0) (- (sin 1.0d0) (c-sin 1.0d0)))
+;;
+;; The following also works: no declaration!
+;;
+(let ((c-cos (cffi:foreign-funcall "cos" :double 1.0d0 :double)))
+   (format t "~%Lisp cos:~t~d~%C cos:~t~d~%Difference:~t~d"
+	(sin 1.0d0) c-sin (- (sin 1.0d0) c-sin)))
+</pre>
+  </div>
+
+  <div class="section" title="3.4.3. Low level example"><div class="titlepage"><div><div><h3 class="title"><a name="ext.ffi.ecl-example"></a>3.4.3. Low level example</h3></div></div></div>
+   
+
+   <p>To compare with the previous pieces of code, we show how the previous
+   programs would be written using <a class="xref" href="re65.html" title="ffi:clines"><code class="function">ffi:clines</code></a> and <a class="xref" href="re66.html" title="ffi:c-inline"><code class="function">ffi:c-inline</code></a></p>
+<pre class="programlisting">
+#|
+Build and load this module with (compile-file "ecl.lsp" :load t)
+|#
+;;
+;; With this other statement, we import the C function sin(), which
+;; operates on IEEE doubles. Notice that we include the C header to
+;; get the full declaration.
+;;
+(defun c-sin (x)
+  (ffi:clines "#include &lt;math.h&gt;")
+  (ffi:c-inline (x) (:double) :double "sin(#0)" :one-liner t))
+;;
+;; We now use this function and compare with the lisp version.
+;;
+(format t "~%Lisp sin:~t~d~%C sin:~t~d~%Difference:~t~d"
+	(sin 1.0d0) (c-sin 1.0d0) (- (sin 1.0d0) (c-sin 1.0d0)))
+</pre>
+  </div>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch26s03.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch26.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch26s05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.3. Foreign objects </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.5. FFI Reference</td></tr></table></div></body></html>

@@ -1,0 +1,69 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>1.3. Practical examples</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch24.html" title="Chapter 1. System building"><link rel="prev" href="ch24s02.html" title="1.2. System definition files"><link rel="next" href="ch24s04.html" title="1.4. ASDF Reference"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.3. Practical examples</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch24s02.html">Prev</a> </td><th width="60%" align="center">Chapter 1. System building</th><td width="20%" align="right"> <a accesskey="n" href="ch24s04.html">Next</a></td></tr></table><hr></div><div class="section" title="1.3. Practical examples"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.asdf.make-build"></a>1.3. Practical examples</h2></div></div></div>
+  
+
+  <p>The version of <span class="application">ASDF</span> which is shipped with <span class="application">ECL</span> has been further
+  customized to allow building all the binary files mentioned in <a class="xref" href="ch24.html#table.make-build" title="Table 1.1. Code distribution models">Table 1.1</a>. The procedure to do this is documented in a
+  detailed and formal manual page for <a class="xref" href="re55.html" title="asdf:make-build"><code class="function">asdf:make-build</code></a>. However, since practice is the best teacher, we
+  will show a couple of examples of how to use this function before moving into
+  the formal specification.</p>
+
+  <p>In <code class="filename">/ecl/examples/asdf</code> you will find a very simple
+  example that can be built in different forms. The example is built around a
+  system definition file that depends on two sources,
+  <code class="filename">file1.lisp</code> and <code class="filename">file2.lisp</code>:</p>
+    <pre class="programlisting">
+(defsystem #:example
+    :serial t
+    :components ((:file "file1")
+		 (:file "file2")))</pre>
+
+    <p>We can built these files into a single <acronym class="acronym">FASL</acronym> file, as shown
+    below. Notice how there is a single file with the name
+    <code class="filename">*.fas</code>, but there are two object files generated from
+    their respective sources, <code class="filename">file1.o</code>,
+    <code class="filename">file2.o</code>.</p>
+<pre class="screen">
+&gt; (require 'asdf)
+;;; Loading #P"/home/jlr/lib/ecl/asdf.fas"
+("ASDF")
+&gt; (asdf:make-build :example :type :fasl)
+...
+NIL
+&gt; (directory "*.o")
+(#P"/home/jlr/src/ecls-new/examples/asdf/file2.o"
+ #P"/home/jlr/src/ecls-new/examples/asdf/file1.o")
+&gt; (directory "*.fas")
+(#P"/home/jlr/src/ecls-new/examples/asdf/example.fas")
+&gt; (load "example.fas")
+;;; Loading "/home/jlr/src/ecls-new/examples/asdf/example.fas"
+======================================================================
+We are now executing FILE1.LSP
+TEST-FUNCTION has been created
+We are now executing FILE2.LSP
+Calling TEST-FUNCTION in FILE2.LSP
+1 + 1 is equal to 2
+Finished
+======================================================================
+"/home/jlr/src/ecls-new/examples/asdf/example.fas"
+</pre>
+
+    <p>The previous sources may be combined into a single program, as shown
+    below. Notice that we choose to execute <code class="function">ext:quit</code> right
+    after all compiled files have run. If you do not supply this parameter,
+    <code class="filename">example</code> will jump to the lisp toplevel right after
+    that.</p>
+<pre class="screen">
+&gt; (asdf:make-build :example :type :program
+                   :epilogue-code '(ext:quit 0))
+NIL
+&gt; (ext:system "./example")
+======================================================================
+We are now executing FILE1.LSP
+TEST-FUNCTION has been created
+We are now executing FILE2.LSP
+Calling TEST-FUNCTION in FILE2.LSP
+1 + 1 is equal to 2
+Finished
+======================================================================</pre>
+
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch24s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch24.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch24s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.2. System definition files </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 1.4. ASDF Reference</td></tr></table></div></body></html>

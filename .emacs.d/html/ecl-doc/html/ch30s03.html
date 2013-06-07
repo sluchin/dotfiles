@@ -1,0 +1,98 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>7.3. Signals and interrupts in ECL</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch30.html" title="Chapter 7. Signals and interrupts"><link rel="prev" href="ch30s02.html" title="7.2. Kinds of signals"><link rel="next" href="ch30s04.html" title="7.4. Considerations when embedding ECL"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">7.3. Signals and interrupts in <span class="application">ECL</span></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch30s02.html">Prev</a> </td><th width="60%" align="center">Chapter 7. Signals and interrupts</th><td width="20%" align="right"> <a accesskey="n" href="ch30s04.html">Next</a></td></tr></table><hr></div><div class="section" title="7.3. Signals and interrupts in ECL"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.signals.implementation"></a>7.3. Signals and interrupts in <span class="application">ECL</span></h2></div></div></div>
+  
+
+  <p>The signal handling facilities in <span class="application">ECL</span> are constrained by two
+  needs. First of all, we can not ignore the synchronous signals mentioned in
+  <a class="xref" href="ch30s02.html#ext.signals.synchronous" title="7.2.1. Synchronous signals">Section 7.2.1</a>. Second, all other signals should
+  cause the least harm to the running threads. Third, when a signal is handled
+  synchronously using a signal handler, the handler should do almost nothing
+  unless we are completely sure that we are in an interruptible region, that is
+  outside system calls, in code that <span class="application">ECL</span> knows and controls.</p>
+
+  <p>The way in which this is solved is based on the existence of both
+  synchronous and asynchronous signal handling code, as explained in the
+  following two sections.</p>
+
+  <div class="section" title="7.3.1. Handling of asynchronous signals"><div class="titlepage"><div><div><h3 class="title"><a name="ext.signals.asynchronous-handler"></a>7.3.1. Handling of asynchronous signals</h3></div></div></div>
+   
+
+   <p>In systems in which this is possible, <span class="application">ECL</span> creates a signal handling
+   thread to detect and process asynchronous signals (See <a class="xref" href="ch30s02.html#ext.signals.asynchronous" title="7.2.2. Asynchronous signals">Section 7.2.2</a>). This thread is a trivial one and does
+   not process the signals itself: it communicates with, or launches new signal
+   handling threads to act accordingly to the denoted events.</p>
+
+   <p>The use of a separate thread has some nice consequences. The first
+   one is that those signals will not interrupt any sensitive code. The
+   second one is that the signal handling thread will be able to execute
+   arbitrary lisp or C code, since it is not being executed in a sensitive
+   context. Most important, this style of signal handling is the recommended
+   one by the POSIX standards, and it is the one that Windows uses.</p>
+
+   <p>The installation of the signal handling thread is dictated by a boot
+   time option, <code class="varname">ECL_OPT_SIGNAL_HANDLING_THREAD</code>, and it will
+   only be possible in systems that support either POSIX or Windows
+   threads.</p>
+
+   <p>Systems which embed <span class="application">ECL</span> as an extension language may wish to
+   deactivate the signal handling thread using the previously mentioned
+   option. If this is the case, then they should take appropriate measures to
+   avoid interrupting the code in <span class="application">ECL</span> when such signals are delivered.</p>
+
+   <p>Systems which embed <span class="application">ECL</span> and do not mind having a separate signal
+   handling thread can control the set of asynchronous signals which is handled
+   by this thread. This is done again using the appropriate boot options such
+   as <code class="varname">ECL_OPT_TRAP_SIGINT</code>,
+   <code class="varname">ECL_OPT_TRAP_SIGTERM</code>, etc. Note that in order to detect
+   and handle those signals, <span class="application">ECL</span> must block them from delivery to any other
+   thread. This means changing the <code class="function">sigprocmask()</code> in POSIX
+   systems or setting up a custom <code class="function">SetConsoleCtrlHandler()</code>
+   in Windows.</p>
+  </div>
+
+  <div class="section" title="7.3.2. Handling of synchronous signals"><div class="titlepage"><div><div><h3 class="title"><a name="ext.signals.synchronous-handler"></a>7.3.2. Handling of synchronous signals</h3></div></div></div>
+   
+
+   <p>We have already mentioned that certain synchronous signals and
+   exceptions can not be ignored and yet the corresponding signal handlers are
+   not able to execute arbitrary code. To solve this seemingly impossible
+   contradiction, <span class="application">ECL</span> uses a simple solution, which is to mark the sections of
+   code which are interruptible, and in which it is safe for the handler to run
+   arbitrary code. All other regions would be considered "unsafe" and would be
+   protected from signals and exceptions.</p>
+
+   <p>In principle this "marking" of safe areas can be done using POSIX
+   functions such as <code class="function">pthread_sigmask()</code> or
+   <code class="function">sigprocmask()</code>. However in practice this is slow, as it
+   involves at least a function call, resolving thread-local variables, etc,
+   etc, and it will not work in Windows.</p>
+
+   <p>Furthermore, sometimes we want signals to be detected but not to be
+   immediately processed. For instance, when reading from the terminal we want
+   to be able to interrupt the process, but we can not execute the code from
+   the handler, since the C function which is used to read from the terminal,
+   <code class="function">read()</code>, may have left the input stream in an
+   inconsistent, or even locked state.</p>
+
+   <p>The approach in <span class="application">ECL</span> is more lightweight: we install our own signal
+   handler and use a thread-local variable as a flag that determines whether
+   the thread is executing interrupt safe code or not. More precisely, if the
+   variable <code class="code">ecl_process_env()-&gt;disable_interrupts</code> is set, signals
+   and exceptions will be postponed and then the information about the signal
+   is queued. Otherwise the appropriate code is executed: for instance invoking
+   the debugger, jumping to a condition handler, quitting, etc.</p>
+
+   <p>Systems that embed <span class="application">ECL</span> may wish to deactivate completely these
+   signal handlers. This is done using the boot options,
+   <code class="varname">ECL_OPT_TRAP_SIGFPE</code>,
+   <code class="varname">ECL_OPT_TRAP_SIGSEGV</code>,
+   <code class="varname">ECL_OPT_TRAP_SIGBUS</code>,
+   <code class="varname">ECL_OPT_TRAP_INTERRUPT_SIGNAL</code>.</p>
+
+   <p>Systems that embed <span class="application">ECL</span> and want to allow handling of synchronous
+   signals should take care to also trap the associated lisp conditions that
+   may arise. This is automatically taken care of by functions such as
+   <code class="function">si_safe_eval()</code>, and in all other cases it can be solved
+   by enclosing the unsafe code in a <code class="function">CL_CATCH_ALL_BEGIN</code>
+   frame (See <a class="xref" href="re89.html" title="CL_CATCH_ALL"><code class="function">CL_CATCH_ALL</code></a>).</p>
+  </div>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch30s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch30.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch30s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">7.2. Kinds of signals </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 7.4. Considerations when embedding <span class="application">ECL</span></td></tr></table></div></body></html>
