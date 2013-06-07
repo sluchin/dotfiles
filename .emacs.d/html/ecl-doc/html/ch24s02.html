@@ -1,0 +1,53 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>1.2. System definition files</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch24.html" title="Chapter 1. System building"><link rel="prev" href="ch24.html" title="Chapter 1. System building"><link rel="next" href="ch24s03.html" title="1.3. Practical examples"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.2. System definition files</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch24.html">Prev</a> </td><th width="60%" align="center">Chapter 1. System building</th><td width="20%" align="right"> <a accesskey="n" href="ch24s03.html">Next</a></td></tr></table><hr></div><div class="section" title="1.2. System definition files"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.asdf.sdf"></a>1.2. System definition files</h2></div></div></div>
+  
+
+  <p>A System Definition File, or just <span class="emphasis"><em>system</em></span>, is the
+  lisp equivalent of a makefile in the Unix world: it contains a list of source
+  files which are to be loaded or compiled, and dependencies among them ("load
+  source <code class="filename">file1.lsp</code> before compiling
+  <code class="filename">file2.lsp</code>", etc).</p>
+
+  <p>It is difficult to tell about the Lisp Machines history, but probably
+  the first most popular system definition format was called
+  <span class="application">mk-defsystem</span> or simply
+  <span class="application">defsystem</span>. Written by Mark Kantrowitz [<a class="xref" href="bi01.html#bib.mk-defsystem">mk-defsystem</a>], this library now lives in the <a class="ulink" href="https://sourceforge.net/projects/clocc/" target="_top">CLOCC</a> repository and is
+  actively maintained. <span class="application">ECL</span> ships with a copy of the version 3.x which
+  fortunately has no customizations. You can load this copy by issuing
+  <code class="code">(require 'defsystem)</code> from the lisp toplevel.</p>
+
+  <p>However, in the last years, Another System Definition Facility known as
+  <span class="application">ASDF</span> has become even more popular in the Common Lisp world. This new
+  format simplifies writing extensions to handle new kind of source files and
+  integrates very well with the package management utility known as
+  <span class="application">ASDF-install</span>. <span class="application">ASDF</span> has a slightly different
+  syntax from <span class="application">mk-defsystem 3.0</span>, but because of
+  reasons of popularity and better integration with <span class="application">ECL</span>, in this manual we
+  have focused on this particular library.</p>
+
+  <p>A simple <span class="application">ASDF</span> definition looks as follows:</p>
+<pre class="programlisting">
+(defsystem test
+  :source-pathname "~/src/test/"
+  :source-extension "lisp"
+  :components ((:module file1
+                        :source-pathname "")
+               (:module file2
+                        :source-pathname ""
+                        :depends-on (file1))))</pre>
+  <p>This example consists of two files, <code class="filename">file1.lisp</code> and
+  <code class="filename">file2.lisp</code>, located in
+  <code class="filename">~/src/test/</code>. When compiling these files,
+  <code class="filename">file1.lisp</code> will be processed before
+  <code class="filename">file2.lisp</code>, because the second depends on the former
+  one. There are more complex rules that allow a system to depend on others,
+  and to contain other kind of files, such as C or Java binaries. For further
+  information we recommend reading <a class="ulink" href="http://constantly.at/lisp/asdf/" target="_top">the online manual</a>.</p>
+
+  <p>You can load <span class="application">ASDF</span> on a running <span class="application">ECL</span> using a single lisp statement
+  <code class="code">(require 'asdf)</code>. Once loaded, <span class="application">ASDF</span> will extend the function
+  <code class="function">require</code> to recognize and load libraries that are placed
+  in standard locations or which have been registered with <span class="application">ASDF</span> itself. The
+  following sections describe other features of <span class="application">ASDF</span> which are specific to
+  <span class="application">ECL</span> and related to the code building and shipping mechanisms introduced
+  before.</p>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch24.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch24.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch24s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 1. System building </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 1.3. Practical examples</td></tr></table></div></body></html>

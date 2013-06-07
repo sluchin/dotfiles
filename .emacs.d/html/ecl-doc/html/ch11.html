@@ -1,0 +1,45 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 11. Characters</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="pt01.html" title="Part I. Standards"><link rel="prev" href="re28.html" title="Numbers C dictionary"><link rel="next" href="ch11s02.html" title="11.2. #\Newline characters"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 11. Characters</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re28.html">Prev</a> </td><th width="60%" align="center">Part I. Standards</th><td width="20%" align="right"> <a accesskey="n" href="ch11s02.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 11. Characters"><div class="titlepage"><div><div><h2 class="title"><a name="ansi.characters"></a>Chapter 11. Characters</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch11.html#ansi.characeer.unicode">11.1. Unicode vs. POSIX locale</a></span></dt><dd><dl><dt><span class="section"><a href="ch11.html#ansi.character-types">11.1.1. Character types</a></span></dt><dt><span class="section"><a href="ch11.html#ansi.character-names">11.1.2. Character names</a></span></dt></dl></dd><dt><span class="section"><a href="ch11s02.html">11.2. <code class="code">#\Newline</code> characters</a></span></dt><dt><span class="section"><a href="ch11s03.html">11.3. C Reference</a></span></dt><dd><dl><dt><span class="refentrytitle"><a href="re29.html">C types</a></span><span class="refpurpose"> — C character types</span></dt><dt><span class="refentrytitle"><a href="re30.html">Constructors</a></span><span class="refpurpose"> — Creating and extracting characters from Lisp objects</span></dt><dt><span class="refentrytitle"><a href="re31.html">Predicates</a></span><span class="refpurpose"> — C predicates for Lisp characters</span></dt><dt><span class="refentrytitle"><a href="re32.html">Character case</a></span><span class="refpurpose"> — C functions related to the character case</span></dt><dt><span class="refentrytitle"><a href="re33.html">ANSI Dictionary</a></span><span class="refpurpose"> — Common Lisp and C equivalence</span></dt></dl></dd></dl></div>
+ 
+ <p><span class="application">ECL</span> is fully ANSI Common-Lisp compliant in all aspects of the character
+ data type, with the following peculiarities.</p>
+
+ <div class="section" title="11.1. Unicode vs. POSIX locale"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ansi.characeer.unicode"></a>11.1. Unicode vs. POSIX locale</h2></div></div></div>
+   
+
+   <p>There are two ways of building <span class="application">ECL</span>: with C or with Unicode character codes. These build modes are accessed using the <code class="code">--disable-unicode</code> and <code class="code">--enable-unicode</code> configuration options, the last one being the default.</p>
+
+   <p>When using C characters we are actually relying on the <span class="type">char</span> type of the C language, using the C library functions for tasks such as character conversions, comparison, etc. In this case characters are typically 8 bit wide and the character order and collation are determines by the current POSIX or C locale. This is not very accurate, leaves out many languages and character encodings but it is sufficient for small applications that do not need multilingual support.</p>
+
+   <p>When no option is specified <span class="application">ECL</span> builds with support for a larger character set, the Unicode 6.0 standard. This uses 24 bit large character codes, also known as <span class="emphasis"><em>codepoints</em></span>, with a large database of character properties which include their nature (alphanumeric, numeric, etc), their case, their collation properties, whether they are standalone or composing characters, etc.</p>
+
+ <div class="section" title="11.1.1. Character types"><div class="titlepage"><div><div><h3 class="title"><a name="ansi.character-types"></a>11.1.1. Character types</h3></div></div></div>
+  
+
+  <p>If compiled without Unicode support, <span class="application">ECL</span> all characters are
+  implemented using 8-bit codes and the type <span class="type">extended-char</span>
+  is empty. If compiled with Unicode support, characters are implemented
+  using 24 bits and the <span class="type">extended-char</span> type covers characters above
+  code 255.</p>
+  <div class="informaltable">
+   <table border="1"><colgroup><col><col><col></colgroup><thead><tr><th>Type</th><th>With Unicode</th><th>Without Unicode</th></tr></thead><tbody><tr><td><span class="type">standard-char</span></td><td>#\Newline,32-126</td><td>#\Newline,32-126</td></tr><tr><td><span class="type">base-char</span></td><td>0-255</td><td>0-255</td></tr><tr><td><span class="type">extended-char</span></td><td>-</td><td>255-16777215</td></tr></tbody></table>
+  </div>
+ </div>
+
+ <div class="section" title="11.1.2. Character names"><div class="titlepage"><div><div><h3 class="title"><a name="ansi.character-names"></a>11.1.2. Character names</h3></div></div></div>
+  
+
+  <p>All characters have a name. For non-printing characters between 0 and 32, and for 127 we use the ordinary <acronym class="acronym">ASCII</acronym> names. Characters above 127 are printed and read using hexadecimal Unicode notation, with a <code class="literal">U</code> followed by 24 bit hexadecimal number, as in <code class="literal">U0126</code>.</p>
+  <div class="table"><a name="table.character-names"></a><p class="title"><b>Table 11.1. Examples of character names</b></p><div class="table-contents">
+   
+   <table summary="Examples of character names" border="1"><colgroup><col><col></colgroup><thead><tr><th>Character</th><th>Code</th></tr></thead><tbody><tr><td><code class="literal">#\Null</code></td><td>0</td></tr><tr><td><code class="literal">#\Ack</code></td><td>1</td></tr><tr><td><code class="literal">#\Bell</code></td><td>7</td></tr><tr><td><code class="literal">#\Backspace</code></td><td>8</td></tr><tr><td><code class="literal">#\Tab</code></td><td>9</td></tr><tr><td><code class="literal">#\Newline</code></td><td>10</td></tr><tr><td><code class="literal">#\Linefeed</code></td><td>10</td></tr><tr><td><code class="literal">#\Page</code></td><td>12</td></tr><tr><td><code class="literal">#\Esc</code></td><td>27</td></tr><tr><td><code class="literal">#\Escape</code></td><td>27</td></tr><tr><td><code class="literal">#\Space</code></td><td>32</td></tr><tr><td><code class="literal">#\Rubout</code></td><td>127</td></tr><tr><td><code class="literal">#\U0080</code></td><td>128</td></tr></tbody></table>
+  </div></div><br class="table-break">
+  <p>Note that <code class="literal">#\Linefeed</code> is synonymous with
+  <code class="literal">#\Newline</code> and thus is a member of
+  <span class="type">standard-char</span>.</p>
+ </div>
+ </div>
+
+ 
+
+ 
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re28.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="pt01.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch11s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Numbers C dictionary </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 11.2. <code class="code">#\Newline</code> characters</td></tr></table></div></body></html>

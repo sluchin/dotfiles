@@ -1,0 +1,51 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ecl_nth_value, ecl_nvalues</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch04s04.html" title="4.4. C Reference"><link rel="prev" href="re08.html" title="ecl_va_arg"><link rel="next" href="re10.html" title="ecl_return0, ecl_return1, ..."></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ecl_nth_value</code>, <code class="function">ecl_nvalues</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re08.html">Prev</a> </td><th width="60%" align="center">4.4. C Reference</th><td width="20%" align="right"> <a accesskey="n" href="re10.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ecl_nth_value, ecl_nvalues"><a name="idp272184"></a><div class="titlepage"></div>
+    <div class="refnamediv"><h2>Name</h2><p>
+      <code class="function">ecl_nth_value</code>, <code class="function">ecl_nvalues</code>
+       — Accessing output values
+    </p></div>
+
+    <a class="indexterm" name="idp273360"></a><a class="indexterm" name="idp273736"></a><div class="refsynopsisdiv" title="Functions and macros"><h2>Functions and macros</h2>
+      
+      <div class="funcsynopsis">
+	<p>
+	  
+	  <code class="funcdef">cl_object <b class="fsfunc">ecl_nvalues</b>(</code>
+	  cl_env_ptr <var class="pdparam">env</var><code>)</code>;
+	</p>
+      </div>
+
+      <div class="funcsynopsis"><a name="ecl_nth_value"></a>
+	<p>
+	  
+	  <code class="funcdef">cl_object <b class="fsfunc">ecl_nth_value</b>(</code>
+	  cl_env_ptr <var class="pdparam">env</var>, 
+	  int <var class="pdparam">n</var><code>)</code>;
+	</p>
+      </div>
+    </div>
+
+    <div class="refsect1" title="Description"><a name="idp277856"></a><h2>Description</h2>
+      
+      <p>Common Lisp functions may return zero, one or more values. In <span class="application">ECL</span>, the first two cases do not require any special manipulation, as the C function returns either <span class="symbol">NIL</span> or the first (zeroth) value directly. However, if one wishes to access additional values from a function, one needs to use these two macros or functions</p>
+      <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="code">ecl_nvalues(env)</code> returns the number of values that the function actually outputs. The single argument is the <a class="link" href="re01.html" title="ecl_process_env">lisp environment</a>. This value is larger or equal to 0 and smaller than <code class="constant">ECL_MULTIPLE_VALUES_LIMIT</code>.</p></li><li class="listitem"><p>Once we know the number of return values, they can be directly accessed using the function <code class="code">ecl_nth_value(env,n)</code>, where <em class="replaceable"><code>n</code></em> is a number larger than or equal to 1, and smaller than <code class="constant">ECL_MULTIPLE_VALUES_LIMIT</code>, which must correspond to a valid output value. No checking is done.</p></li></ul></div>
+
+      <p>Note that in both cases these macros and functions have to be used right after the Lisp function was called. This is so because other Lisp functions might destroy the content of the return stack.</p>
+    </div>
+
+    <div class="refsect1" title="Example"><a name="idp282384"></a><h2>Example</h2>
+      
+      <p>A C/C++ exceprt</p>
+<pre class="programlisting">
+cl_env_ptr env = ecl_process_env();
+cl_object a = ecl_make_fixnum(13);
+cl_object b = ecl_make_fixnum(6);
+cl_object modulus = cl_floor(2, a, b);
+cl_object remainder = ecl_nth_value(env, 1);
+</pre>
+      <p>The somewhat equivalent Common Lisp code</p>
+<pre class="programlisting">
+(multiple-value-bind (modulus equivalent)
+    (floor 13 6))
+</pre>
+    </div>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re08.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04s04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re10.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ecl_va_arg</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">ecl_return0</code>, <code class="function">ecl_return1</code>, ...</td></tr></table></div></body></html>

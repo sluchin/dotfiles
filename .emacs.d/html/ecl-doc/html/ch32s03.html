@@ -1,0 +1,31 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>1.3. Building standalone executables</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch32.html" title="Chapter 1. Building programs"><link rel="prev" href="ch32s02.html" title="1.2. Compiling files"><link rel="next" href="ch32s04.html" title="1.4. Building libraries"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.3. Building standalone executables</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch32s02.html">Prev</a> </td><th width="60%" align="center">Chapter 1. Building programs</th><td width="20%" align="right"> <a accesskey="n" href="ch32s04.html">Next</a></td></tr></table><hr></div><div class="section" title="1.3. Building standalone executables"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-Building-standalone-executables"></a>1.3. Building standalone executables</h2></div></div></div>
+  
+  <p>To build an executable you need a working <span class="application">ECL</span> image with the
+  compiler. The function to build customized images is
+  <em class="replaceable"><code>c::build-program</code></em>. The description of this function is as
+  follows. Care should be taken that <em class="replaceable"><code>image-name</code></em> differs from any
+  filename in <em class="replaceable"><code>lisp-files</code></em>.</p>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2367008"></a> Function: <code class="function">c:build-program</code> <code class="varname">{</code><code class="varname">image-name</code> <code class="varname">&amp;key</code> <code class="varname">lisp-files</code> <code class="varname">ld-flags</code> <code class="varname">prologue-code</code> <code class="varname">epilogue-code</code><code class="varname">}</code></pre>
+   <p>This function builds a lisp image up from the core lisp library, plus all
+   components listed in <em class="replaceable"><code>lisp-files</code></em>.  Each component is either:</p>
+   <div class="itemizedlist"><ul class="itemizedlist" type="bullet"><li class="listitem" style="list-style-type: disc">
+     <p>A symbol: Names a statically linked library built from lisp code.</p>
+    </li><li class="listitem" style="list-style-type: disc">
+     <p>A string: Denotes an object file built from lisp code.</p>
+    </li></ul></div>     
+   <p class="continues"><em class="replaceable"><code>ld-flags</code></em> is a list of strings with additional parameters to be passed
+   to the linker. You can include here your favorite C/C++ libraries.</p>
+   <p><em class="replaceable"><code>prologue-code</code></em> and <em class="replaceable"><code>epilogue-code</code></em> are used to customize the
+   initialization process of the lisp image.  In order to build the executable,
+   <em class="replaceable"><code>c:build-program</code></em> first writes down a piece of C code which initializes the
+   lisp environment. You can customize the initialization process by suppling code
+   to be executed before (<em class="replaceable"><code>prologue-code</code></em>) or after (<em class="replaceable"><code>epilogue-code</code></em>)
+   setting up the lisp environment. Typically <em class="replaceable"><code>prologue-code</code></em> defaults to an
+   empty string, while <em class="replaceable"><code>epilogue-code</code></em> invokes the classical lisp
+   <em class="replaceable"><code>top-level</code></em>. Additionally, as a convenience, <em class="replaceable"><code>epilogue-code</code></em> can
+   be either a string with C code or also a list with a lisp form, which
+   will be interpreted at run time.</p>
+  </blockquote></div>
+  
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch32s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch32.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch32s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.2. Compiling files </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 1.4. Building libraries</td></tr></table></div></body></html>

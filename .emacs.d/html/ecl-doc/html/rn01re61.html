@@ -1,0 +1,90 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ext:process-command-args</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="rn01.html" title="OS Reference"><link rel="prev" href="rn01re60.html" title="ext:command-args"><link rel="next" href="rn01re62.html" title="ext:quit"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ext:process-command-args</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="rn01re60.html">Prev</a> </td><th width="60%" align="center">OS Reference</th><td width="20%" align="right"> <a accesskey="n" href="rn01re62.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ext:process-command-args"><a name="ref.process-command-args"></a><div class="titlepage"></div>
+  <div class="refnamediv"><h2>Name</h2><p>
+   <code class="function">ext:process-command-args</code>
+    — Process command line arguments.
+  </p></div>
+
+  <div class="refsynopsisdiv" title="Function"><h2>Function</h2>
+   
+   <div class="funcsynopsis">
+    <p>
+     <code class="funcdef">(ext:process-command-args</code>
+      <var class="pdparam">&amp;key</var> 
+      <var class="pdparam">args</var> 
+      <var class="pdparam">rules</var>)
+    </p>
+   </div>
+   <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>args</code></em></span></p></td><td><p>A list of strings. Defaults to the output of <a class="xref" href="rn01re60.html" title="ext:command-args"><code class="function">ext:command-args</code></a></p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>rules</code></em></span></p></td><td><p>A list of lists. Defaults to the value of <a class="xref" href="rn01re59.html" title="ext:+default-command-arg-rules+"><code class="varname">ext:+default-command-arg-rules+</code></a></p></td></tr></tbody></table></div>
+  </div>
+
+  <div class="refsect1" title="Description"><a name="idp1875272"></a><h2>Description</h2>
+   
+
+   <p>This function processes the command line arguments passed to either
+   <span class="application">ECL</span> or the program that embeds it. It uses the list of rules
+   <em class="replaceable"><code>rules</code></em>, which has the following syntax:
+</p><pre class="synopsis">(option-name nargs template [:stop | :noloadrc | :loadrc]*)</pre><p>
+   </p>
+   <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>option-name</code></em></span></p></td><td><p>A string with the option prefix as typed by the user. For
+     instance <code class="option">--help</code>, <code class="option">-?</code>,
+     <code class="option">--compile</code>, etc.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>nargs</code></em></span></p></td><td><p>A nonnegative integer denoting the number of arguments
+     taken by this option.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>template</code></em></span></p></td><td><p>A lisp form, not evaluated, where numbers from 0 to
+     <em class="replaceable"><code>nargs</code></em> will be replaced by the corresponding
+     option argument.</p></td></tr><tr><td><p><span class="term"><span class="symbol">:STOP</span></span></p></td><td><p>If present, parsing of arguments stops after this option
+     is found and processed. The list of remaining arguments is passed to
+     the rule. <span class="application">ECL</span>'s top-level uses this option with the <span class="symbol">--</span>
+     command line option to set <span class="symbol">ext:*unprocessed-ecl-command-args*</span>
+     to the list of remaining arguments.</p></td></tr><tr><td><p><span class="term"><span class="symbol">:NOLOADRC</span> and <span class="symbol">:LOADRC</span></span></p></td><td><p>Determine whether the lisp initalization file (<a class="xref" href="rn01re58.html" title="ext:*lisp-init-file-list*"><code class="varname">ext:*lisp-init-file-list*</code></a>) will be loaded before processing
+     all forms.</p></td></tr></tbody></table></div>
+
+   <p><code class="function">EXT:PROCESS-COMMAND-ARGS</code> works as follows. First
+   of all, it parses all the command line arguments, except for the first one,
+   which is assumed to contain the program name. Each of these arguments is
+   matched against the rules, sequentially, until one of the patterns
+   succeeeds.</p>
+
+   <p>A special name <code class="literal">"*DEFAULT*"</code>, matches any unknown
+   command line option. If there is no <code class="literal">"*DEFAULT*"</code> rule and
+   no match is found, an error is signalled. For each rule that succeeds, the
+   function constructs a lisp statement using the
+   <em class="replaceable"><code>template</code></em>.</p>
+
+   <p>After all arguments have been processed,
+   <code class="function">EXT:PROCESS-COMMAND-ARGS</code>, and there were no occurences
+   of <span class="symbol">:NOLOADRC</span>, one of the files listed in <a class="xref" href="rn01re58.html" title="ext:*lisp-init-file-list*"><code class="varname">ext:*lisp-init-file-list*</code></a> will be loaded. Finally, the list of
+   lisp statements will be evaluated.</p>
+  </div>
+
+  <div class="refsect1" title="Example"><a name="idp1886392"></a><h2>Example</h2>
+   
+
+   <p>The following piece of code implements the <span class="command"><strong>ls</strong></span>
+   command using lisp.<sup>[<a name="idp1887128" href="#ftn.idp1887128" class="footnote">1</a>]</sup></p>
+
+<pre class="programlisting">
+(setq ext:*help-message* "
+ls [--help | -?] filename*
+     Lists the file that match the given patterns.
+")
+
+(defun print-directory (pathnames)
+ (format t "~{~A~%~}"
+  (mapcar #'(lambda (x) (enough-namestring x (si::getcwd)))
+	  (mapcan #'directory (or pathnames '("*.*" "*/"))))))
+
+(defconstant +ls-rules+
+'(("--help" 0 (progn (princ ext:*help-message* *standard-output*) (ext:quit 0)))
+  ("-?" 0 (progn (princ ext:*help-message* *standard-output*) (ext:quit 0)))
+  ("*DEFAULT*" 1 (print-directory 1) :stop)))
+
+(let ((ext:*lisp-init-file-list* NIL)) ; No initialization files
+  (handler-case (ext:process-command-args :rules +ls-rules+)
+    (error (c)
+       (princ ext:*help-message* *error-output*)
+       (ext:quit 1))))
+(ext:quit 0)
+</pre>
+  </div>
+ <div class="footnotes"><br><hr width="100" align="left"><div class="footnote"><p><sup>[<a id="ftn.idp1887128" href="#idp1887128" class="para">1</a>] </sup>Instructions for building this program
+   are found under
+   <code class="filename">ecl/examples/cmdline/ls.lsp</code></p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="rn01re60.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="rn01.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="rn01re62.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ext:command-args</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">ext:quit</code></td></tr></table></div></body></html>

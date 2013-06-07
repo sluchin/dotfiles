@@ -1,0 +1,52 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>1.2. C Reference</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch01.html" title="Chapter 1. Overview"><link rel="prev" href="ch01.html" title="Chapter 1. Overview"><link rel="next" href="ch02.html" title="Chapter 2. Evaluation and compilation"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">1.2. C Reference</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch01.html">Prev</a> </td><th width="60%" align="center">Chapter 1. Overview</th><td width="20%" align="right"> <a accesskey="n" href="ch02.html">Next</a></td></tr></table><hr></div><div class="section" title="1.2. C Reference"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ansi.overview.c-dict"></a>1.2. C Reference</h2></div></div></div>
+  
+
+  <div class="section" title="1.2.1. One type for everything: cl_object"><div class="titlepage"><div><div><h3 class="title"><a name="cl_object"></a>1.2.1. One type for everything: <span class="type">cl_object</span></h3></div></div></div>
+   
+
+   <p><span class="application">ECL</span> is designed around the basic principle that Common Lisp already provides everything that a programmer could need, orienting itself around the creation and manipulation of Common Lisp objects: conses, arrays, strings, characters, ... When embedding <span class="application">ECL</span> there should be no need to use other C/C++ types, except when interfacing data to and from those other languages.</p>
+
+   <p>All Common Lisp objects are represented internally through the same C type, <span class="type">cl_object</span>, which is either a pointer to a union type or an integer, depending on the situation. While the inner guts of this type are exposed through various headers, the user should never rely on these details but rather use the macros and functions that are listed in this manual</p>
+
+   <p>There are two types of Common Lisp objects: immediate and memory allocated ones. Immediate types fit in the bits of the <span class="type">cl_object</span> word, and do not require the garbage collector to be created. The list of such types may depend on the platform, but it includes at least the <span class="type">fixnum</span> and <span class="type">character</span> types.</p>
+
+   <p>Memory allocated types on the other hand require the use of the garbage collector to be created. <span class="application">ECL</span> abstracts this from the user providing enough constructors, either in the form of Common Lisp functions (<code class="function">cl_make_array()</code>, <code class="function">cl_complex()</code>,...), or in the form of C/C++ constructors (<code class="function">ecl_make_symbol()</code>, etc).</p>
+
+   <p>Memory allocated types must always be kept alive so that the garbage collector does not reclaim them. This involves referencing the object from one of the places that the collector scans:
+   </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The fields of an object (array, structure, etc) whic is itself alive.</p></li><li class="listitem"><p>A special variable or a constant.</p></li><li class="listitem"><p>The C stack (i.e. automatic variables in a function).</p></li><li class="listitem"><p>Global variables or pointers that have been registered with the garbage collector.</p></li></ul></div><p>
+   Further details will be provided in the section on <a class="link" href="ch28.html" title="Chapter 5. Memory Management">Memory Management</a>.</p>
+  </div>
+
+  <div class="section" title="1.2.2. Naming conventions"><div class="titlepage"><div><div><h3 class="title"><a name="idp135752"></a>1.2.2. Naming conventions</h3></div></div></div>
+   
+
+   <p>As explained in the introduction, each of the chapters in the Common Lisp standard can also be implemented using C functions and types. The mapping between both languages is done using a small set of rules described below.</p>
+   <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Functions in the Common Lisp ("CL") package are prefixed with the characters "cl_", functions in the System ("SI") package are prefix with "si_", etc, etc.</p></li><li class="listitem"><p>If a function takes only a fixed number of arguments, it is mapped to a C function with also a fixed number of arguments. For instance, <span class="symbol">COS</span> maps to <code class="code">cl_object cl_cos(cl_object)</code>, which takes a single Lisp object and returns a Lisp object of type <span class="type">FLOAT</span>.</p></li><li class="listitem"><p>If the function takes a variable number of arguments, its signature consists on an integer with the number of arguments and zero or more of required arguments and then a C vararg. This is the case of <code class="code">cl_object cl_list(cl_narg narg, ...)</code>, which can be invoked without arguments, as in <code class="code">cl_list(0)</code>, with one, <code class="code">cl_list(1, a)</code>, etc.</p></li><li class="listitem"><p>Functions return at least one value, which is either the first value output by the function, or <span class="symbol">NIL</span>. The extra values may be retrieved immediately after the function call using the function <a class="link" href="re09.html#ecl_nth_value"><code class="function">ecl_nth_value</code></a>.</p></li></ul></div>
+   <p>In addition to the Common Lisp core functions (cl_*), there exist functions which are devoted only to C/C++ programming, with tasks such as coercion of objects to and from C types, optimized functions, inlined macroexpansions, etc. These functions and macros typically carry the prefix "ecl_" or "ECL_" and only return one value, if any.</p>
+  </div>
+
+  <div class="section" title="1.2.3. Only in Common Lisp"><div class="titlepage"><div><div><h3 class="title"><a name="ansi.OCL"></a>1.2.3. Only in Common Lisp</h3></div></div></div>
+   
+
+   <p>Some parts of the language are not available as C functions, even though they can be used in Common Lisp programs. These parts are either marked in the "ANSI Dictionary" sections using the tag <a class="link" href="ch01s02.html#ansi.OCL" title="1.2.3. Only in Common Lisp">[Only in Common Lisp]</a>, or they are simply not mentioned (macros and special constructs). This typically happens with non-translatable constructs such as</p>
+   <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Common Lisp macros such as <span class="symbol">with-open-files</span>.</p></li><li class="listitem"><p>Common Lisp special forms, such as <span class="symbol">cond</span></p></li><li class="listitem"><p>Common Lisp generic functions, which cannot be written in C because of their dynamical dispatch and automatic redefinition properties.</p></li></ul></div>
+
+   <p>In most of those cases there exist straightforward alternatives using the constructs and functions in <span class="application">ECL</span>. For example, <span class="symbol">unwind-protect</span> can be implemented using a C macro which is provided by <span class="application">ECL</span></p>
+<pre class="programlisting">
+cl_env_ptr env = ecl_process_env();
+CL_UNWIND_PROTECT_BEGIN(env) {
+    /* protected code goes here */
+} CL_UNWIND_PROTECT_EXIT {
+    /* exit code goes here */
+} CL_UNWIND_PROTECT_END;
+</pre>
+
+   <p>Common Lisp generic functions can be directly accessed using <span class="symbol">funcall</span> or <span class="symbol">apply</span> and the function name, as shown in the code below</p>
+<pre class="programlisting">
+cl_object name = ecl_make_symbol("MY-GENERIC-FUNCTION","CL-USER");
+cl_object output = cl_funcall(2, name, argument);
+</pre>
+
+   <p>Identifying these alternatives requires some knowledge of Common Lisp, which is why it is recommended to approach the embeddable components in <span class="application">ECL</span> only when there is some familiarity with the language.</p>
+  </div>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch01.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch01.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 1. Overview </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 2. Evaluation and compilation</td></tr></table></div></body></html>

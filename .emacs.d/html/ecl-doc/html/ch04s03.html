@@ -1,0 +1,38 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>4.3. C Calling conventions</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch04.html" title="Chapter 4. Data and control flow"><link rel="prev" href="ch04s02.html" title="4.2. Function types"><link rel="next" href="ch04s04.html" title="4.4. C Reference"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4.3. C Calling conventions</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s02.html">Prev</a> </td><th width="60%" align="center">Chapter 4. Data and control flow</th><td width="20%" align="right"> <a accesskey="n" href="ch04s04.html">Next</a></td></tr></table><hr></div><div class="section" title="4.3. C Calling conventions"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ansi.calling-conventions"></a>4.3. C Calling conventions</h2></div></div></div>
+   
+
+   <p><span class="application">ECL</span> is implemented using either a C or a C++ compiler. This is not a limiting factor, but imposes some constraints on how these languages are used to implement functions, multiple values, closures, etc. In particular, while C functions can be called with a variable number of arguments, there is no facility to check how many values were actually passed. This forces us to have two types of functions in <span class="application">ECL</span>
+   </p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>Functions that take a fixed number of arguments have a simple C signature, with all arguments being properly declared, as in <code class="code">cl_object cl_not(cl_object arg1)</code>.</p></li><li class="listitem"><p>Functions with a variable number of arguments, such as those acception <span class="symbol">&amp;optional</span>, <span class="symbol">&amp;rest</span> or <span class="symbol">&amp;key</span> arguments, must take as first argument the number of remaining ones, as in <code class="code">cl_object cl_list(cl_narg narg, ...)</code>. Here <em class="replaceable"><code>narg</code></em> is the number of supplied arguments.</p></li></ul></div><p>
+   The previous conventions set some burden on the C programmer that calls <span class="application">ECL</span>, for she must know the type of function that is being called and supply the right number of arguments. This burden disappears for Common Lisp programmers, though.</p>
+
+   <p>As an example let us assume that the user wants to invoke two functions which are part of the <a class="xref" href="bi01.html#bib.ANSI">ANSI</a> standard and thus are exported with a C name. The first example is <code class="function">cl_cos</code>, which takes just one argument and has a signature <code class="code">cl_object cl_cos(cl_object)</code>.</p>
+   <pre class="programlisting">
+#include &lt;math.h&gt;
+...
+cl_object angle = ecl_make_double_float(M_PI);
+cl_object c = cl_cos(angle);
+printf("\nThe cosine of PI is %g\n", ecl_double_float(c));
+</pre>
+
+   <p>The second example also involves some Mathematics, but now we are going to use the C function corresponding to <span class="symbol">+</span>. As described in <a class="link" href="re28.html" title="Numbers C dictionary">the C dictionary</a>, the C name for the plus operator is <code class="function">cl_P</code> and has a signature <code class="code">cl_object cl_P(cl_narg narg,...)</code>. Our example now reads as follows</p>
+   <pre class="programlisting">
+cl_object one = ecl_make_fixnum(1);
+cl_object two = cl_P(2, one, one);
+cl_object three = cl_P(2, one, one, one);
+printf("\n1 + 1 is %d\n", ecl_fixnum(two));
+printf("\n1 + 1 + 1 is %d\n", ecl_fixnum(three));
+</pre>
+
+   <p>Note that most Common Lisp functions will not have a C name. In this case one must use the symbol that names them to actually call the functions, using <code class="function">cl_funcall</code> or <code class="function">cl_apply</code>. The previous examples may thus be rewritten as follows</p>
+   <pre class="programlisting">
+/* Symbol + in package CL */
+cl_object plus = ecl_make_symbol("+","CL");
+cl_object one = ecl_make_fixnum(1);
+cl_object two = cl_funcall(3, plus, one, one);
+cl_object three = cl_funcall(4, plus, one, one, one);
+printf("\n1 + 1 is %d\n", ecl_fixnum(two));
+printf("\n1 + 1 + 1 is %d\n", ecl_fixnum(three));
+</pre>
+
+   <p>Another restriction of C and C++ is that functions can only take a limited number of arguments. In order to cope with this problem, <span class="application">ECL</span> uses an internal stack to pass any argument above a hardcoded limit, <code class="constant">ECL_C_CALL_ARGUMENTS_LIMIT</code>, which is as of this writing 63. The use of this stack is transparently handled by the Common Lisp functions, such as <span class="symbol">apply</span>, <span class="symbol">funcall</span> and their C equivalents, and also by a set of macros, <a class="link" href="re08.html" title="ecl_va_arg"><code class="function">cl_va_arg</code></a>, which can be used for coding functions that take an arbitrary name of arguments.</p>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">4.2. Function types </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 4.4. C Reference</td></tr></table></div></body></html>

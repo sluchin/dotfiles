@@ -1,0 +1,47 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>3.2. Procedure Call Conventions</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch34.html" title="Chapter 3. The interpreter"><link rel="prev" href="ch34.html" title="Chapter 3. The interpreter"><link rel="next" href="ch34s03.html" title="3.3. The lexical environment"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.2. Procedure Call Conventions</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch34.html">Prev</a> </td><th width="60%" align="center">Chapter 3. The interpreter</th><td width="20%" align="right"> <a accesskey="n" href="ch34s03.html">Next</a></td></tr></table><hr></div><div class="section" title="3.2. Procedure Call Conventions"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-Procedure-Call-Conventions"></a>3.2. Procedure Call Conventions</h2></div></div></div>
+  
+  <p><span class="application">ECL</span> employs standard C calling conventions to achieve efficiency and
+  interoperability with other languages.
+  Each Lisp function is implemented as a C function which takes as many
+  argument as the Lisp original plus one additional integer argument
+  which holds the number of actual arguments.  The function sets <code class="literal">NValues</code>
+  to the number of Lisp values produced, it returns the first one and the
+  remaining ones are kept in  a global (per thread) array (<code class="literal">VALUES</code>).</p>
+  <p>To show the argument/value passing mechanism, here we list the actual
+  code for the Common-Lisp function <code class="literal">cons</code>.</p>
+  <pre class="screen">
+   cl_cons(int narg, object car, object cdr)
+   {       object x;
+   check_arg(2);
+   x = alloc_object(t_cons);
+   CAR(x) = car;
+   CDR(x) = cdr;
+   NValues = 1;
+   return x;
+   }
+  </pre>
+  <p><span class="application">ECL</span> adopts the convention that the name of a function that implements a
+  Common-Lisp function begins with a short package name (<code class="literal">cl</code> for COMMON-LISP,
+  <code class="literal">si</code> for SYSTEM, etc), followed by <code class="literal">L</code>, and followed by the name of
+  the Common-Lisp function.  (Strictly speaking, `<code class="literal">-</code>' and `<code class="literal">*</code>' in the
+  Common-Lisp function name are replaced by `<code class="literal">_</code>' and `<code class="literal">A</code>', respectively,
+  to obey the syntax of C.)</p>
+  <p><code class="literal">check_arg(2)</code> in the code of <code class="literal">cl_cons</code> checks that exactly two
+  arguments are supplied to <code class="literal">cons</code>.  That is, it checks that <code class="literal">narg</code> is
+  2, and otherwise, it causes an error.  <code class="literal">allocate_object(t_cons)</code> allocates
+  a cons cell in the heap and returns the pointer to the cell.  After the
+  <code class="literal">CAR</code> and the <code class="literal">CDR</code> fields of the cell are set, the cell pointer is
+  returned directly. The number assigned to NValues set by the function (1 in
+  this case) represents the number of values of the function.</p>
+  <p>In general, if one is to play with the C kernel of <span class="application">ECL</span> there is no need to
+  know about all these conventions. There is a preprocessor that takes care of
+  the details, by using a lisp representation of the statements that output
+  values, and of the function definitions. For instance, the actual source code
+  for <code class="literal">cl_cons</code> in <code class="filename">src/c/lists.d</code></p>
+  <pre class="screen">
+   @(defun cons (car cdr)
+   @
+   @(return CONS(car, cdr))
+   @)
+  </pre>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch34.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch34.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch34s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 3. The interpreter </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.3. The lexical environment</td></tr></table></div></body></html>

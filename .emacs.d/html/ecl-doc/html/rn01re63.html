@@ -1,0 +1,91 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ext:run-program</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="rn01.html" title="OS Reference"><link rel="prev" href="rn01re62.html" title="ext:quit"><link rel="next" href="rn01re64.html" title="ext:system"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ext:run-program</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="rn01re62.html">Prev</a> </td><th width="60%" align="center">OS Reference</th><td width="20%" align="right"> <a accesskey="n" href="rn01re64.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ext:run-program"><a name="ref.run-program"></a><div class="titlepage"></div>
+  <div class="refnamediv"><h2>Name</h2><p>
+   <code class="function">ext:run-program</code>
+    — Start and communicate with a child process.
+  </p></div>
+
+  <a class="indexterm" name="idp1896968"></a><a class="indexterm" name="idp1897312"></a><a class="indexterm" name="idp1897712"></a><a class="indexterm" name="idp1898040"></a><a class="indexterm" name="idp1898368"></a><a class="indexterm" name="idp1898768"></a><a class="indexterm" name="idp1899096"></a><a class="indexterm" name="idp1899424"></a><a class="indexterm" name="idp1899824"></a><a class="indexterm" name="idp1900152"></a><a class="indexterm" name="idp1900480"></a><a class="indexterm" name="idp1900880"></a><div class="refsynopsisdiv" title="Function"><h2>Function</h2>
+   
+   <div class="funcsynopsis">
+    <p>
+     <code class="funcdef">(ext:run-program</code>
+      <var class="pdparam">command</var> 
+      <var class="pdparam">argv</var> 
+      &amp;key 
+      input 
+      output 
+      error)
+    </p>
+   </div>
+   <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>input</code></em></span></p></td><td><p>One of <span class="symbol">:STREAM</span>, <span class="symbol">T</span> or
+     <span class="symbol">NIL</span>, defaults to
+     <span class="symbol">:STREAM</span></p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>output</code></em></span></p></td><td><p>One of <span class="symbol">:STREAM</span>, <span class="symbol">T</span> or
+     <span class="symbol">NIL</span>, defaults to
+     <span class="symbol">:STREAM</span></p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>error</code></em></span></p></td><td><p>One of <span class="symbol">:OUTPUT</span>, <span class="symbol">T</span> or
+     <span class="symbol">NIL</span>, defaults to
+     <span class="symbol">:STREAM</span></p></td></tr></tbody></table></div>
+  </div>
+
+  <div class="refsect1" title="Description"><a name="idp1908896"></a><h2>Description</h2>
+   
+
+   <p>This function creates a external process by launching the program
+   <em class="replaceable"><code>command</code></em> with the arguments from the list
+   <em class="replaceable"><code>argv</code></em>.</p>
+
+   <p>The arguments <em class="replaceable"><code>input</code></em>,
+   <em class="replaceable"><code>output</code></em> and <em class="replaceable"><code>error</code></em> are
+   used to intercept the standard input, output and error streams of the
+   program. A value of <span class="symbol">:STREAM</span> means a lisp stream will be
+   created to communicate with the child process. A value of
+   <span class="symbol">NIL</span> means that the data from this pipe will be
+   discarded. The vaule of <span class="symbol">T</span> means that the child process will
+   use the parent's standard input, output or error channels. For instance, if
+   <span class="application">ECL</span> writes to the console and you pass a value of
+   <em class="replaceable"><code>output</code></em> equal to <span class="symbol">:STREAM</span>, the
+   child process will also output to the console. Finally, the error messages
+   of the child process are redirected to the same pipe as its standard
+   output when <em class="replaceable"><code>error</code></em> takes the value
+   <span class="symbol">:OUTPUT</span>.</p>
+
+   <p>If the child process was succesfully launched, this function outputs a
+   lisp stream to which we one may write, read or do both things, depending on
+   the arguments <em class="replaceable"><code>input</code></em> and
+   <em class="replaceable"><code>output</code></em>. If an error happened during the
+   preparation of the child process (for instance the program was not found),
+   this function returns <em class="replaceable"><code>NIL</code></em>.</p>
+
+   <p>The design of this function is inspired by the function of same name
+   in <span class="application">CMUCL</span> and <span class="application">SBCL</span>.</p>
+  </div>
+
+  <div class="refsect1" title="Example"><a name="idp1915232"></a><h2>Example</h2>
+   
+
+   <p>List all users in a Unix system. We use the <span class="command"><strong>sed</strong></span>
+   command to parse the file with the list of users, removing comments and
+   information other than the user names:
+</p><pre class="programlisting">(defun all-users (&amp;optional (file "/etc/passwd"))
+  (let ((s (ext:run-program "sed"
+              (list "-e" "/^#.*$/d;/^[^:]*$/d;s,^\\([^:]*\\).*$,\\1,g"
+	            file)
+              :input NIL :output :STREAM :error NIL)))
+    (unless s
+      (error "Unable to parse password file"))
+    (loop for x = (read s NIL NIL)
+          while x
+          collect x)))</pre>
+
+   <p>Make a directory. Redirect standard error output to the same as the
+   output:
+</p><pre class="programlisting">(ext:run-program "mkdir" '("./tmp") :output :STREAM :error :OUTPUT)
+</pre><p>
+</p>
+
+   <p>Same as before, but now both the output and the standard error are
+   discarded
+</p><pre class="programlisting">(ext:run-program "mkdir" '("./tmp") :output NIL :error :OUTPUT)
+</pre><p>
+</p>
+  </div>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="rn01re62.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="rn01.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="rn01re64.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ext:quit</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">ext:system</code></td></tr></table></div></body></html>

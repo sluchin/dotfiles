@@ -1,0 +1,96 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>def-foreign-var</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="rn04.html" title="Objects"><link rel="prev" href="rn04re119.html" title="with-cast-pointer"><link rel="next" href="rn05.html" title="Strings"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">def-foreign-var</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="rn04re119.html">Prev</a> </td><th width="60%" align="center">Objects</th><td width="20%" align="right"> <a accesskey="n" href="rn05.html">Next</a></td></tr></table><hr></div><div class="refentry" title="def-foreign-var"><a name="uffi.def-foreign-var"></a><div class="titlepage"></div>
+   <div class="refnamediv"><h2>Name</h2><p>
+    <code class="function">def-foreign-var</code>
+     — 
+     Defines a symbol macro to access a variable in foreign code
+    
+   </p></div>
+   <div class="refsynopsisdiv" title="Macro"><h2>Macro</h2>
+    
+    <div class="funcsynopsis">
+     <p>
+      <code class="funcdef">(def-foreign-var</code>
+       <var class="pdparam">name</var> 
+       <var class="pdparam">type</var> 
+       <var class="pdparam">module</var>)
+     </p>
+    </div>
+    <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="parameter"><code>name</code></em></span></p></td><td>
+       <p>     
+	A string or list specificying the symbol macro's name. If it is a
+	string, that names the foreign variable. A Lisp name is created
+	by translating #\_ to #\- and by converting to upper-case in
+	case-insensitive Lisp implementations. If it is a list, the first
+	item is a string specifying the foreign variable name and the
+	second it is a symbol stating the Lisp name.</p>
+      </td></tr><tr><td><p><span class="term"><em class="parameter"><code>type</code></em></span></p></td><td>
+       <p>A foreign type of the foreign variable.</p>
+      </td></tr><tr><td><p><span class="term"><span class="returnvalue">module</span></span></p></td><td>
+       <p>
+	A string specifying the module (or library) the foreign variable
+	resides in. (Required by Lispworks)</p>
+      </td></tr></tbody></table></div>
+   </div>
+   <div class="refsect1" title="Description"><a name="idp2857576"></a><h2>Description</h2>
+    
+    <p>
+     Defines a symbol macro which can be used to access (get and set) the
+     value of a variable in foreign code.</p>
+   </div>
+   <div class="refsect1" title="Examples"><a name="idp2858360"></a><h2>Examples</h2>
+    
+    <div class="refsect2" title="C code"><a name="idp2858744"></a><h3>C code</h3>
+     
+     <pre class="screen">
+      int baz = 3;
+
+      typedef struct {
+      int x;
+      double y;
+      } foo_struct;
+
+      foo_struct the_struct = { 42, 3.2 };
+
+      int foo () {
+      return baz;
+      }</pre>
+    </div>
+    <div class="refsect2" title="Lisp code"><a name="idp2859624"></a><h3>Lisp code</h3>
+     
+     <pre class="screen">
+      (uffi:def-struct foo-struct
+      (x :int)
+      (y :double))
+
+      (uffi:def-function ("foo" foo)
+      ()
+      :returning :int
+      :module "foo")
+
+      (uffi:def-foreign-var ("baz" *baz*) :int "foo")
+      (uffi:def-foreign-var ("the_struct" *the-struct*) foo-struct "foo")
+
+
+      *baz*
+      =&gt; 3
+
+      (incf *baz*)
+      =&gt; 4
+
+      (foo)
+      =&gt; 4</pre>
+    </div>
+   </div>
+   <div class="refsect1" title="Side Effects"><a name="idp2860720"></a><h2>Side Effects</h2>
+    
+    <p>None.</p>
+   </div>
+   <div class="refsect1" title="Affected by"><a name="idp2861376"></a><h2>Affected by</h2>
+    
+    <p>None.</p>
+   </div>
+   <div class="refsect1" title="Exceptional Situations"><a name="idp2862032"></a><h2>Exceptional Situations</h2>
+    
+    <p>None.</p>
+   </div>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="rn04re119.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="rn04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="rn05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">with-cast-pointer</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Strings</td></tr></table></div></body></html>

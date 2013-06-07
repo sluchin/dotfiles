@@ -1,0 +1,53 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ext:set-finalizer</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch28s06.html" title="5.6. Memory Management Reference"><link rel="prev" href="re84.html" title="ext:get-limit"><link rel="next" href="re86.html" title="ext:set-limit"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ext:set-finalizer</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re84.html">Prev</a> </td><th width="60%" align="center">5.6. Memory Management Reference</th><td width="20%" align="right"> <a accesskey="n" href="re86.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ext:set-finalizer"><a name="ref.memory.set-finalizer"></a><div class="titlepage"></div>
+ <div class="refnamediv"><h2>Name</h2><p>
+  <code class="function">ext:set-finalizer</code>
+   — Associate a finalizer to an object.
+ </p></div>
+
+ <div class="refsynopsisdiv" title="Function"><h2>Function</h2>
+  
+  <div class="funcsynopsis">
+   <p>
+    <code class="funcdef">(ext:set-finalizer</code>
+     <var class="pdparam">object</var> 
+     <var class="pdparam">function</var>)
+   </p>
+  </div>
+  <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>object</code></em></span></p></td><td><p>Any lisp object.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>function</code></em></span></p></td><td><p>A function or closure that takes one argument or <code class="constant">NIL</code>.</p></td></tr></tbody></table></div>
+ </div>
+
+ <div class="refsect1" title="Description"><a name="idp2166008"></a><h2>Description</h2>
+  
+
+  <p>If <em class="replaceable"><code>function</code></em> is <code class="constant">NIL</code> no finalizer is
+  associated to the object. Otherwise <em class="replaceable"><code>function</code></em> must
+  be a function or a closure of one argument, which will be invoked before the
+  object is destroyed.</p>
+ </div>
+
+ <div class="refsect1" title="Example"><a name="idp2167512"></a><h2>Example</h2>
+  
+  <p>Close a file associated to an object.</p>
+<pre class="programlisting">
+(defclass my-class () ((file :initarg :file :initform nil)))
+
+(defun finalize-my-class (x)
+ (let ((s (slot-value x 'file)))
+   (when s (format t "~%;;; Closing" s) (close s))))
+
+(defmethod initialize-instance :around ((my-instance my-class) &amp;rest args)
+  (ext:set-finalizer my-instance #'finalize-my-class)
+  (call-next-method))
+
+(progn
+  (make-instance 'my-class :file (open "~/.ecl.old" :direction :input))
+  nil)
+
+(si::gc t)
+(si::gc t)
+
+;; Closing
+</pre>
+ </div>
+
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re84.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch28s06.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re86.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ext:get-limit</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">ext:set-limit</code></td></tr></table></div></body></html>

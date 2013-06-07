@@ -1,0 +1,53 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>CL_CATCH_ALL</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch31s02.html" title="8.2. Embedding Reference"><link rel="prev" href="ch31s02.html" title="8.2. Embedding Reference"><link rel="next" href="re90.html" title="CL_UNWIND_PROTECT"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">CL_CATCH_ALL</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch31s02.html">Prev</a> </td><th width="60%" align="center">8.2. Embedding Reference</th><td width="20%" align="right"> <a accesskey="n" href="re90.html">Next</a></td></tr></table><hr></div><div class="refentry" title="CL_CATCH_ALL"><a name="ref.embed.cl_catch_all"></a><div class="titlepage"></div>
+ <div class="refnamediv"><h2>Name</h2><p>
+  <code class="function">CL_CATCH_ALL</code>
+   — Create a protected region.
+ </p></div>
+
+ <div class="refsynopsisdiv" title="C Macro"><h2>C Macro</h2>
+  
+<pre class="programlisting">
+  cl_env_ptr env = ecl_process_env();
+  CL_CATCH_ALL_BEGIN(env) {
+    /*
+     * Code that is protected. Uncaught lisp conditions, THROW,
+     * signals such as SIGSEGV and SIGBUS may cause jump to
+     * this region.
+     */
+  } CL_CATCH_ALL_IF_CAUGHT {
+    /*
+     * If the exception, lisp condition or other control transfer
+     * is caught, this code is executed.
+     */
+  } CL_CATCH_ALL_END
+  /*
+   * In all cases we exit here.
+   */
+</pre>
+ </div>
+
+ <div class="refsect1" title="Description"><a name="idp2253664"></a><h2>Description</h2>
+  
+
+  <p>This is a set of three macros that create an
+  <code class="function">UNWIND-PROTECT</code> region that prevents any nonlocal transfer
+  of control to outer loops. In the Lisp speak, the previous code is
+  equivalent to</p>
+<pre class="programlisting">
+(block nil
+  (unwind-protect
+     (progn
+        ;; Code that is protected
+	)
+    (return nil)))
+</pre>
+
+   <p>As explained in <a class="xref" href="re90.html" title="CL_UNWIND_PROTECT"><code class="function">CL_UNWIND_PROTECT</code></a>,it is normally advisable to set up an unwind-protect frame to avoid the embedded lisp code to perform arbitary transfers of control.</p>
+ </div>
+
+ <div class="refsect1" title="See also"><a name="idp2255944"></a><h2>See also</h2>
+  
+
+  <p><a class="link" href="re90.html" title="CL_UNWIND_PROTECT"><code class="function">cl_unwind_protect</code></a></p>
+ </div>
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch31s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch31s02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re90.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">8.2. Embedding Reference </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">CL_UNWIND_PROTECT</code></td></tr></table></div></body></html>

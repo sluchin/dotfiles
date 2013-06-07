@@ -233,6 +233,7 @@
         (append '("/usr/share/emacs/site-lisp/migemo"
                   "/usr/share/emacs/site-lisp/ddskk"
                   "/usr/share/emacs/site-lisp/mew"
+                  "/usr/share/emacs/site-lisp/slime"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
                   "/usr/local/share/gtags") load-path)))
 (setq load-path
@@ -559,6 +560,14 @@
   (defun elisp-ja-info (&optional node)
     "Read documentation for Elisp-ja in the info system."
     (interactive) (info (format "(elisp-ja)%s" (or node ""))))
+  ;; Gauche info
+  (defun gauche-info (&optional node)
+    "Read documentation for gauche in the info system."
+    (interactive) (info (format "(gauche-refe.info)%s" (or node ""))))
+  ;; Gauche info 日本語
+  (defun gauche-ja-info (&optional node)
+    "Read documentation for gauche in the info system."
+    (interactive) (info (format "(gauche-refj.info)%s" (or node ""))))
   ;; libc info
   (defun libc-info (&optional node)
     "Read documentation for libc in the info system."
@@ -692,50 +701,33 @@
         (call-interactively 'gtk-lookup-symbol)))
     (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
 
-  ;; STL マニュアル
-  ;; sudo apt-get install stl-manual
-  (defun stl-manual ()
-    "STL manual."
-    (interactive)
-    (when (fboundp 'w3m-goto-url-new-session)
-      (let ((html "/usr/share/doc/stl-manual/html/index.html"))
-        (if (file-readable-p html)
-            (w3m-goto-url-new-session (concat "file:/" html))
-          (message "no file: %s" html)))))
-
-  ;; Python マニュアル
-  ;; sudo apt-get install python2.7-doc
-  (defun python-manual ()
-    "Python manual."
-    (interactive)
-    (when (fboundp 'w3m-goto-url-new-session)
-      (let ((html "/usr/share/doc/python2.7/html/index.html"))
-        (if (file-readable-p html)
-            (w3m-goto-url-new-session (concat "file:/" html))
-          (message "no file: %s" html)))))
-
-  ;; Python 日本語マニュアル
+  ;; その他マニュアル
+  ;; sudo apt-get install stl-manual python2.7-doc
   ;; http://keihanna.dl.sourceforge.jp/pythonjp/54307/python-doc-2.7ja1-html.tar.gz
-  (defun python-ja-manual ()
-    "Python japanese manual."
-    (interactive)
-    (when (fboundp 'w3m-goto-url-new-session)
-      (let ((html (expand-file-name
-                   "~/.emacs.d/html/python-doc-2.7ja1-html/index.html")))
-        (if (file-readable-p html)
-            (w3m-goto-url-new-session (concat "file:/" html))
-          (message "no file: %s" html)))))
-
-  ;; Haskell マニュアル
+  ;; sudo apt-get install hyperspec sbcl-doc ghc-doc
+  ;; wget http://ftp.gnu.org/pub/gnu/clisp/release/2.49/clisp-2.49.tar.gz
+  ;; git clone git://git.code.sf.net/p/ecls/ecl-doc ecl-doc
   ;; sudo apt-get install ghc-doc
-  (defun haskell-manual ()
-    "Haskell manual."
-    (interactive)
-    (when (fboundp 'w3m-goto-url-new-session)
-      (let ((html "/usr/share/doc/ghc-doc/html/index.html"))
-        (if (file-readable-p html)
-            (w3m-goto-url-new-session (concat "file:/" html))
-          (message "no file: %s" html))))))
+  (let ((lst '(("stl" "/usr/share/doc/stl-manual/html/index.html")
+               ("python" "/usr/share/doc/python2.7/html/index.html")
+               ("python-ja"
+                (expand-file-name
+                 "~/.emacs.d/html/python-doc-2.7ja1-html/index.html"))
+               ("cl" "/usr/share/doc/hyperspec/Front/index_tx.htm")
+               ("sbcl" "/usr/share/doc/sbcl-doc/html/index.html")
+               ("clisp" "~/.emacs.d/html/clisp-doc/impnotes.html")
+               ("ecl" "~/.emacs.d/html/ecl-doc/html/index.html")
+               ("haskell" "/usr/share/doc/ghc-doc/html/index.html"))))
+    (dolist (l lst)
+      (let ((cmd (intern (format "%s-manual" (car l))))
+            (html (car (cdr l))))
+        (defalias cmd
+          `(lambda ()
+             "View manual."
+             (interactive)
+             (if (file-readable-p ,html)
+                 (w3m-goto-url-new-session (concat "file:/" ,html))
+               (message "no file: %s" ,html))))))))
 
 ;;; サーバを起動する
 (when (eval-and-compile (require 'server nil t))
@@ -4046,21 +4038,65 @@
          (setq eldoc-echo-area-use-multiline-p t))
        (message "Loading %s (eldoc-extension)...done" this-file-name))))
 
-;;; scheme モード
-;; sudo apt-get install gauche gauche-dev gauche-doc
-(when (locate-library "info")
-  (defun gauche-ja-info (&optional node)
-    "Read documentation for zsh in the info system."
-    (interactive) (info (format "(gauche-refj.info)%s" (or node "")))))
+;;; Common Lisp
+;; sudo apt-get install slime
+;; (install-elisp "https://github.com/purcell/ac-slime/raw/master/ac-slime.el")
+;; Allegro CL  http://www.franz.com/downloads/clp/validate_survey
+;; Clozure CL  http://ccl.clozure.com/download.html
+;; CMUCL  http://www.cons.org/cmucl/install.html
+;; sudo apt-get install sbcl clisp ecl
+(when (locate-library "slime")
+  (autoload 'slime "slime" "Superior Lisp Interaction Mode for Emacs." t)
+  (autoload 'hyperspec-lookup "hyperspec" "Browse documentation from the Common Lisp HyperSpec." t)
+  (autoload 'set-up-slime-ac "ac-slime" "An auto-complete source using slime completions." t)
+  (add-hook 'slime-mode-hook 'set-up-slime-ac)
+  (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+  (add-hook 'inferior-lisp-mode-hook (lambda ()
+                                       (when (fboundp 'inferior-slime-mode)
+                                         (inferior-slime-mode t))))
+  (define-key global-map (kbd "C-c C-h") 'hyperspec-lookup)
 
+  (eval-after-load "slime"
+    '(progn
+       ;; 初期設定
+       (when (fboundp 'slime-setup)
+         (slime-setup '(slime-repl slime-fancy slime-banner)))
+       ;; デフォルト
+       (when (boundp 'inferior-lisp-program)
+         (setq inferior-lisp-program "sbcl"))
+       ;; 処理系を変更する (C-u M-x slime)
+       (when (boundp 'slime-lisp-implementation)
+         (setq slime-lisp-implementations
+               `((sbcl ("sbcl") :coding-system utf-8-unix)
+                 (clisp ("clisp"))
+                 (allegro ("alisp"))
+                 (ccl ("ccl"))
+                 (ecl ("ecl"))
+                 (cmucl ("cmucl") :coding-system utf-8-unix))))
+       ;; 文字コード
+       (when (boundp 'slime-net-coding-system)
+         (setq slime-net-coding-system 'utf-8-unix))
+       ;; ドキュメンテーション参照
+       (when (fboundp 'slime-autodoc-mode)
+         (slime-autodoc-mode))
+       ;; キーバインド
+       (when (boundp 'slime-mode-map)
+         (define-key slime-mode-map (kbd "<tab>") 'slime-indent-and-complete-symbol)
+         (define-key slime-mode-map (kbd "C-i") 'lisp-indent-line)
+         (define-key slime-mode-map (kbd "C-c s") 'slime-selector)))))
+
+;;; scheme モード
+;; sudo apt-get install gauche gauche-dev
 (when (locate-library "cmuscheme")
   (autoload 'scheme-mode "cmuscheme" "Major mode for Scheme." t)
   (autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
 
   (eval-after-load "cmuscheme"
     '(progn
+       ;; プログラム名
        (when (boundp 'scheme-program-name)
          (setq scheme-program-name "gosh -i"))
+       ;; 文字コード
        (when (boundp 'process-coding-system-alist)
          (setq process-coding-system-alist
                (cons '("gosh" utf-8 . utf-8) process-coding-system-alist))))))

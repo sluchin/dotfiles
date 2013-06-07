@@ -1,0 +1,57 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>with-foreign-object</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="rn04.html" title="Objects"><link rel="prev" href="rn04re109.html" title="free-foreign-object"><link rel="next" href="rn04re111.html" title="size-of-foreign-type"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">with-foreign-object</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="rn04re109.html">Prev</a> </td><th width="60%" align="center">Objects</th><td width="20%" align="right"> <a accesskey="n" href="rn04re111.html">Next</a></td></tr></table><hr></div><div class="refentry" title="with-foreign-object"><a name="uffi.with-foreign-object"></a><div class="titlepage"></div>
+   <div class="refnamediv"><h2>Name</h2><p>
+    <code class="function">with-foreign-object</code>
+     — Wraps the allocation of a foreign object around a body of code.
+    
+   </p></div>
+
+   <div class="refsynopsisdiv" title="Macro"><h2>Macro</h2>
+    
+    <div class="funcsynopsis">
+     <p>
+      <code class="funcdef">(with-foreign-object</code>
+       <var class="pdparam">(var type)</var> 
+       <var class="pdparam">&amp;body</var> 
+       <var class="pdparam">body</var>)
+     </p>
+    </div>
+   </div>
+   <div class="refsect1" title="Arguments and Values"><a name="idp2766784"></a><h2>Arguments and Values</h2>
+    
+    <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="parameter"><code>var</code></em></span></p></td><td>
+       <p>The variable name to bind.</p>
+      </td></tr><tr><td><p><span class="term"><em class="parameter"><code>type</code></em></span></p></td><td>
+       <p>The type of foreign object to allocate. This parameter is evaluated.</p>
+      </td></tr><tr><td><p><span class="term">returns</span></p></td><td>
+       <p>The result of evaluating the <em class="parameter"><code>body</code></em>.</p>
+      </td></tr></tbody></table></div>
+   </div>
+   <div class="refsect1" title="Description"><a name="idp2770640"></a><h2>Description</h2>
+     <p> This function wraps the allocation,
+    binding, and destruction of a foreign object.  On <span class="application">CMUCL</span> and <span class="application">Lispworks</span>
+    platforms the object is stack allocated for efficiency. Benchmarks show
+    that <span class="application">AllegroCL</span> performs much better with static allocation.</p>
+   </div>
+   <div class="refsect1" title="Examples"><a name="idp2772064"></a><h2>Examples</h2>
+    
+    <pre class="screen">
+     (defun gethostname2 ()
+     "Returns the hostname"
+     (uffi:with-foreign-object (name '(:array :unsigned-char 256))
+     (if (zerop (c-gethostname (uffi:char-array-to-pointer name) 256))
+     (uffi:convert-from-foreign-string name)
+     (error "gethostname() failed."))))</pre>
+   </div>
+   <div class="refsect1" title="Side Effects"><a name="idp2772984"></a><h2>Side Effects</h2>
+    
+    <p>None.</p>
+   </div>
+   <div class="refsect1" title="Affected by"><a name="idp2773576"></a><h2>Affected by</h2>
+    
+    <p>None.</p>
+   </div>
+   <div class="refsect1" title="Exceptional Situations"><a name="idp2774248"></a><h2>Exceptional Situations</h2>
+    
+    <p>None.</p>
+   </div>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="rn04re109.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="rn04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="rn04re111.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">free-foreign-object</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">size-of-foreign-type</code></td></tr></table></div></body></html>

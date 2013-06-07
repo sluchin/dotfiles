@@ -1,0 +1,47 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>2.11. Bytecodes</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch33.html" title="Chapter 2. Manipulating Lisp objects"><link rel="prev" href="ch33s10.html" title="2.10. Instances"><link rel="next" href="ch34.html" title="Chapter 3. The interpreter"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.11. Bytecodes</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch33s10.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Manipulating Lisp objects</th><td width="20%" align="right"> <a accesskey="n" href="ch34.html">Next</a></td></tr></table><hr></div><div class="section" title="2.11. Bytecodes"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-Bytecodes"></a>2.11. Bytecodes</h2></div></div></div>
+  
+  <p>A bytecodes object is a lisp object with a piece of code that can be
+  interpreted. The objects of type <code class="literal">t_bytecode</code> are implicitly constructed
+  by a call to <code class="literal">eval</code>, but can also be explicitly constructed with the
+  <code class="literal">make_lambda</code> function.</p>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2553200"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">cl_safe_eval</code> (<span class="type">cl_object</span> <code class="varname">form</code>, <span class="type">cl_object</span> <code class="varname">env</code>, <span class="type">cl_object</span> <code class="varname">err_value</code></pre>
+   <pre class="screen"><a class="indexterm" name="idp2555544"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">cl_eval</code> (<span class="type">cl_object</span> <code class="varname">form</code>)</pre>
+   <p><code class="literal">cl_safe_eval</code> evaluates <em class="replaceable"><code>form</code></em> in the lexical environment <em class="replaceable"><code>env</code></em>,
+   which can be <em class="replaceable"><code>nil</code></em>. Before evaluating it, the expression <em class="replaceable"><code>form</code></em> must
+   be bytecompiled. <code class="literal">cl_eval</code> is the equivalent of <code class="literal">cl_safe_eval</code> but
+   without environment and with <em class="replaceable"><code>err_value</code></em> set to <em class="replaceable"><code>nil</code></em>. It exists only
+   for compatibility with previous versions.</p>
+   <pre class="screen">
+    cl_object form = c_string_to_object("(print 1)");
+    cl_safe_eval(form,Cnil);
+    cl_safe_eval(form, Cnil);
+   </pre>
+  </blockquote></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2560024"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">si_make_lambda</code> (<span class="type">cl_object</span> <code class="varname">name</code>, <span class="type">cl_object</span> <code class="varname">def</code>)</pre>
+   <p>Builds an interpreted lisp function with name given by the symbol <em class="replaceable"><code>name</code></em>
+   and body given by <em class="replaceable"><code>def</code></em>. For instance, we would achieve the equivalent of</p>
+   <pre class="programlisting">
+    (funcall #'(lambda (x y) (block foo (+ x y)))
+    1 2)
+   </pre>
+   <p class="continues">with the following code</p>
+   <pre class="screen">
+    cl_object def = c_string_to_object("((x y) (+ x y))");
+    cl_object name = _intern("foo")
+    cl_object fun = si_make_lambda(name, def);
+    return funcall(fun, MAKE_FIXNUM(1), MAKE_FIXNUM(2));
+   </pre>
+   <p class="continues">Notice that <code class="literal">si_safe_lambda</code> performs a bytecodes compilation
+   of the definition and thus it may signal some errors. Such errors are not
+   handled by the routine itself you might consider using <code class="literal">cl_safe_eval</code>
+   or <code class="literal">cl_eval</code> instead:</p>
+   <pre class="screen">
+    cl_object def = c_string_to_object("#'(lambda-block foo (x y) (+ x y))");
+    cl_object fun = cl_eval(def);
+    return funcall(fun, MAKE_FIXNUM(1), MAKE_FIXNUM(2));
+   </pre>
+  </blockquote></div>
+  
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch33s10.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch33.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch34.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.10. Instances </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 3. The interpreter</td></tr></table></div></body></html>

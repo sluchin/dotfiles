@@ -1,0 +1,53 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ecl_set_option</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch31s02.html" title="8.2. Embedding Reference"><link rel="prev" href="re92.html" title="cl_shutdown"><link rel="next" href="re94.html" title="ecl_get_option"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">ecl_set_option</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re92.html">Prev</a> </td><th width="60%" align="center">8.2. Embedding Reference</th><td width="20%" align="right"> <a accesskey="n" href="re94.html">Next</a></td></tr></table><hr></div><div class="refentry" title="ecl_set_option"><a name="ref.embed.ecl_set_option"></a><div class="titlepage"></div>
+ <div class="refnamediv"><h2>Name</h2><p>
+  <code class="function">ecl_set_option</code>
+   — Set a boot option.
+ </p></div>
+
+ <a class="indexterm" name="idp2279200"></a><div class="refsynopsisdiv" title="Function"><h2>Function</h2>
+  
+  <div class="funcsynopsis">
+   
+   <p>
+    <code class="funcdef">void <b class="fsfunc">ecl_set_option</b>(</code>
+    int <var class="pdparam">option</var>, 
+    cl_fixnum <var class="pdparam">value</var><code>)</code>;
+   </p>
+  </div>
+  <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>option</code></em></span></p></td><td><p>An integer from <a class="xref" href="re93.html#table.boot_options" title="Table 8.1. Boot options for embedded ECL">Table 8.1</a>.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>value</code></em></span></p></td><td><p>A <span class="type">cl_index</span> value for this option.</p></td></tr></tbody></table></div>
+ </div>
+
+ <div class="refsect1" title="Description"><a name="idp2284120"></a><h2>Description</h2>
+  
+  <p>This functions sets the value of different options that have
+  to be customized <span class="emphasis"><em>before</em></span> <span class="application">ECL</span> boots. The table
+  of options and default values [<a class="xref" href="re93.html#table.boot_options" title="Table 8.1. Boot options for embedded ECL">Table 8.1</a>]
+  shows that some of them are boolean, and some of them are unsigned
+  integers.</p>
+
+  <p>We distinguish three sets of values. The first set determines
+  whether <span class="application">ECL</span> handles certain exceptions, such as access to forbidden
+  regions of memory, interrupts via , floating point
+  exceptions, etc.</p>
+
+  <p>The second set is related to the sizes of different
+  stacks. Currently <span class="application">ECL</span> uses four stacks: a bind stack for keeping
+  assignments to special variables; a frame stack for implementing
+  blocks, tagbodys and catch points; an interpreter stack for
+  evaluating bytecodes, and finally the machine or C stack, of the
+  computer we run in. We can set the expected size of these stacks,
+  together with the size of a safety area which, if penetrated, will
+  lead to the generation of a correctable error.</p>
+
+  <div class="table"><a name="table.boot_options"></a><p class="title"><b>Table 8.1. Boot options for embedded <span class="application">ECL</span></b></p><div class="table-contents">
+    
+    <table summary="Boot options for embedded ECL" border="1"><colgroup><col><col><col><col></colgroup><thead><tr><th>Name (<code class="constant">ECL_OPT_*</code>)</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code class="constant">INCREMENTAL_GC</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE</code></td><td>Activate generational garbage collector.</td></tr><tr><td><code class="constant">TRAP_SIGSEGV</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE</code></td><td>Capture SIGSEGV signals.</td></tr><tr><td><code class="constant">TRAP_SIGFPE</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE</code></td><td>Capture floating point exceptions.</td></tr><tr><td><code class="constant">TRAP_SIGINT</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE</code></td><td>Capture user interrupts.</td></tr><tr><td><code class="constant">TRAP_SIGILL</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE</code></td><td>Capture SIGILL exception.</td></tr><tr><td><code class="constant">TRAP_INTERRUPT_SIGNAL</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE</code></td><td>Capture the signal that implements
+       <code class="function">mp:interrupt-process</code>.</td></tr><tr><td><code class="constant">SIGNAL_HANDLING_THREAD</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE</code></td><td>Create a signal to capture and process asynchronous threads (See
+       <a class="xref" href="ch30s03.html#ext.signals.asynchronous-handler" title="7.3.1. Handling of asynchronous signals">Section 7.3.1</a>).</td></tr><tr><td><code class="constant">BOOTED</code></td><td><span class="type">boolean</span></td><td><code class="constant">TRUE/FALSE</code></td><td>Has <span class="application">ECL</span> booted (read only).</td></tr><tr><td><code class="constant">BIND_STACK_SIZE</code></td><td><span class="type">cl_index</span></td><td><code class="constant">8192</code></td><td>Size of stack for binding special variables.</td></tr><tr><td><code class="constant">BIND_STACK_SAFETY_AREA</code></td><td><span class="type">cl_index</span></td><td><code class="constant">128</code></td><td> </td></tr><tr><td><code class="constant">FRAME_STACK_SIZE</code></td><td><span class="type">cl_index</span></td><td><code class="constant">2048</code></td><td>Size of stack for nonlocal jumps.</td></tr><tr><td><code class="constant">FRAME_STACK_SAFETY_AREA</code></td><td><span class="type">cl_index</span></td><td><code class="constant">128</code></td><td> </td></tr><tr><td><code class="constant">LISP_STACK_SIZE</code></td><td><span class="type">cl_index</span></td><td><code class="constant">32768</code></td><td>Size of interpreter stack.</td></tr><tr><td><code class="constant">LISP_STACK_SAFETY_AREA</code></td><td><span class="type">cl_index</span></td><td><code class="constant">128</code></td><td> </td></tr><tr><td><code class="constant">C_STACK_SIZE</code></td><td><span class="type">cl_index</span></td><td><code class="constant">131072</code></td><td>Size of C stack (not exact).</td></tr><tr><td><code class="constant">C_STACK_SAFETY_AREA</code></td><td><span class="type">cl_index</span></td><td><code class="constant">4192</code></td><td> </td></tr><tr><td><code class="constant">SIGALTSTACK_SIZE</code></td><td><span class="type">cl_index</span></td><td><code class="constant">1</code></td><td>If nonzero, run C signal handler in an alternative
+       signal. A small value is automatically incremented.</td></tr><tr><td><code class="constant">THREAD_INTERRUPT_SIGNAL</code></td><td><span class="type">unsigned int</span></td><td><code class="constant">0</code></td><td>If nonzero, specify the unix signal which is used to
+       communicate different Lisp threads.</td></tr></tbody></table>
+   </div></div><br class="table-break">
+
+ </div>
+
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re92.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch31s02.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re94.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">cl_shutdown</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">ecl_get_option</code></td></tr></table></div></body></html>

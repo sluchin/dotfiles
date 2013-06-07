@@ -1,0 +1,29 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>2.6. Strings</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch33.html" title="Chapter 2. Manipulating Lisp objects"><link rel="prev" href="ch33s05.html" title="2.5. Arrays"><link rel="next" href="ch33s07.html" title="2.7. Bitvectors"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.6. Strings</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch33s05.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Manipulating Lisp objects</th><td width="20%" align="right"> <a accesskey="n" href="ch33s07.html">Next</a></td></tr></table><hr></div><div class="section" title="2.6. Strings"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-Strings"></a>2.6. Strings</h2></div></div></div>
+  
+  <p>A string, both in Common-Lisp and in <span class="application">ECL</span> is nothing but a vector of
+  characters. Therefore, almost everything mentioned in the section of arrays
+  remains valid here. The only important difference is that <span class="application">ECL</span> stores
+  strings as a lisp object with a pointer to a zero terminated C string. Thus, if
+  a string has <em class="replaceable"><code>n</code></em> characters, <span class="application">ECL</span> will reserve <em class="replaceable"><code>n</code></em>+1 bytes for the
+  string. This allows us to pass the string <code class="literal">self</code> pointer to any C
+  routine.</p>
+  <p>If <em class="replaceable"><code>x</code></em> is a lisp object of type string, we can access the following fields:</p>
+  <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><code class="literal">x-&gt;string.dim</code></span></p></td><td>
+     <p>Maximum number of characters that it can contain.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;string.fillp</code></span></p></td><td>
+     <p>Actual number of characters in the string.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;string.self</code></span></p></td><td>
+     <p>Pointer to the characters.</p>
+    </td></tr><tr><td><p><span class="term"><code class="literal">x-&gt;string.hasfillp</code></span></p></td><td>
+     <p>True if <code class="literal">x-&gt;string.fillp</code> can be smaller than <code class="literal">x-&gt;string.dim</code>.</p>
+    </td></tr></tbody></table></div>
+  <div class="blockquote"><blockquote class="blockquote">
+   <pre class="screen"><a class="indexterm" name="idp2544224"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">make_simple_string</code> (<span class="type">char</span> <code class="varname">*</code><code class="varname">s</code>)</pre>
+   <pre class="screen"><a class="indexterm" name="idp2545936"></a> Function: <span class="returnvalue">cl_object</span> <code class="function">make_string_copy</code> (<span class="type">char</span> <code class="varname">*</code><code class="varname">s</code>)</pre>
+   <p>Both routines build a lisp string from a C string. <code class="literal">make_string_copy</code>
+   allocates new space and copies the content of the string to
+   it. <code class="literal">make_simple_string</code> simply uses the memory pointed by <em class="replaceable"><code>s</code></em>, which
+   should not be deallocated. Both routines use <code class="literal">strlen</code> to calculate the
+   length of the string.</p>
+  </blockquote></div>
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch33s05.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch33.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch33s07.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.5. Arrays </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.7. Bitvectors</td></tr></table></div></body></html>

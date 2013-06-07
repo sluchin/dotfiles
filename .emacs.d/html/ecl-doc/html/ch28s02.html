@@ -1,0 +1,38 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>5.2. Boehm-Weiser garbage collector</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch28.html" title="Chapter 5. Memory Management"><link rel="prev" href="ch28.html" title="Chapter 5. Memory Management"><link rel="next" href="ch28s03.html" title="5.3. Memory limits"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.2. Boehm-Weiser garbage collector</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch28.html">Prev</a> </td><th width="60%" align="center">Chapter 5. Memory Management</th><td width="20%" align="right"> <a accesskey="n" href="ch28s03.html">Next</a></td></tr></table><hr></div><div class="section" title="5.2. Boehm-Weiser garbage collector"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="ext.memory.boehm"></a>5.2. Boehm-Weiser garbage collector</h2></div></div></div>
+   
+
+   <p>First of all, the garbage collector must be able to determine which
+   objects are alive and which are not. In other word, the collector must able
+   to find all references to an object. One possiblity would be to know where
+   all variables of a program reside, and where is the stack of the program and
+   its size, and parse all data there, discriminating references to lisp
+   objects. To do this precisely one would need a very precise control of the
+   data and stack segments, as well as how objects are laid out by the C
+   compiler. This is beyond <span class="application">ECL</span>'s scope and wishes and it can make
+   coexistence with other libraries (C++, Fortran, etc) difficult.</p>
+
+   <p>The Boehm-Weiser garbage collector, on the other hand, is a
+   conservative garbage collector. When scanning memory looking for references
+   to live data, it guesses, conservatively, whether a word is a pointer or
+   not. In case of doubt it will consider it to be a pointer and add it to the
+   list of live objects. This may cause certain objects to be retained longer
+   than what an user might expect but, in our experience, this is the best of
+   both worlds and <span class="application">ECL</span> uses certain strategies to minimize the amount of
+   misinterpreted data.</p>
+
+   <p>More precisely, <span class="application">ECL</span> uses the garbage collector with the following
+   settings:</p>
+   <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The collector will not scan the data sectors. If you embed
+    <span class="application">ECL</span> in another program, or link libraries with <span class="application">ECL</span>, you will have to
+    notify <span class="application">ECL</span> which variables point to lisp objects.</p></li><li class="listitem"><p>The collector is configured to ignore pointers that point
+    to the middle of allocated objects. This minimizes the risk of
+    misinterpreting integers as pointers to live obejcts.</p></li><li class="listitem"><p>It is possible to register finalizers that are invoked when
+    an object is destroyed, but for that you should use <span class="application">ECL</span>'s API and
+    understand the restriction described later in <a class="xref" href="ch28s05.html" title="5.5. Finalization">Section 5.5</a></p></li></ul></div>
+
+   <p>Except for finalization, which is a questionable feature, the previous
+   settings are not very relevant for Common Lisp programmers, but are crucial
+   for people interested in embedding in or cooperating with other C, C++ or
+   Fortran libraries. Care should be taken when manipulating directly the GC
+   library to avoid interfering with <span class="application">ECL</span>'s expectations.</p>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch28.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch28.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch28s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 5. Memory Management </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.3. Memory limits</td></tr></table></div></body></html>

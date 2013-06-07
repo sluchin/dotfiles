@@ -1,0 +1,77 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>asdf:make-build</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch24s04.html" title="1.4. ASDF Reference"><link rel="prev" href="ch24s04.html" title="1.4. ASDF Reference"><link rel="next" href="re56.html" title="asdf:load-fasl-op"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center"><code class="function">asdf:make-build</code></th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch24s04.html">Prev</a> </td><th width="60%" align="center">1.4. ASDF Reference</th><td width="20%" align="right"> <a accesskey="n" href="re56.html">Next</a></td></tr></table><hr></div><div class="refentry" title="asdf:make-build"><a name="ref.make-build"></a><div class="titlepage"></div>
+   <div class="refnamediv"><h2>Name</h2><p>
+    <code class="function">asdf:make-build</code>
+     — Block-build an <span class="application">ASDF</span> system definition
+   </p></div>
+
+   <a class="indexterm" name="idp1812152"></a><a class="indexterm" name="idp1812480"></a><a class="indexterm" name="idp1812840"></a><a class="indexterm" name="idp1812968"></a><div class="refsynopsisdiv" title="Function"><h2>Function</h2>
+    
+    <div class="funcsynopsis">
+     <p>
+      <code class="funcdef">(asdf:make-build</code>
+       <var class="pdparam">system-name</var> 
+       &amp;key 
+       <var class="pdparam">type</var> 
+       <var class="pdparam">monolithic</var> 
+       <var class="pdparam">ld-flags</var> 
+       <var class="pdparam">prologue-code</var> 
+       <var class="pdparam">epilogue-code</var> 
+       &amp;allow-other-keys)
+     </p>
+    </div>
+    <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term"><em class="replaceable"><code>system-name</code></em></span></p></td><td><p>A symbol naming the system to be built. Only the symbol
+      name is considered.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>type</code></em></span></p></td><td><p>One of <span class="symbol">:FASL</span>, <span class="symbol">:DLL</span>,
+      <span class="symbol">:LIB</span> or
+      <span class="symbol">:PROGRAM</span></p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>monolithic</code></em></span></p></td><td><p>A boolean value.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>ld-flags</code></em></span></p></td><td><p>A list of strings.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>prologue-code</code></em></span></p></td><td><p>A string.</p></td></tr><tr><td><p><span class="term"><em class="replaceable"><code>epilogue-code</code></em></span></p></td><td><p>A string or a lisp form.</p></td></tr></tbody></table></div>
+   </div>
+
+   <div class="refsect1" title="Description"><a name="idp1822840"></a><h2>Description</h2>
+    
+
+    <p>This function takes a system definition which is known to <span class="application">ASDF</span> and
+    builds one or more binary files, depending on the arguments. The possible
+    output files depend on the value of <code class="varname">type</code> and are
+    summarized in <a class="xref" href="ch24.html#table.make-build" title="Table 1.1. Code distribution models">Table 1.1</a>.</p>
+
+    <p>Internally the function works similary to the
+    <span class="application">ASDF</span> function <code class="function">asdf:oos</code> with the
+    <code class="function">asdf:load-op</code> operator. It finds out the requested
+    system definition, either by searching in a set of predefined locations or
+    because the system has been already loaded into memory, computes all
+    libraries and components this system depends on, builds them and then
+    produces the desired output.</p>
+
+    <p>If the value of <code class="varname">:monolithic</code> is
+    <code class="varname">NIL</code> the output binary will contain just the desired
+    system, while in other cases the output will be linked together with all
+    libraries your system depends on. Standalone executables, given by
+    <code class="code">type = :program</code>, must, by definition, be monolithic. All other
+    systems need not, but in that case you will have to manually satisfy the
+    required dependencies when using those files.</p>
+
+    <p>This function takes additional values which are related to the low
+    level details of the produced binaries. First of all we find
+    <code class="varname">ld-flags</code>, a list of strings with arguments for the
+    object linker. You will only need this argument if you have to link your
+    programs with foreign libraries.</p>
+
+    <p>The next two arguments represent two pieces of code which are
+    executed before (<code class="varname">prologue-code</code>) and after
+    (<code class="varname">epilogue-code</code>) running your lisp code. The prologue
+    code is a string with C code which you will typically use to initialize
+    foreign libraries. It can only be C code because this code may be executed
+    even before <span class="application">ECL</span> itself is initialized.</p>
+
+    <p>The epilogue code, on the other hand, can be either a string with C
+    statements or a lisp form represented as a list. In the case of executables
+    it conveniently defaults to a call to the toplevel
+    <code class="code">(SI::TOP-LEVEL)</code>, while in the case of libraries and <acronym class="acronym">FASL</acronym>
+    files it is left empty.</p>
+
+   </div>
+
+   <div class="refsect1" title="Examples"><a name="idp1829568"></a><h2>Examples</h2>
+    
+
+    <p>See <a class="xref" href="ch24s03.html" title="1.3. Practical examples">Section 1.3</a>.</p></div>
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch24s04.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch24s04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re56.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">1.4. ASDF Reference </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> <code class="function">asdf:load-fasl-op</code></td></tr></table></div></body></html>

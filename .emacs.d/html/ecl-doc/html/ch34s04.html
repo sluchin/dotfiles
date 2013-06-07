@@ -1,0 +1,91 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>3.4. The interpreter stack</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch34.html" title="Chapter 3. The interpreter"><link rel="prev" href="ch34s03.html" title="3.3. The lexical environment"><link rel="next" href="ch35.html" title="Chapter 4. The compiler"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.4. The interpreter stack</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch34s03.html">Prev</a> </td><th width="60%" align="center">Chapter 3. The interpreter</th><td width="20%" align="right"> <a accesskey="n" href="ch35.html">Next</a></td></tr></table><hr></div><div class="section" title="3.4. The interpreter stack"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-The-interpreter-stack"></a>3.4. The interpreter stack</h2></div></div></div>
+  
+  <p>The bytecodes interpreter uses a stack of its own to save and restore values
+  from intermediate calculations. This Forth-like data stack is also used in
+  other parts of the C kernel for various purposes, such as saving compiled code,
+  keeping arguments to FORMAT, etc.</p>
+  <p>However, one of the most important roles of the Interpreter Stack is to keep a
+  log of the functions which are called during the execution of bytecodes. For
+  each function invoked, the interpreter keeps three lisp objects on the stack:</p>
+  <pre class="screen">
+  +----------+------------------------------------------------+
+  | function | lexical environment | index to previous record |
+  +----------+---------------------+--------------------------+
+  </pre>
+  <p>The first item is the object which is funcalled. It can be a bytecodes object,
+  a compiled function or a generic function. In the last two cases the lexical
+  environment is just NIL. In the first case, the second item on the stack is
+  the lexical environment on which the code is executed. Each of these records
+  are popped out of the stack after function invocation.</p>
+  <p>Let us see how these invocation records are used for debugging.</p><pre class="screen">
+  &gt;(defun fact (x)                ;;;  Wrong definition of the
+  (if (= x 0)                  ;;;  factorial function.
+  one                      ;;;  one  should be  1.
+  (* x (fact (1- x)))))
+  FACT
+
+  &gt;(fact 3)                       ;;;  Tries  3!
+  Error: The variable ONE is unbound.
+  Error signalled by IF.
+  Broken at IF.
+  &gt;&gt;:b                            ;;;  Backtrace.
+  Backtrace: eval &gt; fact &gt; if &gt; fact &gt; if &gt; fact &gt; if &gt; fact &gt; IF
+  ;;;  Currently at the last  IF.
+  &gt;&gt;:h                            ;;;  Help.
+
+  Break commands:
+  :q(uit)         Return to some previous break level.
+  :pop            Pop to previous break level.
+  :c(ontinue)     Continue execution.
+  :b(acktrace)    Print backtrace.
+  :f(unction)     Show current function.
+  :p(revious)     Go to previous function.
+  :n(ext)         Go to next function.
+  :g(o)           Go to next function.
+  :fs             Search forward for function.
+  :bs             Search backward for function.
+  :v(ariables)    Show local variables, functions, blocks, and tags.
+  :l(ocal)        Return the nth local value on the stack.
+  :hide           Hide function.
+  :unhide         Unhide function.
+  :hp             Hide package.
+  :unhp           Unhide package.
+  :unhide-all     Unhide all variables and packages.
+  :bds            Show binding stack.
+  :m(essage)      Show error message.
+  :hs             Help stack.
+  Top level commands:
+  :cf             Compile file.
+  :exit or ^D     Exit Lisp.
+  :ld             Load file.
+  :step           Single step form.
+  :tr(ace)        Trace function.
+  :untr(ace)      Untrace function.
+
+  Help commands:
+  :apropos        Apropos.
+  :doc(ument)     Document.
+  :h(elp) or ?    Help.  Type ":help help" for more information.
+
+  &gt;&gt;:p                        ;;;  Move to the last call of  FACT.
+  Broken at IF.
+
+  &gt;&gt;:b
+  Backtrace: eval &gt; fact &gt; if &gt; fact &gt; if &gt; fact &gt; if &gt; FACT &gt; if
+  ;;;  Now at the last  FACT.
+  &gt;&gt;:v                        ;;;  The environment at the last call
+  Local variables:            ;;;  to  FACT  is recovered.
+  X: 0                      ;;;  X  is the only bound variable.
+  Block names: FACT.          ;;;  The block  FACT  is established.
+
+  &gt;&gt;x
+  0                           ;;;  The value of  x  is  0.
+
+  &gt;&gt;(return-from fact 1)      ;;;  Return from the last call of
+  6                           ;;;  FACT  with the value of  0.
+  ;;;  The execution is resumed and
+  &gt;                           ;;;  the value  6  is returned.
+  ;;;  Again at the top-level loop.
+  </pre>
+  
+ </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch34s03.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch34.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch35.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.3. The lexical environment </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 4. The compiler</td></tr></table></div></body></html>

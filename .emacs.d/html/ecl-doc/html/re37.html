@@ -1,0 +1,94 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Constructors</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="ch13s03.html" title="13.3. C Reference"><link rel="prev" href="re36.html" title="ecl_aet_to_symbol, ecl_symbol_to_aet"><link rel="next" href="re38.html" title="Accessors"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Constructors</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="re36.html">Prev</a> </td><th width="60%" align="center">13.3. C Reference</th><td width="20%" align="right"> <a accesskey="n" href="re38.html">Next</a></td></tr></table><hr></div><div class="refentry" title="Constructors"><a name="idp1122864"></a><div class="titlepage"></div>
+    <div class="refnamediv"><h2>Name</h2><p>
+      Constructors
+       — Creating arrays and vectors
+    </p></div>
+
+    <a class="indexterm" name="idp1123704"></a><a class="indexterm" name="idp1124168"></a><a class="indexterm" name="idp1124296"></a><div class="refsynopsisdiv" title="Functions"><h2>Functions</h2>
+      
+      <div class="funcsynopsis">
+	<p>
+	  
+	  <code class="funcdef">cl_object <b class="fsfunc">ecl_alloc_simple_vector</b>(</code>
+	  cl_elttype <var class="pdparam">element_type</var>, 
+	  cl_index <var class="pdparam">length</var><code>)</code>;
+	</p>
+      </div>
+
+      <div class="funcsynopsis">
+	<p>
+	  
+	  <code class="funcdef">cl_object <b class="fsfunc">si_make_vector</b>(</code>
+	  cl_object <var class="pdparam">element_type</var>, 
+	  cl_object <var class="pdparam">length</var>, 
+	  cl_object <var class="pdparam">adjustablep</var>, 
+	  cl_object <var class="pdparam">fill_pointerp</var>, 
+	  cl_object <var class="pdparam">displaced_to</var>, 
+	  cl_object <var class="pdparam">displacement</var><code>)</code>;
+	</p>
+      </div>
+
+      <div class="funcsynopsis">
+	<p>
+	  
+	  <code class="funcdef">cl_object <b class="fsfunc">si_make_array</b>(</code>
+	  cl_object <var class="pdparam">element_type</var>, 
+	  cl_object <var class="pdparam">dimensions</var>, 
+	  cl_object <var class="pdparam">adjustablep</var>, 
+	  cl_object <var class="pdparam">fill_pointerp</var>, 
+	  cl_object <var class="pdparam">displaced_to</var>, 
+	  cl_object <var class="pdparam">displacement</var><code>)</code>;
+	</p>
+      </div>
+    </div>
+
+    <div class="refsect1" title="Description"><a name="idp1133584"></a><h2>Description</h2>
+      
+
+      <p>The function <code class="function">ecl_alloc_simple_vector</code> is the simplest constructor, creating a simple vector (i.e. non-adjustable and without a fill pointer), of the given size, preallocating the memory for the array data. The first argument, <em class="replaceable"><code>element_type</code></em>, is a C constant that represents a valid array element type (See <a class="link" href="re35.html#cl_elttype">cl_elttype</a>).</p>
+
+      <p>The function <code class="function">si_make_vector</code> does the same job but allows creating an array with fill pointer, which is adjustable or displaced to another array.</p>
+      <div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><em class="replaceable"><code>element_type</code></em> is now a Common Lisp type descriptor, which is a symbol or list denoting a valid element type</p></li><li class="listitem"><p><em class="replaceable"><code>dimension</code></em> is a non-negative fixnum with the vector size.</p></li><li class="listitem"><p><em class="replaceable"><code>fill_pointerp</code></em> is either <span class="symbol">Cnil</span> or a non-negative fixnum denoting the fill pointer value.</p></li><li class="listitem"><p><em class="replaceable"><code>displaced_to</code></em> is either <span class="symbol">Cnil</span> or a valid array to which the new array is displaced.</p></li><li class="listitem"><p><em class="replaceable"><code>displacement</code></em> is either <span class="symbol">Cnil</span> or a non-negative value with the array displacement.</p></li></ul></div>
+      <p>Finally, the function <code class="function">si_make_array</code> does a similar job to <code class="function">si_make_function</code> but its second argument, <em class="replaceable"><code>dimension</code></em>, can be a list of dimensions, to create a multidimensional array.</p>
+
+    </div>
+
+    <div class="refsect1" title="Example"><a name="idp1140192"></a><h2>Example</h2>
+      
+
+      <p>Create one-dimensional <span class="type">base-string</span> with room for 11 characters:</p>
+<pre class="programlisting">
+cl_object s = ecl_alloc_simple_vector(ecl_aet_bc, 11);
+</pre>
+
+      <p>Create a one-dimensional <span class="type">array</span> with a fill pointer</p>
+<pre class="programlisting">
+cl_object type = ecl_make_symbol("BYTE8","EXT");
+cl_object a = si_make_vector(ecl_make_fixnum(16), type, Cnil, /* adjustable */
+                             ecl_make_fixnum(0) /* fill-pointer */,
+                             Cnil /* displaced_to */,
+                             Cnil /* displacement */);
+</pre>
+
+      <p>An alternative formulation</p>
+<pre class="programlisting">
+cl_object type = ecl_make_symbol("BYTE8","EXT");
+cl_object a = si_make_array(ecl_make_fixnum(16), type, Cnil, /* adjustable */
+                            ecl_make_fixnum(0) /* fill-pointer */,
+                            Cnil /* displaced_to */,
+                            Cnil /* displacement */);
+</pre>
+
+      <p>Create a 2-by-3 two-dimensional <span class="type">array</span>, specialized for an integer type:</p>
+<pre class="programlisting">
+cl_object dims = cl_list(2, ecl_make_fixnum(2), ecl_make_fixnum(3));
+cl_object type = ecl_make_symbol("BYTE8","EXT");
+cl_object a = si_make_array(dims, type, Cnil, /* adjustable */
+                            Cnil /* fill-pointer */,
+                            Cnil /* displaced_to */,
+                            Cnil /* displacement */);
+</pre>
+    </div>
+
+  </div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="re36.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch13s03.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="re38.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top"><code class="function">ecl_aet_to_symbol</code>,
+      <code class="function">ecl_symbol_to_aet</code> </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Accessors</td></tr></table></div></body></html>

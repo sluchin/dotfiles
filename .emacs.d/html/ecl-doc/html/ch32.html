@@ -1,0 +1,62 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 1. Building programs</title><link rel="stylesheet" type="text/css" href="ecl.css"><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"><link rel="home" href="index.html" title="The ECL manual"><link rel="up" href="pt03.html" title="Part III. Internals"><link rel="prev" href="pt03.html" title="Part III. Internals"><link rel="next" href="ch32s02.html" title="1.2. Compiling files"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 1. Building programs</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="pt03.html">Prev</a> </td><th width="60%" align="center">Part III. Internals</th><td width="20%" align="right"> <a accesskey="n" href="ch32s02.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 1. Building programs"><div class="titlepage"><div><div><h2 class="title"><a name="Building-programs"></a>Chapter 1. Building programs</h2></div></div></div><div class="toc"><dl><dt><span class="section"><a href="ch32.html#Internals-What-can-ECL-do-">1.1. What can <span class="application">ECL</span> do?</a></span></dt><dt><span class="section"><a href="ch32s02.html">1.2. Compiling files</a></span></dt><dt><span class="section"><a href="ch32s03.html">1.3. Building standalone executables</a></span></dt><dt><span class="section"><a href="ch32s04.html">1.4. Building libraries</a></span></dt><dt><span class="section"><a href="ch32s05.html">1.5. File names</a></span></dt><dt><span class="section"><a href="ch32s06.html">1.6. Compiler examples</a></span></dt><dd><dl><dt><span class="section"><a href="ch32s06.html#idp2398816">1.6.1. The <code class="filename">hello.lisp</code> file</a></span></dt><dt><span class="section"><a href="ch32s06.html#idp2401968">1.6.2. Example of loadable object file</a></span></dt><dt><span class="section"><a href="ch32s06.html#idp2406792">1.6.3. Example of standalone program</a></span></dt><dt><span class="section"><a href="ch32s06.html#idp2412040">1.6.4. Combining files into a larger FASL</a></span></dt></dl></dd></dl></div>
+ 
+ <p>In this section we describe how you can use <span class="application">ECL</span> to build programs and
+ loadable extensions that you can later on distribute to other people.</p>
+
+ <div class="section" title="1.1. What can ECL do?"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="Internals-What-can-ECL-do-"></a>1.1. What can <span class="application">ECL</span> do?</h2></div></div></div>
+  
+  <p>Some day for some reasons you will be in the need to distribute code that
+  has been developed using <span class="application">ECL</span>. In the following sections we will describe
+  the means that <span class="application">ECL</span> offers you to do so. Basically, these are the
+  alternatives</p>
+  <div class="variablelist"><table border="0"><col align="left" valign="top"><tbody><tr><td><p><span class="term">Source code</span></p></td><td>
+     <p>You distribute your programs in source code form. This is the easiest and most
+     portable way, but not the fastest one.</p>
+    </td></tr><tr><td><p><span class="term">Standalone programs</span></p></td><td>
+     <p>You translate all your lisp code to C using the <span class="application">ECL</span> compiler. The final
+     object files can be linked against other C/C++ libraries to obtain a standalone
+     executable.</p>
+    </td></tr><tr><td><p><span class="term">You can build statically and dynamically linked libraries.</span></p></td><td>
+     <p>You translate all your lisp code to C and combine the resulting object files
+     into a single library with <code class="filename">.a</code> extension. You can distribute this library
+     to other people and the final users can utilize these libraries to build
+     standalone programs.</p>
+    </td></tr><tr><td><p><span class="term">You can build dynamically loadable files.</span></p></td><td>
+     <p>This is the most flexible way. You translate all lisp code to C and link it
+     against possibly other C/C++ libraries to obtain a dynamically loadable library
+     (file type <code class="filename">.so</code> under unix). This library can be loaded a startup time to
+     add new functionality to the <span class="application">ECL</span> environment.</p>
+    </td></tr></tbody></table></div>
+  <p>In several of these options, we have mentioned the possibility to include C/C++
+  code. Even if this is possible, you cannot use ordinary C/C++ compilers and
+  makefiles to build <span class="application">ECL</span> extensions, let it be programs or
+  libraries. Briefly, you have to organize your code as follows</p>
+  <div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
+    <p>Organize the C code as a library, let it be static or dynamic.</p>
+   </li><li class="listitem">
+    <p>Build a function, say <code class="literal">mymain()</code>, in which the initialization phase
+    for your library is performed.</p>
+   </li><li class="listitem">
+    <p>Group the code that interfaces to Lisp in separate C files, all of which
+    should include <code class="literal">#include &lt;ecl/ecl.h&gt;</code> at the beginning.</p>
+   </li><li class="listitem">
+    <p>Compile your lisp source files.</p>
+   </li><li class="listitem">
+    <p>Let <span class="application">ECL</span> build the final executable or library.</p>
+   </li></ol></div>
+  <p class="continues">In the final step there are ways to instruct <span class="application">ECL</span> to call your
+  initialization function (<code class="literal">mymain()</code> in the example above). These means
+  are explained in the following sections.</p>
+  
+ </div>
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+</div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="pt03.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="pt03.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch32s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Part III. Internals </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 1.2. Compiling files</td></tr></table></div></body></html>
