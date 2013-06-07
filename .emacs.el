@@ -168,9 +168,33 @@
               (delete-file file)))))
     (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)))
 
+;; インストール
+(defun apt-get-install ()
+  "apt-get install"
+  (interactive)
+  (if (executable-find "apt-get")
+      (let ((lst '("fonts-monapo" "devhelp" "stl-manual"
+                   "hyperspec" "sbcl-doc" "ghc-doc"
+                   "migemo" "cmigemo" "ddskk" "skktools"
+                   "sdcv" "mew" "mew-bin" "stunnel4"
+                   "libxpm-dev" "w3m" "exuberant-ctags"
+                   "slime" "sbcl" "clisp" "ecl"
+                   "gauche" "gauche-dev"
+                   "libgmp-dev" "libgmp3c2" "perltidy"))
+            (mes "*Messages*")
+            (passwd (read-passwd (concat "[sudo] password for "
+                                         (user-login-name) ": ")))
+            command)
+        (dolist (l lst)
+          (setq command (concat command " " l)))
+        (shell-command
+         (concat "echo "
+                 (shell-quote-argument passwd)
+                 " | sudo -S apt-get -y install " command) mes))))
+
 ;; レポジトリ更新
 (defun update-repositories ()
-  "git clone. bm, magit and others."
+  "git clone or pull. bm, magit and others."
   (interactive)
   (if (executable-find "git")
       (let (default-directory
@@ -704,7 +728,7 @@
   ;; その他マニュアル
   ;; sudo apt-get install stl-manual python2.7-doc
   ;; http://keihanna.dl.sourceforge.jp/pythonjp/54307/python-doc-2.7ja1-html.tar.gz
-  ;; sudo apt-get install hyperspec sbcl-doc ghc-doc
+  ;; sudo apt-get install hyperspec sbcl-doc
   ;; wget http://ftp.gnu.org/pub/gnu/clisp/release/2.49/clisp-2.49.tar.gz
   ;; git clone git://git.code.sf.net/p/ecls/ecl-doc ecl-doc
   ;; sudo apt-get install ghc-doc
@@ -979,6 +1003,36 @@
   (interactive)
   (setq mark-ring nil)
   (message "mark-ring: %s" mark-ring))
+
+;;; root 権限のファイルを開く
+(defun file-root-p (filename)
+  "Return t if file FILENAME created by root."
+  (eq 0 (nth 2 (file-attributes filename))))
+
+(defun rename-tramp-buffer ()
+  (when (file-remote-p (buffer-file-name))
+    (rename-buffer
+     (format "%s:%s"
+             (file-remote-p (buffer-file-name) 'method)
+             (buffer-name)))))
+
+(add-hook 'find-file-hook
+          'rename-tramp-buffer)
+
+(defun find-file-for-sudo (file)
+  "Opens FILE with root privileges."
+  (interactive "F")
+  (set-buffer (find-file (concat "/sudo::" file))))
+
+(defadvice find-file (around find-file-y-or-no activate compile)
+  "Open FILENAME using tramp's sudo method if it's read-only."
+  (if (and (file-root-p (ad-get-arg 0))
+           (not (file-writable-p (ad-get-arg 0)))
+           (y-or-n-p (concat "File `"
+                             (ad-get-arg 0)
+                             "' is read-only.  Open it as root? ")))
+      (find-file-for-sudo (ad-get-arg 0))
+    ad-do-it))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -4081,7 +4135,7 @@
          (slime-autodoc-mode))
        ;; キーバインド
        (when (boundp 'slime-mode-map)
-         (define-key slime-mode-map (kbd "<tab>") 'slime-indent-and-complete-symbol)
+         (define-key slime-mode-map (kbd "TAB") 'slime-indent-and-complete-symbol)
          (define-key slime-mode-map (kbd "C-i") 'lisp-indent-line)
          (define-key slime-mode-map (kbd "C-c s") 'slime-selector)))))
 
@@ -4131,6 +4185,7 @@
   (eval-after-load "haskell-mode"
     '(progn
        (when (fboundp 'ghc-init)
+         ;; 初期化
          (ghc-init)))))
 
 ;;; nXML モード
