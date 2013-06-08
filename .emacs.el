@@ -168,31 +168,68 @@
               (delete-file file)))))
     (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)))
 
-;; インストール
-(defun apt-get-install ()
-  "apt-get install"
-  (interactive)
+;;; ルートパスワードキャッシュ
+(defun password-cache-sudo ()
+  "Cache root password."
+  (let ((key "sudo")
+        (prompt (concat "[sudo] password for "
+                        (user-login-name) ": ")))
+    (if (and (require 'password-cache nil t)
+             (fboundp 'password-in-cache-p)
+             (fboundp 'password-read-from-cache)
+             (fboundp 'password-read-and-add))
+        (progn
+          (when (boundp 'password-cache-expiry)
+            (setq password-cache-expiry 3600))
+          (if (password-in-cache-p key)
+              (password-read-from-cache key)
+            (password-read-and-add prompt key)))
+      (read-passwd prompt))))
+
+;;; インストール (apt-get)
+(defun apt-get-install (program)
+  "Execute apt-get command."
+  (interactive "sInstall: ")
   (if (executable-find "apt-get")
-      (let ((lst '("fonts-monapo" "devhelp" "stl-manual"
-                   "hyperspec" "sbcl-doc" "ghc-doc"
-                   "migemo" "cmigemo" "ddskk" "skktools"
-                   "sdcv" "mew" "mew-bin" "stunnel4"
-                   "libxpm-dev" "w3m" "exuberant-ctags"
-                   "slime" "sbcl" "clisp" "ecl"
-                   "gauche" "gauche-dev"
-                   "libgmp-dev" "libgmp3c2" "perltidy"))
-            (mes "*Messages*")
-            (passwd (read-passwd (concat "[sudo] password for "
-                                         (user-login-name) ": ")))
-            command)
-        (dolist (l lst)
-          (setq command (concat command " " l)))
+      (let ((passwd (password-cache-sudo))
+            (out " *apt-get*"))
         (shell-command
          (concat "echo "
                  (shell-quote-argument passwd)
-                 " | sudo -S apt-get -y install " command) mes))))
+                 " | sudo -S apt-get -y install " program) out out))
+    (message "not found `apt-get'")))
 
-;; レポジトリ更新
+;;; アップデート (apt-get)
+(defun apt-get-update ()
+  "Execute apt-get command."
+  (interactive)
+  (if (executable-find "apt-get")
+      (let ((passwd (password-cache-sudo))
+            (out " *apt-get*"))
+        (shell-command
+         (concat "echo "
+                 (shell-quote-argument passwd)
+                 " | sudo -S apt-get update") out out))
+    (message "not found `apt-get'")))
+
+;;; 必要なパッケージ全てインストール
+(defun apt-get-install-all ()
+  "Execute apt-get command. all install."
+  (interactive)
+  (let ((lst '("fonts-monapo" "devhelp" "stl-manual" "python2.7-doc"
+               "hyperspec" "sbcl-doc" "ghc-doc"
+               "migemo" "cmigemo" "ddskk" "skktools"
+               "sdcv" "mew" "mew-bin" "stunnel4"
+               "libxpm-dev" "w3m" "exuberant-ctags"
+               "slime" "sbcl" "clisp" "ecl"
+               "gauche" "gauche-dev"
+               "libgmp-dev" "libgmp3c2" "perltidy"))
+        program)
+    (dolist (l lst)
+      (setq program (concat l " " program)))
+    (apt-get-install program)))
+
+;;; レポジトリ更新
 (defun update-repositories ()
   "git clone or pull. bm, magit and others."
   (interactive)
@@ -227,7 +264,7 @@
           (message "not directory %s" base)))
     (message "not found `git'")))
 
-;; Emacswiki
+;;; Emacswiki 全て取得
 (defun update-emacswiki ()
   "git clone. bm and magit."
   (interactive)
