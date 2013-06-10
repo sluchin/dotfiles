@@ -771,9 +771,7 @@
   ;; sudo apt-get install ghc-doc
   (let ((lst '(("stl" "/usr/share/doc/stl-manual/html/index.html")
                ("python" "/usr/share/doc/python2.7/html/index.html")
-               ("python-ja"
-                (expand-file-name
-                 "~/.emacs.d/html/python-doc-2.7ja1-html/index.html"))
+               ("python-ja" "~/.emacs.d/html/python-doc-2.7ja1-html/index.html")
                ("cl" "/usr/share/doc/hyperspec/Front/index_tx.htm")
                ("sbcl" "/usr/share/doc/sbcl-doc/html/index.html")
                ("clisp" "~/.emacs.d/html/clisp-doc/impnotes.html")
