@@ -218,11 +218,11 @@
   (interactive)
   (let ((lst '("fonts-monapo" "devhelp" "stl-manual" "python2.7-doc"
                "hyperspec" "sbcl-doc" "ghc-doc"
-               "migemo" "cmigemo" "ddskk" "skktools"
-               "sdcv" "mew" "mew-bin" "stunnel4"
+               "migemo" "cmigemo" "ddskk" "skktools" "sdcv"
+               "mew" "mew-bin" "stunnel4"
                "libxpm-dev" "w3m" "exuberant-ctags"
-               "slime" "sbcl" "clisp" "ecl"
-               "gauche" "gauche-dev"
+               "slime" "sbcl" "clisp" "ecl" "gauche" "gauche-dev"
+               "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
                "libgmp-dev" "libgmp3c2" "perltidy"))
         program)
     (dolist (l lst)
@@ -574,14 +574,6 @@
 (when (locate-library "info")
   (autoload 'info "info" "Enter Info, the documentation browser." t)
 
-  ;; info ディレクトリ追加
-  (let ((info-dir (expand-file-name "~/.emacs.d/info")))
-    (when (and (file-directory-p info-dir) (file-readable-p info-dir)
-               (boundp 'Info-directory-list))
-      (setq Info-directory-list (cons info-dir
-                                      Info-default-directory-list))
-      (message "Info-directory-list: %s" Info-directory-list)))
-
   (defun info-apropos-region-or-word ()
     "Info apropos from region or word."
     (interactive)
@@ -591,8 +583,26 @@
   (define-key global-map (kbd "C-c C-i") 'info-apropos-region-or-word)
   (define-key global-map (kbd "C-h C-i") 'info-lookup-symbol)
 
+  (dolist (pg '("emacs" "emacs-ja" "elisp" "elisp-ja" "gauche-refe" "gauche-refj"
+                "guile-2.0" "libc" "perl-ja" "python" "tcl" "tramp_ja"
+                "org-ja" "mew.jis" "emacs-w3m" "emacs-w3m-ja"))
+    (let ((cmd (intern (format "%s-info" pg))))
+      (defalias cmd
+        `(lambda (&optional node)
+           "Read documentation in the info system."
+           (interactive)
+           (info (format "(%s)%s" ,pg (or node "")))))))
+
   (eval-after-load "info"
     '(progn
+       ;; info ディレクトリ追加
+       (let ((info-dir (expand-file-name "~/.emacs.d/info")))
+         (when (and (file-directory-p info-dir) (file-readable-p info-dir)
+                    (boundp 'Info-directory-list))
+           (setq Info-directory-list (cons info-dir
+                                           Info-default-directory-list))
+           (message "Info-directory-list: %s" Info-directory-list)))
+
        ;; ヘッダラインを使用しない
        (when (boundp 'Info-use-header-line)
          (setq Info-use-header-line nil))
@@ -603,52 +613,6 @@
          ;; 履歴 戻る (デフォルト: l)
          (define-key Info-mode-map (kbd "<M-left>") 'Info-history-back))
        (message "Loading %s (info)...done" this-file-name))))
-
-(when (locate-library "info")
-  ;; Emacs info
-  (defun emacs-info (&optional node)
-    "Read documentation for Emacs in the info system."
-    (interactive) (info (format "(emacs)%s" (or node ""))))
-  ;; Emacs info 日本語
-  (defun emacs-ja-info (&optional node)
-    "Read documentation for Emacs-ja in the info system."
-    (interactive) (info (format "(emacs-ja)%s" (or node ""))))
-  ;; Emacs Lisp info
-  (defun elisp-info (&optional node)
-    "Read documentation for Elisp in the info system."
-    (interactive) (info (format "(elisp)%s" (or node ""))))
-  ;; Emacs Lisp info 日本語
-  (defun elisp-ja-info (&optional node)
-    "Read documentation for Elisp-ja in the info system."
-    (interactive) (info (format "(elisp-ja)%s" (or node ""))))
-  ;; Gauche info
-  (defun gauche-info (&optional node)
-    "Read documentation for gauche in the info system."
-    (interactive) (info (format "(gauche-refe.info)%s" (or node ""))))
-  ;; Gauche info 日本語
-  (defun gauche-ja-info (&optional node)
-    "Read documentation for gauche in the info system."
-    (interactive) (info (format "(gauche-refj.info)%s" (or node ""))))
-  ;; libc info
-  (defun libc-info (&optional node)
-    "Read documentation for libc in the info system."
-    (interactive) (info (format "(libc)%s" (or node ""))))
-  ;; Perl info 日本語
-  (defun perl-ja-info (&optional node)
-    "Read documentation for perl in the info system."
-    (interactive) (info (format "(perl-ja)%s" (or node ""))))
-  ;; Python info
-  (defun python-info (&optional node)
-    "Read documentation for python in the info system."
-    (interactive) (info (format "(python)%s" (or node ""))))
-  ;; Tcl/Tk info
-  (defun tcl-info (&optional node)
-    "Read documentation for Tcl/Tk in the info system."
-    (interactive) (info (format "(tcl)%s" (or node ""))))
-  ;; Tramp info 日本語
-  (defun tramp-ja-info (&optional node)
-    "Read documentation for Tramp japanese manual in the info system."
-    (interactive) (info (format "(tramp_ja)%s" (or node "")))))
 
 ;;; ヘルプ
 (when (locate-library "help")
@@ -1786,12 +1750,6 @@
 (defun org-reference ()
   "Open reference for Org-mode."
   (interactive) (find-file "~/.emacs.d/org/reference-card.org"))
-
-;; org-mode 日本語 info
-(when (locate-library "info")
-  (defun org-ja-info (&optional node)
-    "Read documentation for Org-mode japanese in the info system."
-    (interactive) (info (format "(org-ja)%s" (or node "")))))
 
 ;; 仕事用 GTD ファイルを開く
 (defun gtd ()
@@ -3164,12 +3122,6 @@
 
 ;;; メール
 ;; sudo apt-get install mew mew-bin stunnel4
-;; Mew info
-(when (locate-library "info")
-  (defun mew-info (&optional node)
-    "Read documentation for Mew in the info system."
-    (interactive) (info (format "(mew.jis.info)%s" (or node "")))))
-
 (when (locate-library "mew")
   (autoload 'mew "mew" "Mailer on Emacs." t)
   (autoload 'mew-send "mew" "Send mail." t)
@@ -3400,17 +3352,6 @@
 ;; sudo apt-get install w3m
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot login
 ;; cvs -d :pserver:anonymous@cvs.namazu.org:/storage/cvsroot co emacs-w3m
-;; emacs-w3m info
-(when (locate-library "info")
-  ;; emacs-w3m info
-  (defun w3m-info (&optional node)
-    "Read documentation for emacs-w3m in the info system."
-    (interactive) (info (format "(emacs-w3m)%s" (or node ""))))
-  ;; emacs-w3m info 日本語
-  (defun w3m-ja-info (&optional node)
-    "Read documentation for emacs-w3m-ja in the info system."
-    (interactive) (info (format "(emacs-w3m-ja)%s" (or node "")))))
-
 (when (and (executable-find "w3m") (locate-library "w3m"))
   (autoload 'w3m "w3m" "Interface for w3m on Emacs." t)
   (autoload 'w3m-find-file "w3m" "w3m interface function for local file." t)
@@ -4133,7 +4074,7 @@
 ;; Allegro CL  http://www.franz.com/downloads/clp/validate_survey
 ;; Clozure CL  http://ccl.clozure.com/download.html
 ;; CMUCL  http://www.cons.org/cmucl/install.html
-;; sudo apt-get install sbcl clisp ecl
+;; sudo apt-get install sbcl clisp ecl guile-1.8
 (when (locate-library "slime")
   (autoload 'slime "slime" "Superior Lisp Interaction Mode for Emacs." t)
   (autoload 'hyperspec-lookup "hyperspec" "Browse documentation from the Common Lisp HyperSpec." t)
@@ -4154,9 +4095,9 @@
        (when (boundp 'inferior-lisp-program)
          (setq inferior-lisp-program "sbcl"))
        ;; 処理系を変更する (C-u M-x slime)
-       (when (boundp 'slime-lisp-implementation)
+       (when (boundp 'slime-lisp-implementations)
          (setq slime-lisp-implementations
-               `((sbcl ("sbcl") :coding-system utf-8-unix)
+               '((sbcl ("sbcl") :coding-system utf-8-unix)
                  (clisp ("clisp"))
                  (allegro ("alisp"))
                  (ccl ("ccl"))
