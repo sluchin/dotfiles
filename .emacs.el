@@ -223,6 +223,7 @@
                "libxpm-dev" "w3m" "exuberant-ctags"
                "slime" "sbcl" "clisp" "ecl" "gauche" "gauche-dev"
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
+               "clojure" "leiningen"
                "libgmp-dev" "libgmp3c2" "perltidy"))
         program)
     (dolist (l lst)
@@ -245,7 +246,10 @@
                    ("ajc-java-complete" "git://github.com/jixiuf/ajc-java-complete.git")
                    ("yasnippet-java-mode" "https://github.com/nekop/yasnippet-java-mode.git")
                    ("malabar-mode" "git://github.com/espenhw/malabar-mode.git")
-                   ("haskell-mode" "git://github.com/haskell/haskell-mode.git")))
+                   ("haskell-mode" "git://github.com/haskell/haskell-mode.git")
+                   ("clojure-mode" "git://github.com/jochu/clojure-mode.git")
+                   ("swank-clojure" "git://github.com/jochu/swank-clojure.git")
+                   ("nrepl.el" "git://github.com/kingtim/nrepl.el.git")))
             (mes "*Messages*"))
         (if (file-directory-p base)
             (progn
@@ -324,6 +328,8 @@
                 "~/.emacs.d/tomatinho"
                 "~/.emacs.d/pomodoro"
                 "~/.emacs.d/haskell-mode"
+                "~/.emacs.d/clojure-mode"
+                "~/.emacs.d/swank-clojure"
                 "~/.emacs.d/cedet/common"
                 "~/.emacs.d/cedet/ede"
                 "~/.emacs.d/cedet/semantic"
@@ -4074,7 +4080,7 @@
 ;; Allegro CL  http://www.franz.com/downloads/clp/validate_survey
 ;; Clozure CL  http://ccl.clozure.com/download.html
 ;; CMUCL  http://www.cons.org/cmucl/install.html
-;; sudo apt-get install sbcl clisp ecl guile-1.8
+;; sudo apt-get install sbcl clisp ecl
 (when (locate-library "slime")
   (autoload 'slime "slime" "Superior Lisp Interaction Mode for Emacs." t)
   (autoload 'hyperspec-lookup "hyperspec" "Browse documentation from the Common Lisp HyperSpec." t)
@@ -4116,7 +4122,7 @@
          (define-key slime-mode-map (kbd "C-c s") 'slime-selector)))))
 
 ;;; scheme モード
-;; sudo apt-get install gauche gauche-dev
+;; sudo apt-get install gauche gauche-dev guile-1.8
 (when (locate-library "cmuscheme")
   (autoload 'scheme-mode "cmuscheme" "Major mode for Scheme." t)
   (autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
@@ -4130,6 +4136,24 @@
        (when (boundp 'process-coding-system-alist)
          (setq process-coding-system-alist
                (cons '("gosh" utf-8 . utf-8) process-coding-system-alist))))))
+
+;;; clojure モード
+;; lein plugin install swank-clojure 1.4.2
+;; プロジェクト作成: lein new hello
+(when (locate-library "clojure-mode")
+  (autoload 'clojure-mode "clojure-mode" "A major mode for Clojure." t)
+  (autoload 'clojure-jack-in "clojure-mode" "Major mode for Clojure code." t)
+  (eval-after-load "clojure"
+    '(progn
+       (require 'swank-clojure nil t)
+       (require 'assoc nil t)
+       ;; /.clojure 内の各jarファイルにクラスパスを通す
+       (setq swank-clojure-jar-home "~/.m2/repository/swank-clojure/swank-clojure/1.4.2/")
+       ;; slime-lisp-implementationsにclojureの呼び出しコマンドを追加する
+       (swank-clojure-reset-implementation))))
+
+(when (locate-library "swank-clojure")
+  (autoload 'swank-clojure-init "swank-clojure" "slime adapter for clojure"))
 
 ;;; haskell モード
 ;; git clone git://github.com/haskell/haskell-mode.git
