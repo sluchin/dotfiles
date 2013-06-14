@@ -144,6 +144,21 @@
           (copy-file file copy t)
           (message "%s" file))))))
 
+;;; サブディレクトリに load-path を追加
+(defun add-to-load-path (&rest paths)
+  (dolist (path paths)
+
+    (let ((default-directory (expand-file-name
+                              (concat user-emacs-directory path))))
+      (unless (file-directory-p default-directory)
+        (make-directory default-directory))
+      (unless (member default-directory load-path)
+        (add-to-list 'load-path default-directory))
+      (message "default-directory: %s" default-directory)
+      (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
+          (normal-top-level-add-subdirs-to-load-path))
+      (message "load-path: %s" load-path))))
+
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
@@ -303,6 +318,7 @@
                   "/usr/local/share/gtags") load-path)))
 (setq load-path
       (append '("~/.emacs.d"
+                "~/.emacs.d/el-get/el-get"
                 "~/.emacs.d/howm"
                 "~/.emacs.d/navi2ch"
                 "~/.emacs.d/magit"
@@ -330,12 +346,103 @@
                 "~/.emacs.d/haskell-mode"
                 "~/.emacs.d/clojure-mode"
                 "~/.emacs.d/swank-clojure"
+                "~/.emacs.d/nrepl.el"
                 "~/.emacs.d/cedet/common"
                 "~/.emacs.d/cedet/ede"
                 "~/.emacs.d/cedet/semantic"
                 "~/.emacs.d/cedet/semantic/bovine"
                 "~/.emacs.d/cedet/speedbar"
                 "~/.emacs.d/auto-install") load-path))
+
+;;; el-get
+(unless (locate-library "el-get")
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
+
+(when (locate-library "el-get")
+  (autoload 'el-get-list-package "el-get" "Display a list of packages." t)
+  (autoload 'el-get-install "el-get" "Cause the named PACKAGE to be installed." t)
+  (autoload 'el-get-self-update "el-get" "Update el-get itself." t)
+  (autoload 'el-get-update-all "el-get" "Performs update of all installed packages." t)
+  (autoload 'el-get-emacswiki-refresh "el-get" "Performs update of all installed packages." t)
+  (autoload 'el-get-elpa-build-local-recipes "el-get" "Performs update of all installed packages." t)
+
+  ;; el-get-sources からインストール
+  (defun el-get-install-all ()
+    "el-get-install from el-get-sources."
+    (interactive)
+    (when (and (require 'el-get nil t)
+               (boundp 'el-get-sources)
+               (fboundp 'el-get-install))
+      (dolist (src el-get-sources)
+        (let ((name (plist-get src :name)))
+          (el-get-install name)))))
+
+  (eval-after-load "el-get"
+    '(progn
+       ;; インストール先
+       (when (boundp 'el-get-dir)
+         (setq el-get-dir "~/.emacs.d/elisp"))
+       ;; レシピ
+       (when (boundp 'el-get-sources)
+         (setq el-get-sources
+               '((:name bm
+                        :type github
+                        :pkgname "joodland/bm")
+                 (:name magit
+                        :type github
+                        :pkgname "magit/magit")
+                 (:name twittering-mode
+                        :type github
+                        :pkgname "hayamiz/twittering-mode")
+                 (:name yasnippet
+                        :type github
+                        :pkgname "capitaomorte/yasnippet")
+                 (:name tomatinho
+                        :type github
+                        :pkgname "konr/tomatinho")
+                 (:name auto-complete-clang
+                        :type github
+                        :pkgname "brianjcj/auto-complete-clang")
+                 (:name ajc-java-complete
+                        :type github
+                        :pkgname "jixiuf/ajc-java-complete")
+                 (:name yasnippet-java-mode
+                        :type github
+                        :pkgname "nekop/yasnippet-java-mode")
+                 (:name malabar-mode
+                        :type github
+                        :pkgname "espenhw/malabar-mode")
+                 (:name haskell-mode
+                        :type github
+                        :pkgname "haskell/haskell-mode")
+                 (:name clojure-mode
+                        :type github
+                        :pkgname "jochu/clojure-mode")
+                 (:name swank-clojure
+                        :type github
+                        :pkgname "jochu/swank-clojure")
+                 (:name nrepl
+                        :type github
+                        :pkgname "kingtim/nrepl.el")
+                 (:name navi2ch
+                        :type github
+                        :description "Navigator for 2ch for Emacsen"
+                        :website "http://navi2ch.sourceforge.net/"
+                        :pkgname "naota/navi2ch"))))
+       ;; autoload を自動生成しない
+       (when (boundp 'el-get-generate-autoloads)
+         (setq el-get-generate-autoloads nil))
+       ;; update-directory-autoloads を無効にする
+       ;; time-less-p でエラーになるため
+       (defalias 'update-directory-autoloads (lambda (&rest dirs) nil))
+       (message "Loading %s (el-get)...done" this-file-name))))
+
+;;; ディレクトリ配下全て load-path に追加
+(add-to-load-path "elisp")
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
@@ -1041,14 +1148,7 @@
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
-(define-key global-map (kbd "<f2>")
-  (lambda ()
-    "Toggle debug-on-error."
-    (interactive)
-    (if debug-on-error
-        (setq debug-on-error nil)
-      (setq debug-on-error t))
-    (message "debug-on-error %s" debug-on-error)))
+(define-key global-map (kbd "<f2>") 'toggle-debug-on-error)
 
 ;; f3 でロードする
 (when (boundp 'emacs-lisp-mode-map)
@@ -2218,21 +2318,21 @@
 ;; (install-elisp-from-emacswiki "igrep.el")
 (when (locate-library "igrep")
   (autoload 'igrep "igrep"
-    "*Run `grep` PROGRAM to match REGEX in FILES..." t)
+    "*Run `grep' PROGRAM to match REGEX in FILES..." t)
   (autoload 'igrep-find "igrep"
-    "*Run `grep` via `find`..." t)
+    "*Run `grep' via `find`..." t)
   (autoload 'igrep-visited-files "igrep"
-    "*Run `grep` ... on all visited files." t)
+    "*Run `grep' ... on all visited files." t)
   (autoload 'dired-do-igrep "igrep"
-    "*Run `grep` on the marked (or next prefix ARG) files." t)
+    "*Run `grep' on the marked (or next prefix ARG) files." t)
   (autoload 'dired-do-igrep-find "igrep"
-    "*Run `grep` via `find` on the marked (or next prefix ARG) directories." t)
+    "*Run `grep' via `find` on the marked (or next prefix ARG) directories." t)
   (autoload 'Buffer-menu-igrep "igrep"
-    "*Run `grep` on the files visited in buffers marked with '>'." t)
+    "*Run `grep' on the files visited in buffers marked with '>'." t)
   (autoload 'igrep-insinuate "igrep"
     "Define `grep' aliases for the corresponding `igrep' commands." t)
   (autoload 'grep "igrep"
-    "*Run `grep` PROGRAM to match REGEX in FILES..." t)
+    "*Run `grep' PROGRAM to match REGEX in FILES..." t)
 
   (defun kill-grep-all-buffer ()
     "Kill grep buffer."
@@ -3191,12 +3291,6 @@
          (setq mew-ask-range nil))
        (when (boundp 'mew-scan-form-mark-delete) ; 重複メールに削除マーク
          (setq mew-scan-form-mark-delete t))
-       (when (boundp 'mew-use-cached-passwd)     ; パスワードの保持
-         (setq mew-use-cached-passwd t))
-       (when (boundp 'mew-passwd-timer-unit)     ; lifetime の単位
-         (setq mew-passwd-timer-unit 60))
-       (when (boundp 'mew-passwd-lifetime)       ; 120 hours
-         (setq mew-passwd-lifetime 120))
        (when (boundp 'mew-use-biff)              ; 着信通知
          (setq mew-use-biff t))
        (when (boundp 'mew-use-biff-bell)         ; ベルを鳴らさない
@@ -3205,6 +3299,14 @@
          (setq mew-biff-interval 3))
        (when (boundp 'mew-auto-get)              ; 起動時取得しない
          (setq mew-auto-get nil))
+
+       ;; パスワード
+       (when (boundp 'mew-use-cached-passwd)     ; パスワードの保持
+         (setq mew-use-cached-passwd t))
+       (when (boundp 'mew-passwd-timer-unit)     ; lifetime の単位
+         (setq mew-passwd-timer-unit 60))
+       (when (boundp 'mew-passwd-lifetime)       ; 120 hours
+         (setq mew-passwd-lifetime 120))
 
        ;; モードラインにアイコンとメールの数を表示する
        (defun mew-propertized-biff-icon (fmt)
