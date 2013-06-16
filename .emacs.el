@@ -147,7 +147,6 @@
 ;;; サブディレクトリに load-path を追加
 (defun add-to-load-path (&rest paths)
   (dolist (path paths)
-
     (let ((default-directory (expand-file-name
                               (concat user-emacs-directory path))))
       (unless (file-directory-p default-directory)
@@ -169,7 +168,7 @@
   (interactive)
   (when (and (require 'em-glob nil t)
              (fboundp 'eshell-extended-glob))
-    (let ((dir (read-directory-name "Directory: " "~/.emacs.d"))
+    (let ((dir (read-directory-name "Directory: " user-emacs-directory))
           files)
       (setq files (append (eshell-extended-glob
                            (concat (file-name-as-directory dir)
@@ -181,7 +180,7 @@
             (progn
               (message "delete file: %s" file)
               (delete-file file)))))
-    (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)))
+    (byte-recompile-directory user-emacs-directory 0 t)))
 
 ;;; ルートパスワードキャッシュ
 (defun password-cache-sudo ()
@@ -355,12 +354,16 @@
                 "~/.emacs.d/auto-install") load-path))
 
 ;;; el-get
-(unless (locate-library "el-get")
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
-    (goto-char (point-max))
-    (eval-print-last-sexp)))
+(defun install-el-get ()
+  "Install el-get."
+  (interactive)
+  (if (locate-library "el-get")
+      (message "Already el-get installed.")
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+      (goto-char (point-max))
+      (eval-print-last-sexp))))
 
 (when (locate-library "el-get")
   (autoload 'el-get-list-package "el-get" "Display a list of packages." t)
@@ -842,7 +845,7 @@
   ;; その他マニュアル
   ;; sudo apt-get install stl-manual python2.7-doc
   ;; http://keihanna.dl.sourceforge.jp/pythonjp/54307/python-doc-2.7ja1-html.tar.gz
-  ;; sudo apt-get install hyperspec sbcl-doc
+  ;; sudo apt-get install hyperspec sbcl-doc clisp-doc
   ;; wget http://ftp.gnu.org/pub/gnu/clisp/release/2.49/clisp-2.49.tar.gz
   ;; git clone git://git.code.sf.net/p/ecls/ecl-doc ecl-doc
   ;; sudo apt-get install ghc-doc
@@ -851,7 +854,7 @@
                ("python-ja" "~/.emacs.d/html/python-doc-2.7ja1-html/index.html")
                ("cl" "/usr/share/doc/hyperspec/Front/index_tx.htm")
                ("sbcl" "/usr/share/doc/sbcl-doc/html/index.html")
-               ("clisp" "~/.emacs.d/html/clisp-doc/impnotes.html")
+               ("clisp" "/usr/share/doc/clisp/clisp/doc/impnotes.html")
                ("ecl" "~/.emacs.d/html/ecl-doc/html/index.html")
                ("haskell" "/usr/share/doc/ghc-doc/html/index.html"))))
     (dolist (l lst)
