@@ -317,15 +317,11 @@
                   "/usr/local/share/gtags") load-path)))
 (setq load-path
       (append '("~/.emacs.d"
+                "~/.emacs.d/conf"
                 "~/.emacs.d/el-get/el-get"
                 "~/.emacs.d/howm"
-                "~/.emacs.d/navi2ch"
-                "~/.emacs.d/magit"
-                "~/.emacs.d/conf"
-                "~/.emacs.d/twittering-mode"
                 "~/.emacs.d/emacs-w3m"
                 "~/.emacs.d/evernote-mode"
-                "~/.emacs.d/bm"
                 "~/.emacs.d/elpa"
                 "~/.emacs.d/elpa/gh-0.5.3"
                 "~/.emacs.d/elpa/gist-1.0.2"
@@ -334,18 +330,8 @@
                 "~/.emacs.d/elpa/tabulated-list-0"
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
-                "~/.emacs.d/yasnippet"
-                "~/.emacs.d/yasnippet-java-mode"
                 "~/.emacs.d/auto-complete"
-                "~/.emacs.d/auto-complete-clang"
-                "~/.emacs.d/ajc-java-complete"
-                "~/.emacs.d/malabar-mode/lisp"
-                "~/.emacs.d/tomatinho"
-                "~/.emacs.d/pomodoro"
-                "~/.emacs.d/haskell-mode"
-                "~/.emacs.d/clojure-mode"
-                "~/.emacs.d/swank-clojure"
-                "~/.emacs.d/nrepl.el"
+                "~/.emacs.d/pomodoro-technique"
                 "~/.emacs.d/cedet/common"
                 "~/.emacs.d/cedet/ede"
                 "~/.emacs.d/cedet/semantic"
@@ -366,76 +352,39 @@
       (eval-print-last-sexp))))
 
 (when (locate-library "el-get")
-  (autoload 'el-get-list-package "el-get" "Display a list of packages." t)
-  (autoload 'el-get-install "el-get" "Cause the named PACKAGE to be installed." t)
-  (autoload 'el-get-self-update "el-get" "Update el-get itself." t)
-  (autoload 'el-get-update-all "el-get" "Performs update of all installed packages." t)
-  (autoload 'el-get-emacswiki-refresh "el-get" "Performs update of all installed packages." t)
-  (autoload 'el-get-elpa-build-local-recipes "el-get" "Performs update of all installed packages." t)
+  (autoload 'el-get-list-package "el-get"
+    "Display a list of packages." t)
+  (autoload 'el-get-install "el-get"
+    "Cause the named PACKAGE to be installed." t)
+  (autoload 'el-get-self-update "el-get"
+    "Update el-get itself." t)
+  (autoload 'el-get-update-all "el-get"
+    "Performs update of all installed packages." t)
+  (autoload 'el-get-emacswiki-refresh "el-get"
+    "Performs update of all installed packages." t)
+  (autoload 'el-get-elpa-build-local-recipes "el-get"
+    "Performs update of all installed packages." t)
+  (autoload 'el-get "el-get"
+    "Ensure that packages have been downloaded once and init them as needed." t)
 
-  ;; el-get-sources からインストール
   (defun el-get-install-all ()
-    "el-get-install from el-get-sources."
+    "el-get-install packages."
     (interactive)
     (when (and (require 'el-get nil t)
-               (boundp 'el-get-sources)
+               (boundp 'el-get-packages)
                (fboundp 'el-get-install))
-      (dolist (src el-get-sources)
-        (let ((name (plist-get src :name)))
-          (el-get-install name)))))
+      (dolist (package el-get-packages)
+        (message "package: %s" package)
+        (el-get-install package))))
 
   (eval-after-load "el-get"
     '(progn
        ;; インストール先
        (when (boundp 'el-get-dir)
          (setq el-get-dir "~/.emacs.d/elisp"))
-       ;; レシピ
-       (when (boundp 'el-get-sources)
-         (setq el-get-sources
-               '((:name bm
-                        :type github
-                        :pkgname "joodland/bm")
-                 (:name magit
-                        :type github
-                        :pkgname "magit/magit")
-                 (:name twittering-mode
-                        :type github
-                        :pkgname "hayamiz/twittering-mode")
-                 (:name yasnippet
-                        :type github
-                        :pkgname "capitaomorte/yasnippet")
-                 (:name tomatinho
-                        :type github
-                        :pkgname "konr/tomatinho")
-                 (:name auto-complete-clang
-                        :type github
-                        :pkgname "brianjcj/auto-complete-clang")
-                 (:name ajc-java-complete
-                        :type github
-                        :pkgname "jixiuf/ajc-java-complete")
-                 (:name yasnippet-java-mode
-                        :type github
-                        :pkgname "nekop/yasnippet-java-mode")
-                 (:name malabar-mode
-                        :type github
-                        :pkgname "espenhw/malabar-mode")
-                 (:name haskell-mode
-                        :type github
-                        :pkgname "haskell/haskell-mode")
-                 (:name clojure-mode
-                        :type github
-                        :pkgname "jochu/clojure-mode")
-                 (:name swank-clojure
-                        :type github
-                        :pkgname "jochu/swank-clojure")
-                 (:name nrepl
-                        :type github
-                        :pkgname "kingtim/nrepl.el")
-                 (:name navi2ch
-                        :type github
-                        :description "Navigator for 2ch for Emacsen"
-                        :website "http://navi2ch.sourceforge.net/"
-                        :pkgname "naota/navi2ch"))))
+       ;; パッケージリスト
+       (when (locate-library "el-get-packages")
+         (load "el-get-packages"))
        ;; autoload を自動生成しない
        (when (boundp 'el-get-generate-autoloads)
          (setq el-get-generate-autoloads nil))
@@ -2569,7 +2518,7 @@
          (setq anything-grep-candidates-fast-directory-regexp "^/tmp")))))
 
 ;;; タブ
-;; (install-elisp "http://www.emacswiki.org/emacs/download/tabbar.el")
+;; (install-elisp-from-emacswiki "tabbar.el")
 (when (locate-library "tabbar")
   (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
   ;; タブ表示
@@ -3168,7 +3117,7 @@
 (eval-and-compile
   (when (eq system-type 'windows-nt)
     ;; Windows のショートカットをリンクできるようにする
-    ;; (install-elisp "http://centaur.maths.qmw.ac.uk/Emacs/files/w32-symlinks.el")
+    ;; (install-elisp-from-emacswiki "w32-symlinks.el")
     (when (and (require 'ls-lisp nil t) (require 'w32-symlinks nil t))
       (custom-set-variables '(w32-symlinks-handle-shortcuts t))
       ;; NTEmacs で動かすための設定
@@ -3185,7 +3134,7 @@
             (insert (w32-symlinks-parse-symlink file))))))
 
     ;; dired で Windows に関連付けられたアプリを起動する
-    ;; (install-elisp "http://www.emacswiki.org/emacs/download/w32-shell-execute.el")
+    ;; (install-elisp-from-emacswiki "w32-shell-execute.el")
     (when (and (require 'w32-shell-execute nil t)
                (fboundp 'w32-shell-execute))
       (defun uenox-dired-winstart ()
@@ -3207,8 +3156,8 @@
 ;; sudo apt-get install sdcv
 ;; ~/stardict に辞書を展開
 ;; sudo ln -s ~/stardict /usr/share/stardict/dic/eijiro
-;; (install-elisp "http://www.emacswiki.org/cgi-bin/emacs/download/showtip.el")
-;; (install-elisp "http://www.emacswiki.org/emacs/download/sdcv.el")
+;; (install-elisp-from-emacswiki "showtip.el")
+;; (install-elisp-from-emacswiki "sdcv.el")
 (when window-system
   (when (let ((dir  "/usr/share/stardict/dic/eijiro/"))
           (and (executable-find "sdcv") (locate-library "sdcv")
@@ -4181,7 +4130,7 @@
 
 ;;; Common Lisp
 ;; sudo apt-get install slime
-;; (install-elisp "https://github.com/purcell/ac-slime/raw/master/ac-slime.el")
+;; git clone git://github.com/purcell/ac-slime.git
 ;; Allegro CL  http://www.franz.com/downloads/clp/validate_survey
 ;; Clozure CL  http://ccl.clozure.com/download.html
 ;; CMUCL  http://www.cons.org/cmucl/install.html
@@ -4467,7 +4416,7 @@
 ;;; Perl
 ;; (install-elisp-from-emacswiki "anything.el")
 ;; (install-elisp-from-emacswiki "perl-completion.el")
-;; (install-elisp "http://www.emacswiki.org/emacs/download/perltidy.el")
+;; (install-elisp-from-emacswiki "perltidy.el")
 ;; sudo apt-get install perltidy
 ;; sudo cpan -i Class::Inspector
 (when (locate-library "cperl-mode")
