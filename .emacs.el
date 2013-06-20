@@ -787,7 +787,7 @@
     (defun w3m-gtk-lookup ()
       "Gtk lookup for w3m."
       (interactive)
-      (let ((browse-url-browser-function 'w3m-browse-url))
+      (let ((browse-url-browser-function 'w3m-goto-url-new-session))
         (call-interactively 'gtk-lookup-symbol)))
     (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
 
@@ -2197,6 +2197,67 @@
                (append '("CVS" "\\.svn" "\\.git")
                        file-cache-filter-regexps))))))
 
+;;; RSS Reader
+(when (locate-library "newsticker")
+  (autoload 'newsticker-start "newsticker" "Emacs Newsticker" t)
+  (autoload 'newsticker-show-news "newsticker" "Emacs Newsticker" t)
+  (autoload 'newsticker-browse-url "newsticker" "Emacs Newsticker" t)
+  (autoload 'newsticker-treeview-browse-url "newsticker" "Emacs Newsticker" t)
+  (eval-after-load "newsticker"
+    '(progn
+       ;; URL リスト
+       (when (boundp 'newsticker-url-list)
+         (setq newsticker-url-list
+               '(("Linux.com" "http://www.linux.com/feature?theme=rss")
+                 ("CNN Topstory" "http://rss.cnn.com/rss/edition.rss")
+                 ("デイリーポータルＺ" "http://portal.nifty.com/rss/headline.rdf")
+                 ("asahi.com" "http://www3.asahi.com/rss/index.rdf")
+                 ("スラッシュドット・ジャパン" "http://slashdot.jp/slashdotjp.rss")
+                 ("ITmedia 速報" "http://rss.itmedia.co.jp/rss/2.0/news_bursts.xml")
+                 ("ITmedia 国内" "http://rss.itmedia.co.jp/rss/2.0/news_domestic.xml")
+                 ("ITmedia 海外" "http://rss.itmedia.co.jp/rss/2.0/news_foreign.xml")
+                 ("ITmedia 科学" "http://rss.itmedia.co.jp/rss/2.0/news_technology.xml")
+                 ("ITmedia ネット" "http://rss.itmedia.co.jp/rss/2.0/news_nettopics.xml")
+                 ("ITmedia セキュリティ" "http://rss.itmedia.co.jp/rss/2.0/news_security.xml")
+                 ("ITmedia 製品" "http://rss.itmedia.co.jp/rss/2.0/news_products.xml")
+                 ("日経BP" "http://feed.nikkeibp.co.jp/rss/nikkeibp/index.rdf")
+                 ("CNET Japan" "http://japan.cnet.com/rss/index.rdf")
+                 ("M$ セキュリティ" "http://www.microsoft.com/japan/technet/rss/articles_rss.aspx?category=029")
+                 ("404 Blog Not Found" "http://blog.livedoor.jp/dankogai/index.rdf")
+                 ("結城浩の日記" "http://www.hyuki.com/d/rss.xml")
+                 ("場末Ｐ科病院の精神科医のblog" "http://blog.livedoor.jp/beziehungswahn/index.rdf")
+                 ("2chまとめサイトのまとめ" "http://www.mudainodocument.com/index.rdf")
+                 ("アルファルファモザイク" "http://alfalfalfa.com/index.rdf")
+                 ("痛いニュース(ﾉ∀`)" "http://blog.livedoor.jp/dqnplus/index.rdf")
+                 ("【2ch】ニュー速クオリティ" "http://news4vip.livedoor.biz/index.rdf"))))
+       ;; デフォルトブラウザで開く
+       (defun newsticker-browse-url-from-default ()
+         "Browse url from default browser."
+         (interactive)
+         (let ((browse-url-browser-function 'browse-url-default-browser))
+           (call-interactively 'newsticker-treeview-browse-url)))
+       ;; w3m で開く
+       (defun newsticker-browse-url-from-w3m ()
+         "Browse url from w3m."
+         (interactive)
+         (let ((browse-url-browser-function 'w3m-browse-url))
+           (call-interactively 'newsticker-treeview-browse-url)
+           (select-window (newsticker--treeview-item-window))
+           (switch-to-buffer "*w3m*")))
+       ;; 選択
+       (defun newsticker-browse-choice ()
+         "newsticker browse choice."
+         (interactive)
+         (execute-choice-from-list
+          "Browse: "
+          '((?d "default(d)" newsticker-browse-url-from-default)
+            (?3 "w3m(3)"     newsticker-browse-url-from-w3m))))
+       (when (boundp 'newsticker-treeview-list-mode-map)
+         (define-key newsticker-treeview-list-mode-map (kbd "v") 'newsticker-browse-choice))
+       (when (boundp 'newsticker-treeview-item-mode-map)
+         (define-key newsticker-treeview-item-mode-map (kbd "v") 'newsticker-browse-choice))
+       (message "Loading %s (newsticker)...done" this-file-name))))
+
 ;;; ここまで標準 lisp
 
 ;;; ここから拡張 lisp の設定
@@ -3423,6 +3484,8 @@
     "Search a word using search engines in a new session." t)
   (autoload 'w3m-goto-url-new-session "w3m"
     "Visit World Wide Web pages in a new session." t)
+  (autoload 'w3m-region "w3m"
+    "Render region in current buffer and replace with result." t)
 
   ;; グーグルで検索する
   (defun w3m-search-google ()
@@ -3437,10 +3500,10 @@
   (defun w3m-search-wikipedia ()
     "Search at wikipedia in w3m."
     (interactive)
-    (when (fboundp 'w3m-browse-url)
-      (w3m-browse-url (concat "ja.wikipedia.org/wiki/"
-                              (let ((region (region-or-word)))
-                                (read-string "Wikipedia search: " region t region))))))
+    (when (fboundp 'w3m-goto-url-new-session)
+      (w3m-goto-url-new-session (concat "ja.wikipedia.org/wiki/"
+                                        (let ((region (region-or-word)))
+                                          (read-string "Wikipedia search: " region t region))))))
 
   ;; URL を開く
   (defun w3m-url-at-point ()
