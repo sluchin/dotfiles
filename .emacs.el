@@ -2209,6 +2209,7 @@
        (when (boundp 'newsticker-url-list)
          (setq newsticker-url-list
                '(("Linux.com" "http://www.linux.com/feature?theme=rss")
+                 ("Linux Journal" "http://blip.tv/linux-journal/rss/itunes")
                  ("CNN Topstory" "http://rss.cnn.com/rss/edition.rss")
                  ("デイリーポータルＺ" "http://portal.nifty.com/rss/headline.rdf")
                  ("asahi.com" "http://www3.asahi.com/rss/index.rdf")
@@ -2226,7 +2227,8 @@
                  ("404 Blog Not Found" "http://blog.livedoor.jp/dankogai/index.rdf")
                  ("結城浩の日記" "http://www.hyuki.com/d/rss.xml")
                  ("場末Ｐ科病院の精神科医のblog" "http://blog.livedoor.jp/beziehungswahn/index.rdf")
-                 ("2chまとめサイトのまとめ" "http://www.mudainodocument.com/index.rdf")
+                 ("2chまとめサイトのまとめ" "http://labo.tv/2chnews/index.xml")
+                 ("無題ドキュメント" "http://www.mudainodocument.com/index.rdf")
                  ("アルファルファモザイク" "http://alfalfalfa.com/index.rdf")
                  ("痛いニュース(ﾉ∀`)" "http://blog.livedoor.jp/dqnplus/index.rdf")
                  ("【2ch】ニュー速クオリティ" "http://news4vip.livedoor.biz/index.rdf"))))
