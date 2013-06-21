@@ -2011,6 +2011,23 @@
          (org-remember-insinuate))
        (message "Loading %s (org-remember)...done" this-file-name))))
 
+;; org-feed 設定
+;; C-c C-x g
+(when (locate-library "org-feed")
+  (defun org-find-file-feed ()
+    "Open org-feed file."
+    (interactive)
+    (find-file (concat (file-name-as-directory
+                        (catch 'found (find-directory "org"))) "feeds.org")))
+  (eval-after-load "org-feed"
+    '(progn
+
+       (when (locate-library "org-feed-alist")
+         (load "org-feed-alist"))
+       (when (boundp org-feed-default-template)
+         (setq org-feed-default-template "\n* %u - %h %description\n %a"))
+       (message "Loading %s (org-feed)...done" this-file-name))))
+
 ;; org-mode キーバインド
 (when (and (locate-library "org")
            (locate-library "org-agenda")
@@ -2024,6 +2041,7 @@
      '((?a "agenda(a)"    org-agenda)
        (?r "rmember(r)"   org-remember)
        (?c "coding(c)"    org-remember-code-reading)
+       (?f "feed(f)"      org-find-file-feed)
        (?s "storelink(s)" org-store-link)
        (?i "iswitchb(i)"  org-iswitchb)
        (?d "dired(d)"     org-dired)
@@ -2199,39 +2217,33 @@
 
 ;;; RSS Reader
 (when (locate-library "newsticker")
-  (autoload 'newsticker-start "newsticker" "Emacs Newsticker" t)
+  (autoload 'newsticker-start "newsticker" "Start Newsticker" t)
   (autoload 'newsticker-show-news "newsticker" "Emacs Newsticker" t)
-  (autoload 'newsticker-browse-url "newsticker" "Emacs Newsticker" t)
-  (autoload 'newsticker-treeview-browse-url "newsticker" "Emacs Newsticker" t)
+
   (eval-after-load "newsticker"
     '(progn
-       ;; URL リスト
-       (when (boundp 'newsticker-url-list)
-         (setq newsticker-url-list
-               '(("Linux.com" "http://www.linux.com/feature?theme=rss")
-                 ("Linux Journal" "http://blip.tv/linux-journal/rss/itunes")
-                 ("CNN Topstory" "http://rss.cnn.com/rss/edition.rss")
-                 ("デイリーポータルＺ" "http://portal.nifty.com/rss/headline.rdf")
-                 ("asahi.com" "http://www3.asahi.com/rss/index.rdf")
-                 ("スラッシュドット・ジャパン" "http://slashdot.jp/slashdotjp.rss")
-                 ("ITmedia 速報" "http://rss.itmedia.co.jp/rss/2.0/news_bursts.xml")
-                 ("ITmedia 国内" "http://rss.itmedia.co.jp/rss/2.0/news_domestic.xml")
-                 ("ITmedia 海外" "http://rss.itmedia.co.jp/rss/2.0/news_foreign.xml")
-                 ("ITmedia 科学" "http://rss.itmedia.co.jp/rss/2.0/news_technology.xml")
-                 ("ITmedia ネット" "http://rss.itmedia.co.jp/rss/2.0/news_nettopics.xml")
-                 ("ITmedia セキュリティ" "http://rss.itmedia.co.jp/rss/2.0/news_security.xml")
-                 ("ITmedia 製品" "http://rss.itmedia.co.jp/rss/2.0/news_products.xml")
-                 ("日経BP" "http://feed.nikkeibp.co.jp/rss/nikkeibp/index.rdf")
-                 ("CNET Japan" "http://japan.cnet.com/rss/index.rdf")
-                 ("M$ セキュリティ" "http://www.microsoft.com/japan/technet/rss/articles_rss.aspx?category=029")
-                 ("404 Blog Not Found" "http://blog.livedoor.jp/dankogai/index.rdf")
-                 ("結城浩の日記" "http://www.hyuki.com/d/rss.xml")
-                 ("場末Ｐ科病院の精神科医のblog" "http://blog.livedoor.jp/beziehungswahn/index.rdf")
-                 ("2chまとめサイトのまとめ" "http://labo.tv/2chnews/index.xml")
-                 ("無題ドキュメント" "http://www.mudainodocument.com/index.rdf")
-                 ("アルファルファモザイク" "http://alfalfalfa.com/index.rdf")
-                 ("痛いニュース(ﾉ∀`)" "http://blog.livedoor.jp/dqnplus/index.rdf")
-                 ("【2ch】ニュー速クオリティ" "http://news4vip.livedoor.biz/index.rdf"))))
+       ;; ディレクトリ
+       (when (boundp 'newsticker-dir)
+         (setq newsticker-dir (catch 'found (find-directory "newsticker"))))
+       ;; URL 設定
+       (when (locate-library "newsticker-url")
+         (load "newsticker-url"))
+       ;; 全文変換
+       (let ((lst newsticker-url-list)
+             temp)
+         (dolist (l lst)
+           (let ((title (car l))
+                 (url (car (cdr l))))
+             (when (and (not (string-match "http://fulltextrssfeed.com/" url))
+                        (not (string-match "blip.tv" url)) ; Linux Journal
+                        (= (string-match "http://" url) 0))
+               (setq url (replace-match "http://fulltextrssfeed.com/" nil nil url)))
+             (add-to-list 'temp `(,title ,url))))
+         (setq newsticker-url-list temp)
+         (message "newsticker-url-list: %s" newsticker-url-list))
+       ;; HTML 対応
+       (when (boundp 'newsticker-html-renderer)
+         (setq newsticker-html-renderer 'w3m-region))
        ;; デフォルトブラウザで開く
        (defun newsticker-browse-url-from-default ()
          "Browse url from default browser."
