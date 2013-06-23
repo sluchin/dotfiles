@@ -2071,7 +2071,8 @@
           '("/TAGS$" "^/var/tmp/" "^/tmp/"
             "~$" "/$" "/howm/" "\\.howm-keys$" "\\.howm-history$"
             "/\\.emacs\\.bmk$" "\\.emacs\\.d/bookmarks$"
-            "\\.pomodoro$" "/org/.*\\.org" "/.eshell/alias$")))
+            "\\.pomodoro$" "/org/.*\\.org" "/.eshell/alias$"
+            "newsticker/groups$" "/gnus/" "/nnrss/")))
 
   ;; 開いたファイルを選択しない
   (when (boundp 'recentf-menu-action)
@@ -2220,6 +2221,11 @@
   (autoload 'newsticker-start "newsticker" "Start Newsticker" t)
   (autoload 'newsticker-show-news "newsticker" "Emacs Newsticker" t)
 
+  ;; 空白強調表示しない
+  (let ((hook (lambda () (setq show-trailing-whitespace nil))))
+    (add-hook 'newsticker-treeview-item-mode-hook hook)
+    (add-hook 'newsticker-treeview-list-mode-hook hook))
+
   (eval-after-load "newsticker"
     '(progn
        ;; ディレクトリ
@@ -2241,9 +2247,42 @@
              (add-to-list 'temp `(,title ,url))))
          (setq newsticker-url-list temp)
          (message "newsticker-url-list: %s" newsticker-url-list))
+       ;; デフォルトリスト
+       (when (boundp 'newsticker-url-list-defaults)
+         (setq newsticker-url-list-defaults nil))
        ;; HTML 対応
        (when (boundp 'newsticker-html-renderer)
          (setq newsticker-html-renderer 'w3m-region))
+       ;; 日時フォーマット
+       (when (boundp 'newsticker-date-format)
+         (setq newsticker-date-format "[%Y-%m-%d %H:%M:%S]"))
+       ;; 古い記事の色
+       (set-face-foreground 'newsticker-treeview-obsolete-face "cyan")
+       (set-face-attribute 'newsticker-treeview-obsolete-face nil :strike-through nil)
+       ;; 更新時に未読を保持
+       (when (boundp 'newsticker-automatically-mark-items-as-old)
+         (setq newsticker-automatically-mark-items-as-old nil))
+       ;; 訪問したファイルを自動で古い記事にしない
+       (when (boundp 'newsticker-automatically-mark-visited-items-as-old)
+         (setq newsticker-automatically-mark-visited-items-as-old nil))
+       ;; 古い記事を保持する
+       (when (boundp 'newsticker-keep-obsolete-items)
+         (setq newsticker-keep-obsolete-items t))
+       ;; 期間
+       (when (boundp 'newsticker-obsolete-item-max-age)
+         (setq newsticker-obsolete-item-max-age  (* 180 (* 60 60 24)))) ; 180日
+       ;; 更新間隔
+       (when (boundp 'newsticker-retrieval-interval)
+         (setq newsticker-retrieval-interval (* 1 (* 60 60 24))))
+       ;; 高さ
+       (when (boundp 'newsticker-treeview-listwindow-height)
+         (setq newsticker-treeview-listwindow-height 15))
+       ;; 幅
+       (when (boundp 'newsticker-treeview-treewindow-width)
+         (setq newsticker-treeview-treewindow-width 40))
+       ;; デバック
+       (when (boundp 'newsticker-debug)
+         (setq newsticker-debug t))
        ;; デフォルトブラウザで開く
        (defun newsticker-browse-url-from-default ()
          "Browse url from default browser."
@@ -2271,6 +2310,48 @@
        (when (boundp 'newsticker-treeview-item-mode-map)
          (define-key newsticker-treeview-item-mode-map (kbd "v") 'newsticker-browse-choice))
        (message "Loading %s (newsticker)...done" this-file-name))))
+
+;;; Gnus
+(when (locate-library "gnus")
+  (autoload 'gnus "gnus" "News reader." t)
+
+  (eval-after-load "gnus"
+    '(progn
+       (when (boundp 'gnus-read-newsrc-file)
+         (setq gnus-read-newsrc-file nil))
+       (when (boundp 'gnus-save-newsrc-file)
+         (setq gnus-save-newsrc-file nil))
+       (when (boundp 'gnus-directory)
+         (setq gnus-directory (catch 'found (find-directory "gnus"))))
+       (when (boundp 'gnus-home-directory)
+         (setq gnus-home-directory (catch 'found (find-directory "gnus"))))
+       (when (boundp 'gnus-select-method)
+         (setq gnus-select-method '(nnml "")))
+       (when (boundp 'gnus-secondary-select-methods)
+         (setq gnus-secondary-select-methods nil))
+       (message "Loading %s (gnus)...done" this-file-name)
+
+       (when (locate-library "nnrss")
+         (autoload 'nnrss-opml-import "nnrss" "RSS reader." t)
+
+         (eval-after-load "nnrss"
+           '(progn
+              ;; ディレクトリ
+              (when (boundp 'nnrss-directory)
+                (setq nnrss-directory (catch 'found (find-directory "nnrss"))))
+              (message "Loading %s (nnrss)...done" this-file-name))))
+
+       (when (and (locate-library "mm-url")
+                  (executable-find "lynx"))
+         (eval-after-load "mm-url"
+           '(progn
+              (when (boundp 'mm-url-use-external)
+                (setq mm-url-use-external t))
+              (when (boundp 'mm-url-program)
+                (setq mm-url-program "lynx"))
+              (when (boundp 'mm-url-arguments)
+                (setq mm-url-arguments '("-source" "-useragent" "Drupal")))
+              (message "Loading %s (mm-url)...done" this-file-name)))))))
 
 ;;; ここまで標準 lisp
 
@@ -2636,6 +2717,7 @@
                          ((string= "*Apropos*" (buffer-name b)) b)
                          ((string-match "*Open Recent*\\|*Recentf*"
                                         (buffer-name b)) b)
+                         ((string= "*Group*" (buffer-name b)) b)
                          ((string= "*Diff*" (buffer-name b)) b)
                          ((string= "*compilation*" (buffer-name b)) b)
                          ((string= "*haskell*" (buffer-name b)) b)
