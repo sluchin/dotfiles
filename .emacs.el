@@ -2280,6 +2280,9 @@
        ;; 幅
        (when (boundp 'newsticker-treeview-treewindow-width)
          (setq newsticker-treeview-treewindow-width 40))
+       ;; wget を使用する
+       (when (boundp 'newsticker-retrieval-method)
+         (setq newsticker-retrieval-method 'extern))
        ;; デバック
        (when (boundp 'newsticker-debug)
          (setq newsticker-debug t))
@@ -2481,7 +2484,19 @@
 ;; 編集後 C-c C-e, C-x s !
 (when (locate-library "grep-edit")
   (add-hook 'grep-mode-hook
-            (lambda () (require 'grep-edit nil t))))
+            (lambda () (require 'grep-edit nil t)))
+  (add-hook 'grep-setup-hook
+            (lambda ()
+              (require 'grep-edit nil t)
+              (when (boundp 'grep-mode-map)
+                (define-key grep-mode-map '[up] nil)
+                (define-key grep-mode-map (kbd "C-c C-c") 'grep-edit-finish-edit)
+                (message (substitute-command-keys "\\[grep-edit-finish-edit] to apply changes.")))
+              (set (make-local-variable 'inhibit-read-only) t)))
+  (defadvice grep-edit-change-file
+    (around inhibit-read-only activate)
+    (let ((inhibit-read-only t))
+      ad-do-it)))
 
 ;;; リドゥ
 ;; (install-elisp-from-emacswiki "redo+.el")
