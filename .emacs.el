@@ -2281,7 +2281,8 @@
        (when (boundp 'newsticker-treeview-treewindow-width)
          (setq newsticker-treeview-treewindow-width 40))
        ;; wget を使用する
-       (when (boundp 'newsticker-retrieval-method)
+       (when (and (executable-find "wget")
+                  (boundp 'newsticker-retrieval-method))
          (setq newsticker-retrieval-method 'extern))
        ;; デバック
        (when (boundp 'newsticker-debug)
