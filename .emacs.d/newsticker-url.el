@@ -31,6 +31,7 @@
           ("404 Blog Not Found" "http://blog.livedoor.jp/dankogai/index.rdf" nil 86400)
           ("結城浩の日記" "http://www.hyuki.com/d/rss.xml" nil 86400)
           ("場末Ｐ科病院の精神科医のblog" "http://blog.livedoor.jp/beziehungswahn/index.rdf" nil 86400)
+          ("プログラマー社長のブログ" "http://blogs.itmedia.co.jp/komata/index.rdf" nil 86400)
           ("2chまとめサイトのまとめ" "http://labo.tv/2chnews/index.xml" nil 1800)
           ("無題ドキュメント" "http://www.mudainodocument.com/index.rdf" nil 1800)
           ("アルファルファモザイク" "http://alfalfalfa.com/index.rdf" nil 1800)

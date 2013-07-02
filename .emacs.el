@@ -597,8 +597,8 @@
            (yas/minor-mode        . " υ")
            (paredit-mode          . " π")
            (gtags-mode            . " ν")
-           (eldoc-mode            .   "")
-           (abbrev-mode           .   "")
+           (eldoc-mode            .    "")
+           (abbrev-mode           .    "")
            ;; メジャーモード
            (lisp-interaction-mode .  "λ")
            (emacs-lisp-mode       .  "ε")
@@ -645,24 +645,14 @@
          (setq default-frame-alist
                (append (list '(width  . 95)
                              '(height . 62)
-                             '(top    . 10)
-                             '(left   .  5)
                              '(cursor-color . "white"))
                        default-frame-alist)))
         ((<= 1050 (x-display-pixel-height))
          (setq default-frame-alist
                (append (list '(width  . 100)
                              '(height .  75)
-                             '(top    .  10)
-                             '(left   .   5)
                              '(cursor-color . "white"))
-                       default-frame-alist)))
-        (t
-         (when (not (eq system-type 'windows-nt))
-           (if (= 900 (x-display-pixel-height))
-               ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-               (set-frame-size (selected-frame) 110 54)
-             (set-frame-size (selected-frame) 110 70)))))
+                       default-frame-alist))))
 
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
