@@ -13,6 +13,9 @@
 ;; 2012-11-27
 ;; GNU Emacs 23.3.1 (i686-pc-linux-gnu, GTK+ Version 2.24.10)
 
+;; 2013-07-02
+;; GNU Emacs 21.4.1 (CentOS release 5.9)
+
 ;;; 起動オプション
 ;; 設定を読み込まない起動オプション
 ;; emacs23 -q --no-site-file
@@ -34,13 +37,14 @@
 ;;; require 時間を計測する
 (defvar benchmark-alist nil
   "Time of require alist.")
-(defadvice require
-  (around require-benchmark
-          (feature &optional filename noerror)
-          activate compile)
-  (let ((time (car (benchmark-run ad-do-it))))
-    (unless (assq (ad-get-arg 0) benchmark-alist)
-      (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time)))))
+(when (fboundp 'benchmark-run)
+  (defadvice require
+    (around require-benchmark
+            (feature &optional filename noerror)
+            activate compile)
+    (let ((time (car (benchmark-run ad-do-it))))
+      (unless (assq (ad-get-arg 0) benchmark-alist)
+        (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time))))))
 
 ;;; require 時間表示
 (defun print-require-benchmark ()
@@ -147,7 +151,10 @@
 ;;; サブディレクトリに load-path を追加
 (defun add-to-load-path (&rest paths)
   (dolist (path paths)
-    (let ((default-directory (expand-file-name
+    (let* ((user-emacs-directory (if (boundp 'user-emacs-directory)
+                                     user-emacs-directory
+                                   "~/"))
+           (default-directory (expand-file-name
                               (concat user-emacs-directory path))))
       (unless (file-directory-p default-directory)
         (make-directory default-directory))
@@ -343,13 +350,15 @@
 (defun install-el-get ()
   "Install el-get."
   (interactive)
-  (if (locate-library "el-get")
-      (message "Already el-get installed.")
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
-      (goto-char (point-max))
-      (eval-print-last-sexp))))
+  (if (executable-find "git")
+      (if (locate-library "el-get")
+          (message "Already el-get installed.")
+        (with-current-buffer
+            (url-retrieve-synchronously
+             "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+          (goto-char (point-max))
+          (eval-print-last-sexp)))
+    (message "not found `git'")))
 
 (when (locate-library "el-get")
   (autoload 'el-get-list-package "el-get"
@@ -370,12 +379,14 @@
   (defun el-get-install-all ()
     "el-get-install packages."
     (interactive)
-    (when (and (require 'el-get nil t)
-               (boundp 'el-get-packages)
-               (fboundp 'el-get-install))
-      (dolist (package el-get-packages)
-        (message "package: %s" package)
-        (el-get-install package))))
+    (if (executable-find "git")
+        (when (and (require 'el-get nil t)
+                   (boundp 'el-get-packages)
+                   (fboundp 'el-get-install))
+          (dolist (package el-get-packages)
+            (message "package: %s" package)
+            (el-get-install package)))
+      (message "not found `git'")))
 
   (eval-after-load "el-get"
     '(progn
@@ -403,24 +414,26 @@
 ;; (list-coding-systems)
 ;; (install-elisp "http://nijino.homelinux.net/emacs/cp5022x.el")
 (eval-and-compile (require 'cp5022x nil t))
-(set-default-coding-systems 'utf-8-emacs)
-(setq default-file-name-coding-system 'utf-8-emacs)
+(set-default-coding-systems 'utf-8)
+(setq default-file-name-coding-system 'utf-8)
 ;; 日本語入力のための設定
-(prefer-coding-system 'utf-8-emacs)
+(prefer-coding-system 'utf-8)
 
 ;; charset の優先度設定
-(set-charset-priority 'ascii
-                      'japanese-jisx0208
-                      'latin-jisx0201
-                      'katakana-jisx0201
-                      'iso-8859-1
-                      'cp1252
-                      'unicode)
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'ascii
+                        'japanese-jisx0208
+                        'latin-jisx0201
+                        'katakana-jisx0201
+                        'iso-8859-1
+                        'cp1252
+                        'unicode))
 ;; coding-system の優先度設定
-(set-coding-system-priority 'utf-8
-                            'euc-jp
-                            'iso-2022-jp
-                            'cp932)
+(when (fboundp 'set-coding-system-priority)
+  (set-coding-system-priority 'utf-8
+                              'euc-jp
+                              'iso-2022-jp
+                              'cp932))
 
 ;;; フォントの設定
 ;; Linux と Windows で変える
@@ -432,16 +445,33 @@
          ;; Windowsの場合
          (set-face-attribute 'default nil
                              :family "Lucida Console"
-                             :height 80)
-         (set-fontset-font nil 'japanese-jisx0208
-                           (font-spec :family "Hiragino Mincho Pro")))
+                             :height 90)
+         (if (fboundp 'font-spec)
+             (set-fontset-font "fontset-default" 'japanese-jisx0208
+                               (font-spec :family "Hiragino Mincho Pro"
+                                          :size 10))
+           (set-fontset-font "fontset-default" 'japanese-jisx0208
+                             '("Hiragino Mincho Pro" . "jisx0208.*")))
+         (setq face-font-rescale-alist
+               '((".*Lucida.*"      . 1.0)
+                 (".*Hiragino.*" . 1.1)))
+         (when (boundp 'fixed-width-rescale)
+           (setq fixed-width-rescale nil))
+         (setq-default line-spacing 1))
         (t
          ;; それ以外
-         (set-face-attribute 'default nil
-                             :family "Monospace"
-                             :height 80)
-         (set-fontset-font nil 'japanese-jisx0208
-                           (font-spec :family "Hiragino Mincho Pro")))))
+         (if (<= emacs-major-version 21)
+             (set-face-attribute 'default nil
+                                 :family "Monospace"
+                                 :height 120)
+           (set-face-attribute 'default nil
+                               :family "Monospace"
+                               :height 80))
+         (if (fboundp 'font-spec)
+             (set-fontset-font "fontset-default" 'japanese-jisx0208
+                               (font-spec :family "Hiragino Mincho Pro"))
+           (set-fontset-font "fontset-default" 'japanese-jisx0208
+                             '("Hiragino Mincho Pro" . "jisx0208.*"))))))
 
 ;; モナーフォントに変更する
 ;; モナーフォントをインストールしておくこと
@@ -488,8 +518,10 @@
 
   (setq-default header-line-format '(which-func-mode ("" which-func-format)))
   ;; 色
-  (set-face-foreground 'which-func "chocolate1")
-  (set-face-bold-p 'which-func t)
+  (when (and (not (eq system-type 'windows-nt))
+             (< 21 emacs-major-version))
+    (set-face-foreground 'which-func "chocolate1")
+    (set-face-bold-p 'which-func t))
 
   ;; ヘッダラインとモードラインをトグルする
   (defun toggle-header-which-func ()
@@ -565,16 +597,16 @@
            (yas/minor-mode        . " υ")
            (paredit-mode          . " π")
            (gtags-mode            . " ν")
-           (eldoc-mode            . "")
-           (abbrev-mode           . "")
+           (eldoc-mode            .   "")
+           (abbrev-mode           .   "")
            ;; メジャーモード
-           (lisp-interaction-mode . "λ")
-           (emacs-lisp-mode       . "ε")
-           (ruby-mode             . "в")
-           (python-mode           . "φ")
-           (cperl-mode            . "ψ")
-           (nxml-mode             . "χ")
-           (twittering-mode       . "ω"))))
+           (lisp-interaction-mode .  "λ")
+           (emacs-lisp-mode       .  "ε")
+           (ruby-mode             .  "в")
+           (python-mode           .  "φ")
+           (cperl-mode            .  "ψ")
+           (nxml-mode             .  "χ")
+           (twittering-mode       .  "ω"))))
     (dolist (mode modes)
       (let* ((name (car mode))
              (short (cdr mode))
@@ -609,10 +641,29 @@
 ;; 高さ (frame-height)
 (when window-system
   ;; 起動時のフレームサイズ
-  (if (= 900 (x-display-pixel-height))
-      ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-      (set-frame-size (selected-frame) 110 54)
-    (set-frame-size (selected-frame) 110 70))
+  (cond ((< (x-display-pixel-height) 1050)
+         (setq default-frame-alist
+               (append (list '(width  . 95)
+                             '(height . 62)
+                             '(top    . 10)
+                             '(left   .  5)
+                             '(cursor-color . "white"))
+                       default-frame-alist)))
+        ((<= 1050 (x-display-pixel-height))
+         (setq default-frame-alist
+               (append (list '(width  . 100)
+                             '(height .  75)
+                             '(top    .  10)
+                             '(left   .   5)
+                             '(cursor-color . "white"))
+                       default-frame-alist)))
+        (t
+         (when (not (eq system-type 'windows-nt))
+           (if (= 900 (x-display-pixel-height))
+               ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
+               (set-frame-size (selected-frame) 110 54)
+             (set-frame-size (selected-frame) 110 70)))))
+
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
     "Resize frame interactively."
@@ -862,7 +913,8 @@
 (setq message-log-max 1001000)
 
 ;;; 履歴を保存する
-(savehist-mode 1)
+(when (fboundp 'savehist-mode)
+  (savehist-mode 1))
 
 ;;; シンボリックリンクを実名にする
 (setq find-file-visit-truename t)
@@ -1353,8 +1405,13 @@
                 (setq ls-lisp-dirs-first t)))
              ((eq system-type 'gnu/linux)
               ;; GNU オプションも使う
-              (setq dired-listing-switches
-                    "-alF --time-style=long-iso --group-directories-first"))
+              ;; CentOS の場合
+              (if (file-readable-p "/etc/redhat-release")
+                  (setq dired-listing-switches
+                        "-alF --time-style=long-iso")
+                ;; Ubuntu の場合 ("/etc/lsb-release")
+                (setq dired-listing-switches
+                      "-alF --time-style=long-iso --group-directories-first")))
              (t
               ;; POSIX オプションのみ
               (setq dired-listing-switches "-alF")))
@@ -1506,7 +1563,9 @@
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
-(when (and (window-system) (locate-library "speedbar"))
+(when (and (fboundp 'window-system)
+           (window-system)
+           (locate-library "speedbar"))
   (autoload 'speedbar-get-focus "speedbar"
     "Change frame focus to or from the speedbar frame." t)
   ;; フォントをデフォルトにする
@@ -2210,7 +2269,10 @@
   (eval-after-load "filecache"
     '(progn
        (when (fboundp 'file-cache-add-directory-list)
-         (file-cache-add-directory-list (list "~" "~/bin")))
+         (file-cache-add-directory-list (list "~" ))
+         (let ((home-bin "~/bin"))
+           (when (file-directory-p home-bin)
+             (add-to-list 'file-cache-add-directory-list `(,home-bin)))))
        (when (boundp 'file-cache-filter-regexps)
          (setq file-cache-filter-regexps
                (append '("CVS" "\\.svn" "\\.git")
