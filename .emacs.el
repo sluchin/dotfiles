@@ -1951,7 +1951,10 @@
        ;; Todo で使用するキーワードを定義。
        (when (boundp 'org-todo-keywords)
          (setq org-todo-keywords
-               '((sequence "TODO(t)" "WAIT(w)" "DONE(d)" "CANCELED(c)"))))
+               '((sequence "TODO(t)" "WAIT(w)" "SOMEDAY(s)" "CANCELED(c)" "DONE(d)"))))
+       ;; DONEの時刻を記録
+       (when (boundp 'org-log-done)
+         (setq org-log-done 'time))
        (message "Loading %s (org)...done" this-file-name))))
 
 ;; org-table 設定

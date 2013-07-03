@@ -121,3 +121,4 @@ function _precmd_vcs_info() {
     [[ -n "$vcs_info_msg_2_" ]] && psvar[3]="$vcs_info_msg_2_"
 }
 add-zsh-hook precmd _precmd_vcs_info
+
