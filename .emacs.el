@@ -4105,18 +4105,20 @@
                (result (read-string prompt nil t nil))
                (files (car (cdr (cdr (assoc-string result lst))))))
           (if (and (file-directory-p dir) (file-readable-p dir))
-              (if files
-                  (let (option-string)
-                    (dolist (option options)
-                      (setq option-string (concat option-string  " " option)))
-                    (let (out (cmd (concat
-                                    "find " dir
-                                    " -type f -regex " "\"" files "$\"" " | "
-                                    exec option-string)))
-                      (setq out (shell-command-to-string cmd))
-                      (message "%s" cmd)
-                      (message "%s" out)))
-                (message "no such language"))
+              (progn
+                (setq tags-file-name (concat (file-name-as-directory dir) "TAGS"))
+                (if files
+                    (let (option-string)
+                      (dolist (option options)
+                        (setq option-string (concat option-string  " " option)))
+                      (let (out (cmd (concat
+                                      "find " dir
+                                      " -type f -regex " "\"" files "$\"" " | "
+                                      exec option-string)))
+                        (setq out (shell-command-to-string cmd))
+                        (message "%s" cmd)
+                        (message "%s" out)))
+                  (message "no such language")))
             (message "no such directory: %s" dir))))
     (message "not found %s" exec)))
 
@@ -5064,9 +5066,12 @@
             (save-window-excursion
               (find-file file)
               (switch-to-buffer (file-name-nondirectory file))
-            ;; インデント
-            (execute-indent)
-            (save-buffer)
+              ;; 改行コードを LF にする
+              (when (fboundp 'set-buffer-file-coding-system)
+                (set-buffer-file-coding-system 'utf-8-unix))
+              ;; インデント
+              (execute-indent)
+              (save-buffer)
               (message "kill-buffer: %s" (current-buffer))
               (kill-buffer (current-buffer)))))))))
 
@@ -5097,6 +5102,9 @@
                   (save-window-excursion
                     (find-file file)
                     (switch-to-buffer (file-name-nondirectory file))
+                    ;; 改行コードを LF にする
+                    (when (fboundp 'set-buffer-file-coding-system)
+                      (set-buffer-file-coding-system 'utf-8-unix))
                     ;; インデント
                     (execute-indent)
                     (save-buffer)
