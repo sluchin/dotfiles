@@ -597,8 +597,8 @@
            (yas/minor-mode        . " υ")
            (paredit-mode          . " π")
            (gtags-mode            . " ν")
-           (eldoc-mode            .    "")
-           (abbrev-mode           .    "")
+           (eldoc-mode            .   "")
+           (abbrev-mode           .   "")
            ;; メジャーモード
            (lisp-interaction-mode .  "λ")
            (emacs-lisp-mode       .  "ε")
@@ -641,7 +641,14 @@
 ;; 高さ (frame-height)
 (when window-system
   ;; 起動時のフレームサイズ
-  (cond ((< (x-display-pixel-height) 1050)
+  (cond ((<= (x-display-pixel-height) 600)
+         (setq default-frame-alist
+               (append (list '(width  . 80)
+                             '(height . 38)
+                             '(cursor-color . "white"))
+                       default-frame-alist)))
+        ((and (< 600 (x-display-pixel-height))
+              (< (x-display-pixel-height) 1050))
          (setq default-frame-alist
                (append (list '(width  . 95)
                              '(height . 62)
