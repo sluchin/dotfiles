@@ -4113,7 +4113,8 @@
                (files (car (cdr (cdr (assoc-string result lst))))))
           (if (and (file-directory-p dir) (file-readable-p dir))
               (progn
-                (setq tags-file-name (concat (file-name-as-directory dir) "TAGS"))
+                (setq tags-file-name "TAGS")
+                (cd dir)
                 (if files
                     (let (option-string)
                       (dolist (option options)
@@ -4125,7 +4126,8 @@
                         (setq out (shell-command-to-string cmd))
                         (message "%s" cmd)
                         (message "%s" out)))
-                  (message "no such language")))
+                  (message "no such language"))
+                (cd default))
             (message "no such directory: %s" dir))))
     (message "not found %s" exec)))
 
@@ -5018,12 +5020,13 @@
       (message "[%d] replace-match (`) {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の前の空白挿入
-    (while (re-search-forward "\\([^ =!<>+-\\*/&\\|^(]\\)=\\([^%\\[])\\)" nil t)
+    (while (re-search-forward
+            "\\([^ \\\"\\'=!<>+-\\*/&\\|^(]\\)=\\([^%\\[\\\"\\'])\\)" nil t)
       (replace-match (concat (match-string 1) " =" (match-string 2)) nil t)
       (message "[%d] replace-match (` =')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; = の後ろの空白挿入
-    (while (re-search-forward "=\\([^ =%\\[])\\)" nil t)
+    (while (re-search-forward "=\\([^ =%\\[\\\"\\'])\\)" nil t)
       (replace-match (concat "= " (match-string 1)) nil t)
       (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
     (goto-char (point-min))
