@@ -4963,6 +4963,18 @@
        (message "Can not write: %s" file))
      (message "Write file %s...done" file))))
 
+;;; 空白・タブを変換
+(defun convert-tab-space ()
+    ;; タブをスペースにする
+    (when (fboundp 'untabify)
+      (untabify (point-min) (point-max))
+      (message "untabify...done"))
+    (goto-char (point-min))
+    ;; 末尾の空白削除
+    (when (fboundp 'delete-trailing-whitespace)
+      (delete-trailing-whitespace)
+      (message "delete-trailing-whitespace...done")))
+
 ;;; インデント整形
 (defun execute-indent ()
   "Execute indent."
@@ -4979,12 +4991,8 @@
       (setq tab-width 4))
     (when (boundp 'indent-tabs-mode) ; スペース
       (setq indent-tabs-mode nil)))
+
   (save-excursion
-    (goto-char (point-min))
-    ;; タブをスペースにする
-    (when (fboundp 'untabify)
-      (untabify (point-min) (point-max))
-      (message "untabify...done"))
     (goto-char (point-min))
     ;; if, else if, for, while のカッコの前は空白をいれる
     (while (re-search-forward
@@ -4992,15 +5000,21 @@
       (replace-match (concat (match-string 1) " (") nil t)
       (message "[%d] replace-match (` (')...done" (line-number-at-pos)))
     (goto-char (point-min))
-    ;; else if, else と次のブレスの間に空白をいれる
+    ;; else if と次のブレスの間に空白をいれる
     (while (re-search-forward
-            "\\(else if[ ]*(.*)\\|else\\)\\({\\)" nil t)
+            "\\(else if[ ]*(.*)\\)\\({\\)" nil t)
+      (replace-match (concat (match-string 1) " {") nil t)
+      (message "[%d] replace-match (` {')...done" (line-number-at-pos)))
+    (goto-char (point-min))
+    ;; else と次のブレスの間に空白をいれる
+    (while (re-search-forward
+            "\\(else[^ ]\\)\\({\\)" nil t)
       (replace-match (concat (match-string 1) " {") nil t)
       (message "[%d] replace-match (` {')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; else if, else と次のブレスの間に空白をいれる
     (while (re-search-forward
-            "\\(}\\)\\(else if\\|else\\)" nil t)
+            "\\(}\\)\\(else\\)" nil t)
       (replace-match (concat "} " (match-string 1)) nil t)
       (message "[%d] replace-match (`} ')...done" (line-number-at-pos)))
     (goto-char (point-min))
@@ -5029,17 +5043,6 @@
     (while (re-search-forward "=\\([^ =%\\[\\\"\\'])\\)" nil t)
       (replace-match (concat "= " (match-string 1)) nil t)
       (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
-    (goto-char (point-min))
-    ;; ^M 削除
-    (while (re-search-forward "$" nil t)
-      (replace-match "")
-      (message "[%d] replace-match (`^M')...done" (line-number-at-pos)))
-    (goto-char (point-min))
-    (mark-whole-buffer)
-    ;; 末尾の空白削除
-    (when (fboundp 'delete-trailing-whitespace)
-      (delete-trailing-whitespace)
-      (message "delete-trailing-whitespace...done"))
     (goto-char (point-min))
     ;; インデント
     (when (fboundp 'indent-region)
@@ -5079,6 +5082,8 @@
               ;; 改行コードを LF にする
               (when (fboundp 'set-buffer-file-coding-system)
                 (set-buffer-file-coding-system 'utf-8-unix))
+              ;; 空白・タブ
+              (convert-tab-space)
               ;; インデント
               (execute-indent)
               (save-buffer)
@@ -5115,6 +5120,8 @@
                     ;; 改行コードを LF にする
                     (when (fboundp 'set-buffer-file-coding-system)
                       (set-buffer-file-coding-system 'utf-8-unix))
+                    ;; 空白・タブ
+                    (convert-tab-space)
                     ;; インデント
                     (execute-indent)
                     (save-buffer)
