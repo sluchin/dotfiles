@@ -639,7 +639,8 @@
 ;;; フレームサイズ
 ;; 幅   (frame-width)
 ;; 高さ (frame-height)
-(when window-system
+(defun set-frame-width-height-cursor ()
+  "Set frame size."
   ;; 起動時のフレームサイズ
   (cond ((<= (x-display-pixel-height) 600)
          (setq default-frame-alist
@@ -659,7 +660,11 @@
                (append (list '(width  . 100)
                              '(height .  75)
                              '(cursor-color . "white"))
-                       default-frame-alist))))
+                       default-frame-alist)))))
+
+(when window-system
+  ;; フレームサイズ
+  (set-frame-width-height-cursor)
 
   ;; フレームサイズを動的に変更する
   (defun resize-frame-interactively ()
@@ -1582,10 +1587,7 @@
        (when (boundp 'speedbar-after-create-hook)
          (setq speedbar-after-create-hook
                '(lambda ()
-                  (if (= (x-display-pixel-height) 900)
-                      ;; 自宅のデュアルディスプレイの小さい方に合わせるための設定
-                      (set-frame-size (selected-frame) 30 35)
-                    (set-frame-size (selected-frame) 30 45)))))
+                  (set-frame-width-height-cursor))))
        (when (boundp 'speedbar-use-images)                ; イメージ表示しない
          (setq speedbar-use-images nil))
        (when (boundp 'speedbar-hide-button-brackets-flag) ; ブラケット表示を隠す
@@ -1606,7 +1608,7 @@
        ;; 拡張子の追加
        (when (fboundp 'speedbar-add-supported-extension)
          (speedbar-add-supported-extension
-          '("js" "as" "html" "css" "php" "org" "scala" "gz")))
+          '("js" "as" "html" "css" "php" "rb" "org" "scala" "gz")))
        ;; 隠しファイルの表示
        (when (boundp 'speedbar-directory-unshown-regexp)
          (setq speedbar-directory-unshown-regexp "^\\'"))
@@ -1619,8 +1621,7 @@
          "Get focus and refresh."
          (interactive)
          (speedbar-get-focus)
-         (speedbar-refresh)
-         (speedbar-get-focus))
+         (speedbar-refresh))
 
        ;; キーバインドのカスタマイズ
        (let ((map speedbar-file-key-map))
@@ -1628,6 +1629,8 @@
          (define-key map (kbd "g") 'speedbar-focus-refresh)
          ;; "a" で無視ファイル表示・非表示のトグル
          (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
+         ;; ダブルクリックでファイル開く
+         (define-key map [double-mouse-3] 'dframe-click)
          ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
          (define-key map (kbd "<right>") 'speedbar-expand-line)
          (define-key map (kbd "C-f") 'speedbar-expand-line)
@@ -4024,12 +4027,19 @@
        ;; ローカルバッファ変数にパスを設定
        (defun set-gtags-libpath ()
          "Set gtags-libpath."
-         (let (path-string
-               (dirs '("/usr/include"
-                       "/usr/include/libxml2/libxml" ; libxml2-dev
-                       "/usr/include/event2"         ; libevent-dev
-                       "/usr/src/glibc"              ; eglibc-source
-                       "/usr/src/linux-source")))    ; linux-source-3.2.0
+         (let*
+             (path-string
+              (dirs
+               (if (eq system-type 'windows-nt)
+                   (let (home-dir (getenv "HOME"))
+                     '((concat (file-name-as-directory home-dir) "src/include")
+                       (concat (file-name-as-directory home-dir) "src/glibc")
+                       (concat (file-name-as-directory home-dir) "src/linux")))
+                 '("/usr/include"
+                   "/usr/include/libxml2/libxml" ; libxml2-dev
+                   "/usr/include/event2"         ; libevent-dev
+                   "/usr/src/glibc"              ; eglibc-source
+                   "/usr/src/linux-source"))))   ; linux-source-3.2.0
            (dolist (dir dirs)
              (if (file-readable-p (concat (file-name-as-directory dir) "GTAGS"))
                  (setq path-string (concat path-string dir ":"))
