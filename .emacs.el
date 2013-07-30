@@ -25,6 +25,7 @@
 ;;; NTEmacs 設定
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
+;; 環境変数 CYGWIN に "nodosfilewarning" を設定する
 
 ;;; Code:
 
@@ -2275,7 +2276,7 @@
          (file-cache-add-directory-list (list "~" ))
          (let ((home-bin "~/bin"))
            (when (file-directory-p home-bin)
-             (add-to-list 'file-cache-add-directory-list `(,home-bin)))))
+             (file-cache-add-directory-list `(,home-bin)))))
        (when (boundp 'file-cache-filter-regexps)
          (setq file-cache-filter-regexps
                (append '("CVS" "\\.svn" "\\.git")
