@@ -40,6 +40,7 @@ setopt sh_word_split
 setopt auto_param_keys
 setopt pushd_ignore_dups
 setopt magic_equal_subst
+setopt share_history
 
 # alias
 alias pu=pushd
