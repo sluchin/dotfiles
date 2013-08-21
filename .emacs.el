@@ -2526,6 +2526,8 @@
             (message "kill buffer: %s (%s)" buffer major-mode)
             (when (buffer-live-p buffer)
               (kill-buffer buffer)))))))
+  (when (boundp 'grep-mode-map)
+    (define-key grep-mode-map (kbd "M-k") 'kill-grep-all-buffer))
 
   (eval-after-load "igrep"
     '(progn
@@ -2599,7 +2601,7 @@
   (autoload 'syslog-mode "syslog-ext" "Mode for viewing system logfiles." t)
   (add-to-list
    'auto-mode-alist
-   '("/var/log/.*\\|\\(messages\\|syslog\\|local[0-9]+\\)\\(\\.[1-9]+\\)?\\(\\.gz\\)?$"
+   '("/var/log/.*\\|\\(messages\\|syslog\\|debug\\|local[0-9]+\\)\\(\\.[1-9]+\\)?\\(\\.gz\\)?$"
      . syslog-mode))
 
   ;; 上下分割のみ (デフォルト: 160)
@@ -3415,6 +3417,26 @@
          (when (boundp 'sdcv-dictionary-complete-list)
            (setq sdcv-dictionary-complete-list
                  '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
+         ;; バグのため関数上書き
+         (defun sdcv-search-detail (&optional word)
+           (message "Search...")
+           (with-current-buffer (get-buffer-create sdcv-buffer-name)
+             (setq buffer-read-only nil)
+             (erase-buffer)
+             (let* ((process
+                     (apply 'start-process
+                            (append `("sdcv" ,sdcv-buffer-name "sdcv")
+                                    (sdcv-search-args word sdcv-dictionary-complete-list)))))
+               (set-process-sentinel
+                process
+                (lambda (process signal)
+                  (when (memq (process-status process) '(exit signal))
+                    (unless (eq (current-buffer) (sdcv-get-buffer))
+                      (sdcv-goto-sdcv))
+                    (sdcv-mode-reinit)))))))
+         (defun sdcv-search-args (word dict-list)
+           (append (apply 'append (mapcar (lambda (d) `("-u" ,d)) dict-list))
+                   (list "-n" word)))
          (message "Loading %s (sdcv)...done" this-file-name)))))
 
 ;;; メール
