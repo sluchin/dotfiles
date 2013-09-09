@@ -209,11 +209,11 @@
       (read-passwd prompt))))
 
 ;;; インストール (apt-get)
-(defun apt-get-install (program)
+(defun apt-get-install (program &rest pw)
   "Execute apt-get command."
   (interactive "sInstall: ")
   (if (executable-find "apt-get")
-      (let ((passwd (password-cache-sudo))
+      (let ((passwd (if pw pw (password-cache-sudo)))
             (out " *apt-get*"))
         (shell-command
          (concat "echo "
@@ -245,12 +245,15 @@
                "libxpm-dev" "w3m" "exuberant-ctags"
                "slime" "sbcl" "clisp" "ecl" "gauche" "gauche-dev"
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
-               "clojure" "leiningen"
-               "libgmp-dev" "libgmp3c2" "perltidy"))
+               "clojure1.4" "leiningen"
+               "libgmp-dev" "perltidy"))
+        (passwd (password-cache-sudo))
         program)
     (dolist (l lst)
-      (setq program (concat l " " program)))
-    (apt-get-install program)))
+      (message (concat "==> " l))
+      (setq program (concat program " " l))
+      (apt-get-install l passwd))
+    (message program)))
 
 ;;; レポジトリ更新
 (defun update-repositories ()
@@ -4394,7 +4397,7 @@
          (interactive)
          (execute-choice-from-list
           "yasnippet: "
-          '((?r "reloaad(r)" yas-reload-all)
+          '((?r "reload(r)" yas-reload-all)
             (?i "insert(i)"  yas-insert-snippet)
             (?n "new(n)"     yas-new-snippet)
             (?v "visit(v)"   yas-visit-snippet-file))))
