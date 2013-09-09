@@ -356,9 +356,9 @@ The result will be displayed in buffer named with
     (setq buffer-read-only nil)
     (erase-buffer)
     (let* ((process
-            (apply 'start-process
-                   (append `("sdcv" ,sdcv-buffer-name "sdcv")
-                           (sdcv-search-args word sdcv-dictionary-complete-list)))))
+            (start-process
+             "sdcv" sdcv-buffer-name "sdcv"
+             (sdcv-search-witch-dictionary word sdcv-dictionary-complete-list))))
       (set-process-sentinel
        process
        (lambda (process signal)
@@ -366,10 +366,6 @@ The result will be displayed in buffer named with
            (unless (eq (current-buffer) (sdcv-get-buffer))
              (sdcv-goto-sdcv))
            (sdcv-mode-reinit)))))))
-
-(defun sdcv-search-args (word dict-list)
-  (append (apply 'append (mapcar (lambda (d) `("-u" ,d)) dict-list))
-          (list "-n" word)))
 
 (defun sdcv-search-simple (&optional word)
   "Search WORD simple translate result."
