@@ -3489,6 +3489,27 @@
   ;; emacs 24.2.1 にバグがあるため　bzr trunk の最新ソースをコピー
   (autoload 'notifications-notify "notifications" "Notify TITLE, BODY." t)
 
+  ;; 日報を送信する
+  (defun mew-daily-report ()
+    "Mew send."
+    (interactive)
+    (when (fboundp 'mew-send)
+      (let ((to "team-m-all@itec-hokkaido.co.jp")
+            (subject (concat "日報(" (format-time-string "%Y%m%d") " 東哲也)"))
+            (buffer (current-buffer))
+            (tmp " *daily*")
+            (region ""))
+        (message subject)
+        (progn)
+        (with-output-to-temp-buffer tmp
+          (set-buffer buffer)
+          (when mark-active
+            (setq region (buffer-substring-no-properties (region-beginning) (region-end))))
+          (set-buffer tmp)
+          (unless (equal region "")
+            (insert region)))
+        (mew-send to nil subject))))
+
   (eval-after-load "mew"
     '(progn
        ;; 初期設定
@@ -3507,13 +3528,19 @@
          (setq mew-demo nil))
        ;; 署名の自動挿入
        ;; ホームディレクトリに .signature を作っておく
-       (when (file-readable-p "~/.signature")
-         (add-hook 'mew-draft-mode-newdraft-hook
-                   (lambda ()
-                     (let ((p (point)))
-                       (goto-char (point-max))
-                       (insert-file "~/.signature")
-                       (goto-char p)))))
+       (add-hook 'mew-draft-mode-newdraft-hook
+                 (lambda ()
+                   (let ((sigfile "~/.signature")
+                         (p (point))
+                         (buffer " *daily*"))
+                     (goto-char (point-max))
+                     (message buffer)
+                     (when (not (eq nil (get-buffer buffer)))
+                       (insert-buffer-substring buffer)
+                       (delete-other-windows))
+                     (when (file-readable-p sigfile)
+                       (insert-file sigfile))
+                     (goto-char p))))
        ;; Summary モードの書式変更
        (when (boundp 'mew-summary-form)
          (setq mew-summary-form
@@ -3627,7 +3654,7 @@
        ;; SSL 接続の設定
        (when (string= "gmail.com" mew-mail-domain)
          (when (boundp 'mew-imap-auth)
-           (setq mew-imap-auth  t))
+           (setq mew-imap-auth t))
          (when (boundp 'mew-imap-ssl)
            (setq mew-imap-ssl t))
          (when (boundp 'mew-imap-ssl-port)
@@ -4901,7 +4928,6 @@
   "Conversion from xml to csv for vlc."
   (interactive "fFilename: ")
   (let* ((buffer (current-buffer))
-         (default "vlc.csv")
          (tmp " *xspf")
          tmpbuf)
     (or
@@ -4932,7 +4958,6 @@
   "Check if directory of location tag exists."
   (interactive "fFilename: ")
   (let* ((buffer (current-buffer))
-         (default "check-location")
          (tmp " *xspf")
          string)
     (or
