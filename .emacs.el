@@ -1910,6 +1910,7 @@
   ;; 自動で org-mode にする
   (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 
+  ;; org ディレクトリ
   (defun org-dired ()
     "Open org file at dired."
     (interactive)
@@ -1921,7 +1922,8 @@
                (fboundp 'dired-omit-mode))
       (dired-omit-mode 1)))
 
-  (defun kill-org-all-buffer ()
+  ;; org バッファを閉じる
+  (defun org-kill-all-buffer ()
     "Kill org-mode buffer."
     (interactive)
     (when (and (require 'org nil t)
@@ -1937,6 +1939,59 @@
               (message "kill buffer: %s (%s)" buffer major-mode)
               (when (buffer-live-p buffer)
                 (kill-buffer buffer))))))))
+
+  (defun org-clock-update-time-maybe ()
+    "If this is a CLOCK line, update it and return t.
+Otherwise, return nil."
+    (interactive)
+    (when (and (boundp 'org-clock-string) (boundp 'org-clock-marker)
+               (boundp 'org-clock-start-time) (fboundp 'org-parse-time-string)
+               (fboundp 'org-clock-update-mode-line) (fboundp 'org-float-time))
+      (let ((re (concat "[ \t]*" org-clock-string
+                        " *[[<]\\([^]>]+\\)[]>]\\(-+[[<]\\([^]>]+\\)[]>]"
+                        "\\([ \t]*=>.*\\)?\\)?"))
+            ts te)
+        (setq ts (match-string 1)
+              te (match-string 3))
+        (save-excursion
+          (beginning-of-line 1)
+          (skip-chars-forward " \t")
+          (when (looking-at org-clock-string)
+            (let ((re (concat "[ \t]*" org-clock-string
+                              " *[[<]\\([^]>]+\\)[]>]\\(-+[[<]\\([^]>]+\\)[]>]"
+                              "\\([ \t]*=>.*\\)?\\)?"))
+                  ts te h m s neg)
+              (cond
+               ((not (looking-at re))
+                nil)
+               ((not (match-end 2))
+                (when (and (equal (marker-buffer org-clock-marker) (current-buffer))
+                           (> org-clock-marker (point))
+                           (<= org-clock-marker (point-at-eol)))
+                  ;; The clock is running here
+                  (setq org-clock-start-time
+                        (apply 'encode-time
+                               (org-parse-time-string (match-string 1))))
+                  (org-clock-update-mode-line)))
+               (t
+                (and (match-end 4) (delete-region (match-beginning 4) (match-end 4)))
+                (end-of-line 1)
+                (setq ts (match-string 1)
+                      te (match-string 3))
+                (message "ts: %s, te: %s" ts te)
+                (setq s (- (org-float-time
+                            (apply 'encode-time (org-parse-time-string te)))
+                           (org-float-time
+                            (apply 'encode-time (org-parse-time-string ts)))))
+                (message "s: %d" s)
+                (setq neg (< s 0))
+                (setq s (abs s))
+                (setq h (floor (/ s 3600)))
+                (setq s (- s (* 3600 h)))
+                (setq m (floor (/ s 60)))
+                (setq s (- s (* 60 s)))
+                (insert " => " (format (if neg "-%d:%02d" "%2d:%02d") h m))
+                t))))))))
 
   (autoload 'org-store-link "org"
     "Store an org-link to the current location." t)
@@ -2112,7 +2167,7 @@
        (?s "storelink(s)" org-store-link)
        (?i "iswitchb(i)"  org-iswitchb)
        (?d "dired(d)"     org-dired)
-       (?k "kill(k)"      org-kill-buffer))))
+       (?k "kill(k)"      org-kill-all-buffer))))
   (define-key global-map (kbd "C-c o") 'org-choice))
 
 ;;; ファイル内のカーソル位置を記録する
