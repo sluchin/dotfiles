@@ -264,6 +264,7 @@
             (base (expand-file-name "~/.emacs.d"))
             (lst '(("bm" "git://github.com/joodland/bm.git")
                    ("magit" "git://github.com/magit/magit.git")
+                   ("git-modes" "https://github.com/magit/git-modes")
                    ("twittering-mode" "git://github.com/hayamiz/twittering-mode.git")
                    ("yasnippet" "https://github.com/capitaomorte/yasnippet.git")
                    ("tomatinho" "git://github.com/konr/tomatinho.git")
@@ -3497,18 +3498,36 @@
       (let ((to "team-m-all@itec-hokkaido.co.jp")
             (subject (concat "日報(" (format-time-string "%Y%m%d") " 東哲也)"))
             (buffer (current-buffer))
+            (template "~/.template_daily")
             (tmp " *daily*")
             (region ""))
-        (message subject)
-        (progn)
         (with-output-to-temp-buffer tmp
           (set-buffer buffer)
           (when mark-active
             (setq region (buffer-substring-no-properties (region-beginning) (region-end))))
           (set-buffer tmp)
-          (unless (equal region "")
+          (when (file-readable-p template) ; テンプレート挿入
+            (insert-file-contents template))
+          (goto-char (point-max))
+          (unless (equal region "")        ; リージョン挿入
             (insert region)))
         (mew-send to nil subject))))
+
+  ;; 署名の自動挿入
+  ;; ホームディレクトリに .signature を作っておく
+  (add-hook 'mew-draft-mode-newdraft-hook
+            (lambda ()
+              (let ((sigfile "~/.signature")
+                    (p (point))
+                    (daily " *daily*"))
+                (goto-char (point-max))
+                (when (not (eq nil (get-buffer daily)))
+                  (insert-buffer-substring daily) ; 日報挿入
+                  (delete-other-windows)
+                  (kill-buffer daily))
+                (when (file-readable-p sigfile)   ; 署名
+                  (insert-file-contents sigfile))
+                (goto-char p))))
 
   (eval-after-load "mew"
     '(progn
@@ -3526,21 +3545,6 @@
        ;; 起動デモを表示しない
        (when (boundp 'mew-demo)
          (setq mew-demo nil))
-       ;; 署名の自動挿入
-       ;; ホームディレクトリに .signature を作っておく
-       (add-hook 'mew-draft-mode-newdraft-hook
-                 (lambda ()
-                   (let ((sigfile "~/.signature")
-                         (p (point))
-                         (buffer " *daily*"))
-                     (goto-char (point-max))
-                     (message buffer)
-                     (when (not (eq nil (get-buffer buffer)))
-                       (insert-buffer-substring buffer)
-                       (delete-other-windows))
-                     (when (file-readable-p sigfile)
-                       (insert-file sigfile))
-                     (goto-char p))))
        ;; Summary モードの書式変更
        (when (boundp 'mew-summary-form)
          (setq mew-summary-form

@@ -54,6 +54,7 @@
         ;; github
         bm
         magit
+        git-modes
         twittering-mode
         yasnippet
         ac-slime
@@ -135,6 +136,10 @@
                  :type github
                  :description "control Git from Emacs."
                  :pkgname "magit/magit")
+          (:name git-modes
+                 :type github
+                 :description "Emacs modes for various Git-related files."
+                 :pkgname "magit/git-modes")
           (:name twittering-mode
                  :type github
                  :description "Major mode for Twitter."
@@ -148,7 +153,7 @@
                  :description "Yet another snippet extension for Emacs."
                  :pkgname "capitaomorte/yasnippet")
           (:name ac-slime
-                 :type http
+                 :type github
                  :description "An auto-complete source using slime completions."
                  :pkgname "purcell/ac-slime")
           (:name auto-complete-clang
