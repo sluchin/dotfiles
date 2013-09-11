@@ -3496,7 +3496,7 @@
     (interactive)
     (when (fboundp 'mew-send)
       (let ((to "team-m-all@itec-hokkaido.co.jp")
-            (subject (concat "日報(" (format-time-string "%Y%m%d") " 東哲也)"))
+            (subject (concat "日報 (" (format-time-string "%Y%m%d") " 東哲也)"))
             (buffer (current-buffer))
             (template "~/.template_daily")
             (tmp " *daily*")
