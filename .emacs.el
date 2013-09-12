@@ -1,5 +1,4 @@
-;;; .emacs.el --- Emacs initialize file
-;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
+;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
 ;; Copyright (C) 2012 2013
 
@@ -1372,10 +1371,10 @@
 (when (eval-and-compile (require 'uniquify nil t))
   ;; filename<dir> 形式のバッファ名にする
   (when (boundp 'uniquify-buffer-name-style)
-    (setq uniquify-buffer-name-style 'post-forward-angle-brackets)))
-;; * で囲まれたバッファ名は対象外にする
-(when (boundp 'uniquify-ignore-buffers-re)
-  (setq uniquify-ignore-buffers-re "*[^*]+*"))
+    (setq uniquify-buffer-name-style 'post-forward-angle-brackets))
+  ;; * で囲まれたバッファ名は対象外にする
+  (when (boundp 'uniquify-ignore-buffers-re)
+    (setq uniquify-ignore-buffers-re "*[^*]+*")))
 
 ;;; ファイラ (dired)
 (when (locate-library "info")
