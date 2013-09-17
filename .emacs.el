@@ -5151,10 +5151,10 @@ Otherwise, return nil."
       (replace-match (concat (match-string 1) " {") nil t)
       (message "[%d] replace-match (` {')...done" (line-number-at-pos)))
     (goto-char (point-min))
-    ;; else if, else と次のブレスの間に空白をいれる
+    ;; else if, else, while の前のブレスの間に空白をいれる
     (while (re-search-forward
-            "\\(}\\)\\(else\\)" nil t)
-      (replace-match (concat "} " (match-string 1)) nil t)
+            "\\(}\\)\\(else\\|while\\)" nil t)
+      (replace-match (concat "} " (match-string 2)) nil t)
       (message "[%d] replace-match (`} ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; 開きカッコの次の空白削除
@@ -5183,9 +5183,14 @@ Otherwise, return nil."
       (replace-match (concat "= " (match-string 1)) nil t)
       (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
     (goto-char (point-min))
+    ;; for 文 ; の後ろの空白挿入
+    (while (re-search-forward ";\\([^ ]+\\|.*\\);\\([^ ]+\\|.*\\)" nil t)
+        (replace-match (concat "; " (match-string 1) "; " (match-string 2)) nil t)
+        (message "[%d] replace-match (`; ')...done" (line-number-at-pos)))
+    (goto-char (point-min))
     ;; インデント
-    (when (fboundp 'indent-region)
-      (indent-region (point-min) (point-max))
+    (when (fboundp 'indent-code-regidly)
+      (indent-code-regidly (point-min) (point-max))
       (message "indent-region...done"))
     (goto-char (point-min))
     (mark-whole-buffer)
@@ -5218,7 +5223,7 @@ Otherwise, return nil."
             (save-window-excursion
               (find-file file)
               (switch-to-buffer (file-name-nondirectory file))
-              ;; 改行コードを LF にする
+              ;; 改行コード
               (when (fboundp 'set-buffer-file-coding-system)
                 (set-buffer-file-coding-system 'utf-8-unix))
               ;; 空白・タブ
