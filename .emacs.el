@@ -5206,7 +5206,9 @@ Otherwise, return nil."
 (defun indent-all (dir)
   "Execute indent for all files."
   (interactive "DDirectory: ")
-  (let* ((backup "_BAK")
+  (let* ((indent (y-or-n-p "Execute indent ? "))
+         (space (y-or-n-p "Convert space from tab ? "))
+         (backup "_BAK")
          (default (file-name-directory
                    (or (buffer-file-name (current-buffer)) "")))
          files)
@@ -5230,9 +5232,11 @@ Otherwise, return nil."
               (when (fboundp 'set-buffer-file-coding-system)
                 (set-buffer-file-coding-system 'utf-8-unix))
               ;; インデント
-              ;(execute-indent)
+              (when indent
+                (execute-indent))
               ;; 空白・タブ
-              ;(convert-tab-space)
+              (when space
+                (convert-tab-space))
               (save-buffer)
               (message "kill-buffer: %s" (current-buffer))
               (kill-buffer (current-buffer)))))))))
