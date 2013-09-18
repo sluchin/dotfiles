@@ -5133,9 +5133,9 @@ Otherwise, return nil."
 
   (save-excursion
     (goto-char (point-min))
-    ;; if, else if, for, while のカッコの前は空白をいれる
+    ;; if, else if, for, while, switch のカッコの前は空白をいれる
     (while (re-search-forward
-            "\\(if\\|else if\\|for\\|while\\)\\((\\)" nil t)
+            "\\(if\\|else if\\|for\\|while\\|switch\\)\\((\\)" nil t)
       (replace-match (concat (match-string 1) " (") nil t)
       (message "[%d] replace-match (` (')...done" (line-number-at-pos)))
     (goto-char (point-min))
@@ -5145,9 +5145,9 @@ Otherwise, return nil."
       (replace-match (concat (match-string 1) " {") nil t)
       (message "[%d] replace-match (` {')...done" (line-number-at-pos)))
     (goto-char (point-min))
-    ;; else と次のブレスの間に空白をいれる
+    ;; else, do と次のブレスの間に空白をいれる
     (while (re-search-forward
-            "\\(else[^ ]\\)\\({\\)" nil t)
+            "\\(else\\|do\\)\\({\\)" nil t)
       (replace-match (concat (match-string 1) " {") nil t)
       (message "[%d] replace-match (` {')...done" (line-number-at-pos)))
     (goto-char (point-min))
@@ -5184,8 +5184,10 @@ Otherwise, return nil."
       (message "[%d] replace-match (`= ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; for 文 ; の後ろの空白挿入
-    (while (re-search-forward ";\\([^ ]+\\|.*\\);\\([^ ]+\\|.*\\)" nil t)
-        (replace-match (concat "; " (match-string 1) "; " (match-string 2)) nil t)
+    (while (re-search-forward
+            "\\(for (?.*\\);\\([^ ]?.*\\);\\([^ ]\\)" nil t)
+        (replace-match
+         (concat (match-string 1) "; " (match-string 2) "; " (match-string 3)) nil t)
         (message "[%d] replace-match (`; ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; インデント
@@ -5223,13 +5225,14 @@ Otherwise, return nil."
             (save-window-excursion
               (find-file file)
               (switch-to-buffer (file-name-nondirectory file))
+              (message "buffer: %s" (current-buffer))
               ;; 改行コード
               (when (fboundp 'set-buffer-file-coding-system)
                 (set-buffer-file-coding-system 'utf-8-unix))
-              ;; 空白・タブ
-              (convert-tab-space)
               ;; インデント
-              (execute-indent)
+              ;(execute-indent)
+              ;; 空白・タブ
+              ;(convert-tab-space)
               (save-buffer)
               (message "kill-buffer: %s" (current-buffer))
               (kill-buffer (current-buffer)))))))))
@@ -5265,9 +5268,9 @@ Otherwise, return nil."
                     (when (fboundp 'set-buffer-file-coding-system)
                       (set-buffer-file-coding-system 'utf-8-unix))
                     ;; 空白・タブ
-                    (convert-tab-space)
+                    ;;(convert-tab-space)
                     ;; インデント
-                    (execute-indent)
+                    ;;(execute-indent)
                     (save-buffer)
                     (message "kill-buffer: %s" (current-buffer))
                     (kill-buffer (current-buffer))))))))))))
