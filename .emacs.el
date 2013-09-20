@@ -75,10 +75,10 @@
       (buffer-substring-no-properties (region-beginning) (region-end))
     (thing-at-point 'word)))
 
-;;; ディレクトリ配下すべてのファイルをリストにする
-(defun recursive-directory (dir &optional exclude)
+;;; ディレクトリ配下すべてのファイルまたはディレクトリをリストにする
+(defun recursive-directory (dir &optional exclude flag)
   "Make file list under directory."
-  (let (files)
+  (let (files dirs)
     (unless (listp dir)
       (setq dir (list dir)))
     (dolist (file dir)
@@ -95,8 +95,11 @@
                     recursive) exclude)))
         (when (or (null exclude)
                   (not (string-match exclude file)))
-          (add-to-list 'files file))))
-    files))
+          (if flag
+              (when (file-directory-p file)
+                (add-to-list 'dirs file))
+            (add-to-list 'files file)))))
+    (if flag dirs files)))
 
 ;;; ディレクトリ配下すべてのファイルを表示
 (defun print-files (dir)
@@ -161,8 +164,8 @@
       (unless (member default-directory load-path)
         (add-to-list 'load-path default-directory))
       (message "default-directory: %s" default-directory)
-      (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
-          (normal-top-level-add-subdirs-to-load-path))
+      (when (fboundp 'normal-top-level-add-subdirs-to-load-path)
+        (normal-top-level-add-subdirs-to-load-path))
       (message "load-path: %s" load-path))))
 
 ;;; ロードパスの設定
