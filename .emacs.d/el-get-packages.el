@@ -24,7 +24,7 @@
         auto-async-byte-compile
         usage-memo
         list-processes+
-        w32-symlinks.el
+        w32-symlinks
         w32-shell-execute
         showtip
         sdcv
@@ -68,7 +68,6 @@
         haskell-mode
         clojure-mode
         swank-clojure
-        nrepl
         navi2ch))
 
 (when (boundp 'el-get-sources)
@@ -186,10 +185,6 @@
                  :type github
                  :description "slime adapter for clojure."
                  :pkgname "jochu/swank-clojure")
-          (:name nrepl
-                 :type github
-                 :description "Client for Clojure nREPL."
-                 :pkgname "kingtim/nrepl.el")
           (:name navi2ch
                  :type github
                  :description "Navigator for 2ch for Emacsen."
