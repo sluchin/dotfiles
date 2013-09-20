@@ -189,8 +189,8 @@
                  (file-writable-p file))
             (progn
               (message "delete file: %s" file)
-              (delete-file file)))))
-    (byte-recompile-directory user-emacs-directory 0 t)))
+              (delete-file file))))
+      (byte-recompile-directory dir 0 t))))
 
 ;;; ルートパスワードキャッシュ
 (defun password-cache-sudo ()
@@ -276,8 +276,7 @@
                    ("malabar-mode" "git://github.com/espenhw/malabar-mode.git")
                    ("haskell-mode" "git://github.com/haskell/haskell-mode.git")
                    ("clojure-mode" "git://github.com/jochu/clojure-mode.git")
-                   ("swank-clojure" "git://github.com/jochu/swank-clojure.git")
-                   ("nrepl.el" "git://github.com/kingtim/nrepl.el.git")))
+                   ("swank-clojure" "git://github.com/jochu/swank-clojure.git")))
             (mes "*Messages*"))
         (if (file-directory-p base)
             (progn
@@ -321,6 +320,11 @@
           (message "not directory %s" base)))
     (message "not found `svn'")))
 
+;;; load-path に追加
+;; ディレクトリ配下全て load-path に追加
+(add-to-load-path "elisp")
+(add-to-load-path "elpa")
+
 (when (eq system-type 'gnu/linux)
   (setq load-path
         (append '("/usr/share/emacs/site-lisp/migemo"
@@ -329,6 +333,7 @@
                   "/usr/share/emacs/site-lisp/slime"
                   "/usr/share/emacs/site-lisp/dictionaries-common"
                   "/usr/local/share/gtags") load-path)))
+;; 優先度高
 (setq load-path
       (append '("~/.emacs.d"
                 "~/.emacs.d/conf"
@@ -336,12 +341,6 @@
                 "~/.emacs.d/howm"
                 "~/.emacs.d/emacs-w3m"
                 "~/.emacs.d/evernote-mode"
-                "~/.emacs.d/elpa"
-                "~/.emacs.d/elpa/gh-0.5.3"
-                "~/.emacs.d/elpa/gist-1.0.2"
-                "~/.emacs.d/elpa/logito-0.1"
-                "~/.emacs.d/elpa/pcache-0.2.3"
-                "~/.emacs.d/elpa/tabulated-list-0"
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
                 "~/.emacs.d/auto-complete"
@@ -410,9 +409,6 @@
        ;; time-less-p でエラーになるため
        (defalias 'update-directory-autoloads (lambda (&rest dirs) nil))
        (message "Loading %s (el-get)...done" this-file-name))))
-
-;;; ディレクトリ配下全て load-path に追加
-(add-to-load-path "elisp")
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
@@ -2645,7 +2641,7 @@ Otherwise, return nil."
 ;;; アンドゥ履歴
 ;; (install-elisp "http://cx4a.org/pub/undohist.el")
 (when (eval-and-compile (require 'undohist nil t))
-  (when (eq system-type 'windows-nt)
+  (when (and (eq system-type 'windows-nt) (boundp 'undo-hist-directory))
     (defun make-undohist-file-name (file)
       (setq file (convert-standard-filename (expand-file-name file)))
       (if (eq (aref file 1) ?:)
