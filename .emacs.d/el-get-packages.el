@@ -9,7 +9,8 @@
         auto-install
         info+
         thing-opt
-        igrep grep-a-lot
+        igrep
+        grep-a-lot
         grep-edit
         redo+
         hide-lines
@@ -23,6 +24,7 @@
         auto-async-byte-compile
         usage-memo
         list-processes+
+        w32-symlinks.el
         w32-shell-execute
         showtip
         sdcv
@@ -37,7 +39,6 @@
         xml-parse
         sl
         ;; http
-        cp5022x
         gtk-look
         japanese-holidays
         iman
@@ -50,8 +51,9 @@
         tea-time
         package-install
         summarye
-        popup
         ;; github
+        cp5022x
+        popup
         bm
         magit
         git-modes
@@ -71,11 +73,7 @@
 
 (when (boundp 'el-get-sources)
   (setq el-get-sources
-        '((:name cp5022x
-                 :type http
-                 :description "cp50220, cp50221, cp50222 coding system."
-                 :url "http://nijino.homelinux.net/emacs/cp5022x.el")
-          (:name gtk-look
+        '((:name gtk-look
                  :type http
                  :description "lookup Gtk and Gnome documentation."
                  :url "http://download.tuxfamily.org/user42/gtk-look.el")
@@ -123,11 +121,15 @@
                  :type http
                  :description "list up matched strings from a buffer, and display them in summary buffer."
                  :url "http://www.bookshelf.jp/elc/summarye.el")
-          (:name popup
-                 :type http
-                 :description "Visual popup interface."
-                 :url "https://github.com/jixiuf/ajc-java-complete/raw/0.2.8/popup.el")
           ;; github
+          (:name cp5022x
+                 :type github
+                 :description "cp50220, cp50221, cp50222 coding system."
+                 :pkgname "awasira/cp5022x.el")
+          (:name popup
+                 :type github
+                 :description "Visual popup interface."
+                 :pkgname "auto-complete/popup-el")
           (:name bm
                  :type github
                  :description "Visible bookmarks in buffer."
