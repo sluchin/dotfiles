@@ -211,12 +211,11 @@
       (read-passwd prompt))))
 
 ;;; インストール (apt-get)
-(defun apt-get-install (program &rest pw)
+(defun apt-get-install (program passwd)
   "Execute apt-get command."
   (interactive "sInstall: ")
   (if (executable-find "apt-get")
-      (let ((passwd (if pw pw (password-cache-sudo)))
-            (out " *apt-get*"))
+      (let ((out " *apt-get*"))
         (shell-command
          (concat "echo "
                  (shell-quote-argument passwd)
@@ -3638,31 +3637,31 @@ Otherwise, return nil."
          (list (propertize fmt
                            'face
                            '(:foreground "white" :background "red1"))))
+       (defvar mew-mode-line-quantity 0)
        (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
        (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
        (defvar mew-notify-biff-icon "~/.emacs.d/icons/letter.xpm")
 
        (when (boundp 'mew-biff-function)
          ;; mew-biff-interval の間隔で呼ばれる関数
-         (let* ((mew-mode-line-biff-quantity 0))
-           (setq mew-biff-function
-                 (lambda (n)
-                   (if (= n 0)
-                       (mew-biff-clear)
-                     (setq mew-mode-line-biff-icon
-                           (mew-propertized-biff-icon " "))
-                     (setq mew-mode-line-biff-string
-                           (mew-propertized-biff-string (format "(%d)" n)))
-                     ;; メール数が増えた場合, D-Bus 経由で通知
-                     (when (fboundp 'notifications-notify)
-                       (when (< mew-mode-line-biff-quantity n)
-                         (notifications-notify
-                          :title "Mew Mail"
-                          :body  (format "You got mail(s): %d" n)
-                          :app-icon (if (file-readable-p mew-notify-biff-icon)
-                                        mew-notify-biff-icon nil)
-                          :timeout 5000)))
-                     (setq mew-mode-line-biff-quantity n)))))
+         (setq mew-biff-function
+               (lambda (n)
+                 (if (= n 0)
+                     (mew-biff-clear)
+                   (setq mew-mode-line-biff-icon
+                         (mew-propertized-biff-icon " "))
+                   (setq mew-mode-line-biff-string
+                         (mew-propertized-biff-string (format "(%d)" n)))
+                   ;; メール数が増えた場合, D-Bus 経由で通知
+                   (when (fboundp 'notifications-notify)
+                     (when (< mew-mode-line-biff-quantity n)
+                       (notifications-notify
+                        :title "Mew Mail"
+                        :body  (format "You got mail(s): %d" n)
+                        :app-icon (if (file-readable-p mew-notify-biff-icon)
+                                      mew-notify-biff-icon nil)
+                        :timeout 5000)))
+                   (setq mew-mode-line-biff-quantity n))))
          ;; 着信後呼ばれる関数
          (defadvice mew-biff-clear (after mew-biff-clear-icon activate compile)
            (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
