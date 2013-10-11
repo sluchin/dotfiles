@@ -1091,7 +1091,7 @@
 (setq mark-ring-max 256)
 
 ;; リージョン強調表示
-(setq transient-mark-mode t)
+(setq-default transient-mark-mode t)
 
 ;; 連続してマークを辿る C-u C-@ C-@ ...
 ;; (デフォルト: C-u C-@ C-u C-@ ...)
@@ -1632,7 +1632,7 @@
          ;; "a" で無視ファイル表示・非表示のトグル
          (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
          ;; ダブルクリックでファイル開く
-         (define-key map [double-mouse-3] 'dframe-click)
+         (define-key map [mouse-1] 'dframe-click)
          ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
          (define-key map (kbd "<right>") 'speedbar-expand-line)
          (define-key map (kbd "C-f") 'speedbar-expand-line)
@@ -1760,7 +1760,7 @@
       (let ((default (car (last lst))))
         (condition-case err
             (make-directory default)
-          (error (message "%s" err)))
+          (error (message "%s: %s" default err)))
         (throw 'found default)))))
 
 ;;; カレンダ
@@ -1937,7 +1937,7 @@
               (when (buffer-live-p buffer)
                 (kill-buffer buffer))))))))
 
-  (defun org-clock-update-time-maybe ()
+  '(defun org-clock-update-time-maybe ()
     "If this is a CLOCK line, update it and return t.
 Otherwise, return nil."
     (interactive)
@@ -2212,6 +2212,7 @@ Otherwise, return nil."
                              (format "*%s*" recentf-menu-title))))
       ad-do-it))
 
+  ;; バッファキルしない
   (defadvice recentf-open-files-action
     (around recentf-open-files-action-no-kill (widget &rest _ignore)
             activate compile)
@@ -2994,8 +2995,14 @@ Otherwise, return nil."
          (setq howm-menu-lang 'ja))
        ;; ディレクトリ設定
        (when (boundp 'howm-directory)
-         (setq howm-directory (catch 'found (find-directory "howm"))))
-       (message "howm-directory: %s" howm-directory)
+         (setq howm-directory (catch 'found (find-directory "howm")))
+         (message "howm-directory: %s" howm-directory)
+         (when (boundp 'howm-menu-file)
+           (setq howm-menu-file
+                 (concat (file-name-as-directory user-emacs-directory)
+                         "howm/ja/" "0000-00-00-000000.txt"))
+           (message "howm-menu-file: %s" howm-menu-file)))
+
        ;; save 時にメニューを自動更新
        (when (boundp 'howm-menu-refresh-after-save)
          (setq howm-menu-refresh-after-save t))
