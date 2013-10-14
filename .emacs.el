@@ -248,13 +248,11 @@
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
                "clojure1.4" "leiningen"
                "libgmp-dev" "perltidy" "php-elisp"))
-        (passwd (password-cache-sudo))
-        program)
+        (passwd (password-cache-sudo)))
     (dolist (l lst)
       (message (concat "==> " l))
-      (setq program (concat program " " l))
       (apt-get-install l passwd))
-    (message program)))
+    (message "apt-get-install-all: end")))
 
 ;;; レポジトリ更新
 (defun update-repositories ()
@@ -4498,14 +4496,14 @@ Otherwise, return nil."
 ;;; Emacs Lisp
 ;; ミニバッファにヘルプ表示
 ;; (install-elisp-from-emacswiki "eldoc-extension.el")
-(when (locate-library "eldoc-extension")
-  (autoload 'turn-on-eldoc-mode "eldoc-extension"
+(when (locate-library "eldoc")
+  (autoload 'turn-on-eldoc-mode "eldoc"
     "Some extension for eldoc." t)
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
 
-  (eval-after-load "eldoc-extension"
+  (eval-after-load "eldoc"
     '(progn
        ;; 待ち時間
        (when (boundp 'eldoc-idle-delay)
@@ -4956,6 +4954,27 @@ Otherwise, return nil."
                                                   global-semantic-idle-summary-mode
                                                   global-semantic-mru-bookmark-mode)))
               (add-hook 'after-save-hook 'malabar-compile-file-silently nil t))))
+
+;;; PHP
+;; https://github.com/zenozeng/php-eldoc.git
+;; https://github.com/arnested/php-extras.git
+;; https://github.com/echosa/phpplus-mode.git
+;; (load-library "php-extras-gen-eldoc")
+;; (php-extras-generate-eldoc)
+(when (locate-library "php-mode")
+  (eval-after-load "php-mode"
+    '(progn
+       (require 'php-extras nil t)
+       (require 'php-eldoc nil t)
+       (require 'php+-mode nil t)
+       (php+-mode-setup))))
+
+;;; CSS
+;; https://github.com/zenozeng/css-eldoc.git
+(when (locate-library "css-eldoc")
+  (autoload 'turn-on-css-eldoc "css-eldoc"
+    "an eldoc-mode plugin for CSS source code" t)
+  (add-hook 'css-mode-hook 'turn-on-css-eldoc))
 
 ;;; ここまでプログラミング用設定
 

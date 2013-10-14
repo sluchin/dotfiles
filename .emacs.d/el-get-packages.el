@@ -64,6 +64,10 @@
         auto-complete-clang
         ajc-java-complete
         yasnippet-java-mode
+        php-eldoc
+        css-eldoc
+        php-extras
+        phpplus-mode
         malabar-mode
         haskell-mode
         clojure-mode
@@ -181,6 +185,26 @@
                  :description "yasnippet java-mode."
                  :pkgname "nekop/yasnippet-java-mode"
                  :url "git://github.com/nekop/yasnippet-java-mode.git")
+          (:name php-eldoc
+                 :type github
+                 :description "eldoc-mode plugin for PHP source code"
+                 :pkgname "zenozeng/php-eldoc"
+                 :url "https://github.com/zenozeng/php-eldoc.git")
+          (:name css-eldoc
+                 :type github
+                 :description "eldoc-mode plugin for CSS"
+                 :pkgname "zenozeng/css-eldoc"
+                 :url "https://github.com/zenozeng/css-eldoc.git")
+          (:name php-extras
+                 :type github
+                 :description "Extra features for Emacs `php-mode'."
+                 :pkgname "arnested/css-eldoc"
+                 :url "https://github.com/arnested/php-extras.git")
+          (:name phpplus-mode
+                 :type github
+                 :description "A better php mode for emacs, with specific support for Zend Framework 1."
+                 :pkgname "echosa/phpplus-mode"
+                 :url "https://github.com/echosa/phpplus-mode.git")
           (:name malabar-mode
                  :type github
                  :description "A better Java mode for Emacs"
