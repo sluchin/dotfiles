@@ -2189,7 +2189,7 @@ Otherwise, return nil."
             "~$" "/$" "/howm/" "\\.howm-keys$" "\\.howm-history$"
             "/\\.emacs\\.bmk$" "\\.emacs\\.d/bookmarks$"
             "\\.pomodoro$" "/org/.*\\.org" "/.eshell/alias$"
-            "newsticker/groups$" "/gnus/" "/nnrss/")))
+            "newsticker/groups$" "/gnus/" "/nnrss/" "\\.git/")))
 
   ;; 開いたファイルを選択しない
   (when (boundp 'recentf-menu-action)
@@ -4582,6 +4582,7 @@ Otherwise, return nil."
 (when (locate-library "clojure-mode")
   (autoload 'clojure-mode "clojure-mode" "A major mode for Clojure." t)
   (autoload 'clojure-jack-in "clojure-mode" "Major mode for Clojure code." t)
+
   (eval-after-load "clojure"
     '(progn
        (require 'swank-clojure nil t)
