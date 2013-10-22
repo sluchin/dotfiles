@@ -247,7 +247,7 @@
                "slime" "sbcl" "clisp" "ecl" "gauche" "gauche-dev"
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
                "clojure1.4" "leiningen"
-               "libgmp-dev" "perltidy" "php-elisp"))
+               "libgmp-dev" "perltidy" "php5" "php-elisp" "php-doc"))
         (passwd (password-cache-sudo)))
     (dolist (l lst)
       (message (concat "==> " l))
@@ -4241,6 +4241,7 @@ Otherwise, return nil."
                    ("js" "[js]cript" ".*\\.js")
                    ("p"  "[p]erl"    ".*\\.perl")
                    ("py" "[py]thon"  ".*\\.py")
+                   ("ph" "[ph]p"     ".*\\.php")
                    ("r"  "[r]uby"    ".*\\.rb")
                    ("s"  "[s]hell"   ".*\\.sh")
                    ("m"  "[m]ake"    "Makefile*")
@@ -4289,7 +4290,7 @@ Otherwise, return nil."
   "Make exuberant ctags file."
   (interactive)
   (exec-tags-command
-   "ctags-exuberant" "-e" "-V" "-L" "-" "--exclude=*/undohist/!*.el"))
+   "ctags-exuberant" "-e" "-V" "-L" "-"))
 
 ;;; 関数一覧表示
 ;; (install-elisp "http://www.bookshelf.jp/elc/summarye.el")
@@ -4336,7 +4337,7 @@ Otherwise, return nil."
        ;; モードライン短縮表示
        (let* ((default (cdr (assq 'auto-complete-mode minor-mode-alist))))
          (setcar default " α"))
-       ;; ディレクトリ設定 
+       ;; ディレクトリ設定
        (let ((dir "~/.emacs.d/auto-complete/dict"))
          (when (and (boundp 'ac-dictionary-directories)
                     (file-readable-p dir))
@@ -4963,19 +4964,38 @@ Otherwise, return nil."
 ;; (load-library "php-extras-gen-eldoc")
 ;; (php-extras-generate-eldoc)
 (when (locate-library "php-mode")
+  (autoload 'php-mode "php-mode" "PHP mode for Emacs." t)
+  (setq auto-mode-alist
+        (cons '("\\.php\\'" . php-mode) auto-mode-alist))
+  (add-hook 'php-mode-user-hook
+            (lambda ()
+              (when (boundp 'php-manual-path)
+                (setq php-manual-path "/usr/share/doc/php-doc/html"))
+              (when (boundp 'php-manual-url)
+                (setq php-manual-url "http://www.phppro.jp/phpmanual/"))))
   (eval-after-load "php-mode"
     '(progn
        (require 'php-extras nil t)
        (require 'php-eldoc nil t)
        (require 'php+-mode nil t)
-       (php+-mode-setup))))
+       (when (fboundp 'php+-mode-setup)
+         (php+-mode-setup))
+       (when (boundp 'php-mode-force-pear)
+         (setq php-mode-force-pear t)))))
 
 ;;; CSS
 ;; https://github.com/zenozeng/css-eldoc.git
 (when (locate-library "css-eldoc")
+  (autoload 'css-mode "css-mode" "Major mode to edit CSS files." t)
   (autoload 'turn-on-css-eldoc "css-eldoc"
-    "an eldoc-mode plugin for CSS source code" t)
-  (add-hook 'css-mode-hook 'turn-on-css-eldoc))
+    "an eldoc-mode plugin for CSS source code." t)
+  (setq auto-mode-alist
+        (cons '("\\.css\\'" . css-mode) auto-mode-alist))
+  (add-hook 'css-mode-hook 'turn-on-css-eldoc)
+  (eval-after-load "css-mode"
+    '(progn
+       (when (boundp 'cssm-indent-function)
+         (setq cssm-indent-function 'cssm-c-style-indenter)))))
 
 ;;; ここまでプログラミング用設定
 

@@ -68,6 +68,7 @@
         css-eldoc
         php-extras
         phpplus-mode
+        geben-on-emacs
         malabar-mode
         haskell-mode
         clojure-mode
@@ -205,6 +206,11 @@
                  :description "A better php mode for emacs, with specific support for Zend Framework 1."
                  :pkgname "echosa/phpplus-mode"
                  :url "https://github.com/echosa/phpplus-mode.git")
+          (:name geben-on-emacs
+                 :type github
+                 :description "GEBEN is a software package that interfaces Emacs to DBGp protocol with which you can debug running scripts interactive."
+                 :pkgname "mcorde/geben-on-emacs"
+                 :url "https://github.com/mcorde/geben-on-emacs.git")
           (:name malabar-mode
                  :type github
                  :description "A better Java mode for Emacs"
