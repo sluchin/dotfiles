@@ -68,6 +68,7 @@
         css-eldoc
         php-extras
         phpplus-mode
+        yaml-mode
         geben-on-emacs
         malabar-mode
         haskell-mode
@@ -206,6 +207,11 @@
                  :description "A better php mode for emacs, with specific support for Zend Framework 1."
                  :pkgname "echosa/phpplus-mode"
                  :url "https://github.com/echosa/phpplus-mode.git")
+          (:name yaml-mode
+                 :type github
+                 :description "The emacs major mode for editing files in the YAML data serialization format."
+                 :pkgname "yoshiki/yaml-mode"
+                 :url "https://github.com/yoshiki/yaml-mode.git")
           (:name geben-on-emacs
                  :type github
                  :description "GEBEN is a software package that interfaces Emacs to DBGp protocol with which you can debug running scripts interactive."

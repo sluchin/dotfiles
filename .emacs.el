@@ -845,20 +845,24 @@
     (define-key global-map (kbd "C-c m") 'w3m-gtk-lookup))
 
   ;; その他マニュアル
-  ;; sudo apt-get install stl-manual python2.7-doc
+  ;; sudo apt-get install stl-manual python2.7-doc hyperspec sbcl-doc clisp-doc ghc-doc php-doc
   ;; http://keihanna.dl.sourceforge.jp/pythonjp/54307/python-doc-2.7ja1-html.tar.gz
-  ;; sudo apt-get install hyperspec sbcl-doc clisp-doc
   ;; wget http://ftp.gnu.org/pub/gnu/clisp/release/2.49/clisp-2.49.tar.gz
   ;; git clone git://git.code.sf.net/p/ecls/ecl-doc ecl-doc
-  ;; sudo apt-get install ghc-doc
+  ;; wget http://jp2.php.net/distributions/manual/php_manual_ja.tar.gz
   (let ((lst '(("stl" "/usr/share/doc/stl-manual/html/index.html")
                ("python" "/usr/share/doc/python2.7/html/index.html")
-               ("python-ja" "~/.emacs.d/html/python-doc-2.7ja1-html/index.html")
+               ("python-ja" (concat (file-name-as-directory user-emacs-directory)
+                                    "html/python-doc-2.7ja1-html/index.html"))
                ("cl" "/usr/share/doc/hyperspec/Front/index_tx.htm")
                ("sbcl" "/usr/share/doc/sbcl-doc/html/index.html")
                ("clisp" "/usr/share/doc/clisp/clisp/doc/impnotes.html")
-               ("ecl" "~/.emacs.d/html/ecl-doc/html/index.html")
-               ("haskell" "/usr/share/doc/ghc-doc/html/index.html"))))
+               ("ecl" (concat (file-name-as-directory user-emacs-directory)
+                              "html/ecl-doc/html/index.html"))
+               ("haskell" "/usr/share/doc/ghc-doc/html/index.html")
+               ("php" "/usr/share/doc/php-doc/html/index.html")
+               ("php-ja" (concat (file-name-as-directory user-emacs-directory)
+                                 "html/php-chunked-xhtml/index.html")))))
     (dolist (l lst)
       (let ((cmd (intern (format "%s-manual" (car l))))
             (html (car (cdr l))))
@@ -867,7 +871,7 @@
              "View manual."
              (interactive)
              (if (file-readable-p ,html)
-                 (w3m-goto-url-new-session (concat "file:/" ,html))
+                 (w3m-goto-url-new-session (concat "file:/" (expand-file-name ,html)))
                (message "no file: %s" ,html))))))))
 
 ;;; サーバを起動する
@@ -1608,7 +1612,7 @@
        ;; 拡張子の追加
        (when (fboundp 'speedbar-add-supported-extension)
          (speedbar-add-supported-extension
-          '("js" "as" "html" "css" "php" "rb" "org" "scala" "gz")))
+          '("js" "as" "html" "css" "yml" "php" "rb" "org" "scala" "gz")))
        ;; 隠しファイルの表示
        (when (boundp 'speedbar-directory-unshown-regexp)
          (setq speedbar-directory-unshown-regexp "^\\'"))
@@ -3296,7 +3300,7 @@ Otherwise, return nil."
        ;; バイトコンパイルしないファイル
        (when (boundp 'auto-async-byte-compile-exclude-files-regexp)
          (setq auto-async-byte-compile-exclude-files-regexp
-               "/junk/\\|cache\\|dirlist\\|filelist"))
+               "/junk/\\|cache\\|dirlist\\|filelist\\|el-get-packages.el"))
        (message "Loading %s (auto-async-byte-compile)...done" this-file-name))))
 
 ;;; *Help* にメモを書き込む
@@ -4815,6 +4819,7 @@ Otherwise, return nil."
   (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
+
   (add-hook 'cperl-mode-hook
             (lambda ()
               (when (fboundp 'cperl-set-style)
@@ -4829,20 +4834,29 @@ Otherwise, return nil."
                 (require 'perltidy nil t))
               (require 'flymake nil t)
               (when (fboundp 'flymake-mode)
-                (flymake-mode 1)))))
+                (flymake-mode 1))))
+
+  (eval-after-load "cperl-mode"
+    '(progn
+       (message "Loading %s (cperl-mode)...done" this-file-name))))
 
 ;; Pod
 (when (locate-library "pod-mode")
   (autoload 'pod-mode
     "pod-mode" "Alternate mode for editing Perl documents." t)
   (add-to-list 'auto-mode-alist '("\\.pod$" . pod-mode))
+
   (add-hook 'pod-mode-hook
             (lambda ()
               (when (fboundp 'auto-fill-mode)
                 (auto-fill-mode 1))
               (require 'flyspell nil t)
               (when (fboundp 'flyspell-mode)
-                (flyspell-mode 1)))))
+                (flyspell-mode 1))))
+
+  (eval-after-load "pod-mode"
+    '(progn
+       (message "Loading %s (pod-mode)...done" this-file-name))))
 
 ;;; Java
 ;; ajc-java-complete
@@ -4888,7 +4902,11 @@ Otherwise, return nil."
                     (setq ajc-tag-file "~/.java_base.tag")
                   (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
               (when (fboundp 'ajc-java-complete-mode)
-                (ajc-java-complete-mode)))))
+                (ajc-java-complete-mode))))
+
+  (eval-after-load "acl-java-complete-config"
+    '(progn
+       (message "Loading %s (acl-java-complete-config)...done" this-file-name))))
 
 ;; malabar-mode
 ;; git clone git://github.com/espenhw/malabar-mode.git または
@@ -4955,7 +4973,11 @@ Otherwise, return nil."
                                                   global-semanticdb-minor-mode
                                                   global-semantic-idle-summary-mode
                                                   global-semantic-mru-bookmark-mode)))
-              (add-hook 'after-save-hook 'malabar-compile-file-silently nil t))))
+              (add-hook 'after-save-hook 'malabar-compile-file-silently nil t)))
+
+  (eval-after-load "malabar-mode"
+    '(progn
+       (message "Loading %s (malabar-mode)...done" this-file-name))))
 
 ;;; PHP
 ;; https://github.com/zenozeng/php-eldoc.git
@@ -4981,21 +5003,49 @@ Otherwise, return nil."
        (when (fboundp 'php+-mode-setup)
          (php+-mode-setup))
        (when (boundp 'php-mode-force-pear)
-         (setq php-mode-force-pear t)))))
+         (setq php-mode-force-pear t))
+       (message "Loading %s (php-mode)...done" this-file-name))))
 
 ;;; CSS
-;; https://github.com/zenozeng/css-eldoc.git
-(when (locate-library "css-eldoc")
+;; git clone https://github.com/zenozeng/css-eldoc.git
+(when (locate-library "css-mode")
   (autoload 'css-mode "css-mode" "Major mode to edit CSS files." t)
-  (autoload 'turn-on-css-eldoc "css-eldoc"
-    "an eldoc-mode plugin for CSS source code." t)
   (setq auto-mode-alist
         (cons '("\\.css\\'" . css-mode) auto-mode-alist))
-  (add-hook 'css-mode-hook 'turn-on-css-eldoc)
+
   (eval-after-load "css-mode"
     '(progn
        (when (boundp 'cssm-indent-function)
-         (setq cssm-indent-function 'cssm-c-style-indenter)))))
+         (setq cssm-indent-function 'cssm-c-style-indenter))
+       (message "Loading %s (css-mode)...done" this-file-name))))
+
+(when (locate-library "css-eldoc")
+  (autoload 'turn-on-css-eldoc "css-eldoc"
+    "an eldoc-mode plugin for CSS source code." t)
+  (add-hook 'css-mode-hook 'turn-on-css-eldoc)
+
+  (eval-after-load "css-eldoc"
+    '(progn
+       (when (boundp 'cssm-indent-function)
+         (setq cssm-indent-function 'cssm-c-style-indenter))
+       (message "Loading %s (css-eldoc)...done" this-file-name))))
+
+;;; YAML
+;; git clone https://github.com/yoshiki/yaml-mode
+(when (locate-library "yaml-mode")
+  (autoload 'yaml-mode
+    "yaml-mode"
+    "The emacs major mode for editing files in the YAML data serialization format." t)
+  (setq auto-mode-alist
+        (cons '("\\.yml\\'" . yaml-mode) auto-mode-alist))
+  (add-hook 'yaml-mode-hook
+            (lambda ()
+              (when (boundp 'yaml-mode-map)
+                (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+
+  (eval-after-load "yaml-mode"
+    '(progn
+       (message "Loading %s (yaml-mode)...done" this-file-name))))
 
 ;;; ここまでプログラミング用設定
 
