@@ -36,6 +36,7 @@
         anything
         perl-completion
         perltidy
+        php-completion
         xml-parse
         sl
         ;; http
