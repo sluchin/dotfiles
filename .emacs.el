@@ -242,7 +242,7 @@
   (let ((lst '("fonts-monapo" "devhelp" "stl-manual" "python2.7-doc"
                "hyperspec" "sbcl-doc" "ghc-doc"
                "migemo" "cmigemo" "ddskk" "skktools" "sdcv"
-               "mew" "mew-bin" "stunnel4"
+               "mew" "mew-bin" "stunnel4" "aspell-en"
                "libxpm-dev" "w3m" "exuberant-ctags"
                "slime" "sbcl" "clisp" "ecl" "gauche" "gauche-dev"
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
@@ -4989,21 +4989,16 @@ Otherwise, return nil."
 ;; (auto-install-batch anything)
 ;; (install-elisp-from-emacswiki auto-complete.el)
 ;; (install-elisp-from-emacswiki php-completion.el)
-(when (locate-library "php-mode")
-  (autoload 'php-mode "php-mode" "PHP mode for Emacs." t)
+(when (locate-library "php+-mode")
+  (defalias 'php-mode 'php+-mode)
+  (defalias 'php-mode-map 'php+-mode-map)
+  (autoload 'php+-mode "php+-mode" "PHP+ mode for Emacs." t)
   (setq auto-mode-alist
-        (cons '("\\.php\\'" . php-mode) auto-mode-alist))
-  (add-hook 'php-mode-hook
+        (cons '("\\.php\\'" . php+-mode) auto-mode-alist))
+  (add-hook 'php+-mode-hook
             (lambda ()
-              (when (boundp 'php-manual-path)
-                (setq php-manual-path "/usr/share/doc/php-doc/html"))
-              (when (boundp 'php-manual-url)
-                (setq php-manual-url "http://www.phppro.jp/phpmanual/"))
-              (when (require 'php-completion nil t)
-                (when (fboundp 'php-completion-mode)
-                  (php-completion-mode t))
-                (when (boundp 'php-mode-map)
-                  (define-key php-mode-map (kbd "C-:") 'phpcmp-complete)))
+              (require 'php-extras nil t)
+              (require 'php-eldoc nil t)
               (when (require 'auto-complete nil t)
                 (when (boundp 'ac-sources)
                   (make-local-variable 'ac-sources)
@@ -5013,19 +5008,26 @@ Otherwise, return nil."
                                      ac-source-etags)))
                 (when (fboundp 'auto-complete-mode)
                   (auto-complete-mode t)))
+              (when (require 'php-completion nil t)
+                (when (fboundp 'php-completion-mode)
+                  (php-completion-mode t))
+                (when (boundp 'php+-mode-map)
+                  (define-key php+-mode-map (kbd "C-:") 'phpcmp-complete)))
               (when (require 'flymake nil t)
                 (when (fboundp 'flymake-mode)
-                  (flymake-mode 1)))))
-  (eval-after-load "php-mode"
-    '(progn
-       (require 'php-extras nil t)
-       (require 'php-eldoc nil t)
-       (require 'php+-mode nil t)
-       (when (fboundp 'php+-mode-setup)
-         (php+-mode-setup))
-       (when (boundp 'php-mode-force-pear)
-         (setq php-mode-force-pear t))
-       (message "Loading %s (php-mode)...done" this-file-name))))
+                  (flymake-mode 1)))
+              (when (fboundp 'php+-mode-setup)
+                (php+-mode-setup))
+              (when (boundp 'php-mode-force-pear)
+                (setq php-mode-force-pear t))
+              (when (boundp 'php-manual-path)
+                (setq php-manual-path "/usr/share/doc/php-doc/html"))
+              (when (boundp 'php-manual-url)
+                (setq php-manual-url "http://www.phppro.jp/phpmanual/")))))
+
+(when (locate-library "inf-php")
+    (autoload 'inf-php "inf-php"
+      "A php process can be fired up with M-x inf-php." t))
 
 ;;; CSS
 ;; git clone https://github.com/zenozeng/css-eldoc.git
