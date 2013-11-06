@@ -52,6 +52,7 @@
         tea-time
         package-install
         summarye
+        php-eval
         ;; github
         cp5022x
         popup
@@ -69,6 +70,7 @@
         css-eldoc
         php-extras
         phpplus-mode
+        inf-php
         yaml-mode
         geben-on-emacs
         malabar-mode
@@ -127,6 +129,11 @@
                  :type http
                  :description "list up matched strings from a buffer, and display them in summary buffer."
                  :url "http://www.bookshelf.jp/elc/summarye.el")
+          (:name php-eval
+                 :type http
+                 :description "eval PHP script and display the result."
+                 :url "http://www.ne.jp/asahi/alpha/kazu/pub/emacs/php-eval.el")
+
           ;; github
           (:name cp5022x
                  :type github
@@ -208,6 +215,11 @@
                  :description "A better php mode for emacs, with specific support for Zend Framework 1."
                  :pkgname "echosa/phpplus-mode"
                  :url "https://github.com/echosa/phpplus-mode.git")
+          (:name inf-php
+                 :type github
+                 :description "Run a php interactive shell on emacs."
+                 :pkgname "taksatou/inf-php"
+                 :url "https://github.com/taksatou/inf-php")
           (:name yaml-mode
                  :type github
                  :description "The emacs major mode for editing files in the YAML data serialization format."
