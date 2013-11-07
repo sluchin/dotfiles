@@ -4997,6 +4997,8 @@ Otherwise, return nil."
         (cons '("\\.php\\'" . php+-mode) auto-mode-alist))
   (add-hook 'php+-mode-hook
             (lambda ()
+              (when (fboundp 'php+-mode-setup)
+                (php+-mode-setup))
               (require 'php-extras nil t)
               (require 'php-eldoc nil t)
               (when (require 'auto-complete nil t)
@@ -5016,8 +5018,6 @@ Otherwise, return nil."
               (when (require 'flymake nil t)
                 (when (fboundp 'flymake-mode)
                   (flymake-mode 1)))
-              (when (fboundp 'php+-mode-setup)
-                (php+-mode-setup))
               (when (boundp 'php-mode-force-pear)
                 (setq php-mode-force-pear t))
               (when (boundp 'php-manual-path)
