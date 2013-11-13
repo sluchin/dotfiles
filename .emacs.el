@@ -5024,6 +5024,7 @@ Otherwise, return nil."
                   (make-local-variable 'ac-sources)
                   (setq ac-sources '(ac-source-words-in-same-mode-buffers
                                      ac-source-php-completion
+                                     ac-source-gtags
                                      ac-source-filename)))
                 (when (fboundp 'auto-complete-mode)
                   (auto-complete-mode t)))
