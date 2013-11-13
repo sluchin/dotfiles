@@ -340,7 +340,6 @@
                 "~/.emacs.d/evernote-mode"
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
-                "~/.emacs.d/auto-complete"
                 "~/.emacs.d/pomodoro-technique"
                 "~/.emacs.d/cedet/common"
                 "~/.emacs.d/cedet/ede"
@@ -597,6 +596,8 @@
            (yas/minor-mode        . " υ")
            (paredit-mode          . " π")
            (gtags-mode            . " ν")
+           (flymake-mode          . " fly")
+           (php-completion-mode   . " comp")
            (eldoc-mode            .   "")
            (abbrev-mode           .   "")
            ;; メジャーモード
@@ -4314,7 +4315,7 @@ Otherwise, return nil."
       (navi (buffer-name)))))
 
 ;;; オートコンプリート
-;; wget -O- http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2 | tar xfj -
+;; https://github.com/auto-complete/auto-complete
 (when (locate-library "auto-complete")
   ;; F4 で オートコンプリートをトグルする
   (defun toggle-auto-complete-mode (&optional n)
@@ -4387,8 +4388,8 @@ Otherwise, return nil."
          (setq auto-insert-directory "~/.emacs.d/autoinsert/"))
        (when (boundp 'auto-insert-alist)
          (setq auto-insert-alist
-               (append '(("\\.el" . "lisp-template.el")
-                         ("\\.pl" . "perl-template.pl")
+               (append '(("\\.el"  . "lisp-template.el")
+                         ("\\.pl"  . "perl-template.pl")
                          ("\\.xml" . "xml-template.xml")
                          ("\\.xhtml\\([.]?\\w+\\)*" . "xml-template.xml"))
                        auto-insert-alist)))
@@ -4491,7 +4492,7 @@ Otherwise, return nil."
          (interactive)
          (execute-choice-from-list
           "yasnippet: "
-          '((?r "reload(r)" yas-reload-all)
+          '((?r "reload(r)"  yas-reload-all)
             (?i "insert(i)"  yas-insert-snippet)
             (?n "new(n)"     yas-new-snippet)
             (?v "visit(v)"   yas-visit-snippet-file))))
@@ -4831,8 +4832,25 @@ Otherwise, return nil."
                   (add-to-list 'ac-sources 'ac-source-perl-completion))
                 (when (fboundp 'perl-completion-mode)
                   (perl-completion-mode 1)))
-              (when (executable-find "perltidy")
-                (require 'perltidy nil t))
+              (when (and (executable-find "perltidy")
+                         (require 'perltidy nil t))
+                                        ; perl tidy
+                                        ; sudo aptitude install perltidy
+                (defun perltidy-region ()
+                  "Run perltidy on the current region."
+                  (interactive)
+                  (save-excursion
+                    (shell-command-on-region (point) (mark) "perltidy -q" nil t)))
+                (defun perltidy-defun ()
+                  "Run perltidy on the current defun."
+                  (interactive)
+                  (save-excursion
+                    (mark-defun)
+                    (when (fboundp 'perltidy-region)
+                      (perltidy-region))))
+                (when (boundp 'cperl-mode-map)
+                  (define-key cperl-mode-map (kbd "C-c t") 'perltidy-region)
+                  (define-key cperl-mode-map (kbd "C-c C-t") 'perltidy-defun)))
               (when (require 'flymake nil t)
                 (when (fboundp 'flymake-mode)
                   (flymake-mode 1)))))
@@ -5006,8 +5024,7 @@ Otherwise, return nil."
                   (make-local-variable 'ac-sources)
                   (setq ac-sources '(ac-source-words-in-same-mode-buffers
                                      ac-source-php-completion
-                                     ac-source-filename
-                                     ac-source-etags)))
+                                     ac-source-filename)))
                 (when (fboundp 'auto-complete-mode)
                   (auto-complete-mode t)))
               (when (require 'php-completion nil t)
@@ -5063,6 +5080,10 @@ Otherwise, return nil."
         (cons '("\\.yml\\'" . yaml-mode) auto-mode-alist))
   (add-hook 'yaml-mode-hook
             (lambda ()
+              (when (boundp 'tab-width)        ; タブ幅 4
+                (setq tab-width 4))
+              (when (boundp 'indent-tabs-mode) ; スペース
+                (setq indent-tabs-mode nil))
               (when (boundp 'yaml-mode-map)
                 (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
 

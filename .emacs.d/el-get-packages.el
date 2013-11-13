@@ -55,7 +55,7 @@
         php-eval
         ;; github
         cp5022x
-        popup
+        auto-complete
         bm
         magit
         git-modes
@@ -140,11 +140,11 @@
                  :description "cp50220, cp50221, cp50222 coding system."
                  :pkgname "awasira/cp5022x.el"
                  :url "git://github.com/awasira/cp5022x.el.git")
-          (:name popup
+          (:name auto-complete
                  :type github
-                 :description "Visual popup interface."
-                 :pkgname "auto-complete/popup-el"
-                 :url "git://github.com/auto-complete/popup-el.git")
+                 :description "Emacs auto-complete package. http://auto-complete.org."
+                 :pkgname "auto-complete/auto-complete"
+                 :url "git://github.com/auto-complete/auto-complete")
           (:name bm
                  :type github
                  :description "Visible bookmarks in buffer."
