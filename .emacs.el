@@ -1580,7 +1580,10 @@
             (lambda ()
               (buffer-face-set
                (font-face-attributes (frame-parameter nil 'font)))
-              (setq header-line-format nil)))
+              (setq header-line-format nil))
+            ;; 自動更新しない
+            (when (fboundp 'speedbar-disable-update)
+              (speedbar-disable-update)))
 
   ;; フォーカスを移す
   (define-key global-map (kbd "C-c x") 'speedbar-get-focus)
@@ -1617,24 +1620,25 @@
        ;; 隠しファイルの表示
        (when (boundp 'speedbar-directory-unshown-regexp)
          (setq speedbar-directory-unshown-regexp "^\\'"))
-       ;; 自動更新しない
-       (when (fboundp 'speedbar-disable-update)
-         (speedbar-disable-update))
-
        ;; 更新する
        (defun speedbar-focus-refresh ()
          "Get focus and refresh."
          (interactive)
-         (speedbar-get-focus)
-         (speedbar-refresh))
+         (when (fboundp 'speedbar-get-focus)
+           (speedbar-get-focus))
+         (when (fboundp 'speedbar-refresh)
+           (speedbar-refresh))
+         (when (fboundp 'speedbar-disable-update)
+           (speedbar-disable-update)))
 
        ;; キーバインドのカスタマイズ
+       ;; ファイル
        (let ((map speedbar-file-key-map))
          ;; 更新する
-         (define-key map (kbd "g") 'speedbar-focus-refresh)
+         (define-key map (kbd "g") 'speedbar-forcus-refresh)
          ;; "a" で無視ファイル表示・非表示のトグル
          (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
-         ;; ダブルクリックでファイル開く
+         ;; クリックでファイル開く
          (define-key map [mouse-1] 'dframe-click)
          ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
          (define-key map (kbd "<right>") 'speedbar-expand-line)
@@ -1643,7 +1647,43 @@
          (define-key map (kbd "C-b") 'speedbar-contract-line)
          ;; BS でも上位ディレクトリへ (デフォルト: `U')
          (define-key map (kbd "<backspace>") 'speedbar-up-directory)
-         (define-key map (kbd "C-h") 'speedbar-up-directory))
+         (define-key map (kbd "C-h") 'speedbar-up-directory)
+         ;; デフォルト
+         (define-key map "[" 'speedbar-expand-line-descendants)
+         (define-key map "]" 'speedbar-contract-line-descendants)
+         (define-key map " " 'speedbar-toggle-line-expansion)
+         (define-key map "I" 'speedbar-item-info)
+         (define-key map "B" 'speedbar-item-byte-compile)
+         (define-key map "L" 'speedbar-item-load)
+         (define-key map "C" 'speedbar-item-copy)
+         (define-key map "D" 'speedbar-item-delete)
+         (define-key map "O" 'speedbar-item-object-delete)
+         (define-key map "R" 'speedbar-item-rename)
+         (define-key map "M" 'speedbar-create-directory))
+
+       ;; バッファ
+       (let ((map speedbar-buffers-key-map))
+         ;; 更新する
+         (define-key map (kbd "g") 'speedbar-forcus-refresh)
+         ;; "a" で無視ファイル表示・非表示のトグル
+         (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
+         ;; クリックでファイル開く
+         (define-key map [mouse-1] 'dframe-click)
+         ;; ← や → でもディレクトリを開閉 (デフォルト: `=' `+' `-')
+         (define-key map (kbd "<right>") 'speedbar-expand-line)
+         (define-key map (kbd "C-f") 'speedbar-expand-line)
+         (define-key map (kbd "<left>") 'speedbar-contract-line)
+         (define-key map (kbd "C-b") 'speedbar-contract-line)
+         ;; BS でも上位ディレクトリへ (デフォルト: `U')
+         (define-key map (kbd "<backspace>") 'speedbar-up-directory)
+         (define-key map (kbd "C-h") 'speedbar-up-directory)
+         ;; デフォルト
+         (define-key map (kbd "e") 'speedbar-edit-line)
+         (define-key map (kbd "\C-m") 'speedbar-edit-line)
+         (define-key map (kbd " ") 'speedbar-toggle-line-expansion)
+         (define-key map (kbd "k") 'speedbar-buffer-kill-buffer)
+         (define-key map (kbd "r") 'speedbar-buffer-revert-buffer))
+
        (message "Loading %s (speedbar)...done" this-file-name))))
 
 ;;; 差分表示 (diff-mode)
@@ -2308,7 +2348,7 @@ Otherwise, return nil."
     "Add directory list from file."
     (interactive "fDir list from file: ")
     (when (fboundp 'file-cache-add-directory-list)
-      (with-temp-buffer
+      (with-temp-bufFer
         (insert-file-contents file)
         (file-cache-add-directory-list (read (current-buffer))))))
 
@@ -2796,7 +2836,8 @@ Otherwise, return nil."
 
 ;;; Anything
 ;; (auto-install-batch "anything")
-(when (locate-library "anything-config")
+(when (and (locate-library "anything-config")
+           (require 'anything-config nil t))
   (autoload 'anything-recentf "anything-config"
     "Preconfigured `anything' for `recentf'." t)
   (autoload 'anything-for-files "anything-config"
@@ -2804,21 +2845,35 @@ Otherwise, return nil."
   (autoload 'anything-filelist "anything-config"
     "Preconfigured `anything' to open files instantly." t)
 
-  (defun anything-make-filelist ()
+  ;; (defun anything-make-filelist ()
+  ;;   "Make file list."
+  ;;   (interactive)
+  ;;   (let ((conf-file "~/.emacs.d/conf/filelist-dir.el")
+  ;;         lst)
+  ;;     (if (file-readable-p conf-file)
+  ;;         (with-temp-buffer
+  ;;           (insert-file-contents conf-file)
+  ;;           (setq lst (read (current-buffer))))
+  ;;       (setq lst '("~/")))
+  ;;     (let* ((dirs (read (read-string
+  ;;                         "Dirlist: "
+  ;;                         (format "%s" (car (cdr lst)))))))
+  ;;       (make-filelist "~/.filelist" dirs
+  ;;                      "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$"))))
+  (defun make-filelist2 (filelist dir &optional exclude)
     "Make file list."
-    (interactive)
-    (let ((conf-file "~/.emacs.d/conf/filelist-dir.el")
-          lst)
-      (if (file-readable-p conf-file)
-          (with-temp-buffer
-            (insert-file-contents conf-file)
-            (setq lst (read (current-buffer))))
-        (setq lst '("~/")))
-      (let* ((dirs (read (read-string
-                          "Dirlist: "
-                          (format "%s" (car (cdr lst)))))))
-        (make-filelist "~/.filelist" dirs
-                       "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$"))))
+    (message "exclude: %S" exclude)
+    (with-temp-buffer
+      (dolist (file (recursive-directory dir exclude))
+        (insert (concat file "\n")))
+      (write-file filelist)))
+
+  (defun anything-make-filelist (dir)
+    "Make file list."
+    (interactive "DDirectory: ")
+    (when (fboundp 'make-filelist2)
+      (make-filelist2 "~/.filelist" dir
+                      "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$")))
 
   (defun anything-choice ()
     "Anything choice."
@@ -2835,7 +2890,12 @@ Otherwise, return nil."
        (when (boundp 'anything-c-filelist-file-name)
          (setq anything-c-filelist-file-name "~/.filelist"))
        (when (boundp 'anything-grep-candidates-fast-directory-regexp)
-         (setq anything-grep-candidates-fast-directory-regexp "^/tmp")))))
+         (setq anything-grep-candidates-fast-directory-regexp "^/tmp"))
+       (global-set-key (kbd "C-x a") 'anything)
+       (when (fboundp 'iswitchb-mode)
+         (iswitchb-mode))
+       (when (fboundp 'anything-iswitchb-setup)
+         (anything-iswitchb-setup)))))
 
 ;;; タブ
 ;; (install-elisp-from-emacswiki "tabbar.el")
@@ -5018,6 +5078,17 @@ Otherwise, return nil."
               (when (fboundp 'php+-mode-setup)
                 (php+-mode-setup))
               (require 'php-extras nil t)
+              ;; インデント
+              (when (fboundp 'c-set-style)
+                (let (c-basic-offset)
+                  (c-set-style "k&r" nil)))
+              (when (boundp 'c-basic-offset)   ; 基本インデント量 4
+                (setq c-basic-offset 4)
+                (message "c-basic-offset=%d" c-basic-offset))
+              (when (boundp 'tab-width)        ; タブ幅 4
+                (setq tab-width 4))
+              (when (boundp 'indent-tabs-mode) ; スペース
+                (setq indent-tabs-mode nil))
               (require 'php-eldoc nil t)
               (when (require 'auto-complete nil t)
                 (when (boundp 'ac-sources)
