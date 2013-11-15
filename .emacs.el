@@ -1620,6 +1620,10 @@
        ;; 隠しファイルの表示
        (when (boundp 'speedbar-directory-unshown-regexp)
          (setq speedbar-directory-unshown-regexp "^\\'"))
+       ;; 自動更新しない
+       (when (fboundp 'speedbar-disable-update)
+         (speedbar-disable-update))
+
        ;; 更新する
        (defun speedbar-focus-refresh ()
          "Get focus and refresh."
@@ -1635,7 +1639,7 @@
        ;; ファイル
        (let ((map speedbar-file-key-map))
          ;; 更新する
-         (define-key map (kbd "g") 'speedbar-forcus-refresh)
+         (define-key map (kbd "g") 'speedbar-focus-refresh)
          ;; "a" で無視ファイル表示・非表示のトグル
          (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
          ;; クリックでファイル開く
@@ -1664,7 +1668,7 @@
        ;; バッファ
        (let ((map speedbar-buffers-key-map))
          ;; 更新する
-         (define-key map (kbd "g") 'speedbar-forcus-refresh)
+         (define-key map (kbd "g") 'speedbar-focus-refresh)
          ;; "a" で無視ファイル表示・非表示のトグル
          (define-key map (kbd "a") 'speedbar-toggle-show-all-files)
          ;; クリックでファイル開く
@@ -2348,7 +2352,7 @@ Otherwise, return nil."
     "Add directory list from file."
     (interactive "fDir list from file: ")
     (when (fboundp 'file-cache-add-directory-list)
-      (with-temp-bufFer
+      (with-temp-buffer
         (insert-file-contents file)
         (file-cache-add-directory-list (read (current-buffer))))))
 
