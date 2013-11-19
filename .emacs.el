@@ -5421,20 +5421,20 @@ Otherwise, return nil."
 (defun indent-all (dir)
   "Execute indent for all files."
   (interactive "DDirectory: ")
-  (let* ((indent (y-or-n-p "Execute indent ? "))
+  (let* ((ext (read-string "File extention ?: " "[hc]" nil "[hc]" nil))
+         (indent (y-or-n-p "Execute indent ? "))
          (space (y-or-n-p "Convert space from tab ? "))
          (backup "_BAK")
          (default (file-name-directory
                    (or (buffer-file-name (current-buffer)) "")))
          files)
     (setq files (recursive-directory dir))
-    (message "%s" files)
     (dolist (file files)
       (when (and (stringp file)
                  (not (file-directory-p file))
                  (file-readable-p file)
                  (file-writable-p file))
-        (when (string-match ".*\\.[hc]$" file)
+        (when (string-match (concat ".*\\." ext "$") file)
           (message "file: %s" file)
           ;; バックアップ
           (copy-file file (concat file backup) t)
