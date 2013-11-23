@@ -954,7 +954,8 @@
      "bookmark: "
      '((?m "set(m)"  bookmark-set)
        (?l "list(l)" bookmark-bmenu-list)
-       (?b "jump(b)"  bookmark-jump))))
+       (?b "jump(b)" bookmark-jump)
+       (?s "save(s)" bookmark-save))))
   (define-key global-map (kbd "C-c r") 'bookmark-choice)
 
   (eval-after-load "bookmark"
@@ -1429,10 +1430,16 @@
        ;; ディレクトリを再帰的に削除可能にする
        (when (boundp 'dired-recursive-deletes)
          (setq dired-recursive-deletes 'always))
-
        ;; wdired のとき上書きで聞かない
        (when (boundp 'wdired-confirm-overwrite)
          (setq wdired-confirm-overwrite nil))
+       ;; デフォルトでもう一方の dired にコピーする
+       (when (boundp 'dired-dwim-target)
+         (setq dired-dwim-target t))
+       ;; zip ファイルを Z で展開
+       (when (boundp 'dired-compress-file-suffixes)
+         (add-to-list 'dired-compress-file-suffixes
+                      '("\\.zip\\'" ".zip" "unzip")))
 
        ;; コマンド実行
        (defun dired-run-command (command)
@@ -1547,7 +1554,7 @@
          ;; evince で開く
          (define-key dired-mode-map (kbd "e") 'dired-run-evince)
          ;; vlc で開く
-         (define-key dired-mode-map (kbd "M-p") 'dired-run-vlc)
+         (define-key dired-mode-map (kbd "M-v") 'dired-run-vlc)
          ;; w3m で開く
          (define-key dired-mode-map (kbd "M-3") 'dired-w3m-find-file)
          ;; tar + gzip で圧縮
@@ -2318,7 +2325,7 @@ Otherwise, return nil."
          (setq cua-enable-cua-keys nil))
        (message "Loading %s (cua-base)...done" this-file-name))))
 
-;;; filecache
+;;; ファイルキャッシュ
 (when (locate-library "filecache")
   (autoload 'file-cache-minibuffer-complete "filecache"
     "Complete a filename in the minibuffer using a preloaded cache." t)
@@ -2372,15 +2379,10 @@ Otherwise, return nil."
   ;; ミニバッファで補完
   (when (boundp 'minibuffer-local-completion-map)
     (define-key minibuffer-local-completion-map
-      (kbd "M-c") 'file-cache-minibuffer-complete))
+      (kbd "C-c C-c") 'file-cache-minibuffer-complete))
 
   (eval-after-load "filecache"
     '(progn
-       (when (fboundp 'file-cache-add-directory-list)
-         (file-cache-add-directory-list (list "~" ))
-         (let ((home-bin "~/bin"))
-           (when (file-directory-p home-bin)
-             (file-cache-add-directory-list `(,home-bin)))))
        (when (boundp 'file-cache-filter-regexps)
          (setq file-cache-filter-regexps
                (append '("CVS" "\\.svn" "\\.git")
@@ -2844,58 +2846,55 @@ Otherwise, return nil."
            (require 'anything-config nil t))
   (autoload 'anything-recentf "anything-config"
     "Preconfigured `anything' for `recentf'." t)
-  (autoload 'anything-for-files "anything-config"
-    "Preconfigured `anything' for opening files." t)
-  (autoload 'anything-filelist "anything-config"
+  (autoload 'anything-find-files "anything-config"
+    "Preconfigured `anything' for anything implementation of `find-file'." t)
+  (autoload 'anything-filelist+ "anything-config"
     "Preconfigured `anything' to open files instantly." t)
+  (autoload 'anything-bookmark "anything-config"
+    "Preconfigured `anything' for bookmarks." t)
 
-  ;; (defun anything-make-filelist ()
-  ;;   "Make file list."
-  ;;   (interactive)
-  ;;   (let ((conf-file "~/.emacs.d/conf/filelist-dir.el")
-  ;;         lst)
-  ;;     (if (file-readable-p conf-file)
-  ;;         (with-temp-buffer
-  ;;           (insert-file-contents conf-file)
-  ;;           (setq lst (read (current-buffer))))
-  ;;       (setq lst '("~/")))
-  ;;     (let* ((dirs (read (read-string
-  ;;                         "Dirlist: "
-  ;;                         (format "%s" (car (cdr lst)))))))
-  ;;       (make-filelist "~/.filelist" dirs
-  ;;                      "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$"))))
-  (defun make-filelist2 (filelist dir &optional exclude)
-    "Make file list."
-    (message "exclude: %S" exclude)
-    (with-temp-buffer
-      (dolist (file (recursive-directory dir exclude))
-        (insert (concat file "\n")))
-      (write-file filelist)))
+  ;; anything インターフェース
+  (defun anything-startup ()
+    "anything.el startup file."
+    (interactive)
+    (require 'anything-startup nil t))
 
-  (defun anything-make-filelist (dir)
+  ;; ファイルリスト作成
+  (defun anything-make-filelist ()
     "Make file list."
-    (interactive "DDirectory: ")
-    (when (fboundp 'make-filelist2)
-      (make-filelist2 "~/.filelist" dir
-                      "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$")))
+    (interactive)
+    (let ((conf-file "~/.filelist-dir.el")
+          lst)
+      (if (file-readable-p conf-file)
+          (with-temp-buffer
+            (insert-file-contents conf-file)
+            (setq lst (read (current-buffer))))
+        (setq lst '("~/")))
+      (let* ((dirs (read (read-string
+                          "Dirlist: "
+                          (format "%s" (car (cdr lst)))))))
+        (make-filelist "~/.filelist" dirs
+                       "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$\\|~$\\|#$"))))
 
   (defun anything-choice ()
     "Anything choice."
     (interactive)
     (execute-choice-from-list
      "anything: "
-     '((?f "recentf(f)"  anything-recentf)
-       (?b "files(b)"    anything-for-files)
-       (?l "filelist(l)" anything-filelist))))
+     '((?p "filelist+(p)" anything-filelist+)
+       (?l "filelist(l)"  anything-filelist)
+       (?f "find-file(f)" anything-find-files)
+       (?r "recentf(r)"   anything-recentf)
+       (?b "bookmarks(b)" anything-bookmarks))))
   (define-key global-map (kbd "C-c a") 'anything-choice)
+  (define-key global-map (kbd "C-x a") 'anything)
 
   (eval-after-load "anything-config"
     '(progn
        (when (boundp 'anything-c-filelist-file-name)
          (setq anything-c-filelist-file-name "~/.filelist"))
        (when (boundp 'anything-grep-candidates-fast-directory-regexp)
-         (setq anything-grep-candidates-fast-directory-regexp "^/tmp"))
-       (global-set-key (kbd "C-x a") 'anything)
+         (setq anything-grep-candidates-anyfast-directory-regexp "~/"))
        (when (fboundp 'iswitchb-mode)
          (iswitchb-mode))
        (when (fboundp 'anything-iswitchb-setup)
