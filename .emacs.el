@@ -151,6 +151,19 @@
           (copy-file file copy t)
           (message "%s" file))))))
 
+;; ある特定のモードのバッファを全てキルする
+  (defun kill-all-buffer (mode)
+    "Kill grep buffer."
+    (interactive "sMode: ")
+    (save-excursion
+      (save-window-excursion
+        (dolist (buffer (buffer-list))
+          (switch-to-buffer buffer)
+          (when (eq major-mode mode)
+            (message "kill buffer: %s (%s)" buffer major-mode)
+            (when (buffer-live-p buffer)
+              (kill-buffer buffer)))))))
+
 ;;; サブディレクトリに load-path を追加
 (defun add-to-load-path (&rest paths)
   (dolist (path paths)
@@ -1540,11 +1553,16 @@
              (setq file-name-coding-system 'japanese-shift-jis)))
          (revert-buffer))
 
-       (defun dired-kill-buffer ()
+       (defun kill-dired-buffer ()
          "Kill dired current buffer."
          (interactive)
          (when (eq major-mode 'dired-mode)
            (kill-buffer (current-buffer))))
+
+       (defun kill-dired-all-buffer ()
+         "Kill all dired buffer."
+         (interactive)
+         (kill-all-buffer 'dired-mode))
 
        (when (boundp 'dired-mode-map)
          ;; firefox で開く
@@ -1564,7 +1582,9 @@
          ;; 文字コードをトグルする
          (define-key dired-mode-map (kbd "c") 'dired-file-name-jp)
          ;; kill する
-         (define-key dired-mode-map (kbd "M-k") 'dired-kill-buffer)
+         (define-key dired-mode-map (kbd "M-k") 'kill-dired-buffer)
+         ;; 全て kill する
+         (define-key dired-mode-map (kbd "C-M-k") 'kill-dired-all-buffer)
          ;; 編集可能にする
          (when (locate-library "wdired")
            (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
@@ -1974,22 +1994,17 @@
       (dired-omit-mode 1)))
 
   ;; org バッファを閉じる
-  (defun org-kill-all-buffer ()
-    "Kill org-mode buffer."
+  (defun kill-org-buffer ()
+    "Kill org current buffer."
     (interactive)
-    (when (and (require 'org nil t)
-               (fboundp 'org-mode))
-      (save-excursion
-        (save-window-excursion
-          (dolist (buffer (buffer-list))
-            (switch-to-buffer buffer)
-            (when (or (eq major-mode 'org-mode)
-                      (string-match
-                       "\\(\\*Org Agenda\\*\\)\\|\\( \\*Agenda Commands\\*\\)"
-                       (buffer-name buffer)))
-              (message "kill buffer: %s (%s)" buffer major-mode)
-              (when (buffer-live-p buffer)
-                (kill-buffer buffer))))))))
+    (when (eq major-mode 'org-mode)
+      (kill-buffer (current-buffer))))
+
+  ;; org バッファを全て閉じる
+  (defun kill-org-all-buffer ()
+    "Kill all org-mode buffer."
+    (interactive)
+    (kill-all-buffer 'org-mode))
 
   '(defun org-clock-update-time-maybe ()
     "If this is a CLOCK line, update it and return t.
@@ -2076,6 +2091,12 @@ Otherwise, return nil."
        ;; DONEの時刻を記録
        (when (boundp 'org-log-done)
          (setq org-log-done 'time))
+       ;; キーバインド
+       (when (boundp 'org-mode-map)
+         ;; kill する
+         (define-key org-mode-map (kbd "M-k") 'kill-org-buffer)
+         ;; 全て kill する
+         (define-key org-mode-map (kbd "C-M-k") 'kill-org-all-buffer))
        (message "Loading %s (org)...done" this-file-name))))
 
 ;; org-table 設定
@@ -2218,7 +2239,7 @@ Otherwise, return nil."
        (?s "storelink(s)" org-store-link)
        (?i "iswitchb(i)"  org-iswitchb)
        (?d "dired(d)"     org-dired)
-       (?k "kill(k)"      org-kill-all-buffer))))
+       (?k "kill(k)"      kill-org-all-buffer))))
   (define-key global-map (kbd "C-c o") 'org-choice))
 
 ;;; ファイル内のカーソル位置を記録する
@@ -2355,6 +2376,7 @@ Otherwise, return nil."
         (setq file-cache-alist (read (current-buffer))))))
 
   ;; ファイルからディレクトリリストを読み込む
+  ;; ("~/dir1" "~/dir2")
   (defun file-cache-add-dir-from-file (file)
     "Add directory list from file."
     (interactive "fDir list from file: ")
@@ -2618,22 +2640,16 @@ Otherwise, return nil."
   (autoload 'grep "igrep"
     "*Run `grep' PROGRAM to match REGEX in FILES..." t)
 
-  (defun kill-grep-all-buffer ()
-    "Kill grep buffer."
+  (defun kill-grep-buffer ()
+    "Kill grep current buffer."
     (interactive)
-    (save-excursion
-      (save-window-excursion
-        (dolist (buffer (buffer-list))
-          (switch-to-buffer buffer)
-          (when (or (eq major-mode 'igrep-mode)
-                    (string-match
-                     "\\(\\*.*grep.*\\*\\)"
-                     (buffer-name buffer)))
-            (message "kill buffer: %s (%s)" buffer major-mode)
-            (when (buffer-live-p buffer)
-              (kill-buffer buffer)))))))
-  (when (boundp 'grep-mode-map)
-    (define-key grep-mode-map (kbd "M-k") 'kill-grep-all-buffer))
+    (when (eq major-mode 'grep-mode)
+      (kill-buffer (current-buffer))))
+
+  (defun kill-grep-all-buffer ()
+    "Kill all grep buffer."
+    (interactive)
+    (kill-all-buffer 'grep-mode))
 
   (eval-after-load "igrep"
     '(progn
@@ -2642,7 +2658,12 @@ Otherwise, return nil."
                      (igrep-regex-option "-Ou8"))
        (igrep-find-define lgrep
                           (igrep-use-zgrep nil)
-                          (igrep-regex-option "-Ou8")))))
+                          (igrep-regex-option "-Ou8"))
+       ;; キーバインド
+       (when (boundp 'grep-mode-map)
+         (define-key grep-mode-map (kbd "M-k") 'kill-grep-buffer)
+         (define-key grep-mode-map (kbd "C-M-k") 'kill-grep-all-buffer))
+       (message "Loading %s (bm)...done" this-file-name))))
 
 ;; 複数のバッファを使う
 ;; (install-elisp-from-emacswiki "grep-a-lot.el")
@@ -2860,6 +2881,7 @@ Otherwise, return nil."
     (require 'anything-startup nil t))
 
   ;; ファイルリスト作成
+  ;; '("\"~/dir1\"" "\"~/dir2\"")
   (defun anything-make-filelist ()
     "Make file list."
     (interactive)
@@ -2885,9 +2907,10 @@ Otherwise, return nil."
        (?l "filelist(l)"  anything-filelist)
        (?f "find-file(f)" anything-find-files)
        (?r "recentf(r)"   anything-recentf)
-       (?b "bookmarks(b)" anything-bookmarks))))
+       (?b "bookmarks(b)" anything-bookmarks)
+       (?m "makelist(m)"  anything-make-filelist))))
   (define-key global-map (kbd "C-c a") 'anything-choice)
-  (define-key global-map (kbd "C-x a") 'anything)
+  (define-key global-map (kbd "C-x a") 'anything-filelist+)
 
   (eval-after-load "anything-config"
     '(progn
