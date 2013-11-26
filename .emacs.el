@@ -2788,8 +2788,8 @@ Otherwise, return nil."
   (add-hook 'after-revert-hook 'bm-buffer-restore)
   ;; キーバインド
   (define-key global-map (kbd "M-\\") 'bm-toggle)
-  (define-key global-map (kbd "M-[") 'bm-previous)
-  (define-key global-map (kbd "M-]") 'bm-next)
+  (define-key global-map (kbd "M-[")  'bm-previous)
+  (define-key global-map (kbd "M-]")  'bm-next)
 
   (eval-after-load "bm"
     '(progn
@@ -3186,6 +3186,7 @@ Otherwise, return nil."
   (autoload 'skk-mode
     "skk" "Daredevil SKK (Simple Kana to Kanji conversion program)." t)
   (define-key global-map (kbd "C-\\") 'skk-mode)
+  (define-key global-map (kbd "C-x t") nil) ; チュートリアル無効
 
   (eval-after-load "skk"
     '(progn
@@ -3234,6 +3235,7 @@ Otherwise, return nil."
           (lambda (date-information format gengo and-time)
             (skk-default-current-date
              date-information "%s-%s-%s(%s)%s:%s" 0 nil 0 0 0 0))))
+
        ;; ユーザ追加設定用の変数
        (when (boundp 'skk-rom-kana-rule-list)
          (setq skk-rom-kana-rule-list
@@ -3248,6 +3250,7 @@ Otherwise, return nil."
                          ("z." nil "。") ("z," nil "、") ("zt2" nil "‥")
                          ("zt3" nil "…")
                          ("z@" nil skk-today)))))
+
        ;; 句読点を変更する
        (when (boundp 'skk-kutouten-type)
          (setq-default skk-kutouten-type '(".". ","))
