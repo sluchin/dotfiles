@@ -2620,7 +2620,6 @@ Otherwise, return nil."
   (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
 
 ;;; 検索
-;; コマンド
 ;; (install-elisp-from-emacswiki "igrep.el")
 (when (locate-library "igrep")
   (autoload 'igrep "igrep"
@@ -2643,13 +2642,22 @@ Otherwise, return nil."
   (defun kill-grep-buffer ()
     "Kill grep current buffer."
     (interactive)
-    (when (eq major-mode 'grep-mode)
+    (when (or (eq major-mode 'grep-mode)
+              (eq major-mode 'igrep-mode))
       (kill-buffer (current-buffer))))
 
   (defun kill-grep-all-buffer ()
     "Kill all grep buffer."
     (interactive)
-    (kill-all-buffer 'grep-mode))
+    (kill-all-buffer 'grep-mode)
+    (kill-all-buffer 'igrep-mode))
+
+  ;; キーバインド
+  (add-hook 'grep-setup-hook
+            (lambda ()
+              (when (boundp 'grep-mode-map)
+                (define-key grep-mode-map (kbd "M-k") 'kill-grep-buffer)
+                (define-key grep-mode-map (kbd "C-M-k") 'kill-grep-all-buffer))))
 
   (eval-after-load "igrep"
     '(progn
@@ -2659,11 +2667,7 @@ Otherwise, return nil."
        (igrep-find-define lgrep
                           (igrep-use-zgrep nil)
                           (igrep-regex-option "-Ou8"))
-       ;; キーバインド
-       (when (boundp 'grep-mode-map)
-         (define-key grep-mode-map (kbd "M-k") 'kill-grep-buffer)
-         (define-key grep-mode-map (kbd "C-M-k") 'kill-grep-all-buffer))
-       (message "Loading %s (bm)...done" this-file-name))))
+       (message "Loading %s (igrep)...done" this-file-name))))
 
 ;; 複数のバッファを使う
 ;; (install-elisp-from-emacswiki "grep-a-lot.el")
@@ -2992,8 +2996,9 @@ Otherwise, return nil."
                          ;; それ以外は表示
                          (t b)))
                       (buffer-list)))))
-       (define-key tabbar-mode-map (kbd "C-.") 'tabbar-forward-tab)
-       (define-key tabbar-mode-map (kbd "C-,") 'tabbar-backward-tab)
+       (when (boundp 'tabbar-mode-map)
+         (define-key tabbar-mode-map (kbd "C-.") 'tabbar-forward-tab)
+         (define-key tabbar-mode-map (kbd "C-,") 'tabbar-backward-tab))
        (message "Loading %s (tabbar)...done" this-file-name))))
 
 ;;; 2chビューア (navi2ch)
