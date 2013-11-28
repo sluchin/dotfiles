@@ -68,8 +68,10 @@
         yasnippet-java-mode
         php-eldoc
         css-eldoc
+        php-mode
         php-extras
         phpplus-mode
+        emacs-php-align
         inf-php
         yaml-mode
         geben-on-emacs
@@ -205,16 +207,26 @@
                  :description "eldoc-mode plugin for CSS"
                  :pkgname "zenozeng/css-eldoc"
                  :url "https://github.com/zenozeng/css-eldoc.git")
+          (:name php-mode
+                 :type github
+                 :description "PHP Mode for GNU Emacs."
+                 :pkgname "ejmr/php-mode"
+                 :url "https://github.com/ejmr/php-mode.git")
           (:name php-extras
                  :type github
                  :description "Extra features for Emacs `php-mode'."
-                 :pkgname "arnested/css-eldoc"
+                 :pkgname "arnested/php-extras"
                  :url "https://github.com/arnested/php-extras.git")
           (:name phpplus-mode
                  :type github
                  :description "A better php mode for emacs, with specific support for Zend Framework 1."
                  :pkgname "echosa/phpplus-mode"
                  :url "https://github.com/echosa/phpplus-mode.git")
+          (:name emacs-php-align
+                 :type github
+                 :description "Emacs's alignment configuration for PHP."
+                 :pkgname "tetsujin/emacs-php-align"
+                 :url "https://github.com/tetsujin/emacs-php-align.git")
           (:name inf-php
                  :type github
                  :description "Run a php interactive shell on emacs."
