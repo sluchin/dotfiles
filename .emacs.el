@@ -1607,10 +1607,10 @@
             (lambda ()
               (buffer-face-set
                (font-face-attributes (frame-parameter nil 'font)))
-              (setq header-line-format nil))
-            ;; 自動更新しない
-            (when (fboundp 'speedbar-disable-update)
-              (speedbar-disable-update)))
+              (setq header-line-format nil)
+              ;; 自動更新しない
+              (when (fboundp 'speedbar-disable-update)
+                (speedbar-disable-update))))
 
   ;; フォーカスを移す
   (define-key global-map (kbd "C-c x") 'speedbar-get-focus)
@@ -1623,11 +1623,9 @@
          (setq speedbar-after-create-hook
                '(lambda ()
                   (set-frame-width-height-cursor))))
-       (when (boundp 'speedbar-use-images)                ; イメージ表示しない
+       (when (boundp 'speedbar-use-images)           ; イメージ表示しない
          (setq speedbar-use-images nil))
-       (when (boundp 'speedbar-hide-button-brackets-flag) ; ブラケット表示を隠す
-         (setq speedbar-hide-button-brackets-flag t))
-       (when (boundp 'speedbar-tag-hierarchy-method)      ; Tags グループ化
+       (when (boundp 'speedbar-tag-hierarchy-method) ; Tags グループ化
          (setq speedbar-tag-hierarchy-method
                '(speedbar-simple-group-tag-hierarchy)))
        ;; フレーム設定
