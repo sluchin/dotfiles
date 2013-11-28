@@ -5093,9 +5093,11 @@ Otherwise, return nil."
        (message "Loading %s (malabar-mode)...done" this-file-name))))
 
 ;;; PHP
-;; https://github.com/zenozeng/php-eldoc.git
+;; https://github.com/ejmr/php-mode.git
 ;; https://github.com/arnested/php-extras.git
 ;; https://github.com/echosa/phpplus-mode.git
+;; https://github.com/tetsujin/emacs-php-align.git
+;; https://github.com/zenozeng/php-eldoc.git
 ;; (load-library "php-extras-gen-eldoc")
 ;; (php-extras-generate-eldoc)
 ;; (auto-install-batch anything)
@@ -5123,6 +5125,13 @@ Otherwise, return nil."
                 (setq tab-width 4))
               (when (boundp 'indent-tabs-mode) ; スペース
                 (setq indent-tabs-mode nil))
+              (when (and (require 'php-mode nil t)
+                         (fboundp 'php-enable-symfony2-coding-style))
+                (php-enable-symfony2-coding-style))
+              ;; 揃える (M-x align)
+              (when (and (require 'php-align nil t)
+                         (fboundp 'php-align-setup))
+                (php-align-setup))
               (require 'php-eldoc nil t)
               (when (require 'auto-complete nil t)
                 (when (boundp 'ac-sources)
@@ -5197,6 +5206,27 @@ Otherwise, return nil."
     '(progn
        (message "Loading %s (yaml-mode)...done" this-file-name))))
 
+;; align
+(when (locate-library "align")
+  (defun align-repeat (start end regexp)
+    "Repeat alignment with respect to
+     the given regular expression."
+    (interactive "r\nsAlign regexp: ")
+    (align-regexp start end
+                  (concat "\\(\\s-*\\)" regexp) 1 1 t))
+  (add-hook 'align-load-hook
+            (lambda ()
+              (when (boundp 'align-rules-list)
+                (add-to-list 'align-rules-list
+                             '(php-doc-assignment
+                               (regexp . "\\w+\\b\\(\\s-*\\)\\w+\\b\\(\\s-*\\)\\w+\\b\\(\\s-*\\)")
+                               (group . (1 2 3))
+                               (modes  . '(php-mode))))
+                (when (boundp 'align-rules-list)
+                  (add-to-list 'align-rules-list
+                               '(yaml-assignment
+                                 (regexp . ":\\(\\s-*\\)")
+                                 (modes  . '(yaml-mode)))))))))
 ;;; ここまでプログラミング用設定
 
 ;;; ユーティリティ
