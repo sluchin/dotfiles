@@ -57,6 +57,8 @@
         cp5022x
         auto-complete
         bm
+        direx-el
+        popwin-el
         magit
         git-modes
         twittering-mode
@@ -146,12 +148,22 @@
                  :type github
                  :description "Emacs auto-complete package. http://auto-complete.org."
                  :pkgname "auto-complete/auto-complete"
-                 :url "git://github.com/auto-complete/auto-complete")
+                 :url "git://github.com/auto-complete/auto-complete.git")
           (:name bm
                  :type github
                  :description "Visible bookmarks in buffer."
                  :pkgname "joodland/bm"
                  :url "git://github.com/joodland/bm.git")
+          (:name direx-el
+                 :type github
+                 :description "direx.el is a simple directory explorer."
+                 :pkgname "m2ym/direx-el"
+                 :url "git://github.com/m2ym/direx-el.git")
+          (:name popwin-el
+                 :type github
+                 :description "Popup Window Manager for Emacs"
+                 :pkgname "m2ym/popwin-el"
+                 :url "git://github.com/m2ym/popwin-el.git")
           (:name magit
                  :type github
                  :description "control Git from Emacs."
@@ -201,47 +213,47 @@
                  :type github
                  :description "eldoc-mode plugin for PHP source code"
                  :pkgname "zenozeng/php-eldoc"
-                 :url "https://github.com/zenozeng/php-eldoc.git")
+                 :url "git://github.com/zenozeng/php-eldoc.git")
           (:name css-eldoc
                  :type github
                  :description "eldoc-mode plugin for CSS"
                  :pkgname "zenozeng/css-eldoc"
-                 :url "https://github.com/zenozeng/css-eldoc.git")
+                 :url "git://github.com/zenozeng/css-eldoc.git")
           (:name php-mode
                  :type github
                  :description "PHP Mode for GNU Emacs."
                  :pkgname "ejmr/php-mode"
-                 :url "https://github.com/ejmr/php-mode.git")
+                 :url "git://github.com/ejmr/php-mode.git")
           (:name php-extras
                  :type github
                  :description "Extra features for Emacs `php-mode'."
                  :pkgname "arnested/php-extras"
-                 :url "https://github.com/arnested/php-extras.git")
+                 :url "git://github.com/arnested/php-extras.git")
           (:name phpplus-mode
                  :type github
                  :description "A better php mode for emacs, with specific support for Zend Framework 1."
                  :pkgname "echosa/phpplus-mode"
-                 :url "https://github.com/echosa/phpplus-mode.git")
+                 :url "git://github.com/echosa/phpplus-mode.git")
           (:name emacs-php-align
                  :type github
                  :description "Emacs's alignment configuration for PHP."
                  :pkgname "tetsujin/emacs-php-align"
-                 :url "https://github.com/tetsujin/emacs-php-align.git")
+                 :url "git://github.com/tetsujin/emacs-php-align.git")
           (:name inf-php
                  :type github
                  :description "Run a php interactive shell on emacs."
                  :pkgname "taksatou/inf-php"
-                 :url "https://github.com/taksatou/inf-php")
+                 :url "git://github.com/taksatou/inf-php.git")
           (:name yaml-mode
                  :type github
                  :description "The emacs major mode for editing files in the YAML data serialization format."
                  :pkgname "yoshiki/yaml-mode"
-                 :url "https://github.com/yoshiki/yaml-mode.git")
+                 :url "git://github.com/yoshiki/yaml-mode.git")
           (:name geben-on-emacs
                  :type github
                  :description "GEBEN is a software package that interfaces Emacs to DBGp protocol with which you can debug running scripts interactive."
                  :pkgname "mcorde/geben-on-emacs"
-                 :url "https://github.com/mcorde/geben-on-emacs.git")
+                 :url "git://github.com/mcorde/geben-on-emacs.git")
           (:name malabar-mode
                  :type github
                  :description "A better Java mode for Emacs"
@@ -251,7 +263,7 @@
                  :type github
                  :description "A Haskell editing mode."
                  :pkgname "haskell/haskell-mode"
-                 :url "git://github.com/haskell/haskell-mode")
+                 :url "git://github.com/haskell/haskell-mode.git")
           (:name clojure-mode
                  :type github
                  :description "Major mode for Clojure code."
