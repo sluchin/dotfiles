@@ -2617,6 +2617,28 @@ Otherwise, return nil."
   (define-key global-map (kbd "C-c C-w") 'mark-word*)            ; 単語選択
   (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
 
+;;; ディレクトリツリー
+;; git://github.com/m2ym/direx-el.git
+;; git://github.com/m2ym/popwin-el.git
+(when (locate-library "direx")
+  (autoload 'direx:jump-to-directory-other-window "direx"
+    "Simple Directory Explorer." t)
+  (autoload 'direx-project:jump-to-project-root-other-window "direx-project"
+    "Project Module for Direx." t)
+    (autoload 'popwin:special-display-config "popwin"
+      "Project Module for Direx." t)
+  (define-key global-map (kbd "C-c C-j")
+    'direx:jump-to-directory-other-window)
+  (eval-after-load "direx"
+    '(progn
+       (when (require 'popwin nil t)
+         (when (fboundp 'popwin-mode)
+           (popwin-mode 1))
+         (when (boundp 'popwin:special-display-config)
+           (push '(direx:direx-mode :position left :width 25 :dedicated t)
+                 popwin:special-display-config)))
+       (message "Loading %s (direx)...done" this-file-name))))
+
 ;;; 検索
 ;; (install-elisp-from-emacswiki "igrep.el")
 (when (locate-library "igrep")
