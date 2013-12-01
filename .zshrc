@@ -1,23 +1,65 @@
-# .zshrc
-# initial setup file for only interactive zsh
+# curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
+# Path to your oh-my-zsh configuration.
+ZSH=$HOME/.oh-my-zsh
 
-autoload -U compinit && compinit
-autoload -Uz vcs_info
-autoload -Uz add-zsh-hook
-autoload -Uz is-at-least
-autoload -Uz colors && colors
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
+ZSH_THEME="robbyrussell"
 
-case ${UID} in
-    0) PROMPT_MARK="#" ;;
-    *) PROMPT_MARK="%%" ;;
-esac
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
 
-PROMPT="%{$fg[red]%}[%*] %n${PROMPT_MARK}%{$reset_color%} "
-RPROMPT="%1(v|%{$fg[green]%}(%1v%3(v|%{$fg[red]%}:%3v|)%2(v|%{$fg[yellow]%}⚡|)%{$fg[green]%})%{$reset_color%}|)%{$bg[magenta]$fg[white]%}[ %~ ]%{$reset_color%}"
-SPROMPT="%{$fg[red]%}%r is correct? [n,y,a,e]:%{$reset_color%} "
+# Set to this to use case-sensitive completion
+# CASE_SENSITIVE="true"
 
-[ -n "${REMOTEHOST}${SSH_CONNECTION}" ] &&
-    PROMPT="%{$fg[white]%}${HOST%%.*}%{$reset_color%} ${PROMPT} "
+# Uncomment this to disable bi-weekly auto-update checks
+# DISABLE_AUTO_UPDATE="true"
+
+# Uncomment to change how often before auto-updates occur? (in days)
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment following line if you want to disable colors in ls
+# DISABLE_LS_COLORS="true"
+
+# Uncomment following line if you want to disable autosetting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment following line if you want to disable command autocorrection
+# DISABLE_CORRECTION="true"
+
+# Uncomment following line if you want red dots to be displayed while waiting for completion
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment following line if you want to disable marking untracked files under
+# VCS as dirty. This makes repository status check for large repositories much,
+# much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+plugins=(git github perl symfony2)
+
+if [ -f $ZSH/oh-my-zsh.sh ]; then
+    source $ZSH/oh-my-zsh.sh
+fi
+
+if [ -d $HOME/.zsh/plugin ]; then
+    source $HOME/.zsh/plugin/*
+fi
+
+# Customize to your needs...
+export PATH=$PATH:/home/higashi/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
+# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
+fpath=($HOME/.zsh/completion $fpath)
+
+autoload -U compinit
+compinit -u
 
 HISTSIZE=100000
 SAVEHIST=100000
@@ -57,70 +99,3 @@ stty stop undef
 
 # bindkey
 bindkey -e
-
-zstyle ':completion:*' format '%BCompleting %d%b'
-zstyle ':completion:*' group-name ''
-zstyle ':vcs_info:*' max-exports 3
-zstyle ':vcs_info:*' enable git svn hg bzr
-zstyle ':vcs_info:*' formats '%s:%b' '%m'
-zstyle ':vcs_info:*' actionformats '%s:%b' '%m' '%a'
-zstyle ':vcs_info:(svn|bzr):*' branchformat '%b:r%r'
-zstyle ':vcs_info:bzr:*' use-simple true
-
-if is-at-least 4.3.11; then
-    # git のときはフック関数を設定する
-
-    # formats '(%s)-[%b]' '%c%u %m' , actionformats '(%s)-[%b]' '%c%u %m' '<!%a>'
-    # のメッセージを設定する直前のフック関数
-    # 今回の設定の場合はformat の時は2つ, actionformats の時は3つメッセージがあるので
-    # 各関数が最大3回呼び出される。
-    zstyle ':vcs_info:git+set-message:*' hooks \
-        git-hook-begin \
-        git-push-status
-
-    # フックの最初の関数
-    # git の作業コピーのあるディレクトリのみフック関数を呼び出すようにする
-    # (.git ディレクトリ内にいるときは呼び出さない)
-    # .git ディレクトリ内では git status --porcelain などがエラーになるため
-    function +vi-git-hook-begin() {
-        if [[ $(command git rev-parse --is-inside-work-tree 2> /dev/null) != 'true' ]]; then
-            # 0以外を返すとそれ以降のフック関数は呼び出されない
-            return 1
-        fi
-
-        return 0
-    }
-
-    # push していないコミットの件数表示
-    # リモートリポジトリに push していないコミットの件数を
-    # pN という形式で misc (%m) に表示する
-    function +vi-git-push-status() {
-        # zstyle formats, actionformats の2番目のメッセージのみ対象にする
-        if [[ "$1" != "1" ]]; then
-            return 0
-        fi
-
-        # push していないコミット数を取得する
-        local ahead
-        ahead=$(command git rev-list origin/${hook_com[branch]}..${hook_com[branch]} 2>/dev/null \
-            | wc -l \
-            | tr -d ' ')
-
-        if [[ "$ahead" -gt 0 ]]; then
-            # misc (%m) に追加
-            # hook_com[misc]+="(p${ahead})"
-            hook_com[misc]+="${ahead}"
-        fi
-    }
-fi
-
-
-function _precmd_vcs_info() {
-    psvar=()
-    LANG=en_US.UTF-8 vcs_info
-    [[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
-    [[ -n "$vcs_info_msg_1_" ]] && psvar[2]="$vcs_info_msg_1_"
-    [[ -n "$vcs_info_msg_2_" ]] && psvar[3]="$vcs_info_msg_2_"
-}
-add-zsh-hook precmd _precmd_vcs_info
-
