@@ -83,6 +83,7 @@ setopt auto_param_keys
 setopt pushd_ignore_dups
 setopt magic_equal_subst
 setopt share_history
+setopt complete_aliases
 
 # alias
 alias pu=pushd
