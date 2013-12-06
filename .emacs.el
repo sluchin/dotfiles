@@ -968,7 +968,8 @@
      '((?m "set(m)"  bookmark-set)
        (?l "list(l)" bookmark-bmenu-list)
        (?b "jump(b)" bookmark-jump)
-       (?s "save(s)" bookmark-save))))
+       (?s "save(s)" bookmark-save)
+       (?f "load(f)" bookmark-load))))
   (define-key global-map (kbd "C-c r") 'bookmark-choice)
 
   (eval-after-load "bookmark"
@@ -3671,7 +3672,7 @@ Otherwise, return nil."
     "Mew send."
     (interactive)
     (when (fboundp 'mew-send)
-      (let ((to "team-m-all@itec-hokkaido.co.jp")
+      (let ((to "sgn-daily-report@itec-hokkaido.co.jp")
             (subject (concat "日報 (" (format-time-string "%Y%m%d") " 東哲也)"))
             (buffer (current-buffer))
             (template "~/.template_daily")
@@ -5180,6 +5181,12 @@ Otherwise, return nil."
 (when (locate-library "inf-php")
     (autoload 'inf-php "inf-php"
       "A php process can be fired up with M-x inf-php." t))
+
+;; Java Script
+(when (locate-library "js2-mode")
+  (autoload 'js2-mode "js2-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-to-list 'auto-mode-alist '("\\.json\\'" . js2-mode)))
 
 ;;; CSS
 ;; git clone https://github.com/zenozeng/css-eldoc.git

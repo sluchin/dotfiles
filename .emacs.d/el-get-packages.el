@@ -53,6 +53,7 @@
         package-install
         summarye
         php-eval
+        js2-mode
         ;; github
         cp5022x
         auto-complete
@@ -137,6 +138,10 @@
                  :type http
                  :description "eval PHP script and display the result."
                  :url "http://www.ne.jp/asahi/alpha/kazu/pub/emacs/php-eval.el")
+          (:name js2-mode
+                 :type http
+                 :description "Enhanced JavaScript IDE Emacs Mode"
+                 :url "http://js2-mode.googlecode.com/files/js2-mode.el")
 
           ;; github
           (:name cp5022x
