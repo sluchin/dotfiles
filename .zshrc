@@ -6,8 +6,8 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-#ZSH_THEME="robbyrussell"
-ZSH_THEME="bira"
+# robbyrussell agnoster bira bureau candy blinks
+ZSH_THEME="bureau"
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -101,3 +101,6 @@ stty stop undef
 
 # bindkey
 bindkey -e
+
+local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
+RPS1="${return_code} $RPS1"
