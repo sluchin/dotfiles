@@ -6,6 +6,7 @@ EMACS_DIR=.emacs.d
 
 # zsh
 OHMYZSH=.oh-my-zsh
+ZSH_PLUGIN=.zsh
 ZSH_RC=.zshrc
 ZSH_ENV=.zshenv
 ZSH_PROFILE=.zlogin
@@ -66,6 +67,7 @@ autolink $DOTFILES $HOME $ZSH_RC
 autolink $DOTFILES $HOME $ZSH_ENV
 autolink $DOTFILES $HOME $ZSH_PROFILE
 autolink $DOTFILES $HOME $OHMYZSH
+autolink $DOTFILES $HOME $ZSH_PLUGIN
 
 # git
 autolink $DOTFILES $HOME $GIT_CONF
