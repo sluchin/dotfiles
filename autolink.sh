@@ -13,6 +13,7 @@ ZSH_PROFILE=.zlogin
 #git
 GIT_CONF=.gitconfig
 GIT_IGNORE=.gitignore.local
+GIT_DIFF=diff-highlight
 
 DOTFILES=$HOME/dotfiles
 BAK_DIR=$HOME/backup
@@ -34,15 +35,16 @@ fi
 
 autolink()
 {
-    link=$1
-    echo "$HOME/$link"
-    if [ -e "$HOME/$link" -o -L "$HOME/$link" ]; then
-        if [ ! -e "$BAK_DIR/$link" -a -e "$HOME/$link" ]; then
-            mv $HOME/$link $BAK_DIR/.; retval=$?
+    src=$1
+    dst=$2
+    link=$3
+    if [ -e "$dst/$link" -o -L "$dst/$link" ]; then
+        if [ ! -e "$BAK_DIR/$link" -a -e "$dst/$link" ]; then
+            mv $dst/$link $BAK_DIR/.; retval=$?
             echo "mv $link[$retval]"
         else
-            if [ -L "$HOME/$link" ]; then
-                rm $HOME/$link; retval=$?
+            if [ -L "$dst/$link" ]; then
+                rm $dst/$link; retval=$?
                 echo "rm $link[$retval]"
             else
                 echo "Can not make $link"
@@ -51,22 +53,27 @@ autolink()
         fi
     fi
 
-    ln -s $DOTFILES/$link $HOME/.; retval=$?
+    ln -s $src/$link $dst/.; retval=$?
     echo "ln -s $link[$retval]"
 }
 
 # emacs
-autolink $EMACS_CONF
-autolink $EMACS_DIR
+autolink $DOTFILES $HOME $EMACS_CONF
+autolink $DOTFILES $HOME $EMACS_DIR
 
 # zsh
-autolink $ZSH_RC
-autolink $ZSH_ENV
-autolink $ZSH_PROFILE
-autolink $OHMYZSH
+autolink $DOTFILES $HOME $ZSH_RC
+autolink $DOTFILES $HOME $ZSH_ENV
+autolink $DOTFILES $HOME $ZSH_PROFILE
+autolink $DOTFILES $HOME $OHMYZSH
 
 # git
-autolink $GIT_CONF
-autolink $GIT_IGNORE
+autolink $DOTFILES $HOME $GIT_CONF
+autolink $DOTFILES $HOME $GIT_IGNORE
+if [ ! -d $HOME/bin ]; then
+    mkdir $HOME/bin; retval=$?
+    echo "mkdir $HOME/bin[$retval]"
+fi
+autolink $DOTFILES/bin $HOME/bin $GIT_DIFF
 
 exit 0
