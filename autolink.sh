@@ -15,6 +15,7 @@ ZSH_PROFILE=.zlogin
 GIT_CONF=.gitconfig
 GIT_IGNORE=.gitignore.local
 GIT_DIFF=diff-highlight
+GIT_MELD=git-meld.pl
 
 # mysql
 MYSQL=.my.cnf
@@ -80,6 +81,7 @@ if [ ! -d $HOME/bin ]; then
     echo "mkdir $HOME/bin[$retval]"
 fi
 autolink $DOTFILES/bin $HOME/bin $GIT_DIFF
+autolink $DOTFILES/bin $HOME/bin $GIT_MELD
 
 # mysql
 autolink $DOTFILES $HOME $MYSQL
