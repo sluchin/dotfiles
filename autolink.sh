@@ -6,7 +6,7 @@ EMACS_DIR=.emacs.d
 
 # zsh
 OHMYZSH=.oh-my-zsh
-ZSH_PLUGIN=.zsh
+ZSH_PLUGIN=.zsh.d
 ZSH_RC=.zshrc
 ZSH_ENV=.zshenv
 ZSH_PROFILE=.zlogin
@@ -15,6 +15,9 @@ ZSH_PROFILE=.zlogin
 GIT_CONF=.gitconfig
 GIT_IGNORE=.gitignore.local
 GIT_DIFF=diff-highlight
+
+# mysql
+MYSQL=.my.cnf
 
 DOTFILES=$HOME/dotfiles
 BAK_DIR=$HOME/backup
@@ -77,5 +80,8 @@ if [ ! -d $HOME/bin ]; then
     echo "mkdir $HOME/bin[$retval]"
 fi
 autolink $DOTFILES/bin $HOME/bin $GIT_DIFF
+
+# mysql
+autolink $DOTFILES $HOME $MYSQL
 
 exit 0

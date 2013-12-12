@@ -1412,11 +1412,16 @@
             (lambda ()
               (require 'dired-x nil t)
               (require 'ls-lisp nil t)))
-  ;; ゴミ箱に移動する
+
   (add-hook 'dired-mode-hook
             (lambda ()
+              ;; ゴミ箱に移動する
               (set (make-local-variable
-                    'delete-by-moving-to-trash) t)))
+                    'delete-by-moving-to-trash) t)
+              ;; バックアップファイルを表示しない
+              (when (and (require 'dired-x nil t)
+                         (fboundp 'dired-omit-mode))
+                (dired-omit-mode 1))))
 
   (eval-after-load "dired"
     '(progn
