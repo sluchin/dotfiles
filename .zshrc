@@ -48,19 +48,51 @@ if [ -f $ZSH/oh-my-zsh.sh ]; then
     source $ZSH/oh-my-zsh.sh
 fi
 
-if [ -d $HOME/.zsh/plugin ]; then
-    source $HOME/.zsh/plugin/*
+# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
+# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
+ZSH_DIR=$HOME/.zsh.d
+if [ -d $ZSH_DIR/plugin ]; then
+    source $ZSH_DIR/plugin/*
+fi
+
+if [ -d $ZSH_DIR/functions ]; then
+    source $ZSH_DIR/functions/*
 fi
 
 # Customize to your needs...
-export PATH=$PATH:/home/higashi/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+path=(
+    $path
+    $HOME/bin
+    /usr/local/sbin
+    /usr/local/bin
+    /usr/sbin
+    /usr/bin
+    /sbin
+    /bin
+)
 
-# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
-# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
-fpath=($HOME/.zsh/completion $fpath)
+fpath=(
+    $fpath
+    $HOME/.zsh.d/*(/N)
+)
 
+cdpath=(
+    $cdpath
+    ..
+    $HOME
+    $HOME/src
+    $HOME/devel
+)
+
+typeset -U path fpath cdpath manpath
+fignore=('.elc' '.o' '~' '\#')
+
+# autoload
 autoload -U compinit
 compinit -u
+autoload run-help
+autoload -U colors
+colors
 
 HISTSIZE=100000
 SAVEHIST=100000
@@ -70,37 +102,92 @@ HISTFILE=~/.zhistory
 setopt auto_cd
 setopt auto_remove_slash
 setopt auto_name_dirs
+setopt auto_pushd
+setopt auto_menu
+setopt auto_param_keys
 setopt extended_history
 setopt hist_ignore_dups
 setopt hist_ignore_space
+setopt share_history
 setopt prompt_subst
 setopt extended_glob
 setopt list_types
+setopt list_packed
 setopt no_beep
 setopt always_last_prompt
 setopt cdable_vars
 setopt sh_word_split
-setopt auto_param_keys
 setopt pushd_ignore_dups
 setopt magic_equal_subst
-setopt share_history
 setopt complete_aliases
+setopt no_clobber
+setopt numeric_glob_sort
+setopt extended_glob
+setopt notify
+unsetopt auto_param_slash
 
 # alias
 alias pu=pushd
 alias po=popd
 alias dirs='dirs -v'
 alias ls='ls --color=auto'
+alias ll='ls --color=auto -l ^*~'
+alias la='ls --color=auto -a ^*~'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias g='git --no-pager'
+alias -s log='tail -f'
+alias -s c='emacsclient'
+alias -s h='emacsclient'
+alias -s cpp='emacsclient'
+alias -s php='emacsclient'
+alias -s yml='emacsclient'
+alias -s el='emacsclient'
+alias -s zsh='emacsclient'
+alias -s sh='emacsclient'
+alias -s pl='emacsclient'
 
 # stty
 stty stop undef
 
 # bindkey
 bindkey -e
+bindkey "^P" history-beginning-search-backward
+bindkey "^N" history-beginning-search-forward
 
+# prompt
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
 RPS1="${return_code} $RPS1"
+
+# mysql prompt
+# https://github.com/tetsujin/zsh-function-mysql
+# mysql client user
+typeset -A mysql_prompt_style_client_user
+mysql_prompt_style_client_user=(
+    'root'     $fg_bold[red]
+    '*'        $fg_bold[green]
+)
+# mysql client host
+typeset -A mysql_prompt_style_client_host
+mysql_prompt_style_client_host=(
+    '*.local.*'     "$fg_bold[green]"
+    '*.dev.*'       "$fg_bold[yellow]"
+    '*'             "$fg_bold[red]"
+)
+# mysql server user
+typeset -A mysql_prompt_style_server_user
+mysql_prompt_style_server_user=(
+    'root'          "$bg_bold[red]$fg_bold[yellow]"
+    '*'             "$fg_bold[blue]"
+)
+# mysql server host
+typeset -A mysql_prompt_style_server_host
+mysql_prompt_style_server_host=(
+    '*master*'      "$bg_bold[red]$fg_bold[yellow]"  # Master Server
+    '*slave*'       "$bg[yellow]$fg[black]" # Slvae Server
+    '*'             "$fg_bold[blue]"
+)
+# mysql prompt style (Should use single quoted string.)
+mysql_prompt='${style_client_host}${USER}@${HOST}${fg_bold[white]} -> '
+mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}@${style_server_host}\h${reset_color}${fg_bold[white]}:${fg[magenta]}\d ${fg_bold[white]}\v${reset_color}\n'
