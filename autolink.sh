@@ -11,6 +11,10 @@ ZSH_RC=.zshrc
 ZSH_ENV=.zshenv
 ZSH_PROFILE=.zlogin
 
+# tmux
+TMUX_DIR=.tmux
+TMUX_CONF=.tmux.conf
+
 #git
 GIT_CONF=.gitconfig
 GIT_IGNORE=.gitignore.local
@@ -72,6 +76,10 @@ autolink $DOTFILES $HOME $ZSH_ENV
 autolink $DOTFILES $HOME $ZSH_PROFILE
 autolink $DOTFILES $HOME $OHMYZSH
 autolink $DOTFILES $HOME $ZSH_PLUGIN
+
+# tmux
+autolink $DOTFILES $HOME $TMUX_DIR
+autolink $DOTFILES $HOME $TMUX_CONF
 
 # git
 autolink $DOTFILES $HOME $GIT_CONF
