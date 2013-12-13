@@ -144,9 +144,6 @@ alias -s cpp='emacsclient'
 alias -s php='emacsclient'
 alias -s yml='emacsclient'
 alias -s el='emacsclient'
-alias -s zsh='emacsclient'
-alias -s sh='emacsclient'
-alias -s pl='emacsclient'
 
 # stty
 stty stop undef
@@ -191,3 +188,6 @@ mysql_prompt_style_server_host=(
 # mysql prompt style (Should use single quoted string.)
 mysql_prompt='${style_client_host}${USER}@${HOST}${fg_bold[white]} -> '
 mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}@${style_server_host}\h${reset_color}${fg_bold[white]}:${fg[magenta]}\d ${fg_bold[white]}\v${reset_color}\n'
+
+# tmux
+#PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD")'
