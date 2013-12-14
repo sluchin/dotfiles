@@ -1,6 +1,7 @@
 # curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
 # Path to your oh-my-zsh configuration.
-ZSH=$HOME/.oh-my-zsh
+ZSH_DIR=$HOME/.zsh.d
+ZSH=$ZSH_DIR/oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -50,7 +51,6 @@ fi
 
 # curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
 # curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
-ZSH_DIR=$HOME/.zsh.d
 if [ -d $ZSH_DIR/plugin ]; then
     source $ZSH_DIR/plugin/*
 fi
@@ -137,6 +137,7 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias g='git --no-pager'
+
 alias -s log='tail -f'
 alias -s c='emacsclient'
 alias -s h='emacsclient'
@@ -144,6 +145,15 @@ alias -s cpp='emacsclient'
 alias -s php='emacsclient'
 alias -s yml='emacsclient'
 alias -s el='emacsclient'
+
+alias -g L='| less'
+alias -g H='| head'
+alias -g T='| tail'
+alias -g G='| grep'
+alias -g W='| wc'
+alias -g S='| sed'
+alias -g A='| awk'
+alias -g W='| wc'
 
 # stty
 stty stop undef
@@ -191,3 +201,4 @@ mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}
 
 # tmux
 #PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD")'
+
