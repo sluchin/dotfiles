@@ -4,9 +4,7 @@
 
 (setq el-get-packages
       ;; emacswiki
-      '(color-moccur
-        moccur-edit
-        auto-install
+      '(auto-install
         info+
         thing-opt
         igrep

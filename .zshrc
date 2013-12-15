@@ -137,6 +137,8 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias g='git --no-pager'
+alias e='emacsclient'
+alias kille="emacsclient -e '(kill-emacs)'"
 
 alias -s log='tail -f'
 alias -s c='emacsclient'
@@ -202,3 +204,19 @@ mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}
 # tmux
 #PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD")'
 
+if pgrep emacs >/dev/null 2>&1; then
+echo "Emacs server is already running..."
+else
+`emacs --daemon`
+fi
+
+# tmux自動起動
+if [ -z "$TMUX" -a -z "$STY" ]; then
+    if type tmux >/dev/null 2>&1; then
+        if tmux has-session && tmux list-sessions | /usr/bin/grep -qE '.*]$'; then
+            tmux attach && echo "tmux attached session "
+        else
+            tmux new-session && echo "tmux created new session"
+        fi
+    fi
+fi

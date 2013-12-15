@@ -260,7 +260,8 @@
                "slime" "sbcl" "clisp" "ecl" "gauche" "gauche-dev"
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
                "clojure1.4" "leiningen"
-               "libgmp-dev" "perltidy" "php5" "php-elisp" "php-doc" "global"))
+               "libgmp-dev" "perltidy" "php5" "php-elisp" "php-doc" "global"
+               "tmux" "xclip"))
         (passwd (password-cache-sudo)))
     (dolist (l lst)
       (message (concat "==> " l))
