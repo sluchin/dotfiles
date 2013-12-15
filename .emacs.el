@@ -472,18 +472,20 @@
          (setq-default line-spacing 1))
         (t
          ;; それ以外
+         ;; "Monospace" "Ricty"
          (if (<= emacs-major-version 21)
              (set-face-attribute 'default nil
                                  :family "Monospace"
                                  :height 120)
            (set-face-attribute 'default nil
-                               :family "Monospace"
+                               :family "Ricty"
                                :height 80))
+         ;; "Hiragino Mincho Pro" "Ricty"
          (if (fboundp 'font-spec)
              (set-fontset-font "fontset-default" 'japanese-jisx0208
-                               (font-spec :family "Hiragino Mincho Pro"))
+                               (font-spec :family "Ricty"))
            (set-fontset-font "fontset-default" 'japanese-jisx0208
-                             '("Hiragino Mincho Pro" . "jisx0208.*"))))))
+                             '("Ricty" . "jisx0208.*"))))))
 
 ;; モナーフォントに変更する
 ;; モナーフォントをインストールしておくこと
