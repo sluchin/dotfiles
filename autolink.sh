@@ -82,10 +82,12 @@ autolink $DOTFILES $HOME $TMUX_DIR
 autolink $DOTFILES $HOME $TMUX_CONF
 autolink $DOTFILES $HOME $TMUX_RC
 
-for font in $DOTFILES/.fonts/*.tar.gz
+cd $DOTFILES/.fonts
+for font in *.tar.gz
 do
     tar xvfz $font
 done
+cd $OLDPWD
 autolink $DOTFILES $HOME $TMUX_FONTS
 
 # git
