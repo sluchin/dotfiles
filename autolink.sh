@@ -5,8 +5,7 @@ EMACS_CONF=.emacs.el
 EMACS_DIR=.emacs.d
 
 # zsh
-OHMYZSH=.oh-my-zsh
-ZSH_PLUGIN=.zsh.d
+ZSH_DIR=.zsh.d
 ZSH_RC=.zshrc
 ZSH_ENV=.zshenv
 ZSH_PROFILE=.zlogin
@@ -14,6 +13,8 @@ ZSH_PROFILE=.zlogin
 # tmux
 TMUX_DIR=.tmux
 TMUX_CONF=.tmux.conf
+TMUX_RC=.tmux-powerlinerc
+TMUX_FONTS=.fonts
 
 #git
 GIT_CONF=.gitconfig
@@ -37,7 +38,7 @@ if [ ! -e $BAK_DIR ]; then
     echo "mkdir $BAK_DIR"
 else
     if [ ! -d $BAK_DIR ]; then
-        echo "$BAK_DIR exist"
+        echo "$BAK_DIR file exist"
         exit 1
     fi
 fi
@@ -74,16 +75,23 @@ autolink $DOTFILES $HOME $EMACS_DIR
 autolink $DOTFILES $HOME $ZSH_RC
 autolink $DOTFILES $HOME $ZSH_ENV
 autolink $DOTFILES $HOME $ZSH_PROFILE
-autolink $DOTFILES $HOME $OHMYZSH
-autolink $DOTFILES $HOME $ZSH_PLUGIN
+autolink $DOTFILES $HOME $ZSH_DIR
 
 # tmux
 autolink $DOTFILES $HOME $TMUX_DIR
 autolink $DOTFILES $HOME $TMUX_CONF
+autolink $DOTFILES $HOME $TMUX_RC
+
+for font in $DOTFILES/.fonts/*.tar.gz
+do
+    tar xvfz $font
+done
+autolink $DOTFILES $HOME $TMUX_FONTS
 
 # git
 autolink $DOTFILES $HOME $GIT_CONF
 autolink $DOTFILES $HOME $GIT_IGNORE
+
 if [ ! -d $HOME/bin ]; then
     mkdir $HOME/bin; retval=$?
     echo "mkdir $HOME/bin[$retval]"
@@ -93,5 +101,25 @@ autolink $DOTFILES/bin $HOME/bin $GIT_MELD
 
 # mysql
 autolink $DOTFILES $HOME $MYSQL
+
+# fonts
+if [ $USER = 'root' ]; then
+    FONTS_DIR=/usr/local/share/fonts/truetype
+    RICTY_DIR=$FONTS_DIR/ricty
+    if [ ! -d $RICTY_DIR ]; then
+        mkdir -p $RICTY_DIR; retval=$?
+        echo "mkdir $RICTY_DIR[$retval]"
+    fi
+
+    for ttf in $DOTFILES/.fonts/*.ttf
+    do
+        file=`basename $ttf`
+        autolink $DOTFILES/.fonts $RICTY_DIR $file
+    done
+fi
+
+fc-cache -vf
+
+# gconftool-2 --set /apps/gnome-terminal/profiles/Default/font --type string "Ricty Regular 10"
 
 exit 0
