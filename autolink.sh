@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Xmodmap
+XMODMAP=.Xmodmap
+
+# aspell
+ASPELL_CONF=.aspell.conf
+
 # emacs
 EMACS_CONF=.emacs.el
 EMACS_DIR=.emacs.d
@@ -8,22 +14,24 @@ EMACS_DIR=.emacs.d
 ZSH_DIR=.zsh.d
 ZSH_RC=.zshrc
 ZSH_ENV=.zshenv
-ZSH_PROFILE=.zlogin
+ZSH_LOGIN=.zlogin
 
 # tmux
 TMUX_DIR=.tmux
 TMUX_CONF=.tmux.conf
 TMUX_RC=.tmux-powerlinerc
-TMUX_FONTS=.fonts
 
-#git
+# git
 GIT_CONF=.gitconfig
 GIT_IGNORE=.gitignore.local
 GIT_DIFF=diff-highlight
 GIT_MELD=git-meld.pl
 
 # mysql
-MYSQL=.my.cnf
+MYSQL_CONF=.my.cnf
+
+# font
+FONTS=.fonts
 
 DOTFILES=$HOME/dotfiles
 BAK_DIR=$HOME/backup
@@ -67,6 +75,12 @@ autolink()
     echo "ln -s $link[$retval]"
 }
 
+# Xmodmap
+autolink $DOTFILES $HOME $XMODMAP
+
+# aspell
+autolink $DOTFILES $HOME $ASPELL_CONF
+
 # emacs
 autolink $DOTFILES $HOME $EMACS_CONF
 autolink $DOTFILES $HOME $EMACS_DIR
@@ -74,21 +88,13 @@ autolink $DOTFILES $HOME $EMACS_DIR
 # zsh
 autolink $DOTFILES $HOME $ZSH_RC
 autolink $DOTFILES $HOME $ZSH_ENV
-autolink $DOTFILES $HOME $ZSH_PROFILE
+autolink $DOTFILES $HOME $ZSH_LOGIN
 autolink $DOTFILES $HOME $ZSH_DIR
 
 # tmux
 autolink $DOTFILES $HOME $TMUX_DIR
 autolink $DOTFILES $HOME $TMUX_CONF
 autolink $DOTFILES $HOME $TMUX_RC
-
-cd $DOTFILES/.fonts
-for font in *.tar.gz
-do
-    tar xvfz $font
-done
-cd $OLDPWD
-autolink $DOTFILES $HOME $TMUX_FONTS
 
 # git
 autolink $DOTFILES $HOME $GIT_CONF
@@ -102,9 +108,17 @@ autolink $DOTFILES/bin $HOME/bin $GIT_DIFF
 autolink $DOTFILES/bin $HOME/bin $GIT_MELD
 
 # mysql
-autolink $DOTFILES $HOME $MYSQL
+autolink $DOTFILES $HOME $MYSQL_CONF
 
 # fonts
+cd $DOTFILES/.fonts
+for font in *.tar.gz
+do
+    tar xvfz $font
+done
+cd $OLDPWD
+autolink $DOTFILES $HOME $FONTS
+
 if [ $USER = 'root' ]; then
     FONTS_DIR=/usr/local/share/fonts/truetype
     RICTY_DIR=$FONTS_DIR/ricty
@@ -120,7 +134,9 @@ if [ $USER = 'root' ]; then
     done
 fi
 
-fc-cache -vf
+if [ -n `which fc-cache` ]; then
+    fc-cache -vf
+fi
 
 # gconftool-2 --set /apps/gnome-terminal/profiles/Default/font --type string "Ricty Regular 10"
 
