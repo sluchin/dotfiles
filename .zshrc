@@ -204,14 +204,8 @@ mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}
 # tmux
 #PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD")'
 
-if pgrep emacs >/dev/null 2>&1; then
-echo "Emacs server is already running..."
-else
-`emacs --daemon`
-fi
-
 # tmux自動起動
-if [ -z "$TMUX" -a -z "$STY" ]; then
+if [ -n `which tmux` -a -z "$TMUX" -a -z "$STY" ]; then
     if type tmux >/dev/null 2>&1; then
         if tmux has-session && tmux list-sessions | /usr/bin/grep -qE '.*]$'; then
             tmux attach && echo "tmux attached session "
@@ -219,4 +213,11 @@ if [ -z "$TMUX" -a -z "$STY" ]; then
             tmux new-session && echo "tmux created new session"
         fi
     fi
+fi
+
+# emacsclient
+if [ -n `which emacs` -a -n `pgrep emacs >/dev/null 2>&1` ]; then
+    echo "Emacs server is already running..."
+else
+    `emacs --daemon`
 fi
