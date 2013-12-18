@@ -21,6 +21,7 @@
         tabbar
         open-junk-file
         lispxmp
+        sr-speedbar
         auto-async-byte-compile
         usage-memo
         list-processes+
@@ -137,6 +138,9 @@
          (:name lispxmp
                  :type http
                  :url "http://www.emacswiki.org/emacs-en/download/lispxmp.el")
+         (:name sr-speedbar
+                 :type http
+                 :url "http://www.emacswiki.org/emacs-en/download/sr-speedbar.el")
          (:name auto-async-byte-compile
                  :type http
                  :url "http://www.emacswiki.org/emacs-en/download/auto-async-byte-compile.el")
