@@ -950,6 +950,12 @@
 ;;; gzip ファイルも編集できるようにする
 (auto-compression-mode 1)
 
+;;; バッファの最後でnewlineで新規行を追加するのを禁止する
+;;(setq next-line-add-newlines nil)
+
+;;; 最終行に必ず一行挿入する
+(setq require-final-newline t)
+
 ;;; ブックマーク
 ;; デフォルト
 ;; C-x r m (bookmark-set)
@@ -1174,6 +1180,20 @@
                              "' is read-only.  Open it as root? ")))
       (find-file-for-sudo (ad-get-arg 0))
     ad-do-it))
+
+;; デフォルトディレクトリを変更しない
+(setq default-directory "~/")
+(defadvice find-file (around find-file-default-directory activate compile)
+  "No change default-directory."
+  (let ((default default-directory))
+    ad-do-it
+    (setq default-directory default)))
+
+(defadvice kill-buffer (around file-default-directory activate compile)
+  "No change default-directory."
+  (let ((default default-directory))
+    ad-do-it
+    (setq default-directory default)))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -1606,11 +1626,10 @@
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
-(when (and (fboundp 'window-system)
-           (window-system)
-           (locate-library "speedbar"))
-  (autoload 'speedbar-get-focus "speedbar"
-    "Change frame focus to or from the speedbar frame." t)
+(when (or (locate-library "speedbar")
+          (locate-library "sr-speedbar")
+          (autoload 'speedbar-get-focus "speedbar"
+            "Change frame focus to or from the speedbar frame." t))
   ;; フォントをデフォルトにする
   (add-hook 'speedbar-mode-hook
             (lambda ()
@@ -1723,6 +1742,25 @@
          (define-key map (kbd "r") 'speedbar-buffer-revert-buffer))
 
        (message "Loading %s (speedbar)...done" this-file-name))))
+
+(when (and (fboundp 'window-system)
+           (not (window-system))
+           (locate-library "sr-speedbar"))
+  (autoload 'sr-speedbar-toggle "sr-speedbar"
+    "Change frame focus to or from the speedbar frame." t)
+  ;; フォントをデフォルトにする
+  (add-hook 'speedbar-mode-hook
+            (lambda ()
+              ;; 自動更新しない
+              (when (boundp 'sr-speedbar-auto-refresh)
+                (setq sr-speedbar-auto-refresh nil))))
+  (define-key global-map (kbd "C-c x") 'sr-speedbar-toggle)
+  (define-key global-map (kbd "<f6>") 'sr-speedbar-toggle)
+  (eval-after-load "sr-speedbar"
+    '(progn 
+       (when (boundp 'sr-speedbar-right-side)
+         (setq sr-speedbar-right-side nil))
+       (message "Loading %s (sr-speedbar)...done" this-file-name))))
 
 ;;; 差分表示 (diff-mode)
 ;; 色設定
