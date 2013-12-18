@@ -139,6 +139,7 @@ alias egrep='egrep --color=auto'
 alias g='git --no-pager'
 alias e='emacsclient'
 alias kille="emacsclient -e '(kill-emacs)'"
+alias gnome-terminal='gnome-terminal --geometry=180x60'
 
 alias -s log='tail -f'
 alias -s c='emacsclient'
