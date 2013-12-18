@@ -20,6 +20,8 @@ ZSH_LOGIN=.zlogin
 TMUX_DIR=.tmux
 TMUX_CONF=.tmux.conf
 TMUX_RC=.tmux-powerlinerc
+TMUX_CPU=get_cpu_usage.sh
+TMUX_MEM=get_mem_usage.sh
 
 # git
 GIT_CONF=.gitconfig
@@ -95,6 +97,8 @@ autolink $DOTFILES $HOME $ZSH_DIR
 autolink $DOTFILES $HOME $TMUX_DIR
 autolink $DOTFILES $HOME $TMUX_CONF
 autolink $DOTFILES $HOME $TMUX_RC
+autolink $DOTFILES/bin $HOME/bin $TMUX_CPU
+autolink $DOTFILES/bin $HOME/bin $TMUX_MEM
 
 # git
 autolink $DOTFILES $HOME $GIT_CONF
