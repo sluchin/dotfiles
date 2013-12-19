@@ -268,44 +268,6 @@
       (apt-get-install l passwd))
     (message "apt-get-install-all: end")))
 
-;;; レポジトリ更新
-(defun update-repositories ()
-  "git clone or pull. bm, magit and others."
-  (interactive)
-  (if (executable-find "git")
-      (let (default-directory
-            (base (expand-file-name "~/.emacs.d"))
-            (lst '(("bm" "git://github.com/joodland/bm.git")
-                   ("magit" "git://github.com/magit/magit.git")
-                   ("git-modes" "https://github.com/magit/git-modes")
-                   ("twittering-mode" "git://github.com/hayamiz/twittering-mode.git")
-                   ("yasnippet" "https://github.com/capitaomorte/yasnippet.git")
-                   ("tomatinho" "git://github.com/konr/tomatinho.git")
-                   ("auto-complete-clang" "git://github.com/brianjcj/auto-complete-clang.git")
-                   ("ajc-java-complete" "git://github.com/jixiuf/ajc-java-complete.git")
-                   ("yasnippet-java-mode" "https://github.com/nekop/yasnippet-java-mode.git")
-                   ("malabar-mode" "git://github.com/espenhw/malabar-mode.git")
-                   ("haskell-mode" "git://github.com/haskell/haskell-mode.git")
-                   ("clojure-mode" "git://github.com/jochu/clojure-mode.git")
-                   ("swank-clojure" "git://github.com/jochu/swank-clojure.git")))
-            (mes "*Messages*"))
-        (if (file-directory-p base)
-            (progn
-              (dolist (l lst)
-                (let ((dir (concat (file-name-as-directory base) (car l))))
-                  (if (file-directory-p
-                       (concat (file-name-as-directory dir) ".git"))
-                      (progn
-                        (cd dir)
-                        (call-process "git" nil mes nil "pull")
-                        (message "git pull (%s)...done" (car l)))
-                    (cd base)
-                    (call-process "git" nil mes nil "clone" (car (cdr l)))
-                    (message "git clone (%s)...done" (car (cdr l))))))
-              (message "update-repositories...done"))
-          (message "not directory %s" base)))
-    (message "not found `git'")))
-
 ;;; Emacswiki 全て取得
 (defun update-emacswiki ()
   "git clone. bm and magit."
@@ -422,6 +384,15 @@
 
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
+
+;; キーマップ (C-<right>, C-<left>)
+(when (not window-system)
+  (defvar arrow-keys-map (make-sparse-keymap) "Keymap for arrow keys")
+  (define-key esc-map "[" arrow-keys-map)
+  (define-key arrow-keys-map "A" 'previous-line)
+  (define-key arrow-keys-map "B" 'next-line)
+  (define-key arrow-keys-map "C" 'forward-char)
+  (define-key arrow-keys-map "D" 'backward-char))
 
 ;;; 各種文字コード設定
 ;; (list-coding-systems)
@@ -649,9 +620,11 @@
 
 ;;; 色
 ;; reverse video に設定
-(set-face-foreground 'default "white")
-(set-face-background 'default "black")
-(setq frame-background-mode 'dark)
+
+(when window-system
+  (set-face-foreground 'default "white")
+  (set-face-background 'default "black")
+  (setq frame-background-mode 'dark))
 
 ;;; フレームサイズ
 ;; 幅   (frame-width)
@@ -1303,6 +1276,7 @@
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
 (define-key global-map (kbd "C-;") 'hippie-expand)
+(define-key global-map (kbd "C-:") 'hippie-expand)
 
 ;; lisp 補完
 ;; Tab で補完 (デフォルト: M-Tab または C-i)
@@ -1375,8 +1349,11 @@
   (when (fboundp 'global-linum-mode)
     (global-linum-mode 1))
   ;; 5桁分の領域を確保して行番号を表示
-  (when (boundp 'linum-format)
-    (setq linum-format "%5d"))
+  (if window-system
+      (when (boundp 'linum-format)
+        (setq linum-format "%5d"))
+    (when (boundp 'linum-format)
+      (setq linum-format "%5d ")))
   ;; 行番号表示する必要のないモードでは表示しない
   (defadvice linum-on (around linum-off activate compile)
     (unless (or (minibufferp)
@@ -1430,6 +1407,11 @@
 (when (locate-library "dired")
   (autoload 'dired "dired"
     "Edit directory DIRNAME--delete, rename, print, etc." t)
+  (autoload 'dired-jump "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+  (autoload 'dired-jump-other-window "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+
   ;; 拡張機能を有効にする
   (add-hook 'dired-load-hook
             (lambda ()

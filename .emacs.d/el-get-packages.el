@@ -87,114 +87,44 @@
 
 (when (boundp 'el-get-sources)
   (setq el-get-sources
-        '((:name color-moccur
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/color-moccur.el")
-         (:name moccur-edit
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/moccur-edit.el")
-         (:name auto-install
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/auto-install.el")
-         (:name info+
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/info+.el")
-         (:name thing-opt
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/thing-opt.el")
-         (:name igrep
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/igrep.el")
-         (:name grep-a-lot
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/grep-a-lot.el")
-         (:name grep-edit
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/grep-edit.el")
-         (:name redo+
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/redo+.el")
-         (:name hide-lines
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/hide-lines.el")
-         (:name syslog-mode
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/syslog-mode.el")
-         (:name tempbuf
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/tempbuf.el")
-         (:name point-undo
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/point-undo.el")
-         (:name goto-chg
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/goto-chg.el")
-         (:name tabbar
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/tabbar.el")
-         (:name open-junk-file
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/open-junk-file.el")
-         (:name lispxmp
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/lispxmp.el")
-         (:name sr-speedbar
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/sr-speedbar.el")
-         (:name auto-async-byte-compile
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/auto-async-byte-compile.el")
-         (:name usage-memo
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/usage-memo.el")
-         (:name list-processes+
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/list-processes+.el")
-         (:name w32-symlinks
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/w32-symlinks.el")
-         (:name w32-shell-execute
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/w32-shell-execute.el")
-         (:name showtip
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/showtip.el")
-         (:name sdcv
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/sdcv.el")
-         (:name multi-term
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/multi-term.el")
-         (:name compile-
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/compile-.el")
-         (:name compile+
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/compile+.el")
-         (:name eldoc-extension
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/eldoc-extension.el")
-         (:name c-eldoc
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/c-eldoc.el")
-         (:name anything
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/anything.el")
-         (:name perl-completion
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/perl-completion.el")
-         (:name perltidy
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/perltidy.el")
-         (:name php-completion
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/php-completion.el")
-         (:name xml-parse
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/xml-parse.el")
-         (:name sl
-                 :type http
-                 :url "http://www.emacswiki.org/emacs-en/download/sl.el")
+        ;; emacswiki
+        '((:name color-moccur :type emacswiki)
+         (:name moccur-edit :type emacswiki)
+         (:name auto-install :type emacswiki)
+         (:name info+ :type emacswiki)
+         (:name thing-opt :type emacswiki)
+         (:name igrep :type emacswiki)
+         (:name grep-a-lot :type emacswiki)
+         (:name grep-edit :type emacswiki)
+         (:name redo+ :type emacswiki)
+         (:name hide-lines :type emacswiki)
+         (:name syslog-mode :type emacswiki)
+         (:name tempbuf :type emacswiki)
+         (:name point-undo :type emacswiki)
+         (:name goto-chg :type emacswiki)
+         (:name tabbar :type emacswiki)
+         (:name open-junk-file :type emacswiki)
+         (:name lispxmp :type emacswiki)
+         (:name sr-speedbar :type emacswiki)
+         (:name auto-async-byte-compile :type emacswiki)
+         (:name usage-memo :type emacswiki)
+         (:name list-processes+ :type emacswiki)
+         (:name w32-symlinks :type emacswiki)
+         (:name w32-shell-execute :type emacswiki)
+         (:name showtip :type emacswiki)
+         (:name sdcv :type emacswiki)
+         (:name multi-term :type emacswiki)
+         (:name compile- :type emacswiki)
+         (:name compile+ :type emacswiki)
+         (:name eldoc-extension :type emacswiki)
+         (:name c-eldoc :type emacswiki)
+         (:name anything :type emacswiki)
+         (:name perl-completion :type emacswiki)
+         (:name perltidy :type emacswiki)
+         (:name php-completion :type emacswiki)
+         (:name xml-parse :type emacswiki)
+         (:name sl :type emacswiki)
+         ;; http
          (:name gtk-look
                  :type http
                  :description "lookup Gtk and Gnome documentation."
@@ -251,7 +181,6 @@
                  :type http
                  :description "Enhanced JavaScript IDE Emacs Mode"
                  :url "http://js2-mode.googlecode.com/files/js2-mode.el")
-
           ;; github
           (:name cp5022x
                  :type github
