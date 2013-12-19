@@ -123,7 +123,7 @@ done
 cd $OLDPWD
 autolink $DOTFILES $HOME $FONTS
 
-if [ $USER = 'root' ]; then
+if [ `whoami` = 'root' ]; then
     FONTS_DIR=/usr/local/share/fonts/truetype
     RICTY_DIR=$FONTS_DIR/ricty
     if [ ! -d $RICTY_DIR ]; then

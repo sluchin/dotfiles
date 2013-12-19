@@ -59,34 +59,6 @@ if [ -d $ZSH_DIR/functions ]; then
     source $ZSH_DIR/functions/*
 fi
 
-# Customize to your needs...
-path=(
-    $path
-    $HOME/bin
-    /usr/local/sbin
-    /usr/local/bin
-    /usr/sbin
-    /usr/bin
-    /sbin
-    /bin
-)
-
-fpath=(
-    $fpath
-    $HOME/.zsh.d/*(/N)
-)
-
-cdpath=(
-    $cdpath
-    ..
-    $HOME
-    $HOME/src
-    $HOME/devel
-)
-
-typeset -U path fpath cdpath manpath
-fignore=('.elc' '.o' '~' '\#')
-
 # autoload
 autoload -U compinit
 compinit -u
@@ -97,6 +69,16 @@ colors
 HISTSIZE=100000
 SAVEHIST=100000
 HISTFILE=~/.zhistory
+
+#色の定義
+local DEFAULT=$'%{^[[m%}'$
+local RED=$'%{^[[1;31m%}'$
+local GREEN=$'%{^[[1;32m%}'$
+local YELLOW=$'%{^[[1;33m%}'$
+local BLUE=$'%{^[[1;34m%}'$
+local PURPLE=$'%{^[[1;35m%}'$
+local LIGHT_BLUE=$'%{^[[1;36m%}'$
+local WHITE=$'%{^[[1;37m%}'$
 
 # shell options
 setopt auto_cd
@@ -124,7 +106,39 @@ setopt no_clobber
 setopt numeric_glob_sort
 setopt extended_glob
 setopt notify
+setopt globdots
+setopt check_jobs
+setopt hup
 unsetopt auto_param_slash
+
+zstyle ':completion:*' verbose yes
+# 矢印で補完を選択
+zstyle ':completion:*:default' menu select=2
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' keep-prefix
+zstyle ':completion:*' \
+    completer \
+    _oldlist \
+    _complete \
+    _match \
+    _ignored \
+    #_approximate \
+    _list \
+    _history
+zstyle ':completion:*' group-name ''
+# オブジェクトファイルは補完しない
+zstyle ':completion:*:*files' ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
+# apt-get や dpkg を速くする
+zstyle ':completion:*' use-cache true
+# セパレータ
+zstyle ':completion:*' list-separator '-->'
+zstyle ':completion:*' format '%F{white}%d%f'
+zstyle ':completion:*:messages' format $YELLOW'%d'$DEFAULT
+zstyle ':completion:*:warnings' format $RED'No matches for:'$YELLOW' %d'$DEFAULT
+zstyle ':completion:*:descriptions' format $YELLOW'completing %B%d%b'$DEFAULT
+zstyle ':completion:*:corrections' format $YELLOW'%B%d '$RED'(errors: %e)%b'$DEFAULT
 
 # alias
 alias pu=pushd
@@ -133,13 +147,18 @@ alias dirs='dirs -v'
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l ^*~'
 alias la='ls --color=auto -a ^*~'
+if [ -n `which trash-put` ]; then
+    alias rm='trash-put'
+fi
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias g='git --no-pager'
 alias e='emacsclient'
+alias t='tail -f'
 alias kille="emacsclient -e '(kill-emacs)'"
 alias gnome-terminal='gnome-terminal --geometry=180x60'
+alias em='emacs -nw'
 
 alias -s log='tail -f'
 alias -s c='emacsclient'
@@ -165,6 +184,7 @@ stty stop undef
 bindkey -e
 bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
+bindkey "^I" menu-complete
 
 # prompt
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
@@ -206,19 +226,60 @@ mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}
 #PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD")'
 
 # tmux自動起動
-if [ -n `which tmux` -a -z "$TMUX" -a -z "$STY" ]; then
-    if type tmux >/dev/null 2>&1; then
-        if tmux has-session && tmux list-sessions | /usr/bin/grep -qE '.*]$'; then
-            tmux attach && echo "tmux attached session "
-        else
-            tmux new-session && echo "tmux created new session"
+if [ -n `which tmux` ]; then
+    if [ -z "$TMUX" -a -z "$STY" ]; then
+        if type tmux >/dev/null 2>&1; then
+            if tmux has-session && tmux list-sessions | /usr/bin/grep -qE '.*]$'; then
+                tmux attach && echo "tmux attached session "
+            else
+                tmux new-session && echo "tmux created new session"
+            fi
         fi
     fi
 fi
 
 # emacsclient
-if [ -n `which emacs` -a -n `pgrep emacs >/dev/null 2>&1` ]; then
-    echo "Emacs server is already running..."
-else
-    `emacs --daemon`
+if [ -n `which emacs` ]; then
+    if [ -n `pgrep emacs >/dev/null 2>&1` ]; then
+        echo "Emacs server is already running..."
+    else
+        `emacs --daemon`
+    fi
 fi
+
+typeset -g -A key
+
+key[F1]=''''
+key[F2]='^[OQ'
+key[F3]='^[OR'
+key[F4]='^[OS'
+key[F5]='^[[15~'
+key[F6]='^[[17~'
+key[F7]='^[[18~'
+key[F8]='^[[19~'
+key[F9]='^[[20~'
+key[F10]='^[[21~'
+key[F11]='^[[23~'
+key[F12]='^[[24~'
+key[Backspace]='^?'
+key[Insert]='^[[2~'
+key[Home]='^[OH'
+key[PageUp]='^[[5~'
+key[Delete]='^[[3~'
+key[End]='^[OF'
+key[PageDown]='^[[6~'
+key[Up]='^[[A'
+key[Left]='^[[D'
+key[Down]='^[[B'
+key[Right]='^[[C'
+key[Menu]=''''
+
+# setup key accordingly
+[[ -n "${key[Home]}"    ]] && bindkey "${key[Home]}"    beginning-of-line
+[[ -n "${key[End]}"     ]] && bindkey "${key[End]}"     end-of-line
+[[ -n "${key[Insert]}"  ]] && bindkey "${key[Insert]}"  overwrite-mode
+[[ -n "${key[Delete]}"  ]] && bindkey "${key[Delete]}"  delete-char
+[[ -n "${key[Up]}"      ]] && bindkey "${key[Up]}"      up-line-or-history
+[[ -n "${key[Down]}"    ]] && bindkey "${key[Down]}"    down-line-or-history
+[[ -n "${key[Left]}"    ]] && bindkey "${key[Left]}"    backward-char
+[[ -n "${key[Right]}"   ]] && bindkey "${key[Right]}"   forward-char
