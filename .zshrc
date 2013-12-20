@@ -147,26 +147,26 @@ alias dirs='dirs -v'
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l ^*~'
 alias la='ls --color=auto -a ^*~'
-if [ -n `which trash-put` ]; then
+if [ -n "`which trash-put`" ]; then
     alias rm='trash-put'
 fi
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias g='git --no-pager'
-alias e='emacsclient'
+alias e='emacsclient &'
 alias t='tail -f'
 alias kille="emacsclient -e '(kill-emacs)'"
 alias gnome-terminal='gnome-terminal --geometry=180x60'
-alias em='emacs -nw'
+alias em='emacs -nw &'
 
 alias -s log='tail -f'
-alias -s c='emacsclient'
-alias -s h='emacsclient'
-alias -s cpp='emacsclient'
-alias -s php='emacsclient'
-alias -s yml='emacsclient'
-alias -s el='emacsclient'
+alias -s c='emacsclient &'
+alias -s h='emacsclient &'
+alias -s cpp='emacsclient &'
+alias -s php='emacsclient &'
+alias -s yml='emacsclient &'
+alias -s el='emacsclient &'
 
 alias -g L='| less'
 alias -g H='| head'
@@ -222,11 +222,8 @@ mysql_prompt_style_server_host=(
 mysql_prompt='${style_client_host}${USER}@${HOST}${fg_bold[white]} -> '
 mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}@${style_server_host}\h${reset_color}${fg_bold[white]}:${fg[magenta]}\d ${fg_bold[white]}\v${reset_color}\n'
 
-# tmux
-#PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD")'
-
 # tmux自動起動
-if [ -n `which tmux` ]; then
+if [ -n "`which tmux`" ]; then
     if [ -z "$TMUX" -a -z "$STY" ]; then
         if type tmux >/dev/null 2>&1; then
             if tmux has-session && tmux list-sessions | /usr/bin/grep -qE '.*]$'; then
@@ -239,13 +236,13 @@ if [ -n `which tmux` ]; then
 fi
 
 # emacsclient
-if [ -n `which emacs` ]; then
-    if [ -n `pgrep emacs >/dev/null 2>&1` ]; then
-        echo "Emacs server is already running..."
-    else
-        `emacs --daemon`
-    fi
-fi
+# if [ -n "`which emacs`" ]; then
+#     if `pgrep emacs >/dev/null 2>&1`; then
+#         echo "Emacs server is already running..."
+#     else
+#         `emacs --daemon`
+#     fi
+# fi
 
 typeset -g -A key
 

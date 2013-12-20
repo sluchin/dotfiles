@@ -261,7 +261,7 @@
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
                "clojure1.4" "leiningen"
                "libgmp-dev" "perltidy" "php5" "php-elisp" "php-doc" "global"
-               "tmux" "xclip"))
+               "tmux" "xclip" "trash-cli"))
         (passwd (password-cache-sudo)))
     (dolist (l lst)
       (message (concat "==> " l))
@@ -393,6 +393,11 @@
   (define-key arrow-keys-map "B" 'next-line)
   (define-key arrow-keys-map "C" 'forward-char)
   (define-key arrow-keys-map "D" 'backward-char))
+
+;; (define-key input-decode-map "\e[1;5A" [C-up])
+;; (define-key input-decode-map "\e[1;5B" [C-down])
+;; (define-key input-decode-map "\e[1;5C" [C-right])
+;; (define-key input-decode-map "\e[1;5D" [C-left])
 
 ;;; 各種文字コード設定
 ;; (list-coding-systems)
@@ -1158,15 +1163,13 @@
 (setq default-directory "~/")
 (defadvice find-file (around find-file-default-directory activate compile)
   "No change default-directory."
-  (let ((default default-directory))
-    ad-do-it
-    (setq default-directory default)))
+  (let (default-directory)
+    ad-do-it))
 
 (defadvice kill-buffer (around file-default-directory activate compile)
   "No change default-directory."
-  (let ((default default-directory))
-    ad-do-it
-    (setq default-directory default)))
+  (let (default-directory)
+    ad-do-it))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
