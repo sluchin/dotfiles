@@ -385,20 +385,6 @@
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
 
-;; キーマップ (C-<right>, C-<left>)
-(when (not window-system)
-  (defvar arrow-keys-map (make-sparse-keymap) "Keymap for arrow keys")
-  (define-key esc-map "[" arrow-keys-map)
-  (define-key arrow-keys-map "A" 'previous-line)
-  (define-key arrow-keys-map "B" 'next-line)
-  (define-key arrow-keys-map "C" 'forward-char)
-  (define-key arrow-keys-map "D" 'backward-char))
-
-;; (define-key input-decode-map "\e[1;5A" [C-up])
-;; (define-key input-decode-map "\e[1;5B" [C-down])
-;; (define-key input-decode-map "\e[1;5C" [C-right])
-;; (define-key input-decode-map "\e[1;5D" [C-left])
-
 ;;; 各種文字コード設定
 ;; (list-coding-systems)
 ;; (install-elisp "http://nijino.homelinux.net/emacs/cp5022x.el")
@@ -1278,8 +1264,9 @@
         try-expand-line
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
-(define-key global-map (kbd "C-;") 'hippie-expand)
-(define-key global-map (kbd "C-:") 'hippie-expand)
+(if window-system
+    (define-key global-map (kbd "C-;") 'hippie-expand)
+  (define-key global-map (kbd "C-x ;") 'hippie-expand))
 
 ;; lisp 補完
 ;; Tab で補完 (デフォルト: M-Tab または C-i)
@@ -1430,6 +1417,8 @@
               (when (and (require 'dired-x nil t)
                          (fboundp 'dired-omit-mode))
                 (dired-omit-mode 1))))
+
+  (define-key global-map (kbd "C-x C-j") 'dired-jump)
 
   (eval-after-load "dired"
     '(progn
@@ -1742,7 +1731,7 @@
   (define-key global-map (kbd "C-c x") 'sr-speedbar-toggle)
   (define-key global-map (kbd "<f6>") 'sr-speedbar-toggle)
   (eval-after-load "sr-speedbar"
-    '(progn 
+    '(progn
        (when (boundp 'sr-speedbar-right-side)
          (setq sr-speedbar-right-side nil))
        (message "Loading %s (sr-speedbar)...done" this-file-name))))
@@ -2374,6 +2363,9 @@ Otherwise, return nil."
        ;; キーバインドを無効化
        (when (boundp 'cua-enable-cua-keys)
          (setq cua-enable-cua-keys nil))
+       (if window-system
+           (define-key global-map (kbd "C-<return>") 'cua-set-rectangle-mark)
+         (define-key global-map (kbd "C-x j") 'cua-set-rectangle-mark))
        (message "Loading %s (cua-base)...done" this-file-name))))
 
 ;;; ファイルキャッシュ
@@ -5674,6 +5666,15 @@ keyboard-quit events while waiting for a valid input."
       (if (stringp msg)
           (with-output-to-temp-buffer " *Char Help*"
             (princ msg))))))
+
+;; キーマップ (C-<right>, C-<left>)
+(when (not window-system)
+  (defvar arrow-keys-map (make-sparse-keymap) "Keymap for arrow keys")
+  (define-key esc-map "[" arrow-keys-map)
+  (define-key arrow-keys-map "A" 'previous-line)
+  (define-key arrow-keys-map "B" 'next-line)
+  (define-key arrow-keys-map "C" 'forward-char)
+  (define-key arrow-keys-map "D" 'backward-char))
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)

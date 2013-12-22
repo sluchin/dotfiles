@@ -32,6 +32,10 @@ GIT_MELD=git-meld.pl
 # mysql
 MYSQL_CONF=.my.cnf
 
+# application
+APP=.local/share/gnome-terminal
+GNOME_TERMINAL=gnome-terminal.desktop
+
 # font
 FONTS=.fonts
 
@@ -113,6 +117,12 @@ autolink $DOTFILES/bin $HOME/bin $GIT_MELD
 
 # mysql
 autolink $DOTFILES $HOME $MYSQL_CONF
+
+# application
+autolink $DOTFILES/$APP $HOME/$APP $GNOME_TERMINAL
+if [ `whoami` = 'root' ]; then
+    autolink $DOTFILES/$APP /usr/share/applications $GNOME_TERMINAL
+fi
 
 # fonts
 cd $DOTFILES/.fonts
