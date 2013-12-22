@@ -70,16 +70,6 @@ HISTSIZE=100000
 SAVEHIST=100000
 HISTFILE=~/.zhistory
 
-#色の定義
-local DEFAULT=$'%{^[[m%}'$
-local RED=$'%{^[[1;31m%}'$
-local GREEN=$'%{^[[1;32m%}'$
-local YELLOW=$'%{^[[1;33m%}'$
-local BLUE=$'%{^[[1;34m%}'$
-local PURPLE=$'%{^[[1;35m%}'$
-local LIGHT_BLUE=$'%{^[[1;36m%}'$
-local WHITE=$'%{^[[1;37m%}'$
-
 # shell options
 setopt auto_cd
 setopt auto_remove_slash
@@ -133,12 +123,8 @@ zstyle ':completion:*:*files' ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
 # apt-get や dpkg を速くする
 zstyle ':completion:*' use-cache true
 # セパレータ
-zstyle ':completion:*' list-separator '-->'
+zstyle ':completion:*' list-separator '=>'
 zstyle ':completion:*' format '%F{white}%d%f'
-zstyle ':completion:*:messages' format $YELLOW'%d'$DEFAULT
-zstyle ':completion:*:warnings' format $RED'No matches for:'$YELLOW' %d'$DEFAULT
-zstyle ':completion:*:descriptions' format $YELLOW'completing %B%d%b'$DEFAULT
-zstyle ':completion:*:corrections' format $YELLOW'%B%d '$RED'(errors: %e)%b'$DEFAULT
 
 # alias
 alias pu=pushd
@@ -156,17 +142,20 @@ alias egrep='egrep --color=auto'
 alias g='git --no-pager'
 alias e='emacsclient &'
 alias t='tail -f'
-alias kille="emacsclient -e '(kill-emacs)'"
-alias gnome-terminal='gnome-terminal --geometry=180x60'
-alias em='emacs -nw &'
+alias gterm='gnome-terminal --geometry=130x40'
+alias emd='emacs --daemon'
+alias emn='emacs -nw'
+alias emw='emacs'
+alias emc='emacsclient -t'
+alias ekill="emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
 
 alias -s log='tail -f'
-alias -s c='emacsclient &'
-alias -s h='emacsclient &'
-alias -s cpp='emacsclient &'
-alias -s php='emacsclient &'
-alias -s yml='emacsclient &'
-alias -s el='emacsclient &'
+alias -s c='emacsclient'
+alias -s h='emacsclient'
+alias -s cpp='emacsclient'
+alias -s php='emacsclient'
+alias -s yml='emacsclient'
+alias -s el='emacsclient'
 
 alias -g L='| less'
 alias -g H='| head'
@@ -191,8 +180,8 @@ local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
 RPS1="${return_code} $RPS1"
 
 # mysql prompt
-# https://github.com/tetsujin/zsh-function-mysql
-# mysql client user
+#https://github.com/tetsujin/zsh-function-mysql
+#mysql client user
 typeset -A mysql_prompt_style_client_user
 mysql_prompt_style_client_user=(
     'root'     $fg_bold[red]
@@ -243,40 +232,3 @@ fi
 #         `emacs --daemon`
 #     fi
 # fi
-
-typeset -g -A key
-
-key[F1]=''''
-key[F2]='^[OQ'
-key[F3]='^[OR'
-key[F4]='^[OS'
-key[F5]='^[[15~'
-key[F6]='^[[17~'
-key[F7]='^[[18~'
-key[F8]='^[[19~'
-key[F9]='^[[20~'
-key[F10]='^[[21~'
-key[F11]='^[[23~'
-key[F12]='^[[24~'
-key[Backspace]='^?'
-key[Insert]='^[[2~'
-key[Home]='^[OH'
-key[PageUp]='^[[5~'
-key[Delete]='^[[3~'
-key[End]='^[OF'
-key[PageDown]='^[[6~'
-key[Up]='^[[A'
-key[Left]='^[[D'
-key[Down]='^[[B'
-key[Right]='^[[C'
-key[Menu]=''''
-
-# setup key accordingly
-[[ -n "${key[Home]}"    ]] && bindkey "${key[Home]}"    beginning-of-line
-[[ -n "${key[End]}"     ]] && bindkey "${key[End]}"     end-of-line
-[[ -n "${key[Insert]}"  ]] && bindkey "${key[Insert]}"  overwrite-mode
-[[ -n "${key[Delete]}"  ]] && bindkey "${key[Delete]}"  delete-char
-[[ -n "${key[Up]}"      ]] && bindkey "${key[Up]}"      up-line-or-history
-[[ -n "${key[Down]}"    ]] && bindkey "${key[Down]}"    down-line-or-history
-[[ -n "${key[Left]}"    ]] && bindkey "${key[Left]}"    backward-char
-[[ -n "${key[Right]}"   ]] && bindkey "${key[Right]}"   forward-char
