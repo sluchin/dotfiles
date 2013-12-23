@@ -76,11 +76,22 @@ setopt auto_remove_slash
 setopt auto_name_dirs
 setopt auto_pushd
 setopt auto_menu
+setopt pushd_to_home        # 引数なしpushdで$HOMEに戻る(直前dirへは cd - で)
+setopt pushd_ignore_dups    # ディレクトリスタックに重複する物は古い方を削除
+setopt extended_history     # コマンドの開始時刻と経過時間を登録
+setopt hist_ignore_dups     # 直前のコマンドと同一ならば登録しない
+setopt hist_ignore_all_dups # 登録済コマンド行は古い方を削除
+setopt hist_reduce_blanks   # 余分な空白は詰めて登録(空白数違い登録を防ぐ)
+setopt share_history        # ヒストリの共有(append系と異なり再読み込み不要)
+setopt hist_no_store        # historyコマンドは登録しない
+setopt hist_ignore_space    # コマンド行先頭が空白の時登録しない(直後ならば呼べる)
+setopt auto_pushd           # cd -[TAB] でこれまでに移動したディレクトリ一覧を表示
+
+setopt list_packed          # 補完候補リストを詰めて表示
+setopt list_types           # 補完候補にファイルの種類も表示する
+setopt print_eight_bit      # 補完候補リストの日本語を適正表示
+
 setopt auto_param_keys
-setopt extended_history
-setopt hist_ignore_dups
-setopt hist_ignore_space
-setopt share_history
 setopt prompt_subst
 setopt extended_glob
 setopt list_types
@@ -89,7 +100,6 @@ setopt no_beep
 setopt always_last_prompt
 setopt cdable_vars
 setopt sh_word_split
-setopt pushd_ignore_dups
 setopt magic_equal_subst
 setopt complete_aliases
 setopt no_clobber
@@ -146,13 +156,13 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias g='git --no-pager'
-alias e='emacsclient &'
 alias t='tail -f'
 alias gterm='gnome-terminal --geometry=130x40'
 alias emd='emacs --daemon'
+alias emc='emacsclient -t'
 alias emn='emacs -nw'
 alias emw='emacs'
-alias emc='emacsclient -t'
+alias emq='emacs -q --no-site-file'
 alias ekill="emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
 
 alias -s log='tail -f'
@@ -167,7 +177,6 @@ alias -g L='| less'
 alias -g H='| head'
 alias -g T='| tail'
 alias -g G='| grep'
-alias -g W='| wc'
 alias -g S='| sed'
 alias -g A='| awk'
 alias -g W='| wc'
@@ -179,7 +188,8 @@ stty stop undef
 bindkey -e
 bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
-bindkey "^I" menu-complete
+#bindkey "^I" menu-complete
+bindkey "^I"  complete-word
 
 # prompt
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
