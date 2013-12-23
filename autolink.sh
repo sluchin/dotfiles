@@ -34,6 +34,7 @@ MYSQL_CONF=.my.cnf
 
 # application
 APP=.local/share/gnome-terminal
+APPSYS=/usr/share/applications
 GNOME_TERMINAL=gnome-terminal.desktop
 
 # font
@@ -119,9 +120,8 @@ autolink $DOTFILES/bin $HOME/bin $GIT_MELD
 autolink $DOTFILES $HOME $MYSQL_CONF
 
 # application
-autolink $DOTFILES/$APP $HOME/$APP $GNOME_TERMINAL
 if [ `whoami` = 'root' ]; then
-    autolink $DOTFILES/$APP /usr/share/applications $GNOME_TERMINAL
+    autolink $DOTFILES/$APP $APPSYS $GNOME_TERMINAL
 fi
 
 # fonts

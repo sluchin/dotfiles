@@ -53,6 +53,9 @@ fi
 # curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
 if [ -d $ZSH_DIR/plugin ]; then
     source $ZSH_DIR/plugin/*
+    if [ -f $ZSH_DIR/plugin/zaw/zaw.zsh ]; then
+        source $ZSH_DIR/plugin/zaw/zaw.zsh
+    fi
 fi
 
 if [ -d $ZSH_DIR/functions ]; then
@@ -68,7 +71,7 @@ colors
 
 HISTSIZE=100000
 SAVEHIST=100000
-HISTFILE=~/.zhistory
+HISTFILE=$HOME/.zhistory
 
 # shell options
 setopt auto_cd
@@ -137,10 +140,11 @@ zstyle ':completion:*' list-separator '=>'
 zstyle ':completion:*' format '%F{white}%d%f'
 
 # apt-get や dpkg を速くする
-if [ -d $ZSH_DIR/cache ]; then
-    zstyle ':completion:*' cache-path $ZSH_DIR/cache
-    zstyle ':completion:*' use-cache yes
+if [ ! -d $ZSH_DIR/cache ]; then
+    mkdir -p $ZSH_DIR/cache
 fi
+zstyle ':completion:*' cache-path $ZSH_DIR/cache
+zstyle ':completion:*' use-cache yes
 
 # alias
 alias pu=pushd
@@ -164,6 +168,7 @@ alias emn='emacs -nw'
 alias emw='emacs'
 alias emq='emacs -q --no-site-file'
 alias ekill="emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
+alias ha='history -E 1'
 
 alias -s log='tail -f'
 alias -s c='emacsclient'
@@ -189,7 +194,8 @@ bindkey -e
 bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
 #bindkey "^I" menu-complete
-bindkey "^I"  complete-word
+bindkey "^I" complete-word
+bindkey "^h" zaw-history
 
 # prompt
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
