@@ -74,44 +74,41 @@ SAVEHIST=100000
 HISTFILE=$HOME/.zhistory
 
 # shell options
-setopt auto_cd
+setopt auto_cd              # ディレクトリ名の入力のみで移動する
 setopt auto_remove_slash
 setopt auto_name_dirs
-setopt auto_pushd
-setopt auto_menu
-setopt pushd_to_home        # 引数なしpushdで$HOMEに戻る(直前dirへは cd - で)
+setopt auto_pushd           # cd -[TAB] でこれまでに移動したディレクトリ一覧を表示
+setopt auto_menu            # 補完キー連打で補完候補を順に表示する
+#setopt auto_list            # 補完候補を一覧で表示する
+setopt pushd_to_home        # 引数なし pushd で $HOME に戻る(直前 dir へは cd - で)
 setopt pushd_ignore_dups    # ディレクトリスタックに重複する物は古い方を削除
 setopt extended_history     # コマンドの開始時刻と経過時間を登録
 setopt hist_ignore_dups     # 直前のコマンドと同一ならば登録しない
 setopt hist_ignore_all_dups # 登録済コマンド行は古い方を削除
 setopt hist_reduce_blanks   # 余分な空白は詰めて登録(空白数違い登録を防ぐ)
 setopt share_history        # ヒストリの共有(append系と異なり再読み込み不要)
-setopt hist_no_store        # historyコマンドは登録しない
+setopt hist_no_store        # history コマンドは登録しない
 setopt hist_ignore_space    # コマンド行先頭が空白の時登録しない(直後ならば呼べる)
-setopt auto_pushd           # cd -[TAB] でこれまでに移動したディレクトリ一覧を表示
-
 setopt list_packed          # 補完候補リストを詰めて表示
 setopt list_types           # 補完候補にファイルの種類も表示する
 setopt print_eight_bit      # 補完候補リストの日本語を適正表示
-
+setopt no_clobber           # 上書きリダイレクトの禁止
+setopt no_hup               # logout時にバックグラウンドジョブを kill しない
+setopt no_beep              # コマンド入力エラーでBEEPを鳴らさない
+setopt extended_glob        # 拡張グロブ
+setopt numeric_glob_sort    # 数字を数値と解釈して昇順ソートで出力
 setopt auto_param_keys
 setopt prompt_subst
-setopt extended_glob
-setopt list_types
-setopt list_packed
-setopt no_beep
+setopt interactive_comments # コマンド入力中のコメントを認める
 setopt always_last_prompt
 setopt cdable_vars
 setopt sh_word_split
 setopt magic_equal_subst
 setopt complete_aliases
-setopt no_clobber
-setopt numeric_glob_sort
-setopt extended_glob
-setopt notify
+setopt notify                # バックグラウンドジョブの状態変化を即時報告する
 setopt globdots
 setopt check_jobs
-setopt hup
+setopt magic_equal_subst     # =以降も補完する(--prefix=/usrなど)
 unsetopt auto_param_slash
 
 zstyle ':completion:*' verbose yes
@@ -168,6 +165,7 @@ alias emn='emacs -nw'
 alias emw='emacs'
 alias emq='emacs -q --no-site-file'
 alias ekill="emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
+unalias history
 alias ha='history -E 1'
 
 alias -s log='tail -f'
@@ -186,6 +184,14 @@ alias -g S='| sed'
 alias -g A='| awk'
 alias -g W='| wc'
 
+# 常にバックグラウンド
+function gimp() { command gimp $* & }
+function firefox() { command firefox $* & }
+function xdvi() { command xdvi $* & }
+function xpdf() { command xpdf $* & }
+function evince() { command evince $* & }
+function vlc() { command vlc $* & }
+
 # stty
 stty stop undef
 
@@ -195,15 +201,21 @@ bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
 #bindkey "^I" menu-complete
 bindkey "^I" complete-word
+bindkey "\e[Z" reverse-menu-complete  # S-Tabで補完候補を逆順する
 bindkey "^h" zaw-history
+
 
 # prompt
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
 RPS1="${return_code} $RPS1"
 
+# SSH ログイン時のプロンプト
+[ -n "${REMOTEHOST}${SSH_CONNECTION}" ] &&
+  PROMPT="%{${fg[white]}%}${HOST%%.*} ${PROMPT}";
+
 # mysql prompt
-#https://github.com/tetsujin/zsh-function-mysql
-#mysql client user
+# https://github.com/tetsujin/zsh-function-mysql
+# mysql client user
 typeset -A mysql_prompt_style_client_user
 mysql_prompt_style_client_user=(
     'root'     $fg_bold[red]
