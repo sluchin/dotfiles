@@ -1179,7 +1179,7 @@
            (forward-list arg))
           (t (self-insert-command arg)))))
 
-;; デフォルトブラウザ で開く
+;; デフォルトブラウザで開く
 ;; グーグル検索
 (defun default-browser-google-search ()
   "Search google in default browser."
@@ -1226,7 +1226,7 @@
                                                          (cdr url-region)))))
     (message "not found vlc")))
 
-;; 選択して デフォルトブラウザ で検索または vlc で開く
+;; 選択してデフォルトブラウザで検索または vlc で開く
 (defun default-browser-or-vlc-choice ()
   "Default browser search or vlc."
   (interactive)
@@ -5668,6 +5668,18 @@ keyboard-quit events while waiting for a valid input."
             (princ msg))))))
 
 ;; キーマップ (C-<right>, C-<left>)
+(defadvice terminal-init-xterm (around
+                                map-escape-sequence
+                                activate compile)
+  (when (not window-system)
+    (defvar arrow-keys-map (make-sparse-keymap) "Keymap for arrow keys")
+    (define-key esc-map "[" arrow-keys-map)
+    (define-key arrow-keys-map "A" 'previous-line)
+    (define-key arrow-keys-map "B" 'next-line)
+    (define-key arrow-keys-map "C" 'forward-char)
+    (define-key arrow-keys-map "D" 'backward-char))
+  ad-do-it)
+
 (when (not window-system)
   (defvar arrow-keys-map (make-sparse-keymap) "Keymap for arrow keys")
   (define-key esc-map "[" arrow-keys-map)
@@ -5675,6 +5687,7 @@ keyboard-quit events while waiting for a valid input."
   (define-key arrow-keys-map "B" 'next-line)
   (define-key arrow-keys-map "C" 'forward-char)
   (define-key arrow-keys-map "D" 'backward-char))
+
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
