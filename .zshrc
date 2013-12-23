@@ -104,9 +104,7 @@ unsetopt auto_param_slash
 zstyle ':completion:*' verbose yes
 # 矢印で補完を選択
 zstyle ':completion:*:default' menu select=2
-
 zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*' keep-prefix
 zstyle ':completion:*' \
     completer \
@@ -120,11 +118,19 @@ zstyle ':completion:*' \
 zstyle ':completion:*' group-name ''
 # オブジェクトファイルは補完しない
 zstyle ':completion:*:*files' ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
-# apt-get や dpkg を速くする
-zstyle ':completion:*' use-cache true
+# カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
+zstyle ':completion:*:cd:*' tag-order local-directories path-directories
+# 大文字小文字の区別をしない
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 # セパレータ
 zstyle ':completion:*' list-separator '=>'
 zstyle ':completion:*' format '%F{white}%d%f'
+
+# apt-get や dpkg を速くする
+if [ -d $ZSH_DIR/cache ]; then
+    zstyle ':completion:*' cache-path $ZSH_DIR/cache
+    zstyle ':completion:*' use-cache yes
+fi
 
 # alias
 alias pu=pushd
