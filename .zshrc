@@ -66,10 +66,10 @@ if [ -d $ZSH_DIR/functions ]; then
 fi
 
 # autoload
-autoload -U compinit
+autoload -Uz compinit
 compinit -u
-autoload run-help
-autoload -U colors
+autoload -Uz run-help
+autoload -Uz colors
 colors
 
 HISTSIZE=100000
@@ -145,6 +145,9 @@ if [ ! -d $ZSH_DIR/cache ]; then
 fi
 zstyle ':completion:*' cache-path $ZSH_DIR/cache
 zstyle ':completion:*' use-cache yes
+zstyle ':completion:*:date:*' fake \
+    '+%Y-%m-%d: 西暦-月-日' \
+    '+%Y-%m-%d %H\:%M\:%S: 西暦-月-日 時\:分\:秒'
 
 # alias
 alias pu=pushd
@@ -217,25 +220,6 @@ zstyle ':filter-select' case-insensitive yes # 絞り込みをcase-insensitive�
 #bindkey "^@" zaw-cdr
 bindkey "^h" zaw-history
 
-function zaw-src-gitdir () {
-    _dir=$(git rev-parse --show-cdup 2>/dev/null)
-    if [ $? -eq 0 ]
-    then
-        candidates=( $(git ls-files ${_dir} | perl -MFile::Basename -nle \
-            '$a{dirname $_}++; END{delete $a{"."}; print for sort keys %a}') )
-    fi
-
-    actions=("zaw-src-gitdir-cd")
-    act_descriptions=("change directory in git repos")
-}
-
-function zaw-src-gitdir-cd () {
-    BUFFER="cd $1"
-    zle accept-line
-}
-
-zaw-register-src -n gitdir zaw-src-gitdir
-
 # prompt
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
 RPS1="${return_code} $RPS1"
@@ -288,12 +272,3 @@ if [ -n "`which tmux`" ]; then
         fi
     fi
 fi
-
-# emacsclient
-# if [ -n "`which emacs`" ]; then
-#     if `pgrep emacs >/dev/null 2>&1`; then
-#         echo "Emacs server is already running..."
-#     else
-#         `emacs --daemon`
-#     fi
-# fi
