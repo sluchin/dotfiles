@@ -2,7 +2,6 @@
 # initial setup file for both interactive and noninteractive zsh
 
 path=(
-    $path
     $HOME/bin(N-/)
     /usr/local/sbin(N-/)
     /usr/local/bin(N-/)
@@ -12,19 +11,22 @@ path=(
     /usr/*/bin(N-/)
     /sbin(N-/)
     /bin(N-/)
+    $path
 )
 
 fpath=(
+    $HOME/.zsh.d/*(N-/)
+    $HOME/.zsh.d/functions/*(N-/)
+    $HOME/.zsh.d/plugin/*(N-/)
     $fpath
-    $HOME/.zsh.d/*(/N)
 )
 
 cdpath=(
-    $cdpath
     ..
     $HOME
     $HOME/src
     $HOME/devel
+    $cdpath
 )
 
 typeset -U path fpath cdpath manpath
@@ -32,8 +34,8 @@ fignore=('.elc' '.o' '~' '\#')
 
 export RSYNC_RSH=ssh
 export CVS_RSH=ssh
+export TERM=xterm
 export EDITOR=emacsclient
 export VISUAL=emacsclient
-export TERM=xterm
 
 limit coredumpsize unlimited

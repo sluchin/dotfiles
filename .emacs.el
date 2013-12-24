@@ -5667,27 +5667,30 @@ keyboard-quit events while waiting for a valid input."
           (with-output-to-temp-buffer " *Char Help*"
             (princ msg))))))
 
-;; キーマップ (C-<right>, C-<left>)
-(defadvice terminal-init-xterm (around
-                                map-escape-sequence
-                                activate compile)
+;; キーマップ (<C-right>, <C-left>)
+(defun set-keys-map ()
+  "Set keys map."
   (when (not window-system)
     (defvar arrow-keys-map (make-sparse-keymap) "Keymap for arrow keys")
     (define-key esc-map "[" arrow-keys-map)
     (define-key arrow-keys-map "A" 'previous-line)
     (define-key arrow-keys-map "B" 'next-line)
     (define-key arrow-keys-map "C" 'forward-char)
-    (define-key arrow-keys-map "D" 'backward-char))
+    (define-key arrow-keys-map "D" 'backward-char)
+    (define-key global-map (kbd "<up>") 'previous-line)
+    (define-key global-map (kbd "<down>") 'next-line)
+    (define-key global-map (kbd "<right>") 'forward-char)
+    (define-key global-map (kbd "<left>") 'backward-char)
+    (define-key global-map (kbd "<C-up>") 'backward-paragraph)
+    (define-key global-map (kbd "<C-down>") 'forward-paragraph)
+    (define-key global-map (kbd "<C-right>") 'forward-word)
+    (define-key global-map (kbd "<C-left>") 'backward-word)))
+
+(defadvice terminal-init-xterm
+  (around map-escape-sequence activate compile)
+  (set-keys-map)
   ad-do-it)
-
-(when (not window-system)
-  (defvar arrow-keys-map (make-sparse-keymap) "Keymap for arrow keys")
-  (define-key esc-map "[" arrow-keys-map)
-  (define-key arrow-keys-map "A" 'previous-line)
-  (define-key arrow-keys-map "B" 'next-line)
-  (define-key arrow-keys-map "C" 'forward-char)
-  (define-key arrow-keys-map "D" 'backward-char))
-
+(set-keys-map)
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)

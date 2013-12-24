@@ -56,6 +56,9 @@ if [ -d $ZSH_DIR/plugin ]; then
     if [ -f $ZSH_DIR/plugin/zaw/zaw.zsh ]; then
         source $ZSH_DIR/plugin/zaw/zaw.zsh
     fi
+    if [ -f $ZSH_DIR/plugin/autojump/bin/autojump.zsh ]; then
+        source $ZSH_DIR/plugin/autojump/bin/autojump.zsh
+    fi
 fi
 
 if [ -d $ZSH_DIR/functions ]; then
@@ -184,13 +187,14 @@ alias -g S='| sed'
 alias -g A='| awk'
 alias -g W='| wc'
 
-# 常にバックグラウンド
+# 常にバックグラウンドで起動
 function gimp() { command gimp $* & }
 function firefox() { command firefox $* & }
 function xdvi() { command xdvi $* & }
 function xpdf() { command xpdf $* & }
 function evince() { command evince $* & }
 function vlc() { command vlc $* & }
+function gitg() { command gitg $* & }
 
 # stty
 stty stop undef
@@ -202,8 +206,35 @@ bindkey "^N" history-beginning-search-forward
 #bindkey "^I" menu-complete
 bindkey "^I" complete-word
 bindkey "\e[Z" reverse-menu-complete  # S-Tabで補完候補を逆順する
+
+# zaw
+autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+add-zsh-hook chpwd chpwd_recent_dirs
+zstyle ':chpwd:*' recent-dirs-max 5000
+zstyle ':chpwd:*' recent-dirs-default yes
+zstyle ':completion:*' recent-dirs-insert both
+zstyle ':filter-select' case-insensitive yes # 絞り込みをcase-insensitiveに
+#bindkey "^@" zaw-cdr
 bindkey "^h" zaw-history
 
+function zaw-src-gitdir () {
+    _dir=$(git rev-parse --show-cdup 2>/dev/null)
+    if [ $? -eq 0 ]
+    then
+        candidates=( $(git ls-files ${_dir} | perl -MFile::Basename -nle \
+            '$a{dirname $_}++; END{delete $a{"."}; print for sort keys %a}') )
+    fi
+
+    actions=("zaw-src-gitdir-cd")
+    act_descriptions=("change directory in git repos")
+}
+
+function zaw-src-gitdir-cd () {
+    BUFFER="cd $1"
+    zle accept-line
+}
+
+zaw-register-src -n gitdir zaw-src-gitdir
 
 # prompt
 local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
