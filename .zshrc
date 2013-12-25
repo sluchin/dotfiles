@@ -198,6 +198,8 @@ function xpdf() { command xpdf $* & }
 function evince() { command evince $* & }
 function vlc() { command vlc $* & }
 function gitg() { command gitg $* & }
+function emacs() { command emacs $* & }
+function emacsclient() { command emacsclient $* & }
 
 # stty
 stty stop undef
@@ -264,7 +266,7 @@ mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}
 if [ -n "`which tmux`" ]; then
     if [ -z "$TMUX" -a -z "$STY" ]; then
         if type tmux >/dev/null 2>&1; then
-            if tmux has-session && tmux list-sessions | /usr/bin/grep -qE '.*]$'; then
+            if tmux has-session && tmux list-sessions | grep -qE '.*]$'; then
                 tmux attach && echo "tmux attached session "
             else
                 tmux new-session && echo "tmux created new session"
