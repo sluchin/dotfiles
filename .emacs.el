@@ -861,6 +861,12 @@
              (fboundp 'server-start))
     (unless (server-running-p) (server-start))))
 
+;;; C ソースの指定
+(when (boundp 'find-function-C-source-directory)
+  (let ((src "~/src/emacs"))
+    (when (file-directory-p src)
+      (setq find-function-C-source-directory src))))
+
 ;;; バックアップファイル
 (setq version-control t)      ; 番号付ファイル
 (setq kept-new-versions 5)    ; 新しいバージョン
