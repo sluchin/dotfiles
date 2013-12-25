@@ -198,8 +198,7 @@ function xpdf() { command xpdf $* & }
 function evince() { command evince $* & }
 function vlc() { command vlc $* & }
 function gitg() { command gitg $* & }
-function emacs() { command emacs $* & }
-function emacsclient() { command emacsclient $* & }
+function emcb() { command emacsclient $* & }
 
 # stty
 stty stop undef
@@ -262,7 +261,7 @@ mysql_prompt_style_server_host=(
 mysql_prompt='${style_client_host}${USER}@${HOST}${fg_bold[white]} -> '
 mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}@${style_server_host}\h${reset_color}${fg_bold[white]}:${fg[magenta]}\d ${fg_bold[white]}\v${reset_color}\n'
 
-# tmux自動起動
+# tmux 自動起動
 if [ -n "`which tmux`" ]; then
     if [ -z "$TMUX" -a -z "$STY" ]; then
         if type tmux >/dev/null 2>&1; then
@@ -293,3 +292,5 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
     cd "$EMACS_CWD"
 }
 
+autoload -Uz dired
+autoload -Uz cde
