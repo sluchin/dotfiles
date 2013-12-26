@@ -2977,22 +2977,29 @@ Otherwise, return nil."
 ;;; helm
 ;; git clone https://github.com/emacs-helm/helm
 ;; git clone https://github.com/emacs-helm/helm-ls-git
-(when (and (locate-library "helm-config")
-           (require 'helm-config nil t))
-  (autoload 'helm-ls-git-ls "helm-ls-git"
-    "Yet another helm to list git file." t)
+(when (locate-library "helm-config")
+  (autoload 'helm-mode "helm-config"
+    "Applications library for `helm.el'." t)
+  (when (locate-library "helm-ls-git")
+    (autoload 'helm-ls-git-ls "helm-ls-git"
+      "list git files." t))
+  (when (locate-library "helm-descbinds")
+    (autoload 'helm-descbinds-mode "helm-descbinds"
+      "A helm frontend for describe-bindings." t))
 
-(defun helm-choice ()
+  (defun helm-choice ()
     "Helm choice."
     (interactive)
     (execute-choice-from-list
      "helm: "
-     '((?m "mini(m)"      helm-mini)
+     '((?h "helm(h)"      helm-mode)
+       (?d "descbinds(d)" helm-descbinds-mode)
+       (?m "mini(m)"      helm-mini)
        (?i "imenu(i)"     helm-imenu)
        (?f "recentf(f)"   helm-recentf)
        (?g "git(g)"       helm-ls-git-ls)
        (?b "bookmark(b)"  helm-bookmark)
-       (?b "apropos(a)"   helm-c-apropos)
+       (?a "apropos(a)"   helm-c-apropos)
        (?k "kill-ring(k)" helm-show-kill-ring)
        (?r "resume(r)"    helm-resume))))
   (define-key global-map (kbd "C-c s") 'helm-choice)
@@ -3000,8 +3007,6 @@ Otherwise, return nil."
 
   (eval-after-load "helm-config"
     '(progn
-       (when (fboundp 'helm-mode)
-         (helm-mode 1))
        (message "Loading %s (helm)...done" this-file-name))))
 
 ;;; タブ
