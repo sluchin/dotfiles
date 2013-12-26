@@ -85,7 +85,8 @@
         swank-clojure
         navi2ch
         emacs-helm
-        helm-ls-git))
+        helm-ls-git
+        helm-descbings))
 
 (when (boundp 'el-get-sources)
   (setq el-get-sources
@@ -334,5 +335,10 @@
                  :type github
                  :description "Yet another helm to list git file."
                  :pkgname "emacs-helm/helm-ls-git"
-                 :url "git://github.com/emacs-helm/helm-ls-git.git"))))
+                 :url "git://github.com/emacs-helm/helm-ls-git.git")
+          (:name helm-descbings
+                 :type github
+                 :description "A helm frontend for describe-bindings."
+                 :pkgname "emacs-helm/helm-descbinds"
+                 :url "git://github.com/emacs-helm/helm-descbinds.git"))))
 
