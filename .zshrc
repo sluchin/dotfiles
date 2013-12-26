@@ -43,26 +43,27 @@ ZSH_THEME="bureau"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
+
+# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
+# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
+
 plugins=(git github perl symfony2)
 
 if [ -f $ZSH/oh-my-zsh.sh ]; then
     source $ZSH/oh-my-zsh.sh
 fi
 
-# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
-# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
-if [ -d $ZSH_DIR/plugin ]; then
-    source $ZSH_DIR/plugin/*
-    if [ -f $ZSH_DIR/plugin/zaw/zaw.zsh ]; then
-        source $ZSH_DIR/plugin/zaw/zaw.zsh
-    fi
-    if [ -f $ZSH_DIR/plugin/autojump/bin/autojump.zsh ]; then
-        source $ZSH_DIR/plugin/autojump/bin/autojump.zsh
-    fi
-fi
-
-if [ -d $ZSH_DIR/functions ]; then
-    source $ZSH_DIR/functions/*
+if [ -d $ZSH_DIR ]; then
+    files=(
+        $ZSH_DIR/plugin/incr-0.2.zsh
+        $ZSH_DIR/plugin/zaw/zaw.zsh
+        $ZSH_DIR/plugin/autojump/bin/autojump.zsh
+        $ZSH_DIR/functions/mysql
+    )
+    for file in $files
+    do
+        [[ -f $file ]] && source $file
+    done
 fi
 
 # autoload
@@ -108,15 +109,16 @@ setopt cdable_vars
 setopt sh_word_split
 setopt magic_equal_subst
 setopt complete_aliases
-setopt notify                # バックグラウンドジョブの状態変化を即時報告する
+setopt notify               # バックグラウンドジョブの状態変化を即時報告する
 setopt globdots
 setopt check_jobs
-setopt magic_equal_subst     # =以降も補完する(--prefix=/usrなど)
+setopt magic_equal_subst    # =以降も補完する(--prefix=/usrなど)
 unsetopt auto_param_slash
 
 zstyle ':completion:*' verbose yes
 # 矢印で補完を選択
 zstyle ':completion:*:default' menu select=2
+zstyle ':completion:*:processes' menu yes select=2
 zstyle ':completion:*' menu select
 zstyle ':completion:*' keep-prefix
 zstyle ':completion:*' \
@@ -134,7 +136,7 @@ zstyle ':completion:*:*files' ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
 zstyle ':completion:*:cd:*' tag-order local-directories path-directories
 # 大文字小文字の区別をしない
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z} r:|[-_.]=**'
 # セパレータ
 zstyle ':completion:*' list-separator '=>'
 zstyle ':completion:*' format '%F{white}%d%f'
@@ -173,6 +175,7 @@ alias emq='emacs -q --no-site-file'
 alias ekill="emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
 unalias history
 alias ha='history -E 1'
+alias comps='echo ${(F)${(uo@)_comps}}'
 
 alias -s log='tail -f'
 alias -s c='emacsclient'
@@ -207,9 +210,9 @@ stty stop undef
 bindkey -e
 bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
-#bindkey "^I" menu-complete
-bindkey "^I" complete-word
-bindkey "\e[Z" reverse-menu-complete  # S-Tabで補完候補を逆順する
+bindkey '^i' menu-expand-or-complete
+bindkey '^[^i' reverse-menu-complete
+bindkey '^[i' expand-or-complete
 
 # zaw
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
@@ -276,7 +279,15 @@ fi
 
 ## Invoke the ``dired'' of current working directory in Emacs buffer.
 function dired () {
-    emacsclient -e "(dired \"$PWD\")"
+    dir=$1
+    if [ ! -d $dir ]; then
+        dir="$PWD/$dir"
+    fi
+    if [ -d $dir ]; then
+        emacsclient -e "(dired \"$dir\")"
+    else
+        echo "no directory"
+    fi
 }
 
 ## Chdir to the ``default-directory'' of currently opened in Emacs buffer.
