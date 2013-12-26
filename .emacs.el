@@ -862,6 +862,7 @@
     (unless (server-running-p) (server-start))))
 
 ;;; C ソースの指定
+;; git clone git://git.savannah.gnu.org/emacs.git
 (when (boundp 'find-function-C-source-directory)
   (let ((src "~/src/emacs"))
     (when (file-directory-p src)
@@ -873,6 +874,14 @@
 (setq kept-old-versions 5)    ; 古いバージョン
 (setq delete-old-versions t)  ; 確認しない
 (setq vc-make-backup-files t) ; バージョン管理下
+
+;;; emacs24 ではデフォルト有効
+(when (fboundp 'partial-completion-mode)
+  (partial-completion-mode t))
+
+;;; 補完可能なものを随時表示
+(when (fboundp 'icomplete-mode)
+  (icomplete-mode 1))
 
 ;;; 検索時大文字小文字の区別をする
 (setq-default case-fold-search nil)
