@@ -1160,18 +1160,6 @@
       (find-file-for-sudo (ad-get-arg 0))
     ad-do-it))
 
-;; デフォルトディレクトリを変更しない
-(setq default-directory "~/")
-(defadvice find-file (around find-file-default-directory activate compile)
-  "No change default-directory."
-  (let (default-directory)
-    ad-do-it))
-
-(defadvice kill-buffer (around file-default-directory activate compile)
-  "No change default-directory."
-  (let (default-directory)
-    ad-do-it))
-
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
 (define-key global-map (kbd "<f2>") 'toggle-debug-on-error)
@@ -1279,9 +1267,8 @@
         try-expand-line
         try-complete-lisp-symbol-partially
         try-complete-lisp-symbol))
-(if window-system
-    (define-key global-map (kbd "C-;") 'hippie-expand)
-  (define-key global-map (kbd "C-x ;") 'hippie-expand))
+(define-key global-map (kbd "C-;") 'hippie-expand)
+(define-key global-map (kbd "C-x ;") 'hippie-expand)
 
 ;; lisp 補完
 ;; Tab で補完 (デフォルト: M-Tab または C-i)
@@ -2984,7 +2971,38 @@ Otherwise, return nil."
        (when (fboundp 'iswitchb-mode)
          (iswitchb-mode))
        (when (fboundp 'anything-iswitchb-setup)
-         (anything-iswitchb-setup)))))
+         (anything-iswitchb-setup))
+       (message "Loading %s (anything)...done" this-file-name))))
+
+;;; helm
+;; git clone https://github.com/emacs-helm/helm
+;; git clone https://github.com/emacs-helm/helm-ls-git
+(when (and (locate-library "helm-config")
+           (require 'helm-config nil t))
+  (autoload 'helm-ls-git-ls "helm-ls-git"
+    "Yet another helm to list git file." t)
+
+(defun helm-choice ()
+    "Helm choice."
+    (interactive)
+    (execute-choice-from-list
+     "helm: "
+     '((?m "mini(m)"      helm-mini)
+       (?i "imenu(i)"     helm-imenu)
+       (?f "recentf(f)"   helm-recentf)
+       (?g "git(g)"       helm-ls-git-ls)
+       (?b "bookmark(b)"  helm-bookmark)
+       (?b "apropos(a)"   helm-c-apropos)
+       (?k "kill-ring(k)" helm-show-kill-ring)
+       (?r "resume(r)"    helm-resume))))
+  (define-key global-map (kbd "C-c s") 'helm-choice)
+  (define-key global-map (kbd "C-c C-c") 'helm-mini)
+
+  (eval-after-load "helm-config"
+    '(progn
+       (when (fboundp 'helm-mode)
+         (helm-mode 1))
+       (message "Loading %s (helm)...done" this-file-name))))
 
 ;;; タブ
 ;; (install-elisp-from-emacswiki "tabbar.el")
@@ -5623,64 +5641,6 @@ Otherwise, return nil."
 ;; (install-elisp-from-emacswiki "sl.el")
 (when (locate-library "sl")
   (autoload 'sl "sl" "This is joke command." t))
-
-;; 24.3 以降 subr.el で定義
-(unless (fboundp 'read-char-choice)
-  (defun read-char-choice (prompt chars &optional inhibit-keyboard-quit)
-    "Read and return one of CHARS, prompting for PROMPT.
-Any input that is not one of CHARS is ignored.
-
-If optional argument INHIBIT-KEYBOARD-QUIT is non-nil, ignore
-keyboard-quit events while waiting for a valid input."
-    (when (fboundp 'help-form-show)
-      (unless (consp chars)
-        (error "Called `read-char-choice' without valid char choices"))
-      (let (char done show-help (helpbuf " *Char Help*"))
-        (let ((cursor-in-echo-area t)
-              (executing-kbd-macro executing-kbd-macro)
-              (esc-flag nil))
-          (save-window-excursion          ; in case we call help-form-show
-            (while (not done)
-              (unless (get-text-property 0 'face prompt)
-                (setq prompt (propertize prompt 'face 'minibuffer-prompt)))
-              (setq char (let ((inhibit-quit inhibit-keyboard-quit))
-                           (read-key prompt)))
-              (and show-help (buffer-live-p (get-buffer helpbuf))
-                   (kill-buffer helpbuf))
-              (cond
-               ((not (numberp char)))
-               ;; If caller has set help-form, that's enough.
-               ;; They don't explicitly have to add help-char to chars.
-               ((and help-form
-                     (eq char help-char)
-                     (setq show-help t)
-                     (help-form-show)))
-               ((memq char chars)
-                (setq done t))
-               ((and executing-kbd-macro (= char -1))
-                ;; read-event returns -1 if we are in a kbd macro and
-                ;; there are no more events in the macro.  Attempt to
-                ;; get an event interactively.
-                (setq executing-kbd-macro nil))
-               ((not inhibit-keyboard-quit)
-                (cond
-                 ((and (null esc-flag) (eq char ?\e))
-                  (setq esc-flag t))
-                 ((memq char '(?\C-g ?\e))
-                  (keyboard-quit))))))))
-        ;; Display the question with the answer.  But without cursor-in-echo-area.
-        (message "%s%s" prompt (char-to-string char))
-        char))))
-
-;; 24.3 以降 help.el で定義
-(unless (fboundp 'help-from-show)
-  ;; Don't print to *Help*; that would clobber Help history.
-  (defun help-form-show ()
-    "Display the output of a non-nil `help-form'."
-    (let ((msg (eval help-form)))
-      (if (stringp msg)
-          (with-output-to-temp-buffer " *Char Help*"
-            (princ msg))))))
 
 ;; キーマップ (<C-right>, <C-left>)
 (defun set-keys-map ()
