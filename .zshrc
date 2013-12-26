@@ -210,9 +210,9 @@ stty stop undef
 bindkey -e
 bindkey "^P" history-beginning-search-backward
 bindkey "^N" history-beginning-search-forward
-bindkey '^i' menu-expand-or-complete
+bindkey '^i' expand-or-complete
 bindkey '^[^i' reverse-menu-complete
-bindkey '^[i' expand-or-complete
+bindkey '^[i' menu-expand-or-complete
 
 # zaw
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook

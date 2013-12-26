@@ -83,7 +83,9 @@
         haskell-mode
         clojure-mode
         swank-clojure
-        navi2ch))
+        navi2ch
+        emacs-helm
+        helm-ls-git))
 
 (when (boundp 'el-get-sources)
   (setq el-get-sources
@@ -322,4 +324,15 @@
                  :description "Navigator for 2ch for Emacsen."
                  :website "http://navi2ch.sourceforge.net/"
                  :pkgname "naota/navi2ch"
-                 :url "git://github.com/naota/navi2ch.git"))))
+                 :url "git://github.com/naota/navi2ch.git")
+          (:name emacs-helm
+                 :type github
+                 :description "Emacs incremental completion and selection narrowing framework."
+                 :pkgname "emacs-helm/helm"
+                 :url "git://github.com/emacs-helm/helm.git")
+          (:name helm-ls-git
+                 :type github
+                 :description "Yet another helm to list git file."
+                 :pkgname "emacs-helm/helm-ls-git"
+                 :url "git://github.com/emacs-helm/helm-ls-git.git"))))
+
