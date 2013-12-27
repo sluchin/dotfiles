@@ -5197,6 +5197,19 @@ Otherwise, return nil."
   (autoload 'php+-mode "php+-mode" "PHP+ mode for Emacs." t)
   (setq auto-mode-alist
         (cons '("\\.php\\'" . php+-mode) auto-mode-alist))
+  (defvar php-imenu-generic-expression
+    '(("All Functions"
+       "^\\s-*function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1)
+      ("Classes"
+       "^\\s-*class\\s-+\\([[:alnum:]_]+\\)\\s-*" 1)
+      ("Public Methods"
+       "^\\s-*public function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1)
+      ("Protected Methods"
+       "^\\s-*protected function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1)
+      ("Private Methods"
+       "^\\s-*private function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1))
+    "Imenu generic expression for PHP Mode. See `imenu-generic-expression'.")
+
   (add-hook 'php+-mode-hook
             (lambda ()
               (when (fboundp 'php+-mode-setup)
@@ -5255,7 +5268,11 @@ Otherwise, return nil."
               (when (boundp 'php-manual-path)
                 (setq php-manual-path "/usr/share/doc/php-doc/html"))
               (when (boundp 'php-manual-url)
-                (setq php-manual-url "http://www.phppro.jp/phpmanual/")))))
+                (setq php-manual-url "http://www.phppro.jp/phpmanual/"))
+              (when (boundp 'case-fold-search)
+                (setq case-fold-search t))
+              (when (boundp 'imenu-generic-expression)
+                (setq imenu-generic-expression php-imenu-generic-expression)))))
 
 (when (locate-library "inf-php")
     (autoload 'inf-php "inf-php"
