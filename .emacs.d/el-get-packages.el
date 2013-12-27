@@ -7,6 +7,7 @@
       '(color-moccur
         moccur-edit
         auto-install
+        imenu+
         info+
         thing-opt
         igrep
@@ -94,6 +95,7 @@
         '((:name color-moccur :type emacswiki)
          (:name moccur-edit :type emacswiki)
          (:name auto-install :type emacswiki)
+         (:name imenu+ :type emacswiki)
          (:name info+ :type emacswiki)
          (:name thing-opt :type emacswiki)
          (:name igrep :type emacswiki)

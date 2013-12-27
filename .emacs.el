@@ -1273,13 +1273,13 @@
 ;; lisp 補完
 ;; Tab で補完 (デフォルト: M-Tab または C-i)
 (when (boundp 'emacs-lisp-mode-map)
-  (define-key emacs-lisp-mode-map (kbd "TAB") 'lisp-complete-symbol))
+  (define-key emacs-lisp-mode-map (kbd "C-i") 'lisp-complete-symbol))
 (when (boundp 'lisp-interaction-mode-map)
-  (define-key lisp-interaction-mode-map (kbd "TAB") 'lisp-complete-symbol))
+  (define-key lisp-interaction-mode-map (kbd "C-i") 'lisp-complete-symbol))
 (when (boundp 'lisp-mode-map)
-  (define-key lisp-mode-map (kbd "TAB") 'lisp-complete-symbol))
+  (define-key lisp-mode-map (kbd "C-i") 'lisp-complete-symbol))
 (when (boundp 'read-expression-map)
-  (define-key read-expression-map (kbd "TAB") 'lisp-complete-symbol))
+  (define-key read-expression-map (kbd "C-i") 'lisp-complete-symbol))
 
 ;; 改行と同時にインデントも行う
 (define-key global-map (kbd "RET") 'newline-and-indent)
@@ -1818,19 +1818,22 @@
        (message "Loading %s (ediff)...done" this-file-name))))
 
 ;;; バッファの切り替えをインクリメンタルにする
-(when (eval-and-compile (require 'iswitchb nil t))
-  ;; iswitchb モードを有効にする
-  (when (fboundp 'iswitchb-mode)
-    (iswitchb-mode 1))
-  ;; バッファ名の読み取り方を指定
-  (when (boundp 'read-buffer-function)
-    (setq read-buffer-function 'iswitchb-read-buffer))
-  ;; 部分文字列の代わりに正規表現を使う場合は t に設定する
-  (when (boundp 'iswitchb-regexp)
-    (setq iswitchb-regexp nil))
-  ;; 新しいバッファを作成するときいちいち聞いてこない
-  (when (boundp 'iswitchb-prompt-newbuffer)
-    (setq iswitchb-prompt-newbuffer nil)))
+(when (locate-library "iswitchb")
+  (autoload 'iswitchb-mode "iswitchb"
+    "A comprehensive visual interface to diff & patch." t)
+
+  (eval-after-load "iswitchb"
+    '(progn
+       ;; バッファ名の読み取り方を指定
+       (when (boundp 'read-buffer-function)
+         (setq read-buffer-function 'iswitchb-read-buffer))
+       ;; 部分文字列の代わりに正規表現を使う場合は t に設定する
+       (when (boundp 'iswitchb-regexp)
+         (setq iswitchb-regexp nil))
+       ;; 新しいバッファを作成するときいちいち聞いてこない
+       (when (boundp 'iswitchb-prompt-newbuffer)
+         (setq iswitchb-prompt-newbuffer nil))
+       (message "Loading %s (iswitch)...done" this-file-name))))
 
 ;;; 優先度の高いディレクトリから探索
 (defun find-directory (base)
@@ -2913,22 +2916,17 @@ Otherwise, return nil."
 
 ;;; Anything
 ;; (auto-install-batch "anything")
-(when (and (locate-library "anything-config")
-           (require 'anything-config nil t))
+(when (locate-library "anything-config")
   (autoload 'anything-recentf "anything-config"
     "Preconfigured `anything' for `recentf'." t)
   (autoload 'anything-find-files "anything-config"
     "Preconfigured `anything' for anything implementation of `find-file'." t)
   (autoload 'anything-filelist+ "anything-config"
     "Preconfigured `anything' to open files instantly." t)
-  (autoload 'anything-bookmark "anything-config"
+  (autoload 'anything-filelist "anything-config"
+    "Preconfigured `anything' to open files instantly." t)
+  (autoload 'anything-bookmarks "anything-config"
     "Preconfigured `anything' for bookmarks." t)
-
-  ;; anything インターフェース
-  (defun anything-startup ()
-    "anything.el startup file."
-    (interactive)
-    (require 'anything-startup nil t))
 
   ;; ファイルリスト作成
   ;; '("\"~/dir1\"" "\"~/dir2\"")
@@ -2993,7 +2991,6 @@ Otherwise, return nil."
     (execute-choice-from-list
      "helm: "
      '((?h "helm(h)"      helm-mode)
-       (?d "descbinds(d)" helm-descbinds-mode)
        (?m "mini(m)"      helm-mini)
        (?i "imenu(i)"     helm-imenu)
        (?f "recentf(f)"   helm-recentf)
@@ -3007,6 +3004,15 @@ Otherwise, return nil."
 
   (eval-after-load "helm-config"
     '(progn
+       (when (locate-library "imenu+")
+         (require 'imenu+ nil t))
+       (when (locate-library "helm-descbinds")
+         (require 'helm-descbinds nil t)
+         (when (fboundp 'helm-descbinds-mode)
+           (helm-descbinds-mode 1)))
+       (when (boundp 'helm-c-read-file-map)
+         (define-key helm-c-read-file-map (kbd "C-h") 'delete-backward-char)
+         (define-key helm-c-read-file-map (kbd "C-i") 'helm-execute-persistent-action))
        (message "Loading %s (helm)...done" this-file-name))))
 
 ;;; タブ
@@ -4739,7 +4745,7 @@ Otherwise, return nil."
          (slime-autodoc-mode))
        ;; キーバインド
        (when (boundp 'slime-mode-map)
-         (define-key slime-mode-map (kbd "TAB") 'slime-indent-and-complete-symbol)
+         (define-key slime-mode-map (kbd "C-i") 'slime-indent-and-complete-symbol)
          (define-key slime-mode-map (kbd "C-i") 'lisp-indent-line)
          (define-key slime-mode-map (kbd "C-c s") 'slime-selector)))))
 
@@ -4845,7 +4851,7 @@ Otherwise, return nil."
          (setq nxml-char-ref-display-glyph-flag nil))
        ;; Tab で補完 (デフォルト: M-Tab)
        (when (boundp 'nxml-mode-map)
-         (define-key nxml-mode-map (kbd "TAB") 'completion-at-point))
+         (define-key nxml-mode-map (kbd "C-i") 'completion-at-point))
        (message "Loading %s (nxml)...done" this-file-name))))
 
 ;;; C 言語
@@ -5228,7 +5234,19 @@ Otherwise, return nil."
                 (when (fboundp 'php-completion-mode)
                   (php-completion-mode t))
                 (when (boundp 'php+-mode-map)
+                  (define-key php+-mode-map (kbd "C-c s") 'helm-choice)
                   (define-key php+-mode-map (kbd "C-:") 'phpcmp-complete)))
+              (when (boundp 'imenu-auto-rescan)
+                (setq imenu-auto-rescan t))
+              (when (locate-library "php-imenu")
+                (autoload 'php-imenu-create-index "php-imenu" nil t)
+                (when (boundp 'imenu-create-index-function)
+                  (setq imenu-create-index-function (function php-imenu-create-index)))
+                ;; uncomment if you prefer speedbar:
+                (when (boundp 'php-imenu-alist-postprocessor)
+                  (setq php-imenu-alist-postprocessor (function reverse)))
+                (when (fboundp 'imenu-add-menubar-index)
+                  (imenu-add-menubar-index)))
               (when (require 'flymake nil t)
                 (when (fboundp 'flymake-mode)
                   (flymake-mode 1)))
