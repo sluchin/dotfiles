@@ -1,6 +1,6 @@
 ;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
-;; Copyright (C) 2012 2013
+;; Copyright (C) 2012 2013 2014
 
 ;; Author: Tetsuya Higashi
 
@@ -25,6 +25,18 @@
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 ;; 環境変数 CYGWIN に "nodosfilewarning" を設定する
+
+;; emacs ソース
+;; git clone git://git.savannah.gnu.org/emacs.git
+;; apt-get
+;; (apt-get-install-all)
+;; anything
+;; (auto-install-batch "anything")
+;; el-get
+;; (el-get-install-all)
+;; バイトコンパイル
+;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)
+
 
 ;;; Code:
 
@@ -317,11 +329,11 @@
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
                 "~/.emacs.d/pomodoro-technique"
-                "~/.emacs.d/cedet/common"
-                "~/.emacs.d/cedet/ede"
-                "~/.emacs.d/cedet/semantic"
-                "~/.emacs.d/cedet/semantic/bovine"
-                "~/.emacs.d/cedet/speedbar"
+                ;"~/.emacs.d/cedet/common"
+                ;"~/.emacs.d/cedet/ede"
+                ;"~/.emacs.d/cedet/semantic"
+                ;"~/.emacs.d/cedet/semantic/bovine"
+                ;"~/.emacs.d/cedet/speedbar"
                 "~/.emacs.d/auto-install") load-path))
 
 ;;; el-get
@@ -1570,42 +1582,47 @@
          (kill-all-buffer 'dired-mode))
 
        (when (boundp 'dired-mode-map)
-         ;; firefox で開く
-         (define-key dired-mode-map (kbd "f") 'dired-run-firefox)
-         ;; libreoffice で開く
-         (define-key dired-mode-map (kbd "M-l") 'dired-run-libreoffice)
-         ;; evince で開く
-         (define-key dired-mode-map (kbd "e") 'dired-run-evince)
-         ;; vlc で開く
-         (define-key dired-mode-map (kbd "M-v") 'dired-run-vlc)
-         ;; w3m で開く
-         (define-key dired-mode-map (kbd "M-3") 'dired-w3m-find-file)
-         ;; tar + gzip で圧縮
-         (define-key dired-mode-map (kbd "z") 'dired-do-tar-gzip)
-         ;; バックアップファイル
-         (define-key dired-mode-map (kbd "b") 'dired-make-backup)
-         ;; 文字コードをトグルする
-         (define-key dired-mode-map (kbd "c") 'dired-file-name-jp)
-         ;; kill する
-         (define-key dired-mode-map (kbd "M-k") 'kill-dired-buffer)
-         ;; 全て kill する
-         (define-key dired-mode-map (kbd "C-M-k") 'kill-dired-all-buffer)
-         ;; 編集可能にする
-         (when (locate-library "wdired")
-           (define-key dired-mode-map "r" 'wdired-change-to-wdired-mode))
-         ;; 無効コマンドを有効にする
-         (put 'dired-find-alternate-file 'disabled nil)
-         ;; 新規バッファを作らない
-         (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-         ;; 新規バッファを作る
-         (define-key dired-mode-map (kbd "a") 'dired-advertised-find-file))
+         (let ((map dired-mode-map))
+           ;; firefox で開く
+           (define-key map (kbd "f") 'dired-run-firefox)
+           ;; libreoffice で開く
+           (define-key map (kbd "M-l") 'dired-run-libreoffice)
+           ;; evince で開く
+           (define-key map (kbd "e") 'dired-run-evince)
+           ;; vlc で開く
+           (define-key map (kbd "M-v") 'dired-run-vlc)
+           ;; w3m で開く
+           (define-key map (kbd "M-3") 'dired-w3m-find-file)
+           ;; tar + gzip で圧縮
+           (define-key map (kbd "z") 'dired-do-tar-gzip)
+           ;; バックアップファイル
+           (define-key map (kbd "b") 'dired-make-backup)
+           ;; 文字コードをトグルする
+           (define-key map (kbd "c") 'dired-file-name-jp)
+           ;; kill する
+           (define-key map (kbd "M-k") 'kill-dired-buffer)
+           ;; 全て kill する
+           (define-key map (kbd "C-M-k") 'kill-dired-all-buffer)
+           ;; 編集可能にする
+           (when (locate-library "wdired")
+             (define-key map "r" 'wdired-change-to-wdired-mode))
+           ;; 無効コマンドを有効にする
+           (put 'dired-find-alternate-file 'disabled nil)
+           ;; 新規バッファを作らない
+           (define-key map (kbd "RET") 'dired-find-alternate-file)
+           ;; 新規バッファを作る
+           (define-key map (kbd "a") 'dired-advertised-find-file)
+           ;; 親ディレクトリへ移動
+           (define-key map (kbd "U") 'dired-up-directory)))
+
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
 (when (or (locate-library "speedbar")
-          (locate-library "sr-speedbar")
-          (autoload 'speedbar-get-focus "speedbar"
-            "Change frame focus to or from the speedbar frame." t))
+          (locate-library "sr-speedbar"))
+  (autoload 'speedbar-get-focus "speedbar"
+    "Change frame focus to or from the speedbar frame." t)
+
   ;; フォントをデフォルトにする
   (add-hook 'speedbar-mode-hook
             (lambda ()
@@ -2990,17 +3007,16 @@ Otherwise, return nil."
     (interactive)
     (execute-choice-from-list
      "helm: "
-     '((?h "helm(h)"      helm-mode)
-       (?m "mini(m)"      helm-mini)
-       (?i "imenu(i)"     helm-imenu)
+     '((?m "mode(m)"      helm-mode)
+       (?n "mini(n)"      helm-mini)
        (?f "recentf(f)"   helm-recentf)
+       (?i "imenu(i)"     helm-imenu)
        (?g "git(g)"       helm-ls-git-ls)
        (?b "bookmark(b)"  helm-bookmark)
        (?a "apropos(a)"   helm-c-apropos)
        (?k "kill-ring(k)" helm-show-kill-ring)
        (?r "resume(r)"    helm-resume))))
   (define-key global-map (kbd "C-c s") 'helm-choice)
-  (define-key global-map (kbd "C-c C-c") 'helm-mini)
 
   (eval-after-load "helm-config"
     '(progn
@@ -3013,6 +3029,7 @@ Otherwise, return nil."
        (when (boundp 'helm-c-read-file-map)
          (define-key helm-c-read-file-map (kbd "C-h") 'delete-backward-char)
          (define-key helm-c-read-file-map (kbd "C-i") 'helm-execute-persistent-action))
+       (define-key global-map (kbd "C-c C-c") 'helm-mini)
        (message "Loading %s (helm)...done" this-file-name))))
 
 ;;; タブ
@@ -3030,18 +3047,9 @@ Otherwise, return nil."
        (set-face-background 'tabbar-unselected "gray60")
        (set-face-foreground 'tabbar-selected "white")
        (set-face-background 'tabbar-selected "blue")
-       ;; グループを使わない
-       (when (boundp 'tabbar-buffer-groups-function)
-         (setq tabbar-buffer-groups-function nil))
        ;; タブがはみ出たときスクロールさせる
        (when (boundp 'tabbar-auto-scroll-flag)
          (setq tabbar-auto-scroll-flag t))
-       ;; タブ左ボタン非表示
-       (dolist (btn '(tabbar-buffer-home-button
-                      tabbar-scroll-left-button
-                      tabbar-scroll-right-button))
-         (set btn (cons (cons "" nil) (cons "" nil))))
-
        ;; バッファ非表示
        (setq tabbar-buffer-list-function
              (lambda ()
@@ -5188,7 +5196,7 @@ Otherwise, return nil."
 ;; https://github.com/zenozeng/php-eldoc.git
 ;; (load-library "php-extras-gen-eldoc")
 ;; (php-extras-generate-eldoc)
-;; (auto-install-batch anything)
+;; (auto-install-batch "anything")
 ;; (install-elisp-from-emacswiki auto-complete.el)
 ;; (install-elisp-from-emacswiki php-completion.el)
 (when (locate-library "php+-mode")
@@ -5197,18 +5205,6 @@ Otherwise, return nil."
   (autoload 'php+-mode "php+-mode" "PHP+ mode for Emacs." t)
   (setq auto-mode-alist
         (cons '("\\.php\\'" . php+-mode) auto-mode-alist))
-  (defvar php-imenu-generic-expression
-    '(("All Functions"
-       "^\\s-*function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1)
-      ("Classes"
-       "^\\s-*class\\s-+\\([[:alnum:]_]+\\)\\s-*" 1)
-      ("Public Methods"
-       "^\\s-*public function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1)
-      ("Protected Methods"
-       "^\\s-*protected function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1)
-      ("Private Methods"
-       "^\\s-*private function\\s-+\\([[:alnum:]_]+\\)\\s-*(" 1))
-    "Imenu generic expression for PHP Mode. See `imenu-generic-expression'.")
 
   (add-hook 'php+-mode-hook
             (lambda ()
@@ -5255,7 +5251,6 @@ Otherwise, return nil."
                 (autoload 'php-imenu-create-index "php-imenu" nil t)
                 (when (boundp 'imenu-create-index-function)
                   (setq imenu-create-index-function (function php-imenu-create-index)))
-                ;; uncomment if you prefer speedbar:
                 (when (boundp 'php-imenu-alist-postprocessor)
                   (setq php-imenu-alist-postprocessor (function reverse)))
                 (when (fboundp 'imenu-add-menubar-index)
@@ -5270,9 +5265,7 @@ Otherwise, return nil."
               (when (boundp 'php-manual-url)
                 (setq php-manual-url "http://www.phppro.jp/phpmanual/"))
               (when (boundp 'case-fold-search)
-                (setq case-fold-search t))
-              (when (boundp 'imenu-generic-expression)
-                (setq imenu-generic-expression php-imenu-generic-expression)))))
+                (setq case-fold-search t)))))
 
 (when (locate-library "inf-php")
     (autoload 'inf-php "inf-php"
