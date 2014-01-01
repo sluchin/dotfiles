@@ -1,9 +1,10 @@
-;;; color-syslog.el --- Syslog for color.
-;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
+;;; color-syslog.el --- Syslog for color. -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
 ;; Copyright (C) 2013
 
 ;; Author: Tetsuya Higashi
+
+;;; Code
 
 (defcustom syslog-month-face
   '((t  :weight bold :foreground "red"))
@@ -44,7 +45,7 @@
 
 (when (boundp 'syslog-font-lock-keywords)
   (setq syslog-font-lock-keywords
-        '(;; Hours: 17:36:00 
+        '(;; Hours: 17:36:00
           ("\\(?:^\\|[[:space:]]\\)\\([[:digit:]]\\{1,2\\}:[[:digit:]]\\{1,2\\}\\(:[[:digit:]]\\{1,2\\}\\)?\\)\\(?:$\\|[[:space:]]\\)" . (1 syslog-hour-face append))
           ;; Date
           ("\\(?:^\\|[[:space:]]\\)\\([[:digit:]]\\{1,2\\}/[[:digit:]]\\{1,2\\}/[[:digit:]]\\{2,4\\}\\)\\(?:$\\|[[:space:]]\\)" . (1 syslog-hour-face append))

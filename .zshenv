@@ -37,5 +37,6 @@ export CVS_RSH=ssh
 export TERM=xterm
 export EDITOR=emacsclient
 export VISUAL=emacsclient
+export FCEDIT=emacsclient
 
 limit coredumpsize unlimited

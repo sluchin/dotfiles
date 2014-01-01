@@ -62,7 +62,7 @@ if [ -d $ZSH_DIR ]; then
     )
     for file in $files
     do
-        [[ -f $file ]] && source $file
+        [ -f $file ] && source $file
     done
 fi
 
@@ -79,11 +79,11 @@ HISTFILE=$HOME/.zhistory
 
 # shell options
 setopt auto_cd              # ディレクトリ名の入力のみで移動する
-setopt auto_remove_slash
-setopt auto_name_dirs
+setopt auto_remove_slash    # スラッシュの削除
 setopt auto_pushd           # cd -[TAB] でこれまでに移動したディレクトリ一覧を表示
 setopt auto_menu            # 補完キー連打で補完候補を順に表示する
-#setopt auto_list            # 補完候補を一覧で表示する
+setopt auto_name_dirs       # 代入直後から名前付きディレクトリにする
+setopt cdable_vars          # チルダ省略
 setopt pushd_to_home        # 引数なし pushd で $HOME に戻る(直前 dir へは cd - で)
 setopt pushd_ignore_dups    # ディレクトリスタックに重複する物は古い方を削除
 setopt extended_history     # コマンドの開始時刻と経過時間を登録
@@ -101,11 +101,9 @@ setopt no_hup               # logout時にバックグラウンドジョブを k
 setopt no_beep              # コマンド入力エラーでBEEPを鳴らさない
 setopt extended_glob        # 拡張グロブ
 setopt numeric_glob_sort    # 数字を数値と解釈して昇順ソートで出力
-setopt auto_param_keys
 setopt prompt_subst
 setopt interactive_comments # コマンド入力中のコメントを認める
 setopt always_last_prompt
-setopt cdable_vars
 setopt sh_word_split
 setopt magic_equal_subst
 setopt complete_aliases
@@ -113,7 +111,8 @@ setopt notify               # バックグラウンドジョブの状態変化�
 setopt globdots
 setopt check_jobs
 setopt magic_equal_subst    # =以降も補完する(--prefix=/usrなど)
-unsetopt auto_param_slash
+unsetopt auto_param_keys    # 変数名の後ろに空白を挿入
+unsetopt auto_param_slash   # ディレクトリの後ろスラッシュを挿入
 
 zstyle ':completion:*' verbose yes
 # 矢印で補完を選択
@@ -130,7 +129,6 @@ zstyle ':completion:*' \
     #_approximate \
     _list \
     _history
-zstyle ':completion:*' group-name ''
 # オブジェクトファイルは補完しない
 zstyle ':completion:*:*files' ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
@@ -139,14 +137,19 @@ zstyle ':completion:*:cd:*' tag-order local-directories path-directories
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z} r:|[-_.]=**'
 # セパレータ
 zstyle ':completion:*' list-separator '=>'
+
 zstyle ':completion:*' format '%F{white}%d%f'
+zstyle ':completion:*' group-name ''
 
 # apt-get や dpkg を速くする
-if [ ! -d $ZSH_DIR/cache ]; then
-    mkdir -p $ZSH_DIR/cache
+ZSH_CACHE_DIR=$ZSH_DIR/cache
+if [ ! -d $ZSH_CACHE_DIR ]; then
+    mkdir -p $ZSH_CACHE_DIR
 fi
-zstyle ':completion:*' cache-path $ZSH_DIR/cache
+zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' use-cache yes
+
+# fake
 zstyle ':completion:*:date:*' fake \
     '+%Y-%m-%d: 西暦-月-日' \
     '+%Y-%m-%d %H\:%M\:%S: 西暦-月-日 時\:分\:秒'
@@ -167,23 +170,16 @@ alias egrep='egrep --color=auto'
 alias g='git --no-pager'
 alias t='tail -f'
 alias gterm='gnome-terminal --geometry=130x40'
-alias emd='emacs --daemon'
-alias emc='emacsclient -t'
-alias emn='emacs -nw'
-alias emw='emacs'
-alias emq='emacs -q --no-site-file'
-alias ekill="emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
-unalias history
-alias ha='history -E 1'
+alias emd='command emacs --daemon'
+alias emn='command emacs -nw'
+alias emc='command emacsclient -t'
+alias emq='command emacs -q --no-site-file'
+alias ekill="command emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
+alias ha='fc -lDE 1'
 alias comps='echo ${(F)${(uo@)_comps}}'
 
 alias -s log='tail -f'
-alias -s c='emacsclient'
-alias -s h='emacsclient'
-alias -s cpp='emacsclient'
-alias -s php='emacsclient'
-alias -s yml='emacsclient'
-alias -s el='emacsclient'
+alias -s {el,c,h,cpp,php,yml}='emacsclient'
 
 alias -g L='| less'
 alias -g H='| head'
@@ -194,6 +190,7 @@ alias -g A='| awk'
 alias -g W='| wc'
 
 # 常にバックグラウンドで起動
+function emacs() { command emacs $* & }
 function gimp() { command gimp $* & }
 function firefox() { command firefox $* & }
 function xdvi() { command xdvi $* & }
@@ -201,7 +198,6 @@ function xpdf() { command xpdf $* & }
 function evince() { command evince $* & }
 function vlc() { command vlc $* & }
 function gitg() { command gitg $* & }
-function emcb() { command emacsclient $* & }
 
 # stty
 stty stop undef
@@ -220,13 +216,12 @@ add-zsh-hook chpwd chpwd_recent_dirs
 zstyle ':chpwd:*' recent-dirs-max 5000
 zstyle ':chpwd:*' recent-dirs-default yes
 zstyle ':completion:*' recent-dirs-insert both
-zstyle ':filter-select' case-insensitive yes # 絞り込みをcase-insensitiveに
+zstyle ':filter-select' case-insensitive yes
 #bindkey "^@" zaw-cdr
 bindkey "^h" zaw-history
 
 # prompt
-local return_code="%(?..%{$fg[red]%}%? ↵%{$reset_color%})"
-RPS1="${return_code} $RPS1"
+RPROMPT="!%!(%?)$RPS1"
 
 # SSH ログイン時のプロンプト
 [ -n "${REMOTEHOST}${SSH_CONNECTION}" ] &&
@@ -277,6 +272,21 @@ if [ -n "`which tmux`" ]; then
     fi
 fi
 
+function cdup() {
+    cd ..
+    zle reset-prompt
+}
+
+function comp_dirup() {
+    BUFFER=${BUFFER%/*}
+}
+
+zle -N cdup
+zle -N comp_dirup
+bindkey '^x\^' cdup
+bindkey '^xU' cdup
+bindkey '^xl' comp_dirup
+
 ## Invoke the ``dired'' of current working directory in Emacs buffer.
 function dired () {
     dir=$1
@@ -303,5 +313,5 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
     cd "$EMACS_CWD"
 }
 
-autoload -Uz dired
-autoload -Uz cde
+zle -N dired
+zle -N cde
