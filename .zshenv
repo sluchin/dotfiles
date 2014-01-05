@@ -18,16 +18,22 @@ fpath=(
     $HOME/.zsh.d/*(N-/)
     $HOME/.zsh.d/functions/*(N-/)
     $HOME/.zsh.d/plugin/*(N-/)
+    $HOME/.zsh.d/plugin/*/*(N-/)
+    $HOME/.zsh.d/plugin/*/*/*(N-/)
     $fpath
 )
 
 cdpath=(
-    ..
+    $HOME/devel/*(N-/)
+    $HOME/src/*(N-/)
     $HOME
-    $HOME/src
-    $HOME/devel
+    ..
     $cdpath
 )
+
+# 名前つきディレクトリ
+phpconf=/etc/php5
+apacheconf=/etc/apache2
 
 typeset -U path fpath cdpath manpath
 fignore=('.elc' '.o' '~' '\#')
@@ -40,3 +46,8 @@ export VISUAL=emacsclient
 export FCEDIT=emacsclient
 
 limit coredumpsize unlimited
+
+ZSHENV_LOCAL=$HOME/.zshenv.local
+if [[ -f $ZSHENV_LOCAL ]]; then
+    source $ZSHENV_LOCAL
+fi

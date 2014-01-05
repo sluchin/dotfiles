@@ -33,9 +33,10 @@ GIT_MELD=git-meld.pl
 MYSQL_CONF=.my.cnf
 
 # application
-APP=.local/share/gnome-terminal
+APP=.local/share/applications
 APPSYS=/usr/share/applications
 GNOME_TERMINAL=gnome-terminal.desktop
+EMACSCLIENT=emacsclient.desktop
 
 # font
 FONTS=.fonts
@@ -120,8 +121,11 @@ autolink $DOTFILES/bin $HOME/bin $GIT_MELD
 autolink $DOTFILES $HOME $MYSQL_CONF
 
 # application
+autolink $DOTFILES/$APP $HOME/$APP $GNOME_TERMINAL
+autolink $DOTFILES/$APP $HOME/$APP $EMACSCLIENT
 if [ `whoami` = 'root' ]; then
     autolink $DOTFILES/$APP $APPSYS $GNOME_TERMINAL
+    autolink $DOTFILES/$APP $APPSYS $EMACSCLIENT
 fi
 
 # fonts
@@ -150,6 +154,11 @@ fi
 
 if [ -n `which fc-cache` ]; then
     fc-cache -vf
+fi
+
+# xdg-mime query filetype .zshrc
+if [ -n `which xdg-mime` ]; then
+    xdg-mime default emacsclient.desktop text/plain
 fi
 
 # gconftool-2 --set /apps/gnome-terminal/profiles/Default/font --type string "Ricty Regular 10"

@@ -62,7 +62,10 @@ if [ -d $ZSH_DIR ]; then
     )
     for file in $files
     do
-        [ -f $file ] && source $file
+        if [ -f $file ]; then
+            #echo $file
+            source $file
+        fi
     done
 fi
 
@@ -72,6 +75,8 @@ compinit -u
 autoload -Uz run-help
 autoload -Uz colors
 colors
+autoload -Uz zmv
+
 
 HISTSIZE=100000
 SAVEHIST=100000
@@ -104,8 +109,7 @@ setopt numeric_glob_sort    # 数字を数値と解釈して昇順ソートで�
 setopt prompt_subst
 setopt interactive_comments # コマンド入力中のコメントを認める
 setopt always_last_prompt
-setopt sh_word_split
-setopt magic_equal_subst
+#setopt sh_word_split
 setopt complete_aliases
 setopt notify               # バックグラウンドジョブの状態変化を即時報告する
 setopt globdots
@@ -177,6 +181,7 @@ alias emq='command emacs -q --no-site-file'
 alias ekill="command emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
 alias ha='fc -lDE 1'
 alias comps='echo ${(F)${(uo@)_comps}}'
+alias zmv='noglob zmv -W'
 
 alias -s log='tail -f'
 alias -s {el,c,h,cpp,php,yml}='emacsclient'
@@ -184,20 +189,21 @@ alias -s {el,c,h,cpp,php,yml}='emacsclient'
 alias -g L='| less'
 alias -g H='| head'
 alias -g T='| tail'
-alias -g G='| grep'
+alias -g G='| grep -n'
 alias -g S='| sed'
 alias -g A='| awk'
 alias -g W='| wc'
+alias -g N='> /dev/null 2>&1'
 
 # 常にバックグラウンドで起動
-function emacs() { command emacs $* & }
-function gimp() { command gimp $* & }
-function firefox() { command firefox $* & }
-function xdvi() { command xdvi $* & }
-function xpdf() { command xpdf $* & }
-function evince() { command evince $* & }
-function vlc() { command vlc $* & }
-function gitg() { command gitg $* & }
+function emacs() { command emacs $* &! }
+function gimp() { command gimp $* &! }
+function firefox() { command firefox $* &! }
+function xdvi() { command xdvi $* &! }
+function xpdf() { command xpdf $* &! }
+function evince() { command evince $* &! }
+function vlc() { command vlc $* &! }
+function gitg() { command gitg $* &! }
 
 # stty
 stty stop undef
@@ -217,8 +223,10 @@ zstyle ':chpwd:*' recent-dirs-max 5000
 zstyle ':chpwd:*' recent-dirs-default yes
 zstyle ':completion:*' recent-dirs-insert both
 zstyle ':filter-select' case-insensitive yes
-#bindkey "^@" zaw-cdr
-bindkey "^h" zaw-history
+
+bindkey "^X@" zaw-cdr
+bindkey "^H" zaw-history
+bindkey "^Xo" zaw-open-file
 
 # prompt
 RPROMPT="!%!(%?)$RPS1"
@@ -235,6 +243,7 @@ mysql_prompt_style_client_user=(
     'root'     $fg_bold[red]
     '*'        $fg_bold[green]
 )
+
 # mysql client host
 typeset -A mysql_prompt_style_client_host
 mysql_prompt_style_client_host=(
@@ -260,21 +269,18 @@ mysql_prompt='${style_client_host}${USER}@${HOST}${fg_bold[white]} -> '
 mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}@${style_server_host}\h${reset_color}${fg_bold[white]}:${fg[magenta]}\d ${fg_bold[white]}\v${reset_color}\n'
 
 # tmux 自動起動
-if [ -n "`which tmux`" ]; then
-    if [ -z "$TMUX" -a -z "$STY" ]; then
-        if type tmux >/dev/null 2>&1; then
-            if tmux has-session && tmux list-sessions | grep -qE '.*]$'; then
-                tmux attach && echo "tmux attached session "
-            else
-                tmux new-session && echo "tmux created new session"
-            fi
+if [ -z "$TMUX" -a -z "$STY" ]; then
+    if type tmux >/dev/null 2>&1; then
+        if tmux has-session && tmux list-sessions | grep -qE '.*]$'; then
+            tmux attach && echo "tmux attached session "
+        else
+            tmux new-session && echo "tmux created new session"
         fi
     fi
 fi
 
 function cdup() {
-    cd ..
-    zle reset-prompt
+    cd .. && zle reset-prompt
 }
 
 function comp_dirup() {
@@ -283,11 +289,10 @@ function comp_dirup() {
 
 zle -N cdup
 zle -N comp_dirup
-bindkey '^x\^' cdup
-bindkey '^xU' cdup
-bindkey '^xl' comp_dirup
+bindkey '^X\^' cdup
+bindkey '^XU' cdup
+bindkey '^XL' comp_dirup
 
-## Invoke the ``dired'' of current working directory in Emacs buffer.
 function dired () {
     dir=$1
     if [ ! -d $dir ]; then
@@ -300,7 +305,6 @@ function dired () {
     fi
 }
 
-## Chdir to the ``default-directory'' of currently opened in Emacs buffer.
 function cde () {
     EMACS_CWD=`emacsclient -e "
 (expand-file-name
