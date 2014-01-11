@@ -77,7 +77,6 @@ autoload -Uz colors
 colors
 autoload -Uz zmv
 
-
 HISTSIZE=100000
 SAVEHIST=100000
 HISTFILE=$HOME/.zhistory
@@ -86,7 +85,6 @@ HISTFILE=$HOME/.zhistory
 setopt auto_cd              # ディレクトリ名の入力のみで移動する
 setopt auto_remove_slash    # スラッシュの削除
 setopt auto_pushd           # cd -[TAB] でこれまでに移動したディレクトリ一覧を表示
-setopt auto_menu            # 補完キー連打で補完候補を順に表示する
 setopt auto_name_dirs       # 代入直後から名前付きディレクトリにする
 setopt cdable_vars          # チルダ省略
 setopt pushd_to_home        # 引数なし pushd で $HOME に戻る(直前 dir へは cd - で)
@@ -95,46 +93,52 @@ setopt extended_history     # コマンドの開始時刻と経過時間を登�
 setopt hist_ignore_dups     # 直前のコマンドと同一ならば登録しない
 setopt hist_ignore_all_dups # 登録済コマンド行は古い方を削除
 setopt hist_reduce_blanks   # 余分な空白は詰めて登録(空白数違い登録を防ぐ)
-setopt share_history        # ヒストリの共有(append系と異なり再読み込み不要)
+setopt share_history        # ヒストリの共有(append 系と異なり再読み込み不要)
 setopt hist_no_store        # history コマンドは登録しない
 setopt hist_ignore_space    # コマンド行先頭が空白の時登録しない(直後ならば呼べる)
+setopt inc_append_history   # すぐにヒストリファイルに追記する
 setopt list_packed          # 補完候補リストを詰めて表示
 setopt list_types           # 補完候補にファイルの種類も表示する
 setopt print_eight_bit      # 補完候補リストの日本語を適正表示
 setopt no_clobber           # 上書きリダイレクトの禁止
-setopt no_hup               # logout時にバックグラウンドジョブを kill しない
-setopt no_beep              # コマンド入力エラーでBEEPを鳴らさない
+setopt no_hup               # logout 時にバックグラウンドジョブを kill しない
+setopt no_beep              # コマンド入力エラーで BEEP を鳴らさない
+setopt glob_complete        # glob を展開しないで候補の一覧から補完する
 setopt extended_glob        # 拡張グロブ
 setopt numeric_glob_sort    # 数字を数値と解釈して昇順ソートで出力
 setopt prompt_subst
 setopt interactive_comments # コマンド入力中のコメントを認める
 setopt always_last_prompt
 #setopt sh_word_split
-setopt complete_aliases
+setopt complete_aliases     # エイリアスには別の補完規則を適用する
 setopt notify               # バックグラウンドジョブの状態変化を即時報告する
 setopt globdots
 setopt check_jobs
-setopt magic_equal_subst    # =以降も補完する(--prefix=/usrなど)
+setopt auto_param_keys      # カッコの対応などを自動的に補完
+setopt complete_in_word     # 語の途中でもカーソル位置で補完
+setopt long_list_jobs       # jobs でプロセスID も出力する
+setopt magic_equal_subst    # = 以降も補完する(--prefix=/usr など)
 unsetopt auto_param_keys    # 変数名の後ろに空白を挿入
 unsetopt auto_param_slash   # ディレクトリの後ろスラッシュを挿入
+unsetopt auto_menu          # 補完キー連打で補完候補を順に表示する
 
-zstyle ':completion:*' verbose yes
 # 矢印で補完を選択
 zstyle ':completion:*:default' menu select=2
 zstyle ':completion:*:processes' menu yes select=2
 zstyle ':completion:*' menu select
 zstyle ':completion:*' keep-prefix
-zstyle ':completion:*' \
-    completer \
+zstyle ':completion:*' completer \
     _oldlist \
     _complete \
     _match \
     _ignored \
     #_approximate \
+    _prefix \
     _list \
     _history
 # オブジェクトファイルは補完しない
-zstyle ':completion:*:*files' ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
+zstyle ':completion:*:*:(^(rm|unlink|mv)):*:*' \
+    ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
 zstyle ':completion:*:cd:*' tag-order local-directories path-directories
 # 大文字小文字の区別をしない
@@ -152,6 +156,9 @@ if [ ! -d $ZSH_CACHE_DIR ]; then
 fi
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' verbose yes    # 詳細な情報を使う
+zstyle ':completion:*:manuals' separate-sections true
+zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH" # sudo 時には sudo 用のパスも使う
 
 # fake
 zstyle ':completion:*:date:*' fake \
@@ -194,6 +201,13 @@ alias -g S='| sed'
 alias -g A='| awk'
 alias -g W='| wc'
 alias -g N='> /dev/null 2>&1'
+
+# 自動的に消費時間の統計情報を表示する(3秒以上)
+REPORTTIME=3
+# 全てのユーザのログイン・ログアウトを監視する
+watch="all"
+# / も単語区切りとみなす
+WORDCHARS=${WORDCHARS:s,/,,}
 
 # 常にバックグラウンドで起動
 function emacs() { command emacs $* &! }
