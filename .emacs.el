@@ -1838,6 +1838,9 @@
 (when (locate-library "iswitchb")
   (autoload 'iswitchb-mode "iswitchb"
     "A comprehensive visual interface to diff & patch." t)
+  ;; 有効にする
+  (when (fboundp 'iswitchb-mode)
+    (iswitchb-mode 1))
 
   (eval-after-load "iswitchb"
     '(progn
@@ -3029,7 +3032,7 @@ Otherwise, return nil."
        (when (boundp 'helm-c-read-file-map)
          (define-key helm-c-read-file-map (kbd "C-h") 'delete-backward-char)
          (define-key helm-c-read-file-map (kbd "C-i") 'helm-execute-persistent-action))
-       (define-key global-map (kbd "C-c C-c") 'helm-mini)
+       (define-key global-map (kbd "C-c C-n") 'helm-mini)
        (message "Loading %s (helm)...done" this-file-name))))
 
 ;;; タブ
