@@ -47,15 +47,27 @@ ZSH_THEME="bureau"
 # curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
 # curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
 
+# autoload
+autoload -Uz compinit
+compinit -u
+autoload -Uz run-help
+autoload -Uz colors
+colors
+autoload -Uz zmv
+
 plugins=(git github perl symfony2)
 
 if [ -f $ZSH/oh-my-zsh.sh ]; then
     source $ZSH/oh-my-zsh.sh
 fi
 
+# zaw
+autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+add-zsh-hook chpwd chpwd_recent_dirs
+
 if [ -d $ZSH_DIR ]; then
     files=(
-        $ZSH_DIR/plugin/incr-0.2.zsh
+        #$ZSH_DIR/plugin/incr-0.2.zsh
         $ZSH_DIR/plugin/zaw/zaw.zsh
         $ZSH_DIR/plugin/autojump/bin/autojump.zsh
         $ZSH_DIR/functions/mysql
@@ -69,13 +81,16 @@ if [ -d $ZSH_DIR ]; then
     done
 fi
 
-# autoload
-autoload -Uz compinit
-compinit -u
-autoload -Uz run-help
-autoload -Uz colors
-colors
-autoload -Uz zmv
+# zaw 関数上書き
+function zaw-src-cdr () {
+    setopt local_options extended_glob
+    : ${(A)candidates::=${${(f)"$(cdr -l | awk '{ print $2 }')"}##<-> ##}}
+    actions=(zaw-src-cdr-cd zaw-src-cdr-insert zaw-src-cdr-prune)
+    act_descriptions=("cd" "insert" "prune")
+    options+=(-m)
+}
+
+zle -N zaw-src-cdr
 
 HISTSIZE=100000
 SAVEHIST=100000
@@ -86,6 +101,7 @@ setopt auto_cd              # ディレクトリ名の入力のみで移動す�
 setopt auto_remove_slash    # スラッシュの削除
 setopt auto_pushd           # cd -[TAB] でこれまでに移動したディレクトリ一覧を表示
 setopt auto_name_dirs       # 代入直後から名前付きディレクトリにする
+setopt auto_menu            # 補完キー連打で補完候補を順に表示する
 setopt cdable_vars          # チルダ省略
 setopt pushd_to_home        # 引数なし pushd で $HOME に戻る(直前 dir へは cd - で)
 setopt pushd_ignore_dups    # ディレクトリスタックに重複する物は古い方を削除
@@ -120,7 +136,6 @@ setopt long_list_jobs       # jobs でプロセスID も出力する
 setopt magic_equal_subst    # = 以降も補完する(--prefix=/usr など)
 unsetopt auto_param_keys    # 変数名の後ろに空白を挿入
 unsetopt auto_param_slash   # ディレクトリの後ろスラッシュを挿入
-unsetopt auto_menu          # 補完キー連打で補完候補を順に表示する
 
 # 矢印で補完を選択
 zstyle ':completion:*:default' menu select=2
@@ -165,10 +180,16 @@ zstyle ':completion:*:date:*' fake \
     '+%Y-%m-%d: 西暦-月-日' \
     '+%Y-%m-%d %H\:%M\:%S: 西暦-月-日 時\:分\:秒'
 
+# zaw
+zstyle ':chpwd:*' recent-dirs-max 5000
+zstyle ':chpwd:*' recent-dirs-default yes
+zstyle ':completion:*' recent-dirs-insert both
+zstyle ':filter-select' case-insensitive yes
+
 # alias
 alias pu=pushd
 alias po=popd
-alias dirs='dirs -v'
+#alias dirs='dirs -v'
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l ^*~'
 alias la='ls --color=auto -a ^*~'
@@ -202,13 +223,6 @@ alias -g A='| awk'
 alias -g W='| wc'
 alias -g N='> /dev/null 2>&1'
 
-# 自動的に消費時間の統計情報を表示する(3秒以上)
-REPORTTIME=3
-# 全てのユーザのログイン・ログアウトを監視する
-watch="all"
-# / も単語区切りとみなす
-WORDCHARS=${WORDCHARS:s,/,,}
-
 # 常にバックグラウンドで起動
 function emacs() { command emacs $* &! }
 function gimp() { command gimp $* &! }
@@ -231,19 +245,19 @@ bindkey '^[^i' reverse-menu-complete
 bindkey '^[i' menu-expand-or-complete
 
 # zaw
-autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
-add-zsh-hook chpwd chpwd_recent_dirs
-zstyle ':chpwd:*' recent-dirs-max 5000
-zstyle ':chpwd:*' recent-dirs-default yes
-zstyle ':completion:*' recent-dirs-insert both
-zstyle ':filter-select' case-insensitive yes
-
 bindkey "^X@" zaw-cdr
 bindkey "^H" zaw-history
 bindkey "^Xo" zaw-open-file
 
+# 自動的に消費時間の統計情報を表示する(3秒以上)
+REPORTTIME=3
+# 全てのユーザのログイン・ログアウトを監視する
+watch="all"
+# / も単語区切りとみなす
+WORDCHARS=${WORDCHARS:s,/,,}
+
 # prompt
-RPROMPT="!%!(%?)$RPS1"
+RPROMPT="!%!(%(?|%?|%{$fg_bold[red]%}%?%{$reset_color%}))$RPS1"
 
 # SSH ログイン時のプロンプト
 [ -n "${REMOTEHOST}${SSH_CONNECTION}" ] &&
@@ -254,29 +268,29 @@ RPROMPT="!%!(%?)$RPS1"
 # mysql client user
 typeset -A mysql_prompt_style_client_user
 mysql_prompt_style_client_user=(
-    'root'     $fg_bold[red]
-    '*'        $fg_bold[green]
+    'root' "$fg_bold[red]"
+    '*'    "$fg_bold[green]"
 )
 
 # mysql client host
 typeset -A mysql_prompt_style_client_host
 mysql_prompt_style_client_host=(
-    '*.local.*'     "$fg_bold[green]"
-    '*.dev.*'       "$fg_bold[yellow]"
-    '*'             "$fg_bold[red]"
+    '*.local.*' "$fg_bold[green]"
+    '*.dev.*'   "$fg_bold[yellow]"
+    '*'         "$fg_bold[red]"
 )
 # mysql server user
 typeset -A mysql_prompt_style_server_user
 mysql_prompt_style_server_user=(
-    'root'          "$bg_bold[red]$fg_bold[yellow]"
-    '*'             "$fg_bold[blue]"
+    'root' "$bg_bold[red]$fg_bold[yellow]"
+    '*'    "$fg_bold[blue]"
 )
 # mysql server host
 typeset -A mysql_prompt_style_server_host
 mysql_prompt_style_server_host=(
-    '*master*'      "$bg_bold[red]$fg_bold[yellow]"  # Master Server
-    '*slave*'       "$bg[yellow]$fg[black]" # Slvae Server
-    '*'             "$fg_bold[blue]"
+    '*master*' "$bg_bold[red]$fg_bold[yellow]" # Master Server
+    '*slave*'  "$bg[yellow]$fg[black]"         # Slave Server
+    '*'        "$fg_bold[blue]"
 )
 # mysql prompt style (Should use single quoted string.)
 mysql_prompt='${style_client_host}${USER}@${HOST}${fg_bold[white]} -> '
@@ -297,15 +311,10 @@ function cdup() {
     cd .. && zle reset-prompt
 }
 
-function comp_dirup() {
-    BUFFER=${BUFFER%/*}
-}
-
 zle -N cdup
-zle -N comp_dirup
+
 bindkey '^X\^' cdup
 bindkey '^XU' cdup
-bindkey '^XL' comp_dirup
 
 function dired () {
     dir=$1
