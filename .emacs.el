@@ -3026,13 +3026,17 @@ Otherwise, return nil."
        (when (locate-library "imenu+")
          (require 'imenu+ nil t))
        (when (locate-library "helm-descbinds")
-         (require 'helm-descbinds nil t)
-         (when (fboundp 'helm-descbinds-mode)
-           (helm-descbinds-mode 1)))
+         (require 'helm-descbinds nil t))
+       ;; 無効にする
+       (when (fboundp 'iswitchb-mode)
+         (when iswitchb-mode
+           (iswitchb-mode -1)))
+       (when (fboundp 'helm-descbinds-mode)
+         (helm-descbinds-mode 1))
        (when (boundp 'helm-c-read-file-map)
          (define-key helm-c-read-file-map (kbd "C-h") 'delete-backward-char)
          (define-key helm-c-read-file-map (kbd "C-i") 'helm-execute-persistent-action))
-       (define-key global-map (kbd "C-c C-n") 'helm-mini)
+       (define-key global-map (kbd "C-c n") 'helm-mini)
        (message "Loading %s (helm)...done" this-file-name))))
 
 ;;; タブ
