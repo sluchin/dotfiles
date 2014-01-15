@@ -1838,9 +1838,6 @@
 (when (locate-library "iswitchb")
   (autoload 'iswitchb-mode "iswitchb"
     "A comprehensive visual interface to diff & patch." t)
-  ;; 有効にする
-  (when (fboundp 'iswitchb-mode)
-    (iswitchb-mode 1))
 
   (eval-after-load "iswitchb"
     '(progn
@@ -3027,10 +3024,6 @@ Otherwise, return nil."
          (require 'imenu+ nil t))
        (when (locate-library "helm-descbinds")
          (require 'helm-descbinds nil t))
-       ;; 無効にする
-       (when (fboundp 'iswitchb-mode)
-         (when iswitchb-mode
-           (iswitchb-mode -1)))
        (when (fboundp 'helm-descbinds-mode)
          (helm-descbinds-mode 1))
        (when (boundp 'helm-c-read-file-map)
