@@ -189,7 +189,7 @@ zstyle ':filter-select' case-insensitive yes
 # alias
 alias pu=pushd
 alias po=popd
-#alias dirs='dirs -v'
+alias dirs='dirs -v'
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l ^*~'
 alias la='ls --color=auto -a ^*~'
