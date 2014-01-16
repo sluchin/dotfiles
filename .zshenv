@@ -1,6 +1,8 @@
 # .zshenv
 # initial setup file for both interactive and noninteractive zsh
 
+typeset -U path fpath cdpath manpath
+
 path=(
     $HOME/bin(N-/)
     /usr/local/sbin(N-/)
@@ -31,11 +33,6 @@ cdpath=(
     $cdpath
 )
 
-# 名前つきディレクトリ
-phpconf=/etc/php5
-apacheconf=/etc/apache2
-
-typeset -U path fpath cdpath manpath
 fignore=('.elc' '.o' '~' '\#')
 
 export RSYNC_RSH=ssh
@@ -48,6 +45,4 @@ export FCEDIT=emacsclient
 limit coredumpsize unlimited
 
 ZSHENV_LOCAL=$HOME/.zshenv.local
-if [[ -f $ZSHENV_LOCAL ]]; then
-    source $ZSHENV_LOCAL
-fi
+[[ -f $ZSHENV_LOCAL ]] && source $ZSHENV_LOCAL
