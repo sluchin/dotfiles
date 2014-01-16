@@ -122,20 +122,20 @@ setopt no_beep              # コマンド入力エラーで BEEP を鳴らさ�
 setopt glob_complete        # glob を展開しないで候補の一覧から補完する
 setopt extended_glob        # 拡張グロブ
 setopt numeric_glob_sort    # 数字を数値と解釈して昇順ソートで出力
-setopt prompt_subst
+setopt prompt_subst         # PROMPT 変数を変数展開
 setopt interactive_comments # コマンド入力中のコメントを認める
-setopt always_last_prompt
-#setopt sh_word_split
+setopt always_last_prompt   # 元のプロンプロに留まる
 setopt complete_aliases     # エイリアスには別の補完規則を適用する
 setopt notify               # バックグラウンドジョブの状態変化を即時報告する
-setopt globdots
-setopt check_jobs
+setopt globdots             # 明確なドットの指定なしで.から始まるファイルをマッチ
+setopt check_jobs           # ジョブが残っているとき警告を出す
 setopt auto_param_keys      # カッコの対応などを自動的に補完
 setopt complete_in_word     # 語の途中でもカーソル位置で補完
 setopt long_list_jobs       # jobs でプロセスID も出力する
 setopt magic_equal_subst    # = 以降も補完する(--prefix=/usr など)
 unsetopt auto_param_keys    # 変数名の後ろに空白を挿入
 unsetopt auto_param_slash   # ディレクトリの後ろスラッシュを挿入
+unsetopt sh_word_split      # クオートしていない変数を単語分割する
 
 # 矢印で補完を選択
 zstyle ':completion:*:default' menu select=2
