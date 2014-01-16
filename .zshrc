@@ -61,9 +61,11 @@ if [ -f $ZSH/oh-my-zsh.sh ]; then
     source $ZSH/oh-my-zsh.sh
 fi
 
-# zaw
+# cdr
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
 add-zsh-hook chpwd chpwd_recent_dirs
+zstyle ':chpwd:*' recent-dirs-max 100000
+zstyle ':chpwd:*' recent-dirs-default true
 
 if [ -d $ZSH_DIR ]; then
     files=(
