@@ -383,6 +383,8 @@
        ;; インストール先
        (when (boundp 'el-get-dir)
          (setq el-get-dir "~/.emacs.d/elisp"))
+       ;; パッケージリストをバイトコンパイル
+       (byte-compile-file "~/.emacs.d/el-get-packages.el")
        ;; パッケージリスト
        (when (locate-library "el-get-packages")
          (load "el-get-packages"))
@@ -4825,43 +4827,6 @@ Otherwise, return nil."
          ;; 初期化
          (ghc-init)))))
 
-;;; nXML モード
-(when (locate-library "nxml-mode")
-  ;; 拡張子のリスト
-  (setq auto-mode-alist
-        (append
-         '(("\\.\\(html\\|xml\\|shtml\\|sgml\\|xspf\\)$" . nxml-mode)
-           ("\\.xhtml\\([.]?\\w+\\)*$" . nxml-mode))
-         auto-mode-alist))
-
-  (eval-after-load "nxml-mode"
-    '(progn
-       ;; スラッシュの入力で終了タグを自動補完
-       (when (boundp 'nxml-slash-auto-complete-flag)
-         (setq nxml-slash-auto-complete-flag t))
-       ;; タグのインデント幅
-       (when (boundp 'nxml-child-indent)
-         (setq nxml-child-indent 2))
-       ;; 属性のインデント幅
-       (when (boundp 'nxml-attribute-indent)
-         (setq nxml-attribute-indent 4))
-       ;; M-Tab で補完
-       (when (boundp 'nxml-bind-meta-tab-to-complete-flag)
-         (setq nxml-bind-meta-tab-to-complete-flag t))
-       ;; </ の入力で閉じタグを補完する
-       (when (boundp 'nxml-slash-auto-complete-flag)
-         (setq nxml-slash-auto-complete-flag t))
-       ;; C-M-k で下位を含む要素全体をkillする
-       (when (boundp 'nxml-sexp-element-flag)
-         (setq nxml-sexp-element-flag t))
-       ;; グリフは非表示
-       (when (boundp 'nxml-char-ref-display-glyph-flag)
-         (setq nxml-char-ref-display-glyph-flag nil))
-       ;; Tab で補完 (デフォルト: M-Tab)
-       (when (boundp 'nxml-mode-map)
-         (define-key nxml-mode-map (kbd "C-i") 'completion-at-point))
-       (message "Loading %s (nxml)...done" this-file-name))))
-
 ;;; C 言語
 ;; git clone git://github.com/brianjcj/auto-complete-clang.git
 ;; clang -cc1 -x c-header stdafx.h -emit-pch -o stdafx.pch
@@ -5277,6 +5242,68 @@ Otherwise, return nil."
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
   (add-to-list 'auto-mode-alist '("\\.json\\'" . js2-mode)))
 
+;;; nXML モード
+(when (locate-library "nxml-mode")
+  ;; 拡張子のリスト
+  ;; (setq auto-mode-alist
+  ;;       (append
+  ;;        '(("\\.\\(html\\|xml\\|shtml\\|sgml\\|xspf\\)$" . nxml-mode)
+  ;;          ("\\.xhtml\\([.]?\\w+\\)*$" . nxml-mode))
+  ;;        auto-mode-alist))
+
+  (eval-after-load "nxml-mode"
+    '(progn
+       ;; スラッシュの入力で終了タグを自動補完
+       (when (boundp 'nxml-slash-auto-complete-flag)
+         (setq nxml-slash-auto-complete-flag t))
+       ;; タグのインデント幅
+       (when (boundp 'nxml-child-indent)
+         (setq nxml-child-indent 2))
+       ;; 属性のインデント幅
+       (when (boundp 'nxml-attribute-indent)
+         (setq nxml-attribute-indent 4))
+       ;; M-Tab で補完
+       (when (boundp 'nxml-bind-meta-tab-to-complete-flag)
+         (setq nxml-bind-meta-tab-to-complete-flag t))
+       ;; </ の入力で閉じタグを補完する
+       (when (boundp 'nxml-slash-auto-complete-flag)
+         (setq nxml-slash-auto-complete-flag t))
+       ;; C-M-k で下位を含む要素全体をkillする
+       (when (boundp 'nxml-sexp-element-flag)
+         (setq nxml-sexp-element-flag t))
+       ;; グリフは非表示
+       (when (boundp 'nxml-char-ref-display-glyph-flag)
+         (setq nxml-char-ref-display-glyph-flag nil))
+       ;; Tab で補完 (デフォルト: M-Tab)
+       (when (boundp 'nxml-mode-map)
+         (define-key nxml-mode-map (kbd "C-i") 'completion-at-point))
+       (message "Loading %s (nxml-mode)...done" this-file-name))))
+
+;;; web-mode
+(when (locate-library "web-mode")
+  (autoload 'web-mode "web-mode"
+    "web-mode.el is an emacs major mode for editing html templates." t)
+  (setq auto-mode-alist
+        (append
+         '(("\\.\\(html\\|xml\\|shtml\\|sgml\\|xspf\\|twig\\)$" . web-mode)
+           ("\\.xhtml\\([.]?\\w+\\)*$" . web-mode))
+         auto-mode-alist))
+
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (let ((offset 4))
+                (when (boundp 'web-mode-markup-indent-offset)
+                  (setq web-mode-markup-indent-offset offset))
+                (when (boundp 'web-mode-css-indent-offset)
+                  (setq web-mode-css-indent-offset offset))
+                (when (boundp 'web-mode-code-indent-offset)
+                  (setq web-mode-code-indent-offset offset))
+                (when (boundp 'web-mode-indent-style)
+                  (setq web-mode-indent-style offset)))))
+
+  (eval-after-load "web-mode"
+    '(progn
+       (message "Loading %s (web-mode)...done" this-file-name))))
 ;;; CSS
 ;; git clone https://github.com/zenozeng/css-eldoc.git
 (when (locate-library "css-mode")
