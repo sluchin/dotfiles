@@ -85,6 +85,7 @@
         clojure-mode
         swank-clojure
         navi2ch
+        web-mode
         emacs-helm
         helm-ls-git
         helm-descbings))
@@ -328,6 +329,11 @@
                  :website "http://navi2ch.sourceforge.net/"
                  :pkgname "naota/navi2ch"
                  :url "git://github.com/naota/navi2ch.git")
+          (:name web-mode
+                 :type github
+                 :description "web-mode.el is an emacs major mode for editing html templates."
+                 :pkgname "fxbois/web-mode"
+                 :url "git://github.com/fxbois/web-mode.git")
           (:name emacs-helm
                  :type github
                  :description "Emacs incremental completion and selection narrowing framework."
