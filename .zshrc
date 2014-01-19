@@ -69,7 +69,6 @@ zstyle ':chpwd:*' recent-dirs-default true
 
 if [ -d $ZSH_DIR ]; then
     files=(
-        #$ZSH_DIR/plugin/incr-0.2.zsh
         $ZSH_DIR/plugin/zaw/zaw.zsh
         $ZSH_DIR/plugin/autojump/bin/autojump.zsh
         $ZSH_DIR/functions/mysql
@@ -77,7 +76,6 @@ if [ -d $ZSH_DIR ]; then
     for file in $files
     do
         if [ -f $file ]; then
-            #echo $file
             source $file
         fi
     done
@@ -91,7 +89,6 @@ function zaw-src-cdr () {
     act_descriptions=("cd" "insert" "prune")
     options+=(-m)
 }
-
 zle -N zaw-src-cdr
 
 HISTSIZE=100000
@@ -247,7 +244,7 @@ bindkey '^[^i' reverse-menu-complete
 bindkey '^[i' menu-expand-or-complete
 
 # zaw
-bindkey "^X@" zaw-cdr
+bindkey "^X^X" zaw-cdr
 bindkey "^H" zaw-history
 bindkey "^Xo" zaw-open-file
 
