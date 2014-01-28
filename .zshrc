@@ -327,7 +327,7 @@ function dired () {
     fi
 }
 
-function cde () {
+function cde() {
     EMACS_CWD=`emacsclient -e "
 (expand-file-name
 (with-current-buffer
@@ -339,5 +339,12 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
     cd "$EMACS_CWD"
 }
 
+function e() {
+    emacsclient -t $* ||
+    emacs --daemon && emacsclient -t $* ||
+    emacs $*
+}
+
 zle -N dired
 zle -N cde
+zle -N e
