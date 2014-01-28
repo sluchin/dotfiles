@@ -341,7 +341,7 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 
 function e() {
     emacsclient -t $* ||
-    emacs --daemon && emacsclient -t $* ||
+    (emacs --daemon && emacsclient -t $*) ||
     emacs $*
 }
 
