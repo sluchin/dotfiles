@@ -29,8 +29,13 @@ cdpath=(
     $HOME/devel/*(N-/)
     $HOME/src/*(N-/)
     $HOME
-    ..
     $cdpath
+)
+
+manpath=(
+    /usr/*/man(N-/)
+    /usr/local/*/man(N-/)
+    $manpath
 )
 
 fignore=('.elc' '.o' '~' '\#')
