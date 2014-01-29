@@ -193,7 +193,7 @@ alias dirs='dirs -v'
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l ^*~'
 alias la='ls --color=auto -a ^*~'
-if [ -n "`which trash-put`" ]; then
+if type trash-put >/dev/null 2>&1; then
     alias rm='trash-put'
 fi
 alias grep='grep --color=auto'
@@ -233,6 +233,7 @@ function evince() { command evince $* &! }
 function vlc() { command vlc $* &! }
 function gitg() { command gitg $* &! }
 function goldendict() { command goldendict $* &! }
+function jd() { command jd $* &! }
 
 # stty
 stty stop undef
@@ -342,7 +343,7 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 }
 
 function e() {
-    emacsclient -t $* 2>&1 /dev/null ||
+    emacsclient -t $* >/dev/null 2>&1 ||
     emacs $*
 }
 
