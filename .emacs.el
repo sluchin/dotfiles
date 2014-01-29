@@ -5349,6 +5349,11 @@ Otherwise, return nil."
     '(progn
        (message "Loading %s (yaml-mode)...done" this-file-name))))
 
+;;; シェルスクリプト
+(when (locate-library "sh-script")
+  (setq auto-mode-alist
+        (cons '("\\.zsh\\'" . shell-script-mode) auto-mode-alist)))
+
 ;; align
 (when (locate-library "align")
   (defun align-repeat (start end regexp)
