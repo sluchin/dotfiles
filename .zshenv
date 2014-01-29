@@ -1,7 +1,6 @@
 # .zshenv
 # initial setup file for both interactive and noninteractive zsh
-
-typeset -U path fpath cdpath manpath
+typeset -U path fpath cdpath
 
 path=(
     $HOME/bin(N-/)
@@ -30,12 +29,6 @@ cdpath=(
     $HOME/src/*(N-/)
     $HOME
     $cdpath
-)
-
-manpath=(
-    /usr/*/man(N-/)
-    /usr/local/*/man(N-/)
-    $manpath
 )
 
 fignore=('.elc' '.o' '~' '\#')
