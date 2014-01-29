@@ -71,6 +71,7 @@ if [ -d $ZSH_DIR ]; then
     files=(
         $ZSH_DIR/plugin/zaw/zaw.zsh
         $ZSH_DIR/plugin/autojump/bin/autojump.zsh
+        $ZSH_DIR/plugin/notify.zsh
         $ZSH_DIR/functions/mysql
     )
     for file in $files
@@ -231,6 +232,7 @@ function xpdf() { command xpdf $* &! }
 function evince() { command evince $* &! }
 function vlc() { command vlc $* &! }
 function gitg() { command gitg $* &! }
+function goldendict() { command goldendict $* &! }
 
 # stty
 stty stop undef
@@ -340,8 +342,7 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 }
 
 function e() {
-    emacsclient -t $* ||
-    (emacs --daemon && emacsclient -t $*) ||
+    emacsclient -t $* 2>&1 /dev/null ||
     emacs $*
 }
 
