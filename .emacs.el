@@ -351,17 +351,13 @@
     (message "not found `git'")))
 
 (when (locate-library "el-get")
-  (autoload 'el-get-list-package "el-get"
+  (autoload 'el-get-list-packages "el-get"
     "Display a list of packages." t)
   (autoload 'el-get-install "el-get"
     "Cause the named PACKAGE to be installed." t)
   (autoload 'el-get-self-update "el-get"
     "Update el-get itself." t)
   (autoload 'el-get-update-all "el-get"
-    "Performs update of all installed packages." t)
-  (autoload 'el-get-emacswiki-refresh "el-get"
-    "Performs update of all installed packages." t)
-  (autoload 'el-get-elpa-build-local-recipes "el-get"
     "Performs update of all installed packages." t)
   (autoload 'el-get "el-get"
     "Ensure that packages have been downloaded once and init them as needed." t)
@@ -588,8 +584,8 @@
            (yas/minor-mode        . " υ")
            (paredit-mode          . " π")
            (gtags-mode            . " ν")
-           (flymake-mode          . " fly")
-           (php-completion-mode   . " comp")
+           (flymake-mode          . " Fl")
+           (php-completion-mode   . " Cmp")
            (eldoc-mode            .   "")
            (abbrev-mode           .   "")
            ;; メジャーモード
@@ -625,7 +621,6 @@
 
 ;;; 色
 ;; reverse video に設定
-
 (when window-system
   (set-face-foreground 'default "white")
   (set-face-background 'default "black")
@@ -1435,6 +1430,7 @@
                 (dired-omit-mode 1))))
 
   (define-key global-map (kbd "C-x C-j") 'dired-jump)
+  (define-key global-map (kbd "C-x j") 'dired-jump-other-window)
 
   (eval-after-load "dired"
     '(progn
