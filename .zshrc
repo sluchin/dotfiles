@@ -54,6 +54,8 @@ autoload -Uz run-help
 autoload -Uz colors
 colors
 autoload -Uz zmv
+autoload -Uz select-word-style
+select-word-style default
 
 plugins=(git github perl symfony2)
 
@@ -175,6 +177,10 @@ zstyle ':completion:*' verbose yes    # 詳細な情報を使う
 zstyle ':completion:*:manuals' separate-sections true
 zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH" # sudo 時には sudo 用のパスも使う
 
+# ディレクトリで区切る
+zstyle ':zle:*' word-chars " /=;@:{},|"
+zstyle ':zle:*' word-style unspecified
+
 # fake
 zstyle ':completion:*:date:*' fake \
     '+%Y-%m-%d: 西暦-月-日' \
@@ -227,7 +233,6 @@ alias -g N='> /dev/null 2>&1'
 function emacs() { command emacs $* &! }
 function gimp() { command gimp $* &! }
 function firefox() { command firefox $* &! }
-function xdvi() { command xdvi $* &! }
 function xpdf() { command xpdf $* &! }
 function evince() { command evince $* &! }
 function vlc() { command vlc $* &! }
@@ -259,8 +264,6 @@ bindkey "^Xo" zaw-open-file
 REPORTTIME=3
 # 全てのユーザのログイン・ログアウトを監視する
 watch="all"
-# / も単語区切りとみなす
-WORDCHARS=${WORDCHARS:s,/,,}
 
 # 右プロンプト
 RPROMPT="!%!(%(?|%?|%{$fg_bold[red]%}%?%{$reset_color%}))$RPS1"
@@ -337,7 +340,7 @@ bindkey '^XU' cdup
 function dired () {
     dir=${1:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
-    echo "$0 $@"
+    echo "$0 $dir"
     if [ -d $dir ]; then
         emacsclient -e "(dired \"$dir\")"
         dir=""
@@ -349,18 +352,19 @@ zle -N dired
 
 function woman () {
     topic=$1
-    echo "$0 $@"
+    echo "$0 $topic"
     emacsclient -e "(woman \"$topic\")"
 }
 zle -N woman
 
 function rgrep () {
     regex=$1
-    files=${2:-"\*.\*"}
+    files=${2:-"\*"}
     dir=${3:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
-    echo "$0 $@"
+    echo "$0 $regex $files $dir"
     if [ -d "$dir" ]; then
+        emacsclient -e "(setq grep-find-template \"find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +\")"
         emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
         dir=""
     else
@@ -372,7 +376,7 @@ zle -N rgrep
 function magit-status () {
     dir=${1:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
-    echo "$0 $@"
+    echo "$0 $dir"
     if [ -d "$dir" ]; then
         emacsclient -e "(magit-status \"$dir\")"
         dir=""
