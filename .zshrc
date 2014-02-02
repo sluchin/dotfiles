@@ -339,6 +339,7 @@ function dired () {
     dir=${1:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
 
+    echo "dired $dir"
     if [ -d $dir ]; then
         emacsclient -e "(dired \"$dir\")"
     else
@@ -352,9 +353,21 @@ function rgrep () {
     dir=${3:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
 
-    echo "$regex $files $dir"
+    echo "rgrep $regex $files $dir"
     if [ -d "$dir" ]; then
         emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
+    else
+        echo "no directory: $dir"
+    fi
+}
+
+function magit-status () {
+    dir=${1:-"$PWD"}
+    [ ! -d $dir ] && dir="$PWD/$dir"
+
+    echo "magit $dir"
+    if [ -d "$dir" ]; then
+        emacsclient -e "(magit-status \"$dir\")"
     else
         echo "no directory: $dir"
     fi
