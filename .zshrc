@@ -234,6 +234,10 @@ function vlc() { command vlc $* &! }
 function gitg() { command gitg $* &! }
 function goldendict() { command goldendict $* &! }
 function jd() { command jd $* &! }
+function exaile() { command exaile $* &! }
+function konqueror() { command konqueror $* &! }
+function easytag() { command easytag $* &! }
+function nautilus() { command nautilus $* &! }
 
 # stty
 stty stop undef
@@ -251,21 +255,21 @@ bindkey "^X^X" zaw-cdr
 bindkey "^H" zaw-history
 bindkey "^Xo" zaw-open-file
 
-# 自動的に消費時間の統計情報を表示する(3秒以上)
+# 自動的に消費時間の統計情報を表示する
 REPORTTIME=3
 # 全てのユーザのログイン・ログアウトを監視する
 watch="all"
 # / も単語区切りとみなす
 WORDCHARS=${WORDCHARS:s,/,,}
 
-# prompt
+# 右プロンプト
 RPROMPT="!%!(%(?|%?|%{$fg_bold[red]%}%?%{$reset_color%}))$RPS1"
 
 # SSH ログイン時のプロンプト
 [ -n "${REMOTEHOST}${SSH_CONNECTION}" ] &&
   PROMPT="%{${fg[white]}%}${HOST%%.*} ${PROMPT}";
 
-# mysql prompt
+# mysql プロンプト
 # https://github.com/tetsujin/zsh-function-mysql
 # mysql client user
 typeset -A mysql_prompt_style_client_user
@@ -296,7 +300,20 @@ mysql_prompt_style_server_host=(
 )
 # mysql prompt style (Should use single quoted string.)
 mysql_prompt='${style_client_host}${USER}@${HOST}${fg_bold[white]} -> '
-mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}@${style_server_host}\h${reset_color}${fg_bold[white]}:${fg[magenta]}\d ${fg_bold[white]}\v${reset_color}\n'
+mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}@${style_server_host}\h${reset_color}${fg_bold[white]}:${fg[magenta]}\d ${fg_bold[white]}\v${reset_color}\n$ '
+
+# notify-send
+__timetrack_threshold=20 # seconds
+read -r -d '' __timetrack_ignore_progs <<EOF
+less
+emacs vi vim
+ssh mosh telnet nc netcat
+gdb
+top htop run-help man
+EOF
+
+export __timetrack_threshold
+export __timetrack_ignore_progs
 
 # tmux 自動起動
 if [ -z "$TMUX" -a -z "$STY" ]; then
@@ -319,14 +336,27 @@ bindkey '^X\^' cdup
 bindkey '^XU' cdup
 
 function dired () {
-    dir=$1
-    if [ ! -d $dir ]; then
-        dir="$PWD/$dir"
-    fi
+    dir=${1:-"$PWD"}
+    [ ! -d $dir ] && dir="$PWD/$dir"
+
     if [ -d $dir ]; then
         emacsclient -e "(dired \"$dir\")"
     else
-        echo "no directory"
+        echo "no directory: $dir"
+    fi
+}
+
+function rgrep () {
+    regex=$1
+    files=${2:-"\*.\*"}
+    dir=${3:-"$PWD"}
+    [ ! -d $dir ] && dir="$PWD/$dir"
+
+    echo "$regex $files $dir"
+    if [ -d "$dir" ]; then
+        emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
+    else
+        echo "no directory: $dir"
     fi
 }
 
@@ -343,10 +373,11 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 }
 
 function e() {
-    emacsclient -t $* >/dev/null 2>&1 ||
+    emacsclient -t $* ||
     emacs $*
 }
 
 zle -N dired
+zle -N rgrep
 zle -N cde
 zle -N e
