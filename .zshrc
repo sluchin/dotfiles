@@ -309,7 +309,7 @@ less
 emacs vi vim
 ssh mosh telnet nc netcat
 gdb
-top htop run-help man
+top htop run-help man e
 EOF
 
 export __timetrack_threshold
@@ -329,7 +329,6 @@ fi
 function cdup() {
     cd .. && zle reset-prompt
 }
-
 zle -N cdup
 
 bindkey '^X\^' cdup
@@ -338,40 +337,50 @@ bindkey '^XU' cdup
 function dired () {
     dir=${1:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
-
-    echo "dired $dir"
+    echo "$0 $@"
     if [ -d $dir ]; then
         emacsclient -e "(dired \"$dir\")"
+        dir=""
     else
         echo "no directory: $dir"
     fi
 }
+zle -N dired
+
+function woman () {
+    topic=$1
+    echo "$0 $@"
+    emacsclient -e "(woman \"$topic\")"
+}
+zle -N woman
 
 function rgrep () {
     regex=$1
     files=${2:-"\*.\*"}
     dir=${3:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
-
-    echo "rgrep $regex $files $dir"
+    echo "$0 $@"
     if [ -d "$dir" ]; then
         emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
+        dir=""
     else
         echo "no directory: $dir"
     fi
 }
+zle -N rgrep
 
 function magit-status () {
     dir=${1:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
-
-    echo "magit $dir"
+    echo "$0 $@"
     if [ -d "$dir" ]; then
         emacsclient -e "(magit-status \"$dir\")"
+        dir=""
     else
         echo "no directory: $dir"
     fi
 }
+zle -N magit-status
 
 function cde() {
     EMACS_CWD=`emacsclient -e "
@@ -384,13 +393,10 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
     echo "chdir to $EMACS_CWD"
     cd "$EMACS_CWD"
 }
+zle -N cde
 
 function e() {
     emacsclient -t $* ||
     emacs $*
 }
-
-zle -N dired
-zle -N rgrep
-zle -N cde
 zle -N e
