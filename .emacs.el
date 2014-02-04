@@ -3048,6 +3048,17 @@ Otherwise, return nil."
        ;; タブがはみ出たときスクロールさせる
        (when (boundp 'tabbar-auto-scroll-flag)
          (setq tabbar-auto-scroll-flag t))
+       ;; タブ上でマウスホイール操作無効
+       (when (fboundp 'tabbar-mwheel-mode)
+         (tabbar-mwheel-mode -1))
+       ;; グループ化しない
+       (when (boundp 'tabbar-buffer-groups-function)
+         (setq tabbar-buffer-groups-function nil))
+       ;; ホームボタンを無効化
+       (when (boundp 'tabbar-buffer-home-button)
+         (dolist (btn '(tabbar-buffer-home-button))
+           (set btn (cons (cons "" nil)
+                          (cons "" nil)))))
        ;; バッファ非表示
        (setq tabbar-buffer-list-function
              (lambda ()
