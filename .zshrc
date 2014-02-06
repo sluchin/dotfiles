@@ -213,7 +213,7 @@ alias t='tail -f'
 alias gterm='gnome-terminal --geometry=130x40'
 alias emd='command emacs --daemon'
 alias emn='command emacs -nw'
-alias emc='command emacsclient -t'
+alias emc='command emacsclient'
 alias emq='command emacs -q --no-site-file'
 alias ha='fc -lDE 1'
 alias comps='echo ${(F)${(uo@)_comps}}'
@@ -244,8 +244,9 @@ function jd() { command jd $* &! }
 function exaile() { command exaile $* &! }
 function konqueror() { command konqueror $* &! }
 function easytag() { command easytag $* &! }
-function nautilus() { command nautilus $* &! }
 function asunder() { command asunder $* &! }
+function ghb() { command ghb $* &! }
+function nautilus() { command nautilus $* &! }
 function pterm() { command pterm $* &! }
 function gnome-calculator() { command gnome-calculator $* &! }
 
@@ -406,7 +407,7 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 zle -N cde
 
 function e() {
-    command emacsclient -t $* ||
+    command emacsclient $* ||
     command emacs $*
 }
 zle -N e
