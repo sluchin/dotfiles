@@ -196,9 +196,12 @@ zstyle ':filter-select' case-insensitive yes
 alias pu=pushd
 alias po=popd
 alias dirs='dirs -v'
+alias d='dirs'
+alias eject='eject -v'
+alias ej='eject'
 alias ls='ls --color=auto'
-alias ll='ls --color=auto -l ^*~'
-alias la='ls --color=auto -a ^*~'
+alias ll='ls --color=auto -ld ^*~'
+alias la='ls --color=auto -ad ^*~'
 if type trash-put >/dev/null 2>&1; then
     alias rm='trash-put'
 fi
@@ -212,13 +215,12 @@ alias emd='command emacs --daemon'
 alias emn='command emacs -nw'
 alias emc='command emacsclient -t'
 alias emq='command emacs -q --no-site-file'
-alias ekill="command emacsclient -e '(progn (defun yes-or-no-p (p) t) (kill-emacs))'"
 alias ha='fc -lDE 1'
 alias comps='echo ${(F)${(uo@)_comps}}'
 alias zmv='noglob zmv -W'
 
 alias -s log='tail -f'
-alias -s {el,c,h,cpp,php,yml}='emacsclient'
+alias -s {el,c,h,cpp,py,pl,pm,rb,java,php,yml}='emacsclient'
 
 alias -g L='| less'
 alias -g H='| head'
@@ -243,6 +245,9 @@ function exaile() { command exaile $* &! }
 function konqueror() { command konqueror $* &! }
 function easytag() { command easytag $* &! }
 function nautilus() { command nautilus $* &! }
+function asunder() { command asunder $* &! }
+function pterm() { command pterm $* &! }
+function gnome-calculator() { command gnome-calculator $* &! }
 
 # stty
 stty stop undef
@@ -259,6 +264,7 @@ bindkey '^[i' menu-expand-or-complete
 bindkey "^X^X" zaw-cdr
 bindkey "^H" zaw-history
 bindkey "^Xo" zaw-open-file
+bindkey "^Xa" zaw-applications
 
 # 自動的に消費時間の統計情報を表示する
 REPORTTIME=3
@@ -308,11 +314,11 @@ mysql_prompt=$mysql_prompt'${style_server_user}\u${reset_color}${fg_bold[white]}
 # notify-send
 __timetrack_threshold=20 # seconds
 read -r -d '' __timetrack_ignore_progs <<EOF
-less
+less more
 emacs vi vim
 ssh mosh telnet nc netcat
 gdb
-top htop run-help man e
+top htop run-help man woman e
 EOF
 
 export __timetrack_threshold
@@ -342,7 +348,7 @@ function dired () {
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $dir"
     if [ -d $dir ]; then
-        emacsclient -e "(dired \"$dir\")"
+        command emacsclient -e "(dired \"$dir\")"
         dir=""
     else
         echo "no directory: $dir"
@@ -353,7 +359,7 @@ zle -N dired
 function woman () {
     topic=$1
     echo "$0 $topic"
-    emacsclient -e "(woman \"$topic\")"
+    command emacsclient -e "(woman \"$topic\")"
 }
 zle -N woman
 
@@ -364,8 +370,8 @@ function rgrep () {
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $regex $files $dir"
     if [ -d "$dir" ]; then
-        emacsclient -e "(setq grep-find-template \"find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +\")"
-        emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
+        command emacsclient -e "(setq grep-find-template \"find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +\")"
+        command emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
         dir=""
     else
         echo "no directory: $dir"
@@ -378,7 +384,7 @@ function magit-status () {
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $dir"
     if [ -d "$dir" ]; then
-        emacsclient -e "(magit-status \"$dir\")"
+        command emacsclient -e "(magit-status \"$dir\")"
         dir=""
     else
         echo "no directory: $dir"
@@ -387,7 +393,7 @@ function magit-status () {
 zle -N magit-status
 
 function cde() {
-    EMACS_CWD=`emacsclient -e "
+    EMACS_CWD=`command emacsclient -e "
 (expand-file-name
 (with-current-buffer
 (nth 1
@@ -400,7 +406,12 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 zle -N cde
 
 function e() {
-    emacsclient -t $* ||
-    emacs $*
+    command emacsclient -t $* ||
+    command emacs $*
 }
 zle -N e
+
+function ekill() {
+    command emacsclient -e "(progn (defun yes-or-no-p (p) t) (kill-emacs))"
+}
+zle -N ekill
