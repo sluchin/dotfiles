@@ -233,6 +233,7 @@ alias -g N='> /dev/null 2>&1'
 
 # 常にバックグラウンドで起動
 function emacs() { command emacs $* &! }
+function emacsclient() { command emacsclient $* &! }
 function gimp() { command gimp $* &! }
 function firefox() { command firefox $* &! }
 function xpdf() { command xpdf $* &! }
@@ -349,7 +350,7 @@ function dired () {
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $dir"
     if [ -d $dir ]; then
-        command emacsclient -e "(dired \"$dir\")"
+        emacsclient -e "(dired \"$dir\")"
         dir=""
     else
         echo "no directory: $dir"
@@ -360,7 +361,7 @@ zle -N dired
 function woman () {
     topic=$1
     echo "$0 $topic"
-    command emacsclient -e "(woman \"$topic\")"
+    emacsclient -e "(woman \"$topic\")"
 }
 zle -N woman
 
@@ -371,8 +372,8 @@ function rgrep () {
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $regex $files $dir"
     if [ -d "$dir" ]; then
-        command emacsclient -e "(setq grep-find-template \"find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +\")"
-        command emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
+        emacsclient -e "(setq grep-find-template \"find . <X> -type f <F> -exec grep <C> -nH -e <R> {} +\")"
+        emacsclient -e "(rgrep \"$regex\" \"$files\" \"$dir\" nil)"
         dir=""
     else
         echo "no directory: $dir"
@@ -385,7 +386,7 @@ function magit-status () {
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $dir"
     if [ -d "$dir" ]; then
-        command emacsclient -e "(magit-status \"$dir\")"
+        emacsclient -e "(magit-status \"$dir\")"
         dir=""
     else
         echo "no directory: $dir"
@@ -394,7 +395,7 @@ function magit-status () {
 zle -N magit-status
 
 function cde() {
-    EMACS_CWD=`command emacsclient -e "
+    EMACS_CWD=`emacsclient -e "
 (expand-file-name
 (with-current-buffer
 (nth 1
@@ -407,12 +408,12 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 zle -N cde
 
 function e() {
-    command emacsclient $* ||
-    command emacs $*
+    emacsclient $* ||
+    emacs $*
 }
 zle -N e
 
 function ekill() {
-    command emacsclient -e "(progn (defun yes-or-no-p (p) t) (kill-emacs))"
+    emacsclient -e "(progn (defun yes-or-no-p (p) t) (kill-emacs))"
 }
 zle -N ekill
