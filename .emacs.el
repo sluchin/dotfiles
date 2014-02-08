@@ -938,11 +938,15 @@
 ;;; gzip ファイルも編集できるようにする
 (auto-compression-mode 1)
 
-;;; バッファの最後でnewlineで新規行を追加するのを禁止する
-;;(setq next-line-add-newlines nil)
+;;; バッファの最後で newline で新規行を追加するのを禁止する
+(setq next-line-add-newlines nil)
 
 ;;; 最終行に必ず一行挿入する
 (setq require-final-newline t)
+
+;;; emacsclient で kill するとき, 問い合わせしない
+(remove-hook 'kill-buffer-query-functions
+             'server-kill-buffer-query-function)
 
 ;;; ブックマーク
 ;; デフォルト
