@@ -88,7 +88,8 @@
         web-mode
         emacs-helm
         helm-ls-git
-        helm-descbings))
+        helm-descbings
+        org-mode))
 
 (when (boundp 'el-get-sources)
   (setq el-get-sources
@@ -348,5 +349,9 @@
                  :type github
                  :description "A helm frontend for describe-bindings."
                  :pkgname "emacs-helm/helm-descbinds"
-                 :url "git://github.com/emacs-helm/helm-descbinds.git"))))
+                 :url "git://github.com/emacs-helm/helm-descbinds.git")
+          (:name org-mode
+                 :type github
+                 :description "Org mode is for keeping notes."
+                 :url "git://orgmode.org/org-mode.git"))))
 
