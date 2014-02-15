@@ -199,6 +199,7 @@ alias dirs='dirs -v'
 alias d='dirs'
 alias eject='eject -v'
 alias ej='eject'
+alias ejt='eject -t'
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -ld ^*~'
 alias la='ls --color=auto -ad ^*~'
@@ -211,10 +212,10 @@ alias egrep='egrep --color=auto'
 alias g='git --no-pager'
 alias t='tail -f'
 alias gterm='gnome-terminal --geometry=130x40'
-alias emd='command emacs --daemon'
-alias emn='command emacs -nw'
-alias emc='command emacsclient'
-alias emq='command emacs -q --no-site-file'
+alias emd='emacs --daemon'
+alias emn='emacs -nw'
+alias emc='emacsclient'
+alias emq='emacs -q --no-site-file'
 alias ha='fc -lDE 1'
 alias comps='echo ${(F)${(uo@)_comps}}'
 alias zmv='noglob zmv -W'
@@ -247,6 +248,7 @@ function konqueror() { command konqueror $* &! }
 function easytag() { command easytag $* &! }
 function asunder() { command asunder $* &! }
 function ghb() { command ghb $* &! }
+function nixnote() { command nixnote $* &! }
 function nautilus() { command nautilus $* &! }
 function pterm() { command pterm $* &! }
 function gnome-calculator() { command gnome-calculator $* &! }

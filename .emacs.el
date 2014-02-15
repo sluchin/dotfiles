@@ -2142,8 +2142,26 @@ Otherwise, return nil."
          (define-key org-mode-map (kbd "C-M-k") 'kill-org-all-buffer))
        (message "Loading %s (org)...done" this-file-name))))
 
+;; MobileOrg
+(when (locate-library "org-mobile")
+  (autoload 'org-mobile-pull "org-mobile"
+    "Pull the contents of `org-mobile-capture-file' and integrate them." t)
+  (autoload 'org-mobile-push "org-mobile"
+    "Push the current state of Org affairs to the target directory." t)
+
+  (eval-after-load "org-mobile"
+    '(progn
+       (when (boundp 'org-mobile-inbox-for-pull)
+         (setq org-mobile-inbox-for-pull
+               (concat org-directory "mobileorg.org")))
+       (when (boundp 'org-mobile-directory) ; ディレクトリ
+         (setq org-mobile-directory (catch 'found (find-directory "mobileorg")))
+         (message "org-mobile-directory: %s" org-mobile-directory))
+       (message "Loading %s (org-mobile)...done" this-file-name))))
+
 ;; org-table 設定
 (when (locate-library "org-table")
+
   (eval-after-load "org-table"
     '(progn
        ;; 表で日本語を崩れないようにするパッチ
@@ -2154,7 +2172,7 @@ Otherwise, return nil."
 ;; org-agenda 設定
 (when (locate-library "org-agenda")
   (autoload 'org-agenda "org-agenda"
-    "Dynamic task and appointment lists for Org" t)
+    "Dynamic task and appointment lists for Org." t)
 
   (eval-after-load "org-agenda"
     '(progn
@@ -2194,9 +2212,9 @@ Otherwise, return nil."
           (org-remember)))))
 
   (autoload 'org-remember "org-remember"
-    "Fast note taking in Org-mode" t)
+    "Fast note taking in Org-mode." t)
   (autoload 'org-remember-code-reading
-    "org-remember" "Fast note taking in Org-mode for code reading" t)
+    "org-remember" "Fast note taking in Org-mode for code reading." t)
   (add-hook 'org-remember-mode-hook
             (lambda ()
               ;; 日付を英語で挿入する
