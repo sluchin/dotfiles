@@ -33,6 +33,7 @@
 ;; anything
 ;; (auto-install-batch "anything")
 ;; el-get
+;; (install-el-get)
 ;; (el-get-install-all)
 ;; バイトコンパイル
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)
