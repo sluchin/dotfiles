@@ -76,7 +76,9 @@
   (let ((all 0.0))
     (dolist (lst (reverse load-history))
       (let* ((file (car lst))
-             (bytes (nth 7 (file-attributes file))))
+             (bytes 0))
+        (ignore-errors
+          (setq bytes (nth 7 (file-attributes file))))
         (message "%-8s %s" bytes file)
         (setq all (+ all bytes))))
     (message "%.6fM (%d)" (/ (/ all 1024.0) 1024.0) all)))
