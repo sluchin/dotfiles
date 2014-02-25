@@ -2804,7 +2804,7 @@ Otherwise, return nil."
 ;;; アンドゥ履歴
 ;; (install-elisp "http://cx4a.org/pub/undohist.el")
 (when (eval-and-compile (require 'undohist nil t))
-  (when (and (eq system-type 'windows-nt) (boundp 'undo-hist-directory))
+  (when (and (eq system-type 'windows-nt) (boundp 'undohist-directory))
     (defun make-undohist-file-name (file)
       (setq file (convert-standard-filename (expand-file-name file)))
       (if (eq (aref file 1) ?:)
