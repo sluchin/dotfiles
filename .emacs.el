@@ -1599,7 +1599,7 @@
            ;; w3m で開く
            (define-key map (kbd "M-3") 'dired-w3m-find-file)
            ;; tar + gzip で圧縮
-           (define-key map (kbd "z") 'dired-do-tar-gzip)
+           (define-key map (kbd "M-z") 'dired-do-tar-gzip)
            ;; バックアップファイル
            (define-key map (kbd "b") 'dired-make-backup)
            ;; 文字コードをトグルする
