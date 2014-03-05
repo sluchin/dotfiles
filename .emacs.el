@@ -1337,6 +1337,9 @@
 (define-key global-map (kbd "C-t") nil)
 (define-key global-map (kbd "C-S-t") 'transpose-chars)
 
+;; タブ
+(define-key global-map (kbd "C-i") 'self-insert-command)
+
 ;; ウィンドウ移動
 (defun other-window-or-split ()
   (interactive)
