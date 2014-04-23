@@ -849,7 +849,7 @@
                                     "html/python-doc-2.7ja1-html/index.html"))
                ("cl" "/usr/share/doc/hyperspec/Front/index_tx.htm")
                ("sbcl" "/usr/share/doc/sbcl-doc/html/index.html")
-               ("clisp" "/usr/share/doc/clisp/clisp/doc/impnotes.html")
+               ("clisp" "/usr/share/doc/clisp/clisp/doc/clisp.html")
                ("ecl" (concat (file-name-as-directory user-emacs-directory)
                               "html/ecl-doc/html/index.html"))
                ("haskell" "/usr/share/doc/ghc-doc/html/index.html")
@@ -4780,7 +4780,6 @@ Otherwise, return nil."
                  (clisp ("clisp"))
                  (allegro ("alisp"))
                  (ccl ("ccl"))
-                 (ecl ("ecl"))
                  (cmucl ("cmucl") :coding-system utf-8-unix))))
        ;; 文字コード
        (when (boundp 'slime-net-coding-system)
@@ -4804,11 +4803,14 @@ Otherwise, return nil."
     '(progn
        ;; プログラム名
        (when (boundp 'scheme-program-name)
-         (setq scheme-program-name "gosh -i"))
+         ;(setq scheme-program-name "gosh -i")
+         ;(setq scheme-program-name "guile")
+         (setq scheme-program-name "mit-scheme"))
        ;; 文字コード
        (when (boundp 'process-coding-system-alist)
          (setq process-coding-system-alist
-               (cons '("gosh" utf-8 . utf-8) process-coding-system-alist))))))
+               (cons '("gosh" utf-8 . utf-8)
+                     process-coding-system-alist))))))
 
 ;;; clojure モード
 ;; lein plugin install swank-clojure 1.4.2

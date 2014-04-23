@@ -38,6 +38,12 @@ APPSYS=/usr/share/applications
 GNOME_TERMINAL=gnome-terminal.desktop
 EMACSCLIENT=emacsclient.desktop
 
+# lisp
+GUILE=.guile
+SBCL=.sbclrc
+CMUCL=.cmucl-init.lisp
+MIT_SCHEME=.scheme.init
+
 # font
 FONTS=.fonts
 
@@ -127,6 +133,12 @@ if [ `whoami` = 'root' ]; then
     autolink $DOTFILES/$APP $APPSYS $GNOME_TERMINAL
     autolink $DOTFILES/$APP $APPSYS $EMACSCLIENT
 fi
+
+# lisp
+autolink $DOTFILES $HOME $GUILE
+autolink $DOTFILES $HOME $SBCL
+autolink $DOTFILES $HOME $CMUCL
+autolink $DOTFILES $HOME $MIT_SCHEME
 
 # fonts
 cd $DOTFILES/.fonts
