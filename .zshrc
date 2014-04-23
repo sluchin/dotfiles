@@ -233,12 +233,13 @@ alias -g W='| wc'
 alias -g N='> /dev/null 2>&1'
 
 # 常にバックグラウンドで起動
+function xpdf() { command xpdf $* &! }
+function evince() { command evince $* &! }
+function qpdfview() { command qpdfview $* &! }
 function emacs() { command emacs $* &! }
 function emacsclient() { command emacsclient $* &! }
 function gimp() { command gimp $* &! }
 function firefox() { command firefox $* &! }
-function xpdf() { command xpdf $* &! }
-function evince() { command evince $* &! }
 function vlc() { command vlc $* &! }
 function gitg() { command gitg $* &! }
 function goldendict() { command goldendict $* &! }
@@ -247,11 +248,13 @@ function exaile() { command exaile $* &! }
 function konqueror() { command konqueror $* &! }
 function easytag() { command easytag $* &! }
 function asunder() { command asunder $* &! }
+function soundkonverter() { command soundkonverter $* &! }
 function ghb() { command ghb $* &! }
 function nixnote() { command nixnote $* &! }
 function nautilus() { command nautilus $* &! }
 function pterm() { command pterm $* &! }
 function gnome-calculator() { command gnome-calculator $* &! }
+function edwin() { command mit-scheme --edit $* &! }
 
 # stty
 stty stop undef
