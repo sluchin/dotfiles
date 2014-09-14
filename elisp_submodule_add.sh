@@ -31,3 +31,4 @@ git submodule add https://github.com/emacs-helm/helm.git .emacs.d/elisp/helm
 git submodule add https://github.com/emacs-helm/helm-ls-git.git .emacs.d/elisp/helm-ls-git
 git submodule add https://github.com/emacs-helm/helm-descbinds.git .emacs.d/elisp/helm-descbinds
 git submodule add https://orgmode.org/org-mode.git .emacs.d/elisp/org-mode
+git submodule add https://github.com/emacs-jp/japanese-holidays.git .emacs.d/elisp/japanese-holidays
