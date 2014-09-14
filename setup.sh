@@ -9,6 +9,7 @@ ASPELL_CONF=.aspell.conf
 # emacs
 EMACS_CONF=.emacs.el
 EMACS_DIR=.emacs.d
+EMACS_SRC=emacs
 
 # zsh
 ZSH_DIR=.zsh.d
@@ -49,6 +50,7 @@ FONTS=.fonts
 
 DOTFILES=$HOME/dotfiles
 BAK_DIR=$HOME/backup
+SRC_DIR=$HOME/src
 
 if [ ! -d $DOTFILES ]; then
     echo "$DOTFILES no exist"
@@ -61,6 +63,16 @@ if [ ! -e $BAK_DIR ]; then
 else
     if [ ! -d $BAK_DIR ]; then
         echo "$BAK_DIR file exist"
+        exit 1
+    fi
+fi
+
+if [ ! -e $SRC_DIR ]; then
+    mkdir $SRC_DIR
+    echo "mkdir $SRC_DIR"
+else
+    if [ ! -d $SRC_DIR ]; then
+        echo "$SRC_DIR file exist"
         exit 1
     fi
 fi
@@ -98,6 +110,7 @@ autolink $DOTFILES $HOME $ASPELL_CONF
 # emacs
 autolink $DOTFILES $HOME $EMACS_CONF
 autolink $DOTFILES $HOME $EMACS_DIR
+autolink $DOTFILES $SRC_DIR $EMACS_SRC
 
 # zsh
 autolink $DOTFILES $HOME $ZSH_RC
