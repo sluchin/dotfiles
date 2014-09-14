@@ -25,14 +25,18 @@ Quick start
 
   `git clone git://github.com/sluchin/dotfiles.git`  
   
-  `ln -s ~/dotfiles/.emacs.el ~/.emacs.el`  
+  `cd dotfiles`  
   
-  `ln -s ~/dotfiles/.emacs.d ~/.emacs.d`  
+  `./setup.sh`  
   
-  `ln -s ~/dotfiles/.emacs.elc ~/.emacs.elc`  
-
+  `git submodule init`  
   
-
+  `git submodule update`  
+  
+  `(install-el-get)`  
+  
+  `(el-get-install-all)`  
+  
 Author
 ------
 
