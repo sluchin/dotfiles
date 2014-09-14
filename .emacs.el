@@ -182,11 +182,11 @@
 ;;; サブディレクトリに load-path を追加
 (defun add-to-load-path (&rest paths)
   (dolist (path paths)
-    (let* ((user-emacs-directory (if (boundp 'user-emacs-directory)
-                                     user-emacs-directory
-                                   "~/"))
+    (let* ((dir (if (boundp 'user-emacs-directory)
+                    user-emacs-directory
+                  "~/"))
            (default-directory (expand-file-name
-                              (concat user-emacs-directory path))))
+                              (concat dir path))))
       (unless (file-directory-p default-directory)
         (make-directory default-directory))
       (unless (member default-directory load-path)
@@ -332,14 +332,10 @@
                 "~/.emacs.d/session/lisp"
                 "~/.emacs.d/term-plus-el"
                 "~/.emacs.d/pomodoro-technique"
-                ;"~/.emacs.d/cedet/common"
-                ;"~/.emacs.d/cedet/ede"
-                ;"~/.emacs.d/cedet/semantic"
-                ;"~/.emacs.d/cedet/semantic/bovine"
-                ;"~/.emacs.d/cedet/speedbar"
                 "~/.emacs.d/auto-install") load-path))
 
 ;;; el-get
+;; (el-get 'sync)
 (defun install-el-get ()
   "Install el-get."
   (interactive)
@@ -348,9 +344,23 @@
           (message "Already el-get installed.")
         (with-current-buffer
             (url-retrieve-synchronously
-             "https://raw.github.com/dimitri/el-get/master/el-get-install.el")
+             "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
           (goto-char (point-max))
           (eval-print-last-sexp)))
+    (message "not found `git'")))
+
+;; アップデート
+(defun update-el-get ()
+  "Update el-get."
+  (interactive)
+  (if (executable-find "git")
+      (if (locate-library "el-get")
+          (let ((default default-directory)
+                (dir "~/.emacs.d/el-get/el-get"))
+            (cd dir)
+            (shell-command "git pull")
+            (cd default))
+        (message "not found `el-get'"))
     (message "not found `git'")))
 
 (when (locate-library "el-get")
@@ -358,6 +368,8 @@
     "Display a list of packages." t)
   (autoload 'el-get-install "el-get"
     "Cause the named PACKAGE to be installed." t)
+  (autoload 'el-get-update "el-get"
+    "Update el-get." t)
   (autoload 'el-get-self-update "el-get"
     "Update el-get itself." t)
   (autoload 'el-get-update-all "el-get"
@@ -374,7 +386,8 @@
                    (fboundp 'el-get-install))
           (dolist (package el-get-packages)
             (message "package: %s" package)
-            (el-get-install package)))
+            (el-get-install package))
+          (message "el-get-install-all done."))
       (message "not found `git'")))
 
   (eval-after-load "el-get"
@@ -1351,6 +1364,9 @@
 ;; 行番号へ移動 (デフォルト: M-g g)
 (define-key global-map (kbd "M-g") 'goto-line)
 
+;; リージョンをコメントアウト
+(define-key global-map (kbd "C-c ;") 'comment-or-uncomment-region)
+
 ;;; ここから標準 lisp (emacs23 以降) の設定
 
 ;;; 行番号表示
@@ -1578,16 +1594,62 @@
              (setq file-name-coding-system 'japanese-shift-jis)))
          (revert-buffer))
 
+       ;; バッファを kill する
        (defun kill-dired-buffer ()
          "Kill dired current buffer."
          (interactive)
          (when (eq major-mode 'dired-mode)
            (kill-buffer (current-buffer))))
 
+       ;; 全てのバッファを kill する
        (defun kill-dired-all-buffer ()
          "Kill all dired buffer."
          (interactive)
          (kill-all-buffer 'dired-mode))
+
+       ;; 無効コマンドを有効にする
+       (put 'dired-find-alternate-file 'disabled nil)
+
+       ;; 画面分割に適した `dired-dwim-find-alternate-file'
+       (defun dired-dwim-find-alternate-file ()
+         (interactive)
+         (cond
+          ;; 同じバッファが他のウインドウにある場合
+          ((delq (selected-window) (get-buffer-window-list))
+           (dired-find-file))
+          ;; 同じバッファが他のウインドウにない場合
+          (t
+           (dired-find-alternate-file))))
+
+       ;; バッファを増やさず上のディレクトリに移動
+       (defun dired-up-alternate-directory ()
+         (interactive)
+         (let* ((dir (dired-current-directory))
+                (up (file-name-directory (directory-file-name dir))))
+           (or (dired-goto-file (directory-file-name dir))
+               ;; Only try dired-goto-subdir if buffer has more than one dir.
+               (and (cdr dired-subdir-alist)
+                    (dired-goto-subdir up))
+               (progn
+                 (find-alternate-file up)
+                 (dired-goto-file dir)))))
+
+       ;; 画面分割に適した `dired-up-alternate-directory'
+       (defun dired-dwim-up-alternate-directory ()
+         (interactive)
+         (cond
+          ;; 同じバッファが他のウインドウにある場合
+          ((delq (selected-window) (get-buffer-window-list))
+           (dired-up-directory))
+          ;; 同じバッファが他のウインドウにない場合
+          (t
+           (dired-up-alternate-directory))))
+
+       ;; 画面分割に適した `quit-window'
+       (defun dired-dwim-quit-window ()
+         (interactive)
+         (quit-window
+          (not (delq (selected-window) (get-buffer-window-list)))))
 
        (when (boundp 'dired-mode-map)
          (let ((map dired-mode-map))
@@ -1608,21 +1670,20 @@
            ;; 文字コードをトグルする
            (define-key map (kbd "c") 'dired-file-name-jp)
            ;; kill する
-           (define-key map (kbd "M-k") 'kill-dired-buffer)
+           (define-key map (kbd "M-k") 'dired-dwim-quit-window)
            ;; 全て kill する
            (define-key map (kbd "C-M-k") 'kill-dired-all-buffer)
            ;; 編集可能にする
            (when (locate-library "wdired")
              (define-key map "r" 'wdired-change-to-wdired-mode))
-           ;; 無効コマンドを有効にする
-           (put 'dired-find-alternate-file 'disabled nil)
-           ;; 新規バッファを作らない
-           (define-key map (kbd "RET") 'dired-find-alternate-file)
            ;; 新規バッファを作る
            (define-key map (kbd "a") 'dired-advertised-find-file)
            ;; 親ディレクトリへ移動
-           (define-key map (kbd "U") 'dired-up-directory)))
-
+           (define-key map (kbd "U") 'dired-dwim-up-alternate-directory)))
+           (define-key dired-mode-map (kbd "<left>") 'dired-dwim-up-alternate-directory)
+           ;; 新規バッファを作らないで開く
+           (define-key dired-mode-map (kbd "RET") 'dired-dwim-find-alternate-file)
+           (define-key dired-mode-map (kbd "<right>") 'dired-dwim-find-alternate-file)
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; 関数のアウトライン表示
@@ -1887,7 +1948,8 @@
         (throw 'found default)))))
 
 ;;; カレンダ
-;; (install-elisp "http://www.meadowy.org/meadow/netinstall/export/799/branches/3.00/pkginfo/japanese-holidays/japanese-holidays.el")
+;; git clone https://github.com/emacs-jp/japanese-holidays
+
 ;; リファレンス
 (defun calendar-reference ()
   "Open reference for calendar-mode."
@@ -1915,8 +1977,11 @@
   (interactive)
   (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
 
-(when (locate-library "calendar")
+(when (and (locate-library "calendar")
+           (locate-library "holidays"))
   (autoload 'calendar "calendar" "Calendar." t)
+  (autoload 'holidays "holidays" "Holidays." t)
+
   ;; 行末空白強調表示, ヘッダ表示をしない
   (add-hook 'calendar-mode-hook
             (lambda ()
@@ -1936,22 +2001,25 @@
 
   (eval-after-load "calendar"
     '(progn
-       ;; 祝日を表示
-       (when (boundp 'calendar-mark-holidays-flag)
-         (setq calendar-mark-holidays-flag t))
-       ;; 日曜日を赤字にする
-       (when (boundp 'calendar-weekend-marker)
-         (setq calendar-weekend-marker 'diary))
-       (add-hook 'today-visible-calendar-hook 'calendar-mark-weekend)
-       (add-hook 'today-invisible-calendar-hook 'calendar-mark-weekend)
-       ;; 今日をマークする
-       (add-hook 'today-visible-calendar-hook 'calendar-mark-today)
-       ;; 日本の祝日を表示
-       (when (eval-and-compile (and (require 'holidays nil t)
-                                    (require 'japanese-holidays nil t)))
-         (setq calendar-holidays (append japanese-holidays
-                                         holiday-local-holidays
-                                         holiday-other-holidays)))
+       (when (eval-and-compile (require 'japanese-holidays nil t))
+         (when (boundp 'calendar-holidays)
+           (setq calendar-holidays ; 他の国の祝日も表示させたい場合は適当に調整
+                 (append japanese-holidays local-holidays other-holidays)))
+         (when (boundp 'mark-holidays-in-calendar)
+           (setq mark-holidays-in-calendar t))       ; 祝日をカレンダーに表示
+         ;; 土曜日・日曜日を祝日として表示する場合、以下の設定を追加します。
+         ;; デフォルトで設定済み
+         (when (boundp 'japanese-holiday-weekend)
+           (setq japanese-holiday-weekend '(0 6)))   ; 土日を祝日として表示
+         (when (boundp 'japanese-holiday-weekend-marker)
+           (setq japanese-holiday-weekend-marker     ; 土曜日を水色で表示
+                 '(holiday nil nil nil nil nil japanese-holiday-saturday)))
+         (when (fboundp 'japanese-holiday-mark-weekend)
+           (add-hook 'calendar-today-visible-hook 'japanese-holiday-mark-weekend)
+           (add-hook 'calendar-today-invisible-hook 'japanese-holiday-mark-weekend))
+         ;; 今日をマークする
+         (add-hook 'today-visible-calendar-hook 'calendar-mark-today))
+
        ;; 日誌ファイル
        (when (boundp 'diary-file)
          (setq diary-file
@@ -5653,7 +5721,7 @@ Otherwise, return nil."
     ;; インデント
     (when (fboundp 'indent-code-regidly)
       (indent-code-regidly (point-min) (point-max))
-      (message "indent-region...done"))
+      (message "indent-code-regidly...done"))
     (goto-char (point-min))
     (mark-whole-buffer)
     (when (and (fboundp 'c-indent-defun)

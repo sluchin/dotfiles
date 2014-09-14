@@ -31,3 +31,4 @@ git submodule deinit .emacs.d/elisp/helm
 git submodule deinit .emacs.d/elisp/helm-ls-git
 git submodule deinit .emacs.d/elisp/helm-descbinds
 git submodule deinit .emacs.d/elisp/org-mode
+git submodule deinit .emacs.d/elisp/japanese-holidays
