@@ -1,7 +1,7 @@
 ;;; howm-backend.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
+;;; Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
 ;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-backend.el,v 1.49 2012-09-23 10:44:24 hira Exp $
+;;; $Id: howm-backend.el,v 1.50 2012-12-29 08:57:18 hira Exp $
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -965,8 +965,8 @@ With arg, search `howm-search-path' iff arg is positive."
   (add-to-list '*howm-independent-directories*
                (expand-file-name dir))
   (let ((default-directory dir))
-    (howm-normalize-show "" (howm-folder-items dir t)))
-  (howm-keyword-add-items (howm-view-item-list)))
+    (howm-normalize-show "" (howm-folder-items dir t))
+    (howm-keyword-add-items (howm-view-item-list))))
 
 (defvar howm-keyword-buffer-name-format " *howm-keys:%s*")
 (defun howm-keyword-buffer ()
