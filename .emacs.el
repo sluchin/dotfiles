@@ -468,7 +468,7 @@
                                  :height 120)
            (set-face-attribute 'default nil
                                :family "Ricty"
-                               :height 80))
+                               :height 120))
          ;; "Hiragino Mincho Pro" "Ricty"
          (if (fboundp 'font-spec)
              (set-fontset-font "fontset-default" 'japanese-jisx0208
@@ -655,16 +655,16 @@
                              '(cursor-color . "white"))
                        default-frame-alist)))
         ((and (< 600 (x-display-pixel-height))
-              (< (x-display-pixel-height) 1050))
+              (< (x-display-pixel-height) 1080))
          (setq default-frame-alist
                (append (list '(width  . 95)
-                             '(height . 62)
+                             '(height . 50)
                              '(cursor-color . "white"))
                        default-frame-alist)))
-        ((<= 1050 (x-display-pixel-height))
+        ((<= 1080 (x-display-pixel-height))
          (setq default-frame-alist
                (append (list '(width  . 100)
-                             '(height .  75)
+                             '(height .  56)
                              '(cursor-color . "white"))
                        default-frame-alist)))))
 

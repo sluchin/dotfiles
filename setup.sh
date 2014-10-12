@@ -20,6 +20,8 @@ ZSH_LOGIN=.zlogin
 # tmux
 TMUX_DIR=.tmux
 TMUX_CONF=.tmux.conf
+TMUX_STATUS1=.tmux.powerline.status
+TMUX_STATUS2=.tmux.status
 TMUX_RC=.tmux-powerlinerc
 TMUX_CPU=get_cpu_usage.sh
 TMUX_MEM=get_mem_usage.sh
@@ -121,6 +123,8 @@ autolink $DOTFILES $HOME $ZSH_DIR
 # tmux
 autolink $DOTFILES $HOME $TMUX_DIR
 autolink $DOTFILES $HOME $TMUX_CONF
+autolink $DOTFILES $HOME $TMUX_STATUS1
+autolink $DOTFILES $HOME $TMUX_STATUS2
 autolink $DOTFILES $HOME $TMUX_RC
 autolink $DOTFILES/bin $HOME/bin $TMUX_CPU
 autolink $DOTFILES/bin $HOME/bin $TMUX_MEM

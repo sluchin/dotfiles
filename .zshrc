@@ -1,3 +1,5 @@
+### .zshrc -*- mode: Shell-script; coding: utf-8; indent-tabs-mode: nil -*-
+
 # curl -L https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh | sh
 # Path to your oh-my-zsh configuration.
 ZSH_DIR=$HOME/.zsh.d
@@ -219,6 +221,7 @@ alias emq='emacs -q --no-site-file'
 alias ha='fc -lDE 1'
 alias comps='echo ${(F)${(uo@)_comps}}'
 alias zmv='noglob zmv -W'
+alias lxterminal='lxterminal --geometry=100x40'
 
 alias -s log='tail -f'
 alias -s {el,c,h,cpp,py,pl,pm,rb,java,php,yml}='emacsclient'
@@ -226,10 +229,10 @@ alias -s {el,c,h,cpp,py,pl,pm,rb,java,php,yml}='emacsclient'
 alias -g L='| less'
 alias -g H='| head'
 alias -g T='| tail'
-alias -g G='| grep -n'
+alias -g G='| grep'
 alias -g S='| sed'
 alias -g A='| awk'
-alias -g W='| wc'
+alias -g W='| wc -l'
 alias -g N='> /dev/null 2>&1'
 
 # 常にバックグラウンドで起動
@@ -268,10 +271,10 @@ bindkey '^[^i' reverse-menu-complete
 bindkey '^[i' menu-expand-or-complete
 
 # zaw
-bindkey "^X^X" zaw-cdr
-bindkey "^H" zaw-history
-bindkey "^Xo" zaw-open-file
-bindkey "^Xa" zaw-applications
+bindkey "^z^z" zaw-cdr
+bindkey "^z^h" zaw-history
+bindkey "^z^o" zaw-open-file
+bindkey "^z^a" zaw-applications
 
 # 自動的に消費時間の統計情報を表示する
 REPORTTIME=3
@@ -334,7 +337,8 @@ export __timetrack_ignore_progs
 # tmux 自動起動
 if [ -z "$TMUX" -a -z "$STY" ]; then
     if type tmux >/dev/null 2>&1; then
-        if tmux has-session && tmux list-sessions | grep -qE '.*]$'; then
+        if tmux has-session >/dev/null 2>&1 &&
+           tmux list-sessions >/dev/null 2>&1 | grep -qE '.*]$'; then
             tmux attach && echo "tmux attached session "
         else
             tmux new-session && echo "tmux created new session"
@@ -344,11 +348,10 @@ fi
 
 function cdup() {
     cd .. && zle reset-prompt
+    echo `pwd`
 }
 zle -N cdup
-
-bindkey '^X\^' cdup
-bindkey '^XU' cdup
+bindkey '^U' cdup
 
 function dired () {
     dir=${1:-"$PWD"}
