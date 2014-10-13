@@ -17,9 +17,9 @@
 
 ;;; 起動オプション
 ;; 設定を読み込まない起動オプション
-;; emacs23 -q --no-site-file
+;; emacs -q --no-site-file
 ;; 通常の起動オプション
-;; emacs23 -g 100x50-100+0
+;; emacs -g 100x50-100+0
 
 ;;; NTEmacs 設定
 ;; Cygwin の Base をインストールしパスを通す
@@ -37,7 +37,6 @@
 ;; (el-get-install-all)
 ;; バイトコンパイル
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)
-
 
 ;;; Code:
 
@@ -196,6 +195,18 @@
         (normal-top-level-add-subdirs-to-load-path))
       (message "load-path: %s" load-path))))
 
+(defun add-to-load-path2 (&rest paths)
+  (dolist (path paths)
+    (let* ((dir (if (boundp 'user-emacs-directory)
+                    user-emacs-directory
+                  "~/"))
+           (default-directory (expand-file-name
+                               (concat dir path))))
+      (dolist (file (directory-files default-directory t))
+        (when (file-directory-p file)
+          (add-to-list 'load-path file)))
+      (message "load-path: %s" load-path))))
+
 ;;; ロードパスの設定
 ;; lisp の置き場所をここで追加
 ;; 全てバイトコンパイルするには以下を評価する
@@ -276,7 +287,7 @@
                "guile-2.0-doc" "guile-1.8" "guile-1.8-dev" "guile-1.8-lib"
                "clojure1.4" "leiningen"
                "libgmp-dev" "perltidy" "php5" "php-elisp" "php-doc" "global"
-               "tmux" "xclip" "trash-cli"))
+               "tmux" "xclip" "xsel" "trash-cli" "git" "subversion" "subversion-tools"))
         (passwd (password-cache-sudo)))
     (dolist (l lst)
       (message (concat "==> " l))
@@ -310,8 +321,7 @@
 
 ;;; load-path に追加
 ;; ディレクトリ配下全て load-path に追加
-(add-to-load-path "elisp")
-(add-to-load-path "elpa")
+(add-to-load-path2 "elisp" "elpa")
 
 (when (eq system-type 'gnu/linux)
   (setq load-path
@@ -319,8 +329,7 @@
                   "/usr/share/emacs/site-lisp/ddskk"
                   "/usr/share/emacs/site-lisp/mew"
                   "/usr/share/emacs/site-lisp/slime"
-                  "/usr/share/emacs/site-lisp/dictionaries-common"
-                  "/usr/local/share/gtags") load-path)))
+                  "/usr/share/emacs/site-lisp/dictionaries-common") load-path)))
 ;; 優先度高
 (setq load-path
       (append '("~/.emacs.d"
@@ -363,6 +372,20 @@
         (message "not found `el-get'"))
     (message "not found `git'")))
 
+(defun el-get-install-all ()
+  "el-get-install packages."
+  (interactive)
+  (if (executable-find "git")
+      (if (require 'el-get nil t)
+          (when (and (boundp 'el-get-packages)
+                     (fboundp 'el-get-install))
+            (dolist (package el-get-packages)
+              (message "package: %s" package)
+              (el-get-install package))
+            (message "el-get-install-all done."))
+        (message "not found `el-get'"))
+    (message "not found `git'")))
+
 (when (locate-library "el-get")
   (autoload 'el-get-list-packages "el-get"
     "Display a list of packages." t)
@@ -376,19 +399,6 @@
     "Performs update of all installed packages." t)
   (autoload 'el-get "el-get"
     "Ensure that packages have been downloaded once and init them as needed." t)
-
-  (defun el-get-install-all ()
-    "el-get-install packages."
-    (interactive)
-    (if (executable-find "git")
-        (when (and (require 'el-get nil t)
-                   (boundp 'el-get-packages)
-                   (fboundp 'el-get-install))
-          (dolist (package el-get-packages)
-            (message "package: %s" package)
-            (el-get-install package))
-          (message "el-get-install-all done."))
-      (message "not found `git'")))
 
   (eval-after-load "el-get"
     '(progn
