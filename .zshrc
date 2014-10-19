@@ -425,3 +425,15 @@ function ekill() {
     emacsclient -e "(progn (defun yes-or-no-p (p) t) (kill-emacs))"
 }
 zle -N ekill
+
+function tmuxload() {
+    file=$1
+    if [ -r "$file" ]; then
+        tac $file | while read line; \
+            do echo $line | tr -d "\n" | tmux load-buffer -; \
+            done
+	else
+        echo "tmuxload file"
+    fi
+}
+zle -N tmuxload
