@@ -321,7 +321,7 @@
 
 ;;; load-path に追加
 ;; ディレクトリ配下全て load-path に追加
-(add-to-load-path2 "elisp" "elpa")
+(add-to-load-path2 "elisp" "elpa" "submodule")
 
 (when (eq system-type 'gnu/linux)
   (setq load-path
