@@ -9,7 +9,7 @@
         auto-install
         imenu+
         info+
-        thing-opt
+        ;thing-opt
         igrep
         grep-a-lot
         grep-edit
@@ -63,7 +63,7 @@
          (:name auto-install :type emacswiki)
          (:name imenu+ :type emacswiki)
          (:name info+ :type emacswiki)
-         (:name thing-opt :type emacswiki)
+         ;(:name thing-opt :type emacswiki)
          (:name igrep :type emacswiki)
          (:name grep-a-lot :type emacswiki)
          (:name grep-edit :type emacswiki)
