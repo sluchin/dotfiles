@@ -1696,6 +1696,17 @@
            (define-key dired-mode-map (kbd "<right>") 'dired-dwim-find-alternate-file)
        (message "Loading %s (dired)...done" this-file-name))))
 
+;;; dired色
+(when (and (locate-library "dired")
+           (locate-library "dired-k"))
+  (autoload 'dired-k "dired-k"
+    "Highlighting dired buffer like k." t)
+
+  (eval-after-load "dired-k"
+    '(progn
+       (define-key dired-mode-map (kbd "K") 'dired-k)
+       (message "Loading %s (dired-k)...done" this-file-name))))
+
 ;;; 関数のアウトライン表示
 (when (or (locate-library "speedbar")
           (locate-library "sr-speedbar"))
@@ -4957,6 +4968,7 @@ Otherwise, return nil."
    'c-mode
    ;; TODO, FIXME を強調表示
    '(("\\( TODO\\| FIXME\\| XXX\\| BUG\\):" 1 font-lock-warning-face prepend)
+     ("\\( TBA\\| TBC\\| TBD \\)" 1 font-lock-warning-face prepend)
      ;; if 文の後ろの = を警告表示
      ("\\<if\\>"
       ("[^!<>=]\\(=\\)[^=]" nil nil (1 font-lock-warning-face)))))
