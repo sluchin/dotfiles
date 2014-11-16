@@ -4492,10 +4492,8 @@ Otherwise, return nil."
                        (concat (file-name-as-directory home-dir) "src/glibc")
                        (concat (file-name-as-directory home-dir) "src/linux")))
                  '("/usr/include"
-                   "/usr/include/libxml2/libxml" ; libxml2-dev
-                   "/usr/include/event2"         ; libevent-dev
-                   "/usr/src/glibc"              ; eglibc-source
-                   "/usr/src/linux-source"))))   ; linux-source-3.2.0
+                   "/usr/src/glibc"       ; eglibc-source
+                   "/usr/src/linux"))))   ; linux-source-3.2.0
            (dolist (dir dirs)
              (if (file-readable-p (concat (file-name-as-directory dir) "GTAGS"))
                  (setq path-string (concat path-string dir ":"))
