@@ -1927,7 +1927,10 @@
 ;;; バッファの切り替えをインクリメンタルにする
 (when (locate-library "iswitchb")
   (autoload 'iswitchb-mode "iswitchb"
-    "A comprehensive visual interface to diff & patch." t)
+    "Switch to buffers or file-cache entries with 1 command." t)
+
+  ;; 有効にする
+  (iswitchb-mode 1)
 
   (eval-after-load "iswitchb"
     '(progn
@@ -4966,7 +4969,7 @@ Otherwise, return nil."
    'c-mode
    ;; TODO, FIXME を強調表示
    '(("\\( TODO\\| FIXME\\| XXX\\| BUG\\):" 1 font-lock-warning-face prepend)
-     ("\\( TBA\\| TBC\\| TBD \\)" 1 font-lock-warning-face prepend)
+     ("\\( TBA\\| TBC\\| TBD\\)" 1 font-lock-warning-face prepend)
      ;; if 文の後ろの = を警告表示
      ("\\<if\\>"
       ("[^!<>=]\\(=\\)[^=]" nil nil (1 font-lock-warning-face)))))
