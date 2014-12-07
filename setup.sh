@@ -146,10 +146,10 @@ autolink $DOTFILES $HOME $MYSQL_CONF
 # application
 autolink $DOTFILES/$APP $HOME/$APP $GNOME_TERMINAL
 autolink $DOTFILES/$APP $HOME/$APP $EMACSCLIENT
-if [ `whoami` = 'root' ]; then
-    autolink $DOTFILES/$APP $APPSYS $GNOME_TERMINAL
-    autolink $DOTFILES/$APP $APPSYS $EMACSCLIENT
-fi
+#if [ `whoami` = 'root' ]; then
+    #autolink $DOTFILES/$APP $APPSYS $GNOME_TERMINAL
+    #autolink $DOTFILES/$APP $APPSYS $EMACSCLIENT
+#fi
 
 # lisp
 autolink $DOTFILES $HOME $GUILE

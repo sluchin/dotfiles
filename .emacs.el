@@ -2773,7 +2773,7 @@ Otherwise, return nil."
 
 ;;; 単語選択 (デフォルト: M-@)
 ;; (install-elisp-from-emacswiki "thing-opt.el")
-(when (eval-and-compile (require 'thing-opt nil t))
+(when (eval-and-compile (require 'thingopt nil t))
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
   (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
@@ -4987,13 +4987,13 @@ Otherwise, return nil."
                 (setq tab-width 4))
               (when (boundp 'indent-tabs-mode) ; スペース
                 (setq indent-tabs-mode nil))
-              (when (and (require 'auto-complete nil t)
-                         (require 'auto-complete-config nil t))
-                (add-ac-sources  '(ac-source-dictionary
-                                   ac-source-words-in-buffer
-                                   ac-source-words-in-same-mode-buffers
-                                   ac-source-filename
-                                   ac-source-files-in-current-dir)))
+              ;; (when (and (require 'auto-complete nil t)
+              ;;            (require 'auto-complete-config nil t))
+              ;;   (add-ac-sources  '(ac-source-dictionary
+              ;;                      ac-source-words-in-buffer
+              ;;                      ac-source-words-in-same-mode-buffers
+              ;;                      ac-source-filename
+              ;;                      ac-source-files-in-current-dir)))
               (when (require 'auto-complete-clang nil t)
                 (when (boundp 'ac-clang-prefix-header)
                   (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
