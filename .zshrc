@@ -239,7 +239,6 @@ alias -g N='> /dev/null 2>&1'
 function xpdf() { command xpdf $* &! }
 function evince() { command evince $* &! }
 function qpdfview() { command qpdfview $* &! }
-function emacs() { command emacs $* &! }
 function emacsclient() { command emacsclient $* &! }
 function gimp() { command gimp $* &! }
 function firefox() { command firefox $* &! }
