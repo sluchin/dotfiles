@@ -334,13 +334,15 @@ export __timetrack_threshold
 export __timetrack_ignore_progs
 
 # tmux 自動起動
-if [ -z "$TMUX" -a -z "$STY" ]; then
-    if type tmux >/dev/null 2>&1; then
-        if tmux has-session >/dev/null 2>&1 &&
-           tmux list-sessions >/dev/null 2>&1 | grep -qE '.*]$'; then
-            tmux attach && echo "tmux attached session "
-        else
-            tmux new-session && echo "tmux created new session"
+if [ -f "$HOME/dotfiles/.autotmux" ]; then
+    if [ -z "$TMUX" -a -z "$STY" ]; then
+        if type tmux >/dev/null 2>&1; then
+            if tmux has-session >/dev/null 2>&1 &&
+                tmux list-sessions >/dev/null 2>&1 | grep -qE '.*]$'; then
+                tmux attach && echo "tmux attached session "
+            else
+                tmux new-session && echo "tmux created new session"
+            fi
         fi
     fi
 fi
