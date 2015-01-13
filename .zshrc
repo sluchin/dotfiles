@@ -224,7 +224,7 @@ alias zmv='noglob zmv -W'
 alias lxterminal='lxterminal --geometry=100x40'
 
 alias -s log='tail -f'
-alias -s {el,c,h,cpp,py,pl,pm,rb,java,php,yml}='emacsclient'
+alias -s {el,c,h,cpp,,pm,java,php,yml}='emacsclient'
 
 alias -g L='| less'
 alias -g H='| head'
@@ -274,6 +274,7 @@ bindkey "^z^z" zaw-cdr
 bindkey "^z^h" zaw-history
 bindkey "^z^o" zaw-open-file
 bindkey "^z^a" zaw-applications
+bindkey "^z^x" zaw-tmux
 
 # 自動的に消費時間の統計情報を表示する
 REPORTTIME=3
