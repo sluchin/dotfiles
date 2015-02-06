@@ -20,6 +20,8 @@ path=(
 fpath=(
     $HOME/.zsh.d/*(N-/)
     $HOME/.zsh.d/functions/*(N-/)
+    $HOME/.zsh.d/completion(N-/)
+    $HOME/.zsh.d/completion/zsh-completions/src(N-/)
     $HOME/.zsh.d/plugin/*(N-/)
     $HOME/.zsh.d/plugin/*/*(N-/)
     $HOME/.zsh.d/plugin/*/*/*(N-/)
@@ -52,5 +54,9 @@ export FCEDIT=emacsclient
 
 limit coredumpsize unlimited
 
+LANG=ja_JP.UTF-8
+export LANG
+
 ZSHENV_LOCAL=$HOME/.zshenv.local
 [[ -f $ZSHENV_LOCAL ]] && source $ZSHENV_LOCAL
+
