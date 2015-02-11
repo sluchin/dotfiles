@@ -183,7 +183,7 @@
   (dolist (path paths)
     (let* ((dir (if (boundp 'user-emacs-directory)
                     user-emacs-directory
-                  "~/"))
+                  (expand-file-name "~/")))
            (default-directory (expand-file-name
                               (concat dir path))))
       (unless (file-directory-p default-directory)
@@ -199,7 +199,7 @@
   (dolist (path paths)
     (let* ((dir (if (boundp 'user-emacs-directory)
                     user-emacs-directory
-                  "~/"))
+                  (expand-file-name "~/")))
            (default-directory (expand-file-name
                                (concat dir path))))
       (dolist (file (directory-files default-directory t))
@@ -332,16 +332,16 @@
                   "/usr/share/emacs/site-lisp/dictionaries-common") load-path)))
 ;; 優先度高
 (setq load-path
-      (append '("~/.emacs.d"
-                "~/.emacs.d/conf"
-                "~/.emacs.d/el-get/el-get"
-                "~/.emacs.d/howm"
-                "~/.emacs.d/emacs-w3m"
-                "~/.emacs.d/evernote-mode"
-                "~/.emacs.d/session/lisp"
-                "~/.emacs.d/term-plus-el"
-                "~/.emacs.d/pomodoro-technique"
-                "~/.emacs.d/auto-install") load-path))
+      (append '((expand-file-name "~/.emacs.d")
+                (expand-file-name "~/.emacs.d/conf")
+                (expand-file-name "~/.emacs.d/el-get/el-get")
+                (expand-file-name "~/.emacs.d/howm")
+                (expand-file-name "~/.emacs.d/emacs-w3m")
+                (expand-file-name "~/.emacs.d/evernote-mode")
+                (expand-file-name "~/.emacs.d/session/lisp")
+                (expand-file-name "~/.emacs.d/term-plus-el")
+                (expand-file-name "~/.emacs.d/pomodoro-technique")
+                (expand-file-name "~/.emacs.d/auto-install")) load-path))
 
 ;;; el-get
 ;; (el-get 'sync)
@@ -365,7 +365,7 @@
   (if (executable-find "git")
       (if (locate-library "el-get")
           (let ((default default-directory)
-                (dir "~/.emacs.d/el-get/el-get"))
+                (dir (expand-file-name "~/.emacs.d/el-get/el-get")))
             (cd dir)
             (shell-command "git pull")
             (cd default))
@@ -404,9 +404,9 @@
     '(progn
        ;; インストール先
        (when (boundp 'el-get-dir)
-         (setq el-get-dir "~/.emacs.d/elisp"))
+         (setq el-get-dir (expand-file-name "~/.emacs.d/elisp")))
        ;; パッケージリストをバイトコンパイル
-       (byte-compile-file "~/.emacs.d/el-get-packages.el")
+       (byte-compile-file (expand-file-name "~/.emacs.d/el-get-packages.el"))
        ;; パッケージリスト
        (when (locate-library "el-get-packages")
          (load "el-get-packages"))
@@ -902,7 +902,7 @@
 ;;; C ソースの指定
 ;; git clone git://git.savannah.gnu.org/emacs.git
 (when (boundp 'find-function-C-source-directory)
-  (let ((src "~/src/emacs"))
+  (let ((src (expand-file-name "~/src/emacs")))
     (when (file-directory-p src)
       (setq find-function-C-source-directory src))))
 
@@ -1980,7 +1980,8 @@
 ;; リファレンス
 (defun calendar-reference ()
   "Open reference for calendar-mode."
-  (interactive) (find-file "~/.emacs.d/ref/calendar.org"))
+  (interactive)
+  (find-file (expand-file-name "~/.emacs.d/ref/calendar.org")))
 
 ;; calendar info
 (when (locate-library "info")
@@ -2086,7 +2087,8 @@
 ;; org-mode Reference Card
 (defun org-reference ()
   "Open reference for Org-mode."
-  (interactive) (find-file "~/.emacs.d/org/reference-card.org"))
+  (interactive)
+  (find-file (expand-file-name "~/.emacs.d/org/reference-card.org")))
 
 ;; 仕事用 GTD ファイルを開く
 (defun gtd ()
@@ -2328,7 +2330,7 @@ Otherwise, return nil."
        ;; テンプレート
        (when (boundp 'org-remember-templates)
          (let* ((dir (file-name-as-directory org-directory))
-                (book-tmpl "~/.emacs.d/org/templates/book.txt")
+                (book-tmpl (expand-file-name "~/.emacs.d/org/templates/book.txt"))
                 (journal-file (concat dir "journal.org"))
                 (emacs-file (concat dir "emacs.org"))
                 (memo-file (concat dir "memo.org"))
@@ -2991,7 +2993,8 @@ Otherwise, return nil."
          (setq-default bm-buffer-persistence t))
        ;; セーブファイル
        (when (boundp 'bm-repository-file)
-         (setq bm-repository-file "~/.emacs.d/.bm-repository"))
+         (setq bm-repository-file
+               (expand-file-name "~/.emacs.d/.bm-repository")))
        ;; 起動時に設定のロード
        (when (boundp 'bm-restore-repository-on-load)
          (setq bm-restore-repository-on-load t))
@@ -3071,17 +3074,17 @@ Otherwise, return nil."
   (defun anything-make-filelist ()
     "Make file list."
     (interactive)
-    (let ((conf-file "~/.filelist-dir.el")
+    (let ((conf-file (expand-file-name "~/.filelist-dir.el"))
           lst)
       (if (file-readable-p conf-file)
           (with-temp-buffer
             (insert-file-contents conf-file)
             (setq lst (read (current-buffer))))
-        (setq lst '("~/")))
+        (setq lst '((expand-file-name "~/"))))
       (let* ((dirs (read (read-string
                           "Dirlist: "
                           (format "%s" (car (cdr lst)))))))
-        (make-filelist "~/.filelist" dirs
+        (make-filelist (expand-file-name "~/.filelist") dirs
                        "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$\\|~$\\|#$"))))
 
   (defun anything-choice ()
@@ -3101,9 +3104,10 @@ Otherwise, return nil."
   (eval-after-load "anything-config"
     '(progn
        (when (boundp 'anything-c-filelist-file-name)
-         (setq anything-c-filelist-file-name "~/.filelist"))
+         (setq anything-c-filelist-file-name (expand-file-name "~/.filelist")))
        (when (boundp 'anything-grep-candidates-fast-directory-regexp)
-         (setq anything-grep-candidates-anyfast-directory-regexp "~/"))
+         (setq anything-grep-candidates-anyfast-directory-regexp
+               (expand-file-name "~/")))
        (when (fboundp 'iswitchb-mode)
          (iswitchb-mode))
        (when (fboundp 'anything-iswitchb-setup)
@@ -3235,7 +3239,8 @@ Otherwise, return nil."
 ;; リファレンス
 (defun navi2ch-reference ()
   "Open reference for navi2ch."
-  (interactive) (find-file "~/.emacs.d/ref/navi2ch.org"))
+  (interactive)
+  (find-file (expand-file-name "~/.emacs.d/ref/navi2ch.org")))
 
 (when (locate-library "navi2ch")
   (autoload 'navi2ch "navi2ch" "Navigator for 2ch for Emacs." t)
@@ -3355,9 +3360,9 @@ Otherwise, return nil."
 (defun sync-skkdic ()
   "Sync skkdic"
   (interactive)
-  (let ((ibus-skk-jisyo "~/.skk-ibus-jisyo")
-        (share-skk-jisyo "~/Dropbox/skk/.skk-jisyo")
-        (home-skk-jisyo "~/.skk-jisyo"))
+  (let ((ibus-skk-jisyo (expand-file-name "~/.skk-ibus-jisyo"))
+        (share-skk-jisyo (expand-file-name "~/Dropbox/skk/.skk-jisyo"))
+        (home-skk-jisyo (expand-file-name "~/.skk-jisyo")))
     (if (and (executable-find "skkdic-expr")
              (executable-find "skkdic-sort"))
         (when (and (boundp 'skk-jisyo)
@@ -3402,7 +3407,8 @@ Otherwise, return nil."
 (defun print-direction-word ()
   "Display direction word."
   (interactive)
-  (let ((file (read-file-name "filename: " "~/.emacs.d/ddskk/"))
+  (let ((file (read-file-name "filename: "
+                              (expand-file-name "~/.emacs.d/ddskk/")))
         (coding-system-for-read 'euc-jp))
     (if (file-readable-p file)
         (progn
@@ -3424,26 +3430,59 @@ Otherwise, return nil."
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
+       ; 個人辞書
        (let ((personal
               (concat (file-name-as-directory
                        (catch 'found (find-directory "skk")))
-                      ".skk-jisyo"))                               ; 個人辞書
-             (large "~/.emacs.d/ddskk/SKK-JISYO.L")                ; 基本辞書
-             (lst '("~/.emacs.d/ddskk/SKK-JISYO.assoc"             ; 連想辞書
-                    "~/.emacs.d/ddskk/SKK-JISYO.edict"             ; 英和辞典
-                    "~/.emacs.d/ddskk/SKK-JISYO.book"              ; 本
-                    "~/.emacs.d/ddskk/SKK-JISYO.law"               ; 法律
-                    "~/.emacs.d/ddskk/SKK-JISYO.propernoun"        ; 企業など
-                    "~/.emacs.d/ddskk/SKK-JISYO.jinmei"            ; 人名
-                    "~/.emacs.d/ddskk/SKK-JISYO.geo"               ; 地名辞典
-                    "~/.emacs.d/ddskk/SKK-JISYO.station"           ; 駅
-                    "~/.emacs.d/ddskk/SKK-JISYO.2ch"               ; 2ch用語
-                    "~/.emacs.d/ddskk/SKK-JISYO.emojio"            ; エモジオ
-                    "~/.emacs.d/ddskk/SKK-JISYO.kao0"              ; 顔文字 0
-                    "~/.emacs.d/ddskk/SKK-JISYO.kao1"              ; 顔文字 1
-                    "~/.emacs.d/ddskk/SKK-JISYO.kao2"              ; 顔文字 2
-                    "~/.emacs.d/ddskk/SKK-JISYO.zipcode"           ; 郵便番号
-                    "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode"))) ; 会社
+                      ".skk-jisyo"))
+             ; 基本辞書
+             (large (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.L")) 
+             ; 連想辞書
+             (lst '((expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.assoc")
+                    ; 英和辞典
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.edict")
+                    ; 本
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.book")
+                    ; 法律
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.law")
+                    ; 企業など
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.propernoun")
+                    ; 人名
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.jinmei")
+                    ; 地名辞典
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.geo")
+                    ; 駅
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.station")
+                    ; 2ch用語
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.2ch")
+                    ; エモジオ
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.emojio")
+                    ; 顔文字 0
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.kao0")
+                    ; 顔文字 1
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.kao1")
+                    ; 顔文字 2
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.kao2")
+                    ; 郵便番号
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.zipcode")
+                    ; 会社
+                    (expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode"))))
          ;; 個人辞書
          (when (boundp 'skk-jisyo)
            (when (and (file-readable-p personal)
@@ -3707,7 +3746,7 @@ Otherwise, return nil."
     '(progn
        ;; 作業時間終了後に開くファイル。デフォルトでは "~/.emacs.d/pomodoro.org"
        (when (boundp 'pomodoro:file)
-         (setq pomodoro:file "~/gtd/pomodoro.org"))
+         (setq pomodoro:file (expand-file-name "~/gtd/pomodoro.org")))
        ;; 作業時間
        (when (boundp 'pomodoro:work-time)      ; 仕事
          (setq pomodoro:work-time 25))
@@ -3758,8 +3797,10 @@ Otherwise, return nil."
     '(progn
        ;; サウンドファイルのパス
        (when (and (boundp 'tea-time-sound)
-                  (file-exists-p "~/.emacs.d/tomatinho/tick.wav"))
-         (setq tea-time-sound "~/.emacs.d/tomatinho/tick.wav"))
+                  (file-exists-p
+                   (expand-file-name "~/.emacs.d/tomatinho/tick.wav")))
+         (setq tea-time-sound
+               (expand-file-name "~/.emacs.d/tomatinho/tick.wav")))
        (message "Loading %s (tea-time)...done" this-file-name))))
 
 ;;; Windows の設定
@@ -3882,7 +3923,7 @@ Otherwise, return nil."
       (let ((to "sgn-daily-report@itec-hokkaido.co.jp")
             (subject (concat "日報 (" (format-time-string "%Y%m%d") " 東哲也)"))
             (buffer (current-buffer))
-            (template "~/.template_daily")
+            (template (expand-file-name "~/.template_daily"))
             (tmp " *daily*")
             (region ""))
         (with-output-to-temp-buffer tmp
@@ -3901,7 +3942,7 @@ Otherwise, return nil."
   ;; ホームディレクトリに .signature を作っておく
   (add-hook 'mew-draft-mode-newdraft-hook
             (lambda ()
-              (let ((sigfile "~/.signature")
+              (let ((sigfile (expand-file-name "~/.signature"))
                     (p (point))
                     (daily " *daily*"))
                 (goto-char (point-max))
@@ -3972,7 +4013,7 @@ Otherwise, return nil."
        (defvar mew-mode-line-quantity 0)
        (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
        (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
-       (defvar mew-notify-biff-icon "~/.emacs.d/icons/letter.xpm")
+       (defvar mew-notify-biff-icon (expand-file-name "~/.emacs.d/icons/letter.xpm"))
 
        (when (boundp 'mew-biff-function)
          ;; mew-biff-interval の間隔で呼ばれる関数
@@ -4277,7 +4318,8 @@ Otherwise, return nil."
        ;; 確認なしでヒストリ保存
        (setq eshell-ask-to-save-history (quote always))
        ;; zsh のヒストリと共有
-       (setq eshell-history-file-name "~/.zsh_history")
+       (setq eshell-history-file-name
+             (expand-file-name "~/.zsh_history"))
        ;; ヒストリサイズ
        (setq eshell-history-size 100000))))
 
@@ -4664,12 +4706,14 @@ Otherwise, return nil."
        (let* ((default (cdr (assq 'auto-complete-mode minor-mode-alist))))
          (setcar default " α"))
        ;; ディレクトリ設定
-       (let ((dir "~/.emacs.d/auto-complete/dict"))
+       (let ((dir (expand-file-name
+                   "~/.emacs.d/auto-complete/dict")))
          (when (and (boundp 'ac-dictionary-directories)
                     (file-readable-p dir))
            (add-to-list 'ac-dictionary-directories dir)))
        (when (boundp 'ac-comphist-file)    ; ソースファイル
-         (setq ac-comphist-file "~/.emacs.d/ac-comphist.dat"))
+         (setq ac-comphist-file
+               (expand-file-name "~/.emacs.d/ac-comphist.dat")))
        (when (fboundp 'ac-config-default)  ; デフォルト設定にする
          (ac-config-default))
        (when (boundp 'ac-delay)            ; 待ち時間
@@ -4705,7 +4749,8 @@ Otherwise, return nil."
   (eval-after-load "autoinsert"
     '(progn
        (when (boundp 'auto-insert-directory)
-         (setq auto-insert-directory "~/.emacs.d/autoinsert/"))
+         (setq auto-insert-directory
+               (expand-file-name "~/.emacs.d/autoinsert/")))
        (when (boundp 'auto-insert-alist)
          (setq auto-insert-alist
                (append '(("\\.el"  . "lisp-template.el")
@@ -4917,7 +4962,9 @@ Otherwise, return nil."
        (require 'swank-clojure nil t)
        (require 'assoc nil t)
        ;; /.clojure 内の各jarファイルにクラスパスを通す
-       (setq swank-clojure-jar-home "~/.m2/repository/swank-clojure/swank-clojure/1.4.2/")
+       (setq swank-clojure-jar-home
+             (expand-file-name
+              "~/.m2/repository/swank-clojure/swank-clojure/1.4.2/"))
        ;; slime-lisp-implementationsにclojureの呼び出しコマンドを追加する
        (swank-clojure-reset-implementation))))
 
@@ -4999,7 +5046,8 @@ Otherwise, return nil."
               ;;                      ac-source-files-in-current-dir)))
               (when (require 'auto-complete-clang nil t)
                 (when (boundp 'ac-clang-prefix-header)
-                  (setq ac-clang-prefix-header "~/.emacs.d/stdafx.pch"))
+                  (setq ac-clang-prefix-header
+                        (expand-file-name "~/.emacs.d/stdafx.pch")))
                 (when (boundp 'ac-clang-flags)
                   (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
                 (add-ac-sources '(ac-source-clang)))
@@ -5181,9 +5229,12 @@ Otherwise, return nil."
   (when (fboundp 'yas--initialize)
     (yas--initialize))
   (when (boundp 'yas-snippet-dirs)
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                             "~/.emacs.d/yasnippet/snippets"
-                             "~/.emacs.d/yasnippet-java-mode"))
+    (setq yas-snippet-dirs '((expand-file-name
+                              "~/.emacs.d/snippets")
+                             (expand-file-name
+                              "~/.emacs.d/yasnippet/snippets")
+                             (expand-file-name
+                              "~/.emacs.d/yasnippet-java-mode")))
     (when (boundp 'yas-load-directory)
       (mapc 'yas-load-directory yas-snippet-dirs)))
 
@@ -5203,9 +5254,11 @@ Otherwise, return nil."
               (when (boundp 'c-auto-newline)
                 (setq c-auto-newline t))
               (when (boundp 'ajc-tag-file)
-                (if (file-readable-p "~/.java_base.tag")
-                    (setq ajc-tag-file "~/.java_base.tag")
-                  (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+                (if (file-readable-p (expand-file-name "~/.java_base.tag"))
+                    (setq ajc-tag-file (expand-file-name "~/.java_base.tag"))
+                  (setq ajc-tag-file
+                        (expand-file-name
+                         "~/.emacs.d/ajc-java-complete/java_base.tag"))))
               (when (fboundp 'ajc-java-complete-mode)
                 (ajc-java-complete-mode))))
 
@@ -5242,9 +5295,9 @@ Otherwise, return nil."
   (when (fboundp 'yas--initialize)
     (yas--initialize))
   (when (boundp 'yas-snippet-dirs)
-    (setq yas-snippet-dirs '("~/.emacs.d/snippets"
-                             "~/.emacs.d/yasnippet/snippets"
-                             "~/.emacs.d/yasnippet-java-mode"))
+    (setq yas-snippet-dirs '((expand-file-name "~/.emacs.d/snippets")
+                             (expand-file-name "~/.emacs.d/yasnippet/snippets")
+                             (expand-file-name "~/.emacs.d/yasnippet-java-mode")))
     (when (boundp 'yas-load-directory)
       (mapc 'yas-load-directory yas-snippet-dirs)))
 
@@ -5267,9 +5320,10 @@ Otherwise, return nil."
               (require 'yasnippet nil t)
               (require 'ajc-java-complete-config nil t)
               (when (boundp 'ajc-tag-file)
-                (if (file-readable-p "~/.java_base.tag")
-                    (setq ajc-tag-file "~/.java_base.tag")
-                  (setq ajc-tag-file "~/.emacs.d/ajc-java-complete/java_base.tag")))
+                (if (file-readable-p (expand-file-name "~/.java_base.tag"))
+                    (setq ajc-tag-file (expand-file-name "~/.java_base.tag"))
+                  (setq ajc-tag-file (expand-file-name
+                                      "~/.emacs.d/ajc-java-complete/java_base.tag"))))
               (when (fboundp 'ajc-java-complete-mode)
                 (ajc-java-complete-mode))
               (require 'semantic nil t)
