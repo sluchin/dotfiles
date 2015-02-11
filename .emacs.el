@@ -460,44 +460,34 @@
 ;; 使えるフォントを調べるには以下を評価する
 ;; (prin1 (font-family-list))
 (when window-system
-  (set-face-attribute 'default nil
-                      :family "Ricty"
-                      :height 120)
-  (if (fboundp 'font-spec)
-      (set-fontset-font "fontset-default" 'japanese-jisx0208
-                        (font-spec :family "Ricty"))
-    (set-fontset-font "fontset-default" 'japanese-jisx0208
-                      '("Ricty" . "jisx0208.*"))))
-
-;; (when window-system
-;;   (cond ((eq system-type 'windows-nt)
-;;          ;; Windowsの場合
-;;          (set-face-attribute 'default nil
-;;                              :family "Lucida Console"
-;;                              :height 90)
-;;          (if (fboundp 'font-spec)
-;;              (set-fontset-font "fontset-default" 'japanese-jisx0208
-;;                                (font-spec :family "Hiragino Mincho Pro"
-;;                                           :size 10))
-;;            (set-fontset-font "fontset-default" 'japanese-jisx0208
-;;                              '("Hiragino Mincho Pro" . "jisx0208.*")))
-;;          (setq face-font-rescale-alist
-;;                '((".*Lucida.*"      . 1.0)
-;;                  (".*Hiragino.*" . 1.1)))
-;;          (when (boundp 'fixed-width-rescale)
-;;            (setq fixed-width-rescale nil))
-;;          (setq-default line-spacing 1))
-;;         (t
-;;          ;; それ以外
-;;          ;; "Ricty"
-;;          (set-face-attribute 'default nil
-;;                              :family "Ricty"
-;;                              :height 120)
-;;          (if (fboundp 'font-spec)
-;;              (set-fontset-font "fontset-default" 'japanese-jisx0208
-;;                                (font-spec :family "Ricty"))
-;;            (set-fontset-font "fontset-default" 'japanese-jisx0208
-;;                              '("Ricty" . "jisx0208.*"))))))
+  (cond ((eq system-type 'windows-nt)
+         ;; Windowsの場合, Rictyがいまいちなため,
+         ;; Hiragino Mincho にする
+         (set-face-attribute 'default nil
+                             :family "Lucida Console"
+                             :height 90)
+         (if (fboundp 'font-spec)
+             (set-fontset-font "fontset-default" 'japanese-jisx0208
+                               (font-spec :family "Hiragino Mincho Pro"
+                                          :size 10))
+           (set-fontset-font "fontset-default" 'japanese-jisx0208
+                             '("Hiragino Mincho Pro" . "jisx0208.*")))
+         (setq face-font-rescale-alist
+               '((".*Lucida.*"      . 1.0)
+                 (".*Hiragino.*" . 1.1)))
+         (when (boundp 'fixed-width-rescale)
+           (setq fixed-width-rescale nil))
+         (setq-default line-spacing 1))
+        (t
+         ;; それ以外はRictyにする
+         (set-face-attribute 'default nil
+                             :family "Ricty"
+                             :height 120)
+         (if (fboundp 'font-spec)
+             (set-fontset-font "fontset-default" 'japanese-jisx0208
+                               (font-spec :family "Ricty"))
+           (set-fontset-font "fontset-default" 'japanese-jisx0208
+                             '("Ricty" . "jisx0208.*"))))))
 
 ;; モナーフォントに変更する
 ;; モナーフォントをインストールしておくこと
