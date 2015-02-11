@@ -165,18 +165,18 @@
           (copy-file file copy t)
           (message "%s" file))))))
 
-;; ある特定のモードのバッファを全てキルする
-  (defun kill-all-buffer (mode)
-    "Kill grep buffer."
-    (interactive "sMode: ")
-    (save-excursion
-      (save-window-excursion
-        (dolist (buffer (buffer-list))
-          (switch-to-buffer buffer)
-          (when (eq major-mode mode)
-            (message "kill buffer: %s (%s)" buffer major-mode)
-            (when (buffer-live-p buffer)
-              (kill-buffer buffer)))))))
+;;; ある特定のモードのバッファを全てキルする
+(defun kill-all-buffer (mode)
+  "Kill grep buffer."
+  (interactive "sMode: ")
+  (save-excursion
+    (save-window-excursion
+      (dolist (buffer (buffer-list))
+        (switch-to-buffer buffer)
+        (when (eq major-mode mode)
+          (message "kill buffer: %s (%s)" buffer major-mode)
+          (when (buffer-live-p buffer)
+            (kill-buffer buffer)))))))
 
 ;;; サブディレクトリに load-path を追加
 (defun add-to-load-path (&rest paths)
@@ -421,6 +421,14 @@
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
 
+;;; tty対策
+(when tty-erase-char
+  (define-key global-map
+    (string tty-erase-char) 'backward-delete-char-untabify)
+  (define-key minibuffer-local-map
+    (string tty-erase-char) 'backward-delete-char)
+  (setq search-delete-char tty-erase-char))
+
 ;;; 各種文字コード設定
 ;; (list-coding-systems)
 ;; (install-elisp "http://nijino.homelinux.net/emacs/cp5022x.el")
@@ -452,39 +460,44 @@
 ;; 使えるフォントを調べるには以下を評価する
 ;; (prin1 (font-family-list))
 (when window-system
-  (cond ((eq system-type 'windows-nt)
-         ;; Windowsの場合
-         (set-face-attribute 'default nil
-                             :family "Lucida Console"
-                             :height 90)
-         (if (fboundp 'font-spec)
-             (set-fontset-font "fontset-default" 'japanese-jisx0208
-                               (font-spec :family "Hiragino Mincho Pro"
-                                          :size 10))
-           (set-fontset-font "fontset-default" 'japanese-jisx0208
-                             '("Hiragino Mincho Pro" . "jisx0208.*")))
-         (setq face-font-rescale-alist
-               '((".*Lucida.*"      . 1.0)
-                 (".*Hiragino.*" . 1.1)))
-         (when (boundp 'fixed-width-rescale)
-           (setq fixed-width-rescale nil))
-         (setq-default line-spacing 1))
-        (t
-         ;; それ以外
-         ;; "Monospace" "Ricty"
-         (if (<= emacs-major-version 21)
-             (set-face-attribute 'default nil
-                                 :family "Monospace"
-                                 :height 120)
-           (set-face-attribute 'default nil
-                               :family "Ricty"
-                               :height 120))
-         ;; "Hiragino Mincho Pro" "Ricty"
-         (if (fboundp 'font-spec)
-             (set-fontset-font "fontset-default" 'japanese-jisx0208
-                               (font-spec :family "Ricty"))
-           (set-fontset-font "fontset-default" 'japanese-jisx0208
-                             '("Ricty" . "jisx0208.*"))))))
+  (set-face-attribute 'default nil
+                      :family "Ricty"
+                      :height 120)
+  (if (fboundp 'font-spec)
+      (set-fontset-font "fontset-default" 'japanese-jisx0208
+                        (font-spec :family "Ricty"))
+    (set-fontset-font "fontset-default" 'japanese-jisx0208
+                      '("Ricty" . "jisx0208.*"))))
+
+;; (when window-system
+;;   (cond ((eq system-type 'windows-nt)
+;;          ;; Windowsの場合
+;;          (set-face-attribute 'default nil
+;;                              :family "Lucida Console"
+;;                              :height 90)
+;;          (if (fboundp 'font-spec)
+;;              (set-fontset-font "fontset-default" 'japanese-jisx0208
+;;                                (font-spec :family "Hiragino Mincho Pro"
+;;                                           :size 10))
+;;            (set-fontset-font "fontset-default" 'japanese-jisx0208
+;;                              '("Hiragino Mincho Pro" . "jisx0208.*")))
+;;          (setq face-font-rescale-alist
+;;                '((".*Lucida.*"      . 1.0)
+;;                  (".*Hiragino.*" . 1.1)))
+;;          (when (boundp 'fixed-width-rescale)
+;;            (setq fixed-width-rescale nil))
+;;          (setq-default line-spacing 1))
+;;         (t
+;;          ;; それ以外
+;;          ;; "Ricty"
+;;          (set-face-attribute 'default nil
+;;                              :family "Ricty"
+;;                              :height 120)
+;;          (if (fboundp 'font-spec)
+;;              (set-fontset-font "fontset-default" 'japanese-jisx0208
+;;                                (font-spec :family "Ricty"))
+;;            (set-fontset-font "fontset-default" 'japanese-jisx0208
+;;                              '("Ricty" . "jisx0208.*"))))))
 
 ;; モナーフォントに変更する
 ;; モナーフォントをインストールしておくこと
@@ -5337,7 +5350,9 @@ Otherwise, return nil."
                   (php-completion-mode t))
                 (when (boundp 'php+-mode-map)
                   (define-key php+-mode-map (kbd "C-c s") 'helm-choice)
-                  (define-key php+-mode-map (kbd "C-:") 'phpcmp-complete)))
+                  (define-key php+-mode-map (kbd "C-:") 'phpcmp-complete)
+                  ;; deleteキーが動かない対処
+                  (define-key php+-mode-map (kbd "M-[") nil)))
               (when (boundp 'imenu-auto-rescan)
                 (setq imenu-auto-rescan t))
               (when (locate-library "php-imenu")
