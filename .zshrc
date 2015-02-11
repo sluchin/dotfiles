@@ -260,6 +260,7 @@ function edwin() { command mit-scheme --edit $* &! }
 
 # stty
 stty stop undef
+stty erase ^?
 
 # bindkey
 bindkey -e
