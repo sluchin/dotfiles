@@ -46,6 +46,9 @@
 ;;; ファイル名を保持
 (defconst this-file-name load-file-name)
 
+;;; *Message* バッファ表示
+;;(switch-to-buffer "*Messages*")
+
 ;;; require 時間を計測する
 (defvar benchmark-alist nil
   "Time of require alist.")
@@ -332,16 +335,16 @@
                   "/usr/share/emacs/site-lisp/dictionaries-common") load-path)))
 ;; 優先度高
 (setq load-path
-      (append '((expand-file-name "~/.emacs.d")
-                (expand-file-name "~/.emacs.d/conf")
-                (expand-file-name "~/.emacs.d/el-get/el-get")
-                (expand-file-name "~/.emacs.d/howm")
-                (expand-file-name "~/.emacs.d/emacs-w3m")
-                (expand-file-name "~/.emacs.d/evernote-mode")
-                (expand-file-name "~/.emacs.d/session/lisp")
-                (expand-file-name "~/.emacs.d/term-plus-el")
-                (expand-file-name "~/.emacs.d/pomodoro-technique")
-                (expand-file-name "~/.emacs.d/auto-install")) load-path))
+      (append (list (expand-file-name "~/.emacs.d/lisp")
+                    (expand-file-name "~/.emacs.d/lisp/conf")
+                    (expand-file-name "~/.emacs.d/lisp/el-get/el-get")
+                    (expand-file-name "~/.emacs.d/lisp/howm")
+                    (expand-file-name "~/.emacs.d/lisp/emacs-w3m")
+                    (expand-file-name "~/.emacs.d/lisp/evernote-mode")
+                    (expand-file-name "~/.emacs.d/lisp/session/lisp")
+                    (expand-file-name "~/.emacs.d/lisp/term-plus-el")
+                    (expand-file-name "~/.emacs.d/lisp/pomodoro-technique")
+                    (expand-file-name "~/.emacs.d/lisp/auto-install")) load-path))
 
 ;;; el-get
 ;; (el-get 'sync)
@@ -4321,7 +4324,8 @@ Otherwise, return nil."
        (setq eshell-history-file-name
              (expand-file-name "~/.zsh_history"))
        ;; ヒストリサイズ
-       (setq eshell-history-size 100000))))
+       (setq eshell-history-size 100000)
+       (setq eshell-hist-ignoredups t))))
 
 ;; shell
 ;; 行末空白強調表示をしない
@@ -5391,12 +5395,7 @@ Otherwise, return nil."
                   (auto-complete-mode t)))
               (when (require 'php-completion nil t)
                 (when (fboundp 'php-completion-mode)
-                  (php-completion-mode t))
-                (when (boundp 'php+-mode-map)
-                  (define-key php+-mode-map (kbd "C-c s") 'helm-choice)
-                  (define-key php+-mode-map (kbd "C-:") 'phpcmp-complete)
-                  ;; deleteキーが動かない対処
-                  (define-key php+-mode-map (kbd "M-[") nil)))
+                  (php-completion-mode t)))
               (when (boundp 'imenu-auto-rescan)
                 (setq imenu-auto-rescan t))
               (when (locate-library "php-imenu")
@@ -5417,7 +5416,10 @@ Otherwise, return nil."
               (when (boundp 'php-manual-url)
                 (setq php-manual-url "http://www.phppro.jp/phpmanual/"))
               (when (boundp 'case-fold-search)
-                (setq case-fold-search t)))))
+                (setq case-fold-search t))
+              (when (boundp 'php+-mode-map)
+                (define-key php+-mode-map (kbd "C-c s") 'helm-choice)
+                (define-key php+-mode-map (kbd "C-:") 'phpcmp-complete)))))
 
 (when (locate-library "inf-php")
     (autoload 'inf-php "inf-php"
@@ -5427,7 +5429,11 @@ Otherwise, return nil."
 (when (locate-library "js2-mode")
   (autoload 'js2-mode "js2-mode" nil t)
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-  (add-to-list 'auto-mode-alist '("\\.json\\'" . js2-mode)))
+  (add-to-list 'auto-mode-alist '("\\.json\\'" . js2-mode))
+  (eval-after-load "js2-mode"
+    '(progn
+       (require 'json-reformat nil t)
+       (message "Loading %s (js2-mode)...done" this-file-name))))
 
 ;;; nXML モード
 (when (locate-library "nxml-mode")
