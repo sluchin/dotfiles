@@ -9,6 +9,7 @@ ASPELL_CONF=.aspell.conf
 # emacs
 EMACS_CONF=.emacs.el
 EMACS_DIR=.emacs.d
+EMACS_ESHELL=.eshell
 EMACS_SRC=emacs
 
 # zsh
@@ -112,6 +113,7 @@ autolink $DOTFILES $HOME $ASPELL_CONF
 # emacs
 autolink $DOTFILES $HOME $EMACS_CONF
 autolink $DOTFILES $HOME $EMACS_DIR
+autolink $DOTFILES $HOME $EMACS_ESHELL
 autolink $DOTFILES $SRC_DIR $EMACS_SRC
 
 # zsh

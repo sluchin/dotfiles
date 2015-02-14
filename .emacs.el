@@ -3061,6 +3061,8 @@ Otherwise, return nil."
 ;;; Anything
 ;; (auto-install-batch "anything")
 (when (locate-library "anything-config")
+  (autoload 'anything "anything"
+    "Preconfigured `anything'." t)
   (autoload 'anything-recentf "anything-config"
     "Preconfigured `anything' for `recentf'." t)
   (autoload 'anything-find-files "anything-config"
@@ -3071,6 +3073,10 @@ Otherwise, return nil."
     "Preconfigured `anything' to open files instantly." t)
   (autoload 'anything-bookmarks "anything-config"
     "Preconfigured `anything' for bookmarks." t)
+  (autoload 'anything-complete "anything-complete"
+    "Preconfigured `anything' for complete." t)
+  (autoload 'anything-eshell "anything-eshell"
+    "Preconfigured `anything' for eshell." t)
 
   ;; ファイルリスト作成
   ;; '("\"~/dir1\"" "\"~/dir2\"")
@@ -3090,6 +3096,42 @@ Otherwise, return nil."
         (make-filelist (expand-file-name "~/.filelist") dirs
                        "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$\\|~$\\|#$"))))
 
+  (defvar anything-c-source-eshell
+    `((name . "Files from Current Directory")
+      (candidates . (lambda ()
+                      (with-anything-current-buffer
+                        (directory-files (anything-c-current-directory) t))))
+      (help-message . anything-generic-file-help-message)
+      (mode-line . anything-generic-file-mode-line-string)
+      (candidate-transformer anything-c-highlight-files)
+      (action . (("insert command" . anything-eshell-insert)))
+      (type . file)))
+
+  (defvar anything-c-source-zhistory
+    `((name . ".zhistory")
+      (init . (lambda ()
+                (with-current-buffer (anything-candidate-buffer 'global)
+                  (insert-file-contents (expand-file-name "~/.zhistory")))))
+      (candidates-in-buffer)
+      (action ("insert command" . anything-eshell-zhistory-insert))))
+
+  (defun anything-eshell-insert (dir)
+    (let ((cmd (if (file-directory-p dir) "cd " "find-file ") ))
+      (insert (concat cmd dir))))
+
+  (defun anything-eshell-zhistory-insert (cmd)
+      (insert (substring cmd 15)))
+
+  (defun anything-eshell ()
+    "anything eshell"
+    (interactive)
+    (require 'anything-config nil t)
+    (unless (eq major-mode 'eshell-mode)
+      (eshell))
+    (anything-other-buffer
+     '(anything-c-source-eshell anything-c-source-zhistory)
+     "*anything eshell*"))
+
   (defun anything-choice ()
     "Anything choice."
     (interactive)
@@ -3100,12 +3142,21 @@ Otherwise, return nil."
        (?f "find-file(f)" anything-find-files)
        (?r "recentf(r)"   anything-recentf)
        (?b "bookmarks(b)" anything-bookmarks)
-       (?m "makelist(m)"  anything-make-filelist))))
-  (define-key global-map (kbd "C-c a") 'anything-choice)
+       (?m "makelist(m)"  anything-make-filelist)
+       (?e "eshell(e)"    anything-eshell))))
+  (define-key global-map (kbd "C-c a")
+    (lambda ()
+      (interactive)
+      (cond
+       ((eq major-mode 'eshell-mode)
+        (call-interactively 'anything-eshell))
+       (t (call-interactively 'anything-choice)))))
   (define-key global-map (kbd "C-x a") 'anything-filelist+)
 
   (eval-after-load "anything-config"
     '(progn
+       (when (boundp 'anything-candidate-number-limit)
+         (setq anything-candidate-number-limit 300))
        (when (boundp 'anything-c-filelist-file-name)
          (setq anything-c-filelist-file-name (expand-file-name "~/.filelist")))
        (when (boundp 'anything-grep-candidates-fast-directory-regexp)
@@ -3381,17 +3432,17 @@ Otherwise, return nil."
             (if (and (file-readable-p home-skk-jisyo)
                      (file-readable-p ibus-skk-jisyo))
                 (call-process "skkdic-expr" nil tmp nil
-                              (expand-file-name home-skk-jisyo)
-                              (expand-file-name ibus-skk-jisyo)
-                              (expand-file-name skk-jisyo))
+                              home-skk-jisyo
+                              ibus-skk-jisyo
+                              skk-jisyo)
               (when (file-readable-p home-skk-jisyo)
                 (call-process "skkdic-expr" nil tmp nil
-                              (expand-file-name home-skk-jisyo)
-                              (expand-file-name skk-jisyo)))
+                              home-skk-jisyo
+                              skk-jisyo))
               (when (file-readable-p ibus-skk-jisyo)
                 (call-process "skkdic-expr" nil tmp nil
-                              (expand-file-name ibus-skk-jisyo)
-                              (expand-file-name skk-jisyo))))
+                              ibus-skk-jisyo
+                              skk-jisyo)))
             ;; バッファ切替
             (switch-to-buffer tmp)
             ;; ソートする
@@ -3440,9 +3491,10 @@ Otherwise, return nil."
                       ".skk-jisyo"))
              ; 基本辞書
              (large (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.L")) 
-             ; 連想辞書
-             (lst '((expand-file-name
+                     "~/.emacs.d/ddskk/SKK-JISYO.L"))
+             (lst (list
+                   ; 連想辞書
+                   (expand-file-name
                      "~/.emacs.d/ddskk/SKK-JISYO.assoc")
                     ; 英和辞典
                     (expand-file-name
@@ -4316,6 +4368,11 @@ Otherwise, return nil."
   (add-hook 'eshell-mode-hook
             (lambda ()
               (setq show-trailing-whitespace nil)))
+  (add-hook 'after-init-hook
+            (lambda()
+              (eshell)
+              (switch-to-buffer "*scratch*")))
+
   (eval-after-load "eshell"
     '(progn
        ;; 確認なしでヒストリ保存
@@ -4325,7 +4382,45 @@ Otherwise, return nil."
              (expand-file-name "~/.zsh_history"))
        ;; ヒストリサイズ
        (setq eshell-history-size 100000)
-       (setq eshell-hist-ignoredups t))))
+       (setq eshell-hist-ignoredups t)
+       (message "Loading %s (eshell)...done" this-file-name)))
+
+  (eval-after-load "em-ls"
+    '(progn
+       (defun pat-eshell-ls-find-file-at-mouse-click (event)
+         "Middle click on Eshell's `ls' output to open files.
+     From Patrick Anderson via the wiki."
+         (interactive "e")
+         (ted-eshell-ls-find-file-at-point (posn-point (event-end event))))
+       (defun ted-eshell-ls-find-file ()
+         (interactive)
+         (let ((fname (buffer-substring-no-properties
+                       (previous-single-property-change (point) 'help-echo)
+                       (next-single-property-change (point) 'help-echo))))
+           ;; Remove any leading whitespace, including newline that might
+           ;; be fetched by buffer-substring-no-properties
+           (setq fname (replace-regexp-in-string "^[ \t\n]*" "" fname))
+           ;; Same for trailing whitespace and newline
+           (setq fname (replace-regexp-in-string "[ \t\n]*$" "" fname))
+           (cond
+            ((equal "" fname)
+             (message "No file name found at point"))
+            (fname
+             (find-file fname)))))
+       (let ((map (make-sparse-keymap)))
+         (define-key map (kbd "RET")      'ted-eshell-ls-find-file)
+         (define-key map (kbd "<return>") 'ted-eshell-ls-find-file)
+         (define-key map (kbd "<mouse-2>") 'pat-eshell-ls-find-file-at-mouse-click)
+         (defvar ted-eshell-ls-keymap map))
+       (defadvice eshell-ls-decorated-name (after ted-electrify-ls activate)
+         "Eshell's `ls' now lets you click or RET on file names to open them."
+         (add-text-properties 0 (length ad-return-value)
+                              (list 'help-echo "RET, mouse-2: visit this file"
+                                    'mouse-face 'highlight
+                                    'keymap ted-eshell-ls-keymap)
+                              ad-return-value)
+         ad-return-value)
+       (message "Loading %s (em-ls)...done" this-file-name))))
 
 ;; shell
 ;; 行末空白強調表示をしない
