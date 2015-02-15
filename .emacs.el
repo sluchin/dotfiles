@@ -1936,7 +1936,7 @@
     "Switch to buffers or file-cache entries with 1 command." t)
 
   ;; 有効にする
-  (iswitchb-mode 1)
+  ;(iswitchb-mode 1)
 
   (eval-after-load "iswitchb"
     '(progn
@@ -3112,10 +3112,38 @@ Otherwise, return nil."
       (insert (concat cmd directory))
       (eshell-send-input)))
 
+  (defvar anything-c-source-lastdir
+    `((name . "eshell lastdir")
+      (init . (lambda ()
+                (with-current-buffer (anything-candidate-buffer 'local)
+                  (insert-file-contents eshell-last-dir-ring-file-name))))
+      (candidates-in-buffer)
+      (action ("insert command" . anything-eshell-lastdir-insert))))
+
+  (defun anything-eshell-lastdir-insert (directory)
+    (let ((cmd "cd " ))
+      (if (file-directory-p directory)
+          (progn
+            (insert (concat cmd directory))
+            (eshell-send-input))
+        (message "not found %s" directory))))
+
+  (defvar anything-c-source-ehistory
+    `((name . "eshell history")
+      (init . (lambda ()
+                (with-current-buffer (anything-candidate-buffer 'local)
+                  (insert-file-contents eshell-history-file-name))))
+      (candidates-in-buffer)
+      (action ("insert command" . anything-eshell-history-insert))))
+
+  (defun anything-eshell-history-insert (cmd)
+    (insert cmd)
+    (eshell-send-input))
+
   (defvar anything-c-source-cdr
     `((name . "zsh cdr")
       (init . (lambda ()
-                (with-current-buffer (anything-candidate-buffer 'global)
+                (with-current-buffer (anything-candidate-buffer 'local)
                   (insert-file-contents (expand-file-name "~/.chpwd-recent-dirs")))))
       (candidates-in-buffer)
       (action ("insert command" . anything-eshell-cdr-insert))))
@@ -3129,7 +3157,7 @@ Otherwise, return nil."
   (defvar anything-c-source-zhistory
     `((name . "zsh history")
       (init . (lambda ()
-                (with-current-buffer (anything-candidate-buffer 'global)
+                (with-current-buffer (anything-candidate-buffer 'local)
                   (insert-file-contents (expand-file-name "~/.zhistory")))))
       (candidates-in-buffer)
       (action ("insert command" . anything-eshell-zhistory-insert))))
@@ -3144,7 +3172,11 @@ Otherwise, return nil."
     (unless (eq major-mode 'eshell-mode)
       (eshell))
     (anything-other-buffer
-     '(anything-c-source-cdr anything-c-source-cd anything-c-source-zhistory)
+     '(anything-c-source-lastdir
+       anything-c-source-ehistory
+       anything-c-source-cd
+       anything-c-source-cdr
+       anything-c-source-zhistory)
      "*anything eshell*"))
 
   (defun anything-choice ()
@@ -3186,6 +3218,7 @@ Otherwise, return nil."
 ;;; helm
 ;; git clone https://github.com/emacs-helm/helm
 ;; git clone https://github.com/emacs-helm/helm-ls-git
+;; cd ~/.emacs.d/submodule/helm; make
 (when (locate-library "helm-config")
   (autoload 'helm-mode "helm-config"
     "Applications library for `helm.el'." t)
@@ -3195,12 +3228,27 @@ Otherwise, return nil."
   (when (locate-library "helm-descbinds")
     (autoload 'helm-descbinds-mode "helm-descbinds"
       "A helm frontend for describe-bindings." t))
+  (autoload 'helm-mini "helm-config" nil t)
+  (autoload 'helm-recentf "helm-config" nil t)
+  (autoload 'helm-imenu "helm-config" nil t)
+  (autoload 'helm-bookmark "helm-config" nil t)
+  (autoload 'helm-c-apropos "helm-config" nil t)
+  (autoload 'helm-show-kill-ring "helm-config" nil t)
+  (autoload 'helm-resume "helm-config" nil t)
+  (autoload 'helm-eshell-history "helm-config" nil t)
+  (autoload 'helm-esh-pcomplete "helm-config" nil t)
+
+  (defun helm-status ()
+     (format "helm[%s]: "
+             (if (boundp 'helm-mode)
+                 (if helm-mode "enable" "disable")
+               "disable")))
 
   (defun helm-choice ()
     "Helm choice."
     (interactive)
     (execute-choice-from-list
-     "helm: "
+     (helm-status)
      '((?m "mode(m)"      helm-mode)
        (?n "mini(n)"      helm-mini)
        (?f "recentf(f)"   helm-recentf)
@@ -3210,7 +3258,24 @@ Otherwise, return nil."
        (?a "apropos(a)"   helm-c-apropos)
        (?k "kill-ring(k)" helm-show-kill-ring)
        (?r "resume(r)"    helm-resume))))
-  (define-key global-map (kbd "C-c s") 'helm-choice)
+
+  (defun helm-choice-for-eshell ()
+    "Helm choice."
+    (interactive)
+    (execute-choice-from-list
+     (helm-status)
+     '((?m "mode(m)"      helm-mode)
+       (?h "history(h)"   helm-eshell-history)
+       (?p "pcomplete(p)" helm-esh-pcomplete)
+       (?n "mini(n)"      helm-mini)
+       (?f "recentf(f)"   helm-recentf))))
+
+  (define-key global-map (kbd "C-c s")
+    (lambda ()
+      (interactive)
+      (if (eq major-mode 'eshell-mode)
+          (helm-choice-for-eshell)
+        (helm-choice))))
 
   (eval-after-load "helm-config"
     '(progn
@@ -3283,7 +3348,7 @@ Otherwise, return nil."
                          ((string-match
                            "\\*terminal.*\\*" (buffer-name b)) b)
                          ((string-match
-                           "\\*[e]?shell.*\\*" (buffer-name b)) b)
+                           "^\\*[e]?shell.*\\*" (buffer-name b)) b)
                          ((string-match
                            "\\*\\(Wo\\)?Man[^(-Log)].*\\*" (buffer-name b)) b)
                          ;; それ以外の * で始まるバッファは非表示
@@ -4378,33 +4443,65 @@ Otherwise, return nil."
 
 ;;; 端末エミュレータ
 ;; eshell
-;; 行末空白強調表示をしない
 (when (locate-library "eshell")
+  (defun eshell-chdir-up ()
+    "eshell change directory up."
+    (interactive)
+    (insert "cd ..")
+    (eshell-send-input))
+
+  (defun eshell/open (&optional file)
+    "file open."
+    (if file
+        (find-file file)
+      (switch-to-buffer nil) ))
+
   (add-hook 'eshell-mode-hook
             (lambda ()
-              (setq show-trailing-whitespace nil)))
-  (add-hook 'after-init-hook
-            (lambda()
-              (eshell)
-              (switch-to-buffer "*scratch*")))
+              ;; 行末空白強調表示をしない
+              (setq show-trailing-whitespace nil)
+              (when (and (require 'auto-complete nil t)
+                         (require 'pcomplete nil t))
+                (when (boundp 'ac-modes)
+                  (add-to-list 'ac-modes 'eshell-mode))
+                (when (fboundp 'ac-define-source)
+                  (ac-define-source pcomplete
+                    '((candidates . pcomplete-completions))))
+                (when (boundp 'ac-sources)
+                  (setq ac-sources
+                        '(ac-source-pcomplete
+                          ac-source-filename
+                          ac-source-files-in-current-dir
+                          ac-source-words-in-buffer
+                          ac-source-dictionary)))
+                (when (boundp 'eshell-mode-map)
+                  (define-key eshell-mode-map (kbd "C-i") 'auto-complete)
+                  (define-key eshell-mode-map (kbd "C-u") 'eshell-chdir-up)))))
 
   (eval-after-load "eshell"
     '(progn
        ;; 確認なしでヒストリ保存
-       (setq eshell-ask-to-save-history (quote always))
+       (when (boundp 'eshell-ask-to-save-history)
+           (setq eshell-ask-to-save-history (quote always)))
        ;; zsh のヒストリと共有
-       (setq eshell-history-file-name
-             (expand-file-name "~/.zsh_history"))
+       (when (boundp 'eshell-history-file-name)
+         (setq eshell-history-file-name
+               (expand-file-name "~/.zhistory")))
+       ;; ディレクトリ移動履歴サイズ
+       (when (boundp 'eshell-last-dir-ring-size)
+         (setq eshell-last-dir-ring-size 100000))
        ;; ヒストリサイズ
-       (setq eshell-history-size 100000)
-       (setq eshell-hist-ignoredups t)
+       (when (boundp 'eshell-history-size)
+         (setq eshell-history-size 100000))
+       (when (boundp 'eshell-hist-ignoredups)
+         (setq eshell-hist-ignoredups t))
        (message "Loading %s (eshell)...done" this-file-name)))
 
   (eval-after-load "em-ls"
     '(progn
        (defun pat-eshell-ls-find-file-at-mouse-click (event)
          "Middle click on Eshell's `ls' output to open files.
-     From Patrick Anderson via the wiki."
+          From Patrick Anderson via the wiki."
          (interactive "e")
          (ted-eshell-ls-find-file-at-point (posn-point (event-end event))))
        (defun ted-eshell-ls-find-file ()
@@ -4422,11 +4519,7 @@ Otherwise, return nil."
              (message "No file name found at point"))
             (fname
              (find-file fname)))))
-       (let ((map (make-sparse-keymap)))
-         (define-key map (kbd "RET")      'ted-eshell-ls-find-file)
-         (define-key map (kbd "<return>") 'ted-eshell-ls-find-file)
-         (define-key map (kbd "<mouse-2>") 'pat-eshell-ls-find-file-at-mouse-click)
-         (defvar ted-eshell-ls-keymap map))
+
        (defadvice eshell-ls-decorated-name (after ted-electrify-ls activate)
          "Eshell's `ls' now lets you click or RET on file names to open them."
          (add-text-properties 0 (length ad-return-value)
@@ -4435,11 +4528,17 @@ Otherwise, return nil."
                                     'keymap ted-eshell-ls-keymap)
                               ad-return-value)
          ad-return-value)
+
+       (let ((map (make-sparse-keymap)))
+         (define-key map (kbd "RET")      'ted-eshell-ls-find-file)
+         (define-key map (kbd "<return>") 'ted-eshell-ls-find-file)
+         (define-key map (kbd "<mouse-2>") 'pat-eshell-ls-find-file-at-mouse-click)
+         (defvar ted-eshell-ls-keymap map))
        (message "Loading %s (em-ls)...done" this-file-name))))
 
 ;; shell
-;; 行末空白強調表示をしない
 (when (locate-library "shell")
+  ;; 行末空白強調表示をしない
   (add-hook 'shell-mode-hook
             (lambda ()
               (setq show-trailing-whitespace nil))))
