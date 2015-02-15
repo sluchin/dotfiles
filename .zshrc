@@ -68,8 +68,6 @@ fi
 # cdr
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
 add-zsh-hook chpwd chpwd_recent_dirs
-zstyle ':chpwd:*' recent-dirs-max 100000
-zstyle ':chpwd:*' recent-dirs-default true
 
 if [ -d $ZSH_DIR ]; then
     files=(
@@ -189,7 +187,7 @@ zstyle ':completion:*:date:*' fake \
     '+%Y-%m-%d %H\:%M\:%S: 西暦-月-日 時\:分\:秒'
 
 # zaw
-zstyle ':chpwd:*' recent-dirs-max 5000
+zstyle ':chpwd:*' recent-dirs-max 100000
 zstyle ':chpwd:*' recent-dirs-default yes
 zstyle ':completion:*' recent-dirs-insert both
 zstyle ':filter-select' case-insensitive yes
@@ -199,6 +197,7 @@ alias pu=pushd
 alias po=popd
 alias dirs='dirs -v'
 alias d='dirs'
+alias q='echo $?'
 alias eject='eject -v'
 alias out='eject'
 alias in='eject -t'

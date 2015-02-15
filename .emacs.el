@@ -3096,28 +3096,43 @@ Otherwise, return nil."
         (make-filelist (expand-file-name "~/.filelist") dirs
                        "CVS\\|\\\.svn/\\|\\\.git/\\|\\\.o$\\|\\\.elc$\\|~$\\|#$"))))
 
-  (defvar anything-c-source-eshell
-    `((name . "Files from Current Directory")
+  (defvar anything-c-source-cd
+    `((name . "current directory")
       (candidates . (lambda ()
                       (with-anything-current-buffer
                         (directory-files (anything-c-current-directory) t))))
       (help-message . anything-generic-file-help-message)
       (mode-line . anything-generic-file-mode-line-string)
       (candidate-transformer anything-c-highlight-files)
-      (action . (("insert command" . anything-eshell-insert)))
+      (action . (("insert command" . anything-eshell-cd-insert)))
       (type . file)))
 
+  (defun anything-eshell-cd-insert (directory)
+    (let ((cmd (if (file-directory-p directory) "cd " "find-file ")))
+      (insert (concat cmd directory))
+      (eshell-send-input)))
+
+  (defvar anything-c-source-cdr
+    `((name . "zsh cdr")
+      (init . (lambda ()
+                (with-current-buffer (anything-candidate-buffer 'global)
+                  (insert-file-contents (expand-file-name "~/.chpwd-recent-dirs")))))
+      (candidates-in-buffer)
+      (action ("insert command" . anything-eshell-cdr-insert))))
+
+  (defun anything-eshell-cdr-insert (directory)
+    (let ((cmd "cd " ))
+      (when (string-match "\\(^\\$'\\)\\(.*\\)\\('$\\)" directory)
+        (insert (concat cmd (match-string 2 directory)))
+        (eshell-send-input))))
+
   (defvar anything-c-source-zhistory
-    `((name . ".zhistory")
+    `((name . "zsh history")
       (init . (lambda ()
                 (with-current-buffer (anything-candidate-buffer 'global)
                   (insert-file-contents (expand-file-name "~/.zhistory")))))
       (candidates-in-buffer)
       (action ("insert command" . anything-eshell-zhistory-insert))))
-
-  (defun anything-eshell-insert (dir)
-    (let ((cmd (if (file-directory-p dir) "cd " "find-file ") ))
-      (insert (concat cmd dir))))
 
   (defun anything-eshell-zhistory-insert (cmd)
       (insert (substring cmd 15)))
@@ -3129,7 +3144,7 @@ Otherwise, return nil."
     (unless (eq major-mode 'eshell-mode)
       (eshell))
     (anything-other-buffer
-     '(anything-c-source-eshell anything-c-source-zhistory)
+     '(anything-c-source-cdr anything-c-source-cd anything-c-source-zhistory)
      "*anything eshell*"))
 
   (defun anything-choice ()
