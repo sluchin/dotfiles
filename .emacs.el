@@ -1,31 +1,33 @@
 ;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
-;; Copyright (C) 2012 2013 2014
+;; Copyright (C) 2012 2013 2014 2015
 
 ;; Author: Tetsuya Higashi
 
-;;; Emacs バージョン
+;;; Version
+;; Emacs
 ;; 2013-04-16
 ;; GNU Emacs 24.3.1 (i686-pc-linux-gnu, GTK+ Version 3.4.2)
 ;; 2012-12-28
 ;; GNU Emacs 24.2.1 (i686-pc-linux-gnu, GTK+ Version 2.24.10)
 ;; 2012-11-27
 ;; GNU Emacs 23.3.1 (i686-pc-linux-gnu, GTK+ Version 2.24.10)
-
 ;; 2013-07-02
 ;; GNU Emacs 21.4.1 (CentOS release 5.9)
 
-;;; 起動オプション
+;;; Options
 ;; 設定を読み込まない起動オプション
 ;; emacs -q --no-site-file
 ;; 通常の起動オプション
 ;; emacs -g 100x50-100+0
 
-;;; NTEmacs 設定
+;;; Configuration
+;; NTEmacs
 ;; Cygwin の Base をインストールしパスを通す
 ;; 環境変数 HOME を任意のディレクトリに設定する
 ;; 環境変数 CYGWIN に "nodosfilewarning" を設定する
 
+;;; Installation:
 ;; emacs ソース
 ;; git clone git://git.savannah.gnu.org/emacs.git
 ;; apt-get
@@ -37,6 +39,22 @@
 ;; (el-get-install-all)
 ;; バイトコンパイル
 ;; (byte-recompile-directory (expand-file-name "~/.emacs.d") 0 t)
+
+;;; License:
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License
+;; as published by the Free Software Foundation; either version 3
+;; of the License, or (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING. If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Code:
 
@@ -4475,7 +4493,7 @@ Otherwise, return nil."
                           ac-source-words-in-buffer
                           ac-source-dictionary)))
                 (when (boundp 'eshell-mode-map)
-                  (define-key eshell-mode-map (kbd "C-i") 'auto-complete)
+                  ;(define-key eshell-mode-map (kbd "C-i") 'auto-complete)
                   (define-key eshell-mode-map (kbd "C-u") 'eshell-chdir-up)))))
 
   (eval-after-load "eshell"
@@ -5636,13 +5654,31 @@ Otherwise, return nil."
 
 ;; Java Script
 (when (locate-library "js2-mode")
-  (autoload 'js2-mode "js2-mode" nil t)
+  (autoload 'js2-mode "js2-mode" "Improved JavaScript editing mode" t)
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-  (add-to-list 'auto-mode-alist '("\\.json\\'" . js2-mode))
+
   (eval-after-load "js2-mode"
     '(progn
-       (require 'json-reformat nil t)
        (message "Loading %s (js2-mode)...done" this-file-name))))
+
+;; JSON
+(when (and (locate-library "json-mode")
+           (locate-library "json-snatcher")
+           (locate-library "json-reformat"))
+  (autoload 'json-mode "json-mode" "Major mode for editing JSON files" t)
+  (add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
+
+  (eval-after-load "json-mode"
+    '(progn
+       (message "Loading %s (json-mode)...done" this-file-name))))
+
+(when (locate-library "json-reformat")
+  (autoload 'json-reformat-region "json-reformat"
+    "Reformatting tool for JSON" t)
+
+  (eval-after-load "json-reformat"
+    '(progn
+       (message "Loading %s (json-reformat)...done" this-file-name))))
 
 ;;; nXML モード
 (when (locate-library "nxml-mode")
@@ -5706,6 +5742,7 @@ Otherwise, return nil."
   (eval-after-load "web-mode"
     '(progn
        (message "Loading %s (web-mode)...done" this-file-name))))
+
 ;;; CSS
 ;; git clone https://github.com/zenozeng/css-eldoc.git
 (when (locate-library "css-mode")
