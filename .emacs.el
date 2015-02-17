@@ -3236,7 +3236,8 @@ Otherwise, return nil."
 ;;; helm
 ;; git clone https://github.com/emacs-helm/helm
 ;; git clone https://github.com/emacs-helm/helm-ls-git
-;; cd ~/.emacs.d/submodule/helm; make
+;; (cd "~/.emacs.d/submodule/helm")
+;; (compile "make -k" "~/.emacs.d/submodule/helm")
 (when (locate-library "helm-config")
   (autoload 'helm-mode "helm-config"
     "Applications library for `helm.el'." t)
