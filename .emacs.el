@@ -442,7 +442,10 @@
 ;;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
 
-;;; tty対策
+;;; zsh 補完関数ファイル
+(add-to-list 'magic-mode-alist '("^#compdef" . shell-script-mode))
+
+;;; tty 対策
 (when tty-erase-char
   (define-key global-map
     (string tty-erase-char) 'backward-delete-char-untabify)

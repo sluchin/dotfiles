@@ -156,12 +156,16 @@ zstyle ':completion:*' completer \
 # オブジェクトファイルは補完しない
 zstyle ':completion:*:*:(^(rm|unlink|mv)):*:*' \
     ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
+zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#'
+
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
 zstyle ':completion:*:cd:*' tag-order local-directories path-directories
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+
 # 大文字小文字の区別をしない
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z} r:|[-_.]=**'
 # セパレータ
-zstyle ':completion:*' list-separator '=>'
+zstyle ':completion:*' list-separator '-->'
 
 zstyle ':completion:*' format '%F{white}%d%f'
 zstyle ':completion:*' group-name ''
@@ -172,19 +176,30 @@ if [ ! -d $ZSH_CACHE_DIR ]; then
     mkdir -p $ZSH_CACHE_DIR
 fi
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
-zstyle ':completion:*' use-cache yes
+zstyle ':completion:*' use-cache yes  # apt-get update キャッシュを使う
 zstyle ':completion:*' verbose yes    # 詳細な情報を使う
 zstyle ':completion:*:manuals' separate-sections true
 zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH" # sudo 時には sudo 用のパスも使う
+zstyle ':completion:*' format '%B%d%b'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' group-name ''
+
+# 変数の添字の補完
+zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+# man の補完をセクション番号別に表示させる
+zstyle ':completion:*:manuals' separate-sections true
 
 # ディレクトリで区切る
 zstyle ':zle:*' word-chars " /=;@:{},|"
 zstyle ':zle:*' word-style unspecified
 
-# fake
+# date コマンド補完
 zstyle ':completion:*:date:*' fake \
     '+%Y-%m-%d: 西暦-月-日' \
     '+%Y-%m-%d %H\:%M\:%S: 西暦-月-日 時\:分\:秒'
+
+compdef _gnu_generic emacs emacsclient \
+        emacs-snapshot emacsclient.emacs-snapshot
 
 # zaw
 zstyle ':chpwd:*' recent-dirs-max 100000
@@ -445,3 +460,35 @@ function print_known_hosts (){
     fi
 }
 _cache_hosts=( $(print_known_hosts) $_cache_hosts)
+
+function zload ()
+{
+    local file files dir dirs
+    typeset -U dirs
+    if [[ "${#}" -le 0 ]]; then
+        files=($ZSH_DIR/completion/*[^~](.))
+    else
+        files="$@"
+    fi
+
+    for file in $files
+    do
+        if (( $+functions["${file:t}"] )) ; then
+            echo "unfunction ${file:t}"
+            unfunction "${file:t}"
+        fi
+        echo "autoload ${file:t}"
+        FPATH="${file:h:a}" autoload -Uz +X "${file:t}"
+
+        if [[ "${file:t}" == _* ]]; then
+            dirs=($dirs "${file:h:a}")
+        fi
+    done
+
+    if [[ $dirs ]]; then
+        echo $dirs | sed -e"s# #\n#g"
+        echo "compinit"
+        fpath=($dirs $fpath) compinit
+    fi
+}
+zle -N zload

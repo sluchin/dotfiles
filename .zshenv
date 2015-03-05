@@ -2,7 +2,7 @@
 # initial setup file for both interactive and noninteractive zsh
 
 typeset -T PYTHONPATH pythonpath
-typeset -U path fpath cdpath pythonpath
+typeset -U path fpath cdpath manpath pythonpath
 
 path=(
     $HOME/bin(N-/)
@@ -18,10 +18,12 @@ path=(
 )
 
 fpath=(
+    /usr/local/share/zsh/*/functions*(N-/)
+    /usr/share/zsh/*/functions*(N-/)
     $HOME/.zsh.d/*(N-/)
     $HOME/.zsh.d/functions/*(N-/)
-    $HOME/.zsh.d/completion(N-/)
-    $HOME/.zsh.d/completion/zsh-completions/src(N-/)
+    $HOME/.zsh.d/completion*(N-/)
+    $HOME/.zsh.d/completion/zsh-completions/src*(N-/)
     $HOME/.zsh.d/plugin/*(N-/)
     $HOME/.zsh.d/plugin/*/*(N-/)
     $HOME/.zsh.d/plugin/*/*/*(N-/)
@@ -59,4 +61,3 @@ export LANG
 
 ZSHENV_LOCAL=$HOME/.zshenv.local
 [[ -f $ZSHENV_LOCAL ]] && source $ZSHENV_LOCAL
-
