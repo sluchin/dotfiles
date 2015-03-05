@@ -59,7 +59,11 @@ autoload -Uz zmv
 autoload -Uz select-word-style
 select-word-style default
 
-plugins=(git github perl symfony2)
+plugins=(
+    adb cp gas gem git github perl pod postgres python
+    rsync ruby scala sudo svn symfony2
+    vagrant tmux yum
+)
 
 if [ -f $ZSH/oh-my-zsh.sh ]; then
     source $ZSH/oh-my-zsh.sh
@@ -159,8 +163,8 @@ zstyle ':completion:*:*:(^(rm|unlink|mv)):*:*' \
 zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#'
 
 # カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
-zstyle ':completion:*:cd:*' tag-order local-directories path-directories
-zstyle ':completion:*:cd:*' ignore-parents parent pwd
+#zstyle ':completion:*:cd:*' tag-order local-directories path-directories
+#zstyle ':completion:*:cd:*' ignore-parents parent pwd
 
 # 大文字小文字の区別をしない
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z} r:|[-_.]=**'
@@ -362,14 +366,16 @@ if [ -f "$HOME/dotfiles/.autotmux" ]; then
     fi
 fi
 
-function cdup() {
+function cdup ()
+{
     cd .. && zle reset-prompt
     echo `pwd`
 }
 zle -N cdup
 bindkey '^U' cdup
 
-function dired () {
+function dired ()
+{
     dir=${1:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $dir"
@@ -382,14 +388,16 @@ function dired () {
 }
 zle -N dired
 
-function woman () {
+function woman ()
+{
     topic=$1
     echo "$0 $topic"
     emacsclient -e "(woman \"$topic\")"
 }
 zle -N woman
 
-function rgrep () {
+function rgrep ()
+{
     regex=$1
     files=${2:-"\*"}
     dir=${3:-"$PWD"}
@@ -405,7 +413,8 @@ function rgrep () {
 }
 zle -N rgrep
 
-function magit-status () {
+function magit-status ()
+{
     dir=${1:-"$PWD"}
     [ ! -d $dir ] && dir="$PWD/$dir"
     echo "$0 $dir"
@@ -418,7 +427,8 @@ function magit-status () {
 }
 zle -N magit-status
 
-function cde() {
+function cde ()
+{
     EMACS_CWD=`emacsclient -e "
 (expand-file-name
 (with-current-buffer
@@ -431,18 +441,21 @@ default-directory))" | sed 's/^"\(.*\)"$/\1/'`
 }
 zle -N cde
 
-function e() {
+function e ()
+{
     emacsclient $* ||
     emacs $*
 }
 zle -N e
 
-function ekill() {
+function ekill ()
+{
     emacsclient -e "(progn (defun yes-or-no-p (p) t) (kill-emacs))"
 }
 zle -N ekill
 
-function tmuxload() {
+function tmuxload ()
+{
     file=$1
     if [ -r "$file" ]; then
         tac $file | while read line; \
@@ -454,7 +467,8 @@ function tmuxload() {
 }
 zle -N tmuxload
 
-function print_known_hosts (){
+function print_known_hosts ()
+{
     if [ -f $HOME/.ssh/known_hosts ]; then
         cat $HOME/.ssh/known_hosts | tr ',' ' ' | cut -d' ' -f1
     fi
@@ -465,12 +479,13 @@ function zload ()
 {
     local file files dir dirs
     typeset -U dirs
-    if [[ "${#}" -le 0 ]]; then
+    if [ "${#}" -le 0 ]; then
         files=($ZSH_DIR/completion/*[^~](.))
     else
         files="$@"
     fi
 
+    dirs=()
     for file in $files
     do
         if (( $+functions["${file:t}"] )) ; then
@@ -485,7 +500,7 @@ function zload ()
         fi
     done
 
-    if [[ $dirs ]]; then
+    if [ "${#dirs}" -gt 0 ]; then
         echo $dirs | sed -e"s# #\n#g"
         echo "compinit"
         fpath=($dirs $fpath) compinit
