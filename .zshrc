@@ -20,7 +20,7 @@ ZSH_THEME="bureau"
 # CASE_SENSITIVE="true"
 
 # Uncomment this to disable bi-weekly auto-update checks
-# DISABLE_AUTO_UPDATE="true"
+DISABLE_AUTO_UPDATE="true"
 
 # Uncomment to change how often before auto-updates occur? (in days)
 # export UPDATE_ZSH_DAYS=13
@@ -46,8 +46,15 @@ ZSH_THEME="bureau"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 
-# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.bash
-# curl -O https://raw.github.com/git/git/master/contrib/completion/git-completion.zsh
+plugins=(
+    adb cp gas gem git github perl pod postgres python
+    rsync ruby scala sudo svn symfony2
+    vagrant tmux yum
+)
+
+if [ -f $ZSH/oh-my-zsh.sh ]; then
+    source $ZSH/oh-my-zsh.sh
+fi
 
 # autoload
 autoload -Uz compinit
@@ -58,16 +65,6 @@ colors
 autoload -Uz zmv
 autoload -Uz select-word-style
 select-word-style default
-
-plugins=(
-    adb cp gas gem git github perl pod postgres python
-    rsync ruby scala sudo svn symfony2
-    vagrant tmux yum
-)
-
-if [ -f $ZSH/oh-my-zsh.sh ]; then
-    source $ZSH/oh-my-zsh.sh
-fi
 
 # cdr
 autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
@@ -170,7 +167,6 @@ zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#'
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z} r:|[-_.]=**'
 # セパレータ
 zstyle ':completion:*' list-separator '-->'
-
 zstyle ':completion:*' format '%F{white}%d%f'
 zstyle ':completion:*' group-name ''
 
