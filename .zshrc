@@ -469,7 +469,7 @@ function print_known_hosts ()
         cat $HOME/.ssh/known_hosts | tr ',' ' ' | cut -d' ' -f1
     fi
 }
-_cache_hosts=( $(print_known_hosts) $_cache_hosts)
+_cache_hosts=($(print_known_hosts) $_cache_hosts)
 
 function zload ()
 {
@@ -484,7 +484,7 @@ function zload ()
     dirs=()
     for file in $files
     do
-        if (( $+functions["${file:t}"] )) ; then
+        if (($+functions["${file:t}"])) ; then
             echo "unfunction ${file:t}"
             unfunction "${file:t}"
         fi
@@ -503,3 +503,14 @@ function zload ()
     fi
 }
 zle -N zload
+
+function git-branchall ()
+{
+    for remote_branch in `git branch -a | grep remotes | grep -v HEAD | grep -v master`; do
+        remote_name="$(echo -n "$remote_branch" | cut -d/ -f2)"
+        branch_name="$(echo -n "$remote_branch" | cut -d/ -f3)"
+        git checkout -b $branch_name $remote_name/$branch_name
+    done
+    git checkout master
+}
+zle -N git-branchall
