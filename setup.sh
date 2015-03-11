@@ -32,6 +32,7 @@ GIT_CONF=.gitconfig
 GIT_IGNORE=.gitignore.local
 GIT_DIFF=diff-highlight
 GIT_MELD=git-meld.pl
+GIT_BRANCHALL=git-branchall
 
 # mysql
 MYSQL_CONF=.my.cnf
@@ -141,6 +142,7 @@ if [ ! -d $HOME/bin ]; then
 fi
 autolink $DOTFILES/bin $HOME/bin $GIT_DIFF
 autolink $DOTFILES/bin $HOME/bin $GIT_MELD
+autolink $DOTFILES/bin $HOME/bin $GIT_BRANCHALL
 
 # mysql
 autolink $DOTFILES $HOME $MYSQL_CONF
