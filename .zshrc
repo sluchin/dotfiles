@@ -143,7 +143,7 @@ unsetopt sh_word_split      # クオートしていない変数を単語分割�
 # 矢印で補完を選択
 zstyle ':completion:*:default' menu select=2
 zstyle ':completion:*:processes' menu yes select=2
-zstyle ':completion:*' menu select
+zstyle ':completion:*' menu select interactive
 zstyle ':completion:*' keep-prefix
 zstyle ':completion:*' completer \
     _oldlist \
@@ -216,15 +216,15 @@ alias q='echo $?'
 alias eject='eject -v'
 alias out='eject'
 alias in='eject -t'
-alias ls='ls --color=auto'
-alias ll='ls --color=auto -ld ^*~'
-alias la='ls --color=auto -ad ^*~'
+alias ls='ls --color=always'
+alias ll='ls --color=always -ld ^*~'
+alias la='ls --color=always -ad ^*~'
 if type trash-put >/dev/null 2>&1; then
     alias rm='trash-put'
 fi
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
+alias grep='grep --color=always'
+alias fgrep='fgrep --color=always'
+alias egrep='egrep --color=always'
 alias g='git --no-pager'
 alias t='tail -f'
 alias gterm='gnome-terminal --geometry=130x40'

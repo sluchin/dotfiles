@@ -363,6 +363,7 @@
                     (expand-file-name "~/.emacs.d/lisp/term-plus-el")
                     (expand-file-name "~/.emacs.d/lisp/pomodoro-technique")
                     (expand-file-name "~/.emacs.d/lisp/auto-install")) load-path))
+;; (expand-file-name "~/.emacs.d/submodule/org-mode/lisp")
 
 ;;; el-get
 ;; (el-get 'sync)
@@ -2429,6 +2430,16 @@ Otherwise, return nil."
        (?d "dired(d)"     org-dired)
        (?k "kill(k)"      kill-org-all-buffer))))
   (define-key global-map (kbd "C-c o") 'org-choice))
+
+;; org-jekyll 設定
+(when (locate-library "ox-jekyll")
+  (autoload 'ox-jekyll "org-jekyll"
+    "Export Jekyll articles using org-mode." t)
+
+  (eval-after-load "org-jekyll"
+    '(progn
+
+       (message "Loading %s (org-jekyll)...done" this-file-name))))
 
 ;;; ファイル内のカーソル位置を記録する
 (when (eval-and-compile (require 'saveplace nil t))
