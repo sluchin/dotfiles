@@ -1533,6 +1533,12 @@
          (add-to-list 'dired-compress-file-suffixes
                       '("\\.zip\\'" ".zip" "unzip")))
 
+       ;; ファイルのフルパスを取得.
+       (defun dired-copy-pathname-as-kill ()
+         "Copy pathname."
+         (interactive)
+         (dired-copy-filename-as-kill 0))
+
        ;; コマンド実行
        (defun dired-run-command (command)
          "Open file in command."
@@ -1691,6 +1697,8 @@
 
        (when (boundp 'dired-mode-map)
          (let ((map dired-mode-map))
+           ;; フルパスをコピー
+           (define-key map (kbd "W") 'dired-copy-pathname-as-kill)
            ;; firefox で開く
            (define-key map (kbd "f") 'dired-run-firefox)
            ;; libreoffice で開く
@@ -1706,7 +1714,7 @@
            ;; バックアップファイル
            (define-key map (kbd "b") 'dired-make-backup)
            ;; 文字コードをトグルする
-           (define-key map (kbd "c") 'dired-file-name-jp)
+           (define-key map (kbd "M-c") 'dired-file-name-jp)
            ;; kill する
            (define-key map (kbd "M-k") 'dired-dwim-quit-window)
            ;; 全て kill する
@@ -5261,6 +5269,9 @@ Otherwise, return nil."
         (add-to-list 'ac-sources source)))))
 
 (when (locate-library "cc-mode")
+  (when (locate-library "hideif")
+    (autoload 'hide-ifdef-mode "hideif" "hides selected code within ifdef." t)
+    (autoload 'hide-ifdefs "hideif" "hides selected code within ifdef." t))
   (font-lock-add-keywords
    'c-mode
    ;; TODO, FIXME を強調表示
@@ -5283,6 +5294,28 @@ Otherwise, return nil."
                 (setq tab-width 4))
               (when (boundp 'indent-tabs-mode) ; スペース
                 (setq indent-tabs-mode nil))
+              (when (fboundp 'cpp-highlight-buffer)
+                (let ((lisp "~/.emacs.d/.cpp.el"))
+                  (when (file-exists-p
+                         (expand-file-name lisp))
+                    (load-file lisp)))
+                (when (boundp 'cpp-known-face)
+                  (setq cpp-known-face 'default))
+                (when (boundp 'cpp-unknown-face)
+                  (setq cpp-unknown-face 'default))
+                (when (boundp 'cpp-known-writable)
+                  (setq cpp-known-writable 't))
+                (when (boundp 'cpp-unknown-writable)
+                  (setq cpp-unknown-writable 't))
+                (when (boundp 'cpp-edit-list)
+                  (setq cpp-edit-list '(("0" font-lock-comment-face default both)
+                                        ("1" default font-lock-comment-face both))))
+                (cpp-highlight-buffer t))
+              ;; (install-elisp-from-emacswiki "hideif.el")
+              (when (fboundp 'hide-ifdef-mode)
+                (hide-ifdef-mode t))
+              ;; (when (fboundp 'hide-ifdefs)
+              ;;   (hide-ifdefs))
               ;; (when (and (require 'auto-complete nil t)
               ;;            (require 'auto-complete-config nil t))
               ;;   (add-ac-sources  '(ac-source-dictionary
