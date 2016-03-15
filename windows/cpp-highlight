@@ -1,0 +1,16 @@
+  (dolist (pg '("gray" "invisible"))
+    (let ((cmd (intern (format "cpp-%s" pg)))
+          (lisp (format "~/.emacs.d/cpp-%s.el" pg)))
+      (defalias cmd
+        `(lambda ()
+           "cpp-highlight-buffer."
+           (interactive)
+           (when (file-exists-p
+                  (expand-file-name ,lisp))
+             (load-file ,lisp)
+             (message "Loading %s...done" ,lisp))
+           (when (fboundp 'cpp-highlight-buffer)
+             (cpp-highlight-buffer t)
+             (message "Loading cpp-highlight-buffer=>t...done"))
+           (message "Loading %s...done" ,pg)))))
+  (cpp-gray)
