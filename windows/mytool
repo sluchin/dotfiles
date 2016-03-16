@@ -1,0 +1,4280 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use constant TRUE  => 1;
+use constant FALSE => 0;
+
+use File::Basename qw/basename dirname/;
+use File::Copy qw/copy/;
+use File::Path qw/mkpath rmtree/;
+use File::Temp qw/tempfile/;
+use Cwd qw/getcwd/;
+use Getopt::Long qw/GetOptions Configure/;
+use Encode qw/encode_utf8 decode_utf8 is_utf8/;
+use File::Spec::Functions qw/catfile/;
+use Time::HiRes qw/sleep/;
+use POSIX qw/strftime locale_h/;
+use Expect;
+use Term::UI;
+use Term::ReadLine;
+
+our $VERSION = do { my @r = ( q$Revision: 0.01 $ =~ /\d+/g );
+    sprintf "%d." . "%02d" x $#r, @r if (@r);
+};
+
+my $progname = basename($0);
+my $progdir;
+
+BEGIN {
+    $progdir = dirname( readlink($0) || $0 );
+    push( @INC, catfile( $progdir, 'lib' ) );
+}
+use YAML::Tiny;
+
+# ステータス
+my %stathash = (
+    'EX_OK' => 0,    # 正常終了
+    'EX_NG' => 1,    # 異常終了
+);
+
+# デフォルトオプション
+my %opt = (
+    'file'     => '',
+    'user'     => '',
+    'pass'     => '',
+    'host'     => '',
+    'base'     => undef,
+    'save'     => undef,
+    'update'   => 0,
+    'updirs'   => 0,
+    'revision' => 0,
+    'revert'   => undef,
+    'extract'  => undef,
+    'status'   => undef,
+    'info'     => 0,
+    'log'      => 0,
+    'diff'     => 0,
+    'meld'     => undef,
+    'date'     => undef,
+    'sed'      => undef,
+    'dellog'   => 0,
+    'add'      => undef,
+    'commit'   => undef,
+    'deploy'   => undef,
+    'sync'     => 0,
+    'make'     => undef,
+    '13make'   => undef,
+    'target'   => '',
+    'module'   => undef,
+    'fork'     => undef,
+    'rebuild'  => 0,
+    'klocwork' => undef,
+    'qadiff'   => undef,
+    'command'  => undef,
+    'clear'    => 0,
+    'check'    => 0,
+    'tree'     => 0,
+    'review'   => 0,
+    'mail'     => 0,
+    'mount'    => undef,
+    'start'    => undef,
+    'crypt'    => undef,
+    'oscrypt'  => undef,
+    'demo'     => 0,
+    'gui'      => 0,
+    'debug'    => 0,
+    'vorbis'   => 0,
+    'help'     => 0,
+    'version'  => 0,
+);
+
+# 設定ファイル読み込み必要なオプションを登録
+my %need_conf;
+while ( my ( $key, $value ) = each(%opt) ) {
+    foreach (
+        'save',     'update', 'updirs', 'revision', 'revert',
+        'extract',  'status', 'info',   'log',      'diff',
+        'meld',     'date',   'sed',    'dellog',   'add',
+        'commit',   'deploy', 'sync',   'make',     '13make',
+        'klocwork', 'qadiff', 'clear',  'check',    'tree',
+        'review',   'mail'
+      )
+    {
+        if ( $key eq $_ ) {
+            if ( !defined $value ) {
+                push( @{ $need_conf{'undef'} }, $key );
+            }
+            elsif ( $value == 0 ) {
+                push( @{ $need_conf{'0'} }, $key );
+            }
+        }
+    }
+}
+
+# バージョン情報表示
+sub print_version {
+    print "$progname version " . $VERSION, "\n";
+    print '  running on Perl version '
+      . join( ".", map { $_ ||= 0; $_ * 1 } ( $] =~ /(\d)\.(\d{3})(\d{3})?/ ) ),
+      "\n";
+    exit( $stathash{'EX_OK'} );
+}
+
+# ヘルプ表示
+sub usage {
+    require Pod::Usage;
+    import Pod::Usage;
+    pod2usage();
+}
+
+# オプション引数
+Getopt::Long::Configure(
+    qw{posix_default no_ignore_case no_auto_abbrev no_getopt_compat gnu_compat}
+);
+GetOptions(
+    'file|f=s'   => \$opt{'file'},
+    'user|u=s'   => \$opt{'user'},
+    'pass|p=s'   => \$opt{'pass'},
+    'host=s'     => \$opt{'host'},
+    'base|b=s'   => \$opt{'base'},
+    'save|s:s'   => \$opt{'save'},
+    'update'     => \$opt{'update'},
+    'updirs'     => \$opt{'updirs'},
+    'revision|r' => \$opt{'revision'},
+    'revert:s'   => \$opt{'revert'},
+    'extract:s'  => \$opt{'extract'},
+    'status:s'   => \$opt{'status'},
+    'info'       => \$opt{'info'},
+    'log'        => \$opt{'log'},
+    'diff|d'     => \$opt{'diff'},
+    'meld:s'     => \$opt{'meld'},
+    'date=s'     => \$opt{'date'},
+    'sed=s'      => \$opt{'sed'},
+    'dellog'     => \$opt{'dellog'},
+    'add:s'      => \@{ $opt{'add'} },
+    'commit:s'   => \@{ $opt{'commit'} },
+    'deploy:s'   => \$opt{'deploy'},
+    'sync'       => \$opt{'sync'},
+    'make:s'     => \$opt{'make'},
+    '13make:s'   => \$opt{'13make'},
+    'target=s'   => \$opt{'target'},
+    'module:s'   => \@{ $opt{'module'} },
+    'fork:s'     => \$opt{'fork'},
+    'rebuild'    => \$opt{'rebuild'},
+    'klocwork:s' => \$opt{'klocwork'},
+    'qadiff:s'   => \$opt{'qadiff'},
+    'command:s'  => \$opt{'command'},
+    'clear'      => \$opt{'clear'},
+    'check'      => \$opt{'check'},
+    'tree'       => \$opt{'tree'},
+    'review'     => \$opt{'review'},
+    'mail'       => \$opt{'mail'},
+    'mount:s'    => \$opt{'mount'},
+    'start:s'    => \$opt{'start'},
+    'crypt:s'    => \$opt{'crypt'},
+    'oscrypt:s'  => \$opt{'oscrypt'},
+    'demo!'      => \$opt{'demo'},
+    'gui!'       => \$opt{'gui'},
+    'debug|D'    => \$opt{'debug'},
+    'vorbis|v'   => \$opt{'vorbis'},
+    'help|h|?'   => \$opt{'help'},
+    'version|V'  => \$opt{'version'},
+  )
+  or usage()
+  and exit( $stathash{'EX_NG'} );
+
+usage() and exit( $stathash{'EX_OK'} ) if ( $opt{'help'} );
+print_version() if ( $opt{'version'} );
+
+my $signame = undef;
+$SIG{'INT'} = sub {
+    $signame = shift;
+    die 'catch sig_handler!!!: ' . $signame . ': ', $!;
+    exit $stathash{'EX_NG'};
+};
+
+my $cur     = getcwd();
+my $prompt  = '$';
+my $timeout = 300;
+my %pclinux = (
+    '13CY' => readlink('/vns/tool/13CY/VMware/13pclinux'),
+    '17CY' => readlink('/vns/tool/13CY/VMware/17pclinux')
+);
+my $mount       = '/vns/tool/13CY/VMware/isogai/13mount/13mount';
+my $mapsdir     = '/home/naviwork/maps';
+my $common_file = catfile( $progdir, '.conf_common.yml' );
+my $max_procs   = ( $opt{'fork'} || '10' );
+
+# yamlファイルに必要なパラメータない場合エラーにする
+sub _yaml_check {
+    my $conf = shift;
+    my @name = @_;
+
+    foreach my $n (@name) {
+        unless ( defined $conf->{$n} ) {
+            next if ( $n eq 'user' && $opt{'user'} ne '' );
+            next if ( $n eq 'pass' && $opt{'pass'} ne '' );
+            die 'yaml file error: ' . $n . ': ', $!;
+        }
+    }
+}
+
+# ファイル指定チェック
+sub _check_conf {
+    if ( $opt{'file'} eq '' ) {    # ファイル指定なし
+        my @files = ();
+        opendir my $dh, $cur or die 'opendir: ' . encode_utf8($cur) . ': ', $!;
+        foreach my $file ( sort readdir $dh ) {
+            next if $file =~ /^\.{1,2}$/;
+            next unless $file =~ /^.conf.*\.yml$/;
+            next if $file eq '.conf_common.yml';
+            push( @files, $file );
+        }
+        closedir $dh;
+
+        # .conf_xxxxファイルがない場合
+        print 'Try option -f filename', "\n" and exit $stathash{'EX_NG'}
+          if ( !@files );
+
+        # ファイル選択
+        my $term  = Term::ReadLine->new($progname);
+        my $reply = $term->get_reply(
+            prompt =>
+              encode_utf8('設定ファイルを指定してください.'),
+            choices => [@files],
+            default => $files[0],
+            allow   => qw/^.conf.*\.yml$/
+        );
+        $opt{'file'} = $reply;
+    }
+    else {    # ファイル存在チェック
+        print 'no file: ' . $opt{'file'} , "\n" and exit $stathash{'EX_NG'}
+          unless ( -f $opt{'file'} );
+    }
+}
+
+# UTF8にデコードする
+sub _decode_utf8 {
+    my $s = shift;
+    return is_utf8($s) ? decode_utf8($s) : $s;
+}
+
+# 共通設定ファイル読み込み
+my $common;
+{
+    my $data   = YAML::Tiny::LoadFile($common_file);
+    my $string = YAML::Tiny::Dump($data);
+    $string = _decode_utf8($string);
+    $common = YAML::Tiny::Load($string);
+
+    my $cipher;
+    if ( $common->{'crypt'} || $common->{'oscrypt'} || $opt{'crypt'} ) {
+        require Crypt::CBC;
+        import Crypt::CBC;
+        $cipher = Crypt::CBC->new(
+            {
+                key     => 'xWgz0q5ZQvW1.',
+                cipher  => 'Blowfish',
+                padding => 'null'
+            }
+        );
+    }
+
+    if ( defined $opt{'crypt'} || defined $opt{'oscrypt'} ) {
+        if ( defined $opt{'crypt'} ) {
+            $common->{'pass'} = $opt{'crypt'} and $common->{'crypt'} = 0
+              if ( $opt{'crypt'} ne '' );
+            if ( defined $common->{'pass'} && !$common->{'crypt'} ) {
+                $common->{'pass'} = $cipher->encrypt_hex( $common->{'pass'} );
+                print $common->{'pass'}, "\n";
+                $common->{'crypt'} = 1;
+            }
+        }
+
+        if ( defined $opt{'oscrypt'} ) {
+            $common->{'ospass'} = $opt{'oscrypt'} and $common->{'oscrypt'} = 0
+              if ( $opt{'oscrypt'} ne '' );
+            if ( defined $common->{'ospass'} && !$common->{'oscrypt'} ) {
+                $common->{'ospass'} =
+                  $cipher->encrypt_hex( $common->{'ospass'} );
+                print $common->{'ospass'}, "\n";
+                $common->{'oscrypt'} = 1;
+            }
+        }
+
+        # デコード
+        my $decode_str = YAML::Tiny::Dump($common);
+        $decode_str = _decode_utf8($decode_str);
+
+        # エンコード
+        my $encode_data = YAML::Tiny::Load($decode_str);
+        my $encode_str  = YAML::Tiny::Dump($encode_data);
+        $encode_str = encode_utf8($encode_str);
+
+        # デコードしたデータ書き込み
+        open my $out, '>', $common_file
+          or die 'open error: ' . $common_file . ': ', $!;
+        print $out $encode_str;
+        close $out;
+        exit $stathash{'EX_OK'};
+    }
+    else {
+        if ( $common->{'crypt'} ) {
+            $common->{'pass'} = $cipher->decrypt_hex( $common->{'pass'} )
+              if ( defined $common->{'pass'} );
+        }
+        if ( $common->{'oscrypt'} ) {
+            $common->{'ospass'} = $cipher->decrypt_hex( $common->{'ospass'} )
+              if ( defined $common->{'ospass'} );
+        }
+    }
+};
+
+# 個別設定ファイル読み込み
+my $config = undef;
+
+sub _set_config {
+    my $data = YAML::Tiny::LoadFile( catfile( $cur, $opt{'file'} ) );
+    my $string = YAML::Tiny::Dump($data);
+    $string = _decode_utf8($string);
+    my $cf = YAML::Tiny::Load($string);
+    $cf->{'after'} =
+      $common->{'share'}
+      ? catfile( $common->{'share'}, $cf->{'develop'},
+        decode_utf8('変更後') )
+      : undef
+      if !defined $cf->{'after'};
+    $cf->{'before'} =
+      $common->{'share'}
+      ? catfile( $common->{'share'}, $cf->{'develop'},
+        decode_utf8('変更前') )
+      : undef
+      if !defined $cf->{'before'};
+    return $cf;
+}
+
+# 設定ファイル読み込み必要な場合読み込む
+foreach my $key ( @{ $need_conf{'undef'} } ) {
+    if ( defined $opt{$key} ) {
+        if ( ref( $opt{$key} ) eq 'ARRAY' ) {
+            next if ( !defined @{ $opt{$key} } );
+        }
+        _check_conf();
+        $config = _set_config();
+        last;
+    }
+}
+
+if ( !defined $config ) {
+    foreach my $key ( @{ $need_conf{'0'} } ) {
+        if ( $opt{$key} == 1 ) {
+            _check_conf();
+            $config = _set_config();
+            last;
+        }
+    }
+}
+
+sub _ask {
+    my ( $option, $msg, $default, %decode ) = @_;
+
+    if ( ( $option || '' ) ne '' ) {
+        my $bool = FALSE;
+        foreach my $value ( values %decode ) {
+            if ( $option eq $value ) {
+                $bool = TRUE;
+                last;
+            }
+        }
+        return undef unless ($bool);
+        return $option;
+    }
+    else {
+        my @encode;
+        foreach my $key ( sort keys %decode ) {
+            push( @encode, encode_utf8($key) );
+        }
+        my $term  = Term::ReadLine->new($progname);
+        my $reply = $term->get_reply(
+            prompt  => encode_utf8($msg),
+            choices => [@encode],
+            default => $encode[ defined($default) ? $default : 0 ]
+        );
+        return $decode{ decode_utf8($reply) };
+    }
+}
+
+sub _ask_sim {
+    my $default = shift || 0;
+    my @dirs = ();
+    opendir my $dh, $common->{'simdir'}
+      or die 'opendir: ' . encode_utf8( $common->{'simdir'} ) . ': ', $!;
+    foreach my $dir ( sort readdir $dh ) {
+        next if $dir =~ /^\.{1,2}$/;
+        next if $dir =~ /.*\.7z$/;
+        push( @dirs, $dir );
+    }
+    closedir $dh;
+    print "no dir for simulator\n" and exit( $stathash{'EX_NG'} )
+      if ( !@dirs );
+    my $term  = Term::ReadLine->new($progname);
+    my $reply = $term->get_reply(
+        prompt => encode_utf8('シミュレータを指定してください.'),
+        choices => [@dirs],
+        default => $dirs[$default]
+    );
+    return $reply;
+}
+
+sub setopt_start {
+    if ( defined $opt{'start'} || defined $opt{'mount'} ) {
+        if ( defined $opt{'start'} && defined $opt{'mount'} ) {
+            if ( $opt{'mount'} eq '' || $opt{'start'} eq '' ) {
+                $opt{'mount'} = $opt{'start'} if ( $opt{'start'} ne '' );
+                $opt{'start'} = $opt{'mount'} if ( $opt{'mount'} ne '' );
+            }
+            if ( ( $opt{'mount'} eq '' && $opt{'start'} eq '' )
+                || $opt{'mount'} ne $opt{'start'} )
+            {
+                $opt{'mount'} = $opt{'start'} = _ask_sim(-1);
+            }
+        }
+        elsif ( defined $opt{'mount'} ) {
+            _yaml_check( $common, 'simdir' );
+            if ( $opt{'mount'} ne '' ) {
+                $opt{'mount'} = catfile( $common->{'simdir'}, $opt{'mount'} );
+            }
+            else {
+                my $reply = _ask_sim(-1);
+                $opt{'mount'} = catfile( $common->{'simdir'}, $reply );
+            }
+            print "no dir for simulator\n" and exit( $stathash{'EX_NG'} )
+              if ( !-d $opt{'mount'} );
+        }
+        elsif ( defined $opt{'start'} ) {
+            _yaml_check( $common, 'simdir' );
+            if ( $opt{'start'} ne '' ) {
+                $opt{'start'} = catfile( $common->{'simdir'}, $opt{'start'} );
+            }
+            else {
+                my $reply = _ask_sim(-1);
+                $opt{'start'} = catfile( $common->{'simdir'}, $reply );
+            }
+            print "no dir for simulator\n" and exit( $stathash{'EX_NG'} )
+              if ( !-d $opt{'start'} );
+        }
+    }
+}
+
+sub setopt_save {
+    my %decode = (
+        decode_utf8('レポジトリ(変更前)') => 'brepo',
+        decode_utf8('レポジトリ(変更後)') => 'arepo',
+        decode_utf8('ワーク環境(変更前)') => 'bwork',
+        decode_utf8('ワーク環境(変更後)') => 'awork',
+    );
+
+    $opt{'save'} =
+      _ask( $opt{'save'}, '保存する場所を指定してください.',
+        3, %decode );
+    print "option error: --save: $!\n" and exit( $stathash{'EX_NG'} )
+      if ( !defined $opt{'save'} );
+}
+
+sub setopt_13make {
+    _yaml_check( $config, 'dirs' );
+
+    my $all     = decode_utf8('全て');
+    my $exe     = decode_utf8('実行ファイルリンク');
+    my @modules = ();
+    my $dirs    = $config->{'dirs'};
+    foreach my $dir ( @{$dirs} ) {
+        push( @modules, $dir );
+    }
+    if ( ( $opt{'13make'} || '' ) eq '' ) {
+        if ( exists $opt{'module'} && @{ $opt{'module'} } ) {
+            $opt{'13make'} = '';
+        }
+        else {
+            my $term  = Term::ReadLine->new($progname);
+            my $reply = $term->get_reply(
+                prompt =>
+                  encode_utf8('モジュールを指定してください.'),
+                choices =>
+                  [ sort(@modules), encode_utf8($exe), encode_utf8($all) ],
+                default => encode_utf8($all)
+            );
+            $opt{'13make'} =
+              $reply eq encode_utf8($all)
+              ? 'all'
+              : ( $reply eq encode_utf8($exe) ? 'exe' : $reply );
+        }
+    }
+}
+
+sub setopt_make {
+    _yaml_check( $config, 'dirs' );
+
+    my $all     = decode_utf8('全て');
+    my $exe     = decode_utf8('実行ファイルリンク');
+    my @modules = ();
+    my $dirs    = $config->{'dirs'};
+    foreach my $dir ( @{$dirs} ) {
+        push( @modules, $dir );
+    }
+    if ( ( $opt{'make'} || '' ) eq '' ) {
+        if ( exists $opt{'module'} && @{ $opt{'module'} } ) {
+            $opt{'make'} = '';
+        }
+        else {
+            my $term  = Term::ReadLine->new($progname);
+            my $reply = $term->get_reply(
+                prompt =>
+                  encode_utf8('モジュールを指定してください.'),
+                choices =>
+                  [ sort(@modules), encode_utf8($exe), encode_utf8($all) ],
+                default => encode_utf8($all)
+            );
+            $opt{'make'} =
+              $reply eq encode_utf8($all)
+              ? 'all'
+              : ( $reply eq encode_utf8($exe) ? 'exe' : $reply );
+        }
+    }
+}
+
+sub setopt_deploy {
+    my %decode = (
+        decode_utf8('レポジトリ(work)') => 'wrepo',
+        decode_utf8('レポジトリ(main)') => 'mrepo',
+        decode_utf8('ワーク環境')       => 'work',
+        decode_utf8('シミュレータ')     => 'sim',
+        decode_utf8('PBMSG')            => 'pbmsg'
+    );
+
+    $opt{'deploy'} =
+      _ask( $opt{'deploy'},
+        'デプロイする環境を指定してください.',
+        4, %decode );
+    print "option error: --deploy: $!\n" and exit( $stathash{'EX_NG'} )
+      if ( !defined $opt{'deploy'} );
+}
+
+sub setopt_revert {
+    my %decode = (
+        decode_utf8('レポジトリ') => 'repo',
+        decode_utf8('ワーク環境') => 'work'
+    );
+
+    $opt{'revert'} =
+      _ask( $opt{'revert'},
+        '元に戻す(svn revert)環境を指定してください.',
+        0, %decode );
+    print "option error: --revert: $!\n" and exit( $stathash{'EX_NG'} )
+      if ( !defined $opt{'revert'} );
+}
+
+sub setopt_status {
+    my %decode = (
+        decode_utf8('レポジトリ') => 'repo',
+        decode_utf8('ワーク環境') => 'work'
+    );
+
+    $opt{'status'} = _ask(
+        $opt{'status'},
+'ステータス表示する(svn status)環境を指定してください.',
+        0,
+        %decode
+    );
+    print "option error: --status: $!\n" and exit( $stathash{'EX_NG'} )
+      if ( !defined $opt{'status'} );
+}
+
+sub setopt_extract {
+    my %decode = (
+        decode_utf8('diff 生成')           => 'create',
+        decode_utf8('クロックワーク') => 'klocwork',
+        'qadiff'                             => 'qadiff',
+        decode_utf8('コンパイルログ') => 'compile',
+        decode_utf8('全て')                => 'all'
+    );
+
+    $opt{'extract'} =
+      _ask( $opt{'extract'},
+        '抽出するカテゴリを指定してください.',
+        4, %decode );
+    print "option error: --extract: $!\n" and exit( $stathash{'EX_NG'} )
+      if ( !defined $opt{'extract'} );
+}
+
+sub setopt_meld {
+    my %decode = (
+        decode_utf8('レポジトリ') => 'repo',
+        decode_utf8('保存先')       => 'save',
+    );
+
+    $opt{'meld'} =
+      _ask( $opt{'meld'}, '比較先を指定してください.', 0, %decode );
+    print "option error: --meld: $!\n" and exit( $stathash{'EX_NG'} )
+      if ( !defined $opt{'meld'} );
+}
+
+sub setopt_klocwork {
+    _yaml_check( $config, 'dirs' );
+
+    my $all     = decode_utf8('全て');
+    my @modules = ();
+    my $dirs    = $config->{'dirs'};
+    foreach my $dir ( @{$dirs} ) {
+        push( @modules, $dir );
+    }
+
+    if ( $opt{'klocwork'} ne 'all' ) {
+        if ( $opt{'klocwork'} ne '' ) {
+            my $flag = FALSE;
+            foreach my $module (@modules) {
+                $flag = TRUE if ( $opt{'klocwork'} eq $module );
+            }
+            print 'no module for klocwork', "\n" unless ($flag);
+        }
+        else {
+            if (@modules) {
+                my $term  = Term::ReadLine->new($progname);
+                my $reply = $term->get_reply(
+                    prompt => encode_utf8(
+                        'モジュールを指定してください.'),
+                    choices => [ sort(@modules), encode_utf8($all) ],
+                    default => encode_utf8($all)
+                );
+                $opt{'klocwork'} = $reply eq encode_utf8($all) ? 'all' : $reply;
+            }
+            else {
+                $opt{'klocwork'} = 'all';
+            }
+        }
+    }
+}
+
+sub setopt_qadiff {
+    _yaml_check( $config, 'dirs' );
+
+    my $all     = decode_utf8('全て');
+    my @modules = ();
+    my $dirs    = $config->{'dirs'};
+    foreach my $dir ( @{$dirs} ) {
+        push( @modules, $dir );
+    }
+
+    if ( $opt{'qadiff'} ne 'all' ) {
+        if ( $opt{'qadiff'} ne '' ) {
+            my $flag = FALSE;
+            foreach my $module (@modules) {
+                $flag = TRUE if ( $opt{'qadiff'} eq $module );
+            }
+            print 'no module for qadiff', "\n" unless ($flag);
+        }
+        else {
+            if (@modules) {
+                my $term  = Term::ReadLine->new($progname);
+                my $reply = $term->get_reply(
+                    prompt => encode_utf8(
+                        'モジュールを指定してください.'),
+                    choices => [ sort(@modules), encode_utf8($all) ],
+                    default => encode_utf8($all)
+                );
+                $opt{'qadiff'} = $reply eq encode_utf8($all) ? 'all' : $reply;
+            }
+            else {
+                $opt{'qadiff'} = 'all';
+            }
+        }
+    }
+}
+
+if ( $opt{'debug'} ) {
+    require Data::Dumper;
+    import Data::Dumper;
+    print Data::Dumper->Dumper($config);
+}
+
+my $develop =
+  ( defined $config->{'develop'} && ( $config->{'develop'} ne '' ) )
+  ? $config->{'develop'}
+  : undef;
+
+my $changes =
+  ( defined $config->{'changes'} && ( $config->{'changes'} ne '' ) )
+  ? $config->{'changes'}
+  : undef;
+
+my $content =
+  ( defined $config->{'content'} && ( $config->{'content'} ne '' ) )
+  ? $config->{'content'}
+  : undef;
+
+my $klocwork    = ( defined $develop ? $develop . '_' : '' ) . 'klocwork';
+my $qac         = ( defined $develop ? $develop . '_' : '' ) . 'qac';
+my $qacdna      = ( defined $develop ? $develop . '_' : '' ) . 'qac_dna';
+my $diffline    = ( defined $develop ? $develop . '_' : '' ) . 'line.diff';
+my $after       = ( defined $develop ? $develop . '_' : '' ) . 'after';
+my $before      = ( defined $develop ? $develop . '_' : '' ) . 'before';
+my $compile_log = ( defined $develop ? $develop . '_' : '' ) . 'compile.log';
+my $error_log   = ( defined $develop ? $develop . '_' : '' ) . 'error.log';
+my $update_revision_yaml =
+  ( defined $develop ? $develop . '_' : '' ) . 'update_revision.yml';
+my $sync_revision_yaml =
+  ( defined $develop ? $develop . '_' : '' ) . 'sync_revision.yml';
+my $repochk = '/vns/tool/17CY/17repochk';
+
+sub _get_dirname {
+    my $basedir = shift;
+
+    my ( $mday, $mon, $year ) = ( localtime(time) )[ 3 .. 5 ];
+    $basedir = _decode_utf8($basedir);
+    $basedir =
+      catfile( $basedir,
+        sprintf( "%04d%02d%02d", ( $year + 1900 ), ( $mon + 1 ), $mday ) );
+
+    my $dir = '';
+    my $n   = 0;
+    do {
+        $dir = $basedir . "_" . sprintf( "%03d", $n );
+        if ( ++$n == 1000 ) {
+            return $basedir . "_" . $$;
+        }
+    } while ( -d $dir );
+
+    return $dir;
+}
+
+sub _get_repodir_to_deploy {
+    my $dir = shift;
+    my $basedir =
+      defined $opt{'base'} && $opt{'base'} ne ''
+      ? catfile( $cur,               $opt{'base'} )
+      : catfile( $config->{'after'}, $dir );
+    $basedir = $basedir ne '' ? $basedir : 'before';
+    my ( $mday, $mon, $year ) = ( localtime(time) )[ 3 .. 5 ];
+    $basedir = catfile(
+        $basedir,
+        sprintf "%04d%02d%02d",
+        ( $year + 1900 ),
+        ( $mon + 1 ), $mday
+    );
+    $basedir = _decode_utf8($basedir);
+
+    my @dirs = ();
+    opendir my $dh, catfile( $config->{'after'}, $dir )
+      or die 'opendir: ' . encode_utf8( $config->{'after'} ) . ': ',
+      $!;
+    foreach my $dir ( sort readdir $dh ) {
+        next if $dir =~ m#^\.{1,2}$#;
+        next unless $dir =~ m#^[0-9]{8}_[0-9]{3}$#;
+        push( @dirs, $dir );
+    }
+    closedir $dh;
+    print 'no dir to deploy', "\n" and return undef if ( !@dirs );
+    my $term  = Term::ReadLine->new($progname);
+    my $reply = $term->get_reply(
+        prompt => encode_utf8(
+            'コピー元のディレクトリを指定してください.'
+        ),
+        choices => [@dirs],
+        default => $dirs[$#dirs],
+        allow   => qw#^[0-9]{8}_[0-9]{3}$#
+    );
+    my $dest = catfile( $config->{'after'}, $dir, $reply );
+    print encode_utf8($dest), "\n"
+      if ( $opt{'vorbis'} );
+    return _decode_utf8($dest);
+}
+
+sub _get_destdir {
+    my $option_save = 'after';
+    if (   ( $opt{'save'} || '' ) eq 'brepo'
+        || ( $opt{'save'} || '' ) eq 'bwork' )
+    {
+        $option_save = 'before';
+    }
+    else {
+        $option_save = 'after';
+    }
+    _yaml_check( $config, ( $option_save, 'after' ) );
+
+    my $basedir =
+      defined $opt{'base'} && $opt{'base'} ne '' ? catfile( $cur, $opt{'base'} )
+      : (
+        defined $opt{'save'} ? $config->{$option_save}
+        : $config->{'after'}
+      );
+
+    #$basedir = defined $basedir && $basedir ne '' ? $basedir : 'before';
+    $basedir =
+      catfile( $basedir,
+        ( ( $opt{'save'} || '' ) =~ m/work$/ ? 'work' : 'main' ) );
+    my $dest = _get_dirname($basedir);
+    print encode_utf8($dest), "\n"
+      if ( $opt{'vorbis'} );
+    return _decode_utf8($dest);
+}
+
+sub _copy_host {
+    my ( $exp, $curdir, $base, $dirs, $sources ) = @_;
+
+    foreach my $source ( @{$sources} ) {
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $file =~ s/\s/\\ /g;
+        my $dir = dirname $file;
+        my $dest = catfile( $curdir, $base, $dir );
+        $exp->send( 'mkdir -p ' . $dest . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        my $src = catfile( $curdir, $file );
+        $exp->send( 'cp -rpfv ' . "$src" . ' ' . "$dest" . "\n" );
+        $exp->expect( $timeout, $prompt );
+    }
+}
+
+sub _login {
+    my ( $exp, $pass, $to ) = @_;
+
+    print 'timeout='. (defined $to ? $to : 'undef'), "\n";
+    $exp->expect(
+        $to,
+        [
+            qr/\(yes\/no\)\?/ => sub {
+                my $self = shift;
+                $self->send("yes\n");
+                exp_continue;
+              }
+        ],
+        [
+            qr/word:/ => sub {
+                my $self = shift;
+                $self->send( $pass . "\n" );
+                exp_continue;
+              }
+        ],
+        [
+            qr/Permission denied/ => sub {
+                exit;
+              }
+        ],
+        $prompt
+    );
+}
+
+sub _scp_to_host {
+    my ( $host, $user, $pass, $hostdir, $srcdir, $curdir, $tar ) = @_;
+    $tar = defined $tar ? $tar : FALSE;
+
+    my $src     = '';
+    my $tarfile = '';
+    my $basedir = dirname $srcdir;
+    my $tardir  = basename $srcdir;
+
+    # tarで固めて圧縮
+    if ($tar) {
+        $tarfile = $tardir . '.tar.gz';
+        _change_dir($basedir);
+        system( 'tar cvfz ' . $tarfile . ' ' . $tardir );
+        _change_dir($curdir);
+        $src = catfile( $basedir, $tarfile );
+    }
+    else {
+        $src = $srcdir;
+    }
+
+    my $dest = $user . '@' . $host . ":" . $hostdir;
+
+    # scpでコピー
+    my $scp = Expect->new();
+    $scp->spawn( 'scp -rp ' . $src . ' ' . $dest )
+      or die 'spawn error: ', $!;
+    _login( $scp, $pass, undef );
+    $scp->hard_close();
+
+    # ログインして解凍
+    if ($tar) {
+        my $extract = Expect->new();
+        $extract->spawn( 'ssh -l ' . $user . ' ' . $host )
+          or die 'spawn error: ', $!;
+        _login( $extract, $pass, $timeout );
+
+        $extract->send( 'cd ' . $hostdir . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send( 'tar xvfz ' . $tarfile . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send( 'cd ' . $tardir . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send( 'cp -rpf * ../. ' . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send( 'cd ' . $hostdir . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send( 'rm -rf ' . $tardir . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $scp->hard_close();
+        unlink $src or warn 'unlink error: ', $!
+          if ( -f $src );
+    }
+}
+
+sub _scp_to_local {
+    my ( $host, $user, $pass, $hostdir, $target, $dest, $tar ) = @_;
+    $tar = defined $tar ? $tar : FALSE;
+    my $src     = '';
+    my $tarfile = '';
+
+    # ログインして圧縮
+    if ($tar) {
+        $tarfile = catfile( '/tmp', $target ) . '.tar.gz';
+        print 'tar cvfz ' . $tarfile . ' ' . $target, "\n";
+        $src = $user . '@' . $host . ":" . $tarfile;
+        print $src, "\n";
+
+        my $extract = Expect->new();
+        $extract->spawn( 'ssh -l ' . $user . ' ' . $host )
+          or die 'spawn error ', $!;
+        _login( $extract, $pass, $timeout );
+
+        $extract->send( 'cd ' . $hostdir . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send( 'tar --exclude=.svn -z -c -v -f ' . $tarfile . ' ' . $target . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send( 'md5sum ' . $tarfile . "\n" );
+        $extract->expect( $timeout, $prompt );
+        $extract->send("exit\n");
+        $extract->expect( $timeout, $prompt );
+    }
+    else {
+        $src = $user . '@' . $host . ":" . $hostdir . '/' . $target;
+        print $src, "\n";
+    }
+
+    # scpでコピー
+    print 'scp -rp ' . $src . ' ' . $dest, "\n";
+    my $scp = Expect->new();
+    $scp->spawn( 'scp -rp ' . $src . ' ' . $dest )
+      or die 'spawn error: ', $!;
+    _login( $scp, $pass, undef );
+    $scp->hard_close();
+
+    # 解凍
+    if ($tar) {
+        _change_dir($dest);
+        system( 'md5sum ' . $target . '.tar.gz' );
+        print 'tar xvfz ' . $target . '.tar.gz', "\n";
+        system( 'tar xvfz ' . $target . '.tar.gz' );
+        _change_dir($cur);
+    }
+}
+
+sub _scp_from_host_file {
+    my $host  = shift;
+    my $user  = shift;
+    my $pass  = shift;
+    my $bsrc  = shift;
+    my $bdest = shift;
+    my @file  = @_;
+
+    my $src = $user . '@' . $host . ":" . catfile( $bsrc, "@file" );
+    $src =~ s/\s/\\ /g;
+    my $dest = dirname catfile( $bdest, "@file" );
+
+    print 'src=' . encode_utf8($src), "\n"
+      if ( $opt{'vorbis'} );
+    print 'dest=' . encode_utf8($dest), "\n"
+      if ( $opt{'vorbis'} );
+    mkpath($dest) if ( !-d $dest );
+
+    # scpでコピー
+    my $scp = Expect->new();
+    $scp->spawn( 'scp -rp "' . "$src" . '" "' . "$dest" . '"' )
+      or die 'spawn error: ', $!;
+    _login( $scp, $pass, undef );
+}
+
+sub _recent_dir {
+    my $destdir = shift;
+
+    # 直近のディレクトリ名取得
+    my $path   = dirname $destdir;
+    my $recent = undef;
+    mkpath($path) if ( !-d $path );
+    opendir my $dh, $path
+      or warn 'opendir: ' . encode_utf8($path) . ': ', $! and return undef;
+    foreach my $dir ( reverse( sort readdir $dh ) ) {
+        next if $dir =~ /^\.{1,2}$/;
+        next unless $dir =~ /^[0-9]{8}_[0-9]{3}$/;
+        $recent = _decode_utf8($dir);
+        last;
+    }
+    closedir $dh;
+
+    return defined $recent ? catfile( $path, $recent ) : undef;
+}
+
+sub _rmdir_nodiff {
+    my ( $recent, $new ) = @_;
+    return if ( !defined $recent || !defined $new );
+    return if ( $recent eq $new );
+    print 'no dir: ' . ( encode_utf8($recent) || '' ), "\n"
+      and return
+      if ( !-d $recent );
+    print 'no dir: ' . ( encode_utf8($new) || '' ), "\n"
+      and return
+      if ( !-d $new );
+
+    # 直近と比較して相違がない場合削除
+    my $diff = `diff -rN $recent $new` || undef;
+    if ( !defined $diff ) {
+        print 'no difference: rmtree '
+          . encode_utf8($recent) . ' '
+          . encode_utf8($new), "\n"
+          if ( rmtree($new) );
+    }
+    else {
+        print 'make directory: ' . encode_utf8($new), "\n";
+    }
+}
+
+sub _get_host {
+    my $host = '';
+    if ( $opt{'host'} ) {
+        $host = $opt{'host'};
+    }
+    else {
+        if ( ref $common->{'host'} eq 'ARRAY' ) {
+            my $term  = Term::ReadLine->new($progname);
+            my $reply = $term->get_reply(
+                prompt =>
+                  encode_utf8('IPアドレスを指定してください.'),
+                choices => [ @{ $common->{'host'} } ],
+                default => $common->{'host'}[0]
+            );
+            $host = $reply;
+        }
+        else {
+            $host = $common->{'host'};
+        }
+    }
+    return $host;
+}
+
+sub _change_dir {
+    my $dir = shift;
+    if ($dir) {
+        print 'cd ' . _decode_utf8($dir), "\n" if $opt{'demo'};
+        my $retval = chdir( _decode_utf8($dir) );
+        unless ($retval) {
+            print 'chdir error: '
+              . encode_utf8($dir) . ' cwd='
+              . getcwd() . ": $!",
+              "\n";
+        }
+    }
+    else {
+        print 'can not chdir. no dir.', "\n" if $opt{'demo'};
+    }
+}
+
+sub _exp_error {
+    my ( $exp, $msg ) = @_;
+    $exp->expect(
+        $timeout,
+        [
+            eof => sub {
+                die $msg . ': ', $!;
+              }
+        ],
+        $prompt
+    );
+}
+
+sub read_diffline {
+    my %info = ();
+
+    open my $in, '<', $diffline
+      or warn 'open: no diff file: ' . $diffline . ': ', $! and return;
+
+    while ( defined( my $line = <$in> ) ) {
+        my @list = ();
+        chomp($line);
+
+        # ファイル名抽出
+        if ( $line =~ m/^\+\+\+/ ) {
+
+            $line =~ s#^(.*?)/##;    # 先頭から`/'まで削除
+            my ( $file, $dummy ) = split /\t/, $line;
+            while ( defined( my $line2 = <$in> ) ) {
+                chomp($line2);
+
+                # 行数抽出しリスト化
+                if ( $line2 =~ m/^@@/ ) {
+                    $line2 =~ s/^(.*?)\+//;    # 先頭から`+'まで削除
+                    my ( $addl, $dummy ) = split / /, $line2;
+                    my ( $l,    $c )     = split /,/, $addl;
+                    next unless ( defined($l) );
+                    $c = 1 unless ( defined($c) );
+                    while ( $c-- ) {
+                        push( @list, $l . '' );
+                        $l++;
+                    }
+                }
+                else {
+                    seek( $in, -1, 1 );
+                    last;
+                }
+            }
+
+            # リストをハッシュに登録
+            @{ $info{$file} } = @list;
+            print encode_utf8($file), "\n" if ( $opt{'vorbis'} );
+            print encode_utf8("@list"), "\n" if ( $opt{'vorbis'} );
+        }
+    }
+    close $in;
+
+    if ( $opt{'vorbis'} ) {
+        while ( my ( $key, $val ) = each(%info) ) {
+            print 'key=' . $key, "\n";
+            print 'val=' . "@{$val}", "\n";
+        }
+    }
+    return %info;
+}
+
+sub analysis_qadiff {
+    my %info = @_ or warn 'no hash: ', $! and return;
+
+    opendir my $dh, $qac or warn 'opendir:' . $qac . ': ', $! and return;
+
+    while ( my $file = readdir $dh ) {
+        next if $file =~ /^\.{1,2}$/;
+        print encode_utf8($file), "\n" if ( $opt{'vorbis'} );
+
+        open my $in, '<', catfile( $qac, $file )
+          or die 'open error: ' . $file . ': ', $!;
+        my $count = 0;
+        my $flag  = FALSE;
+        while ( defined( my $line = <$in> ) ) {
+            $count++;
+            chomp($line);
+            $line =~ s/^\s+//;
+            my ( $f, $l ) = split /,/, $line;
+            next unless ( defined $f and defined $l );
+
+            $f =~ s/"//g;
+            $l =~ s/"//g;
+            print encode_utf8( "ファイル = " . $f . "\n行数 = " . $l ),
+              "\n"
+              if ( $opt{'vorbis'} );
+
+            while ( my ( $key, $val ) = each(%info) ) {
+                if ( $f =~ m/$key$/ ) {    # ファイル名一致
+                    foreach my $v ( @{$val} ) {
+                        if ( $l eq $v ) {    # 行数一致
+                            $line = decode_utf8($line);
+                            print $file . "[" . $count . "]: "
+                              . encode_utf8($line), "\n";
+                            $flag = TRUE;
+                        }
+                    }
+                }
+            }
+        }
+        print encode_utf8( $file . ": 該当行なし\n" ) unless ($flag);
+        close $in;
+    }
+    closedir $dh;
+}
+
+sub analysis_klocwork {
+    my %info = @_ or warn 'no hash: ', $! and return;
+
+    opendir my $dh, $klocwork
+      or warn 'opendir: ' . $klocwork . ': ', $! and return;
+
+    while ( my $file = readdir $dh ) {
+
+        next if $file =~ /^\.{1,2}$/;
+        print encode_utf8($file), "\n" if ( $opt{'vorbis'} );
+
+        open my $in, '<', catfile( $klocwork, $file )
+          or die 'open error: ' . $file . ': ', $!;
+
+        my $dsrc  = "";
+        my $count = 0;
+        my $flag  = FALSE;
+        while ( defined( my $line = <$in> ) ) {
+            $count++;
+            chomp($line);
+
+            if ( $line =~ /^\s*\d+ \(.*\)/ ) {
+                my $tmp = $line;
+                $tmp =~ s#(^\s*\d+ \(.*\).*?)/#/#
+                  ;    # 先頭からファイル名の前まで削除
+                my ( $tmp2, $dummy ) = split / /, $tmp;
+                my ( $f,    $l )     = split /:/, $tmp2;
+                next unless ( defined $f and defined $l );
+
+                while ( my ( $key, $val ) = each(%info) ) {
+                    if ( $f =~ m/$key$/ ) {    # ファイル名一致
+                        print encode_utf8(
+                            "ファイル = " . $f . "\n行数 = " . $l ), "\n"
+                          if ( $opt{'vorbis'} );
+                        foreach my $v ( @{$val} ) {
+                            if ( $l =~ $v ) {    # 行数一致
+                                $line = decode_utf8($line);
+                                print $file . "[" 
+                                  . $count . "]: "
+                                  . encode_utf8($line),
+                                  "\n";
+                                $flag = TRUE;
+                            }
+                        }
+                        $dsrc = dirname $key;
+                        print encode_utf8(
+                            "ディレクトリ(比較元) = " . $dsrc ), "\n"
+                          if ( $opt{'vorbis'} );
+                    }
+                }
+            }
+            elsif ( $line =~ /^\s*\*/ ) {
+                my $tmp = $line;
+                $tmp =~ s/^\s*\* //
+                  ;    # 先頭からファイル名の前までを削除
+                my ( $f, $l, $dummy ) = split /:/, $tmp;
+                next unless ( defined $f and defined $l );
+
+                $f =~ s#^(.*?)/#/#;    # 先頭から`/'の前まで削除
+                ( $tmp, $dummy ) = split( / /, $l );
+                $l = $tmp;
+
+                while ( my ( $key, $val ) = each(%info) ) {
+                    my $base = basename $key;
+                    my $ddst = dirname $key;
+                    if ( ( $f =~ $base ) && ( $dsrc =~ m/$ddst/ ) )
+                    {                  # ファイル名一致
+                        print encode(
+                            'utf-8', "ファイル = " . $f . "\n行数 = " . $l
+                          ),
+                          "\n"
+                          if ( $opt{'vorbis'} );
+                        print encode_utf8(
+                            "ディレクトリ(比較先) = " . $ddst ), "\n"
+                          if ( $opt{'vorbis'} );
+                        foreach my $v ( @{$val} ) {
+                            if ( $l eq $v ) {    # 行数一致
+                                $line = decode_utf8($line);
+                                print $file . "[" 
+                                  . $count . "]: "
+                                  . encode_utf8($line),
+                                  "\n";
+                                $flag = TRUE;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        print encode_utf8( $file . ": 該当行なし\n" ) unless ($flag);
+        close $in;
+    }
+    closedir $dh;
+}
+
+sub analysis_compile {
+    my %info = @_ or warn 'no hash: ', $! and return;
+
+    open my $in, '<', $compile_log
+      or warn 'open error: ' . $compile_log . ': ', $! and return;
+    my $count = 0;
+    my $flag  = FALSE;
+    while ( defined( my $line = <$in> ) ) {
+        $count++;
+        chomp($line);
+
+        $line =~ s/^\s+//;
+        my ( $f, $l ) = split /:/, $line;
+        next unless ( defined $f and defined $l );
+
+        while ( my ( $key, $val ) = each(%info) ) {
+            if ( $f =~ m/$key$/ ) {    # ファイル名一致
+                print encode_utf8(
+                    "ファイル = " . $f . "\n行数 = " . $l ), "\n"
+                  if ( $opt{'vorbis'} );
+                foreach my $v ( @{$val} ) {
+                    if ( $l eq $v ) {    # 行数一致
+                        $line = decode_utf8($line);
+                        print $compile_log . "[" 
+                          . $count . "]: "
+                          . encode_utf8($line),
+                          "\n";
+                        $flag = TRUE;
+                    }
+                }
+            }
+        }
+    }
+    print encode_utf8( $compile_log . ": 該当行なし\n" ) unless ($flag);
+    close $in;
+}
+
+sub svn_meld {
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ('sources') );
+
+    my $sources = $config->{'sources'};
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $file =~ s/\s/\\ /g;
+        print 'no meld command', "\n" and exit $stathash{'EX_NG'}
+          if ( !`which meld` );
+        print 'no file: ' . ( encode_utf8(_decode_utf8($file)) || '' ), "\n" and next
+          if ( !-f $file );
+        my @status = split( /\s+/, `svn status -v $file` );
+        print 'no difference: ' . ( encode_utf8(_decode_utf8($file)) || '' ), "\n" and next
+          if ( ( $status[0] || '' ) ne 'M' );
+
+        system( 'svn diff ' 
+              . $file
+              . ' --diff-cmd meld'
+              . ' --username '
+              . ( $opt{'user'} || $common->{'user'} )
+              . ' --password '
+              . ( $opt{'pass'} || $common->{'pass'} )
+              . ' --no-auth-cache' );
+    }
+}
+
+sub svn_diff {
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ('sources') );
+
+    my $sources = $config->{'sources'};
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $file =~ s/\s/\\ /g;
+
+        system( 'svn diff ' 
+              . $file
+              . ' --username '
+              . ( $opt{'user'} || $common->{'user'} )
+              . ' --password '
+              . ( $opt{'pass'} || $common->{'pass'} )
+              . ' --no-auth-cache 2> /dev/null' );
+    }
+}
+
+sub svn_status {
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ('sources') );
+
+    my $sources = $config->{'sources'};
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $file =~ s/\s/\\ /g;
+
+        system( 'svn status -v ' 
+              . $file
+              . ' --username '
+              . ( $opt{'user'} || $common->{'user'} )
+              . ' --password '
+              . ( $opt{'pass'} || $common->{'pass'} )
+              . ' --no-auth-cache' );
+    }
+}
+
+sub svn_info {
+    my $dir = shift;
+    print "no dirname\n" and return if ( !-d $dir );
+    _yaml_check( $common, ( 'user', 'pass' ) );
+
+    # svn info を表示
+    system( 'svn info ' 
+          . $dir
+          . ' --username '
+          . ( $opt{'user'} || $common->{'user'} )
+          . ' --password '
+          . ( $opt{'pass'} || $common->{'pass'} )
+          . ' --no-auth-cache' );
+
+    # 17repochk -b を表示
+    my $repo = _get_repo($dir);
+    print $repo . "\n";
+    my @repochk = _get_branch($repo);
+    foreach my $line (@repochk) {
+        print '    ' . $line, "\n";
+    }
+
+    #if ( -f $repochk ) {
+    #    system( $repochk, '-b', '-d=' . catfile( $cur, $dir ) );
+    #}
+}
+
+sub svn_log {
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ('sources') );
+
+    my $sources = $config->{'sources'};
+    foreach my $source (
+        sort { ( $a->{'changes'} || '' ) cmp( $b->{'changes'} || '' ) }
+        @{$sources} )
+    {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $file =~ s/\s/\\ /g;
+
+        my $cmd =
+            'svn log '
+          . '--non-interactive --limit 1 '
+          . $file
+          . ' --username '
+          . ( $opt{'user'} || $common->{'user'} )
+          . ' --password '
+          . ( $opt{'pass'} || $common->{'pass'} )
+          . ' --no-auth-cache';
+
+        my $log = `$cmd`;
+        $log =~ s/-{72,}?//g;
+        $log =~ s/\n/ /g;
+        $log = $file . ': ' . $log;
+        $log =~ s/\s+/ /g;
+        print $log, "\n";
+    }
+}
+
+sub _copy {
+    my ( $file, $destdir ) = @_;
+    my $dest = catfile( $destdir, basename("$file") );
+
+    # 元のタイムスタンプを取っておく
+    my ( $atime, $mtime ) = ( stat("$file") )[ 8, 9 ];
+
+    # コピー
+    copy "$file", $destdir or die 'copy failed: ', $!;
+
+    # タイムスタンプだけ元に戻す
+    utime( ( $atime || '' ), ( $mtime || '' ), $dest );
+}
+
+sub save {
+    my $destdir = shift;
+    _yaml_check( $config, ('sources') );
+
+    my $sources = $config->{'sources'};
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'} or die 'undefined filename: ', $!;
+        print "no file: " . ( encode_utf8("$file") || '' ), "\n" and next
+          if ( !-f "$file" );
+        my $dest = dirname( catfile( $destdir, "$file" ) );
+
+        # コピー
+        print 'src=' . encode_utf8("$file"), "\n";
+        print 'dest=' . encode_utf8($dest), "\n";
+        mkpath($dest) if ( !-d $dest );
+        _copy( "$file", $dest );
+    }
+}
+
+sub save_work {
+    my $src = shift;
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'sources', 'work' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $sources = $config->{'sources'};
+    my $workdir = $config->{'work'};
+
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        print "no file: " . ( $file || '' ), "\n" and next
+          if ( !-f $file );
+
+        # scpでコピー
+        _scp_from_host_file( $host, $user, $pass, $workdir, $src, "$file" );
+    }
+}
+
+sub svn_revert {
+    my $destdir = shift;
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ('sources') );
+
+    my $sources = $config->{'sources'};
+    foreach my $source ( @{$sources} ) {
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $file =~ s/\s/\\ /g;
+
+        #        my $dest = dirname( catfile( $destdir, $file ) );
+        #        mkpath($dest) if ( !-d $dest );
+        #        _copy( $file, $dest )
+        #          if ( !defined $source->{'delete'}
+        #            || ( $source->{'delete'} || '' ) ne '1' );
+
+        system( 'svn revert ' . "$file"
+              . ' --username '
+              . ( $opt{'user'} || $common->{'user'} )
+              . ' --password '
+              . ( $opt{'pass'} || $common->{'pass'} )
+              . ' --no-auth-cache' );
+    }
+}
+
+sub svn_update {
+    my ( $dir, $file, $chno, $rev, $destdir ) = @_;
+    print "no file: " . ( $file || '' ), "\n" and return
+      if ( !-f $file );
+    _yaml_check( $common, ( 'user', 'pass' ) );
+
+    my $option = '-r ' . $rev . ' ' if defined $rev;
+    $file =~ s/\s/\\ /g;
+
+    #    my $dest = dirname( catfile( $destdir, $dir, $file ) );
+    #    mkpath($dest) if ( !-d $dest );
+    #    _copy( $file, $dest );
+
+    print $file, "\n";
+    system('svn cleanup');
+    system( 'svn update '
+          . ( $option || '' ) . "$file"
+          . ' --username '
+          . ( $opt{'user'} || $common->{'user'} )
+          . ' --password '
+          . ( $opt{'pass'} || $common->{'pass'} )
+          . ' --no-auth-cache '
+          . ' --non-interactive' );
+}
+
+sub svn_dirs_update {
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ( 'dirs', 'includes' ) );
+    my $dirs     = $config->{'dirs'};
+    my $includes = $config->{'includes'};
+
+    foreach my $dir ( @{$dirs}, @{$includes} ) {
+        system('svn cleanup');
+        system( 'svn update ' . "$dir"
+              . ' --username '
+              . ( $opt{'user'} || $common->{'user'} )
+              . ' --password '
+              . ( $opt{'pass'} || $common->{'pass'} )
+              . ' --no-auth-cache '
+              . ' --non-interactive' );
+    }
+}
+
+sub change_date {
+    my ( $file, $chno, $destdir, $date ) = @_;
+    print "no file: " . ( $file || '' ), "\n" and return
+      if ( !-f $file );
+
+    #my $dest = dirname( catfile( $destdir, $file ) );
+    #mkpath($dest) if ( !-d $dest );
+    #_copy( $file, $dest );
+
+    open my $out, '<', $file or die 'open error: ' . $file . ': ', $!;
+    my @data = <$out>;
+    close $out;
+
+    open my $in, '>', $file or die 'open: ' . $file . ': ', $!;
+    my $num = 0;
+    foreach my $line (@data) {
+        $num++;
+        if ( $line =~ m/($chno.*)[0-9]{4}\.[0-9]{2}\.[0-9]{2}/ ) {
+            print '(' . $num . ') ' . $line;
+            $line =~ s/($chno.*)[0-9]{4}\.[0-9]{2}\.[0-9]{2}/${1}${date}/;
+            print '    ==> ' . $line;
+        }
+        print $in $line;
+    }
+    close $in;
+}
+
+sub sed {
+    my ( $file, $destdir, $a, $b ) = @_;
+    print "no file: " . ( $file || '' ), "\n" and return
+      if ( !-f $file );
+
+    #my $dest = dirname( catfile( $destdir, $file ) );
+    #mkpath($dest) if ( !-d $dest );
+    #_copy( $file, $dest );
+
+    open my $out, '<', $file or die 'open error: ' . $file . ': ', $!;
+    my @data = <$out>;
+    close $out;
+
+    open my $in, '>', $file or die 'open error: ' . $file . ': ', $!;
+    my $num = 0;
+    foreach my $line (@data) {
+        $num++;
+        my $bak = $line;
+        $line =~ s/${a}/${b}/;
+        print '(' . $num . ') ' . 'sed ==> ' . $line, "\n" if ( $bak ne $line );
+        print $in $line;
+    }
+    close $in;
+}
+
+sub delete_log {
+    my ( $file, $destdir ) = @_;
+    print 'no file: ' . ( $file || '' ), "\n" and return
+      if ( !-f $file );
+
+    #my $dest = dirname( catfile( $destdir, $file ) );
+    #mkpath($dest) if ( !-d $dest );
+    #_copy( $file, $dest );
+
+    open my $out, '<', $file or die 'open error: ' . $file . ': ', $!;
+    my @data = <$out>;
+    close $out;
+
+    open my $in, '>', $file or die 'open: ' . $file . ': ', $!;
+    my $num = 0;
+    foreach my $line (@data) {
+        $num++;
+        if ( $line =~ m#^\/\*LOG\*\/# ) {
+            print '(' . $num . ') ' . 'delete ==> ' . $line, "\n";
+        }
+        else {
+            print $in $line;
+        }
+    }
+    close $in;
+}
+
+sub do_add {
+    my $src = shift;
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    print 'svn add ' . $src, "\n";
+
+    unless ( $opt{'demo'} ) {
+        system( 'svn add ' 
+              . $src
+              . ' --username '
+              . ( $opt{'user'} || $common->{'user'} )
+              . ' --password '
+              . ( $opt{'pass'} || $common->{'pass'} )
+              . ' --no-auth-cache' );
+    }
+}
+
+sub do_commit {
+    my ( $src, $chno ) = @_;
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    print 'svn commit -m' . $chno . ' ' . $src, "\n";
+
+    unless ( $opt{'demo'} ) {
+        system( 'svn commit -m' 
+              . $chno . ' ' 
+              . $src
+              . ' --username '
+              . ( $opt{'user'} || $common->{'user'} )
+              . ' --password '
+              . ( $opt{'pass'} || $common->{'pass'} )
+              . ' --no-auth-cache' );
+    }
+}
+
+sub deploy_repo {
+    my $destdir = shift;
+    _yaml_check( $config, ('sources') );
+
+    my $sources = $config->{'sources'};
+    foreach my $source ( @{ $config->{'sources'} } ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'} or die 'undefined filename: ', $!;
+        print 'no file: ' . ( $file || '' ), "\n" and next
+          if ( !-f catfile( $destdir, $file ) );
+        _copy( catfile( $destdir, $file ), catfile( $cur, $file ) );
+        if ( -f catfile( $cur, $file ) ) {
+            print encode_utf8( 'copy '
+                  . catfile( $destdir, $file ) . ' '
+                  . catfile( $cur, $file ) ), "\n";
+        }
+        else {
+            print encode_utf8( 'copy new file: copy '
+                  . catfile( $destdir, $file ) . ' '
+                  . catfile( $cur, $file ) ), "\n";
+        }
+    }
+}
+
+sub deploy_work {
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'dirs', 'sources', 'after' ) );
+    my $workdir = catfile( $config->{'after'}, 'work' );
+
+    my @dirs = ();
+    opendir my $dh, $workdir
+      or die 'opendir: ' . encode_utf8($workdir) . ': ',
+      $!;
+    foreach my $dir ( sort readdir $dh ) {
+        next if $dir =~ m#^\.{1,2}$#;
+        next unless $dir =~ m#^[0-9]{8}_[0-9]{3}$#;
+        push( @dirs, $dir );
+    }
+    closedir $dh;
+    print 'no dir to deploy', "\n" and return if ( !@dirs );
+    my $term  = Term::ReadLine->new($progname);
+    my $reply = $term->get_reply(
+        prompt => encode_utf8(
+            'コピー元のディレクトリを指定してください.'
+        ),
+        choices => [@dirs],
+        default => $dirs[$#dirs],
+        allow   => qw#^[0-9]{8}_[0-9]{3}$#
+    );
+
+    my $dir     = catfile( $workdir, $reply );
+    my $source  = $dir;
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $hostdir = $config->{'work'};
+    my $dirs    = $config->{'dirs'};
+    my $sources = $config->{'sources'};
+
+    # scpでコピー
+    _scp_to_host( $host, $user, $pass, $hostdir, $source, $cur, TRUE );
+
+    # ログイン
+    my $exp = Expect->new();
+    $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+      or die 'spawn error: ', $!;
+    _login( $exp, $pass, $timeout );
+
+    $exp->send( 'cd ' . $hostdir . "\n" );
+    $exp->expect( $timeout, $prompt );
+
+    # コピー
+    $exp->send( 'test -d ' . $after . ' || mkdir ' . $after . "\n" );
+    $exp->expect( $timeout, $prompt );
+    _copy_host( $exp, $hostdir, $after, $dirs, $sources );
+    $exp->hard_close();
+    print "\n\n**** deploy work end.\n"
+}
+
+sub deploy_simulator {
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'simulator' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+    my $target  = $opt{'target'} || 'x86';
+    my $bindir  = catfile( $workdir, 'exe', $target, 'bin' );
+    my $exe     = 'navicore.exe';
+    my $dest    = catfile( $config->{'simulator'}, 'bin' );
+
+    # ローカルにコピー
+    _scp_to_local( $host, $user, $pass, $bindir, $exe, $dest, TRUE );
+}
+
+sub deploy_13simulator {
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'simulator' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+    my $target  = $opt{'target'} || 'x86';
+    my $bindir  = catfile( $workdir, 'runtime', 'bin', $target );
+    my $exe     = 'navicore.exe';
+    my $dest    = catfile( $config->{'simulator'}, 'bin' );
+
+    # ローカルにコピー
+    _scp_to_local( $host, $user, $pass, $bindir, $exe, $dest, TRUE );
+}
+
+sub deploy_pbmsg {
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'sources' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+    my $srcpath = catfile( $workdir, 'fw/common/libray/pbmsg/pbmsg/modules/pbmsg' );
+    my $srcdir  = 'pms_spec';
+    my $dest    = '.';
+    my $sources = $config->{'sources'};
+
+    # ローカルにコピー
+    _scp_to_local( $host, $user, $pass, $srcpath, $srcdir, $dest, TRUE );
+
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'} or die 'undefined filename: ', $!;
+        print "no file: " . ( encode_utf8("$file") || '' ), "\n" and next
+          if ( !-f "$file" );
+        next if ( $file !~ m/pms$/ );
+        my $dest = $file;
+
+        $dest =~ s#fw/common/libray/pbmsg/pbmsg/modules/pbmsg/pms_spec/##;
+        $dest = dirname( catfile( $srcdir, $dest ) );
+
+        # コピー
+        print 'src=' . encode_utf8("$file"), "\n";
+        print 'dest=' . encode_utf8($dest), "\n";
+        mkpath($dest) if ( !-d $dest );
+        _copy( "$file", $dest );
+    }
+}
+
+sub revert_work {
+    _yaml_check( $common, ( 'user', 'pass',    'host' ) );
+    _yaml_check( $config, ( 'dirs', 'sources', 'work' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $dirs    = $config->{'dirs'};
+    my $sources = $config->{'sources'};
+    my $workdir = $config->{'work'};
+
+    # ログイン
+    my $exp = Expect->new();
+    $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+      or die 'spawn error: ', $!;
+    _login( $exp, $pass, $timeout );
+    $exp->send( 'cd ' . $workdir . "\n" );
+    print $workdir, "\n";
+    $exp->expect( $timeout, $prompt );
+
+    foreach my $source ( @{$sources} ) {
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $exp->send( 'svn revert ' . $file . "\n" );
+        $exp->expect( $timeout, $prompt );
+    }
+
+    # コピー
+    $exp->send( 'test -d ' . $before . ' || mkdir ' . $before . "\n" );
+    $exp->expect( $timeout, $prompt );
+    _copy_host( $exp, $workdir, $before, $dirs, $sources );
+    $exp->hard_close();
+}
+
+sub status_work {
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'sources' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+    my $sources = $config->{'sources'};
+
+    # ログイン
+    my $exp = Expect->new();
+    $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+      or die 'spawn error: ', $!;
+    _login( $exp, $pass, $timeout );
+    $exp->send( 'cd ' . $workdir . "\n" );
+    $exp->expect( $timeout, $prompt );
+
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $exp->send( 'svn status -v ' . $file . "\n" );
+        $exp->expect( $timeout, $prompt );
+    }
+    $exp->hard_close();
+}
+
+sub sync {
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'sources' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+    my $sources = $config->{'sources'};
+
+    # ログイン
+    my $exp = Expect->new();
+    $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+      or die 'spawn error: ', $!;
+    _login( $exp, $pass, $timeout );
+    $exp->send( 'cd ' . $workdir . "\n" );
+    $exp->expect( $timeout, $prompt );
+
+    open my $save, '>&', STDOUT    # 保存
+      or die 'dup error: stdout: ', $!;
+    my ( $fh, $tmpfile ) = tempfile();
+    binmode $fh, ':unix:encoding(utf8)';
+    open STDOUT, '>&', $fh         # コピー
+      or die 'dup error: ' . $tmpfile . ': ', $!;
+
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'}
+          or die 'undefined filename: ', $!;
+        $exp->send( 'svn status -v ' . $file . "\n" );
+        $exp->expect( $timeout, $prompt );
+    }
+    $exp->hard_close();
+
+    # 標準出力を戻す
+    open STDOUT, '>&', $save
+      or die 'dup error: save: ', $!;
+    seek $fh, 0, 0
+      or die 'seek error: ', $!;
+
+    my @lines;
+    my $i = 0;
+
+    # 改行コード置換
+    while ( defined( my $line = <$fh> ) ) {
+        $line =~ tr/\r\n/\n/;
+        $lines[ $i++ ] = $line;
+    }
+
+    for ( my $i = 0 ; $i < $#lines ; $i++ ) {
+        my @status = split( /\s+/, $lines[$i] );
+        if ( ( $status[0] || '' ) eq '' || ( $status[0] || '' ) =~ m/^M$/ ) {
+            my @rev = ( '', '' );
+            foreach my $s (@status) {
+                next unless ( $s =~ m/^\d+$/ );
+                if ( $rev[0] eq '' ) {
+                    $rev[0] = $s;
+                }
+                else {
+                    $rev[1] = $s;
+                    last;
+                }
+            }
+            my $revision =
+              ( $rev[1] || '' ) =~ m/^\d+$/ ? $rev[1] : ( $rev[0] || '' );
+            my $file = $status[-1] || '';
+            print 'svn update -r ' . $revision . ' ' . $file, "\n";
+            unless ( $opt{'demo'} ) {
+                system( 'svn update -r '
+                      . $revision . ' '
+                      . $file
+                      . ' --username '
+                      . ( $opt{'user'} || $common->{'user'} )
+                      . ' --password '
+                      . ( $opt{'pass'} || $common->{'pass'} )
+                      . ' --no-auth-cache '
+                      . ' --non-interactive' );
+            }
+        }
+    }
+    write_yaml_to_revision($sync_revision_yaml);
+}
+
+sub diffline {
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'dirs', 'sources' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $dirs    = $config->{'dirs'};
+    my $sources = $config->{'sources'};
+    my $workdir = $config->{'work'};
+
+    # ログイン
+    my $exp = Expect->new();
+    $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+      or die 'spawn error: ', $!;
+    _login( $exp, $pass, $timeout );
+
+    $exp->send( 'cd ' . $workdir . "\n" );
+    $exp->expect( $timeout, $prompt );
+
+    $exp->send( 'test -d ' . $before . ' || exit 1' . "\n" );
+    _exp_error( $exp,
+        'no ' . $before . '. Please try --revert work option.' . "\n" );
+
+    $exp->send( 'test -d ' . $after . ' || exit 1' . "\n" );
+    _exp_error( $exp,
+        'no ' . $after . '. Please try --deploy work option.' . "\n" );
+
+    # diff
+    $exp->send( 'diff -r -U 0 '
+          . catfile( $before, 'navi' ) . ' '
+          . catfile( $after,  'navi' )
+          . ' | egrep "^@@|^---|^\+\+\+" > '
+          . $diffline
+          . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->hard_close();
+
+    # ローカルにコピー
+    rmtree catfile( $cur, $after )  if ( -d catfile( $cur, $after ) );
+    rmtree catfile( $cur, $before ) if ( -d catfile( $cur, $before ) );
+    _scp_to_local( $host, $user, $pass, $workdir, $after,    '.', TRUE );
+    _scp_to_local( $host, $user, $pass, $workdir, $before,   '.', TRUE );
+    _scp_to_local( $host, $user, $pass, $workdir, $diffline, '.', FALSE );
+    _scp_to_local( $host, $user, $pass, $workdir, $klocwork, '.', TRUE );
+    _scp_to_local( $host, $user, $pass, $workdir, $qacdna,   '.', TRUE );
+    _scp_to_local( $host, $user, $pass, $workdir, $qac,      '.', TRUE );
+}
+
+sub do_17make_old {
+    my ( $option, $modules ) = @_;
+    my $rebuild = $opt{'rebuild'} ? 'rebuild' : '';
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'dirs' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+
+    my @targets = ();
+    if ( $opt{'target'} ) {
+        push @targets, $opt{'target'};
+    }
+    else {
+        if ( defined $config->{'targets'} ) {
+            @targets = @{ $config->{'targets'} };
+        }
+        else {
+            push @targets, 'x86';
+        }
+    }
+
+    print strftime( "[%Y-%m-%d %H:%M:%S]: begin", localtime ), "\n";
+    my $pm;
+    if ( defined $opt{'fork'} ) {
+        require Parallel::ForkManager;
+        import Parallel::ForkManager;
+        $pm = new Parallel::ForkManager($max_procs);
+        $pm->run_on_finish(
+            sub {
+                my ( $pid, $exit_code, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident just got out of the pool "
+                  . "with PID $pid and exit code: $exit_code\n";
+            }
+        );
+
+        $pm->run_on_start(
+            sub {
+                my ( $pid, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident started, pid: $pid\n";
+            }
+        );
+    }
+
+    # ディレクトリごとにmakeとリンクする
+    my $exp  = undef;
+    my @logs = ();
+    foreach my $dir ( sort @{ $config->{'dirs'} } ) {
+        if ( $option ne 'all' ) {
+            if ( @{$modules} ) {
+                my @mod = split /\//, $dir;
+                my $modname = ( $mod[0] || '' ) . '-' . ( $mod[-1] || '' );
+                my $exec = FALSE;
+                foreach my $module ( @{$modules} ) {
+                    $exec = TRUE if ( $modname eq $module );
+                }
+                next unless ($exec);
+            }
+            else {
+                next if ( $option ne $dir );
+            }
+        }
+
+        # 子プロセス
+        my $log =
+            'compile_'
+          . basename( dirname($dir) ) . '_'
+          . basename($dir) . '_'
+          . $$ . '.log';
+        mkpath('log') if ( !-d 'log' );
+        $log = catfile( 'log', $log );
+        push( @logs, $log );
+
+        if ( defined $opt{'fork'} ) {    # 並列処理
+            my $pid = $pm->start( $dir . ' ==> ' . $log ) and next;
+        }
+        else {                           # 逐次処理
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' ==> ' . $log, "\n";
+        }
+
+        open my $save, '>&', STDOUT      # 保存
+          or die 'dup error: stdout: ', $!;
+        open my $out, '>', $log          # ファイルに出力
+          or die 'open error: ' . $log . ': ', $!;
+        binmode $out, ':unix:encoding(utf8)';
+        open STDOUT, '>&', $out          # コピー
+          or die 'dup error: ' . $log . ': ', $!;
+
+        # ログイン
+        $exp = Expect->new();
+        $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+          or die 'spawn error: ', $!;
+        _login( $exp, $pass, $timeout );
+
+        $exp->send( 'cd ' . catfile( $workdir, $dir ) . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        foreach my $target (@targets) {
+
+            # make
+            $exp->send(
+                '17make TARGET_CPU=' . $target . ' -j8 ' . $rebuild . "\n" );
+            $exp->expect( undef, $prompt );
+
+            # リンク
+            $exp->send( '17make TARGET_CPU=' . $target . ' lnk' . "\n" );
+            $exp->expect( undef, $prompt );
+        }
+        $exp->hard_close();
+        close($out);
+
+        # 標準出力を戻す
+        open STDOUT, '>&', $save
+          or die 'dup error: save: ', $!;
+
+        if ( defined $opt{'fork'} ) {
+            $pm->finish( $stathash{'EX_OK'} );
+        }
+        else {
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' End', "\n";
+        }
+    }
+
+    # 子プロセス終了待ち
+    if ( defined $opt{'fork'} ) {
+        print "Waiting for Children...\n";
+        $pm->wait_all_children;
+        print "Everybody is out of the pool!\n";
+    }
+
+    # navicore指定の場合実行する
+    my $modname = 'navicore';
+    my $exec    = FALSE;
+    if ( defined $modules ) {
+        foreach my $module ( @{$modules} ) {
+            $exec = TRUE if ( $modname eq $module );
+        }
+    }
+
+    # リンク(exe)
+    if ( $option eq 'all' || $option eq 'exe' || $exec ) {
+
+        my $dir = catfile( $workdir, 'navi', 'navicore' );
+        my $log = 'compile_navicore_' . $$ . '.log';
+        mkpath('log') if ( !-d 'log' );
+        $log = catfile( 'log', $log );
+        push( @logs, $log );
+        print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+        print $dir . ' ==> ' . $log, "\n";
+        open my $save, '>&', STDOUT    # 保存
+          or die 'dup error: stdout: ', $!;
+        open my $out, '>', $log        # ファイルに出力
+          or warn 'open error: ' . $log . ': ', $!;
+        binmode $out, ':unix:encoding(utf8)';
+        open STDOUT, '>&', $out        # コピー
+          or warn 'dup error: ' . $log . ': ', $!;
+
+        $exp = Expect->new();
+        $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+          or die 'spawn error: ', $!;
+        _login( $exp, $pass, $timeout );
+
+        $exp->send( 'cd ' . $dir . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        foreach my $target (@targets) {
+            $exp->send( '17make TARGET_CPU=' . $target . ' lnk' . "\n" );
+            $exp->expect( undef, $prompt );
+        }
+        close($out);
+
+        # 標準出力を戻す
+        open STDOUT, '>&', $save
+          or die 'dup error: save: ', $!;
+        $exp->send(
+            'ls -l ' . catfile( $workdir, 'exe', 'x86', 'bin' ) . "\n" );
+        $exp->expect( $timeout, $prompt );
+        $exp->hard_close();
+        print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+        print $dir . ' End', "\n";
+    }
+
+    open my $out, '>', $compile_log
+      or die 'open error: ' . $compile_log . ': ', $!;
+    foreach my $log (@logs) {
+        open my $in, '<', $log
+          or die 'open error: ' . $log . ': ', $!;
+
+        # ログを1ファイルにまとめる
+        my @lines = <$in>;
+        foreach my $line (@lines) {
+            print $out $line;
+        }
+
+        # ログのエラーを検索して表示
+        my @matched = grep { $_ =~ /[Ee]rror|ERROR/ } @lines;
+        foreach my $match (@matched) {
+            print $match;
+        }
+        close($in);
+    }
+    close($out);
+
+    print strftime( "[%Y-%m-%d %H:%M:%S]: end", localtime ), "\n";
+}
+
+sub do_make {
+    my ( $command, $option, $modules ) = @_;
+    my $rebuild = $opt{'rebuild'} ? 'rebuild' : '';
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'dirs' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+
+    my @targets = ();
+    if ( $opt{'target'} ) {
+        push @targets, $opt{'target'};
+    }
+    else {
+        if ( defined $config->{'targets'} ) {
+            @targets = @{ $config->{'targets'} };
+        }
+        else {
+            push @targets, 'x86';
+        }
+    }
+
+    print strftime( "[%Y-%m-%d %H:%M:%S]: begin", localtime ), "\n";
+    my $pm;
+    if ( defined $opt{'fork'} ) {
+        require Parallel::ForkManager;
+        import Parallel::ForkManager;
+        $pm = new Parallel::ForkManager($max_procs);
+        $pm->run_on_finish(
+            sub {
+                my ( $pid, $exit_code, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident just got out of the pool "
+                  . "with PID $pid and exit code: $exit_code\n";
+            }
+        );
+
+        $pm->run_on_start(
+            sub {
+                my ( $pid, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident started, pid: $pid\n";
+            }
+        );
+    }
+
+    # ディレクトリごとにmakeとリンクする
+    my $exp  = undef;
+    my @logs = ();
+    foreach my $dir ( @{ $config->{'dirs'} } ) {
+        if ( $option ne 'all' ) {
+            if ( @{$modules} ) {
+                my @mod = split /\//, $dir;
+                my $modname = ( $mod[0] || '' ) . '-' . ( $mod[-1] || '' );
+                my $exec = FALSE;
+                foreach my $module ( @{$modules} ) {
+                    $exec = TRUE if ( $modname eq $module );
+                }
+                next unless ($exec);
+            }
+            else {
+                next if ( $option ne $dir );
+            }
+        }
+
+        # 子プロセス
+        my $log =
+            'compile_'
+          . basename( dirname($dir) ) . '_'
+          . basename($dir) . '_'
+          . $$ . '.log';
+        mkpath('log') if ( !-d 'log' );
+        $log = catfile( 'log', $log );
+        push( @logs, $log );
+
+        if ( defined $opt{'fork'} ) {    # 並列処理
+            my $pid = $pm->start( $dir . ' ==> ' . $log ) and next;
+        }
+        else {                           # 逐次処理
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' ==> ' . $log, "\n";
+        }
+
+        open my $save, '>&', STDOUT      # 保存
+          or die 'dup error: stdout: ', $!;
+        open my $out, '>', $log          # ファイルに出力
+          or die 'open error: ' . $log . ': ', $!;
+        binmode $out, ':unix:encoding(utf8)';
+        open STDOUT, '>&', $out          # コピー
+          or die 'dup error: ' . $log . ': ', $!;
+
+        # ログイン
+        $exp = Expect->new();
+        $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+          or die 'spawn error: ', $!;
+        _login( $exp, $pass, $timeout );
+
+        $exp->send( 'cd ' . catfile( $workdir, $dir ) . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        # make
+        foreach my $target (@targets) {
+            $exp->send( $command
+                  . ' TARGET_CPU='
+                  . $target . ' -j8 '
+                  . $rebuild
+                  . "\n" );
+            $exp->expect( undef, $prompt );
+        }
+
+        # 標準出力を戻す
+        open STDOUT, '>&', $save
+          or die 'dup error: save: ', $!;
+
+        if ( defined $opt{'fork'} ) {
+            $pm->finish( $stathash{'EX_OK'} );
+        }
+        else {
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' End', "\n";
+        }
+    }
+
+    # 子プロセス終了待ち
+    if ( defined $opt{'fork'} ) {
+        print "Waiting for Children...\n";
+        $pm->wait_all_children;
+        print "Everybody is out of the pool!\n";
+    }
+
+    # リンク(exe)
+    if ( $option eq 'all' || $option eq 'exe' ) {
+        _yaml_check( $config, ('links') );
+
+        foreach my $link ( @{ $config->{'links'} } ) {
+            my $dir = catfile( $workdir, $link );
+            my $log = 'link_' . basename($link) . '_' . $$ . '.log';
+            mkpath('log') if ( !-d 'log' );
+            $log = catfile( 'log', $log );
+            push( @logs, $log );
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' ==> ' . $log, "\n";
+            open my $save, '>&', STDOUT    # 保存
+              or die 'dup error: stdout: ', $!;
+            open my $out, '>', $log        # ファイルに出力
+              or warn 'open error: ' . $log . ': ', $!;
+            binmode $out, ':unix:encoding(utf8)';
+            open STDOUT, '>&', $out        # コピー
+              or warn 'dup error: ' . $log . ': ', $!;
+
+            $exp = Expect->new();
+            $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+              or die 'spawn error: ', $!;
+            _login( $exp, $pass, $timeout );
+
+            $exp->send( 'cd ' . $dir . "\n" );
+            $exp->expect( $timeout, $prompt );
+
+            foreach my $target (@targets) {
+                $exp->send(
+                    $command . ' TARGET_CPU=' . $target . ' lnk' . "\n" );
+                $exp->expect( undef, $prompt );
+                if ( $command eq '13make' ) {
+                    $exp->send( 'ls -l '
+                          . catfile( $workdir, 'runtime', 'bin', $target )
+                          . "\n" );
+                }
+                else {
+                    $exp->send( 'ls -l '
+                          . catfile( $workdir, 'exe', $target, 'bin' )
+                          . "\n" );
+                }
+            }
+            close($out);
+
+            # 標準出力を戻す
+            open STDOUT, '>&', $save
+              or die 'dup error: save: ', $!;
+            $exp->expect( $timeout, $prompt );
+            $exp->hard_close();
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' End', "\n";
+        }
+    }
+
+    open my $out, '>', $compile_log
+      or die 'open error: ' . $compile_log . ': ', $!;
+    foreach my $log (@logs) {
+        open my $in, '<', $log
+          or die 'open error: ' . $log . ': ', $!;
+
+        # ログを1ファイルにまとめる
+        my @lines = <$in>;
+        foreach my $line (@lines) {
+            print $out $line;
+        }
+
+        # ログのエラーを検索して表示
+        my @matched = grep { $_ =~ /[Ee]rror|ERROR/ } @lines;
+        foreach my $match (@matched) {
+            print $match;
+        }
+        close($in);
+    }
+    close($out);
+
+    print strftime( "[%Y-%m-%d %H:%M:%S]: end", localtime ), "\n";
+}
+
+# klocworkの実行
+sub do_klocwork {
+    my $mod = shift || 'all';
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'dirs', 'sources' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+    my $dirs    = $config->{'dirs'};
+    my $sources = $config->{'sources'};
+    my $command = $opt{'command'} || 'kloc_DESKTOP_17CY.pl VE48 -init arm';
+
+    print strftime( "[%Y-%m-%d %H:%M:%S]: begin", localtime ), "\n";
+    my $pm;
+    if ( defined $opt{'fork'} ) {
+        require Parallel::ForkManager;
+        import Parallel::ForkManager;
+        $pm = new Parallel::ForkManager($max_procs);
+        $pm->run_on_finish(
+            sub {
+                my ( $pid, $exit_code, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident just got out of the pool "
+                  . "with PID $pid and exit code: $exit_code\n";
+            }
+        );
+
+        $pm->run_on_start(
+            sub {
+                my ( $pid, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident started, pid: $pid\n";
+            }
+        );
+    }
+
+    # ディレクトリごとに処理する
+    foreach my $dir ( @{$dirs} ) {
+
+        # ログファイル名
+        my $log =
+            'klocwork_'
+          . basename( dirname($dir) ) . '_'
+          . basename($dir) . '_'
+          . $$ . '.log';
+        mkpath('log') if ( !-d 'log' );
+        $log = catfile( 'log', $log );
+
+        # 子プロセス
+        if ( defined $opt{'fork'} ) {    # 並列処理
+            my $pid = $pm->start( $dir . ' ==> ' . $log ) and next;
+        }
+        else {                           # 逐次処理
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' ==> ' . $log, "\n";
+        }
+
+        open my $save, '>&', STDOUT      # 保存
+          or die 'dup error: stdout: ', $!;
+        open my $out, '>', $log          # ファイルに出力
+          or die 'open error: ' . $log . ': ', $!;
+        binmode $out, ':unix:encoding(utf8)';
+        open STDOUT, '>&', $out          # コピー
+          or die 'dup error: ' . $log . ': ', $!;
+
+        # ログイン
+        my $exp = Expect->new();
+        $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+          or die 'spawn error: ', $!;
+        _login( $exp, $pass, $timeout );
+
+        $exp->send( 'cd ' . $workdir . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        # ディレクトリ作成
+        $exp->send( 'mkdir -p ' . $klocwork . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        next if ( $mod ne 'all' && $mod ne $dir );
+        $exp->send( 'cd ' . catfile( $workdir, $dir ) . "\n" );
+        $exp->expect( $timeout, $prompt );
+        sleep(1);
+
+        # ファイルごとに処理する
+        my $count = 1;
+        my @csources =
+          grep { $_->{'filename'} =~ m/^$dir.*(\.c)|(\.cpp)$/ } @{$sources};
+        foreach my $source (@csources) {
+            my $filepath = $source->{'filename'};
+            my $file     = $filepath
+              or die 'undefined filename: ', $!;
+            $file =~ s/^$dir//;
+            $file =~ s#^/##;
+
+            # クロックワーク
+            print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $save '(' 
+              . $count . '/'
+              . @csources
+              . ") klocwork begin: $$ ==> "
+              . $filepath, "\n";
+            $exp->send(
+                    $command . ' ' 
+                  . $file . ' -j=4' . '; \\' . "\n" . 'mv '
+                  . catfile( $workdir, $dir, 'klocwork', 'res_detaile.txt' )
+                  . ' '
+                  . catfile( $workdir, $klocwork,
+                    basename($file) . '_detaile.txt' )
+                  . '; \\' . "\n" . 'mv '
+                  . catfile(
+                    $workdir, $dir, 'klocwork', 'res_detaile_MISRA.txt'
+                  )
+                  . ' '
+                  . catfile(
+                    $workdir, 'klocwork',
+                    basename($file) . '_detaile_MISRA.txt'
+                  )
+                  . "\n"
+            );
+
+            # タイムアウトなし
+            $exp->expect( undef, $prompt );
+            print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $save '('
+              . $count++ . '/'
+              . @csources
+              . ") klocwork end: $$ ==> "
+              . $filepath, "\n";
+        }    # ファイル
+        $exp->hard_close();
+        close($out);
+
+        # 標準出力を戻す
+        open STDOUT, '>&', $save
+          or die 'dup error: save: ', $!;
+
+        if ( defined $opt{'fork'} ) {
+            $pm->finish( $stathash{'EX_OK'} );
+        }
+        else {
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' End', "\n";
+        }
+    }    # ディレクトリ
+
+    # 子プロセス終了待ち
+    if ( defined $opt{'fork'} ) {
+        print "Waiting for Children...\n";
+        $pm->wait_all_children;
+        print "Everybody is out of the pool!\n";
+    }
+}
+
+# qadiffの実行
+sub do_qadiff {
+    my $mod = shift || 'all';
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ( 'work', 'dirs', 'sources', 'qadiff' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+    my $dirs    = $config->{'dirs'};
+    my $sources = $config->{'sources'};
+    my $option  = $config->{'qadiff'};
+
+    print strftime( "[%Y-%m-%d %H:%M:%S]: begin", localtime ), "\n";
+    my $pm;
+    if ( defined $opt{'fork'} ) {
+        require Parallel::ForkManager;
+        import Parallel::ForkManager;
+        $pm = new Parallel::ForkManager($max_procs);
+        $pm->run_on_finish(
+            sub {
+                my ( $pid, $exit_code, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident just got out of the pool "
+                  . "with PID $pid and exit code: $exit_code\n";
+            }
+        );
+
+        $pm->run_on_start(
+            sub {
+                my ( $pid, $ident ) = @_;
+                print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print "** $ident started, pid: $pid\n";
+            }
+        );
+    }
+
+    # ディレクトリごとに処理する
+    foreach my $dir ( @{$dirs} ) {
+        next if ( $mod ne 'all' && $mod ne $dir );
+
+        # ログファイル名
+        my $log =
+            'qadiff_'
+          . basename( dirname($dir) ) . '_'
+          . basename($dir) . '_'
+          . $$ . '.log';
+        mkpath('log') if ( !-d 'log' );
+        $log = catfile( 'log', $log );
+
+        # 子プロセス
+        if ( defined $opt{'fork'} ) {    # 並列処理
+            my $pid = $pm->start( $dir . ' ==> ' . $log ) and next;
+        }
+        else {                           # 逐次処理
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' ==> ' . $log, "\n";
+        }
+
+        open my $save, '>&', STDOUT      # 保存
+          or die 'dup error: stdout: ', $!;
+        open my $out, '>', $log          # ファイルに出力
+          or die 'open error: ' . $log . ': ', $!;
+        binmode $out, ':unix:encoding(utf8)';
+        open STDOUT, '>&', $out          # コピー
+          or die 'dup error: ' . $log . ': ', $!;
+
+        # ログイン
+        my $exp = Expect->new();
+        $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+          or die 'spawn error: ', $!;
+        _login( $exp, $pass, $timeout );
+
+        # ディレクトリ作成
+        $exp->send( 'cd ' . $workdir . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        $exp->send( 'mkdir -p ' . $qacdna . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        $exp->send( 'mkdir -p ' . $qac . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        $exp->send( 'cd ' . catfile( $workdir, $dir ) . "\n" );
+        $exp->expect( $timeout, $prompt );
+
+        # ファイルごとに処理する
+        my $count = 1;
+        my @csources = grep { $_->{'filename'} =~ /^$dir.*\.c$/ } @{$sources};
+        foreach my $source (@csources) {
+            my $filepath = $source->{'filename'};
+            my $file     = $filepath
+              or die 'undefined filename: ', $!;
+            $file =~ s/^$dir//;
+            $file =~ s#^/##;
+
+            # qadiff
+            print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $save '(' 
+              . $count . '/'
+              . @csources
+              . ") qadiff begin: $$ ==> "
+              . $filepath, "\n";
+            $exp->send(
+                    'qadiff -M ' 
+                  . $option
+                  . ' -b -SOURCE='
+                  . $file . '; \\' . "\n" . 'mv '
+                  . catfile(
+                    $workdir, $dir,
+                    'qadiff_dna_' . basename($file) . '.csv'
+                  )
+                  . ' '
+                  . catfile( $workdir, $qacdna, '.' ) . '; \\' . "\n" . 'mv '
+                  . catfile( $workdir, $dir,
+                    'qadiff_' . basename($file) . '.csv' )
+                  . ' '
+                  . catfile( $workdir, $qac, '.' ) . "\n"
+            );
+
+            # タイムアウトなし
+            $exp->expect( undef, $prompt );
+            print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $save '('
+              . $count++ . '/'
+              . @csources
+              . ") qadiff end: $$ ==> "
+              . $filepath, "\n";
+        }    # ファイル
+        $exp->hard_close();
+        close($out);
+
+        # 標準出力を戻す
+        open STDOUT, '>&', $save
+          or die 'dup error: save: ', $!;
+
+        if ( defined $opt{'fork'} ) {
+            $pm->finish( $stathash{'EX_OK'} );
+        }
+        else {
+            print strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $dir . ' End', "\n";
+        }
+    }    # ディレクトリ
+
+    # 子プロセス終了待ち
+    if ( defined $opt{'fork'} ) {
+        print "Waiting for Children...\n";
+        $pm->wait_all_children;
+        print "Everybody is out of the pool!\n";
+    }
+}
+
+sub _reply_dir {
+    my ( $prompt, $base ) = @_;
+    my @dirs = ();
+    my $main = catfile( $base, 'main' );
+    my $work = catfile( $base, 'work' );
+    opendir my $dh_main, $main
+      or die 'opendir: ' . encode_utf8($main) . ': ',
+      $!;
+    foreach my $dir ( sort readdir $dh_main ) {
+        next if $dir =~ /^\.{1,2}$/;
+        next unless $dir =~ /^[0-9]{8}_[0-9]{3}$/;
+        push( @dirs, catfile( 'main', $dir ) );
+    }
+    closedir $dh_main;
+
+    opendir my $dh_work, $work
+      or die 'opendir: ' . encode_utf8($work) . ': ',
+      $!;
+    foreach my $dir ( sort readdir $dh_work ) {
+        next if $dir =~ /^\.{1,2}$/;
+        next unless $dir =~ /^[0-9]{8}_[0-9]{3}$/;
+        push( @dirs, catfile( 'work', $dir ) );
+    }
+    closedir $dh_work;
+
+    print 'no dir', "\n" and return if ( !@dirs );
+    my $term  = Term::ReadLine->new($progname);
+    my $reply = $term->get_reply(
+        prompt  => encode_utf8($prompt),
+        choices => [@dirs],
+        default => $dirs[$#dirs],
+        allow   => qw/^[0-9]{8}_[0-9]{3}$/
+    );
+
+    return catfile( $base, $reply );
+}
+
+sub do_meld {
+    _yaml_check( $config, ( 'after', 'before' ) );
+
+    my $after  = $config->{'after'};
+    my $before = $config->{'before'};
+
+    my $src =
+      _reply_dir( '変更前ソースを指定してください.', $before );
+    my $dest =
+      _reply_dir( '変更後ソースを指定してください.', $after );
+
+    my $cmd = 'meld ' . $src . ' ' . $dest . ' &';
+    print encode_utf8($cmd), "\n";
+    system($cmd);
+}
+
+# クリア
+sub clear {
+    my $mod = shift || '';
+    _yaml_check( $common, ( 'user', 'pass', 'host' ) );
+    _yaml_check( $config, ('work') );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $host    = _get_host();
+    my $workdir = $config->{'work'};
+
+    # ログイン
+    my $exp = Expect->new();
+    $exp->spawn( 'ssh -l ' . $user . ' ' . $host )
+      or die 'spawn error: ', $!;
+    _login( $exp, $pass, $timeout );
+
+    $exp->send( 'cd ' . $workdir . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->send( 'test -d ' . $klocwork . ' && rm -rf ' . $klocwork . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->send( 'test -d ' . $qacdna . ' && rm -rf ' . $qacdna . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->send( 'test -d ' . $qac . ' && rm -rf ' . $qac . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->send( 'test -f ' . $diffline . ' && rm -rf ' . $diffline . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->send( 'test -d ' . $after . ' && rm -rf ' . $after . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->send( 'test -d ' . $before . ' && rm -rf ' . $before . "\n" );
+    $exp->expect( $timeout, $prompt );
+    $exp->hard_close();
+
+    if ( -d $klocwork ) {
+        rmtree($klocwork);
+    }
+
+    if ( -d $qac ) {
+        rmtree($qac);
+    }
+
+    if ( -d $qacdna ) {
+        rmtree($qacdna);
+    }
+}
+
+# ファイルがあるかどうかのチェック
+sub check {
+    _yaml_check( $config, ( 'dirs', 'sources' ) );
+
+    my $check_dirs    = TRUE;
+    my $check_files   = TRUE;
+    my $check_changes = TRUE;
+
+    my $dirs     = $config->{'dirs'};
+    my $sources  = $config->{'sources'};
+    my $includes = $config->{'includes'};
+
+    foreach my $dir ( @{$dirs} ) {
+        $dir = _decode_utf8($dir);
+        my $file = catfile( $dir, 'make_def.mk' );
+        print 'no make_def.mk: ' . $dir, "\n" if ( !-f $file );
+    }
+
+    foreach my $dir ( @{$dirs}, @{$includes} ) {
+        $dir = _decode_utf8($dir);
+
+        if ( !-d $dir ) {
+            print "no directory: " . $dir . "\n";
+            $check_dirs = FALSE;
+            next;
+        }
+
+        _change_dir( catfile( $cur, $dir ) );
+        foreach my $source ( @{$sources} ) {
+            next
+              if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+            my $file = $source->{'filename'}
+              or die 'undefined filename: ', $!;
+            my $chno =
+              defined $source->{'changes'}
+              ? $source->{'changes'}
+              : ( $changes || '' );
+
+            if ( $file =~ m/^$dir/ ) {
+                $file =~ s/^$dir//;
+                $file =~ s#^/##;
+                if ( !-f $file ) {
+                    print "no file: " . catfile( $dir, $file ) . "\n";
+                    $check_files = FALSE;
+                    next;
+                }
+            }
+            if ( !defined $chno ) {
+                print "no changes: " . catfile( $dir, $file ) . "\n";
+                $check_changes = FALSE;
+            }
+        }
+        _change_dir($cur);
+    }
+
+    foreach my $source ( @{$sources} ) {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $error = TRUE;
+        foreach my $dir ( @{$dirs}, @{$includes} ) {
+            $error = FALSE if ( $source->{'filename'} =~ m/^$dir/ );
+        }
+        if ($error) {
+            print 'no dirs param: '
+              . encode_utf8( basename( $source->{'filename'} ) ) . ': ? '
+              . encode_utf8( dirname( $source->{'filename'} ) ), "\n";
+            $check_dirs = FALSE;
+        }
+    }
+
+    my %srcdirs = ();
+    foreach my $source (
+        sort { ( $a->{'changes'} || '' ) cmp( $b->{'changes'} || '' ) }
+        @{$sources} )
+    {
+        next if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+        my $file = $source->{'filename'} or die 'undefined filename: ', $!;
+        my $chno = defined $changes ? $changes : ( $source->{'changes'} || '' );
+        my $devno =
+          ( defined $source->{'develop'} && $source->{'develop'} ne '' )
+          ? $source->{'develop'}
+          : $develop;
+
+        print $devno . ' ' if ( $devno ne '' );
+        print $chno . ' '  if ( $chno  ne '' );
+        print $file, "\n";
+        $srcdirs{ dirname( $source->{'filename'} ) } = 1;
+    }
+    print "\n";
+
+    # 変更ディレクトリ
+    print encode_utf8('**** 変更ディレクトリ'), "\n";
+    foreach my $dir ( sort keys(%srcdirs) ) {
+        print $dir, "\n" if ( -d $dir );
+    }
+    print "\n";
+
+    # コンパイルディレクトリ
+    print encode_utf8('**** コンパイルディレクトリ'), "\n";
+    my @exist_dirs = ();
+    foreach my $dir ( sort @{ $config->{'dirs'} } ) {
+        if ( -d $dir ) {
+            print $dir, "\n";
+            push @exist_dirs, $dir;
+        }
+    }
+    print "\n";
+
+    print encode_utf8('**** ワーク修正モジュール指定'), "\n";
+    foreach my $dir ( sort @{ $config->{'includes'} } ) {
+        push @exist_dirs, $dir if ( -d $dir );
+    }
+    print "fixmodules=@exist_dirs\n";
+
+    # チェック
+    $check_dirs    ? print "dir:     OK\n" : print "dir:     NG\n";
+    $check_files   ? print "file:    OK\n" : print "file:    NG\n";
+    $check_changes ? print "changes: OK\n" : print "changes: NG\n";
+}
+
+sub _subtree {
+    my ( $depth, @trees ) = @_;
+    $depth++;
+    foreach my $tree (@trees) {
+        for ( my $i = 0 ; $i < $depth ; $i++ ) {
+            print '  ';
+        }
+        print encode_utf8( decode_utf8('└─ ') );
+        print $tree->{'function'};
+        print ' ('
+          . ( encode_utf8( _decode_utf8( $tree->{'comment'} ) ) || '' ) . ')'
+          if ( $opt{'vorbis'} && defined $tree->{'comment'} );
+        print "\n";
+        _subtree( $depth, @{ $tree->{'subtree'} } )
+          if ( defined $tree->{'subtree'} );
+    }
+}
+
+sub tree {
+    my $depth = 0;
+    _yaml_check( $config, ('tree') );
+    _subtree( $depth, @{ $config->{'tree'} } );
+}
+
+sub _lastdir {
+    my $dir  = shift;
+    my $base = '';
+
+    if ( -d $dir ) {
+        opendir my $dh, $dir
+          or die 'opendir: ' . encode_utf8($dir) . ': ',
+          $!;
+        foreach my $base ( reverse( sort readdir $dh ) ) {
+            next if $base =~ m#^\.{1,2}$#;
+            next unless $base =~ m#^[0-9]{8}_[0-9]{3}$#;
+            closedir $dh;
+            return $base;
+        }
+        closedir $dh;
+    }
+    return '';
+}
+
+sub _repofile {
+    my $dir  = shift;
+    my $base = '';
+
+    if ( -d $dir ) {
+        opendir my $dh, $dir
+          or die 'opendir: ' . encode_utf8($dir) . ': ',
+          $!;
+        foreach my $file ( sort readdir $dh ) {
+            next if $file =~ m#^\.{1,2}$#;
+            next unless $file =~ m#^.*r\d+\.diff$#;
+            closedir $dh;
+            return $file;
+        }
+        closedir $dh;
+    }
+    return '';
+}
+
+sub _get_repo {
+    my $dir = shift;
+    _yaml_check( $common, ( 'user', 'pass' ) );
+
+    my $user = $common->{'user'};
+    my $pass = $common->{'pass'};
+
+    setlocale( LC_ALL, "C" );
+    $ENV{"LANG"} = "C";
+    my $cmd =
+        'svn info ' 
+      . $dir
+      . ' --username '
+      . $user
+      . ' --password '
+      . $pass
+      . ' --no-auth-cache';
+    my @result = `$cmd`;
+
+    foreach my $res (@result) {
+        chomp $res;
+        if ( $res =~ m/^URL/ ) {
+            $res =~ s/URL: //;
+            setlocale( LC_ALL, "ja_JP.UTF8" );
+            $ENV{"LANG"} = "ja_JP.UTF8";
+            return $res;
+        }
+    }
+    setlocale( LC_ALL, "ja_JP.UTF8" );
+    $ENV{"LANG"} = "ja_JP.UTF8";
+    return '';
+}
+
+sub _get_revision {
+    my $dir = shift;
+    _yaml_check( $common, ( 'user', 'pass' ) );
+
+    my $user = $common->{'user'};
+    my $pass = $common->{'pass'};
+
+    setlocale( LC_ALL, "C" );
+    $ENV{"LANG"} = "C";
+    my $cmd =
+        'svn info ' 
+      . $dir
+      . ' --username '
+      . $user
+      . ' --password '
+      . $pass
+      . ' --no-auth-cache';
+    my @result = `$cmd`;
+
+    foreach my $res (@result) {
+        chomp $res;
+        if ( $res =~ m/Last Changed Rev/ ) {
+            $res =~ s/Last Changed Rev: //;
+            setlocale( LC_ALL, "ja_JP.UTF8" );
+            $ENV{"LANG"} = "ja_JP.UTF8";
+            return $res;
+        }
+    }
+    setlocale( LC_ALL, "ja_JP.UTF8" );
+    $ENV{"LANG"} = "ja_JP.UTF8";
+    return '';
+}
+
+sub _get_branch {
+    my $repo = shift;
+
+    my @db     = `/vns/tool/13CY/isogai/13repochk/mysqlbranch $repo`;
+    my @result = ();
+    foreach my $res (@db) {
+        chomp $res;
+        my @br = split /\,/, $res;
+        return @result if ( $#br != 2 );
+
+        print "$br[0]: $br[1]/$br[2]\n"
+          if ( $opt{'vorbis'} );
+        if ( $br[0] eq 'V-E01' || $br[0] eq 'V-E02' ) {
+            if ( -d "/vns/main/16CY/$br[1]/$br[2]" ) {
+                push @result, "$br[0] : /vns/main/16CY/$br[1]/$br[2]";
+                next;
+            }
+        }
+        if ( -d "/vns/main/13CY/$br[1]/$br[2]" ) {
+            push @result, "$br[0] : /vns/main/13CY/$br[1]/$br[2]";
+        }
+        elsif ( -d "/vns/main/13DOP/$br[1]/$br[2]" ) {
+            push @result, "$br[0] : /vns/main/13DOP/$br[1]/$br[2]";
+        }
+        elsif ( -d "/vns/main/13M/$br[1]/$br[2]" ) {
+            push @result, "$br[0] : /vns/main/13M/$br[1]/$br[2]";
+        }
+        elsif ( -d "/vns/main/15CY/$br[1]/$br[2]" ) {
+            push @result, "$br[0] : /vns/main/15CY/$br[1]/$br[2]";
+        }
+        elsif ( -d "/vns/main/16DOP/$br[1]/$br[2]" ) {
+            push @result, "$br[0] : /vns/main/16DOP/$br[1]/$br[2]";
+        }
+        elsif ( $br[1] =~ /^15CY_/ ) {
+            my $br1 = $br[1];
+            $br1 =~ s/^15CY_//;
+            if ( -d "/vns/main/15CY/$br1/$br[2]" ) {
+                push @result, "$br[0] : /vns/main/15CY/br1/$br[2]";
+            }
+        }
+    }
+    return @result;
+}
+
+sub review {
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ( 'sources', 'dirs', 'after', 'before' ) );
+
+    my $user    = $common->{'user'};
+    my $pass    = $common->{'pass'};
+    my $sources = $config->{'sources'};
+    my $dirs    = $config->{'dirs'};
+    my $after   = $config->{'after'};
+    my $before  = $config->{'before'};
+
+    # リビジョン取得
+    my $revision;
+    foreach my $dir ( @{$dirs} ) {
+        $revision .= '_' . basename($dir) . '_r' . _get_revision($dir);
+    }
+
+    my ( $base, $tmp );
+    $base = _lastdir( catfile( $after, 'main' ) );
+    $tmp = $after;
+    $tmp =~ s/$common->{'linuxshare'}//;
+    $tmp =~ s#^/##;
+    $tmp =~ s#/#\\#g;
+    my $amain = $common->{'winshare'} . '\\' . $tmp . '\\main\\' . $base;
+
+    $base = _lastdir( catfile( $after, 'work' ) );
+    $tmp = $after;
+    $tmp =~ s/$common->{'linuxshare'}//;
+    $tmp =~ s#^/##;
+    $tmp =~ s#/#\\#g;
+    my $awork = $common->{'winshare'} . '\\' . $tmp . '\\work\\' . $base;
+
+    $base = _lastdir( catfile( $before, 'main' ) );
+    $tmp = $before;
+    $tmp =~ s/$common->{'linuxshare'}//;
+    $tmp =~ s#^/##;
+    $tmp =~ s#/#\\#g;
+    my $bmain = $common->{'winshare'} . '\\' . $tmp . '\\main\\' . $base;
+
+    $base = _lastdir( catfile( $before, 'work' ) );
+    $tmp = $before;
+    $tmp =~ s/$common->{'linuxshare'}//;
+    $tmp =~ s#^/##;
+    $tmp =~ s#/#\\#g;
+    my $bwork = $common->{'winshare'} . '\\' . $tmp . '\\work\\' . $base;
+
+    my %hash = ();
+    foreach my $source (
+        sort { ( $a->{'changes'} || '' ) cmp( $b->{'changes'} || '' ) }
+        @{$sources} )
+    {
+        my $file = $source->{'filename'} or die 'undefined filename: ', $!;
+        my $chno =
+          defined $changes ? $changes : ( $source->{'changes'} || 'no' );
+        my $devno =
+          ( defined $source->{'develop'} && $source->{'develop'} ne '' )
+          ? $source->{'develop'}
+          : $develop;
+        my $cont = defined $content ? $content : ( $source->{'content'} || '' );
+
+        push( @{ $hash{$chno}->{'filename'} }, $file );
+        push( @{ $hash{$chno}->{'develop'} },  $devno );
+        push( @{ $hash{$chno}->{'content'} },  $cont );
+    }
+
+    my @uniq_dev;
+    my @uniq_cont;
+    foreach my $no ( sort keys %hash ) {
+        my %h = ();
+        @uniq_dev  = grep { !$h{$_}++ } @{ $hash{$no}->{'develop'} };
+        @uniq_cont = grep { !$h{$_}++ } @{ $hash{$no}->{'content'} };
+    }
+
+    # 内部レビュー依頼
+    print "\n-----------------------------------\n";
+    print encode_utf8('【内部レビュー依頼】'), "\n\n";
+    foreach my $no ( sort keys %hash ) {
+        print encode_utf8( '開発管理番号: ' . "@uniq_dev" ), "\n";
+        print encode_utf8( 'changes番号: ' . $no ), "\n";
+        print encode_utf8( '対応内容: ' . "@uniq_cont" ), "\n";
+    }
+
+    print encode_utf8( 'ワーク環境: ' . $config->{'work'} ), "\n";
+    print encode_utf8('変更前ソース: '), "\n";
+    print encode_utf8( '  メイン: <' . $bmain . '>' ), "\n";
+    print encode_utf8( '  ワーク: <' . $bwork . '>' ), "\n";
+    print encode_utf8('変更後ソース: '), "\n";
+    print encode_utf8( '  メイン: <' . $amain . '>' ), "\n";
+    print encode_utf8( '  ワーク: <' . $awork . '>' ), "\n";
+
+    # WinMerge
+    my $mgmain = <<EOF;
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<paths>
+		<left>$bmain</left>
+		<right>$amain</right>
+		<filter>*.*</filter>
+		<subfolders>1</subfolders>
+		<left-readonly>0</left-readonly>
+		<right-readonly>0</right-readonly>
+	</paths>
+</project>
+EOF
+    my $mgwork = <<EOF;
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<paths>
+		<left>$bwork</left>
+		<right>$awork</right>
+		<filter>*.*</filter>
+		<subfolders>1</subfolders>
+		<left-readonly>0</left-readonly>
+		<right-readonly>0</right-readonly>
+	</paths>
+</project>
+EOF
+    my $mgmnwk = <<EOF;
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<paths>
+		<left>$amain</left>
+		<right>$awork</right>
+		<filter>*.*</filter>
+		<subfolders>1</subfolders>
+		<left-readonly>0</left-readonly>
+		<right-readonly>0</right-readonly>
+	</paths>
+</project>
+EOF
+    my $wmgfile_main = catfile( dirname($after), 'main' . '.WinMerge' );
+    open my $in_main, '>', $wmgfile_main
+      or die 'open error: ' . encode_utf8($wmgfile_main) . ': ', $!;
+    print $in_main encode_utf8($mgmain);
+    close $in_main;
+    $wmgfile_main =~ s/$common->{'linuxshare'}//;
+    $wmgfile_main =~ s#^/##;
+    $wmgfile_main =~ s#/#\\#g;
+    $wmgfile_main = $common->{'winshare'} . '\\' . $wmgfile_main;
+
+    my $wmgfile_work = catfile( dirname($after), 'work' . '.WinMerge' );
+    open my $in_work, '>', $wmgfile_work
+      or die 'open error: ' . encode_utf8($wmgfile_work) . ': ', $!;
+    print $in_work encode_utf8($mgwork);
+    close $in_work;
+    $wmgfile_work =~ s/$common->{'linuxshare'}//;
+    $wmgfile_work =~ s#^/##;
+    $wmgfile_work =~ s#/#\\#g;
+    $wmgfile_work = $common->{'winshare'} . '\\' . $wmgfile_work;
+
+    my $wmgfile_mnwk = catfile( dirname($after), 'mainwork' . '.WinMerge' );
+    open my $in_mnwk, '>', $wmgfile_mnwk
+      or die 'open error: ' . encode_utf8($wmgfile_mnwk) . ': ', $!;
+    print $in_mnwk encode_utf8($mgmnwk);
+    close $in_mnwk;
+
+    print encode_utf8('WinMerge: '), "\n";
+    print encode_utf8( '  メイン: <' . $wmgfile_main . '>' ), "\n";
+    print encode_utf8( '  ワーク: <' . $wmgfile_work . '>' ), "\n";
+
+    # diff
+    my $diffile = catfile( dirname($after), $config->{'develop'} . '.diff' );
+    open my $save, '>&', STDOUT    # 保存
+      or die 'dup error: stdout: ', $!;
+    open my $out, '>', $diffile    # ファイルに出力
+      or die 'open error: ' . $diffile . ': ', $!;
+    binmode $out, ':unix:encoding(utf8)';
+    open STDOUT, '>&', $out        # コピー
+      or die 'dup error: ' . $diffile . ': ', $!;
+
+    # diff出力
+    svn_diff();
+
+    # 標準出力を戻す
+    open STDOUT, '>&', $save
+      or die 'dup error: save: ', $!;
+
+    $diffile =~ s/$common->{'linuxshare'}//;
+    $diffile =~ s#^/##;
+    $diffile =~ s#/#\\#g;
+    $diffile = $common->{'winshare'} . '\\' . $diffile;
+
+    print encode_utf8( 'svnリポジトリ diff: <' . $diffile . '>' ), "\n";
+
+    print encode_utf8('織り込み先: '), "\n";
+    foreach my $dir ( @{$dirs} ) {
+        my $repo = _get_repo($dir);
+        print '    ' . $repo . "\n";
+        my @repochk = _get_branch($repo);
+        foreach my $line (@repochk) {
+            print '        ' . $line, "\n";
+        }
+    }
+
+    # SR依頼
+    print "\n-----------------------------------\n";
+    print encode_utf8('【SR依頼】'), "\n\n";
+    foreach my $no ( sort keys %hash ) {
+        print encode_utf8( '開発管理番号: ' . "@uniq_dev" ), "\n";
+        print encode_utf8( 'changes番号: ' . $no ), "\n";
+        print encode_utf8( '対応内容: ' . "@uniq_cont" ), "\n";
+    }
+    print encode_utf8( 'ワーク環境: ' . $config->{'work'} ), "\n";
+    print encode_utf8( '変更前ソース: <' . $bmain . '>' ),        "\n";
+    print encode_utf8( '変更後ソース: <' . $amain . '>' ),        "\n";
+    print encode_utf8( 'WinMerge: <' . $wmgfile_main . '>' ),           "\n";
+    print encode_utf8( 'svnリポジトリ diff: <' . $diffile . '>' ), "\n";
+    print encode_utf8('織り込み先: '), "\n";
+    foreach my $dir ( @{$dirs} ) {
+        my $repo = _get_repo($dir);
+        print '    ' . $repo . "\n";
+        my @repochk = _get_branch($repo);
+        foreach my $line (@repochk) {
+            print '        ' . $line, "\n";
+        }
+    }
+}
+
+sub mail {
+    _yaml_check( $common, ( 'user', 'pass' ) );
+    _yaml_check( $config, ( 'sources', 'dirs', 'after' ) );
+
+    my $user     = $common->{'user'};
+    my $pass     = $common->{'pass'};
+    my $sources  = $config->{'sources'};
+    my $dirs     = $config->{'dirs'};
+    my $includes = $config->{'includes'};
+    my $after    = $config->{'after'};
+
+    my %hash = ();
+    foreach my $source (
+        sort { ( $a->{'changes'} || '' ) cmp( $b->{'changes'} || '' ) }
+        @{$sources} )
+    {
+        my $file = $source->{'filename'} or die 'undefined filename: ', $!;
+        my $chno =
+          defined $changes ? $changes : ( $source->{'changes'} || 'no' );
+        my $devno =
+          ( defined $source->{'develop'} && $source->{'develop'} ne '' )
+          ? $source->{'develop'}
+          : $develop;
+        my $cont = defined $content ? $content : ( $source->{'content'} || '' );
+
+        push( @{ $hash{$chno}->{'filename'} }, $file );
+        push( @{ $hash{$chno}->{'develop'} },  $devno );
+        push( @{ $hash{$chno}->{'content'} },  $cont );
+    }
+
+    my @uniq_dev;
+    my @uniq_cont;
+    foreach my $no ( sort keys %hash ) {
+        my %h = ();
+        @uniq_dev  = grep { !$h{$_}++ } @{ $hash{$no}->{'develop'} };
+        @uniq_cont = grep { !$h{$_}++ } @{ $hash{$no}->{'content'} };
+    }
+
+    # webビルドログ確認
+    print "\n-----------------------------------\n";
+    print encode_utf8('【webビルドログ確認】'), "\n\n";
+
+    {
+        my %h             = ();
+        my @uniq_dirs     = sort( grep { !$h{$_}++ } @{$dirs} );
+        my @uniq_includes = sort( grep { !$h{$_}++ } @{$includes} );
+        my @uniq_sources  = sort( grep { !$h{$_}++ } @{$sources} );
+        print encode_utf8('ビルド対象ディレクトリ: '), "\n";
+        foreach my $dir ( @uniq_dirs, @uniq_includes ) {
+            print encode_utf8( '    ' . $dir ), "\n";
+
+            #        print encode_utf8('        svn update: '),           "\n";
+            #        print encode_utf8('        コンパイル(x86): '), "\n";
+            #        print encode_utf8('        コンパイル(arm): '), "\n";
+            #        print encode_utf8('        リンク(x86): '),       "\n";
+            #        print encode_utf8('        リンク(arm): '),       "\n";
+        }
+
+        print encode_utf8('変更ソース: '), "\n";
+        foreach my $source (@uniq_sources) {
+            print encode_utf8( '    ' . $source->{'filename'} ), "\n";
+        }
+    }
+
+    # 織り込み完了報告
+    print "\n-----------------------------------\n";
+    print encode_utf8('【織り込み完了報告】'), "\n\n";
+
+    my $mes = <<'EOF';
+To： {{ 名前 }} 様
+お世話になっております。{{ 名前 }} です。
+
+EOF
+    print encode_utf8($mes), "\n";
+    print encode_utf8(
+        $#uniq_cont == 0 ? $uniq_cont[0] : '{{ 対応内容 }}' );
+
+    $mes = <<'EOF';
+ の織り込み、changes番号登録が完了しましたので
+ご報告いたします。
+EOF
+    print encode_utf8($mes), "\n";
+    foreach my $no ( sort keys %hash ) {
+        print encode_utf8( '開発管理番号: ' . "@uniq_dev" ), "\n";
+        print encode_utf8( 'changes番号: ' . $no ), "\n";
+        print encode_utf8( '対応内容: ' . "@uniq_cont" ), "\n\n";
+    }
+
+    print encode_utf8('織り込み先: '), "\n";
+    setlocale( LC_ALL, "C" );
+    $ENV{"LANG"} = "C";
+    foreach my $dir ( @{$dirs} ) {
+        my $repo = _get_repo($dir);
+        print '    ' . $repo . "\n";
+        my @repochk = _get_branch($repo);
+        foreach my $line (@repochk) {
+            print '        ' . $line, "\n";
+        }
+    }
+    setlocale( LC_ALL, "ja_JP.UTF8" );
+    $ENV{"LANG"} = "ja_JP.UTF8";
+
+    print "\n";
+
+    $mes = <<'EOF';
+※ビルド、リンク、オールリンクまで確認できました。
+
+以上です。
+よろしくお願いいたします。
+EOF
+    print encode_utf8($mes), "\n";
+}
+
+sub mount {
+    my $env = shift;
+    _yaml_check( $common, ( 'user', 'pass', 'ospass' ) );
+
+    my $user   = $common->{'user'};
+    my $pass   = $common->{'pass'};
+    my $ospass = $common->{'ospass'};
+    my $sim    = $opt{'mount'};
+
+    my $map = Expect->new();
+    $map->spawn( $mount, ('-m') ) or die 'spawn error: ', $!;
+
+    $map->expect(
+        $timeout,
+        [
+            qr/password/ => sub {
+                my $self = shift;
+                $self->send( $ospass . "\n" );
+                exp_continue;
+              }
+        ],
+        $prompt
+    );
+
+    my @dirs = ();
+    opendir my $dh, $mapsdir
+      or die 'opendir: ' . encode_utf8($mapsdir) . ': ', $!;
+    foreach my $dir ( sort readdir $dh ) {
+        next if $dir =~ /^\.{1,2}$/;
+        next if $dir eq '.snapshot';
+        push( @dirs, $dir );
+    }
+    closedir $dh;
+    print "no map dir\n" and return if ( !@dirs );
+    my $term  = Term::ReadLine->new($progname);
+    my $reply = $term->get_reply(
+        prompt  => encode_utf8('地図データを選択してください.'),
+        choices => [@dirs],
+        default => $env . '_JP'
+    );
+
+    _change_dir($sim);
+
+    # ログイン
+    my $exp = Expect->new();
+    $exp->spawn( $pclinux{$env}, ('-s') ) or die 'spawn error: ', $!;
+
+    $exp->expect(
+        $timeout,
+        [
+            qr/password/ => sub {
+                my $self = shift;
+                $self->send( $ospass . "\n" );
+                exp_continue;
+              }
+        ],
+        [
+            qr/Work/ => sub {
+                my $self = shift;
+                $self->send( $sim . "\n" );
+                exp_continue;
+              }
+        ],
+        [
+            qr/Main project dir/ => sub {
+                my $self = shift;
+                $self->send("\n");
+                exp_continue;
+              }
+        ],
+        [
+            qr/MAP/ => sub {
+                my $self = shift;
+                $self->send( catfile( $mapsdir, $reply ) . "\n" );
+                exp_continue;
+              }
+        ],
+        [
+            qr/\(Y\/N\)/ => sub {
+                my $self = shift;
+                $self->send( 'y' . "\n" );
+                exp_continue;
+              }
+        ],
+        $prompt
+    );
+
+    if ( $env eq '13CY' ) {
+        $exp = Expect->new();
+        $exp->spawn( 'perl ' . catfile( $sim, 'ln_set.pl' ) )
+          or die 'spawn error: ', $!;
+
+        $exp->expect(
+            $timeout,
+            [
+                qr/password/ => sub {
+                    my $self = shift;
+                    $self->send( $ospass . "\n" );
+                    exp_continue;
+                  }
+            ],
+            $prompt
+        );
+    }
+    _change_dir($cur);
+}
+
+sub start_sim_17 {
+    my $sim = shift;
+    $ENV{'LD_LIBRARY_PATH'} =
+        catfile( $sim, 'lib' ) . ':'
+      . catfile( $sim, 'bin' ) . ':'
+      . '/usr/wayland/lib:/usr/local/lib/freetype:/lib:/usr/lib';
+    $ENV{'PATH'} =
+        catfile( $sim, 'bin' ) . ':'
+      . catfile( $sim, 'debug' ) . ':'
+      . '/usr/wayland/bin:'
+      . $ENV{'PATH'};
+    my $tmp = '/tmp/wayland-0';
+    $ENV{'XDG_RUNTIME_DIR'} = $tmp;
+
+    print $ENV{'LD_LIBRARY_PATH'}, "\n";
+    print $ENV{'PATH'},            "\n";
+    system('env');
+    system( 'mkdir -p ' . $tmp );
+    chmod 0700, $tmp;
+    _change_dir($sim);
+    system( 'weston'
+          . ' --width=1260'
+          . ' --height=500'
+          . ' --idle-time=0'
+          . ' &' );
+    sleep(1);
+
+    _change_dir( catfile( $sim, 'bin' ) );
+
+    my $file = 'ServerIP.txt';
+    if ( defined $common->{'ip'} ) {
+        open my $in, '>', $file or die 'open error: ' . $file . ': ', $!;
+        print $in $common->{'ip'};
+        close $in;
+    }
+    system('./navicore.exe');
+    _change_dir($cur);
+}
+
+sub start_sim_13 {
+    my $sim = shift;
+    _yaml_check( $common, ('ospass') );
+
+    my $ospass = $common->{'ospass'};
+    $ENV{'LD_LIBRARY_PATH'} =
+        catfile( $sim, 'runtime', 'lib', 'x86' ) . ':'
+      . catfile( $sim, 'runtime', 'bin', 'x86' ) . ':'
+      . catfile( $sim, 'runtime', 'lib', 'x86', 'directfb', 'lib' ) . ':'
+      . '/lib:/usr/lib';
+    $ENV{'PATH'} =
+      catfile( $sim, 'runtime', 'bin', 'x86' ) . ':' . $ENV{'PATH'};
+    print $ENV{'LD_LIBRARY_PATH'}, "\n";
+    print $ENV{'PATH'},            "\n";
+    system('env');
+
+    _change_dir( catfile( $sim, 'runtime', 'bin', 'x86' ) );
+
+    my $exp = Expect->new();
+    $exp->spawn( 'sudo LD_LIBRARY_PATH='
+          . $ENV{'LD_LIBRARY_PATH'}
+          . ' PATH='
+          . $ENV{'PATH'}
+          . ' ./pmng' )
+      or die 'spawn error: ', $!;
+
+    $exp->expect(
+        $timeout,
+        [
+            qr/password/ => sub {
+                my $self = shift;
+                $self->send( $ospass . "\n" );
+                exp_continue;
+              }
+        ],
+        $prompt
+    );
+
+    _change_dir($cur);
+}
+
+sub write_yaml_to_revision {
+    my $file = shift;
+    _yaml_check( $config, ('sources') );
+    my $sources = $config->{'sources'};
+
+    my $copy;
+    foreach my $source ( @{$sources} ) {
+        my $file   = $source->{'filename'};
+        my @status = split( /\s+/, `svn status -v $file` );
+        my @rev    = ( '', '' );
+        foreach my $s (@status) {
+            next unless ( $s =~ m/\d+/ );
+            if ( $rev[0] eq '' ) {
+                $rev[0] = $s;
+            }
+            else {
+                $rev[1] = $s;
+                last;
+            }
+        }
+        my $modified = ( $status[0] || '' ) =~ m/^[M|?]$/ ? $status[0] : '';
+        $source->{'revision'} =
+          ( $rev[1] || '' ) =~ m/^\d+$/ ? $rev[1] : ( $rev[0] || '' );
+        print "revision=" . ( $source->{'revision'} || '' ) . "\n"
+          if ( $opt{'vorbis'} );
+        push( @{ $copy->{'sources'} }, $source );
+    }
+
+    # デコード
+    my $decode_str = YAML::Tiny::Dump($copy);
+    $decode_str = _decode_utf8($decode_str);
+
+    # エンコード
+    my $encode_data = YAML::Tiny::Load($decode_str);
+    my $encode_str  = YAML::Tiny::Dump($encode_data);
+    $encode_str = encode_utf8($encode_str);
+
+    # デコードしたデータ書き込み
+    my $cf_file = catfile( $cur, $file );
+    open my $out, '>', $cf_file
+      or die 'open error: ' . $opt{'file'} . ': ', $!;
+    print $out $encode_str;
+    close $out;
+}
+
+sub recursive_func {
+    my $func = shift;
+    my ( $arg1, $arg2 ) = @_;
+    _yaml_check( $config, ( 'dirs', 'sources' ) );
+
+    my $dirs     = $config->{'dirs'};
+    my $sources  = $config->{'sources'};
+    my $includes = $config->{'include'};
+
+    my $exitcode = 0;
+    foreach my $dir ( @{$dirs}, @{$includes} ) {
+        $dir = _decode_utf8($dir);
+        _change_dir( catfile( $cur, $dir ) );
+
+        foreach my $source (
+            sort { ( $a->{'changes'} || '' ) cmp( $b->{'changes'} || '' ) }
+            @{$sources} )
+        {
+            next
+              if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+            my $file = $source->{'filename'}
+              or die 'undefined filename: ', $!;
+            next unless ( $file =~ m/^$dir/ );
+            print 'dir=' . $dir, "\n";
+            print 'file=' . $file, "\n";
+            $file =~ s/^$dir//;
+            $file =~ s#^/##;
+            print '*** no file: ' . $file, "\n" unless ( -f $file );
+            next unless ( -f $file );
+
+            my $chno = $changes || $source->{'changes'} || '';
+            print 'changes=' . $chno, "\n" if ( $opt{'vorbis'} );
+            my $rev = undef;
+            $rev = $source->{'revision'} || undef if ( $opt{'revision'} );
+
+            &$func( $dir, $file, $chno, $rev, $arg1, $arg2 );
+            $exitcode = $?;
+
+            last if ( defined $signame || $exitcode == 1 );
+            sleep 0.5;
+        }    # ファイル
+        _change_dir($cur);
+        return if ( defined $signame || $exitcode == 1 );
+    }    # ディレクトリ
+}
+
+sub commit_loop {
+    my ( $mod, $option ) = @_;
+    _yaml_check( $config, ( 'dirs', 'sources' ) );
+
+    my $dirs     = $config->{'dirs'};
+    my $sources  = $config->{'sources'};
+    my $includes = $config->{'includes'};
+
+    if ( defined $changes ) {
+        @{$option} = ();
+        push @{$option}, $changes;
+    }
+    die 'option error: no changes: ', $!
+      if ( !@{$option} );
+    print "changes=@{$option}, " . ( $changes || '' ), "\n"
+      if ( $opt{'vorbis'} );
+
+    # changes番号ごとに処理する
+    foreach my $chno ( @{$option} ) {
+
+        # ディレクトリごとに処理する
+        foreach my $dir ( @{$dirs}, @{$includes} ) {
+            $dir = _decode_utf8($dir);
+            _change_dir( catfile( $cur, $dir ) );
+
+            # ファイルごとに処理する
+            my ( $files, $modified ) = undef;
+            foreach my $source ( @{$sources} ) {
+                next
+                  if ( defined $source->{'delete'}
+                    && $source->{'delete'} eq '1' );
+                if ( defined $source->{'changes'} ) {
+                    next if ( $chno ne $source->{'changes'} );
+                }
+                my $file = $source->{'filename'}
+                  or die 'undefined filename: ', $!;
+                next unless ( $file =~ m/^$dir/ );
+                $file =~ s/^$dir//;
+                $file =~ s#^/##;
+                print "** no file: " . $file, "\n" unless ( -f $file );
+                next unless ( -f $file );
+
+                my @status = split( /\s+/, `svn status -v $file` );
+                $modified =
+                  ( $status[0] || '' ) =~ m/^[M|A|?]$/ ? $status[0] : '';
+
+                if ( $mod eq 'M' ) {    # コミットする
+                    if ( ( $modified || '' ) eq '?' )
+                    {                   # 追加し忘れていた場合
+                        my $bool = TRUE;
+                        unless ( $opt{'demo'} ) {
+                            my $term = Term::ReadLine->new($progname);
+                            my $bool = $term->ask_yn(
+                                prompt => encode_utf8(
+                                    $file
+                                      . ' を追加します. よろしいですか？'
+                                ),
+                                default => 'n',
+                            );
+                        }
+                        if ($bool) {
+                            do_add($file);
+                            $files .= " \\\n" . '        ' . $file;
+                        }
+                        else {
+                            next;
+                        }
+                    }
+                    if (   ( $modified || '' ) eq 'M'
+                        || ( $modified || '' ) eq
+                        'A' )    # 追加済, コミット済の場合
+                    {
+                        $files .= " \\\n" . '        ' . $file;
+                    }
+                    else {
+                        print $file . encode_utf8(': 変更なし'), "\n"
+                          if ( ( $modified || '' ) ne '?' );
+                    }
+                }
+                elsif ( $mod eq '?' ) {    # 追加する
+                    if ( ( $modified || '' ) eq '?' ) {
+                        do_add($file);
+                    }
+                }
+                last if ( defined $signame );
+            }    # ファイル
+            do_commit( $files, $chno ) if ( $mod eq 'M' && defined $files );
+
+            _change_dir($cur);
+            last if ( defined $signame );
+        }
+        exit $stathash{'EX_OK'} if ( defined $signame );
+    }
+}
+
+if ( !$opt{'gui'} ) {
+    print "@{$config->{'dirs'}}", "\n"
+      if ( $opt{'debug'} && defined @{ $config->{'dirs'} } );
+
+    clear() if ( $opt{'clear'} );
+
+    # リビジョンを合わせる
+    sync() if ( $opt{'sync'} );
+
+    # 元に戻す
+    if ( defined $opt{'revert'} ) {
+        setopt_revert();
+        if ( $opt{'revert'} eq 'repo' ) {    # レポジトリの場合
+            my $dest   = _get_destdir();
+            my $recent = _recent_dir($dest);
+            svn_revert($dest);
+        }
+        elsif ( $opt{'revert'} eq 'work' ) {    # ワーク環境の場合
+            revert_work();
+        }
+    }
+
+    # 保存
+    if ( defined $opt{'save'} ) {
+        setopt_save();
+        my $option_save = $opt{'save'};
+        my $dest        = _get_destdir();
+        my $recent      = _recent_dir($dest);
+
+        # 一旦保存
+        if ( $opt{'save'} eq 'bwork' ) {
+            save_work($dest);
+        }
+        elsif ( $opt{'save'} eq 'awork' ) {
+            save($dest);
+        }
+        else {
+            save($dest);
+        }
+
+        # 相違ないなら削除
+        _rmdir_nodiff( $recent, $dest );
+    }
+
+    # デプロイ(レポジトリ)
+    if ( defined $opt{'deploy'} ) {
+        setopt_deploy();
+        if ( $opt{'deploy'} =~ /repo$/ ) {
+            my $dest = _get_repodir_to_deploy(
+                $opt{'deploy'} eq 'wrepo' ? 'work' : 'main' );
+            deploy_repo($dest);
+        }
+    }
+
+    # アップデート
+    if ( $opt{'update'} ) {
+        my $dest   = _get_destdir();
+        my $recent = _recent_dir($dest);
+
+        recursive_func( \&svn_update, $dest );
+
+        # アップデート時yamlにリビジョン番号書き込み
+        write_yaml_to_revision($update_revision_yaml);
+    }
+
+    if ( $opt{'updirs'} ) {
+        svn_dirs_update();
+    }
+
+    # チェック
+    check() if ( $opt{'check'} );
+
+    # ツリー表示
+    tree() if ( $opt{'tree'} );
+
+    # SR依頼
+    review() if ( $opt{'review'} );
+
+    # メール
+    mail() if ( $opt{'mail'} );
+
+    # デプロイ(ワーク環境)
+    if ( defined $opt{'deploy'} ) {
+        if ( $opt{'deploy'} eq 'work' ) {
+            deploy_work();
+        }
+    }
+
+    # make
+    if ( defined $opt{'make'} ) {
+        setopt_make();
+        do_make( '17make', $opt{'make'}, $opt{'module'} );
+    }
+
+    if ( defined $opt{'13make'} ) {
+        setopt_13make();
+        do_make( '13make', $opt{'13make'}, $opt{'module'} );
+    }
+
+    # klocwork
+    if ( defined $opt{'klocwork'} ) {
+        setopt_klocwork();
+        do_klocwork( $opt{'klocwork'} );
+    }
+
+    # qadiff
+    if ( defined $opt{'qadiff'} ) {
+        setopt_qadiff();
+        do_qadiff( $opt{'qadiff'} );
+    }
+
+    # 抽出
+    if ( defined $opt{'extract'} ) {
+        setopt_extract();
+        my %info;
+        if ( $opt{'extract'} eq 'create' ) {
+            diffline();
+        }
+        elsif ( $opt{'extract'} eq 'all' ) {
+            diffline();
+            my %info = read_diffline();
+            analysis_klocwork(%info);
+            analysis_qadiff(%info);
+            analysis_compile(%info);
+        }
+        else {
+            my %info = read_diffline();
+            analysis_klocwork(%info) if ( $opt{'extract'} eq 'klocwork' );
+            analysis_qadiff(%info)   if ( $opt{'extract'} eq 'qadiff' );
+            analysis_compile(%info)  if ( $opt{'extract'} eq 'compile' );
+        }
+    }
+
+    # デプロイ(シミュレータ, pbmsg)
+    if ( defined $opt{'deploy'} ) {
+        if ( $opt{'deploy'} eq 'sim' ) {
+            deploy_simulator();
+        }
+        elsif ( $opt{'deploy'} eq 'pbmsg' ) {
+            deploy_pbmsg();
+        }
+    }
+
+    # デプロイ(pbmsg)
+    if ( defined $opt{'deploy'} ) {
+    }
+    # 日付の置換
+    if ( defined $opt{'date'} ) {
+        print "date format error (example: 2015.01.01)\n"
+          unless ( $opt{'date'} =~ m/[0-9]{4}\.[0-9]{2}\.[0-9]{2}/ );
+        _yaml_check( $config, ('sources') );
+
+        my $dest   = _get_destdir();
+        my $recent = _recent_dir($dest);
+        foreach my $source (
+            sort { ( $a->{'changes'} || '' ) cmp( $b->{'changes'} || '' ) }
+            @{ $config->{'sources'} } )
+        {
+            next
+              if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+            my $file = $source->{'filename'}
+              or die 'undefined filename: ', $!;
+            print $file, "\n";
+            my $chno = $changes || $source->{'changes'} || undef;
+            print 'no changes: ' . $file, "\n" and next
+              if ( !defined $chno );
+            change_date( $file, $chno, $dest, $opt{'date'} );
+        }
+
+    }
+
+    if ( defined $opt{'sed'} ) {
+        _yaml_check( $config, ('sources') );
+
+        my ( $search, $replace ) = split /,/, $opt{'sed'};
+        my $dest   = _get_destdir();
+        my $recent = _recent_dir($dest);
+        foreach my $source (
+            sort { ( $a->{'changes'} || '' ) cmp( $b->{'changes'} || '' ) }
+            @{ $config->{'sources'} } )
+        {
+            next
+              if ( defined $source->{'delete'} && $source->{'delete'} eq '1' );
+            my $file = $source->{'filename'}
+              or die 'undefined filename: ', $!;
+            print encode_utf8(_decode_utf8($file)), "\n";
+            my $chno = $changes || $source->{'changes'} || undef;
+            print 'no changes: ' . encode_utf8(_decode_utf8($file)), "\n" and next
+              if ( !defined $chno );
+            sed( $file, $dest, $search, $replace );
+        }
+    }
+
+    # ログの削除
+    if ( $opt{'dellog'} ) {
+        _yaml_check( $config, ('sources') );
+
+        my $dest    = _get_destdir();
+        my $recent  = _recent_dir($dest);
+        my $sources = $config->{'sources'};
+        foreach my $source ( @{$sources} ) {
+            my $file = $source->{'filename'}
+              or die 'undefined filename: ', $!;
+            print $file, "\n";
+            delete_log( $file, $dest );
+        }
+    }
+
+    # diff
+    svn_diff() if ( $opt{'diff'} );
+
+    # info
+    if ( $opt{'info'} ) {
+        _yaml_check( $config, ('dirs') );
+
+        my $dirs     = $config->{'dirs'};
+        my $includes = $config->{'include'};
+        foreach my $dir ( @{$dirs} ) {
+            svn_info($dir);
+        }
+        foreach my $inc ( @{$includes} ) {
+            svn_info($inc);
+        }
+    }
+
+    # status
+    if ( defined $opt{'status'} ) {
+        setopt_status();
+        if ( $opt{'status'} eq 'repo' ) {    # レポジトリの場合
+            svn_status();
+        }
+        elsif ( $opt{'status'} eq 'work' ) {    # ワーク環境の場合
+            status_work();
+        }
+    }
+
+    # log
+    svn_log() if ( $opt{'log'} );
+
+    # meld
+    if ( defined $opt{'meld'} ) {
+        setopt_meld();
+        if ( $opt{'meld'} eq 'save' ) {
+            do_meld();
+        }
+        else {
+            svn_meld();
+        }
+    }
+
+    # 追加の場合
+    if ( exists $opt{'add'} && @{ $opt{'add'} } ) {
+
+        # 追加するかどうか尋ねる
+        my $bool = TRUE;
+        unless ( $opt{'demo'} ) {
+            my $term = Term::ReadLine->new($progname);
+            $bool = $term->ask_yn(
+                prompt =>
+                  encode_utf8('追加します. よろしいですか？'),
+                default => 'n',
+            );
+        }
+        exit $stathash{'EX_NG'} if ( !$bool );
+
+        # 追加する
+        commit_loop( '?', $opt{'add'} );
+    }
+
+    # コミットの場合
+    if ( exists $opt{'commit'} && @{ $opt{'commit'} } ) {
+
+        # コミットするかどうか尋ねる
+        my $bool = TRUE;
+        unless ( $opt{'demo'} ) {
+            my $term = Term::ReadLine->new($progname);
+            $bool = $term->ask_yn(
+                prompt => encode_utf8(
+                    'コミットします. よろしいですか？'),
+                default => 'n',
+            );
+        }
+        exit $stathash{'EX_NG'} if ( !$bool );
+
+        # コミットする
+        commit_loop( 'M', $opt{'commit'} );
+    }
+
+    if ( defined $opt{'mount'} ) {
+        setopt_start();
+        if ( $opt{'mount'} =~ m/^(13CY)|(15CY)/ ) {
+            mount('13CY');
+        }
+        else {
+            mount('17CY');
+        }
+    }
+
+    # シミュレータ起動
+    if ( defined $opt{'start'} ) {
+        setopt_start() unless ( defined $opt{'mount'} );
+        if ( $opt{'start'} =~ m/^(13CY)|(15CY)/ ) {
+            start_sim_13( $opt{'start'} );
+        }
+        else {
+            start_sim_17( $opt{'start'} );
+        }
+    }
+}
+else {
+    require Gtk2;
+    Gtk2->import('-init');
+    require Glib;
+
+    my $win = Gtk2::Window->new('toplevel');
+    $win->signal_connect( delete_event => sub { Gtk2->main_quit; } );
+
+    $win->set_title($progname);
+    $win->set_default_size(600, 400);
+
+    my $table = new Gtk2::Table( 3, 6, FALSE );
+    $win->add( $table );
+
+    my $notebook = new Gtk2::Notebook();
+    $notebook->set_tab_pos( 'top' );
+    $table->attach_defaults( $notebook, 0, 6, 0, 1 );
+    $notebook->show();
+
+#    $win->add($notebook);
+    $win->show_all();
+    Gtk2->main;
+}
+
+exit $stathash{'EX_OK'};
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 SYNOPSIS
+
+ mytool オプション引数
+
+ Options:
+   -f, --file     [ファイル名]    設定ファイルの指定
+   -u, --user                     ユーザ名を指定する
+   -p, --pass                     パスワードを指定する
+       --host                     IPアドレスを指定する
+   -b, --base                     保存するディレクトリを指定する
+   -s, --save     [before|after|work]
+                  before          変更前のファイルを保存する
+                  after           変更後のファイルを保存する
+       --update                   subversion のサブコマンド update を実行する
+   -r, --revision                 更新する際, リビジョン指定で更新する
+
+       --revert   [repo|work]
+                  repo            レポジトリに subversion のサブコマンド revert を実行する
+                  work            ワーク環境に subversion のサブコマンド revert を実行する
+
+       --extract  [create|klocwork|qadiff|compile|all]
+                  create          line.diff を出力する
+                  klocwork        変更行番号から対象となるクロックワークを抽出する
+                  qadiff          変更行番号から対象となる qadiff を抽出する
+                  compile         変更行番号から対象となるコンパイルログを抽出する
+                  all             全てを対象として抽出する
+       --status                   subversion のサブコマンド status を実行する
+       --info                     subversion のサブコマンド info を実行する
+       --log                      subversion のサブコマンド log を実行し一行で表示する
+   -d, --diff                     subversion のサブコマンド diff を実行する
+       --meld     [repo|save]
+                  repo            subversion のサブコマンド diff を実行し meld で表示する
+                  save            保存先から meld で表示する
+       --sed      検索文字列,置換文字列
+                                  置換する
+       --date     日付文字列 (例: 2015.01.01)
+                                  コメントの日付を置換する
+       --add                      subversion のサブコマンドaddを実行する
+       --commit                   subversion のサブコマンドcommitを実行する
+       --deploy   [repo|work|sim]
+                  repo            レポジトリにデプロイする
+                  work            ワーク環境にデプロイする
+                  sim             シミュレータにデプロイする
+       --sync                     ワーク環境とレポジトリのリビジョンを合わせる
+       --make     [exe|all]
+                                  ワーク環境で, make・リンクを実行する
+       --rebuild                  リビルドする
+       --target   [ターゲット名 ...]
+                                  ターゲットを指定する
+       --module   [モジュール名 ...]
+                                  モジュールを指定する
+       --fork     [最大プロセス数]
+                                  並列処理で行なう
+       --klocwork [all|モジュール名]
+                                  クロックワークを実行する
+                                  モジュールを指定した場合, そのモジュールのみ実行
+       --qadiff   [all|モジュール名]
+                                  qadiff を実行する
+                                  モジュールを指定した場合, そのモジュールのみ実行
+       --clear                    ワーク環境の一時ディレクトリを削除
+       --check                    yaml ファイルをチェックする
+       --tree                     ツリーを出力する
+       --review                   SR依頼の文面を出力する
+       --mail                     織り込み完了報告の文面を出力する
+       --mount                    17pclinux -s を実行してマウントする
+       --start                    シミュレータを起動する
+       --crypt [パスワード]       パスワードを暗号化して保存する
+       --oscrypt [パスワード]     OSのパスワードを暗号化して保存する
+       --demo                     コミットや追加のオプションの時実行しないで表示のみする
+   -D, --debug                    デバッグの表示
+   -v, --vorbis                   詳細情報の表示
+   -h, --help                     ヘルプの表示
+   -V, --version                  バージョンの表示
+
+=cut
