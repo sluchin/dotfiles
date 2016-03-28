@@ -1230,7 +1230,7 @@ sub analysis_klocwork {
                         foreach my $v ( @{$val} ) {
                             if ( $l =~ $v ) {    # 行数一致
                                 $line = decode_utf8($line);
-                                print $file . "[" 
+                                print $file . "["
                                   . $count . "]: "
                                   . encode_utf8($line),
                                   "\n";
@@ -1271,7 +1271,7 @@ sub analysis_klocwork {
                         foreach my $v ( @{$val} ) {
                             if ( $l eq $v ) {    # 行数一致
                                 $line = decode_utf8($line);
-                                print $file . "[" 
+                                print $file . "["
                                   . $count . "]: "
                                   . encode_utf8($line),
                                   "\n";
@@ -1311,7 +1311,7 @@ sub analysis_compile {
                 foreach my $v ( @{$val} ) {
                     if ( $l eq $v ) {    # 行数一致
                         $line = decode_utf8($line);
-                        print $compile_log . "[" 
+                        print $compile_log . "["
                           . $count . "]: "
                           . encode_utf8($line),
                           "\n";
@@ -1343,7 +1343,7 @@ sub svn_meld {
         print 'no difference: ' . ( encode_utf8(_decode_utf8($file)) || '' ), "\n" and next
           if ( ( $status[0] || '' ) ne 'M' );
 
-        system( 'svn diff ' 
+        system( 'svn diff '
               . $file
               . ' --diff-cmd meld'
               . ' --username '
@@ -1365,7 +1365,7 @@ sub svn_diff {
           or die 'undefined filename: ', $!;
         $file =~ s/\s/\\ /g;
 
-        system( 'svn diff ' 
+        system( 'svn diff '
               . $file
               . ' --username '
               . ( $opt{'user'} || $common->{'user'} )
@@ -1386,7 +1386,7 @@ sub svn_status {
           or die 'undefined filename: ', $!;
         $file =~ s/\s/\\ /g;
 
-        system( 'svn status -v ' 
+        system( 'svn status -v '
               . $file
               . ' --username '
               . ( $opt{'user'} || $common->{'user'} )
@@ -1402,7 +1402,7 @@ sub svn_info {
     _yaml_check( $common, ( 'user', 'pass' ) );
 
     # svn info を表示
-    system( 'svn info ' 
+    system( 'svn info '
           . $dir
           . ' --username '
           . ( $opt{'user'} || $common->{'user'} )
@@ -1667,7 +1667,7 @@ sub do_add {
     print 'svn add ' . $src, "\n";
 
     unless ( $opt{'demo'} ) {
-        system( 'svn add ' 
+        system( 'svn add '
               . $src
               . ' --username '
               . ( $opt{'user'} || $common->{'user'} )
@@ -1683,8 +1683,8 @@ sub do_commit {
     print 'svn commit -m' . $chno . ' ' . $src, "\n";
 
     unless ( $opt{'demo'} ) {
-        system( 'svn commit -m' 
-              . $chno . ' ' 
+        system( 'svn commit -m'
+              . $chno . ' '
               . $src
               . ' --username '
               . ( $opt{'user'} || $common->{'user'} )
@@ -2139,10 +2139,12 @@ sub do_17make_old {
         $exp->expect( $timeout, $prompt );
 
         foreach my $target (@targets) {
+            my $cmd = '17make TARGET_CPU=' . $target . ' -j8 ' . $rebuild;
+            print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $save $cmd, "\n";
 
             # make
-            $exp->send(
-                '17make TARGET_CPU=' . $target . ' -j8 ' . $rebuild . "\n" );
+            $exp->send( $cmd . "\n" );
             $exp->expect( undef, $prompt );
 
             # リンク
@@ -2208,7 +2210,11 @@ sub do_17make_old {
         $exp->expect( $timeout, $prompt );
 
         foreach my $target (@targets) {
-            $exp->send( '17make TARGET_CPU=' . $target . ' lnk' . "\n" );
+            my $cmd = '17make TARGET_CPU=' . $target . ' lnk';
+            print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $save $cmd, "\n";
+
+            $exp->send( $cmd . "\n" );
             $exp->expect( undef, $prompt );
         }
         close($out);
@@ -2352,11 +2358,12 @@ sub do_make {
 
         # make
         foreach my $target (@targets) {
-            $exp->send( $command
-                  . ' TARGET_CPU='
-                  . $target . ' -j8 '
-                  . $rebuild
-                  . "\n" );
+            my $cmd = $command . ' TARGET_CPU=' . $target . ' -j8 ' . $rebuild;
+            print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+            print $save $cmd . '['. basename($workdir) . '...' . basename($dir) . ']', "\n";
+            $exp->send( "pwd\n" );
+            $exp->expect( undef, $prompt );
+            $exp->send( $cmd . "\n" );
             $exp->expect( undef, $prompt );
         }
 
@@ -2409,8 +2416,13 @@ sub do_make {
             $exp->expect( $timeout, $prompt );
 
             foreach my $target (@targets) {
-                $exp->send(
-                    $command . ' TARGET_CPU=' . $target . ' lnk' . "\n" );
+                my $cmd = $command . ' TARGET_CPU=' . $target . ' lnk ';
+                print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
+                print $save $cmd . '['. basename($workdir) . '...' . basename($dir) . ']', "\n";
+
+                $exp->send( "pwd\n" );
+                $exp->expect( undef, $prompt );
+                $exp->send( $cmd . "\n" );
                 $exp->expect( undef, $prompt );
                 if ( $command eq '13make' ) {
                     $exp->send( 'ls -l '
@@ -2557,13 +2569,13 @@ sub do_klocwork {
 
             # クロックワーク
             print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
-            print $save '(' 
+            print $save '('
               . $count . '/'
               . @csources
               . ") klocwork begin: $$ ==> "
               . $filepath, "\n";
             $exp->send(
-                    $command . ' ' 
+                    $command . ' '
                   . $file . ' -j=4' . '; \\' . "\n" . 'mv '
                   . catfile( $workdir, $dir, 'klocwork', 'res_detaile.txt' )
                   . ' '
@@ -2713,13 +2725,13 @@ sub do_qadiff {
 
             # qadiff
             print $save strftime( "[%Y-%m-%d %H:%M:%S]: ", localtime );
-            print $save '(' 
+            print $save '('
               . $count . '/'
               . @csources
               . ") qadiff begin: $$ ==> "
               . $filepath, "\n";
             $exp->send(
-                    'qadiff -M ' 
+                    'qadiff -M '
                   . $option
                   . ' -b -SOURCE='
                   . $file . '; \\' . "\n" . 'mv '
@@ -3058,7 +3070,7 @@ sub _get_repo {
     setlocale( LC_ALL, "C" );
     $ENV{"LANG"} = "C";
     my $cmd =
-        'svn info ' 
+        'svn info '
       . $dir
       . ' --username '
       . $user
@@ -3091,7 +3103,7 @@ sub _get_revision {
     setlocale( LC_ALL, "C" );
     $ENV{"LANG"} = "C";
     my $cmd =
-        'svn info ' 
+        'svn info '
       . $dir
       . ' --username '
       . $user
