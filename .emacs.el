@@ -1,11 +1,13 @@
 ;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
-;; Copyright (C) 2012 2013 2014 2015
+;; Copyright (C) 2012 2013 2014 2015 2016
 
 ;; Author: Tetsuya Higashi
 
 ;;; Version
 ;; Emacs
+;; 2016-08-12
+;; GNU Emacs 24.5.1 (i686-pc-linux-gnu, GTK+ Version 3.18.9)
 ;; 2013-04-16
 ;; GNU Emacs 24.3.1 (i686-pc-linux-gnu, GTK+ Version 3.4.2)
 ;; 2012-12-28
