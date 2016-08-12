@@ -2455,10 +2455,8 @@ Otherwise, return nil."
     (setq-default save-place t)))
 
 ;;; 最近使ったファイルを保存
+;;(require 'recentf)
 (when (eval-and-compile (require 'recentf nil t))
-  ;; 有効にする
-  (when (fboundp 'recentf-mode)
-    (recentf-mode 1))
   (when (boundp 'recentf-menu-title)
     (setq recentf-menu-title "Recentf"))
   (when (boundp 'recentf-max-menu-items)  ; メニュー表示最大数
@@ -2474,6 +2472,13 @@ Otherwise, return nil."
             "/\\.emacs\\.bmk$" "\\.emacs\\.d/bookmarks$"
             "\\.pomodoro$" "/org/.*\\.org" "/.eshell/alias$"
             "newsticker/groups$" "/gnus/" "/nnrss/" "\\.git/")))
+
+  ;; 拡張機能
+  (require 'recentf-ext nil t)
+
+  ;; 有効にする
+  (when (fboundp 'recentf-mode)
+    (recentf-mode 1))
 
   ;; 開いたファイルを選択しない
   (when (boundp 'recentf-menu-action)
@@ -5311,6 +5316,24 @@ Otherwise, return nil."
                   (setq cpp-edit-list '(("0" font-lock-comment-face default both)
                                         ("1" default font-lock-comment-face both))))
                 (cpp-highlight-buffer t))
+
+              (dolist (pg '("gray" "invisible"))
+                (let ((cmd (intern (format "cpp-%s" pg)))
+                      (lisp (format "~/.emacs.d/cpp-%s.el" pg)))
+                  (defalias cmd
+                    `(lambda ()
+                       "cpp-highlight-buffer."
+                       (interactive)
+                       (when (file-exists-p
+                              (expand-file-name ,lisp))
+                         (load-file ,lisp)
+                         (message "Loading %s...done" ,lisp))
+                       (when (fboundp 'cpp-highlight-buffer)
+                         (cpp-highlight-buffer t)
+                         (message "Loading cpp-highlight-buffer=>t...done"))
+                       (message "Loading %s...done" ,pg)))))
+              (cpp-gray)
+
               ;; (install-elisp-from-emacswiki "hideif.el")
               (when (fboundp 'hide-ifdef-mode)
                 (hide-ifdef-mode t))
