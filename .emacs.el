@@ -1,7 +1,6 @@
 ;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
 ;; Copyright (C) 2012 2013 2014 2015 2016
-
 ;; Author: Tetsuya Higashi
 
 ;;; Version
@@ -74,9 +73,9 @@
   "Time of require alist.")
 (when (fboundp 'benchmark-run)
   (defadvice require
-    (around require-benchmark
-            (feature &optional filename noerror)
-            activate compile)
+      (around require-benchmark
+              (feature &optional filename noerror)
+              activate compile)
     (let ((time (car (benchmark-run ad-do-it))))
       (unless (assq (ad-get-arg 0) benchmark-alist)
         (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time))))))
@@ -208,7 +207,7 @@
                     user-emacs-directory
                   (expand-file-name "~/")))
            (default-directory (expand-file-name
-                              (concat dir path))))
+                               (concat dir path))))
       (unless (file-directory-p default-directory)
         (make-directory default-directory))
       (unless (member default-directory load-path)
@@ -323,11 +322,11 @@
   (interactive)
   (if (executable-find "svn")
       (let* (default-directory
-             (system-time-locale "ja_JP.utf8")
-             (base (expand-file-name "~/.emacs.d"))
-             (dir (concat (file-name-as-directory base) "emacswikipages"))
-             (repo "svn://svn.sv.gnu.org/emacswiki/emacswikipages")
-             (mes "*Messages*"))
+              (system-time-locale "ja_JP.utf8")
+              (base (expand-file-name "~/.emacs.d"))
+              (dir (concat (file-name-as-directory base) "emacswikipages"))
+              (repo "svn://svn.sv.gnu.org/emacswiki/emacswikipages")
+              (mes "*Messages*"))
         (if (file-directory-p base)
             (progn
               (if (file-directory-p
@@ -1057,9 +1056,9 @@
 (when (locate-library "isearch")
   ;; リージョンで検索する
   (defadvice isearch-mode
-    (before isearch-region-mode
-            (forward &optional regexp op-fun recursive-edit word-p)
-            activate compile)
+      (before isearch-region-mode
+              (forward &optional regexp op-fun recursive-edit word-p)
+              activate compile)
     (if mark-active
         (progn
           (isearch-update-ring
@@ -1149,7 +1148,7 @@
          (setq skk-isearch-start-mode 'latin))
        ;; 変換でエラーを捕捉しない
        (defadvice skk-isearch-wrapper
-         (around skk-isearch-wrapper-nil (&rest arg) activate compile)
+           (around skk-isearch-wrapper-nil (&rest arg) activate compile)
          (if (null (car arg))            ; (nil) の場合
              (let ((skk-dcomp-multiple-activate nil))
                (ignore-errors ad-do-it)) ; エラーを無視する
@@ -1174,7 +1173,7 @@
 
 ;; C-@ マークコマンド
 (defadvice set-mark-command
-  (after print-mark-ring (arg) activate compile)
+    (after print-mark-ring (arg) activate compile)
   (message "%s - %s" (point) mark-ring))
 
 ;; 現在ポイントのマークを削除
@@ -1728,10 +1727,10 @@
            (define-key map (kbd "a") 'dired-advertised-find-file)
            ;; 親ディレクトリへ移動
            (define-key map (kbd "U") 'dired-dwim-up-alternate-directory)))
-           (define-key dired-mode-map (kbd "<left>") 'dired-dwim-up-alternate-directory)
-           ;; 新規バッファを作らないで開く
-           (define-key dired-mode-map (kbd "RET") 'dired-dwim-find-alternate-file)
-           (define-key dired-mode-map (kbd "<right>") 'dired-dwim-find-alternate-file)
+       (define-key dired-mode-map (kbd "<left>") 'dired-dwim-up-alternate-directory)
+       ;; 新規バッファを作らないで開く
+       (define-key dired-mode-map (kbd "RET") 'dired-dwim-find-alternate-file)
+       (define-key dired-mode-map (kbd "<right>") 'dired-dwim-find-alternate-file)
        (message "Loading %s (dired)...done" this-file-name))))
 
 ;;; dired色
@@ -1968,7 +1967,7 @@
     "Switch to buffers or file-cache entries with 1 command." t)
 
   ;; 有効にする
-  ;(iswitchb-mode 1)
+                                        ;(iswitchb-mode 1)
 
   (eval-after-load "iswitchb"
     '(progn
@@ -2188,57 +2187,57 @@
     (kill-all-buffer 'org-mode))
 
   '(defun org-clock-update-time-maybe ()
-    "If this is a CLOCK line, update it and return t.
+     "If this is a CLOCK line, update it and return t.
 Otherwise, return nil."
-    (interactive)
-    (when (and (boundp 'org-clock-string) (boundp 'org-clock-marker)
-               (boundp 'org-clock-start-time) (fboundp 'org-parse-time-string)
-               (fboundp 'org-clock-update-mode-line) (fboundp 'org-float-time))
-      (let ((re (concat "[ \t]*" org-clock-string
-                        " *[[<]\\([^]>]+\\)[]>]\\(-+[[<]\\([^]>]+\\)[]>]"
-                        "\\([ \t]*=>.*\\)?\\)?"))
-            ts te)
-        (setq ts (match-string 1)
-              te (match-string 3))
-        (save-excursion
-          (beginning-of-line 1)
-          (skip-chars-forward " \t")
-          (when (looking-at org-clock-string)
-            (let ((re (concat "[ \t]*" org-clock-string
-                              " *[[<]\\([^]>]+\\)[]>]\\(-+[[<]\\([^]>]+\\)[]>]"
-                              "\\([ \t]*=>.*\\)?\\)?"))
-                  ts te h m s neg)
-              (cond
-               ((not (looking-at re))
-                nil)
-               ((not (match-end 2))
-                (when (and (equal (marker-buffer org-clock-marker) (current-buffer))
-                           (> org-clock-marker (point))
-                           (<= org-clock-marker (point-at-eol)))
-                  ;; The clock is running here
-                  (setq org-clock-start-time
-                        (apply 'encode-time
-                               (org-parse-time-string (match-string 1))))
-                  (org-clock-update-mode-line)))
-               (t
-                (and (match-end 4) (delete-region (match-beginning 4) (match-end 4)))
-                (end-of-line 1)
-                (setq ts (match-string 1)
-                      te (match-string 3))
-                (message "ts: %s, te: %s" ts te)
-                (setq s (- (org-float-time
-                            (apply 'encode-time (org-parse-time-string te)))
-                           (org-float-time
-                            (apply 'encode-time (org-parse-time-string ts)))))
-                (message "s: %d" s)
-                (setq neg (< s 0))
-                (setq s (abs s))
-                (setq h (floor (/ s 3600)))
-                (setq s (- s (* 3600 h)))
-                (setq m (floor (/ s 60)))
-                (setq s (- s (* 60 s)))
-                (insert " => " (format (if neg "-%d:%02d" "%2d:%02d") h m))
-                t))))))))
+     (interactive)
+     (when (and (boundp 'org-clock-string) (boundp 'org-clock-marker)
+                (boundp 'org-clock-start-time) (fboundp 'org-parse-time-string)
+                (fboundp 'org-clock-update-mode-line) (fboundp 'org-float-time))
+       (let ((re (concat "[ \t]*" org-clock-string
+                         " *[[<]\\([^]>]+\\)[]>]\\(-+[[<]\\([^]>]+\\)[]>]"
+                         "\\([ \t]*=>.*\\)?\\)?"))
+             ts te)
+         (setq ts (match-string 1)
+               te (match-string 3))
+         (save-excursion
+           (beginning-of-line 1)
+           (skip-chars-forward " \t")
+           (when (looking-at org-clock-string)
+             (let ((re (concat "[ \t]*" org-clock-string
+                               " *[[<]\\([^]>]+\\)[]>]\\(-+[[<]\\([^]>]+\\)[]>]"
+                               "\\([ \t]*=>.*\\)?\\)?"))
+                   ts te h m s neg)
+               (cond
+                ((not (looking-at re))
+                 nil)
+                ((not (match-end 2))
+                 (when (and (equal (marker-buffer org-clock-marker) (current-buffer))
+                            (> org-clock-marker (point))
+                            (<= org-clock-marker (point-at-eol)))
+                   ;; The clock is running here
+                   (setq org-clock-start-time
+                         (apply 'encode-time
+                                (org-parse-time-string (match-string 1))))
+                   (org-clock-update-mode-line)))
+                (t
+                 (and (match-end 4) (delete-region (match-beginning 4) (match-end 4)))
+                 (end-of-line 1)
+                 (setq ts (match-string 1)
+                       te (match-string 3))
+                 (message "ts: %s, te: %s" ts te)
+                 (setq s (- (org-float-time
+                             (apply 'encode-time (org-parse-time-string te)))
+                            (org-float-time
+                             (apply 'encode-time (org-parse-time-string ts)))))
+                 (message "s: %d" s)
+                 (setq neg (< s 0))
+                 (setq s (abs s))
+                 (setq h (floor (/ s 3600)))
+                 (setq s (- s (* 3600 h)))
+                 (setq m (floor (/ s 60)))
+                 (setq s (- s (* 60 s)))
+                 (insert " => " (format (if neg "-%d:%02d" "%2d:%02d") h m))
+                 t))))))))
 
   (autoload 'org-store-link "org"
     "Store an org-link to the current location." t)
@@ -2324,8 +2323,8 @@ Otherwise, return nil."
 (when (locate-library "org-remember")
   ;; ロケールを C にする
   (defadvice org-remember-apply-template
-    (before org-remember-locale
-            (&optional use-char skip-interactive) activate compile)
+      (before org-remember-locale
+              (&optional use-char skip-interactive) activate compile)
     (set (make-local-variable 'system-time-locale) "C"))
 
   ;; ソースコードを読みメモする
@@ -2494,8 +2493,8 @@ Otherwise, return nil."
 
   ;; recentf バッファを kill しない
   (defadvice kill-buffer
-    (around kill-buffer-recentf-no-kill (&optional buffer)
-            disable compile)
+      (around kill-buffer-recentf-no-kill (&optional buffer)
+              disable compile)
     (when (and (bufferp (ad-get-arg 0))
                (not (string= (buffer-name (ad-get-arg 0))
                              (format "*%s*" recentf-menu-title))))
@@ -2503,8 +2502,8 @@ Otherwise, return nil."
 
   ;; バッファキルしない
   (defadvice recentf-open-files-action
-    (around recentf-open-files-action-no-kill (widget &rest _ignore)
-            activate compile)
+      (around recentf-open-files-action-no-kill (widget &rest _ignore)
+              activate compile)
     (ad-enable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill)
     (ad-activate 'kill-buffer)   ; 有効化
     ad-do-it
@@ -2516,8 +2515,8 @@ Otherwise, return nil."
 
   ;; .recentf のバックアップファイルをつくらない
   (defadvice write-file
-    (around recentf-save-nobackup (filename &optional confirm)
-            activate compile)
+      (around recentf-save-nobackup (filename &optional confirm)
+              activate compile)
     (if (and (boundp 'recentf-save-file)
              (string= (ad-get-arg 0) (expand-file-name recentf-save-file))
              (not backup-inhibited))
@@ -2844,8 +2843,8 @@ Otherwise, return nil."
     "Simple Directory Explorer." t)
   (autoload 'direx-project:jump-to-project-root-other-window "direx-project"
     "Project Module for Direx." t)
-    (autoload 'popwin:special-display-config "popwin"
-      "Project Module for Direx." t)
+  (autoload 'popwin:special-display-config "popwin"
+    "Project Module for Direx." t)
   (define-key global-map (kbd "C-c C-j")
     'direx:jump-to-directory-other-window)
   (eval-after-load "direx"
@@ -2933,7 +2932,7 @@ Otherwise, return nil."
                 (message (substitute-command-keys "\\[grep-edit-finish-edit] to apply changes.")))
               (set (make-local-variable 'inhibit-read-only) t)))
   (defadvice grep-edit-change-file
-    (around inhibit-read-only activate)
+      (around inhibit-read-only activate)
     (let ((inhibit-read-only t))
       ad-do-it)))
 
@@ -2996,7 +2995,7 @@ Otherwise, return nil."
 
   ;; 上下分割のみ (デフォルト: 160)
   (defadvice syslog-open-file-move-line
-    (around syslog-mode-width activate compile)
+      (around syslog-mode-width activate compile)
     (let ((split-width-threshold 100000))
       ad-do-it))
 
@@ -3147,7 +3146,7 @@ Otherwise, return nil."
     `((name . "current directory")
       (candidates . (lambda ()
                       (with-anything-current-buffer
-                        (directory-files (anything-c-current-directory) t))))
+                       (directory-files (anything-c-current-directory) t))))
       (help-message . anything-generic-file-help-message)
       (mode-line . anything-generic-file-mode-line-string)
       (candidate-transformer anything-c-highlight-files)
@@ -3210,7 +3209,7 @@ Otherwise, return nil."
       (action ("insert command" . anything-eshell-zhistory-insert))))
 
   (defun anything-eshell-zhistory-insert (cmd)
-      (insert (substring cmd 15)))
+    (insert (substring cmd 15)))
 
   (defun anything-eshell ()
     "anything eshell"
@@ -3287,10 +3286,10 @@ Otherwise, return nil."
   (autoload 'helm-esh-pcomplete "helm-config" nil t)
 
   (defun helm-status ()
-     (format "helm[%s]: "
-             (if (boundp 'helm-mode)
-                 (if helm-mode "enable" "disable")
-               "disable")))
+    (format "helm[%s]: "
+            (if (boundp 'helm-mode)
+                (if helm-mode "enable" "disable")
+              "disable")))
 
   (defun helm-choice ()
     "Helm choice."
@@ -3612,60 +3611,60 @@ Otherwise, return nil."
   (eval-after-load "skk"
     '(progn
        ;; 辞書の登録
-       ; 個人辞書
+                                        ; 個人辞書
        (let ((personal
               (concat (file-name-as-directory
                        (catch 'found (find-directory "skk")))
                       ".skk-jisyo"))
-             ; 基本辞書
+                                        ; 基本辞書
              (large (expand-file-name
                      "~/.emacs.d/ddskk/SKK-JISYO.L"))
              (lst (list
-                   ; 連想辞書
+                                        ; 連想辞書
                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.assoc")
-                    ; 英和辞典
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.edict")
-                    ; 本
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.book")
-                    ; 法律
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.law")
-                    ; 企業など
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.propernoun")
-                    ; 人名
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.jinmei")
-                    ; 地名辞典
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.geo")
-                    ; 駅
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.station")
-                    ; 2ch用語
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.2ch")
-                    ; エモジオ
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.emojio")
-                    ; 顔文字 0
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.kao0")
-                    ; 顔文字 1
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.kao1")
-                    ; 顔文字 2
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.kao2")
-                    ; 郵便番号
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.zipcode")
-                    ; 会社
-                    (expand-file-name
-                     "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode"))))
+                    "~/.emacs.d/ddskk/SKK-JISYO.assoc")
+                                        ; 英和辞典
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.edict")
+                                        ; 本
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.book")
+                                        ; 法律
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.law")
+                                        ; 企業など
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.propernoun")
+                                        ; 人名
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.jinmei")
+                                        ; 地名辞典
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.geo")
+                                        ; 駅
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.station")
+                                        ; 2ch用語
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.2ch")
+                                        ; エモジオ
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.emojio")
+                                        ; 顔文字 0
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.kao0")
+                                        ; 顔文字 1
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.kao1")
+                                        ; 顔文字 2
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.kao2")
+                                        ; 郵便番号
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.zipcode")
+                                        ; 会社
+                   (expand-file-name
+                    "~/.emacs.d/ddskk/SKK-JISYO.office.zipcode"))))
          ;; 個人辞書
          (when (boundp 'skk-jisyo)
            (when (and (file-readable-p personal)
@@ -3859,7 +3858,7 @@ Otherwise, return nil."
     '(progn
        ;; ヘッダを使用しない
        (defadvice usage-memo-mode
-         (around usage-memo-no-header activate compile)
+           (around usage-memo-no-header activate compile)
          (let (header-line-format)
            ad-do-it))
        ;; ディレクトリ
@@ -3995,7 +3994,7 @@ Otherwise, return nil."
       (custom-set-variables '(w32-symlinks-handle-shortcuts t))
       ;; NTEmacs で動かすための設定
       (defadvice insert-file-contents-literally
-        (before insert-file-contents-literally-before activate compile)
+          (before insert-file-contents-literally-before activate compile)
         (set-buffer-multibyte nil))
 
       (defadvice minibuffer-complete (before expand-symlinks activate compile)
@@ -4236,7 +4235,7 @@ Otherwise, return nil."
 
        ;; カーソルから最後までを refile するよう変更する
        (defadvice mew-summary-auto-refile
-         (around mew-summary-auto-refile-from-cursor activate compile)
+           (around mew-summary-auto-refile-from-cursor activate compile)
          (save-excursion
            (save-window-excursion
              (narrow-to-region (point) (point-max))
@@ -4514,7 +4513,7 @@ Otherwise, return nil."
                   (add-to-list 'ac-modes 'eshell-mode))
                 (when (fboundp 'ac-define-source)
                   (ac-define-source pcomplete
-                    '((candidates . pcomplete-completions))))
+                                    '((candidates . pcomplete-completions))))
                 (when (boundp 'ac-sources)
                   (setq ac-sources
                         '(ac-source-pcomplete
@@ -4523,14 +4522,14 @@ Otherwise, return nil."
                           ac-source-words-in-buffer
                           ac-source-dictionary)))
                 (when (boundp 'eshell-mode-map)
-                  ;(define-key eshell-mode-map (kbd "C-i") 'auto-complete)
+                                        ;(define-key eshell-mode-map (kbd "C-i") 'auto-complete)
                   (define-key eshell-mode-map (kbd "C-u") 'eshell-chdir-up)))))
 
   (eval-after-load "eshell"
     '(progn
        ;; 確認なしでヒストリ保存
        (when (boundp 'eshell-ask-to-save-history)
-           (setq eshell-ask-to-save-history (quote always)))
+         (setq eshell-ask-to-save-history (quote always)))
        ;; zsh のヒストリと共有
        (when (boundp 'eshell-history-file-name)
          (setq eshell-history-file-name
@@ -4815,7 +4814,7 @@ Otherwise, return nil."
 
        ;; 環境変数の設定
        (defadvice gtags-goto-tag
-         (before setenv-gtags-libpath activate compile)
+           (before setenv-gtags-libpath activate compile)
          (when gtags-libpath
            (setenv "GTAGSLIBPATH" gtags-libpath))
          (setenv "GTAGSTHROUGH" "") ; 全てのパスを走査する
@@ -5030,7 +5029,7 @@ Otherwise, return nil."
 
   ;; コンパイル
   (defadvice compile
-    (around compile-directory (command &optional comint) activate compile)
+      (around compile-directory (command &optional comint) activate compile)
     (let ((split-width-threshold 100000) ; 上下分割のみ (デフォルト: 160)
           (default-directory (read-directory-name
                               "Directory: " default-directory nil nil nil)))
@@ -5061,7 +5060,7 @@ Otherwise, return nil."
        (add-to-list 'compilation-error-regexp-alist 'gcc-ja)
 
        (defadvice compilation-find-file
-         (before compilation-find-file-log activate compile)
+           (before compilation-find-file-log activate compile)
          (message "compilation-find-file: %s %s %s"
                   (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2)))
 
@@ -5202,8 +5201,8 @@ Otherwise, return nil."
     '(progn
        ;; プログラム名
        (when (boundp 'scheme-program-name)
-         ;(setq scheme-program-name "gosh -i")
-         ;(setq scheme-program-name "guile")
+                                        ;(setq scheme-program-name "gosh -i")
+                                        ;(setq scheme-program-name "guile")
          (setq scheme-program-name "mit-scheme"))
        ;; 文字コード
        (when (boundp 'process-coding-system-alist)
@@ -5256,8 +5255,8 @@ Otherwise, return nil."
   ;; シェバン追加
   (add-to-list 'interpreter-mode-alist '("runghc" . haskell-mode))
   (add-to-list 'interpreter-mode-alist '("runhaskell" . haskell-mode)
-  ;; 実行パス追加
-  (add-to-list 'exec-path (concat (getenv "HOME") "/.cabal/bin")))
+               ;; 実行パス追加
+               (add-to-list 'exec-path (concat (getenv "HOME") "/.cabal/bin")))
 
   (eval-after-load "haskell-mode"
     '(progn
@@ -5421,7 +5420,7 @@ Otherwise, return nil."
     '(progn
        ;; 関数が見つからないメッセージ抑制
        (defadvice c-eldoc-print-current-symbol-info
-         (around c-eldoc-print-current-symbol-info-noerror activate compile)
+           (around c-eldoc-print-current-symbol-info-noerror activate compile)
          (flet ((message (format-string &rest args)
                          (eval `(format ,format-string ,@args))))
            ad-do-it))
@@ -5722,8 +5721,8 @@ Otherwise, return nil."
                 (define-key php+-mode-map (kbd "C-:") 'phpcmp-complete)))))
 
 (when (locate-library "inf-php")
-    (autoload 'inf-php "inf-php"
-      "A php process can be fired up with M-x inf-php." t))
+  (autoload 'inf-php "inf-php"
+    "A php process can be fired up with M-x inf-php." t))
 
 ;; Java Script
 (when (locate-library "js2-mode")
@@ -6039,15 +6038,15 @@ Otherwise, return nil."
 
 ;;; 空白・タブを変換
 (defun convert-tab-space ()
-    ;; タブをスペースにする
-    (when (fboundp 'untabify)
-      (untabify (point-min) (point-max))
-      (message "untabify...done"))
-    (goto-char (point-min))
-    ;; 末尾の空白削除
-    (when (fboundp 'delete-trailing-whitespace)
-      (delete-trailing-whitespace)
-      (message "delete-trailing-whitespace...done")))
+  ;; タブをスペースにする
+  (when (fboundp 'untabify)
+    (untabify (point-min) (point-max))
+    (message "untabify...done"))
+  (goto-char (point-min))
+  ;; 末尾の空白削除
+  (when (fboundp 'delete-trailing-whitespace)
+    (delete-trailing-whitespace)
+    (message "delete-trailing-whitespace...done")))
 
 ;;; インデント整形
 (defun execute-indent ()
@@ -6121,9 +6120,9 @@ Otherwise, return nil."
     ;; for 文 ; の後ろの空白挿入
     (while (re-search-forward
             "\\(for (?.*\\);\\([^ ]?.*\\);\\([^ ]\\)" nil t)
-        (replace-match
-         (concat (match-string 1) "; " (match-string 2) "; " (match-string 3)) nil t)
-        (message "[%d] replace-match (`; ')...done" (line-number-at-pos)))
+      (replace-match
+       (concat (match-string 1) "; " (match-string 2) "; " (match-string 3)) nil t)
+      (message "[%d] replace-match (`; ')...done" (line-number-at-pos)))
     (goto-char (point-min))
     ;; インデント
     (when (fboundp 'indent-code-regidly)
@@ -6239,7 +6238,7 @@ Otherwise, return nil."
     (define-key global-map (kbd "<C-left>") 'backward-word)))
 
 (defadvice terminal-init-xterm
-  (around map-escape-sequence activate compile)
+    (around map-escape-sequence activate compile)
   (set-keys-map)
   ad-do-it)
 (set-keys-map)
