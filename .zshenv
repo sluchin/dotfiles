@@ -44,7 +44,8 @@ ld_library_path=(
     $HOME/lib/*(N-/)
     /usr/local/lib(N-/)
     /usr/local/*/lib(N-/)
-    /usr/lib/(N-/)
+    /usr/lib(N-/)
+    /usr/lib/*(N-/)
     /usr/*/lib/(N-/)
     $ld_library_path
 )
