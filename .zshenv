@@ -40,6 +40,7 @@ cdpath=(
 )
 
 ld_library_path=(
+    .
     $HOME/lib(N-/)
     $HOME/lib/*(N-/)
     /usr/local/lib(N-/)
@@ -54,12 +55,13 @@ fignore=('.elc' '.o' '~' '\#')
 
 pythonpath=(
     .
-    /usr/lib/python*/site-packages(N-/)
     /usr/local/lib/python*/site-packages(N-/)
+    /usr/lib/python*/site-packages(N-/)
     /usr/share/pyshared(N-/)
     $pythonpath
 )
 
+export LANG=ja_JP.UTF-8
 export RSYNC_RSH=ssh
 export CVS_RSH=ssh
 export TERM=xterm
@@ -68,8 +70,6 @@ export VISUAL=$EDITOR
 export FCEDIT=$EDITOR
 
 limit coredumpsize unlimited
-
-export LANG=ja_JP.UTF-8
 
 ZSHENV_LOCAL=$HOME/.zshenv.local
 [[ -f $ZSHENV_LOCAL ]] && source $ZSHENV_LOCAL

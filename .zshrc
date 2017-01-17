@@ -413,9 +413,8 @@ function tmux_automatically_attach_session()
     fi
 }
 
-if [ -f .tmux_autostart ]; then
-    tmux_automatically_attach_session
-fi
+DOT_TMUX_AUTO=$HOME/.tmux_autostart
+[[ -f $DOT_TMUX_AUTO ]] && tmux_automatically_attach_session
 
 function cdup ()
 {
