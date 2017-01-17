@@ -1,7 +1,8 @@
 ### .zshenv -*- mode: Shell-script; coding: utf-8; indent-tabs-mode: nil -*-
 # initial setup file for both interactive and noninteractive zsh
 
-typeset -T PYTHONPATH pythonpath
+typeset -xT LD_LIBRARY_PATH ld_library_path
+typeset -xT PYTHONPATH pythonpath
 typeset -U path fpath cdpath manpath pythonpath
 
 path=(
@@ -37,6 +38,14 @@ cdpath=(
     $cdpath
 )
 
+ld_library_path=(
+    /usr/local/lib(N-/)
+    /usr/local/*/lib(N-/)
+    /usr/lib/(N-/)
+    /usr/*/lib/(N-/)
+    $ld_library_path
+)
+
 fignore=('.elc' '.o' '~' '\#')
 
 pythonpath=(
@@ -51,13 +60,12 @@ export RSYNC_RSH=ssh
 export CVS_RSH=ssh
 export TERM=xterm
 export EDITOR=emacsclient
-export VISUAL=emacsclient
-export FCEDIT=emacsclient
+export VISUAL=$EDITOR
+export FCEDIT=$EDITOR
 
 limit coredumpsize unlimited
 
-LANG=ja_JP.UTF-8
-export LANG
+export LANG=ja_JP.UTF-8
 
 ZSHENV_LOCAL=$HOME/.zshenv.local
 [[ -f $ZSHENV_LOCAL ]] && source $ZSHENV_LOCAL
