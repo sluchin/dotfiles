@@ -300,7 +300,7 @@ RPROMPT="!%!(%(?|%?|%{$fg_bold[red]%}%?%{$reset_color%}))$RPS1"
 
 # SSH ログイン時のプロンプト
 [ -n "${REMOTEHOST}${SSH_CONNECTION}" ] &&
-  PROMPT="%{${fg[white]}%}${HOST%%.*} ${PROMPT}";
+    PROMPT="%{${fg[white]}%}${HOST%%.*} ${PROMPT}";
 
 # mysql プロンプト
 # https://github.com/tetsujin/zsh-function-mysql
@@ -412,7 +412,10 @@ function tmux_automatically_attach_session()
         fi
     fi
 }
-tmux_automatically_attach_session
+
+if [ -f .tmux_autostart ]; then
+    tmux_automatically_attach_session
+fi
 
 function cdup ()
 {
