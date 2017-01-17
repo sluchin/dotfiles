@@ -7,6 +7,7 @@ typeset -U path fpath cdpath manpath pythonpath
 
 path=(
     $HOME/bin(N-/)
+    $HOME/bin/*(N-/)
     /usr/local/sbin(N-/)
     /usr/local/bin(N-/)
     /usr/local/*/bin(N-/)
@@ -39,6 +40,8 @@ cdpath=(
 )
 
 ld_library_path=(
+    $HOME/lib(N-/)
+    $HOME/lib/*(N-/)
     /usr/local/lib(N-/)
     /usr/local/*/lib(N-/)
     /usr/lib/(N-/)
