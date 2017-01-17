@@ -3,7 +3,7 @@
 
 typeset -xT LD_LIBRARY_PATH ld_library_path
 typeset -xT PYTHONPATH pythonpath
-typeset -U path fpath cdpath manpath pythonpath
+typeset -U path fpath cdpath manpath ld_library_path pythonpath
 
 path=(
     $HOME/bin(N-/)
