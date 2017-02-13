@@ -98,6 +98,7 @@ zle -N zaw-src-cdr
 HISTSIZE=100000
 SAVEHIST=100000
 HISTFILE=$HOME/.zhistory
+LS_COLORS='di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30'
 
 # shell options
 setopt auto_cd              # ディレクトリ名の入力のみで移動する
@@ -140,6 +141,11 @@ unsetopt auto_param_keys    # 変数名の後ろに空白を挿入
 unsetopt auto_param_slash   # ディレクトリの後ろスラッシュを挿入
 unsetopt sh_word_split      # クオートしていない変数を単語分割する
 
+compctl -f -x 'C[-1,-[ef]]' -k '(mew batch-byte-compile trr)' -- emacs
+compctl -x 'S[C]' -k '(CC CFLAGS CPPFLAGS CXXFLAGS)' -S = -- make
+compctl -x 'q[d][s]' -k '(%Y-%m-%d\ %H:%M:%S %Y/%m/%d)' \
+        -P '+' -- date
+
 # 矢印で補完を選択
 zstyle ':completion:*:default' menu select=2
 zstyle ':completion:*:processes' menu yes select=2
@@ -154,17 +160,29 @@ zstyle ':completion:*' completer \
     _prefix \
     _list \
     _history
-# オブジェクトファイルは補完しない
-zstyle ':completion:*:*:(^(rm|unlink|mv)):*:*' \
-    ignored-patterns '*?.elc' '*?.o' '*?~' '*\#'
-zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#'
 
-# カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを候補
-#zstyle ':completion:*:cd:*' tag-order local-directories path-directories
-#zstyle ':completion:*:cd:*' ignore-parents parent pwd
+# ファイル補完候補に色を付ける
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# cd, pushed では補完しない
+zstyle ':completion::*:(cd|pushed):*:directories' \
+    ignored-patterns '.git' '.svn' '.deps' '(*/)#(CVS|RCS)'
+
+# カレントディレクトリに候補がない場合のみ cdpath 上のディレクトリを補完
+zstyle ':completion::*:(cd|pushed):*:directories' \
+    tag-order local-directories path-directories
+
+# 親ディレクトリからカレントディレクトリを補完しない
+zstyle ':completion::*:(cd|pushed):*:directories' \
+    ignore-parents parent pwd
+
+# rm, unlink, mv 以外ではオブジェクトファイルを補完しない
+zstyle ':completion::*:(^(rm|unlink|mv)):*:*files' \
+    ignored-patterns '?*.elc' '?*.o' '?*~' '?*.bak'
 
 # 大文字小文字の区別をしない
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z} r:|[-_.]=**'
+
 # セパレータ
 zstyle ':completion:*' list-separator '-->'
 zstyle ':completion:*' format '%F{white}%d%f'
@@ -181,11 +199,14 @@ zstyle ':completion:*' verbose yes    # 詳細な情報を使う
 zstyle ':completion:*:manuals' separate-sections true
 zstyle ':completion:sudo:*' environ PATH="$SUDO_PATH:$PATH" # sudo 時には sudo 用のパスも使う
 zstyle ':completion:*' format '%B%d%b'
-zstyle ':completion:*:warnings' format 'No matches for: %d'
+
+# 補完方法毎にグループ化する。
+zstyle ':completion:*' format '%B%F{blue}%d%f%b'
 zstyle ':completion:*' group-name ''
 
 # 変数の添字の補完
 zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+
 # man の補完をセクション番号別に表示させる
 zstyle ':completion:*:manuals' separate-sections true
 
@@ -222,9 +243,9 @@ alias la='ls --color=always -ad ^*~'
 if type trash-put >/dev/null 2>&1; then
     alias rm='trash-put'
 fi
-alias grep='grep --color=always'
-alias fgrep='fgrep --color=always'
-alias egrep='egrep --color=always'
+alias grep='grep --color=always -dskip --binary-files=without-match --exclude="*~" --exclude-dir={.git,.svn,.deps}'
+alias fgrep='fgrep --color=always -dskip --binary-files=without-match --exclude="*~" --exclude-dir={.git,.svn,.deps}'
+alias egrep='egrep --color=always -dskip --binary-files=without-match --exclude="*~" --exclude-dir={.git,.svn,.deps}'
 alias g='git --no-pager'
 alias t='tail -f'
 alias gterm='gnome-terminal --geometry=130x40'
@@ -248,6 +269,11 @@ alias -g S='| sed'
 alias -g A='| awk'
 alias -g W='| wc -l'
 alias -g N='> /dev/null 2>&1'
+
+
+zstyle ':completion::*:shnsplit::' \
+    file-patterns '?*.flac'
+alias shnsplit='shnsplit -o flac -t %n'
 
 # 常にバックグラウンドで起動
 function xpdf() { command xpdf $* &! }
@@ -415,6 +441,84 @@ function tmux_automatically_attach_session()
 
 DOT_TMUX_AUTO=$HOME/.tmux_autostart
 [[ -f $DOT_TMUX_AUTO ]] && tmux_automatically_attach_session
+
+function extract() {
+    case $1 in
+        *.tar.gz|*.tgz) tar xzvf $1;;
+        *.tar.xz) tar Jxvf $1;;
+        *.zip) unzip $1;;
+        *.lzh) lha e $1;;
+        *.tar.bz2|*.tbz) tar xjvf $1;;
+        *.tar.Z) tar zxvf $1;;
+        *.gz) gzip -d $1;;
+        *.bz2) bzip2 -dc $1;;
+        *.Z) uncompress $1;;
+        *.tar) tar xvf $1;;
+        *.arj) unarj $1;;
+    esac
+}
+
+alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz}=extract
+
+function splitflac() {
+
+    [[ -z $(which shnsplit) ]] && return 1
+    [[ ! -d split ]] && mkdir split
+
+    if [ "$1" = "-f" ]; then
+        cuefile=$2
+        flacfile=$3
+    else
+        printf "Usage: %s -f cuefile flacfile\n" $(basename $0) >&2
+        return 1
+    fi
+
+    echo shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
+    shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
+
+    [[ -z $(which cuetag) ]] && return 1
+
+    local save=$IFS
+    IFS='\n'
+
+    [[ -f split/00* ]] && rm split/00*
+
+    echo cuetag "$cuefile" ./split/*.flac
+    cuetag "$cuefile" ./split/*.flac
+    [[ $? -ne 0 ]] && return 1
+
+    rm ./*.flac
+    mv split/*.flac .
+    rm -rf split
+
+    IFS=$save
+
+    return 0
+}
+
+#compctl -g '*.flac *.cue' -x 'c[-1,-f]' -k '*.cue' -- splitflac
+
+function zman() {
+    PAGER="less -g -s '+/^       "$1"'" man zshall
+
+# zsh           zshの概要
+# zshroadmap    zshのmanの概要
+# zshmisc       その他すべて
+# zshexpn       展開機能について
+# zshparam      変数について
+# zshoptions    オプションについて
+# zshbuiltins   組み込みコマンドについて
+# zshzle        コマンドライン編集について
+# zshcompwid    補完ウィジェットについて
+# zshcompsys    compsysという補完システムについて
+# zshcompctl    compctlという補完システムについて
+# zshmodules    モジュールについて
+# zshcalsys     カレンダーシステムについて
+# zshtcpsys     TCPシステムについて
+# zshzftpsys    zftpコマンドのラッパー関数について
+# zshcontrib    ユーザーから投稿されたスクリプトについて
+# zshall        他のすべてのzsh manページを集めたページ
+}
 
 function cdup ()
 {
