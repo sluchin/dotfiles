@@ -51,7 +51,7 @@ ld_library_path=(
     $ld_library_path
 )
 
-fignore=('.elc' '.o' '~' '\#')
+fignore=()
 
 pythonpath=(
     .
