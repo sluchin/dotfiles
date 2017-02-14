@@ -442,65 +442,92 @@ function tmux_automatically_attach_session()
 DOT_TMUX_AUTO=$HOME/.tmux_autostart
 [[ -f $DOT_TMUX_AUTO ]] && tmux_automatically_attach_session
 
-# export GOPATH="$HOME/.go"
-# go get github.com/peco/peco/cmd/peco
-#function peco-history-selection() {
-#    BUFFER=`history -n 1 | tail -r | awk '!a[$0]++' | peco`
-#    CURSOR=$#BUFFER
-#    zle reset-prompt
-#}
+if type peco >/dev/null 2>&1; then
+    function peco-buffer() {
+        BUFFER=$(eval ${BUFFER} | peco)
+        CURSOR=0
+    }
+    zle -N peco-buffer
+    bindkey '^p' peco-buffer
 
-#zle -N peco-history-selection
-#bindkey '^R' peco-history-selection
-
-function peco-select-history() {
-    local tac
-    if which tac > /dev/null; then
-        tac="tac"
-    else
-        tac="tail -r"
-    fi
-    BUFFER=$(\history -n 1 | \
-        eval $tac | \
-        peco --query "$LBUFFER")
-    CURSOR=$#BUFFER
-    zle clear-screen
-}
-zle -N peco-select-history
-
-if which peco > /dev/null; then
+    function peco-select-history() {
+        local tac
+        if type tac > /dev/null 2>&1; then
+            tac="tac"
+        else
+            tac="tail -r"
+        fi
+        BUFFER=$(\history -n 1 | grep -v cd | eval $tac | \
+            peco --query "$LBUFFER")
+        CURSOR=$#BUFFER
+        zle clear-screen
+    }
+    zle -N peco-select-history
     bindkey '^r' peco-select-history
+
+    function peco-cdr () {
+        local dir=$(cdr -l | sed 's/^[0-9]\+ \+//' | \
+            peco --prompt="cdr >" --query "$LBUFFER")
+        if [ -n "$dir" ]; then
+            BUFFER="cd ${dir}"
+            zle accept-line
+        fi
+    }
+    zle -N peco-cdr
+    bindkey '^s' peco-cdr
+
+    MAXDEPTH=""
+    function peco-path() {
+        if [[ -n $LBUFFER || -n $RBUFFER ]]; then
+            (( CURSOR++ ))
+            return 0;
+        fi
+        local filepath=$(find . -maxdepth ${MAXDEPTH:-5} | \
+            grep -v '/\.' | peco --prompt 'PATH>')
+        if [ -n "$filepath" ]; then
+            if [ -d "$filepath" ]; then
+                BUFFER+="cd '$filepath'"
+            elif [ -f "$filepath" ]; then
+                BUFFER="emacsclient '$filepath'"
+            fi
+            zle accept-line
+        else
+            return 1
+        fi
+        CURSOR=$#BUFFER
+    }
+    zle -N peco-path
+    bindkey '^f' peco-path
+
+    function peco-pkill() {
+        local pid=$(ps aux | peco | awk '{ print $2 }')
+        if [ ${#pid} -ne 0 ]; then
+            kill $pid
+            echo "kill ${pid}"
+        fi
+    }
+    alias pk="peco-pkill"
+
+    function peco-grep() {
+        local search=$1
+        local res=$(grep --color=never -rn $search | peco | \
+            awk -F: '{ print $2" "$1 }')
+        if [ ${#res} -ne 0 ]; then
+            local file=$(echo $res | awk -F" " '{ print $2 }')
+            local nu=$(echo $res | awk -F" " '{ print $1 }')
+            local cur=$(pwd)
+            [[ -d ${file:h} ]] && cd ${file:h}
+            emacsclient +${nu:=0} ${file:t}
+
+            echo "emacsclient +${nu} ${file:t}"
+            cd ${cur}
+        fi
+    }
+    alias pg="peco-grep"
+    alias pgrep="peco-grep"
 else
     bindkey "^r" zaw-history
-fi
-
-function peco-z-search
-{
-    which peco z > /dev/null
-    if [ $? -ne 0 ]; then
-        echo "Please install peco and z"
-        return 1
-    fi
-    local res=$(z | sort -rn | cut -c 12- | peco)
-    if [ -n "$res" ]; then
-        BUFFER+="cd $res"
-        zle accept-line
-    else
-        return 1
-    fi
-}
-
-if [[ -f $ZSH_DIR/z/z.sh ]]; then
-    source $ZSH_DIR/z/z.sh
-fi
-
-zle -N peco-z-search
-
-PECO=`which peco`
-if [[ -n $PECO && -f $ZSH_DIR/z/z.sh ]]; then
-    bindkey '^f' peco-z-search
-else
-    bindkey "^f" zaw-cdr
+    bindkey '^s' zaw-cdr
 fi
 
 function extract() {
@@ -540,8 +567,7 @@ function splitflac() {
     [[ -z $(which cuetag) ]] && return 1
 
     local save=$IFS
-    IFS='\n'
-
+    IFS='	'
     [[ -f split/00* ]] && rm split/00*
 
     echo cuetag "$cuefile" ./split/*.flac
