@@ -1,0 +1,75 @@
+#compdef zman
+
+# zsh           zshの概要
+# zshroadmap    zshのmanの概要
+# zshmisc       その他すべて
+# zshexpn       展開機能について
+# zshparam      変数について
+# zshoptions    オプションについて
+# zshbuiltins   組み込みコマンドについて
+# zshzle        コマンドライン編集について
+# zshcompwid    補完ウィジェットについて
+# zshcompsys    compsysという補完システムについて
+# zshcompctl    compctlという補完システムについて
+# zshmodules    モジュールについて
+# zshcalsys     カレンダーシステムについて
+# zshtcpsys     TCPシステムについて
+# zshzftpsys    zftpコマンドのラッパー関数について
+# zshcontrib    ユーザーから投稿されたスクリプトについて
+# zshall        他のすべてのzsh manページを集めたページ
+
+function __zman_zsh_cmd_common ()
+{
+	local -a list
+	list=(
+        zsh:'zshの概要'
+        zshroadmap:'zshのmanの概要'
+        zshmisc:'その他すべて'
+        zshexpn:'展開機能について'
+        zshparam:'変数について'
+        zshoptions:'オプションについて'
+        zshbuiltins:'組み込みコマンドについて'
+        zshzle:'コマンドライン編集について'
+        zshcompwid:'補完ウィジェットについて'
+        zshcompsys:'compsysという補完システムについて'
+        zshcompctl:'compctlという補完システムについて'
+        zshmodules:'モジュールについて'
+        zshcalsys:'カレンダーシステムについて'
+        zshtcpsys:'TCPシステムについて'
+        zshzftpsys:'zftpコマンドのラッパー関数について'
+        zshcontrib:'ユーザーから投稿されたスクリプトについて'
+        zshall:'他のすべてのzsh manページを集めたページ')
+
+	_describe -t common-commands 'common commands' list && _ret=0
+}
+
+function __zman_zsh_main ()
+{
+	_arguments -C \
+		'(-): :->command' && return
+
+	case $state in
+	(command)
+		_alternative 'common-commands:common:__zman_zsh_cmd_common' && _ret=0
+		;;
+	esac
+}
+
+function _zman ()
+{
+	local _ret=1
+	local cur cword prev
+
+	cur=${words[CURRENT]}
+	prev=${words[CURRENT-1]}
+	let cword=CURRENT-1
+
+	if (( $+functions[__${service}_zsh_main] )); then
+		__${service}_zsh_main
+	fi
+
+	let _ret && _default && _ret=0
+	return _ret
+}
+
+_zman
