@@ -442,6 +442,67 @@ function tmux_automatically_attach_session()
 DOT_TMUX_AUTO=$HOME/.tmux_autostart
 [[ -f $DOT_TMUX_AUTO ]] && tmux_automatically_attach_session
 
+# export GOPATH="$HOME/.go"
+# go get github.com/peco/peco/cmd/peco
+#function peco-history-selection() {
+#    BUFFER=`history -n 1 | tail -r | awk '!a[$0]++' | peco`
+#    CURSOR=$#BUFFER
+#    zle reset-prompt
+#}
+
+#zle -N peco-history-selection
+#bindkey '^R' peco-history-selection
+
+function peco-select-history() {
+    local tac
+    if which tac > /dev/null; then
+        tac="tac"
+    else
+        tac="tail -r"
+    fi
+    BUFFER=$(\history -n 1 | \
+        eval $tac | \
+        peco --query "$LBUFFER")
+    CURSOR=$#BUFFER
+    zle clear-screen
+}
+zle -N peco-select-history
+
+if which peco > /dev/null; then
+    bindkey '^r' peco-select-history
+else
+    bindkey "^r" zaw-history
+fi
+
+function peco-z-search
+{
+    which peco z > /dev/null
+    if [ $? -ne 0 ]; then
+        echo "Please install peco and z"
+        return 1
+    fi
+    local res=$(z | sort -rn | cut -c 12- | peco)
+    if [ -n "$res" ]; then
+        BUFFER+="cd $res"
+        zle accept-line
+    else
+        return 1
+    fi
+}
+
+if [[ -f $ZSH_DIR/z/z.sh ]]; then
+    source $ZSH_DIR/z/z.sh
+fi
+
+zle -N peco-z-search
+
+PECO=`which peco`
+if [[ -n $PECO && -f $ZSH_DIR/z/z.sh ]]; then
+    bindkey '^f' peco-z-search
+else
+    bindkey "^f" zaw-cdr
+fi
+
 function extract() {
     case $1 in
         *.tar.gz|*.tgz) tar xzvf $1;;
@@ -465,13 +526,13 @@ function splitflac() {
     [[ -z $(which shnsplit) ]] && return 1
     [[ ! -d split ]] && mkdir split
 
-    if [ "$1" = "-f" ]; then
-        cuefile=$2
-        flacfile=$3
-    else
+    if [ $# -ne 2 ]; then
         printf "Usage: %s -f cuefile flacfile\n" $(basename $0) >&2
         return 1
     fi
+
+    cuefile=$1
+    flacfile=$2
 
     echo shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
     shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
@@ -496,28 +557,10 @@ function splitflac() {
     return 0
 }
 
-#compctl -g '*.flac *.cue' -x 'c[-1,-f]' -k '*.cue' -- splitflac
-
 function zman() {
-    PAGER="less -g -s '+/^       "$1"'" man zshall
-
-# zsh           zshの概要
-# zshroadmap    zshのmanの概要
-# zshmisc       その他すべて
-# zshexpn       展開機能について
-# zshparam      変数について
-# zshoptions    オプションについて
-# zshbuiltins   組み込みコマンドについて
-# zshzle        コマンドライン編集について
-# zshcompwid    補完ウィジェットについて
-# zshcompsys    compsysという補完システムについて
-# zshcompctl    compctlという補完システムについて
-# zshmodules    モジュールについて
-# zshcalsys     カレンダーシステムについて
-# zshtcpsys     TCPシステムについて
-# zshzftpsys    zftpコマンドのラッパー関数について
-# zshcontrib    ユーザーから投稿されたスクリプトについて
-# zshall        他のすべてのzsh manページを集めたページ
+    kind=$1
+    search=$2
+    PAGER="less -g -s '+/^       "$search"'" man $kind
 }
 
 function cdup ()

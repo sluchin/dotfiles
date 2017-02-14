@@ -1,0 +1,44 @@
+#compdef splitflac
+
+function __splitflac_zsh_main ()
+{
+	_arguments -C \
+		'(-): :->cue' \
+		'(-)*:: :->flac' && return
+
+	case $state in
+	(cue)
+        local file=`find . -type f | grep '.cue'`
+        [ -z $file ] && return _ret
+
+        _cuefile=$file
+        _describe -t cuefile 'cuefile' _cuefile && _ret=0
+		;;
+	(flac)
+        local file=`find . -type f | grep '.flac'`
+        [ -z $file ] && return _ret
+
+        _flacfile=$file
+        _describe -t flacfile 'flacfile' _flacfile && _ret=0
+		;;
+	esac
+}
+
+function _splitflac ()
+{
+	local _ret=1
+	local cur cword prev
+
+	cur=${words[CURRENT]}
+	prev=${words[CURRENT-1]}
+	let cword=CURRENT-1
+
+	if (( $+functions[__${service}_zsh_main] )); then
+		__${service}_zsh_main
+	fi
+
+	let _ret && _default && _ret=0
+	return _ret
+}
+
+_splitflac
