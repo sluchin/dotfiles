@@ -450,7 +450,7 @@ if type peco >/dev/null 2>&1; then
     zle -N peco-buffer
     bindkey '^p' peco-buffer
 
-    function peco-select-history() {
+    function peco-history() {
         local tac
         if type tac > /dev/null 2>&1; then
             tac="tac"
@@ -458,12 +458,12 @@ if type peco >/dev/null 2>&1; then
             tac="tail -r"
         fi
         BUFFER=$(\history -n 1 | grep -v cd | eval $tac | \
-            peco --query "$LBUFFER")
+            peco --prompt="history >" --query "$LBUFFER")
         CURSOR=$#BUFFER
         zle clear-screen
     }
-    zle -N peco-select-history
-    bindkey '^r' peco-select-history
+    zle -N peco-history
+    bindkey '^r' peco-history
 
     function peco-cdr () {
         local dir=$(cdr -l | sed 's/^[0-9]\+ \+//' | \
@@ -483,7 +483,7 @@ if type peco >/dev/null 2>&1; then
             return 0;
         fi
         local filepath=$(find . -maxdepth ${MAXDEPTH:-5} | \
-            grep -v '/\.' | peco --prompt 'PATH>')
+            grep -v '/\.' | peco --prompt 'path >' --query "$LBUFFER")
         if [ -n "$filepath" ]; then
             if [ -d "$filepath" ]; then
                 BUFFER+="cd '$filepath'"
@@ -499,29 +499,30 @@ if type peco >/dev/null 2>&1; then
     zle -N peco-path
     bindkey '^f' peco-path
 
-    function peco-pkill() {
-        local pid=$(ps aux | peco | awk '{ print $2 }')
+    function peco-kill() {
+        local pid=$(ps aux | peco --prompt 'kill >' | awk '{ print $2 }')
         if [ ${#pid} -ne 0 ]; then
             kill $pid
             echo "kill ${pid}"
         fi
     }
-    alias pk="peco-pkill"
+    zle -N peco-kill
+    alias pk="peco-kill"
+    alias pkill="peco-kill"
 
     function peco-grep() {
         local search=$1
-        local res=$(grep --color=never -rn $search | peco | \
+        local res=$(grep --color=never -rn $search | \
+            peco --prompt 'grep >' | \
             awk -F: '{ print $2" "$1 }')
         if [ ${#res} -ne 0 ]; then
             local file=$(echo $res | awk -F" " '{ print $2 }')
             local nu=$(echo $res | awk -F" " '{ print $1 }')
-            local cur=$(pwd)
-            [[ -d ${file:h} ]] && cd ${file:h}
-            emacsclient +${nu:=0} ${file:t}
-            echo "emacsclient +${nu} ${file:t}"
-            cd ${cur}
+            emacsclient +${nu:=0} ${file}
+            echo "emacsclient +${nu} ${file}"
         fi
     }
+    zle -N peco-grep
     alias pg="peco-grep"
     alias pgrep="peco-grep"
 else
@@ -565,15 +566,19 @@ function splitflac() {
 
     [[ -z $(which cuetag) ]] && return 1
 
+    local zerofile=$(find . -type f | grep split/00)
+    [[ -n zerofile ]] && rm split/00*
+
     local save=$IFS
     IFS='	'
-    [[ -f split/00* ]] && rm split/00*
-
     echo cuetag "$cuefile" ./split/*.flac
     cuetag "$cuefile" ./split/*.flac
     [[ $? -ne 0 ]] && return 1
 
-    rm ./*.flac
+    local flacfile=$(find . -type f | egrep ".flac$")
+    local apefile=$(find . -type f | egrep ".ape$")
+    [[ -n $flacfile ]] && rm ./*.flac
+    [[ -n $apefile ]] && rm ./*.ape
     mv split/*.flac .
     rm -rf split
 
