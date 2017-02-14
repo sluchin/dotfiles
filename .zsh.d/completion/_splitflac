@@ -7,19 +7,31 @@ function __splitflac_zsh_main ()
 		'(-)*:: :->flac' && return
 
 	case $state in
-	(cue)
-        local file=`find . -type f | grep '.cue'`
-        [ -z $file ] && return _ret
+	    (cue)
+        local -a cuelist
+        save=$IFS
+        IFS=$'\n'
+        for file in $(find . -type f | grep '.cue')
+        do
+            cuelist=($cuelist $file)
+        done
+        [ ${#cuelist} -eq 0 ] && return _ret
 
-        _cuefile=$file
-        _describe -t cuefile 'cuefile' _cuefile && _ret=0
+        _describe -t cuefile 'cuefile' cuelist && _ret=0
+        IFS=$save
 		;;
 	(flac)
-        local file=`find . -type f | grep -e '.flac' -e '.ape'`
-        [ -z $file ] && return _ret
+        local -a flaclist
+        save=$IFS
+        IFS=$'\n'
+        for file in $(find . -type f | grep -e '.flac' -e '.ape')
+        do
+            flaclist=($flaclist $file)
+        done
+        [ ${#flaclist} -eq 0 ] && return _ret
 
-        _flacfile=$file
-        _describe -t flacfile 'flacfile' _flacfile && _ret=0
+        _describe -t flacfile 'cuefile' flaclist && _ret=0
+        IFS=$save
 		;;
 	esac
 }
