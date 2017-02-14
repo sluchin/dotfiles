@@ -575,8 +575,8 @@ function splitflac() {
     cuetag "$cuefile" ./split/*.flac
     [[ $? -ne 0 ]] && return 1
 
-    local flacfile=$(find . -type f | egrep ".flac$")
-    local apefile=$(find . -type f | egrep ".ape$")
+    local flacfile=$(find . -type f -maxdepth 1 | egrep ".flac$")
+    local apefile=$(find . -type f -maxdepth 1 | egrep ".ape$")
     [[ -n $flacfile ]] && rm ./*.flac
     [[ -n $apefile ]] && rm ./*.ape
     mv split/*.flac .
