@@ -518,7 +518,6 @@ if type peco >/dev/null 2>&1; then
             local cur=$(pwd)
             [[ -d ${file:h} ]] && cd ${file:h}
             emacsclient +${nu:=0} ${file:t}
-
             echo "emacsclient +${nu} ${file:t}"
             cd ${cur}
         fi
