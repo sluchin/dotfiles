@@ -500,7 +500,7 @@ if type peco >/dev/null 2>&1; then
     bindkey '^f' peco-path
 
     function peco-kill() {
-        local pid=$(ps aux | peco --prompt 'kill >' | awk '{ print $2 }')
+        local pid=$(ps aux --sort=-pid | peco --prompt 'kill >' | awk '{ print $2 }')
         if [ ${#pid} -ne 0 ]; then
             kill $pid
             echo "kill ${pid}"
