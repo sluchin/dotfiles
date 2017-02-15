@@ -428,7 +428,7 @@ function tmux_automatically_attach_session()
                 # to spawn a shell in the user's namespace
                 tmux_config=$(cat $HOME/.tmux.conf < \
                               (echo 'set-option -g default-command \
-								"reattach-to-user-namespace -l $SHELL"'))
+                                "reattach-to-user-namespace -l $SHELL"'))
                 tmux -f < \
                      (echo "$tmux_config") new-session && \
                     echo "$(tmux -V) created new session supported OS X"
@@ -478,7 +478,7 @@ if type peco >/dev/null 2>&1; then
 
     MAXDEPTH=""
     function peco-path() {
-        if [[ -n $LBUFFER || -n $RBUFFER ]]; then
+        if [[ -n $RBUFFER ]]; then
             (( CURSOR++ ))
             return 0;
         fi
@@ -570,7 +570,7 @@ function splitflac() {
     [[ -n zerofile ]] && rm split/00*
 
     local save=$IFS
-    IFS='	'
+    IFS='   '
     echo cuetag "$cuefile" ./split/*.flac
     cuetag "$cuefile" ./split/*.flac
     [[ $? -ne 0 ]] && return 1
@@ -688,7 +688,7 @@ function tmuxload ()
         tac $file | while read line; \
             do echo $line | tr -d "\n" | tmux load-buffer -; \
             done
-	else
+    else
         echo "tmuxload file"
     fi
 }
