@@ -550,21 +550,22 @@ alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz}=extract
 
 function splitflac() {
 
-    [[ -z $(which shnsplit) ]] && return 1
-    [[ ! -d split ]] && mkdir split
+    [[ $# -ne 2 ]] ||
+        { echo >&2 "Usage: ${0:t} -f cuefile flacfile"; return 1; }
 
-    if [ $# -ne 2 ]; then
-        printf "Usage: %s -f cuefile flacfile\n" $(basename $0) >&2
-        return 1
-    fi
+    type shnsplit > /dev/null 2>&1 ||
+        { echo >&2 "I require shnsplit but it:s not installed. Aborting."; return 1; }
+
+    [[ ! -d split ]] && mkdir split
 
     cuefile=$1
     flacfile=$2
 
     echo shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
     shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
-
-    [[ -z $(which cuetag) ]] && return 1
+    [[ $? -ne 0 ]] && return 1
+    type cuetag > /dev/null 2>&1 ||
+        { echo >&2 "I require cuetag but it:s not installed. Aborting."; return 1; }
 
     local zerofile=$(find . -type f | grep split/00)
     [[ -n zerofile ]] && rm split/00*
@@ -575,10 +576,16 @@ function splitflac() {
     cuetag "$cuefile" ./split/*.flac
     [[ $? -ne 0 ]] && return 1
 
-    local flacfile=$(find . -type f -maxdepth 1 | egrep ".flac$")
-    local apefile=$(find . -type f -maxdepth 1 | egrep ".ape$")
-    [[ -n $flacfile ]] && rm ./*.flac
-    [[ -n $apefile ]] && rm ./*.ape
+    while true; do
+        read ans\?"Do you delete $flacfile? [Y/n]"
+        case $ans in
+        [Yy]* )
+            rm $flacfile
+            break ;;
+        [Nn]* )
+            break ;;
+        esac
+    done
     mv split/*.flac .
     rm -rf split
 
