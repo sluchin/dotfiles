@@ -2,55 +2,55 @@
 
 function __splitflac_zsh_main ()
 {
-	_arguments -C \
-		'(-): :->cue' \
-		'(-)*:: :->flac' && return
+    _arguments -C \
+        '(-): :->cue' \
+        '(-)*:: :->flac' && return
 
-	case $state in
-	    (cue)
+    case $state in
+    (cue)
         local -a cuelist
         save=$IFS
         IFS=$'\n'
         for file in $(find . -type f -maxdepth 1 | grep '.cue')
         do
-            cuelist=($cuelist $file)
+            cuelist=($cuelist ${file:t})
         done
         [ ${#cuelist} -eq 0 ] && return _ret
 
         _describe -t cuefile 'cuefile' cuelist && _ret=0
         IFS=$save
-		;;
-	(flac)
+        ;;
+    (flac)
         local -a flaclist
         save=$IFS
         IFS=$'\n'
         for file in $(find . -type f -maxdepth 1 | grep -e '.flac' -e '.ape')
         do
-            flaclist=($flaclist $file)
+            flaclist=($flaclist ${file:t})
         done
         [ ${#flaclist} -eq 0 ] && return _ret
 
         _describe -t flacfile 'cuefile' flaclist && _ret=0
         IFS=$save
-		;;
-	esac
+        ;;
+    esac
 }
 
 function _splitflac ()
 {
-	local _ret=1
-	local cur cword prev
+    local _ret=1
+    local cur cword prev
 
-	cur=${words[CURRENT]}
-	prev=${words[CURRENT-1]}
-	let cword=CURRENT-1
+    cur=${words[CURRENT]}
+    prev=${words[CURRENT-1]}
+    let cword=CURRENT-1
 
-	if (( $+functions[__${service}_zsh_main] )); then
-		__${service}_zsh_main
-	fi
+    if (( $+functions[__${service}_zsh_main] )); then
+        __${service}_zsh_main
+    fi
 
-	let _ret && _default && _ret=0
-	return _ret
+    let _ret && _default && _ret=0
+    return _ret
 }
 
 _splitflac
