@@ -550,16 +550,16 @@ alias -s {gz,tgz,zip,lzh,bz2,tbz,Z,tar,arj,xz}=extract
 
 function splitflac() {
 
-    [[ $# -ne 2 ]] ||
-        { echo >&2 "Usage: ${0:t} -f cuefile flacfile"; return 1; }
+    [[ $# -eq 2 ]] ||
+        { echo >&2 "Usage: ${0:t} cuefile flacfile"; return 1; }
 
     type shnsplit > /dev/null 2>&1 ||
         { echo >&2 "I require shnsplit but it:s not installed. Aborting."; return 1; }
 
     [[ ! -d split ]] && mkdir split
 
-    cuefile=$1
-    flacfile=$2
+    local cuefile=$1
+    local flacfile=$2
 
     echo shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
     shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
@@ -577,7 +577,7 @@ function splitflac() {
     [[ $? -ne 0 ]] && return 1
 
     while true; do
-        read ans\?"Do you delete $flacfile? [Y/n]"
+        read ans\?"Do you delete $flacfile ? [Y/n]"
         case $ans in
         [Yy]* )
             rm $flacfile
