@@ -512,7 +512,7 @@ if type peco >/dev/null 2>&1; then
 
     function peco-grep() {
         local search=$1
-        local res=$(grep --color=never -rn $search | \
+        res=$(grep --color=never -rn $search | \
             peco --prompt 'grep >' | \
             awk -F: '{ print $2" "$1 }')
         if [ ${#res} -ne 0 ]; then
