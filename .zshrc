@@ -457,7 +457,7 @@ if type peco >/dev/null 2>&1; then
         else
             tac="tail -r"
         fi
-        BUFFER=$(\history -n 1 | grep -v cd | eval $tac | \
+        BUFFER=$(\history -n 1 | egrep -v "^cd" | eval $tac | \
             peco --prompt="history >" --query "$LBUFFER")
         CURSOR=$#BUFFER
         zle clear-screen
