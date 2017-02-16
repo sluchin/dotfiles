@@ -554,7 +554,7 @@ function splitflac() {
         { echo >&2 "Usage: ${0:t} cuefile flacfile"; return 1; }
 
     type shnsplit > /dev/null 2>&1 ||
-        { echo >&2 "I require shnsplit but it:s not installed. Aborting."; return 1; }
+        { echo >&2 "I require shnsplit but it's not installed. Aborting."; return 1; }
 
     [[ ! -d split ]] && mkdir split
 
@@ -565,7 +565,7 @@ function splitflac() {
     shnsplit -d split -t "%n - %p - %t" -o flac -f "$cuefile" "$flacfile"
     [[ $? -ne 0 ]] && return 1
     type cuetag > /dev/null 2>&1 ||
-        { echo >&2 "I require cuetag but it:s not installed. Aborting."; return 1; }
+        { echo >&2 "I require cuetag but it's not installed. Aborting."; return 1; }
 
     local zerofile=$(find . -type f | grep split/00)
     [[ -n zerofile ]] && rm split/00*
