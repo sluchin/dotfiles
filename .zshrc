@@ -502,8 +502,8 @@ if type peco >/dev/null 2>&1; then
     function peco-kill() {
         local pid=$(ps aux --sort=-pid | peco --prompt 'kill >' | awk '{ print $2 }')
         if [ ${#pid} -ne 0 ]; then
-            kill $pid
-            echo "kill ${pid}"
+            kill "$@" $pid
+            echo "kill $@ ${pid}"
         fi
     }
     zle -N peco-kill
@@ -511,8 +511,7 @@ if type peco >/dev/null 2>&1; then
     alias pkill="peco-kill"
 
     function peco-grep() {
-        local search=$1
-        res=$(grep --color=never -rn $search | \
+        res=$(grep --color=never "$@" | \
             peco --prompt 'grep >' | \
             awk -F: '{ print $2" "$1 }')
         if [ ${#res} -ne 0 ]; then
