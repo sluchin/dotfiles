@@ -443,14 +443,16 @@ DOT_TMUX_AUTO=$HOME/.tmux_autostart
 [[ -f $DOT_TMUX_AUTO ]] && tmux_automatically_attach_session
 
 if type peco >/dev/null 2>&1; then
-    function peco-buffer() {
+    function peco-buffer()
+    {
         BUFFER=$(eval ${BUFFER} | peco)
         CURSOR=0
     }
     zle -N peco-buffer
     bindkey '^p' peco-buffer
 
-    function peco-history() {
+    function peco-history()
+    {
         local tac
         if type tac > /dev/null 2>&1; then
             tac="tac"
@@ -465,7 +467,8 @@ if type peco >/dev/null 2>&1; then
     zle -N peco-history
     bindkey '^r' peco-history
 
-    function peco-cdr () {
+    function peco-cdr ()
+    {
         local dir=$(cdr -l | sed 's/^[0-9]\+ \+//' | \
             peco --prompt="cdr >" --query "$LBUFFER")
         if [ -n "$dir" ]; then
@@ -477,7 +480,8 @@ if type peco >/dev/null 2>&1; then
     bindkey '^s' peco-cdr
 
     MAXDEPTH=""
-    function peco-path() {
+    function peco-path()
+    {
         if [[ -n $RBUFFER ]]; then
             (( CURSOR++ ))
             return 0;
@@ -499,7 +503,8 @@ if type peco >/dev/null 2>&1; then
     zle -N peco-path
     bindkey '^f' peco-path
 
-    function peco-kill() {
+    function peco-kill()
+    {
         local pid=$(ps aux --sort=-pid | peco --prompt 'kill >' | awk '{ print $2 }')
         if [ ${#pid} -ne 0 ]; then
             kill "$@" $pid
@@ -529,7 +534,8 @@ else
     bindkey '^s' zaw-cdr
 fi
 
-function extract() {
+function extract()
+{
     case $1 in
         *.tar.gz|*.tgz) tar xzvf $1;;
         *.tar.xz) tar Jxvf $1;;
@@ -567,7 +573,7 @@ function splitflac() {
         { echo >&2 "I require cuetag but it's not installed. Aborting."; return 1; }
 
     local zerofile=$(find . -type f | grep split/00)
-    [[ -n zerofile ]] && rm split/00*
+    [[ -n $zerofile ]] && rm split/00*
 
     local save=$IFS
     IFS='   '
@@ -576,7 +582,7 @@ function splitflac() {
     [[ $? -ne 0 ]] && return 1
 
     while true; do
-        read ans\?"Do you delete $flacfile ? [Y/n]"
+        read ans\?"Do you delete $flacfile ? [Y/n] "
         case $ans in
         [Yy]* )
             rm $flacfile
@@ -585,8 +591,8 @@ function splitflac() {
             break ;;
         esac
     done
-    mv split/*.flac .
-    rm -rf split
+    \mv split/*.flac .
+    \rm -rf split
 
     IFS=$save
 
