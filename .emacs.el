@@ -1,6 +1,6 @@
 ;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
-;; Copyright (C) 2012 2013 2014 2015 2016
+;; Copyright (C) 2012 2013 2014 2015 2016 2017
 ;; Author: Tetsuya Higashi
 
 ;;; Version
@@ -30,7 +30,10 @@
 
 ;;; Installation:
 ;; emacs ソース
-;; git clone git://git.savannah.gnu.org/emacs.git
+;; > git clone git://git.savannah.gnu.org/emacs.git
+;; submodule
+;; > git submodule foreach 'git checkout master; git pull'
+;; > git submodule update
 ;; apt-get
 ;; (apt-get-install-all)
 ;; anything
@@ -354,16 +357,16 @@
                   "/usr/share/emacs/site-lisp/dictionaries-common") load-path)))
 ;; 優先度高
 (setq load-path
-      (append (list (expand-file-name "~/.emacs.d/lisp")
-                    (expand-file-name "~/.emacs.d/lisp/conf")
-                    (expand-file-name "~/.emacs.d/lisp/el-get/el-get")
-                    (expand-file-name "~/.emacs.d/lisp/howm")
-                    (expand-file-name "~/.emacs.d/lisp/emacs-w3m")
-                    (expand-file-name "~/.emacs.d/lisp/evernote-mode")
-                    (expand-file-name "~/.emacs.d/lisp/session/lisp")
-                    (expand-file-name "~/.emacs.d/lisp/term-plus-el")
-                    (expand-file-name "~/.emacs.d/lisp/pomodoro-technique")
-                    (expand-file-name "~/.emacs.d/lisp/auto-install")) load-path))
+      (append (list (expand-file-name "~/.emacs.d")
+                    (expand-file-name "~/.emacs.d/conf")
+                    (expand-file-name "~/.emacs.d/el-get/el-get")
+                    (expand-file-name "~/.emacs.d/howm")
+                    (expand-file-name "~/.emacs.d/emacs-w3m")
+                    (expand-file-name "~/.emacs.d/evernote-mode")
+                    (expand-file-name "~/.emacs.d/session/lisp")
+                    (expand-file-name "~/.emacs.d/term-plus-el")
+                    (expand-file-name "~/.emacs.d/pomodoro-technique")
+                    (expand-file-name "~/.emacs.d/auto-install")) load-path))
 ;; (expand-file-name "~/.emacs.d/submodule/org-mode/lisp")
 
 ;;; el-get
@@ -1967,7 +1970,7 @@
     "Switch to buffers or file-cache entries with 1 command." t)
 
   ;; 有効にする
-                                        ;(iswitchb-mode 1)
+  ;(iswitchb-mode 1)
 
   (eval-after-load "iswitchb"
     '(progn
@@ -2936,8 +2939,30 @@ Otherwise, return nil."
     (let ((inhibit-read-only t))
       ad-do-it)))
 
-;;; リドゥ
-;; (install-elisp-from-emacswiki "redo+.el")
+;; Windows
+;; Grep for Windows
+;; http://gnuwin32.sourceforge.net/packages/grep.htm
+;; FindUtils for Windows
+;; http://gnuwin32.sourceforge.net/packages/findutils.htm
+(when (or (fboundp 'rgrep) (fboundp 'dired-find))
+  (when (or (eq system-type 'windows-nt) (eq system-type 'msdos))
+    (let ((dir "C:\\GNU\\gnuwin32\\bin"))
+      (setenv "PATH" (concat dir ";" (getenv "PATH")))
+      (setq find-program (concat dir "\\find.exe")
+            grep-program (concat dir "\\grep.exe")))
+
+    (defadvice shell-quote-argument
+        (after windows-nt-special-quote (argument) activate)
+      "Add special quotes to ARGUMENT in case the system type is 'windows-nt."
+      (when (and (eq system-type 'windows-nt)
+                 (w32-shell-dos-semantics))
+        (if (string-match "[\\.~]" ad-return-value)
+            (setq ad-return-value
+                  (replace-regexp-in-string
+                   "\\([\\.~]\\)"
+                   "\\\\\\1"
+                   ad-return-value)))))))
+
 ;; C-? でリドゥ C-/ でアンドゥ
 (when (eval-and-compile (require 'redo+ nil t))
   ;; 過去の Undo が Redo されないようにする
@@ -3340,7 +3365,10 @@ Otherwise, return nil."
 
 ;;; タブ
 ;; (install-elisp-from-emacswiki "tabbar.el")
-(when (locate-library "tabbar")
+(when (and (not (locate-library "tabbar"))
+           (let ((dir "~/.emacs.d/tabbar"))
+             (when (file-directory-p dir)
+               (add-to-list 'load-path dir))))
   (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
   ;; タブ表示
   (define-key global-map (kbd "C-c t") 'tabbar-mode)
