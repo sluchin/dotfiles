@@ -357,8 +357,7 @@
                   "/usr/share/emacs/site-lisp/dictionaries-common") load-path)))
 ;; 優先度高
 (setq load-path
-      (append (list (expand-file-name "~/.emacs.d")
-                    (expand-file-name "~/.emacs.d/conf")
+      (append (list (expand-file-name "~/.emacs.d/conf")
                     (expand-file-name "~/.emacs.d/el-get/el-get")
                     (expand-file-name "~/.emacs.d/howm")
                     (expand-file-name "~/.emacs.d/emacs-w3m")
@@ -2963,6 +2962,7 @@ Otherwise, return nil."
                    "\\\\\\1"
                    ad-return-value)))))))
 
+
 ;; C-? でリドゥ C-/ でアンドゥ
 (when (eval-and-compile (require 'redo+ nil t))
   ;; 過去の Undo が Redo されないようにする
@@ -3368,7 +3368,8 @@ Otherwise, return nil."
 (when (and (not (locate-library "tabbar"))
            (let ((dir "~/.emacs.d/tabbar"))
              (when (file-directory-p dir)
-               (add-to-list 'load-path dir))))
+               (add-to-list 'load-path dir)))))
+(when (locate-library "tabbar")
   (autoload 'tabbar-mode "tabbar" "Display a tab bar in the header line." t)
   ;; タブ表示
   (define-key global-map (kbd "C-c t") 'tabbar-mode)
