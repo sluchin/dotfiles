@@ -68,8 +68,13 @@
 ;;; ファイル名を保持
 (defconst this-file-name load-file-name)
 
+;;; バイトコンパイル警告抑制
+;; (setq byte-compile-warnings
+;;       '(not nresolved free-vars make-local callargs
+;;             redefine obsolete noruntime cl-functions interactive-only))
+
 ;;; *Message* バッファ表示
-;;(switch-to-buffer "*Messages*")
+(switch-to-buffer "*Messages*")
 
 ;;; require 時間を計測する
 (defvar benchmark-alist nil
@@ -222,14 +227,14 @@
 
 (defun add-to-load-path2 (&rest paths)
   (dolist (path paths)
-    (let* ((dir (if (boundp 'user-emacs-directory)
+    (let* ((rootdir (if (boundp 'user-emacs-directory)
                     user-emacs-directory
                   (expand-file-name "~/")))
            (default-directory (expand-file-name
-                               (concat dir path))))
-      (dolist (file (directory-files default-directory t))
-        (when (file-directory-p file)
-          (add-to-list 'load-path file)))
+                               (concat rootdir path))))
+      (dolist (dir (directory-files default-directory t))
+        (when (file-directory-p dir)
+          (add-to-list 'load-path dir)))
       (message "load-path: %s" load-path))))
 
 ;;; ロードパスの設定
@@ -346,7 +351,8 @@
 
 ;;; load-path に追加
 ;; ディレクトリ配下全て load-path に追加
-(add-to-load-path2 "elisp" "elpa" "submodule")
+(when (eq system-type 'gnu/linux)
+  (add-to-load-path2 "elisp" "elpa" "submodule"))
 
 (when (eq system-type 'gnu/linux)
   (setq load-path
@@ -565,7 +571,7 @@
   (when (and (not (eq system-type 'windows-nt))
              (< 21 emacs-major-version))
     (set-face-foreground 'which-func "chocolate1")
-    (set-face-bold-p 'which-func t))
+    (set-face-bold 'which-func t))
 
   ;; ヘッダラインとモードラインをトグルする
   (defun toggle-header-which-func ()
@@ -922,10 +928,11 @@
                (message "no file: %s" ,html))))))))
 
 ;;; サーバを起動する
-(when (eval-and-compile (require 'server nil t))
-  (when (and (fboundp 'server-running-p)
-             (fboundp 'server-start))
-    (unless (server-running-p) (server-start))))
+(when (eq system-type 'gnu/linux)
+      (when (eval-and-compile (require 'server nil t))
+        (when (and (fboundp 'server-running-p)
+                   (fboundp 'server-start))
+          (unless (server-running-p) (server-start)))))
 
 ;;; C ソースの指定
 ;; git clone git://git.savannah.gnu.org/emacs.git
@@ -1473,6 +1480,8 @@
 
 ;; dired 設定
 (when (locate-library "dired")
+  (defvar dired-subdir-alist nil)
+  (defvar dired-mode-map nil)
   (autoload 'dired "dired"
     "Edit directory DIRNAME--delete, rename, print, etc." t)
   (autoload 'dired-jump "dired"
@@ -1536,7 +1545,8 @@
          (add-to-list 'dired-compress-file-suffixes
                       '("\\.zip\\'" ".zip" "unzip")))
 
-       ;; ファイルのフルパスを取得.
+       ;; ファイルのフルパスを取得
+       (declare-function dired-copy-filename-as-kill ())
        (defun dired-copy-pathname-as-kill ()
          "Copy pathname."
          (interactive)
@@ -1658,6 +1668,8 @@
        (put 'dired-find-alternate-file 'disabled nil)
 
        ;; 画面分割に適した `dired-dwim-find-alternate-file'
+       (declare-function dired-find-file ())
+       (declare-function dired-find-alternate-file ())
        (defun dired-dwim-find-alternate-file ()
          (interactive)
          (cond
@@ -1669,6 +1681,9 @@
            (dired-find-alternate-file))))
 
        ;; バッファを増やさず上のディレクトリに移動
+       (declare-function dired-current-directory ())
+       (declare-function dired-goto-file ())
+       (declare-function dired-goto-subdir ())
        (defun dired-up-alternate-directory ()
          (interactive)
          (let* ((dir (dired-current-directory))
@@ -1682,6 +1697,8 @@
                  (dired-goto-file dir)))))
 
        ;; 画面分割に適した `dired-up-alternate-directory'
+       (declare-function dired-up-directory ())
+       (declare-function dired-up-alternate-directory ())
        (defun dired-dwim-up-alternate-directory ()
          (interactive)
          (cond
@@ -1743,6 +1760,7 @@
 
   (eval-after-load "dired-k"
     '(progn
+       (eval-when-compile (defvar dired-mode-map))
        (define-key dired-mode-map (kbd "K") 'dired-k)
        (message "Loading %s (dired-k)...done" this-file-name))))
 
@@ -1812,6 +1830,7 @@
 
        ;; キーバインドのカスタマイズ
        ;; ファイル
+       (eval-when-compile (defvar speedbar-file-key-map))
        (let ((map speedbar-file-key-map))
          ;; 更新する
          (define-key map (kbd "g") 'speedbar-focus-refresh)
@@ -1841,6 +1860,7 @@
          (define-key map "M" 'speedbar-create-directory))
 
        ;; バッファ
+       (eval-when-compile (defvar speedbar-buffers-key-map))
        (let ((map speedbar-buffers-key-map))
          ;; 更新する
          (define-key map (kbd "g") 'speedbar-focus-refresh)
@@ -1920,8 +1940,8 @@
          (diff-mode-setup-faces))
 
        ;; old ファイル名と new ファイル名を保持する
-       (defvar diff-old-filname nil)
-       (defvar diff-new-filname nil)
+       (eval-when-compile (defvar diff-old-filname))
+       (eval-when-compile (defvar diff-new-filname))
        (defadvice diff (before diff-keep-arg
                                (old new &optional switches no-async)
                                activate compile)
@@ -1929,6 +1949,8 @@
          (setq diff-new-filename (ad-get-arg 1)))
 
        ;; 空白無視をトグルする
+       (defvar diff-old-filename nil)
+       (defvar diff-new-filename nil)
        (defun diff-toggle-whitespace ()
          "Toggle whitespace."
          (interactive)
@@ -2068,7 +2090,7 @@
        (when (eval-and-compile (require 'japanese-holidays nil t))
          (when (boundp 'calendar-holidays)
            (setq calendar-holidays ; 他の国の祝日も表示させたい場合は適当に調整
-                 (append japanese-holidays local-holidays other-holidays)))
+                 (append japanese-holidays holiday-local-holidays holiday-other-holidays)))
          (when (boundp 'mark-holidays-in-calendar)
            (setq mark-holidays-in-calendar t))       ; 祝日をカレンダーに表示
          ;; 土曜日・日曜日を祝日として表示する場合、以下の設定を追加します。
@@ -2262,6 +2284,7 @@ Otherwise, return nil."
        (when (boundp 'org-directory)           ; ディレクトリ
          (setq org-directory (catch 'found (find-directory "org")))
          (message "org-directory: %s" org-directory))
+       (eval-when-compile (defvar org-directory))
        (when (boundp 'org-default-notes-file)  ; ファイル名
          (setq org-default-notes-file
                (concat (file-name-as-directory org-directory) "agenda.org"))
@@ -2415,9 +2438,9 @@ Otherwise, return nil."
                         (catch 'found (find-directory "org"))) "feeds.org")))
   (eval-after-load "org-feed"
     '(progn
-
        (when (locate-library "org-feed-alist")
          (load "org-feed-alist"))
+       (eval-when-compile (defvar org-feed-default-template))
        (when (boundp org-feed-default-template)
          (setq org-feed-default-template "\n* %u - %h %description\n %a"))
        (message "Loading %s (org-feed)...done" this-file-name))))
@@ -2647,6 +2670,7 @@ Otherwise, return nil."
        (when (locate-library "newsticker-url")
          (load "newsticker-url"))
        ;; 全文変換
+       (eval-when-compile (defvar newsticker-url-list))
        (let ((lst newsticker-url-list)
              temp)
          (dolist (l lst)
@@ -2706,12 +2730,13 @@ Otherwise, return nil."
          (let ((browse-url-browser-function 'browse-url-default-browser))
            (call-interactively 'newsticker-treeview-browse-url)))
        ;; w3m で開く
+       (declare-function newsticker-treeview-item-window ())
        (defun newsticker-browse-url-from-w3m ()
          "Browse url from w3m."
          (interactive)
          (let ((browse-url-browser-function 'w3m-browse-url))
            (call-interactively 'newsticker-treeview-browse-url)
-           (select-window (newsticker--treeview-item-window))
+           (select-window (newsticker-treeview-item-window))
            (switch-to-buffer "*w3m*")))
        ;; 選択
        (defun newsticker-browse-choice ()
@@ -2901,10 +2926,10 @@ Otherwise, return nil."
 
   (eval-after-load "igrep"
     '(progn
-       (igrep-define lgrep
+       '(igrep-define lgrep
                      (igrep-use-zgrep nil)
                      (igrep-regex-option "-Ou8"))
-       (igrep-find-define lgrep
+       '(igrep-find-define lgrep
                           (igrep-use-zgrep nil)
                           (igrep-regex-option "-Ou8"))
        (message "Loading %s (igrep)...done" this-file-name))))
@@ -2917,7 +2942,7 @@ Otherwise, return nil."
 
   (eval-after-load "grep-a-lot"
     '(progn
-       (grep-a-lot-advise igrep))))
+       '(grep-a-lot-advise igrep))))
 
 ;; 編集
 ;; (install-elisp-from-emacswiki "grep-edit.el")
@@ -3178,6 +3203,7 @@ Otherwise, return nil."
       (action . (("insert command" . anything-eshell-cd-insert)))
       (type . file)))
 
+  (declare-function eshell-send-input ())
   (defun anything-eshell-cd-insert (directory)
     (let ((cmd (if (file-directory-p directory) "cd " "find-file ")))
       (insert (concat cmd directory))
@@ -3236,6 +3262,7 @@ Otherwise, return nil."
   (defun anything-eshell-zhistory-insert (cmd)
     (insert (substring cmd 15)))
 
+  (declare-function anything-other-buffer ())
   (defun anything-eshell ()
     "anything eshell"
     (interactive)
@@ -3277,6 +3304,7 @@ Otherwise, return nil."
          (setq anything-candidate-number-limit 300))
        (when (boundp 'anything-c-filelist-file-name)
          (setq anything-c-filelist-file-name (expand-file-name "~/.filelist")))
+       (eval-when-compile (defvar anything-grep-candidates-anyfast-directory-regexp))
        (when (boundp 'anything-grep-candidates-fast-directory-regexp)
          (setq anything-grep-candidates-anyfast-directory-regexp
                (expand-file-name "~/")))
@@ -3515,6 +3543,8 @@ Otherwise, return nil."
        ;; 送信控えをとる
        (when (boundp 'navi2ch-message-save-sendlog)
          (setq navi2ch-message-save-sendlog t)
+         (eval-when-compile (defvar navi2ch-message-sendlog-board))
+         (eval-when-compile (defvar navi2ch-list-navi2ch-category-alist))
          (add-to-list 'navi2ch-list-navi2ch-category-alist
                       navi2ch-message-sendlog-board))
        (message "Loading %s (navi2ch)...done" this-file-name))))
@@ -4078,8 +4108,14 @@ Otherwise, return nil."
            (setq sdcv-dictionary-complete-list
                  '("EIJI127" "WAEI127" "REIJI127" "RYAKU127")))
          ;; バグのため関数上書き
+         (declare-function sdcv-search-args ())
+         (declare-function sdcv-get-buffer ())
+         (declare-function sdcv-mode-reinit ())
+         (declare-function sdcv-goto-sdcv ())
          (defun sdcv-search-detail (&optional word)
            (message "Search...")
+           (eval-when-compile (defvar sdcv-buffer-name))
+           (eval-when-compile (defvar sdcv-dictionary-complete-list))
            (with-current-buffer (get-buffer-create sdcv-buffer-name)
              (setq buffer-read-only nil)
              (erase-buffer)
@@ -4221,6 +4257,9 @@ Otherwise, return nil."
          (list (propertize fmt
                            'face
                            '(:foreground "white" :background "red1"))))
+       (declare-function mew-propertized-biff-icon ())
+       (declare-function mew-propertized-biff-string ())
+       (declare-function mew-biff-clear ())
        (defvar mew-mode-line-quantity 0)
        (defvar mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
        (defvar mew-mode-line-biff-string (mew-propertized-biff-string ""))
@@ -4228,6 +4267,7 @@ Otherwise, return nil."
 
        (when (boundp 'mew-biff-function)
          ;; mew-biff-interval の間隔で呼ばれる関数
+         (eval-when-compile (defvar mew-mode-line-biff-quantity))
          (setq mew-biff-function
                (lambda (n)
                  (if (= n 0)
@@ -4292,6 +4332,7 @@ Otherwise, return nil."
          (load "mail-account")) ; ファイルからロードする
 
        ;; SSL 接続の設定
+       (eval-when-compile (defvar mew-mail-domain))
        (when (string= "gmail.com" mew-mail-domain)
          (when (boundp 'mew-imap-auth)
            (setq mew-imap-auth t))
@@ -4540,7 +4581,7 @@ Otherwise, return nil."
                          (require 'pcomplete nil t))
                 (when (boundp 'ac-modes)
                   (add-to-list 'ac-modes 'eshell-mode))
-                (when (fboundp 'ac-define-source)
+                '(when (fboundp 'ac-define-source)
                   (ac-define-source pcomplete
                                     '((candidates . pcomplete-completions))))
                 (when (boundp 'ac-sources)
@@ -4575,6 +4616,7 @@ Otherwise, return nil."
 
   (eval-after-load "em-ls"
     '(progn
+       (declare-function ted-eshell-ls-find-file-at-point ())
        (defun pat-eshell-ls-find-file-at-mouse-click (event)
          "Middle click on Eshell's `ls' output to open files.
           From Patrick Anderson via the wiki."
@@ -4814,7 +4856,9 @@ Otherwise, return nil."
   (eval-after-load "gtags"
     '(progn
        ;; ローカルバッファ変数
+       (eval-when-compile (defvar gtags-libpath))
        (defvar gtags-libpath nil "Library directory of language.")
+       (setq gtags-libpath "")
        (make-variable-buffer-local 'gtags-libpath)
 
        ;; ローカルバッファ変数にパスを設定
@@ -5245,12 +5289,14 @@ Otherwise, return nil."
 (when (locate-library "clojure-mode")
   (autoload 'clojure-mode "clojure-mode" "A major mode for Clojure." t)
   (autoload 'clojure-jack-in "clojure-mode" "Major mode for Clojure code." t)
+  (declare-function swank-clojure-reset-implementation ())
 
   (eval-after-load "clojure"
     '(progn
        (require 'swank-clojure nil t)
        (require 'assoc nil t)
        ;; /.clojure 内の各jarファイルにクラスパスを通す
+       (eval-when-compile (defvar swank-clojure-jar-home))
        (setq swank-clojure-jar-home
              (expand-file-name
               "~/.m2/repository/swank-clojure/swank-clojure/1.4.2/"))
@@ -5307,6 +5353,7 @@ Otherwise, return nil."
   (when (locate-library "hideif")
     (autoload 'hide-ifdef-mode "hideif" "hides selected code within ifdef." t)
     (autoload 'hide-ifdefs "hideif" "hides selected code within ifdef." t))
+    (declare-function cpp-gray ())
   (font-lock-add-keywords
    'c-mode
    ;; TODO, FIXME を強調表示
@@ -5685,6 +5732,7 @@ Otherwise, return nil."
   (defalias 'php-mode 'php+-mode)
   (defalias 'php-mode-map 'php+-mode-map)
   (autoload 'php+-mode "php+-mode" "PHP+ mode for Emacs." t)
+  (declare-function php-imenu-create-index ())
   (setq auto-mode-alist
         (cons '("\\.php\\'" . php+-mode) auto-mode-alist))
 
@@ -6274,3 +6322,7 @@ Otherwise, return nil."
 
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
+
+;; Local Variables:
+;; byte-compile-warnings: (not make-local)
+;; End:
