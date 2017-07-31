@@ -6323,6 +6323,22 @@ Otherwise, return nil."
 ;;; バックトレースを無効にする
 (setq debug-on-error nil)
 
+;Compiling file c:/home/higashi/dotfiles/.emacs.el at Mon Jul 31 12:40:55 2017
+;.emacs.el:471:9:Warning: assignment to free variable ‘search-delete-char’
+;.emacs.el:2100:26:Warning: reference to free variable ‘japanese-holidays’
+;.emacs.el:3805:23:Warning: reference to free variable
+;    ‘skk-dcomp-multiple-rows’
+;.emacs.el:3806:24:Warning: assignment to free variable
+;    ‘skk-dcomp-multiple-rows’
+
+;In execute-indent:
+;.emacs.el:6213:8:Warning: ‘mark-whole-buffer’ is for interactive use only.
+
+;In end of data:
+;.emacs.el:6336:1:Warning: the following functions are not known to be defined:
+;    bm-buffer-save-all, bm-repository-save, helm-status,
+;    helm-choice-for-eshell, helm-choice
+
 ;; Local Variables:
 ;; byte-compile-warnings: (not make-local)
 ;; End:
