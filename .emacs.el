@@ -1480,8 +1480,6 @@
 
 ;; dired 設定
 (when (locate-library "dired")
-  (defvar dired-subdir-alist nil)
-  (defvar dired-mode-map nil)
   (autoload 'dired "dired"
     "Edit directory DIRNAME--delete, rename, print, etc." t)
   (autoload 'dired-jump "dired"
@@ -1684,6 +1682,7 @@
        (declare-function dired-current-directory ())
        (declare-function dired-goto-file ())
        (declare-function dired-goto-subdir ())
+       (defvar dired-subdir-alist nil)
        (defun dired-up-alternate-directory ()
          (interactive)
          (let* ((dir (dired-current-directory))
@@ -1715,6 +1714,7 @@
          (quit-window
           (not (delq (selected-window) (get-buffer-window-list)))))
 
+       (defvar dired-mode-map nil)
        (when (boundp 'dired-mode-map)
          (let ((map dired-mode-map))
            ;; フルパスをコピー
