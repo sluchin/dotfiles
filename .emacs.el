@@ -33,7 +33,9 @@
 ;; > git clone git://git.savannah.gnu.org/emacs.git
 ;; submodule
 ;; > git submodule foreach 'git checkout master; git pull'
+;; > git submodule foreach git pull origin master
 ;; > git submodule update
+;; > git submodule update --init --recursive
 ;; apt-get
 ;; (apt-get-install-all)
 ;; anything
@@ -1515,13 +1517,13 @@
                 (setq ls-lisp-dirs-first t)))
              ((eq system-type 'gnu/linux)
               ;; GNU オプションも使う
-              ;; CentOS の場合
-              (if (file-readable-p "/etc/redhat-release")
+              ;; Ubuntu の場合
+              (if (file-readable-p "/etc/lsb-release")
                   (setq dired-listing-switches
-                        "-alF --time-style=long-iso")
-                ;; Ubuntu の場合 ("/etc/lsb-release")
+                        "-alF --time-style=long-iso --group-directories-first")
+                ;; CentOS の場合 ("/etc/redhat-release")
                 (setq dired-listing-switches
-                      "-alF --time-style=long-iso --group-directories-first")))
+                      "-alF --time-style=long-iso")))
              (t
               ;; POSIX オプションのみ
               (setq dired-listing-switches "-alF")))
