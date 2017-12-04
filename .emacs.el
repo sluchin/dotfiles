@@ -1383,7 +1383,7 @@
 (define-key global-map (kbd "C-\\") nil)
 
 ;; 折り返し表示 ON/OFF
-(define-key global-map (kbd "C-c l") 'toggle-truncate-lines)
+(define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
 
 ;; 現在位置のファイル・URLを開く
 (define-key global-map (kbd "C-x M-f") 'find-file-at-point)
@@ -1402,6 +1402,10 @@
 
 ;; タブ
 (define-key global-map (kbd "C-i") 'self-insert-command)
+
+;; 少しずつスクロール
+(define-key global-map (kbd "C-S-n") 'scroll-down-in-place)
+(define-key global-map (kbd "C-S-p") 'scroll-up-in-place)
 
 ;; ウィンドウ移動
 (defun other-window-or-split ()
@@ -2265,15 +2269,13 @@ Otherwise, return nil."
                  (insert " => " (format (if neg "-%d:%02d" "%2d:%02d") h m))
                  t))))))))
 
-  (autoload 'org-store-link "org"
-    "Store an org-link to the current location." t)
-  (autoload 'org-iswitchb "org" "Switch between Org buffers." t)
   (add-hook 'org-mode-hook
             (lambda ()
               ;; 日付を英語で挿入する
               (set (make-local-variable 'system-time-locale) "C")
               ;; org-mode での強調表示を可能にする
-              (turn-on-font-lock)))
+              (turn-on-font-lock)
+              (compilation-minor-mode 1)))
 
   (eval-after-load "org"
     '(progn
@@ -2446,6 +2448,24 @@ Otherwise, return nil."
        (when (boundp org-feed-default-template)
          (setq org-feed-default-template "\n* %u - %h %description\n %a"))
        (message "Loading %s (org-feed)...done" this-file-name))))
+
+;; org-store-link 設定
+(when (locate-library "org-store-link")
+  (autoload 'org-store-link "org-store-link"
+    "Store an org-link to the current location." t)
+
+  (eval-after-load "org-store-link"
+    '(progn
+       (define-key global-map (kbd "C-c l" 'org-store-link))
+       (message "Loading %s (org-feed)...done" this-file-name))))
+
+;; org-iswitchb 設定
+(when (locate-library "org-iswitchb")
+  (autoload 'org-iswitchb "org-iswitchb" "Switch between Org buffers." t)
+
+  (eval-after-load "org-iswitchb"
+    '(progn
+       (message "Loading %s (org-iswitchb)...done" this-file-name))))
 
 ;; org-mode キーバインド
 (when (and (locate-library "org")
@@ -2859,7 +2879,7 @@ Otherwise, return nil."
 (when (eval-and-compile (require 'thingopt nil t))
   (when (fboundp 'define-thing-commands)
     (define-thing-commands))
-  (define-key emacs-lisp-mode-map (kbd "C-c C-l") 'mark-up-list) ; リスト選択
+  (define-key emacs-lisp-mode-map (kbd "C-c C-p") 'mark-up-list) ; リスト選択
   (define-key global-map (kbd "C-c C-m") 'mark-symbol)           ; シンボル選択
   (define-key global-map (kbd "C-c C-w") 'mark-word*)            ; 単語選択
   (define-key global-map (kbd "C-c C-s") 'mark-string))          ; 文字列選択
@@ -4995,6 +5015,96 @@ Otherwise, return nil."
   (exec-tags-command
    "ctags-exuberant" "-e" "-V" "-L" "-"))
 
+;;; cscope
+;; https://github.com/dkogan/xcscope.el
+;; (cscope-index-files)
+;; find -L . -name '*.cpp' -o -name '*.c' -o -name '*.cc' -o -name '*.cxx' -o -name '*.cp' -o -name '*.c++' -o -name '*.h' -o -name '*.hpp' -o -name '*.hxx' -o -name '*.hh' -o -name '*.hp' -o -name '*.h++' > cscope.files
+;; cscope -Rb
+;; M-c s L
+(when (and (locate-library "xcscope") (executable-find "cscope"))
+  (autoload 'xcscope "xcscope"
+    "cscope interface for (X)Emacs")
+  (cscope-setup) ;; add-hook
+  (define-key global-map [(control f3)] 'cscope-set-initial-directory)
+  (define-key global-map [(control f4)] 'cscope-unset-initial-directory)
+  (define-key global-map [(control f5)] 'cscope-find-this-symbol)
+  (define-key global-map [(control f6)] 'cscope-find-global-definition)
+  (define-key global-map [(control f7)] 'cscope-find-global-definition-no-prompting)
+  (define-key global-map [(control f8)] 'cscope-pop-mark)
+  (define-key global-map [(control f9)] 'cscope-history-forward-line)
+  (define-key global-map [(control f10)] 'cscope-history-forward-file)
+  (define-key global-map [(control f11)] 'cscope-history-backward-line)
+  (define-key global-map [(control f12)] 'cscope-history-backward-file)
+  (define-key global-map [(meta f9)] 'cscope-display-buffer)
+  (define-key global-map [(meta f10)] 'cscope-display-buffer-toggle)
+
+  (message "Loading %s (xcscope)...done" this-file-name))
+
+;;; ソースに注釈をつける
+(when (locate-library "annotate")
+  (autoload 'annotate-mode "annotate"
+    "annotate files without changing them." t)
+  ;; 常に使えるようにする
+  (add-hook 'find-file-hook 'annotate-mode)
+
+  (eval-after-load "annotate"
+    '(progn
+       ;; ファイル設定
+       (when (boundp 'annotate-file)
+         (setq annotate-file (expand-file-name "~/.emacs.d/annotations")))
+
+       ;; view-mode でも使えるようにする
+       (defun annotate-editing-text-property (&rest them)
+         (let ((bmp (buffer-modified-p))
+               (inhibit-read-only t))
+           (apply them)
+           (set-buffer-modified-p bmp)))
+       (advice-add 'annotate-change-annotation :around 'annotate-editing-text-property)
+       (advice-add 'annotate-create-annotation :around 'annotate-editing-text-property)
+
+       ;; 規約違反なキーバインドを矯正
+       (when (boundp 'annotate-mode-map)
+         (define-key annotate-mode-map (kbd "C-c C-a") nil)
+         (define-key annotate-mode-map (kbd "C-c a") 'annotate-annotate))
+       (message "Loading %s (annotate)...done" this-file-name))))
+
+;;; fold-this
+;; https://github.com/magnars/fold-this.el
+;; (setq fold-this-persistent-folds t)
+(when (locate-library "fold-this")
+  (autoload 'fold-this "fold-this"
+    "Just fold this region please." t)
+  (autoload 'fold-this "fold-this-all"
+    "Just fold this region please." t)
+
+  ;; この設定を入れると Emacs を終了しても fold が持続する
+  (defun fold-this--this-or-all (all)
+    (interactive "P")
+    (let ((x (bounds-of-thing-at-point 'sexp))
+          (rap (region-active-p)))
+      (funcall (if all 'fold-this-all 'fold-this)
+               (if rap (region-beginning) (car x))
+               (if rap (region-end) (cdr x))))
+    (message (substitute-command-keys "To unfold all, try \\[fold-this-unfold-all]")))
+  (with-eval-after-load "view"
+    (when (boundp 'view-mode-map)
+      (define-key view-mode-map (kbd "f") 'fold-this--this-or-all)
+      (define-key view-mode-map (kbd "a") 'fold-this-unfold-all)))
+
+  (eval-after-load "fold-this"
+    '(progn
+       (message "Loading %s (fold-this)...done" this-file-name))))
+
+;;; hide-comnt
+;; https://github.com/emacsmirror/hide-comnt
+(when (locate-library "hide-comnt")
+  (autoload 'hide/show-comments "hide-comnt"
+    "Hide/show comments in code." t)
+
+  (eval-after-load "hide-comnt"
+    '(progn
+       (message "Loading %s (hide-comnt)...done" this-file-name))))
+
 ;;; 関数一覧表示
 ;; (install-elisp "http://www.bookshelf.jp/elc/summarye.el")
 (when (locate-library "summarye")
@@ -5002,9 +5112,11 @@ Otherwise, return nil."
     "list up matched strings from a buffer, and display them in summary buffer" t)
   (define-key global-map (kbd "M-2") 'se/make-summary-buffer))
 
+;;; navi
 ;; wget -O- http://www.ne.jp/asahi/love/suna/pub/soft/navi.el/file/navi.1.43.tar.gz | tar xfz -
 (when (locate-library "navi")
   (autoload 'navi "navi" "List function declaration and jump to it." t)
+
   (defun call-navi ()
     "Display and jump functions."
     (interactive)
@@ -5355,7 +5467,6 @@ Otherwise, return nil."
   (when (locate-library "hideif")
     (autoload 'hide-ifdef-mode "hideif" "hides selected code within ifdef." t)
     (autoload 'hide-ifdefs "hideif" "hides selected code within ifdef." t))
-    (declare-function cpp-gray ())
   (font-lock-add-keywords
    'c-mode
    ;; TODO, FIXME を強調表示
@@ -5364,6 +5475,32 @@ Otherwise, return nil."
      ;; if 文の後ろの = を警告表示
      ("\\<if\\>"
       ("[^!<>=]\\(=\\)[^=]" nil nil (1 font-lock-warning-face)))))
+
+  (when (boundp 'cpp-known-face)
+    (setq cpp-known-face 'default))
+  (when (boundp 'cpp-unknown-face)
+    (setq cpp-unknown-face 'default))
+  (when (boundp 'cpp-known-writable)
+    (setq cpp-known-writable 't))
+  (when (boundp 'cpp-unknown-writable)
+    (setq cpp-unknown-writable 't))
+  (when (boundp 'cpp-edit-list)
+    (setq cpp-edit-list
+          '(("1" nil
+             (background-color . "dim gray")
+             both nil)
+            ("0"
+             (background-color . "dim gray")
+             default both))))
+  (add-hook 'c-mode-hook
+            (when (fboundp 'cpp-highlight-buffer)
+              (cpp-highlight-buffer t)))
+  (add-hook 'c++-mode-hook
+            (when (fboundp 'cpp-highlight-buffer)
+              (cpp-highlight-buffer t)))
+  (add-hook 'c-mode-common-hook
+            (when (fboundp 'cpp-highlight-buffer)
+              (cpp-highlight-buffer t)))
 
   (add-hook 'c-mode-hook
             (lambda ()
@@ -5378,40 +5515,6 @@ Otherwise, return nil."
                 (setq tab-width 4))
               (when (boundp 'indent-tabs-mode) ; スペース
                 (setq indent-tabs-mode nil))
-              (when (fboundp 'cpp-highlight-buffer)
-                (let ((lisp "~/.emacs.d/.cpp.el"))
-                  (when (file-exists-p
-                         (expand-file-name lisp))
-                    (load-file lisp)))
-                (when (boundp 'cpp-known-face)
-                  (setq cpp-known-face 'default))
-                (when (boundp 'cpp-unknown-face)
-                  (setq cpp-unknown-face 'default))
-                (when (boundp 'cpp-known-writable)
-                  (setq cpp-known-writable 't))
-                (when (boundp 'cpp-unknown-writable)
-                  (setq cpp-unknown-writable 't))
-                (when (boundp 'cpp-edit-list)
-                  (setq cpp-edit-list '(("0" font-lock-comment-face default both)
-                                        ("1" default font-lock-comment-face both))))
-                (cpp-highlight-buffer t))
-
-              (dolist (pg '("gray" "invisible"))
-                (let ((cmd (intern (format "cpp-%s" pg)))
-                      (lisp (format "~/.emacs.d/cpp-%s.el" pg)))
-                  (defalias cmd
-                    `(lambda ()
-                       "cpp-highlight-buffer."
-                       (interactive)
-                       (when (file-exists-p
-                              (expand-file-name ,lisp))
-                         (load-file ,lisp)
-                         (message "Loading %s...done" ,lisp))
-                       (when (fboundp 'cpp-highlight-buffer)
-                         (cpp-highlight-buffer t)
-                         (message "Loading cpp-highlight-buffer=>t...done"))
-                       (message "Loading %s...done" ,pg)))))
-              (cpp-gray)
 
               ;; (install-elisp-from-emacswiki "hideif.el")
               (when (fboundp 'hide-ifdef-mode)
