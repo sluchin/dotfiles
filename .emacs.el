@@ -65,6 +65,13 @@
 ;;; Code:
 
 ;;; バックトレースを有効にする
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (setq debug-on-error t)
 
 ;;; ファイル名を保持
@@ -374,7 +381,13 @@
                     (expand-file-name "~/.emacs.d/term-plus-el")
                     (expand-file-name "~/.emacs.d/pomodoro-technique")
                     (expand-file-name "~/.emacs.d/auto-install")) load-path))
-;; (expand-file-name "~/.emacs.d/submodule/org-mode/lisp")
+;; org-mode
+(let* ((org-dir "~/.emacs.d/org-mode")
+       (org-lisp-dir (concat (file-name-as-directory org-dir) "lisp")))
+  (when (and (file-directory-p org-dir) (file-directory-p org-lisp-dir))
+    (setq load-path
+          (append (list (expand-file-name org-dir)
+                        (expand-file-name org-lisp-dir)) load-path))))
 
 ;;; el-get
 ;; (el-get 'sync)
@@ -1367,6 +1380,20 @@
 ;; C-x F 関数, C-x V 変数, C-x K キー割り当てコマンド
 (find-function-setup-keys)
 
+;; 現在位置のファイル・URLを開く
+(defun find-file-at-point-goto-line ()
+  (interactive)
+  (let* ((s (thing-at-point 'filename))
+         (l (split-string s ":"))
+         (file (car l))
+         (line (car (cdr l))))
+    (find-file-at-point file)
+    (ignore-errors
+      (goto-line (string-to-number line)))))
+(define-key global-map (kbd "C-x M-l") 'find-file-at-point-goto-line)
+(define-key global-map (kbd "C-x M-f") 'find-file-at-point)
+(define-key global-map (kbd "C-x M-d") 'dired-at-point)
+
 ;; 改行・タブ・スペースを色づけする
 (define-key global-map (kbd "C-^") 'global-whitespace-mode)
 
@@ -1384,10 +1411,6 @@
 
 ;; 折り返し表示 ON/OFF
 (define-key global-map (kbd "C-c C-l") 'toggle-truncate-lines)
-
-;; 現在位置のファイル・URLを開く
-(define-key global-map (kbd "C-x M-f") 'find-file-at-point)
-(define-key global-map (kbd "C-x M-d") 'dired-at-point)
 
 ;; エコー領域をクリアする
 (define-key global-map (kbd "C-c C-g") (lambda () (interactive) (message nil)))
@@ -2274,8 +2297,7 @@ Otherwise, return nil."
               ;; 日付を英語で挿入する
               (set (make-local-variable 'system-time-locale) "C")
               ;; org-mode での強調表示を可能にする
-              (turn-on-font-lock)
-              (compilation-minor-mode 1)))
+              (turn-on-font-lock)))
 
   (eval-after-load "org"
     '(progn
@@ -5022,9 +5044,11 @@ Otherwise, return nil."
 ;; cscope -Rb
 ;; M-c s L
 (when (and (locate-library "xcscope") (executable-find "cscope"))
-  (autoload 'xcscope "xcscope"
+  (autoload 'cscope-minor-mode "xcscope"
     "cscope interface for (X)Emacs")
-  (cscope-setup) ;; add-hook
+  (autoload 'cscope-setup "xcscope"
+    "cscope interface for (X)Emacs")
+
   (define-key global-map [(control f3)] 'cscope-set-initial-directory)
   (define-key global-map [(control f4)] 'cscope-unset-initial-directory)
   (define-key global-map [(control f5)] 'cscope-find-this-symbol)
@@ -5038,7 +5062,10 @@ Otherwise, return nil."
   (define-key global-map [(meta f9)] 'cscope-display-buffer)
   (define-key global-map [(meta f10)] 'cscope-display-buffer-toggle)
 
-  (message "Loading %s (xcscope)...done" this-file-name))
+  (eval-after-load "xcscope"
+    '(progn
+       (cscope-setup) ;; add-hook
+       (message "Loading %s (xcscope)...done" this-file-name))))
 
 ;;; ソースに注釈をつける
 (when (locate-library "annotate")
@@ -5476,78 +5503,74 @@ Otherwise, return nil."
      ("\\<if\\>"
       ("[^!<>=]\\(=\\)[^=]" nil nil (1 font-lock-warning-face)))))
 
-  (when (boundp 'cpp-known-face)
-    (setq cpp-known-face 'default))
-  (when (boundp 'cpp-unknown-face)
-    (setq cpp-unknown-face 'default))
-  (when (boundp 'cpp-known-writable)
-    (setq cpp-known-writable 't))
-  (when (boundp 'cpp-unknown-writable)
-    (setq cpp-unknown-writable 't))
-  (when (boundp 'cpp-edit-list)
-    (setq cpp-edit-list
-          '(("1" nil
-             (background-color . "dim gray")
-             both nil)
-            ("0"
-             (background-color . "dim gray")
-             default both))))
-  (add-hook 'c-mode-hook
-            (when (fboundp 'cpp-highlight-buffer)
-              (cpp-highlight-buffer t)))
-  (add-hook 'c++-mode-hook
-            (when (fboundp 'cpp-highlight-buffer)
-              (cpp-highlight-buffer t)))
-  (add-hook 'c-mode-common-hook
-            (when (fboundp 'cpp-highlight-buffer)
-              (cpp-highlight-buffer t)))
+  (defvar cpp-known-face 'default)
+  (defvar cpp-unknown-face 'default)
+  (defvar cpp-face-type 'dark)
+  (defvar cpp-known-writable 't)
+  (defvar cpp-unknown-writable 't)
+  (defvar cpp-edit-list
+        '(("1" nil
+           (background-color . "dim gray")
+           both nil)
+          ("0"
+           (background-color . "dim gray")
+           default both)))
 
-  (add-hook 'c-mode-hook
-            (lambda ()
-              ;; インデント
-              (when (fboundp 'c-set-style)
-                (let (c-basic-offset)
-                  (c-set-style "k&r" nil)))
-              (when (boundp 'c-basic-offset)   ; 基本インデント量 4
-                (setq c-basic-offset 4)
-                (message "c-basic-offset=%d" c-basic-offset))
-              (when (boundp 'tab-width)        ; タブ幅 4
-                (setq tab-width 4))
-              (when (boundp 'indent-tabs-mode) ; スペース
-                (setq indent-tabs-mode nil))
+  (dolist (hook '(c-mode-hook c++-mode-hook c-mode-common-hook))
+    (add-hook hook
+              (lambda ()
+                ;; インデント
+                (when (fboundp 'c-set-style)
+                  (let (c-basic-offset)
+                    (c-set-style "k&r" nil)))
+                (when (boundp 'c-basic-offset)   ; 基本インデント量 4
+                  (setq c-basic-offset 4)
+                  (message "c-basic-offset=%d" c-basic-offset))
+                (when (boundp 'tab-width)        ; タブ幅 4
+                  (setq tab-width 4))
+                (when (boundp 'indent-tabs-mode) ; スペース
+                  (setq indent-tabs-mode nil))
 
-              ;; (install-elisp-from-emacswiki "hideif.el")
-              (when (fboundp 'hide-ifdef-mode)
-                (hide-ifdef-mode t))
-              ;; (when (fboundp 'hide-ifdefs)
-              ;;   (hide-ifdefs))
-              ;; (when (and (require 'auto-complete nil t)
-              ;;            (require 'auto-complete-config nil t))
-              ;;   (add-ac-sources  '(ac-source-dictionary
-              ;;                      ac-source-words-in-buffer
-              ;;                      ac-source-words-in-same-mode-buffers
-              ;;                      ac-source-filename
-              ;;                      ac-source-files-in-current-dir)))
-              (when (require 'auto-complete-clang nil t)
-                (when (boundp 'ac-clang-prefix-header)
-                  (setq ac-clang-prefix-header
-                        (expand-file-name "~/.emacs.d/stdafx.pch")))
-                (when (boundp 'ac-clang-flags)
-                  (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
-                (add-ac-sources '(ac-source-clang)))
-              (when (require 'cedet nil t)
-                (when (fboundp 'global-ede-mode)
-                  (global-ede-mode 1)))
-              (when (require 'semantic nil t)
-                (add-ac-sources '(ac-source-semantic-raw
-                                  ac-source-semantic)))
-              (when (require 'semantic-load nil t)
-                (when (fboundp 'semantic-load--enable-code-helpers)
-                  (semantic-load--enable-code-helpers)))
-              (when (locate-library "gtags")
-                (add-ac-sources '(ac-source-gtags)))
-              (when (boundp 'ac-sources)
-                (message "ac-sources: %s" ac-sources)))))
+                ;; (install-elisp-from-emacswiki "hideif.el")
+                (when (fboundp 'hide-ifdef-mode)
+                  (hide-ifdef-mode t))
+                ;; (when (fboundp 'hide-ifdefs)
+                ;;   (hide-ifdefs))
+                ;; (when (and (require 'auto-complete nil t)
+                ;;            (require 'auto-complete-config nil t))
+                ;;   (add-ac-sources  '(ac-source-dictionary
+                ;;                      ac-source-words-in-buffer
+                ;;                      ac-source-words-in-same-mode-buffers
+                ;;                      ac-source-filename
+                ;;                      ac-source-files-in-current-dir)))
+
+                (when (require 'auto-complete-clang nil t)
+                  (when (boundp 'ac-clang-prefix-header)
+                    (setq ac-clang-prefix-header
+                          (expand-file-name "~/.emacs.d/stdafx.pch")))
+                  (when (boundp 'ac-clang-flags)
+                    (setq ac-clang-flags '("-w" "-ferror-limit" "1")))
+                  (add-ac-sources '(ac-source-clang)))
+                (when (require 'cedet nil t)
+                  (when (fboundp 'global-ede-mode)
+                    (global-ede-mode 1)))
+                (when (require 'semantic nil t)
+                  (add-ac-sources '(ac-source-semantic-raw
+                                    ac-source-semantic)))
+                (when (require 'semantic-load nil t)
+                  (when (fboundp 'semantic-load--enable-code-helpers)
+                    (semantic-load--enable-code-helpers)))
+                (when (locate-library "gtags")
+                  (add-ac-sources '(ac-source-gtags)))
+                (when (boundp 'ac-sources)
+                  (message "ac-sources: %s" ac-sources))
+                (when (fboundp 'cpp-highlight-buffer)
+                  (cpp-highlight-buffer t))
+                ;(when (boundp 'cscope-minor-mode)
+                ;  (cscope-minor-mode 1))
+                (when (fboundp 'cscope-setup)
+                  (cscope-setup))
+))))
 
 ;;; CEDET
 (when (locate-library "info")
@@ -6447,3 +6470,4 @@ Otherwise, return nil."
 ;; Local Variables:
 ;; byte-compile-warnings: (not make-local)
 ;; End:
+
