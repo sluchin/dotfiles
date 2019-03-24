@@ -68,6 +68,7 @@ export TERM=xterm
 export EDITOR=emacsclient
 export VISUAL=$EDITOR
 export FCEDIT=$EDITOR
+export TERM='xterm-256color'
 
 limit coredumpsize unlimited
 

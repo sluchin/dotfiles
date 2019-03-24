@@ -242,7 +242,9 @@
            (default-directory (expand-file-name
                                (concat rootdir path))))
       (dolist (dir (directory-files default-directory t))
-        (when (file-directory-p dir)
+        (when (and (file-directory-p dir)
+                   (not (member
+                         (file-name-nondirectory dir) '("." ".."))))
           (add-to-list 'load-path dir)))
       (message "load-path: %s" load-path))))
 
@@ -319,7 +321,7 @@
   (interactive)
   (let ((lst '("fonts-monapo" "devhelp" "stl-manual" "python2.7-doc"
                "hyperspec" "sbcl-doc" "ghc-doc"
-               "migemo" "cmigemo" "ddskk" "skktools" "sdcv"
+               "cmigemo" "ddskk" "skktools" "sdcv"
                "mew" "mew-bin" "stunnel4" "aspell-en"
                "libxpm-dev" "w3m" "exuberant-ctags"
                "slime" "sbcl" "clisp" "ecl" "gauche" "gauche-dev"
@@ -361,7 +363,7 @@
 ;;; load-path に追加
 ;; ディレクトリ配下全て load-path に追加
 (when (eq system-type 'gnu/linux)
-  (add-to-load-path2 "elisp" "elpa" "submodule"))
+  (add-to-load-path2 "submodule" "elpa"))
 
 (when (eq system-type 'gnu/linux)
   (setq load-path
@@ -2020,7 +2022,7 @@
     "Switch to buffers or file-cache entries with 1 command." t)
 
   ;; 有効にする
-  ;(iswitchb-mode 1)
+  (iswitchb-mode 1)
 
   (eval-after-load "iswitchb"
     '(progn
@@ -5072,7 +5074,7 @@ Otherwise, return nil."
   (autoload 'annotate-mode "annotate"
     "annotate files without changing them." t)
   ;; 常に使えるようにする
-  (add-hook 'find-file-hook 'annotate-mode)
+  ;(add-hook 'find-file-hook 'annotate-mode)
 
   (eval-after-load "annotate"
     '(progn

@@ -8,10 +8,7 @@ ZSH=$ZSH_DIR/oh-my-zsh
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-# robbyrussell agnoster bira bureau candy blinks
-ZSH_THEME="bureau"
-
+# time that oh-my-zsh is loaded.  # robbyrussell agnoster bira bureau candy blinks ZSH_THEME="bureau" 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
@@ -757,3 +754,14 @@ function git-branchall ()
     git checkout master
 }
 zle -N git-branchall
+
+function docfx {
+  mono $HOME/bin/docfx/docfx.exe
+}
+zle -N docfx
+
+function docfx-serve {
+  mono $HOME/bin/docfx/docfx.exe serve _site
+}
+zle -N docfx-serve
+
