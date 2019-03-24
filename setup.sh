@@ -34,6 +34,9 @@ GIT_DIFF=diff-highlight
 GIT_MELD=git-meld.pl
 GIT_BRANCHALL=git-branchall
 
+# shell
+DIFF_LINES=diff-lines.sh
+
 # mysql
 MYSQL_CONF=.my.cnf
 
@@ -143,6 +146,9 @@ fi
 autolink $DOTFILES/bin $HOME/bin $GIT_DIFF
 autolink $DOTFILES/bin $HOME/bin $GIT_MELD
 autolink $DOTFILES/bin $HOME/bin $GIT_BRANCHALL
+
+# shell
+autolink $DOTFILES/bin $HOME/bin $DIFF_LINES
 
 # mysql
 autolink $DOTFILES $HOME $MYSQL_CONF
