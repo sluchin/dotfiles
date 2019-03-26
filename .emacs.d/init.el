@@ -816,6 +816,40 @@
               (when (fboundp 'linum-mode)
                 (linum-mode 0)))))
 
+;;; メモ (howm)
+;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.1.tar.gz | tar xfz -
+(when (locate-library "howm")
+  (autoload 'howm-menu "howm" "Hitori Otegaru Wiki Modoki." t)
+  (define-key global-map (kbd "C-c h") 'howm-menu)
+
+  (eval-after-load "howm"
+    '(progn
+       ;; メニュー言語
+       (when (boundp 'howm-menu-lang)
+         (setq howm-menu-lang 'ja))
+       ;; ディレクトリ設定
+       (when (boundp 'howm-directory)
+         (setq howm-directory (catch 'found (find-directory "howm")))
+         (message "howm-directory: %s" howm-directory)
+         (when (boundp 'howm-menu-file)
+           (setq howm-menu-file
+                 (concat (file-name-as-directory user-emacs-directory)
+                         "howm/ja/" "0000-00-00-000000.txt"))
+           (message "howm-menu-file: %s" howm-menu-file)))
+
+       ;; save 時にメニューを自動更新
+       (when (boundp 'howm-menu-refresh-after-save)
+         (setq howm-menu-refresh-after-save t))
+       ;; タイトルを表示
+       (when (boundp 'howm-list-title)
+         (setq howm-list-title t))
+       ;; 除外するファイル
+       (when (boundp 'howm-excluded-file-regexp)
+         (setq howm-excluded-file-regexp
+               "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0000-00-00-0+\\)\\)\\|
+                [~#]$\\|\\.bak$\\|/CVS/\\|~$"))
+       (message "Loading %s (howm)...done" this-file-name))))
+
 ;; skk の設定
 (when (locate-library "skk")
   (autoload 'skk-mode
