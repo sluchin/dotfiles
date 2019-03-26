@@ -1,7 +1,6 @@
 ;;; howm-common.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-common.el,v 1.90 2012-12-29 08:57:18 hira Exp $
+;;; Copyright (C) 2002, 2003, 2004, 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -19,8 +18,11 @@
 ;;; USA.
 ;;--------------------------------------------------------------------
 
-(require 'howm-cl)
 (require 'howm-vars)
+
+(defun howm-cl-remove-duplicates* (&rest args)
+  ":from-end version of `remove-duplicates'"
+  (apply #'cl-remove-duplicates `(,@args :from-end t)))
 
 (defun howm-sort (evaluator comparer obj-list)
   (let* ((orig (mapcar (lambda (obj) (cons (funcall evaluator obj) obj))
@@ -33,6 +35,9 @@
   "For the directory DIR, check whether TARGET is under it.
 When TARGET and DIR are same, (not STRICT) is returned."
   (and (stringp dir)
+       ;; avoid unnecessary password prompting
+       ;; (I'm not sure about the return value of file-remote-p.)
+       (eq (not (file-remote-p dir)) (not (file-remote-p target)))
        (progn
          (setq target (howm-normalize-file-name target))
          (setq dir (howm-normalize-file-name dir))
@@ -40,6 +45,18 @@ When TARGET and DIR are same, (not STRICT) is returned."
              (not strict)
            (and (string-match (regexp-quote dir) target)
                 (= 0 (match-beginning 0)))))))
+
+(defun howm-normalize-file-name (filename)
+  (let* ((r (file-remote-p filename))
+         (f (if r
+                (concat r filename)
+              (file-truename (expand-file-name filename)))))
+    ;; for meadow
+    (if (string-match "^[A-Z]:" f)
+        (let ((drive (substring f 0 1))
+              (rest (substring f 1)))
+          (concat (downcase drive) rest))
+      f)))
 
 (defvar howm-abbreviate-file-name t)
 (defun howm-abbreviate-file-name (f)
@@ -59,8 +76,8 @@ When TARGET and DIR are same, (not STRICT) is returned."
   (mapcar (lambda (f) (directory-file-name (expand-file-name f)))
           file-list))
 
-(defun howm-fontify (&optional i-dont-understand-this)
-  (cheat-font-lock-fontify i-dont-understand-this))
+(defun howm-insert-file-contents (file)
+  (insert-file-contents file nil nil howm-view-contents-limit))
 
 ;;; for XEmacs fallback
 ;; (if (not (fboundp 'font-lock-fontify-block))
@@ -107,8 +124,8 @@ STRING should be given if the last search was by `string-match' on STRING."
 ;;                (howm-time-difference-second ti1 ti0)))))
 (defun howm-time-difference-second (ti1 ti0)
   (let ((h (- (car ti1) (car ti0)))
-        (l (- (second ti1) (second ti0)))
-        (m (- (third ti1) (third ti0)))
+        (l (- (cadr ti1) (cadr ti0)))
+        (m (- (or (cl-caddr ti1) 0) (or (cl-caddr ti0) 0)))
         )
     (+ (* h 65536) l
        (* m 1e-6)
@@ -224,7 +241,7 @@ If PASS-RET-THROUGH is non-nil, RET is unread and nil is returned.
   ;; xemacs:    (subseq '(a b c d e) 0 7) ==> Args out of range
   (if (<= (length seq) n)
       seq
-    (howm-cl-subseq seq 0 n)))
+    (cl-subseq seq 0 n)))
 
 ;; check
 (let ((seq '(a b c d e))
@@ -278,6 +295,23 @@ If PASS-RET-THROUGH is non-nil, RET is unread and nil is returned.
       (with-current-buffer buf
         (rename-buffer buffer-name)))
     buf))
+
+(defun howm-basic-save-buffer ()
+  "Silent version of `basic-save-buffer' without \"Wrote ...\" message."
+  (let ((original-write-region (symbol-function 'write-region)))
+    ;; make silent `write-region', which doesn't say "Wrote ...".
+    ;; I borrowed the idea from Okuyama's auto-save-buffers. thx.
+    ;; http://homepage3.nifty.com/oatu/emacs/misc.html
+    (cl-flet ((write-region (start end filename
+                                &optional append visit lockname must)
+                         (funcall original-write-region
+                                  start end filename append
+                                  'dont-say-wrote-foobar
+                                  lockname must)))
+      (basic-save-buffer)))
+  ;; As a side effect, basic-save-buffer does not update buffer-modified-p.
+  (set-visited-file-modtime)
+  (set-buffer-modified-p nil))
 
 (defvar howm-log-buffer-name-format " *howm-log:%s*")
 (defun howm-write-log (message fmt file &optional limit remove-fmt)
@@ -359,9 +393,9 @@ current timezone rule uniformly to avoid inconsistency."
 (defmacro howm-with-need (&rest body)
   "Execute BODY where (need xxx) exits from this form if xxx is nil."
   (declare (indent 0))
-  (let ((g (howm-cl-gensym)))
+  (let ((g (cl-gensym)))
     `(catch ',g
-       (labels ((need (x) (or x (throw ',g nil))))
+       (cl-labels ((need (x) (or x (throw ',g nil))))
          ,@body))))
 
 (defun howm-goto-line (n)
@@ -384,23 +418,6 @@ Use `howm-view-in-background' and `howm-view-in-background-p' instead.")
 (defun howm-view-in-background-p ()
   *howm-view-in-background*)
 
-;;; exclusion
-
-;; Fix me on inefficiency.
-;; 
-;; [2005-02-18] I can't remember why I checked relative path in old versions.
-;; [2005-04-24] Now I remember the reason.
-;; Some people like ~/.howm/ rather than ~/howm/ as their howm-directory.
-;; It must be included even if it matches to howm-excluded-file-regexp.
-;; 
-;; Bug: (howm-exclude-p "~/howm/CVS") != (howm-exclude-p "~/howm/CVS/")
-(defun howm-exclude-p (filename)
-  (not (howm-cl-find-if-not
-        (lambda (dir) (howm-folder-match-under-p dir
-                                                 howm-excluded-file-regexp
-                                                 filename))
-        (howm-search-path))))
-
 ;;; history of search
 
 (defvar howm-history-format "> %s | %s")
@@ -412,25 +429,6 @@ Use `howm-view-in-background' and `howm-view-in-background-p' instead.")
     (howm-write-log message howm-history-format howm-history-file
                     howm-history-limit
                     (and howm-history-unique howm-history-remove-format))))
-
-(defun howm-history ()
-  (interactive)
-  (unless (file-exists-p howm-history-file)
-    (error "No history."))
-  ;; disable expansion of %schedule etc.
-  (let ((howm-menu-display-rules nil)) ;; dirty
-    (howm-menu-open howm-history-file)))
-
-;; (defvar howm-history-exclude
-;;   (let ((strings '("[0-9][0-9][0-9][0-9]" "^[*=] [^ ]")))
-;;     `("| %.*%$"
-;;       ,(mapconcat 'regexp-quote strings "\\|"))))
-;; (defun howm-history ()
-;;   (interactive)
-;;   (howm-menu-open howm-history-file)
-;;   (howm-edit-read-only-buffer
-;;     (mapc #'flush-lines
-;;           howm-history-exclude)))
 
 ;;; call process
 
@@ -447,7 +445,7 @@ examples:
  (howm-with-coding-system '(utf-8-unix . sjis-unix) ...)  ;; (read . write)
  (howm-with-coding-system nil ...)  ;; howm-process-coding-system is used."
   (declare (indent 1))
-  (let ((g (howm-cl-gensym))
+  (let ((g (cl-gensym))
         (cs (or coding-system 'howm-process-coding-system)))
     `(let* ((,g ,cs)
             (coding-system-for-read  (or (car-safe ,g) ,g))
@@ -489,7 +487,7 @@ examples:
   ;; (howm-call-process "grep" '("pattern" "001" ... "099"))
   ;; (howm-call-process "grep" '("pattern" "101" ... "199"))
   ;; ..., depending on howm-command-length-limit.
-  (labels ((div (a limit measure)
+  (cl-labels ((div (a limit measure)
                 ;; (div '(3 1 4 1 5 9 2 6 5 3 5 8 9 7 9 3 2 3 8) 20 #'identity)
                 ;; ==> ((3 1 4 1 5) (9 2 6) (5 3 5) (8 9) (7 9 3) (2 3 8))
                 ;; [create new group when sum >= 20]
@@ -507,11 +505,11 @@ examples:
                   (reverse (mapcar #'reverse ans)))))
     ;; XEmacs 21.4 lacks "string-bytes".
     (let* ((len (symbol-function
-                 (howm-cl-find-if #'fboundp '(string-bytes length))))
+                 (cl-find-if #'fboundp '(string-bytes length))))
            (limit (apply #'- howm-command-length-limit
                          (mapcar len (cons command common-args))))
            (as (div rest-args limit len)))
-      (howm-cl-mapcan (lambda (args)
+      (cl-mapcan (lambda (args)
                         (apply #'howm-call-process
                                command (append common-args args) options))
                       as))))

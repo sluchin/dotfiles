@@ -1,8 +1,7 @@
 # shamelessly copied from navi2ch-cvs-0.0.20031209
-# $Id: configure.in,v 1.225 2012-12-29 00:59:48 hira Exp $
 
-AC_INIT(howm.el)
-AM_INIT_AUTOMAKE(howm, "1.4.2")
+AC_INIT([howm], [1.4.5])
+AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
 # Emacs set environment variable EMACS as t
@@ -166,4 +165,8 @@ if test `cd ${srcdir}; pwd` != `pwd`; then
 #  AC_CONFIG_LINKS(doc/howm.info:doc/howm.info)
 fi
 
-AC_OUTPUT([Makefile doc/Makefile ext/Makefile en/Makefile ja/Makefile sample/Makefile])
+AC_OUTPUT([
+  Makefile doc/Makefile ext/Makefile sample/Makefile
+  en/Makefile fr/Makefile ja/Makefile
+  howm.el
+])

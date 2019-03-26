@@ -1,7 +1,6 @@
 ;;; howm-menu.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-menu.el,v 1.106 2012-09-23 11:34:59 hira Exp $
+;;; Copyright (C) 2002, 2003, 2004, 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -129,8 +128,6 @@ Regexp R1 is replaced by T1 if T1 is a string.
     (("%eval%\\(.*$\\)" 1) howm-menu-eval previous)
     (("%call%\\(.*$\\)" 1) howm-menu-call previous)
      ))
-
-(howm-defvar-risky howm-menu-action-arg 'howm-menu-action-arg-name)
 
 ;;; which is opened as menu?
 
@@ -278,7 +275,7 @@ When this is nil, delete-region is used instead, and bug appears.")
   (howm-view-set-place place)
   (let* ((r (howm-view-paragraph-region))
          (b (car r))
-         (e (second r)))
+         (e (cadr r)))
     (delete-region e (point-max))
     (delete-region (point-min) b))
   (goto-char (point-max))
@@ -313,7 +310,7 @@ When this is nil, delete-region is used instead, and bug appears.")
              (buttons (mapcar (lambda (f)
                                 (cdr (assoc f
                                             (mapcar (lambda (z)
-                                                      (cons (second z)
+                                                      (cons (cadr z)
                                                             (car z)))
                                                     r))))
                               '(howm-menu-refresh howm-menu-edit)))
@@ -349,7 +346,7 @@ When this is nil, delete-region is used instead, and bug appears.")
          (m (mapcar (lambda (pair)
                       (let* ((h (car pair))
                              (r (if (listp h) (car h) h))
-                             (n (if (listp h) (second h) nil))
+                             (n (if (listp h) (cadr h) nil))
                              (args (if n
                                        `(list (match-string-no-properties ,n))
                                      nil))
@@ -365,7 +362,7 @@ When this is nil, delete-region is used instead, and bug appears.")
 ;; for debug. [2003/09/25]
 (defun howm-menu-action (function-table args)
   (let* ((func (car function-table))
-         (onbuf (second function-table))
+         (onbuf (cadr function-table))
          (switch-p (eq onbuf 'previous)))
     (let* ((s-buf (if (eq onbuf 'current) 'cur 'prev))
            (s-switch `(switch-to-buffer ,s-buf))
@@ -697,7 +694,7 @@ ITEM-LIST is list of items which should be shown."
 (defun howm-menu-format-reminder (item &optional day-of-week-str show-priority)
   (let* ((p (howm-todo-parse item))
          (late (floor (car p)))
-         (dow (fourth p))
+         (dow (cl-cadddr p))
          (dow-str (or day-of-week-str
                       (howm-day-of-week-string dow)))
          (priority (if (and howm-menu-todo-priority-format
@@ -747,7 +744,7 @@ ITEM-LIST is list of items which should be shown."
          (files (howm-first-n sorted num)))
     (let ((r (howm-menu-recent-regexp)))
       (if randomp
-          (howm-cl-mapcan (lambda (f)
+          (cl-mapcan (lambda (f)
                             (let ((is (howm-view-search-items r (list f)
                                                               summarizer)))
                               (and is (list (nth (random (length is))
@@ -872,11 +869,11 @@ If you don't like misc. category, try
                            t))))
          (classifier (lambda (item)
                        (let ((s (howm-item-summary item)))
-                         (or (howm-cl-find-if (lambda (c)
+                         (or (cl-find-if (lambda (c)
                                                 (funcall matcher c s item))
                                               categories)
                              (if omit-misc-p nil "misc.")))))
-         (pos (lambda (c) (or (howm-cl-position c categories) howm-infinity)))
+         (pos (lambda (c) (or (cl-position c categories) howm-infinity)))
          (comparer (lambda (a b) (< (funcall pos a) (funcall pos b)))))
     (howm-menu-classified-reminder classifier comparer title-format)))
 
@@ -953,7 +950,7 @@ If you don't like misc. category, try
 (defun howm-time< (t1 t2)
   (or (< (car t1) (car t2))
       (and (= (car t1) (car t2))
-           (< (second t1) (second t2)))))
+           (< (cadr t1) (cadr t2)))))
 
 (defun howm-menu-invisible-region (beg end)
   (if howm-menu-invisible

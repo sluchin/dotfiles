@@ -1,7 +1,6 @@
 ;;; howm-date.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-date.el,v 1.35 2011-12-31 15:07:29 hira Exp $
+;;; Copyright (C) 2002, 2003, 2004, 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -26,6 +25,7 @@
 ;; insert & action-lock
 
 (defvar howm-insert-date-pass-through nil)
+(defvar howm-action-lock-date-future nil)
 
 (defun howm-insert-date ()
   (interactive)
@@ -53,7 +53,8 @@
      ((string-match "^[-+][0-9]+$" c)
       (howm-action-lock-date-shift (string-to-number c) date))
      ((string-match "^[0-9]+$" c)
-      (howm-action-lock-date-set c date future-p))
+      (howm-action-lock-date-set c date
+                                 (or future-p howm-action-lock-date-future)))
      ((string-match "^~\\([0-9]+\\)$" c)
       (howm-action-lock-date-repeat (match-string-no-properties 1 c) date))
      ((string-match "^[.]$" c)
@@ -76,11 +77,15 @@
                       (error "Can't happen.")))))
     (format "[%s] %s: " dow help)))
 
+(defvar howm-date-current nil)
+(make-variable-buffer-local 'howm-date-current)
+
 (defun howm-action-lock-date-search (date)
   (howm-set-command 'howm-action-lock-date-search)
   (prog1
       (howm-search date t)
-    (howm-action-lock-forward-escape)))
+    (howm-action-lock-forward-escape)
+    (setq howm-date-current date)))
 
 (defun howm-search-today ()
   (interactive)
@@ -137,8 +142,8 @@
 (defun howm-datestr-to-time (date)
   (let* ((ymd (howm-datestr-parse date))
          (y (car ymd))
-         (m (second ymd))
-         (d (third ymd)))
+         (m (cadr ymd))
+         (d (cl-caddr ymd)))
     (encode-time 0 0 0 d m y)))
 
 (defun howm-time-to-datestr (&optional time)
@@ -149,31 +154,33 @@
   (format-time-string "%a" (howm-datestr-to-time date)))
 
 (defun howm-datestr-expand (date base &optional future-p)
-  (if future-p
-      (howm-datestr-expand-future date base)
-    (howm-datestr-expand-general date base future-p)))
-
-(defun howm-datestr-expand-future (date base)
-  (let ((raw (howm-datestr-expand-general date base nil))
-        (future (howm-datestr-expand-general date base t)))
-    (when (not (string= raw future))
-      (message "Future date"))
-    future))
+  (let* ((raw (howm-datestr-expand-general date base nil))
+         (future (howm-datestr-expand-general date base t))
+         (ret
+          (cond ((eq future-p 'closer)
+                 (cl-labels ((to-f (d) (float-time (howm-datestr-to-time d)))
+                             (delta (d1 d2) (abs (- (to-f d1) (to-f d2)))))
+                   (if (< (delta raw base) (delta future base)) raw future)))
+                (future-p future)
+                (t raw))))
+    (unless (string= raw ret)
+      (message "Assume future date"))
+    ret))
 
 (defun howm-datestr-expand-general (date base &optional future-p)
   (let* ((base-ymd (howm-datestr-parse base))
          (nval (format "%8s" date))
          (given-ymd-str (mapcar (lambda (r)
-                                  (substring nval (car r) (second r)))
+                                  (substring nval (car r) (cadr r)))
                                 '((0 4) (4 6) (6 8))))
          (ys (car given-ymd-str))
-         (ms (second given-ymd-str))
-         (ds (third given-ymd-str)))
+         (ms (cadr given-ymd-str))
+         (ds (cl-caddr given-ymd-str)))
      (when (string-match "^ +0+$" ys)
        (setq ys "2000"))
      (let* ((given-ymd (mapcar #'string-to-number (list ys ms ds)))
             (carry nil) ;; to force future date
-            (dmy (howm-cl-mapcar* (lambda (ox nx)
+            (dmy (cl-mapcar (lambda (ox nx)
                                     (when future-p
                                       (when (and carry (= nx 0))
                                         (setq ox (+ ox 1)))
@@ -185,15 +192,15 @@
                                     (if (= nx 0) ox nx))
                                   (reverse base-ymd) (reverse given-ymd)))
          (d (car dmy))
-         (m (second dmy))
-         (y (third dmy)))
+         (m (cadr dmy))
+         (y (cl-caddr dmy)))
        (howm-make-datestr (if (<= y 99) (+ y 2000) y) m d))))
 
 (defun howm-datestr-shift (date y m d)
   (let* ((ymd (howm-datestr-parse date))
          (oy (car ymd))
-         (om (second ymd))
-         (od (third ymd)))
+         (om (cadr ymd))
+         (od (cl-caddr ymd)))
     (howm-make-datestr (+ oy y) (+ om m) (+ od d))))
 
 (defun howm-datestr<= (date1 date2)
@@ -216,13 +223,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; search for next/previous date
-
-(defvar howm-date-current nil)
-(make-variable-buffer-local 'howm-date-current)
-
-(defadvice howm-action-lock-date-search (around remember-date (date) activate)
-  ad-do-it
-  (setq howm-date-current date))
 
 (defvar howm-date-forward-ymd-msg "Searching %s...")
 (defvar howm-date-forward-ymd-limit 35)

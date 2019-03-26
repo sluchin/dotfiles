@@ -1,28 +1,36 @@
 ;;; howm.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm.el,v 1.22 2011-12-31 15:07:29 hira Exp $
-;;;
-;;; This program is free software; you can redistribute it and/or modify
-;;; it under the terms of the GNU General Public License as published by
-;;; the Free Software Foundation; either version 1, or (at your option)
-;;; any later version.
-;;;
-;;; This program is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;;; GNU General Public License for more details.
-;;;
-;;; The GNU General Public License is available by anonymouse ftp from
-;;; prep.ai.mit.edu in pub/gnu/COPYING.  Alternately, you can write to
-;;; the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
-;;; USA.
+;;; -*- Emacs-Lisp -*-
+;;; howm.el.  Generated from howm.el.in by configure.
+
+;; Copyright (C) 2002, 2003, 2004, 2005-2018 HIRAOKA Kazuyuki
+
+;; Author: HIRAOKA Kazuyuki <khi@users.osdn.me>
+;; URL: https://howm.osdn.jp
+;; Version: 1.4.5
+;; Package-Requires: ((cl-lib "0.5"))
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 1, or (at your option)
+;; any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; The GNU General Public License is available by anonymouse ftp from
+;; prep.ai.mit.edu in pub/gnu/COPYING.  Alternately, you can write to
+;; the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
+;; USA.
 ;;--------------------------------------------------------------------
 
 ;;; DESCRIPTION:
 ;;; 
 ;;; See README.
 ;;; HOWM is acronym of "Hitori Otegaru Wiki Modoki".
+
+(defconst howm-version "1.4.5")
 
 ;; Files [0]-[3] have only hierarchical dependencies,
 ;; whereas files in [5] have circular dependencies.
@@ -36,9 +44,14 @@
 
 ;;; [1] cl
 
-(require 'howm-cl)
+(require 'cl-lib)
 
-;;; [2] my tools
+;;; [2] howm basic libraries
+
+(require 'howm-vars)
+(require 'howm-common)
+
+;;; [3] my tools
 
 ;; This doesn't work in byte-compilation. I don't understand it. Sigh...
 ;; (mapcar #'require howm-required-features)
@@ -49,12 +62,6 @@
 (require 'riffle)
 (require 'action-lock)
 (require 'honest-report)
-
-;;; [3] howm basic libraries
-
-(require 'howm-version)
-(require 'howm-vars)
-(require 'howm-common)
 
 ;;; [4] howm main (this file)
 
@@ -75,6 +82,7 @@
 ;;; http://noir.s7.xrea.com/pub/zaurus/howmz.el
 
 (howm-require-lang 'en)
+(howm-require-lang 'fr)
 (howm-require-lang 'ja)
 
 ;;; security fix [2006-12-16]

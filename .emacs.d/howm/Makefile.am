@@ -1,5 +1,4 @@
 # shamelessly copied from navi2ch-cvs-0.0.20031209
-# $Id: Makefile.am,v 1.23 2010-12-31 12:12:48 hira Exp $
 
 howm_LISP = \
 	howm.el \
@@ -12,35 +11,33 @@ howm_LISP = \
 	howm-backend.el \
 	howm-common.el \
 	howm-vars.el \
-	howm-version.el \
 	howm-lang-en.el \
+	howm-lang-fr.el \
 	howm-lang-ja.el \
 	howm-menu-en.el \
+	howm-menu-fr.el \
 	howm-menu-ja.el \
 	honest-report.el \
 	action-lock.el \
 	riffle.el \
 	gfunc.el \
 	illusion.el \
-	cheat-font-lock.el \
-	howm-cl.el
+	cheat-font-lock.el
 
 EXTRA_DIST = Makefile.old bcomp.el howm-mkmenu.el $(howm_LISP) \
-	bcomp.el.in howm-version.el.in test.bat
-BUILT_SOURCES = $(srcdir)/howm-version.el $(srcdir)/bcomp.el
-SUBDIRS = doc ext en ja sample
+	bcomp.el.in howm.el.in test.bat
+BUILT_SOURCES = $(srcdir)/howm.el $(srcdir)/bcomp.el
+SUBDIRS = doc ext en fr ja sample
 
-MENU_SRC = en/0000-00-00-000000.txt ja/0000-00-00-000000.txt
-MENU_EL = $(srcdir)/howm-menu-en.el $(srcdir)/howm-menu-ja.el
+MENU_SRC = en/0000-00-00-000000.txt \
+	fr/0000-00-00-000000.txt \
+	ja/0000-00-00-000000.txt
+MENU_EL = $(srcdir)/howm-menu-en.el \
+	$(srcdir)/howm-menu-fr.el \
+	$(srcdir)/howm-menu-ja.el
 TEST_INIT = sample/dot.emacs
 
 AM_MAKEFLAGS = HOWM_MAKE=t
-
-$(srcdir)/howm-version.el: $(srcdir)/howm-version.el.in $(srcdir)/configure.in Makefile
-	rm -f $@.tmp && \
-	sed -e 's/~\(VERSION\)~/$(VERSION)/' \
-		$(srcdir)/howm-version.el.in > $@.tmp && \
-	mv $@.tmp $@
 
 $(MENU_EL): $(srcdir)/howm-mkmenu.el $(MENU_SRC)
 	$(EMACS) -q -batch -l $(srcdir)/howm-mkmenu.el

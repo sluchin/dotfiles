@@ -1,7 +1,6 @@
 ;;; howm-backend.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-backend.el,v 1.50 2012-12-29 08:57:18 hira Exp $
+;;; Copyright (C) 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -121,7 +120,7 @@ DUMMY-EXCLUSION-CHECKER has no effect; it should be removed soon."
     (cond (excluded-p
            nil)
           ((file-directory-p full-path)
-           (howm-cl-mapcan (lambda (s)
+           (cl-mapcan (lambda (s)
                              (howm-files-in-directory-sub s full-path))
                    (directory-files full-path t)))
           ((file-exists-p full-path)
@@ -139,7 +138,7 @@ DUMMY-EXCLUSION-CHECKER has no effect; it should be removed soon."
 ;;         (t nil)))
 
 ;; (defun howm-files-in-directory-sub (dir exclusion-checker)
-;;   (howm-cl-mapcan (lambda (f)
+;;   (cl-mapcan (lambda (f)
 ;;             (cond
 ;;              ((funcall exclusion-checker f) nil)
 ;;              ((file-directory-p f) (if (howm-subdirectory-p dir f t)
@@ -199,7 +198,7 @@ DUMMY-EXCLUSION-CHECKER has no effect; it should be removed soon."
   (let ((bufs pages)
         (r (howm-fake-grep-regexp pattern fixed-p))
         (c *howm-view-force-case-fold-search*))
-    (let ((grep-result (howm-cl-mapcan
+    (let ((grep-result (cl-mapcan
                         (lambda (b)
                           (if (howm-buffer-killed-p b)
                               nil
@@ -208,8 +207,8 @@ DUMMY-EXCLUSION-CHECKER has no effect; it should be removed soon."
                         bufs)))
       (mapcar (lambda (g)
                 (let ((buf (car g))
-                      (place (second g))
-                      (content (third g)))
+                      (place (cadr g))
+                      (content (cl-caddr g)))
                   (howm-make-item (howm-make-page:buf buf) content place)))
               grep-result))))
 
@@ -218,7 +217,7 @@ DUMMY-EXCLUSION-CHECKER has no effect; it should be removed soon."
   (interactive "P")
   (let* ((bufs (if all
                    (buffer-list)
-                 (howm-cl-remove-if
+                 (cl-remove-if
                   (lambda (b)
                     (let ((name (buffer-name b)))
                       (or (null name)
@@ -312,11 +311,11 @@ DUMMY-EXCLUSION-CHECKER has no effect; it should be removed soon."
   (cdr self))
 
 (defun howm-folder-items:nest (folder &optional recursive-p)
-  (howm-cl-mapcan (lambda (f) (howm-folder-items f recursive-p))
+  (cl-mapcan (lambda (f) (howm-folder-items f recursive-p))
                   (howm-folder-subfolders folder)))
 
 (defun howm-folder-grep-internal:nest (folder pattern &optional fixed-p)
-  (howm-cl-mapcan (lambda (f) (howm-folder-grep-internal f pattern fixed-p))
+  (cl-mapcan (lambda (f) (howm-folder-grep-internal f pattern fixed-p))
                   (howm-folder-subfolders folder)))
 
 ;;;
@@ -358,7 +357,7 @@ ssearch: ")
                  (split-string (buffer-substring-no-properties (point-min)
                                                                (point-max))
                                "[\n\r\v]+")))
-         (files (howm-cl-remove-if (lambda (f) (not (file-exists-p f))) hits)))
+         (files (cl-remove-if (lambda (f) (not (file-exists-p f))) hits)))
     ;; grep again
     (let ((howm-view-use-grep nil)) ;; Japanese encoding is annoying.
       (howm-folder-grep-internal (howm-make-folder:files files)
@@ -416,8 +415,8 @@ ssearch: ")
   (let* ((found (howm-grep str file-list fixed-p))
          (items (mapcar (lambda (z)
                           (let ((file (car z))
-                                (place (second z))
-                                (content (third z)))
+                                (place (cadr z))
+                                (content (cl-caddr z)))
                             (if (and exclusion-checker
                                      (funcall exclusion-checker file))
                                 nil
@@ -468,7 +467,7 @@ ssearch: ")
         (case-fold (or force-case-fold
                        (not (let ((case-fold-search nil))
                               (string-match "[A-Z]" str))))))
-    (labels ((add-opt (pred x) (when (and pred x) (setq opt (cons x opt)))))
+    (cl-labels ((add-opt (pred x) (when (and pred x) (setq opt (cons x opt)))))
       (add-opt case-fold howm-view-grep-ignore-case-option)
       (add-opt fixed-p howm-view-grep-fixed-option)
       (add-opt (not fixed-p) howm-view-grep-extended-option))
@@ -487,9 +486,9 @@ ssearch: ")
     (let* ((str-list (cond ((stringp str) (list str))
                            ((listp str) str)
                            (t (error "Wrong type: %s" str))))
-           (caps-p (howm-cl-member-if (lambda (s) (howm-capital-p s)) str-list))
+           (caps-p (cl-member-if (lambda (s) (howm-capital-p s)) str-list))
            (case-fold (or force-case-fold (not caps-p))))
-      (labels ((add-opt (pred x) (when (and pred x) (setq opt (cons x opt)))))
+      (cl-labels ((add-opt (pred x) (when (and pred x) (setq opt (cons x opt)))))
         (add-opt case-fold howm-view-grep-ignore-case-option)
         (add-opt fixed-p howm-view-grep-fixed-option)
         (add-opt (not fixed-p) howm-view-grep-extended-option))
@@ -515,10 +514,10 @@ difference of capital letters and small letters are ignored.
 
 Extended feature:
 STR can be list of strings. They are regarded as 'or' pattern of all elements."
-  (howm-cl-mapcan (lambda (file)
+  (cl-mapcan (lambda (file)
                     (howm-fake-grep-file (howm-fake-grep-regexp str fixed-p)
                                          file force-case-fold))
-                  (howm-cl-mapcan #'howm-files-in-directory file-list)))
+                  (cl-mapcan #'howm-files-in-directory file-list)))
 
 (defun howm-fake-grep-regexp (str &optional fixed-p)
   (let ((str-list (if (stringp str) (list str) str)))
@@ -615,9 +614,6 @@ STR can be list of strings. They are regarded as 'or' pattern of all elements."
                   (setq limit (min limit howm-view-contents-limit)))
                 (buffer-substring-no-properties (point-min) limit))))))
 
-(defun howm-insert-file-contents (file)
-  (insert-file-contents file nil nil howm-view-contents-limit))
-
 ;; (defun howm-page-insert-range ()
 ;;   (let ((limit (point-max)))
 ;;     (when howm-view-contents-limit
@@ -669,7 +665,7 @@ STR can be list of strings. They are regarded as 'or' pattern of all elements."
                  (buffer-substring-no-properties (point-min) (point-max)))))
          (dir-viewer (and (file-directory-p page)
                           (howm-make-viewer:func #'find-file ls)))
-         (viewer (cdr (howm-cl-assoc-if (lambda (reg) (string-match reg page))
+         (viewer (cdr (cl-assoc-if (lambda (reg) (string-match reg page))
                                         howm-view-external-viewer-assoc))))
     (or viewer dir-viewer
         (and howm-view-use-mailcap
@@ -681,7 +677,7 @@ STR can be list of strings. They are regarded as 'or' pattern of all elements."
                     (type-match (lambda (r) (string-match r type))))
                (cond ((null type)
                       nil)
-                     ((howm-cl-member-if type-match howm-view-open-by-myself)
+                     ((cl-member-if type-match howm-view-open-by-myself)
                       nil)
                      (t
                       (howm-funcall-if-defined
@@ -934,7 +930,7 @@ STR can be list of strings. They are regarded as 'or' pattern of all elements."
 (defun howm-independent-search-path ()
   (let ((c default-directory))
     (and c
-         (car (howm-cl-member-if (lambda (dir) (howm-subdirectory-p dir c))
+         (car (cl-member-if (lambda (dir) (howm-subdirectory-p dir c))
                                  *howm-independent-directories*)))))
 
 (defun howm-search-path (&optional ignore-independent-search-path)
@@ -976,5 +972,22 @@ With arg, search `howm-search-path' iff arg is positive."
     (if dir
         (get-buffer-create buffer-name)
       (howm-get-buffer-for-file (howm-keyword-file) buffer-name))))
+
+;;; exclusion
+
+;; Fix me on inefficiency.
+;; 
+;; [2005-02-18] I can't remember why I checked relative path in old versions.
+;; [2005-04-24] Now I remember the reason.
+;; Some people like ~/.howm/ rather than ~/howm/ as their howm-directory.
+;; It must be included even if it matches to howm-excluded-file-regexp.
+;; 
+;; Bug: (howm-exclude-p "~/howm/CVS") != (howm-exclude-p "~/howm/CVS/")
+(defun howm-exclude-p (filename)
+  (not (cl-find-if-not
+        (lambda (dir) (howm-folder-match-under-p dir
+                                                 howm-excluded-file-regexp
+                                                 filename))
+        (howm-search-path))))
 
 ;;; howm-backend.el ends here
