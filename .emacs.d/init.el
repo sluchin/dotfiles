@@ -68,24 +68,14 @@
 ;;; load-path に追加
 ;; ディレクトリ配下全て load-path に追加
 (when (eq system-type 'gnu/linux)
-  (add-to-load-path2 "submodule" "elpa"))
-
-(when (eq system-type 'gnu/linux)
   (setq load-path
         (append '("/usr/share/emacs/site-lisp/migemo"
-                  "/usr/share/emacs/site-lisp/ddskk"
-                  "/usr/share/emacs/site-lisp/mew"
-                  "/usr/share/emacs/site-lisp/slime"
-                  "/usr/share/emacs/site-lisp/dictionaries-common") load-path)))
+                  "/usr/share/emacs/site-lisp/ddskk") load-path)))
+
 ;; 優先度高
 (setq load-path
-      (append (list (expand-file-name "~/.emacs.d/conf")
-                    (expand-file-name "~/.emacs.d/el-get/el-get")
+      (append (list (expand-file-name "~/.emacs.d/imenu-list")
                     (expand-file-name "~/.emacs.d/howm")
-                    (expand-file-name "~/.emacs.d/emacs-w3m")
-                    (expand-file-name "~/.emacs.d/evernote-mode")
-                    (expand-file-name "~/.emacs.d/session/lisp")
-                    (expand-file-name "~/.emacs.d/term-plus-el")
                     (expand-file-name "~/.emacs.d/pomodoro-technique")
                     (expand-file-name "~/.emacs.d/auto-install")) load-path))
 
@@ -95,8 +85,52 @@
 
 (display-time)
 (line-number-mode 1)
-(column-number-mode 1)
-(which-function-mode 1)
+;(column-number-mode 1)
+;(which-function-mode 1)
+
+;;; 行番号表示
+;; 画面左に行数を表示する
+(when (eval-and-compile (require 'linum nil t))
+  ;; デフォルトで linum-mode を有効にする
+  (when (fboundp 'global-linum-mode)
+    (global-linum-mode 1))
+  ;; 5桁分の領域を確保して行番号を表示
+  (when (boundp 'linum-format)
+    (setq linum-format "%5d "))
+  ;; 軽くする
+  (when (boundp 'linum-delay)
+    (setq linum-delay t))
+  (defadvice linum-schedule (around my-linum-schedule () activate)
+    (run-with-idle-timer 0.2 nil #'linum-update-current)))
+
+;; モードライン
+;; バイト数/総行数 (行数:カラム数)
+'(setq mode-line-position
+      '(:eval (format "%%I/%d (%%l:%%c)"
+                      (count-lines (point-max) (point-min)))))
+
+(defun count-lines-all ()
+  (interactive)
+  (message "%d" (count-lines (point-max) (point-min))))
+(define-key global-map (kbd "<f11>") 'count-lines-all)
+
+;; スクロール
+(setq scroll-step 1)
+(setq scroll-conservatively 10000)
+(setq auto-window-vscroll nil)
+
+(defun scroll-up-in-place (n)
+  (interactive "p")
+  (previous-line n)
+  (scroll-down n))
+(defun scroll-down-in-place (n)
+  (interactive "p")
+  (next-line n)
+  (scroll-up n))
+(define-key global-map (kbd "M-p") 'scroll-up-in-place)
+(define-key global-map (kbd "M-<up>") 'scroll-up-in-place)
+(define-key global-map (kbd "M-n") 'scroll-down-in-place)
+(define-key global-map (kbd "M-<down>") 'scroll-down-in-place)
 
 ;;; 色
 ;; reverse video に設定
@@ -112,9 +146,6 @@
 (when window-system
   (tool-bar-mode -1)
   (scroll-bar-mode -1))
-
-;;; スクロールを一行ずつにする
-(setq scroll-step 1)
 
 ;;; ビープ音とフラッシュを消す
 (setq visible-bell t)
@@ -257,17 +288,6 @@
   (other-window 1))
 (define-key global-map (kbd "<f10>") 'other-window-or-split)
 
-(when (eval-and-compile (require 'linum nil t))
-  ;; デフォルトで linum-mode を有効にする
-  (when (fboundp 'global-linum-mode)
-    (global-linum-mode 1))
-  ;; 5桁分の領域を確保して行番号を表示
-  (if window-system
-      (when (boundp 'linum-format)
-        (setq linum-format "%5d"))
-    (when (boundp 'linum-format)
-      (setq linum-format "%5d "))))
-
 (when (eval-and-compile (require 'paren nil t))
   (when (fboundp 'show-paren-mode)  ; 有効化
     (show-paren-mode 1))
@@ -300,7 +320,6 @@
 (when (and (locate-library "ido") (locate-library "icomplete"))
 
   ;; 有効にする
-  ;(ido-mode 'buffers)
   (ido-mode t)
   (icomplete-mode 1)
   (eval-after-load "icomplete"
@@ -457,6 +476,17 @@
     (let ((inhibit-read-only t))
       ad-do-it)))
 
+;;; imenu-list
+(when (locate-library "imenu-list")
+  (autoload 'imenu-list "imenu-list" "imenu-list." t)
+  (autoload 'imenu-list-minor-mode "imenu-list" "imenu-list." t)
+  (autoload 'imenu-list-smart-toggle "imenu-list" "imenu-list." t)
+  (add-hook 'imenu-list-major-mode-hook
+            (lambda ()
+              (when (fboundp 'linum-mode)
+                (linum-mode 0))))
+  (global-set-key (kbd "C-x i") 'imenu-list-smart-toggle))
+
 ;;; Anything
 ;; (auto-install-batch "anything")
 (when (locate-library "anything-config")
@@ -476,6 +506,8 @@
     "Preconfigured `anything' for complete." t)
   (autoload 'anything-eshell "anything-eshell"
     "Preconfigured `anything' for eshell." t)
+  (autoload 'anything-imenu "anything-imenu"
+    "Preconfigured `anything' for imenu." t)
 
   ;; ファイルリスト作成
   ;; '("\"~/dir1\"" "\"~/dir2\"")
@@ -591,7 +623,8 @@
        (?r "recentf(r)"   anything-recentf)
        (?b "bookmarks(b)" anything-bookmarks)
        (?m "makelist(m)"  anything-make-filelist)
-       (?e "eshell(e)"    anything-eshell))))
+       (?e "eshell(e)"    anything-eshell)
+       (?i "imenu(i)"     anything-imenu))))
   (define-key global-map (kbd "C-c a")
     (lambda ()
       (interactive)
@@ -746,6 +779,42 @@
          (define-key gtags-select-mode-map "n" 'next-line)
          (define-key gtags-select-mode-map "q" 'gtags-pop-stack))
        (message "Loading %s (gtags)...done" this-file-name))))
+
+;; dired
+(when (locate-library "dired")
+  (autoload 'dired "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+  (autoload 'dired-jump "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+  (autoload 'dired-jump-other-window "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+
+  ;; 拡張機能を有効にする
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (require 'dired-x nil t)
+              (require 'ls-lisp nil t)))
+
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              ;; ゴミ箱に移動する
+              (set (make-local-variable
+                    'delete-by-moving-to-trash) t)
+              ;; バックアップファイルを表示しない
+              (when (and (require 'dired-x nil t)
+                         (fboundp 'dired-omit-mode))
+                (dired-omit-mode 1))
+              (when (fboundp 'linum-mode)
+                (linum-mode 0)))
+  (define-key global-map (kbd "C-x C-j") 'dired-jump)
+  (define-key global-map (kbd "C-x j") 'dired-jump-other-window)))
+
+;; eshell
+(when (locate-library "eshell")
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (when (fboundp 'linum-mode)
+                (linum-mode 0)))))
 
 ;; skk の設定
 (when (locate-library "skk")
