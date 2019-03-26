@@ -1,7 +1,6 @@
 ;;; howm-mkmenu.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-mkmenu.el,v 1.11 2011-12-31 15:07:29 hira Exp $
+;;; Copyright (C) 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -25,6 +24,7 @@
   '(
     ;; (<var> <src> [<src-coding> <dest-coding>]) ==> <var>.el
     (howm-menu-en "en/0000-00-00-000000.txt")
+    (howm-menu-fr "fr/0000-00-00-000000.txt" utf-8-unix utf-8-unix)
     (howm-menu-ja "ja/0000-00-00-000000.txt" euc-jp iso-2022-7bit)
     ))
 

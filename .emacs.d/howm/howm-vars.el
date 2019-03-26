@@ -1,7 +1,6 @@
 ;;; howm-vars.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-vars.el,v 1.59 2011-12-31 15:07:29 hira Exp $
+;;; Copyright (C) 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -19,15 +18,15 @@
 ;;; USA.
 ;;--------------------------------------------------------------------
 
-(require 'howm-cl)
+(require 'cl-lib)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Util
 
 (defmacro howm-define-risky-command (risky orig)
   "Define a macro RISKY which is risky-version of ORIG."
-  (let* ((gsymbol (howm-cl-gensym))
-         (gargs (howm-cl-gensym))
+  (let* ((gsymbol (cl-gensym))
+         (gargs (cl-gensym))
          (docstring (format "Do `%s' and set risky-local-variable property."
                             orig)))
     `(defmacro ,risky
@@ -40,16 +39,17 @@
 ;; I split this function from howm-define-risky-command for avoiding
 ;; nested backquotes. Nested backquotes are byte-compiled to
 ;; old-style-backquotes, that cause warnings when *.elc is loaded.
-(defun howm-define-risky-command-body (command symbol args)
-  `(progn
-     (,command ,symbol ,@args)
-     (put ',symbol 'risky-local-variable t)))
+(cl-eval-when (compile load eval)
+  (defun howm-define-risky-command-body (command symbol args)
+    `(progn
+       (,command ,symbol ,@args)
+       (put ',symbol 'risky-local-variable t))))
 
 ;; ;; This code is byte-compiled to old-style-backquotes. Sigh...
 ;; (defmacro howm-define-risky-command (risky orig)
 ;;   "Define a macro RISKY which is risky-version of ORIG."
-;;   (let* ((gsymbol (howm-cl-gensym))
-;;          (gargs (howm-cl-gensym))
+;;   (let* ((gsymbol (cl-gensym))
+;;          (gargs (cl-gensym))
 ;;          (docstring (format "Do `%s' and set risky-local-variable property."
 ;;                             orig)))
 ;;     `(progn
@@ -133,7 +133,7 @@ as default of some variables; put (setq howm-compatible-to-ver1dot3 t)
 
 (defmacro howm-if-ver1dot3 (oldval def)
   (declare (indent 1))
-  (destructuring-bind (command var val &rest args) def
+  (cl-destructuring-bind (command var val &rest args) def
     `(,command ,var (if howm-compatible-to-ver1dot3 ,oldval ,val)
                ,@args
                :group 'howm-compatibility)))
@@ -203,32 +203,33 @@ To avoid such troubles, this variable is prepared as a fixed string.")
         (string-match "windows" (symbol-name system-type)))
       "[/\\\\]" ;; / or \ for win
     "/")) ;; / otherwise
+
 (let ((dir-head (concat "\\(^\\|" howm-excluded-file-regexp-dir-sep "\\)"))
       (excluded-dirs (concat (regexp-opt howm-excluded-dirs t)
-                   howm-excluded-file-regexp-dir-sep)))
-  (defvar howm-excluded-file-regexp-dots-ok
-    (mapconcat #'identity
-               `(,(concat dir-head excluded-dirs)
-                 "^[.][.]"
-                 ,@howm-excluded-file-regexp-common-list)
-               "\\|"))
-  (defvar howm-excluded-file-regexp-dots-ng
-    (mapconcat #'identity
-               `(,(concat dir-head "\\([.]\\|" excluded-dirs "\\)")
-                 ,@howm-excluded-file-regexp-common-list)
-               "\\|")))
-
-(howm-defcustom-risky howm-excluded-file-regexp howm-excluded-file-regexp-dots-ng
-  "Regexp for excluded files.
+                             howm-excluded-file-regexp-dir-sep)))
+  (let ((howm-excluded-file-regexp-dots-ok
+         (mapconcat #'identity
+                    `(,(concat dir-head excluded-dirs)
+                      "^[.][.]"
+                      ,@howm-excluded-file-regexp-common-list)
+                    "\\|"))
+        (howm-excluded-file-regexp-dots-ng
+         (mapconcat #'identity
+                    `(,(concat dir-head "\\([.]\\|" excluded-dirs "\\)")
+                      ,@howm-excluded-file-regexp-common-list)
+                    "\\|")))
+    (howm-defcustom-risky howm-excluded-file-regexp
+                          howm-excluded-file-regexp-dots-ng
+      "Regexp for excluded files.
 It is checked for relative paths from howm-directory and howm-search-path.
 A file is excluded iff this regexp matches with all the relative paths."
-  :type `(radio (const :tag "Don't search dot files"
-                       ,howm-excluded-file-regexp-dots-ng)
-                (const :tag "Search dot files"
-                       ,howm-excluded-file-regexp-dots-ok)
-                regexp)
-  :group 'howm-files
-  )
+      :type `(radio (const :tag "Don't search dot files"
+                           ,howm-excluded-file-regexp-dots-ng)
+                    (const :tag "Search dot files"
+                           ,howm-excluded-file-regexp-dots-ok)
+                    regexp)
+      :group 'howm-files
+      )))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menu
@@ -238,13 +239,21 @@ A file is excluded iff this regexp matches with all the relative paths."
   :group 'howm)
 
 (defcustom howm-menu-lang
-  (if (or (and (boundp 'current-language-environment)
-               (string= current-language-environment "Japanese"))
-          (string-match "^ja" (howm-get-locale)))
-      'ja
-    'en)
+  (let ((lang-table '((fr "French" "^fr")
+                      (ja "Japanese" "^ja"))))
+    (let ((lang (or (and (boundp 'current-language-environment)
+                        current-language-environment)
+                   ""))
+          (locale (howm-get-locale))
+          (ret 'en))
+      (mapc (lambda (rule)
+              (if (or (string= lang (cadr rule))
+                      (string-match (cl-caddr rule) locale))
+                  (setq ret (car rule))))
+            lang-table)
+      ret))
   "*Language of menu."
-  :type '(radio (const en) (const ja))
+  :type '(radio (const en) (const fr) (const ja))
   :group 'howm-menu)
 
 (howm-defcustom-risky howm-menu-file nil
@@ -304,10 +313,10 @@ A file is excluded iff this regexp matches with all the relative paths."
     (if (not (string-match "^\\[\\(.*\\)\\]" reg))
         reg
       (let ((types (split-string (match-string-no-properties 1 reg) "")))
-        (if (howm-cl-find-if-not (lambda (x) (member x default-types))
+        (if (cl-find-if-not (lambda (x) (member x default-types))
                                  types)
             reg
-          (howm-cl-remove-if-not (lambda (x) (member x types))
+          (cl-remove-if-not (lambda (x) (member x types))
                                  default-types))))))
 (defun howm-custom-reminder-set-types (symbol types)
   (when (listp types)
@@ -757,13 +766,14 @@ When the value is elisp function, it is used instead of `howm-fake-grep'."
   "*Command name for fgrep.
 This variable is obsolete and may be removed in future.")
 (defvar howm-view-grep-default-option
-  (labels ((ed (d) (concat "--exclude-dir=" d)))
-    (let* ((has-ed (condition-case nil
-                       (eq 0 (call-process howm-view-grep-command nil nil nil
-                                           (ed "/") "--version"))
+  ;; "labels" causes a trouble in git-head emacs (d5e3922) [2015-01-31]
+  (let* ((ed (lambda (d) (concat "--exclude-dir=" d)))
+         (has-ed (condition-case nil
+                     (eq 0 (call-process howm-view-grep-command nil nil nil
+                                         (apply ed "/") "--version"))
                      (error nil)))
-           (opts (cons "-Hnr" (and has-ed (mapcar #'ed howm-excluded-dirs)))))
-      (mapconcat #'identity opts " "))))
+         (opts (cons "-Hnr" (and has-ed (mapcar ed howm-excluded-dirs)))))
+    (mapconcat #'identity opts " ")))
 (howm-defcustom-risky howm-view-grep-option howm-view-grep-default-option
   "*Common grep option for howm."
   :type `(radio (const :tag "scan all files"
@@ -1191,6 +1201,38 @@ Note: `howm-menu-font-lock-rules' overrides this variable."
 (defgroup howm-experimental nil
   "Test of experimental features."
   :group 'howm)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Date format (need refactoring)
+
+(defvar howm-date-separator "-") ;; "-" ==> 2003-10-21
+
+;; Fix me: redundant (howm-date-* & howm-reminder-*)
+;; (cf.) howm-reminder-regexp-grep-* howm-reminder-today-format
+(defvar howm-date-regexp-grep
+  (concat "[1-2][0-9][0-9][0-9]" howm-date-separator
+          "[0-1][0-9]" howm-date-separator
+          "[0-3][0-9]"))
+(defvar howm-date-regexp
+  (concat "\\([1-2][0-9][0-9][0-9]\\)" howm-date-separator
+          "\\([0-1][0-9]\\)" howm-date-separator
+          "\\([0-3][0-9]\\)"))
+(defvar howm-date-regexp-year-pos 1)
+(defvar howm-date-regexp-month-pos 2)
+(defvar howm-date-regexp-day-pos 3)
+(defvar howm-date-format
+  (concat "%Y" howm-date-separator "%m" howm-date-separator "%d"))
+(defvar howm-dtime-body-format
+  (concat howm-date-format " %H:%M"))
+(defvar howm-dtime-format
+  (concat "[" howm-dtime-body-format "]"))
+(defvar howm-insert-date-format "[%s]")
+(defvar howm-insert-date-future nil)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Avoid reference to free variable (need refactoring)
+
+(howm-defvar-risky howm-menu-action-arg 'howm-menu-action-arg-name)
 
 ;;;
 

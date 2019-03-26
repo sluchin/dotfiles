@@ -1,8 +1,7 @@
 ;;; action-lock.el --- invoke magic action by RET key on spell strings
 
-;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;; $Id: action-lock.el,v 1.72 2011-12-31 15:07:28 hira Exp $
+;; Copyright (C) 2002, 2003, 2004, 2005-2018
+;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,10 +26,11 @@
 ;; rule = (regexp action) or (regexp action hilit-pos)
 ;; action = function with one argument which corresponds to (interactive "P").
 
-(require 'howm-cl)
+(require 'cl-lib)
 (require 'easy-mmode)
 (require 'font-lock)
 (require 'cheat-font-lock)
+(require 'howm-common)
 
 (defgroup action-lock nil
   "Invoke magic action by RET key on spell strings."
@@ -177,7 +177,7 @@ at the beginning of this file, when ARG-P is non-nil."
 (defvar action-lock-default-rules
   (list (action-lock-switch action-lock-switch-default)
         (action-lock-date (regexp-quote (car action-lock-date-default))
-                          (second action-lock-date-default))
+                          (cadr action-lock-date-default))
         (action-lock-open (action-lock-url-regexp "URL:\\(file://\\)?\\(localhost\\)?" ">))")
                           3) ;; ((<URL:...>))
         (action-lock-open action-lock-open-regexp
@@ -273,7 +273,7 @@ at the beginning of this file, when ARG-P is non-nil."
     (let* ((entries (mapcar (lambda (pair)
                               (let* ((regexp (car pair))
                                      (matcher (action-lock-matcher regexp))
-                                     (pos (or (caddr pair) 0))
+                                     (pos (or (cl-caddr pair) 0))
                                      (hilit (list pos 'action-lock-face
                                                   'prepend)))
                                 (cons matcher hilit)))
@@ -304,7 +304,7 @@ at the beginning of this file, when ARG-P is non-nil."
               rules (cdr rules))
         (let* ((regexp (car current))
                (action (cadr current))
-               (pos (caddr current))
+               (pos (cl-caddr current))
                (range (action-lock-regexp-range regexp pos)))
           (if range
               (setq found (cons action range))))))

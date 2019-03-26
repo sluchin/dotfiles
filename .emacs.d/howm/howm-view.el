@@ -1,7 +1,6 @@
 ;;; howm-view.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-view.el,v 1.251 2012-12-29 08:57:18 hira Exp $
+;;; Copyright (C) 2002, 2003, 2004, 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -124,7 +123,7 @@
 (defalias 'howm-view-restore-window-configuration #'riffle-restore-window-configuration)
 
 ;; for howmoney.el
-;; http://howm.sourceforge.jp/cgi-bin/hiki/hiki.cgi?howmoney
+;; https://howm.osdn.jp/cgi-bin/hiki/hiki.cgi?howmoney
 (defun howm-view-get-buffer (name-format &optional name new)
   (let ((riffle-type ':howm)) ;; cheat
     (riffle-get-buffer name-format name new)))
@@ -208,7 +207,7 @@ key	binding
   (set (make-local-variable 'font-lock-keywords-case-fold-search) t)
   ;;     (setq font-lock-keywords-case-fold-search
   ;;           howm-view-grep-ignore-case-option)
-  (howm-fontify)
+  (cheat-font-lock-fontify)
   )
 
 (riffle-define-derived-mode howm-view-contents-mode riffle-contents-mode "HowmC"
@@ -251,7 +250,7 @@ key	binding
     (set (make-local-variable 'font-lock-keywords-only) t)
     (set (make-local-variable 'font-lock-keywords-case-fold-search)
          howm-view-grep-ignore-case-option)
-    (howm-fontify)
+    (cheat-font-lock-fontify)
     ))
 
 (defun howm-view-font-lock-keywords ()
@@ -483,7 +482,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
             (setq h (point))
             (let ((r (howm-view-contents-region page)))
               (setq b (car r)
-                    e (second r))))
+                    e (cadr r))))
         (setq b (point-min)
               e (point-max)
               h b))
@@ -618,7 +617,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
 (defun howm-view-filter-by-time-range (filter &optional remove-p range)
   (let* ((r (or range (howm-view-ask-time-range remove-p)))
          (from (car r))
-         (to (second r))
+         (to (cadr r))
          (f `(lambda (item-list rmv-p)
                (funcall #',filter item-list ',from ',to rmv-p))))
     (howm-view-filter-doit f remove-p)))
@@ -626,7 +625,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
 (defun howm-view-filter-by-region (beg end)
   (interactive "r")
   (let ((r (mapcar #'howm-view-line-number (list beg end))))
-    (howm-view-filter-by-line-range (car r) (second r))))
+    (howm-view-filter-by-line-range (car r) (cadr r))))
 
 (defvar howm-view-filter-by-around-default 10)
 (defun howm-view-filter-by-around (&optional distance)
@@ -640,7 +639,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
               (when remove-p
                 (error "Not supported."))
               ;; beg and end are counted as 1,2,3,...
-              (howm-cl-subseq item-list
+              (cl-subseq item-list
                               (max (1- ,beg) 0)
                               ;; end is included.
                               (min ,end (length item-list))))))
@@ -686,7 +685,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
   (let ((kw font-lock-keywords))
     (prog1
         ;; return item-list for
-        ;; http://howm.sourceforge.jp/cgi-bin/hiki/hiki.cgi?HidePrivateReminder
+        ;; https://howm.osdn.jp/cgi-bin/hiki/hiki.cgi?HidePrivateReminder
         (howm-view-summary-rebuild (funcall proc (howm-view-item-list) switch))
       (setq font-lock-keywords kw))))
 
@@ -695,15 +694,15 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
 ;; For backward compatibility with howmoney. Don't use this.
 (defun howm-view-filter-general (pred)
   (howm-view-filter-doit (lambda (item-list dummy)
-                           (howm-cl-remove-if-not pred item-list))))
+                           (cl-remove-if-not pred item-list))))
 ;; (defun howm-view-filter-general (pred &optional remove-p with-index)
 ;;   (let* ((item-list (howm-view-item-list))
 ;;          (s (if with-index
 ;;                 (howm-map-with-index #'list item-list)
 ;;               item-list))
 ;;          (r (if remove-p
-;;                 (howm-cl-remove-if pred s)
-;;               (howm-cl-remove-if-not pred s)))
+;;                 (cl-remove-if pred s)
+;;               (cl-remove-if-not pred s)))
 ;;          (filtered (if with-index
 ;;                        (mapcar #'car r)
 ;;                      r)))
@@ -711,8 +710,8 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
 
 (defmacro howm-filter-items (pred lis &optional remove-p)
   `(if ,remove-p
-       (howm-cl-remove-if ,pred ,lis)
-     (howm-cl-remove-if-not ,pred ,lis)))
+       (cl-remove-if ,pred ,lis)
+     (cl-remove-if-not ,pred ,lis)))
 
 (defun howm-filter-items-uniq (item-list &optional remove-p)
   (when remove-p
@@ -731,7 +730,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
                            (not (and (howm-page= page p-page)
                                      (and place p-range
                                           (<= (car p-range) place)
-                                          (<= place (second p-range)))))
+                                          (<= place (cadr p-range)))))
                          (setq howm-view-filter-uniq-prev (cons page range)))))
                  ;; old code
                  (lambda (item)
@@ -739,7 +738,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
                      (prog1
                          (not (howm-page= f howm-view-filter-uniq-prev))
                        (setq howm-view-filter-uniq-prev f)))))))
-    (howm-cl-remove-if-not pred item-list)))
+    (cl-remove-if-not pred item-list)))
 
 (defun howm-filter-items-by-name (item-list regexp &optional remove-p)
   (howm-filter-items-by-name/summary #'howm-view-item-basename
@@ -760,7 +759,7 @@ But I'm not sure for multi-byte characters on other versions of emacsen."
                         (file-name-nondirectory (format-time-string form x)))
                       (list from to)))
          (fs (car fts))
-         (ts (second fts)))
+         (ts (cadr fts)))
     (howm-filter-items (lambda (item)
                          (let ((cs (howm-view-item-basename item)))
                            (and (howm-view-string<= fs cs)
@@ -909,9 +908,9 @@ to see file names."
                (nohit-items (cdr r))
                ;; should I use (howm-classify #'howm-item-place nohit-items) ?
                (noplace-nohit-items
-                (howm-cl-remove-if #'howm-item-place nohit-items))
+                (cl-remove-if #'howm-item-place nohit-items))
                (rest-items
-                (howm-item-list-filter (howm-cl-remove-if-not #'howm-item-place
+                (howm-item-list-filter (cl-remove-if-not #'howm-item-place
                                                               nohit-items)
                                        items t))
                (all-items (append hit-items noplace-nohit-items rest-items)))
@@ -921,8 +920,8 @@ to see file names."
       (let* ((pages (howm-cl-remove-duplicates* (mapcar #'howm-item-page
                                                         item-list)))
              (hit-pages (mapcar #'howm-item-page items))
-             (nohit-pages (howm-cl-remove-if
-                           (lambda (p) (howm-cl-member* p hit-pages
+             (nohit-pages (cl-remove-if
+                           (lambda (p) (cl-member p hit-pages
                                                         :test #'howm-page=))
                            pages))
              (nohit-items (mapcar #'howm-make-item nohit-pages))
@@ -938,11 +937,11 @@ to see file names."
   "Put title before summary."
   ;; fix me: howm-item-place is not set for howm-list-all
   (let ((last-title ""))
-    (howm-cl-mapcan
+    (cl-mapcan
      (lambda (item)
        (let ((orig (howm-item-summary item))
              (titles (howm-item-titles item)))
-         (howm-cl-mapcan
+         (cl-mapcan
           (lambda (s)
             (if (string= s last-title)
                 (setq s "")
@@ -975,7 +974,7 @@ to see file names."
                 (progn
                   (riffle-set-place p)
                   (howm-view-paragraph-region)))))
-      (narrow-to-region (car r) (second r))
+      (narrow-to-region (car r) (cadr r))
       (funcall proc item))))
 
 (defun howm-item-titles (item)
@@ -1009,7 +1008,7 @@ Otherwise, ITEM can have two or more titles."
                (goto-char (car r))
                (riffle-get-place))
              (progn
-               (goto-char (second r))
+               (goto-char (cadr r))
                (riffle-get-place)))))))
 ;;   (with-temp-buffer
 ;;     (howm-page-insert (howm-item-page item))
@@ -1023,7 +1022,7 @@ Otherwise, ITEM can have two or more titles."
 ;;               (goto-char (car r))
 ;;               (riffle-get-place))
 ;;             (progn
-;;               (goto-char (second r))
+;;               (goto-char (cadr r))
 ;;               (riffle-get-place))))))
 
 (defun howm-item-list-rangeset (item-list)
@@ -1033,7 +1032,7 @@ Return value is assoc list; each element of it is a cons pair of page
 and rangeset which indicates ranges of places of paragraphs to which items
 in ITEM-LIST belongs."
   (let ((alist nil))  ;; key = page, value = rangeset of place
-    (labels ((add-to-alist (page rs)
+    (cl-labels ((add-to-alist (page rs)
                            (setq alist (cons (cons page rs) alist))))
       (mapc (lambda (item)
               (let* ((page (howm-item-page item))
@@ -1071,7 +1070,7 @@ B is items in REFERENCE-ITEM-LIST that do not match in case 1."
   ;; 
   ;; implementation 1 (call grep many times)
   (setq item-list
-        (howm-cl-mapcan (lambda (item)
+        (cl-mapcan (lambda (item)
                           (if (howm-item-place item)
                               (list item)
                             (or (howm-view-search-folder-items-fi
@@ -1080,8 +1079,8 @@ B is items in REFERENCE-ITEM-LIST that do not match in case 1."
                         item-list))
   ;; 
   ;; ;; implementation 2 (making items-folder is slow)
-  ;; (let* ((place-items (howm-cl-remove-if-not #'howm-item-place item-list))
-  ;;        (no-place-items (howm-cl-remove-if #'howm-item-place item-list))
+  ;; (let* ((place-items (cl-remove-if-not #'howm-item-place item-list))
+  ;;        (no-place-items (cl-remove-if #'howm-item-place item-list))
   ;;        (split-items (howm-view-search-folder-items-fi
   ;;                      (howm-view-title-regexp-grep) no-place-items))
   ;;        ;;; !!!!!!!!! use CL !!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1098,18 +1097,18 @@ B is items in REFERENCE-ITEM-LIST that do not match in case 1."
                             ((howm-rangeset-belong-p place rs) rs)
                             (t nil))))))
     (cond ((eq remove-match 'with-rest)
-           (let ((match (howm-cl-remove-if-not
+           (let ((match (cl-remove-if-not
                          (lambda (item)
                            (let ((rs (funcall matcher item)))
                              (and rs (howm-rangeset-hit! rs))))
                          item-list)))
              (cons match
-                   (howm-cl-mapcan
+                   (cl-mapcan
                     (lambda (a) (and (not (howm-rangeset-hit-p (cdr a)))
                                      (list (howm-make-item (car a)))))
                     alist))))
-          (remove-match (howm-cl-remove-if matcher item-list))
-          (t (howm-cl-remove-if-not matcher item-list)))))
+          (remove-match (cl-remove-if matcher item-list))
+          (t (cl-remove-if-not matcher item-list)))))
 
 ;;; rangeset
 ;;; ex.
@@ -1125,7 +1124,7 @@ B is items in REFERENCE-ITEM-LIST that do not match in case 1."
 
 (defun howm-rangeset-belong-p (point rs)
   (or (null (cdr rs))
-      (howm-cl-member-if (lambda (pair)
+      (cl-member-if (lambda (pair)
                            (and (<= (car pair) point) (<= point (cdr pair))))
                          (cdr rs))))
 
@@ -1135,7 +1134,7 @@ B is items in REFERENCE-ITEM-LIST that do not match in case 1."
   ;; p = pair
   (let ((c rs)
         (beg (car beg-end))
-        (end (second beg-end)))
+        (end (cadr beg-end)))
     (while (and (cdr c) beg)
       (let ((p (cadr c)))
         (cond ((< end (car p)) ;; insert [beg, end] here
@@ -1183,7 +1182,7 @@ B is items in REFERENCE-ITEM-LIST that do not match in case 1."
                ))
        ;; inhibit 'reference to free variable' warning in byte-compilation
       (check nil))
-  (labels ((check (ans result)
+  (cl-labels ((check (ans result)
                   (cond ((null ans) (null result))
                         ((not (equal (car ans) (car result))) nil)
                         (t (funcall check (cdr ans) (cdr result))))))
@@ -1278,7 +1277,7 @@ B is items in REFERENCE-ITEM-LIST that do not match in case 1."
       (list kw name items))))
 
 (defun howm-view-search-folder-doit (p)
-  (howm-view-summary (second p) (third p) (car p)))
+  (howm-view-summary (cadr p) (cl-caddr p) (car p)))
 
 (defun howm-view-search-folder-items (str folder &optional summarizer fixed-p)
   (let ((found (howm-folder-grep folder str fixed-p))
@@ -1532,7 +1531,7 @@ matched can be nil, single, or multi."
          (current-file (funcall i2f (riffle-summary-current-item)))
          (files (howm-cl-remove-duplicates* (mapcar i2f (howm-view-item-list))
                                             :test #'equal))
-;;          (pos (howm-cl-position f files :test #'string=))
+;;          (pos (cl-position f files :test #'string=))
          (args (append howm-view-dired-ls-options files))
          (a `((howm-view-summary-mode . ,howm-view-summary-persistent)
               (howm-view-contents-mode . ,howm-view-contents-persistent)))
@@ -1582,7 +1581,7 @@ RNAME must be relative name."
                            (cons default 0)
                            '(howm-view-summary-shell-hist . 1))))
       (shell-command c))
-    (let ((item-list (howm-cl-remove-if (lambda (item)
+    (let ((item-list (cl-remove-if (lambda (item)
                                           (not (file-exists-p
                                                 (howm-view-item-filename item))))
                                         (howm-view-item-list))))

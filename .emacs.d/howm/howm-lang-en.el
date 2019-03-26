@@ -1,7 +1,6 @@
 ;;; howm-lang-en.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-lang-en.el,v 1.11 2011-12-31 15:07:29 hira Exp $
+;;; Copyright (C) 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -19,7 +18,7 @@
 ;;; USA.
 ;;--------------------------------------------------------------------
 
-(provide 'howm-lang-en)
+(require 'howm-common)
 
 (defvar howm-day-of-week-en '("Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"))
 
@@ -56,5 +55,7 @@
     ("[Preference]" (lambda () (customize-group 'howm)))
     ("[Random Walk]" howm-random-walk previous)
     ))
+
+(provide 'howm-lang-en)
 
 ;;; howm-lang-en.el ends here

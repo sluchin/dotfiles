@@ -1,7 +1,6 @@
 ;;; howm-misc.el --- Wiki-like note-taking tool
-;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-;;;   HIRAOKA Kazuyuki <khi@users.sourceforge.jp>
-;;; $Id: howm-misc.el,v 1.96 2012-12-29 08:57:18 hira Exp $
+;;; Copyright (C) 2002, 2003, 2004, 2005-2018
+;;;   HIRAOKA Kazuyuki <khi@users.osdn.me>
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -56,15 +55,6 @@
     (let ((hdir (car (howm-search-path))))
       (and (buffer-file-name)
            (howm-folder-territory-p hdir (buffer-file-name))))))
-
-(defun howm-normalize-file-name (filename)
-  (let ((f (file-truename (expand-file-name filename))))
-    ;; for meadow
-    (if (string-match "^[A-Z]:" f)
-        (let ((drive (substring f 0 1))
-              (rest (substring f 1)))
-          (concat (downcase drive) rest))
-      f)))
 
 (defvar howm-configuration-for-major-mode nil)
 ;; ;; sample
@@ -431,7 +421,6 @@ and replace a sub-expression, e.g.
       (insert s)
       (howm-mode 1)
       (howm-initialize-buffer))
-;;     (howm-fontify)
     (goto-char pos)
     (switch-to-buffer b)))
 
@@ -695,7 +684,7 @@ When DOTS-STR is non-nil, it is used instead of \"...\"."
         (let ((name0 (mapconcat  
                       (lambda (s)
                         (howm-truncate-string s howm-buffer-name-limit))
-                      (reverse (howm-cl-remove-if (lambda (s) (string= s ""))
+                      (reverse (cl-remove-if (lambda (s) (string= s ""))
                                                   titles))
                       "/")))
           (when (not (string= name0 "")) ;; exclude "no title" case
@@ -761,7 +750,7 @@ When DOTS-STR is non-nil, it is used instead of \"...\"."
 ;; http://books.nips.cc/papers/files/nips18/NIPS2005_0712.pdf
 
 (defun howm-bset-nodup (f &rest args)
-  (howm-cl-remove-duplicates (apply f args) :test #'equal))
+  (cl-remove-duplicates (apply f args) :test #'equal))
 (defun howm-bset-mapcar (func lis)
   (howm-bset-nodup #'mapcar func lis))
 (defun howm-bset-mapcan (func lis)
@@ -873,70 +862,6 @@ When DOTS-STR is non-nil, it is used instead of \"...\"."
 (defadvice canna:quit-canna-mode (around action-lock-fix activate)
   (setq action-lock-mode action-lock-mode-before-canna)
   ad-do-it)
-
-;; (obsolete)
-;; 
-;; If you have a trouble on behavior of RET key, check this first:
-;; (progn (print (mapcar #'car minor-mode-map-alist)) nil)
-
-(defvar howm-ime-fix nil)
-(when howm-ime-fix
-  (progn
-    (defun howm-raise-in-minor-mode-map-alist (mode)
-      "Raise MODE to the top in minor-mode-map-alist"
-      (let* ((pair (assoc mode minor-mode-map-alist)))
-        (when pair
-          (setq minor-mode-map-alist
-                (cons pair
-                      ;; Duplications must be removed for canna. Sigh...
-                      (remove pair minor-mode-map-alist))))))
-
-    ;; for canna [2003/09/21]
-    ;; canna modes should be prior to howm modes.
-    (defun howm-canna-fix ()
-      (mapc #'howm-raise-in-minor-mode-map-alist
-            '(canna:*fence-mode* canna:*select-mode*)))
-    ;; I don't understand curious behavior on duplicate canna:*fence-mode*
-    ;; in minor-mode-map-alist. It happens *after* '.emacs'.
-    (defadvice canna-toggle-japanese-mode (around howm-fix activate)
-      (howm-canna-fix)
-      ad-do-it
-      (howm-canna-fix))
-
-    ;; for yc.el [2003-11-29][2004-01-15]
-    ;; http://www.ceres.dti.ne.jp/~knak/yc.html
-    (defun howm-yc-fix ()
-      (mapc #'howm-raise-in-minor-mode-map-alist
-            '(yc-mode
-              yc-henkan-mode
-              yc-input-mode
-              yc-edit-mode
-              yc-select-mode
-              yc-defword-mode
-              yc-wclist-mode)))
-    (defadvice yc-rK-trans (around howm-fix activate)
-      (howm-yc-fix)
-      ad-do-it)
-    ;; (eval-after-load "yc"
-    ;;   '(mapc #'howm-raise-in-minor-mode-map-alist
-    ;;          '(yc-mode
-    ;;            yc-henkan-mode
-    ;;            yc-input-mode
-    ;;            yc-edit-mode
-    ;;            yc-select-mode
-    ;;            yc-defword-mode
-    ;;            yc-wclist-mode)))
-
-    ;; for tamago [2003-12-20]
-    (eval-after-load "egg"
-      '(mapc #'howm-raise-in-minor-mode-map-alist
-             '(egg:henkan-mode-in-use egg-mode egg:*in-fence-mode*)))
-
-    ;; for anthy [2003-12-29]
-    (eval-after-load "anthy"
-      '(mapc #'howm-raise-in-minor-mode-map-alist
-             '(anthy-minor-mode)))
-    ))
  
 ;; for mcomplete.el [2003-12-17]
 ;; http://homepage1.nifty.com/bmonkey/emacs/elisp/mcomplete.el
@@ -970,22 +895,6 @@ When DOTS-STR is non-nil, it is used instead of \"...\"."
           (not (howm-auto-save-buffers-p)))
       ad-do-it
     (howm-auto-save-buffers-dispose)))
-(defun howm-basic-save-buffer ()
-  "Silent version of `basic-save-buffer' without \"Wrote ...\" message."
-  (let ((original-write-region (symbol-function 'write-region)))
-    ;; make silent `write-region', which doesn't say "Wrote ...".
-    ;; I borrowed the idea from Okuyama's auto-save-buffers. thx.
-    ;; http://homepage3.nifty.com/oatu/emacs/misc.html
-    (flet ((write-region (start end filename
-                                &optional append visit lockname must)
-                         (funcall original-write-region
-                                  start end filename append
-                                  'dont-say-wrote-foobar
-                                  lockname must)))
-      (basic-save-buffer)))
-  ;; As a side effect, basic-save-buffer does not update buffer-modified-p.
-  (set-visited-file-modtime)
-  (set-buffer-modified-p nil))
 
 ;; howm on ChangeLog Memo
 (defun howm-setup-change-log ()
@@ -1085,7 +994,7 @@ When DOTS-STR is non-nil, it is used instead of \"...\"."
     (when (eq howm-view-use-grep t)
       (insert
        (format "grep: %s - %s\n"
-               (howm-cl-mapcan (lambda (d)
+               (cl-mapcan (lambda (d)
                                  (let ((f (expand-file-name
                                            howm-view-grep-command d)))
                                    (and (file-executable-p f)
