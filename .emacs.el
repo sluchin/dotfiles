@@ -1429,8 +1429,8 @@
 (define-key global-map (kbd "C-i") 'self-insert-command)
 
 ;; 少しずつスクロール
-(define-key global-map (kbd "C-S-n") 'scroll-down-in-place)
-(define-key global-map (kbd "C-S-p") 'scroll-up-in-place)
+;(define-key global-map (kbd "C-S-n") 'scroll-down-in-place)
+;(define-key global-map (kbd "C-S-p") 'scroll-up-in-place)
 
 ;; ウィンドウ移動
 (defun other-window-or-split ()
