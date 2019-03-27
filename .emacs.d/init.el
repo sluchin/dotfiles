@@ -1,4 +1,8 @@
 ;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
+
+;; Copyright (C) 2019
+;; Author: Tetsuya Higashi
+
 ;; igrep
 ;; grep-a-lot
 ;; grep-edit
@@ -6,6 +10,25 @@
 ;; anything
 ;; paredit
 ;; gtags
+;; howm
+
+;;; License:
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License
+;; as published by the Free Software Foundation; either version 3
+;; of the License, or (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING. If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Code:
 
 (when (file-exists-p (expand-file-name "~/.emacs.el"))
   (with-current-buffer " *load*"
@@ -73,7 +96,6 @@
         (call-interactively func)))))
 
 ;;; load-path に追加
-;; ディレクトリ配下全て load-path に追加
 (when (eq system-type 'gnu/linux)
   (setq load-path
         (append '("/usr/share/emacs/site-lisp/migemo"
@@ -89,17 +111,26 @@
 ;; 初期画面を表示しない
 (setq inhibit-startup-screen t)
 
-(display-time)
-(line-number-mode 1)
-(column-number-mode 1)
-;(which-function-mode 1)
-
-;; 時刻表示
-(when (boundp 'display-time-string-forms)
+;;; モードライン表示カスタマイズ
+(when (fboundp 'display-time)             ; 時間
+  (display-time))
+(when (fboundp 'line-number-mode)         ; 行数
+  (line-number-mode 1))
+(when (fboundp 'column-number-mode)       ; カラム数
+  (column-number-mode 1))
+(when (fboundp 'size-indication-mode)     ; ファイルサイズ
+  (size-indication-mode 1))
+(when (boundp 'display-time-day-and-date) ; 日時表示
+  (setq display-time-day-and-date t))
+(when (boundp 'display-time-24hr-format)  ; 24 時間表示
+  (setq display-time-24hr-format t))
+'(when (boundp 'which-function-mode)       ; 関数名
+  (setq which-function-mode t))
+(when (boundp 'display-time-string-forms) ; 日時フォーマット
   (setq display-time-string-forms
-        '((format "%s/%s(%s) %s:%s"
-                  month day dayname
-                  24-hours minutes))))
+        '((format
+           "%s/%s(%s) %s:%s "
+           month day dayname 24-hours minutes))))
 
 ;; モードライン
 ;; バイト数/総行数 (行数:カラム数)
@@ -107,13 +138,12 @@
       '(:eval (format "%%I/%d (%%l:%%c)"
                       (count-lines (point-max) (point-min)))))
 
-
 ;;; 行番号表示
 ;; 画面左に行数を表示する
 (when (eval-and-compile (require 'linum nil t))
   ;; デフォルトで linum-mode を有効にする
   (when (fboundp 'global-linum-mode)
-    (global-linum-mode 1))
+    (global-linum-mode 0))
   ;; 5桁分の領域を確保して行番号を表示
   (when (boundp 'linum-format)
     (setq linum-format "%5d "))
@@ -121,7 +151,7 @@
   (when (boundp 'linum-delay)
     (setq linum-delay t))
   (defadvice linum-schedule (around my-linum-schedule () activate)
-    (run-with-idle-timer 0.2 nil #'linum-update-current)))
+    (run-with-idle-timer 0.3 nil #'linum-update-current)))
 
 (defun count-lines-all ()
   (interactive)
@@ -216,6 +246,14 @@
 ;; f3 でロードする
 (when (boundp 'emacs-lisp-mode-map)
   (define-key emacs-lisp-mode-map (kbd "<f3>") 'eval-current-buffer))
+
+;; ウィンドウ移動
+(defun other-window-or-split ()
+  (interactive)
+  (when (one-window-p)
+    (split-window-vertically))
+  (other-window 1))
+(define-key global-map (kbd "<f10>") 'other-window-or-split)
 
 ;; 括弧へジャンプ (デフォルト: C-M-n C-M-p)
 (define-key global-map (kbd "C-x %")
@@ -833,9 +871,9 @@
                          (fboundp 'dired-omit-mode))
                 (dired-omit-mode 1))
               (when (fboundp 'linum-mode)
-                (linum-mode 0)))
+                (linum-mode 0))))
   (define-key global-map (kbd "C-x C-j") 'dired-jump)
-  (define-key global-map (kbd "C-x j") 'dired-jump-other-window)))
+  (define-key global-map (kbd "C-x j") 'dired-jump-other-window))
 
 ;; eshell
 (when (locate-library "eshell")
