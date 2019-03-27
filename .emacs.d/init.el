@@ -1,6 +1,13 @@
 ;;; -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
+;; igrep
+;; grep-a-lot
+;; grep-edit
+;; recentf
+;; anything
+;; paredit
+;; gtags
 
-(when (file-exists-p "~/.emacs.el")
+(when (file-exists-p (expand-file-name "~/.emacs.el"))
   (with-current-buffer " *load*"
     (goto-char (point-max))))
 
@@ -74,8 +81,7 @@
 
 ;; 優先度高
 (setq load-path
-      (append (list (expand-file-name "~/.emacs.d/imenu-list")
-                    (expand-file-name "~/.emacs.d/howm")
+      (append (list (expand-file-name "~/.emacs.d/howm")
                     (expand-file-name "~/.emacs.d/pomodoro-technique")
                     (expand-file-name "~/.emacs.d/auto-install")) load-path))
 
@@ -85,8 +91,22 @@
 
 (display-time)
 (line-number-mode 1)
-;(column-number-mode 1)
+(column-number-mode 1)
 ;(which-function-mode 1)
+
+;; 時刻表示
+(when (boundp 'display-time-string-forms)
+  (setq display-time-string-forms
+        '((format "%s/%s(%s) %s:%s"
+                  month day dayname
+                  24-hours minutes))))
+
+;; モードライン
+;; バイト数/総行数 (行数:カラム数)
+'(setq mode-line-position
+      '(:eval (format "%%I/%d (%%l:%%c)"
+                      (count-lines (point-max) (point-min)))))
+
 
 ;;; 行番号表示
 ;; 画面左に行数を表示する
@@ -103,30 +123,31 @@
   (defadvice linum-schedule (around my-linum-schedule () activate)
     (run-with-idle-timer 0.2 nil #'linum-update-current)))
 
-;; モードライン
-;; バイト数/総行数 (行数:カラム数)
-'(setq mode-line-position
-      '(:eval (format "%%I/%d (%%l:%%c)"
-                      (count-lines (point-max) (point-min)))))
-
 (defun count-lines-all ()
   (interactive)
   (message "%d" (count-lines (point-max) (point-min))))
-(define-key global-map (kbd "<f11>") 'count-lines-all)
+
+(define-key global-map (kbd "<f11>")
+  (lambda ()
+    (if linum-mode (linum-mode 0)
+      (linum-mode 1))
+    (count-lines-all)))
 
 ;; スクロール
 (setq scroll-step 1)
-(setq scroll-conservatively 10000)
+(setq scroll-conservatively 10)
 (setq auto-window-vscroll nil)
 
 (defun scroll-up-in-place (n)
   (interactive "p")
   (previous-line n)
   (scroll-down n))
+
 (defun scroll-down-in-place (n)
   (interactive "p")
   (next-line n)
   (scroll-up n))
+
 (define-key global-map (kbd "M-p") 'scroll-up-in-place)
 (define-key global-map (kbd "M-<up>") 'scroll-up-in-place)
 (define-key global-map (kbd "M-n") 'scroll-down-in-place)
@@ -276,10 +297,6 @@
 ;; タブ
 (define-key global-map (kbd "C-i") 'self-insert-command)
 
-;; 少しずつスクロール
-(define-key global-map (kbd "C-S-n") 'scroll-down-in-place)
-(define-key global-map (kbd "C-S-p") 'scroll-up-in-place)
-
 ;; ウィンドウ移動
 (defun other-window-or-split ()
   (interactive)
@@ -326,6 +343,11 @@
     '(progn
        (message "Loading %s (icomplete)...done" this-file-name))))
 
+;;; ファイル内のカーソル位置を記録する
+(when (eval-and-compile (require 'saveplace nil t))
+  (when (boundp 'save-place)
+    (setq-default save-place t)))
+
 ;;; 最近使ったファイルを保存
 ;;(require 'recentf)
 (when (eval-and-compile (require 'recentf nil t))
@@ -353,7 +375,7 @@
     (recentf-mode 1))
 
   ;; 開いたファイルを選択しない
-  (when (boundp 'recentf-menu-action)
+  '(when (boundp 'recentf-menu-action)
     (setq recentf-menu-action
           (lambda (file)
             (if (file-readable-p file)
@@ -363,7 +385,7 @@
               (message "Can not open `%s'" file)))))
 
   ;; recentf バッファを kill しない
-  (defadvice kill-buffer
+  '(defadvice kill-buffer
       (around kill-buffer-recentf-no-kill (&optional buffer)
               disable compile)
     (when (and (bufferp (ad-get-arg 0))
@@ -372,7 +394,7 @@
       ad-do-it))
 
   ;; バッファキルしない
-  (defadvice recentf-open-files-action
+  '(defadvice recentf-open-files-action
       (around recentf-open-files-action-no-kill (widget &rest _ignore)
               activate compile)
     (ad-enable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill)
@@ -410,11 +432,15 @@
     (when (fboundp 'recentf-open-files)
       (recentf-open-files)))
 
+  (defun ido-recentf ()
+    (interactive)
+    (find-file (ido-completing-read "Find recent file: " recentf-list)))
+
   ;; キーバインド
   (when (boundp 'recentf-dialog-mode-map)
     (define-key recentf-dialog-mode-map (kbd "s") 'recentf-sort-files)
     (define-key recentf-dialog-mode-map (kbd "w") 'recentf-edit-list))
-  (define-key global-map (kbd "C-c C-x") 'recentf-open-files)
+  (define-key global-map (kbd "C-x C-r") 'recentf-open-files)
   (define-key global-map (kbd "<f12>") 'recentf-open-files))
 
 ;;; 検索
@@ -751,6 +777,8 @@
        ;; 選択バッファを一段階のみ有効
        (when (boundp 'gtags-select-buffer-single)
          (setq gtags-select-buffer-single t))
+       (when (boundp 'gtags-path-style)
+         (setq gtags-path-style 'relative))
        ;; 選択して タグ検索
        (defun gtags-choice ()
          "Gtags search."
