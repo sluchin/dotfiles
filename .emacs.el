@@ -1,10 +1,12 @@
 ;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
-;; Copyright (C) 2012 2013 2014 2015 2016 2017
+;; Copyright (C) 2012 2013 2014 2015 2016 2017 2018 2019
 ;; Author: Tetsuya Higashi
 
 ;;; Version
 ;; Emacs
+;; 2019-03-28
+;; GNU Emacs 25.1.1 (x86_64-pc-linux-gnu, GTK+ Version 3.22.11)
 ;; 2016-08-12
 ;; GNU Emacs 24.5.1 (i686-pc-linux-gnu, GTK+ Version 3.18.9)
 ;; 2013-04-16
@@ -65,13 +67,6 @@
 ;;; Code:
 
 ;;; バックトレースを有効にする
-
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(package-initialize)
-
 (setq debug-on-error t)
 
 ;;; ファイル名を保持
@@ -337,7 +332,7 @@
 
 ;;; Emacswiki 全て取得
 (defun update-emacswiki ()
-  "git clone. bm and magit."
+  "Update emacswiki."
   (interactive)
   (if (executable-find "svn")
       (let* (default-directory
@@ -1427,10 +1422,6 @@
 
 ;; タブ
 (define-key global-map (kbd "C-i") 'self-insert-command)
-
-;; 少しずつスクロール
-;(define-key global-map (kbd "C-S-n") 'scroll-down-in-place)
-;(define-key global-map (kbd "C-S-p") 'scroll-up-in-place)
 
 ;; ウィンドウ移動
 (defun other-window-or-split ()
