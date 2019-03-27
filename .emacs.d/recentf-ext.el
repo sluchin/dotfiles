@@ -106,7 +106,7 @@
   :group 'emacs)
 (require 'recentf)
 
-;(recentf-mode 1)
+(recentf-mode 1)
 
 ;;; [2009/03/01] (@* "`recentf' as most recently USED files")
 (defun recentf-push-buffers-in-frame ()
