@@ -30,17 +30,24 @@
 
 ;;; Code:
 
+;;; ファイル名を保持
+
+(defconst this-file-name load-file-name)
+
+(setq debug-on-error t)
+
 (when (file-exists-p (expand-file-name "~/.emacs.el"))
   (with-current-buffer " *load*"
     (goto-char (point-max))))
 
 (message "Start loading %s" load-file-name)
 
-(package-initialize)
-(setq debug-on-error t)
-
-;;; ファイル名を保持
-(defconst this-file-name load-file-name)
+;;; サーバを起動する
+(when (eq system-type 'gnu/linux)
+      (when (eval-and-compile (require 'server nil t))
+        (when (and (fboundp 'server-running-p)
+                   (fboundp 'server-start))
+          (unless (server-running-p) (server-start)))))
 
 ;;; 優先度の高いディレクトリから探索
 (defun find-directory (base)
@@ -101,9 +108,9 @@
         (append '("/usr/share/emacs/site-lisp/migemo"
                   "/usr/share/emacs/site-lisp/ddskk") load-path)))
 
-;; 優先度高
 (setq load-path
-      (append (list (expand-file-name "~/.emacs.d/howm")
+      (append (list (expand-file-name "~/.emacs.d/elisp")
+                    (expand-file-name "~/.emacs.d/howm")
                     (expand-file-name "~/.emacs.d/pomodoro-technique")
                     (expand-file-name "~/.emacs.d/auto-install")) load-path))
 
@@ -159,6 +166,7 @@
 
 (define-key global-map (kbd "<f11>")
   (lambda ()
+    (interactive)
     (if linum-mode (linum-mode 0)
       (linum-mode 1))
     (count-lines-all)))
@@ -846,42 +854,6 @@
          (define-key gtags-select-mode-map "q" 'gtags-pop-stack))
        (message "Loading %s (gtags)...done" this-file-name))))
 
-;; dired
-(when (locate-library "dired")
-  (autoload 'dired "dired"
-    "Edit directory DIRNAME--delete, rename, print, etc." t)
-  (autoload 'dired-jump "dired"
-    "Edit directory DIRNAME--delete, rename, print, etc." t)
-  (autoload 'dired-jump-other-window "dired"
-    "Edit directory DIRNAME--delete, rename, print, etc." t)
-
-  ;; 拡張機能を有効にする
-  (add-hook 'dired-load-hook
-            (lambda ()
-              (require 'dired-x nil t)
-              (require 'ls-lisp nil t)))
-
-  (add-hook 'dired-mode-hook
-            (lambda ()
-              ;; ゴミ箱に移動する
-              (set (make-local-variable
-                    'delete-by-moving-to-trash) t)
-              ;; バックアップファイルを表示しない
-              (when (and (require 'dired-x nil t)
-                         (fboundp 'dired-omit-mode))
-                (dired-omit-mode 1))
-              (when (fboundp 'linum-mode)
-                (linum-mode 0))))
-  (define-key global-map (kbd "C-x C-j") 'dired-jump)
-  (define-key global-map (kbd "C-x j") 'dired-jump-other-window))
-
-;; eshell
-(when (locate-library "eshell")
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (when (fboundp 'linum-mode)
-                (linum-mode 0)))))
-
 ;;; メモ (howm)
 ;; wget -O- http://howm.sourceforge.jp/a/howm-1.4.1.tar.gz | tar xfz -
 (when (locate-library "howm")
@@ -915,6 +887,283 @@
                "\\(^\\|/\\)\\([.]\\|\\(menu\\(_edit\\)?\\|0000-00-00-0+\\)\\)\\|
                 [~#]$\\|\\.bak$\\|/CVS/\\|~$"))
        (message "Loading %s (howm)...done" this-file-name))))
+
+;; eshell
+(when (locate-library "eshell")
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (when (fboundp 'linum-mode)
+                (linum-mode 0)))))
+
+;;; ファイラ (dired)
+(when (locate-library "info")
+  ;; dired info
+  (defun dired-info ()
+    "Read documentation for Dired in the info system."
+    (interactive) (info "(emacs)Dired"))
+  ;; dired info 日本語
+  (defun dired-ja-info ()
+    "Read documentation for Dired japanese in the info system."
+    (interactive) (info "(emacs-ja)Dired")))
+
+;; dired 設定
+(when (locate-library "dired")
+  (autoload 'dired "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+  (autoload 'dired-jump "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+  (autoload 'dired-jump-other-window "dired"
+    "Edit directory DIRNAME--delete, rename, print, etc." t)
+
+  ;; 拡張機能を有効にする
+  (add-hook 'dired-load-hook
+            (lambda ()
+              (require 'dired-x nil t)
+              (require 'ls-lisp nil t)))
+
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              ;; ゴミ箱に移動する
+              (set (make-local-variable
+                    'delete-by-moving-to-trash) t)
+              ;; バックアップファイルを表示しない
+              (when (and (require 'dired-x nil t)
+                         (fboundp 'dired-omit-mode))
+                (dired-omit-mode 1))
+              (when (fboundp 'linum-mode)
+                (linum-mode 0))))
+
+  (define-key global-map (kbd "C-x C-j") 'dired-jump)
+  (define-key global-map (kbd "C-x j") 'dired-jump-other-window)
+
+  (eval-after-load "dired"
+    '(progn
+       ;; ディレクトリを先に表示する
+       (cond ((eq system-type 'windows-nt)
+              ;; Windows の場合
+              (when (eval-and-compile (require 'ls-lisp nil t))
+                (setq ls-lisp-dirs-first t)))
+             ((eq system-type 'gnu/linux)
+              ;; GNU オプションも使う
+              ;; Ubuntu の場合
+              (if (file-readable-p "/etc/lsb-release")
+                  (setq dired-listing-switches
+                        "-alF --time-style=long-iso --group-directories-first")
+                ;; CentOS の場合 ("/etc/redhat-release")
+                (setq dired-listing-switches
+                      "-alF --time-style=long-iso")))
+             (t
+              ;; POSIX オプションのみ
+              (setq dired-listing-switches "-alF")))
+
+       ;; ディレクトリを再帰的にコピー可能にする
+       (when (boundp 'dired-recursive-copies)
+         (setq dired-recursive-copies 'always))
+       ;; ディレクトリを再帰的に削除可能にする
+       (when (boundp 'dired-recursive-deletes)
+         (setq dired-recursive-deletes 'always))
+       ;; wdired のとき上書きで聞かない
+       (when (boundp 'wdired-confirm-overwrite)
+         (setq wdired-confirm-overwrite nil))
+       ;; デフォルトでもう一方の dired にコピーする
+       (when (boundp 'dired-dwim-target)
+         (setq dired-dwim-target t))
+       ;; zip ファイルを Z で展開
+       (when (boundp 'dired-compress-file-suffixes)
+         (add-to-list 'dired-compress-file-suffixes
+                      '("\\.zip\\'" ".zip" "unzip")))
+
+       ;; ファイルのフルパスを取得
+       (declare-function dired-copy-filename-as-kill ())
+       (defun dired-copy-pathname-as-kill ()
+         "Copy pathname."
+         (interactive)
+         (dired-copy-filename-as-kill 0))
+
+       ;; コマンド実行
+       (defun dired-run-command (command)
+         "Open file in command."
+         (if (executable-find command)
+             (when (and (fboundp 'dired-run-shell-command)
+                        (fboundp 'dired-get-filename))
+               (let ((file (dired-get-filename)))
+                 (if (and (file-directory-p file) (not (string= command "vlc")))
+                     (message "%s is a directory" (file-name-nondirectory file))
+                   (when (y-or-n-p (format "Open `%s' %s "
+                                           command (file-name-nondirectory file)))
+                     (dired-run-shell-command (concat command " " file " &"))))))
+           (message "not found: %s" command)))
+       (dolist (pg '("firefox" "libreoffice" "evince" "vlc"))
+         (let ((cmd (intern (format "dired-run-%s" pg))))
+           (defalias cmd
+             `(lambda ()
+                "Run command."
+                (interactive)
+                (dired-run-command ,pg)))))
+
+       ;; tar + gzip で圧縮
+       (defun dired-do-tar-gzip (arg)
+         "Execute tar and gzip command."
+         (interactive "P")
+         (if (and (executable-find "tar")
+                  (executable-find "gzip"))
+             (when (and (fboundp 'dired-get-marked-files)
+                        (boundp 'current-prefix-arg)
+                        (fboundp 'dired-do-shell-command))
+               (let* ((files (dired-get-marked-files t current-prefix-arg))
+                      (default (concat (car files) ".tar.gz"))
+                      (tarfile (read-file-name "Filename: "
+                                               dired-directory
+                                               default nil default)))
+                 (unless (string-match
+                          "\\(\\.tar\\.gz\\)$\\|\\(\\.tgz\\)$" tarfile)
+                   (setq tarfile (concat tarfile ".tar.gz"))) ; 拡張子追加
+                 (or
+                  (when (member tarfile (directory-files default-directory))
+                    (not (y-or-n-p ; 同名ファイル
+                          (concat "Overwrite `" tarfile "'? "))))
+                  (condition-case err
+                      (dired-do-shell-command
+                       (concat "tar cfz " tarfile " *") nil files)
+                    (error (message "%s" err)))
+                  (message "Execute tar command to %s...done" tarfile))))
+           (message "not found tar or gzip")))
+
+       ;; バックアップファイルを作る
+       (defun dired-make-backup ()
+         "Make buckup file."
+         (interactive)
+         (when (and (fboundp 'dired-get-marked-files)
+                    (fboundp 'dired-copy-file))
+           (let* ((files (dired-get-marked-files))
+                  (date (format-time-string "%Y%m%d%H%M%S")))
+             (mapc (lambda (file)
+                     (let* ((ext (file-name-extension file))
+                            (backup
+                             (format "%s_%s%s"
+                                     (file-name-sans-extension file)
+                                     date
+                                     (if ext (concat "." ext) ""))))
+                       (dired-copy-file file backup nil)))
+                   files)
+             (revert-buffer))))
+
+       ;; 文字コードをトグルする
+       ;; (list-coding-systems)
+       (defun dired-file-name-jp ()
+         "Change coding system."
+         (interactive)
+         (if (eq system-type 'windows-nt)
+             (if file-name-coding-system
+                 (setq file-name-coding-system nil)
+               (setq file-name-coding-system 'japanese-shift-jis-dos))
+           (if file-name-coding-system
+               (setq file-name-coding-system nil)
+             (setq file-name-coding-system 'japanese-shift-jis)))
+         (revert-buffer))
+
+       ;; バッファを kill する
+       (defun kill-dired-buffer ()
+         "Kill dired current buffer."
+         (interactive)
+         (when (eq major-mode 'dired-mode)
+           (kill-buffer (current-buffer))))
+
+       ;; 全てのバッファを kill する
+       (defun kill-dired-all-buffer ()
+         "Kill all dired buffer."
+         (interactive)
+         (kill-all-buffer 'dired-mode))
+
+       ;; 無効コマンドを有効にする
+       (put 'dired-find-alternate-file 'disabled nil)
+
+       ;; 画面分割に適した `dired-dwim-find-alternate-file'
+       (declare-function dired-find-file ())
+       (declare-function dired-find-alternate-file ())
+       (defun dired-dwim-find-alternate-file ()
+         (interactive)
+         (cond
+          ;; 同じバッファが他のウインドウにある場合
+          ((delq (selected-window) (get-buffer-window-list))
+           (dired-find-file))
+          ;; 同じバッファが他のウインドウにない場合
+          (t
+           (dired-find-alternate-file))))
+
+       ;; バッファを増やさず上のディレクトリに移動
+       (declare-function dired-current-directory ())
+       (declare-function dired-goto-file ())
+       (declare-function dired-goto-subdir ())
+       (defvar dired-subdir-alist nil)
+       (defun dired-up-alternate-directory ()
+         (interactive)
+         (let* ((dir (dired-current-directory))
+                (up (file-name-directory (directory-file-name dir))))
+           (or (dired-goto-file (directory-file-name dir))
+               ;; Only try dired-goto-subdir if buffer has more than one dir.
+               (and (cdr dired-subdir-alist)
+                    (dired-goto-subdir up))
+               (progn
+                 (find-alternate-file up)
+                 (dired-goto-file dir)))))
+
+       ;; 画面分割に適した `dired-up-alternate-directory'
+       (declare-function dired-up-directory ())
+       (declare-function dired-up-alternate-directory ())
+       (defun dired-dwim-up-alternate-directory ()
+         (interactive)
+         (cond
+          ;; 同じバッファが他のウインドウにある場合
+          ((delq (selected-window) (get-buffer-window-list))
+           (dired-up-directory))
+          ;; 同じバッファが他のウインドウにない場合
+          (t
+           (dired-up-alternate-directory))))
+
+       ;; 画面分割に適した `quit-window'
+       (defun dired-dwim-quit-window ()
+         (interactive)
+         (quit-window
+          (not (delq (selected-window) (get-buffer-window-list)))))
+
+       (defvar dired-mode-map nil)
+       (when (boundp 'dired-mode-map)
+         (let ((map dired-mode-map))
+           ;; フルパスをコピー
+           (define-key map (kbd "W") 'dired-copy-pathname-as-kill)
+           ;; firefox で開く
+           (define-key map (kbd "f") 'dired-run-firefox)
+           ;; libreoffice で開く
+           (define-key map (kbd "M-l") 'dired-run-libreoffice)
+           ;; evince で開く
+           (define-key map (kbd "e") 'dired-run-evince)
+           ;; vlc で開く
+           (define-key map (kbd "M-v") 'dired-run-vlc)
+           ;; w3m で開く
+           (define-key map (kbd "M-3") 'dired-w3m-find-file)
+           ;; tar + gzip で圧縮
+           (define-key map (kbd "M-z") 'dired-do-tar-gzip)
+           ;; バックアップファイル
+           (define-key map (kbd "b") 'dired-make-backup)
+           ;; 文字コードをトグルする
+           (define-key map (kbd "M-c") 'dired-file-name-jp)
+           ;; kill する
+           (define-key map (kbd "M-k") 'dired-dwim-quit-window)
+           ;; 全て kill する
+           (define-key map (kbd "C-M-k") 'kill-dired-all-buffer)
+           ;; 編集可能にする
+           (when (locate-library "wdired")
+             (define-key map "r" 'wdired-change-to-wdired-mode))
+           ;; 新規バッファを作る
+           (define-key map (kbd "a") 'dired-advertised-find-file)
+           ;; 親ディレクトリへ移動
+           (define-key map (kbd "U") 'dired-dwim-up-alternate-directory)))
+       (define-key dired-mode-map (kbd "<left>") 'dired-dwim-up-alternate-directory)
+       ;; 新規バッファを作らないで開く
+       (define-key dired-mode-map (kbd "RET") 'dired-dwim-find-alternate-file)
+       (define-key dired-mode-map (kbd "<right>") 'dired-dwim-find-alternate-file)
+       (message "Loading %s (dired)...done" this-file-name))))
 
 ;; skk の設定
 (when (locate-library "skk")
