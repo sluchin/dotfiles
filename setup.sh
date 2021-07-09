@@ -202,4 +202,6 @@ fi
 
 # gconftool-2 --set /apps/gnome-terminal/profiles/Default/font --type string "Ricty Regular 10"
 
+chsh -s $(which zsh)
+
 exit 0
