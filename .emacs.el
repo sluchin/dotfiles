@@ -83,14 +83,15 @@
 ;;; require 時間を計測する
 (defvar benchmark-alist nil
   "Time of require alist.")
-(when (fboundp 'benchmark-run)
-  (defadvice require
-      (around require-benchmark
-              (feature &optional filename noerror)
-              activate compile)
-    (let ((time (car (benchmark-run ad-do-it))))
-      (unless (assq (ad-get-arg 0) benchmark-alist)
-        (add-to-list 'benchmark-alist (cons (ad-get-arg 0) time))))))
+;; benchmark-run を使うと, その中の require で再帰するので, float-time で計る
+(defun require-benchmark (orig feature &rest args)
+  "Measure the time of `require'."
+  (let* ((start (float-time))
+         (result (apply orig feature args)))
+    (unless (assq feature benchmark-alist)
+      (push (cons feature (- (float-time) start)) benchmark-alist))
+    result))
+(advice-add 'require :around #'require-benchmark)
 
 ;;; require 時間表示
 (defun print-require-benchmark ()
@@ -238,8 +239,10 @@
                                (concat rootdir path))))
       (dolist (dir (directory-files default-directory t))
         (when (and (file-directory-p dir)
+                   ;; tabulated-list は Emacs 24 以降は標準にあるので, 古いものを読まない
                    (not (member
-                         (file-name-nondirectory dir) '("." ".."))))
+                         (file-name-nondirectory dir)
+                         '("." ".." "tabulated-list-0"))))
           (add-to-list 'load-path dir)))
       (message "load-path: %s" load-path))))
 
@@ -1441,31 +1444,58 @@
 
 ;;; 行番号表示
 ;; 画面左に行数を表示する
-(when (eval-and-compile (require 'linum nil t))
-  ;; デフォルトで linum-mode を有効にする
-  (when (fboundp 'global-linum-mode)
-    (global-linum-mode 1))
-  ;; 5桁分の領域を確保して行番号を表示
-  (if window-system
+;; Emacs 26 以降は display-line-numbers を使う (linum は Emacs 29 で非推奨)
+(if (require 'display-line-numbers nil t)
+    (progn
+      ;; 5桁分の領域を確保して行番号を表示
+      (setq-default display-line-numbers-width 5)
+      ;; 行番号表示する必要のないモード
+      (defvar display-line-numbers-off-modes
+        '(eshell-mode
+          term-mode
+          dired-mode
+          calendar-mode
+          speedbar-mode
+          mew-summary-mode
+          compilation-mode
+          navi2ch-list-mode
+          navi2ch-board-mode
+          twittering-mode)
+        "Major modes not to display line numbers.")
+      ;; 行番号表示する必要のないモードでは表示しない
+      (define-globalized-minor-mode global-display-line-numbers-except-mode
+        display-line-numbers-mode
+        (lambda ()
+          (unless (or (minibufferp)
+                      (apply #'derived-mode-p display-line-numbers-off-modes))
+            (display-line-numbers-mode 1))))
+      ;; デフォルトで有効にする
+      (global-display-line-numbers-except-mode 1))
+  (when (require 'linum nil t)
+    ;; デフォルトで linum-mode を有効にする
+    (when (fboundp 'global-linum-mode)
+      (global-linum-mode 1))
+    ;; 5桁分の領域を確保して行番号を表示
+    (if window-system
+        (when (boundp 'linum-format)
+          (setq linum-format "%5d"))
       (when (boundp 'linum-format)
-        (setq linum-format "%5d"))
-    (when (boundp 'linum-format)
-      (setq linum-format "%5d ")))
-  ;; 行番号表示する必要のないモードでは表示しない
-  (defadvice linum-on (around linum-off activate compile)
-    (unless (or (minibufferp)
-                (member
-                 major-mode
-                 '(eshell-mode
-                   term-mode
-                   dired-mode
-                   calendar-mode
-                   speedbar-mode
-                   mew-summary-mode
-                   compilation-mode
-                   navi2ch-list-mode
-                   navi2ch-board-mode
-                   twittering-mode))) ad-do-it)))
+        (setq linum-format "%5d ")))
+    ;; 行番号表示する必要のないモードでは表示しない
+    (defadvice linum-on (around linum-off activate compile)
+      (unless (or (minibufferp)
+                  (member
+                   major-mode
+                   '(eshell-mode
+                     term-mode
+                     dired-mode
+                     calendar-mode
+                     speedbar-mode
+                     mew-summary-mode
+                     compilation-mode
+                     navi2ch-list-mode
+                     navi2ch-board-mode
+                     twittering-mode))) ad-do-it))))
 
 ;;; 釣り合いのとれる括弧をハイライトにする
 (when (eval-and-compile (require 'paren nil t))
@@ -1476,7 +1506,7 @@
   (when (boundp 'show-paren-style)  ; スタイル
     (setq show-paren-style 'parenthesis))
   ;; 色
-  (set-face-attribute 'show-paren-match-face nil
+  (set-face-attribute 'show-paren-match nil
                       :background "gray20" :foreground "green"
                       :underline "yellow" :weight 'extra-bold))
 
