@@ -746,12 +746,21 @@ zle -N zload
 
 function git-branchall ()
 {
-    for remote_branch in `git branch -a | grep remotes | grep -v HEAD | grep -v master`; do
+    # 既定のブランチ (origin の HEAD. 分からなければ, main があれば main, なければ master)
+    local default=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)
+    if [ -n "$default" ]; then
+        default=${default#origin/}
+    elif git show-ref -q --verify refs/heads/main; then
+        default=main
+    else
+        default=master
+    fi
+    for remote_branch in `git branch -a | grep remotes | grep -v HEAD | grep -v "/$default\$"`; do
         remote_name="$(echo -n "$remote_branch" | cut -d/ -f2)"
         branch_name="$(echo -n "$remote_branch" | cut -d/ -f3)"
         git checkout -b $branch_name $remote_name/$branch_name
     done
-    git checkout master
+    git checkout "$default"
 }
 zle -N git-branchall
 
