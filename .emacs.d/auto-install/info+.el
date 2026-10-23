@@ -532,7 +532,7 @@
 ;;; Code:
 
 (require 'info)
-(eval-when-compile (require 'cl)) ;; case
+(eval-when-compile (require 'cl-lib)) ;; cl-case
                                   ;; Plus, for Emacs < 20, caar, cadr, when, unless
 
 ;; These are optional, for cosmetic purposes.
@@ -1129,11 +1129,11 @@ For example, type `^Q^L^Q^J* ' to set this to \"\\f\\n* \"."
 ;; Added prefix arg.
 ;;
 (when (> emacs-major-version 22)
-  (defadvice Info-history (around clear-info-hist-with-prefix-arg first (&optional clearp) activate)
+  (define-advice Info-history (:around (orig &optional clearp) clear-info-hist-with-prefix-arg)
     "With a prefix arg, clear the history instead, upon confirmation."
     (interactive "P")
-    (if (not (ad-get-arg 0))
-        ad-do-it
+    (if (not clearp)
+        (funcall orig)
       (when (equal "*History*" Info-current-file) (Info-up))
       (call-interactively #'Info-history-clear))))
 
@@ -4294,15 +4294,15 @@ Syntax class:\\|User Option:\\|Variable:\\)\\(.*\\)\\([\n]          \\(.*\\)\\)*
       (put-text-property (match-beginning 1)
                          (match-end 1)
                          (if (> emacs-major-version 21) 'font-lock-face 'face)
-                         (case symb
-                           ('Constant:       'info-constant-ref-item)
-                           ('Command:        'info-command-ref-item)
-                           ('Function:       'info-function-ref-item)
-                           ('Macro:          'info-macro-ref-item)
-                           ('Special\ Form:  'info-special-form-ref-item)
-                           ('Syntax\ class:  'info-syntax-class-item)
-                           ('User\ Option:   'info-user-option-ref-item)
-                           ('Variable:       'info-variable-ref-item)))
+                         (cl-case symb
+                           (Constant:       'info-constant-ref-item)
+                           (Command:        'info-command-ref-item)
+                           (Function:       'info-function-ref-item)
+                           (Macro:          'info-macro-ref-item)
+                           (Special\ Form:  'info-special-form-ref-item)
+                           (Syntax\ class:  'info-syntax-class-item)
+                           (User\ Option:   'info-user-option-ref-item)
+                           (Variable:       'info-variable-ref-item)))
       (put-text-property (match-beginning 2) (match-end 2)
                          (if (> emacs-major-version 21) 'font-lock-face 'face)
                          'info-reference-item)

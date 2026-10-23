@@ -461,4 +461,4 @@
   (remove-hook 'kill-emacs-hook 'pomodoro-save-time)
   (kill-emacs))
 
-(provide 'pomodoro)
+(provide 'pomodoro-technique)
