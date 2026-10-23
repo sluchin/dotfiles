@@ -1,10 +1,12 @@
 ;;; .emacs.el --- Emacs initialize file -*- mode: emacs-lisp; coding: utf-8; indent-tabs-mode: nil -*-
 
-;; Copyright (C) 2012 2013 2014 2015 2016 2017 2018 2019
+;; Copyright (C) 2012 2013 2014 2015 2016 2017 2018 2019 2026
 ;; Author: Tetsuya Higashi
 
 ;;; Version
 ;; Emacs
+;; 2026-10-23
+;; GNU Emacs 30.2 (x86_64-pc-linux-gnu, GTK+ Version 3.24.52, cairo version 1.18.4)
 ;; 2019-03-28
 ;; GNU Emacs 25.1.1 (x86_64-pc-linux-gnu, GTK+ Version 3.22.11)
 ;; 2016-08-12
@@ -239,10 +241,8 @@
                                (concat rootdir path))))
       (dolist (dir (directory-files default-directory t))
         (when (and (file-directory-p dir)
-                   ;; tabulated-list は Emacs 24 以降は標準にあるので, 古いものを読まない
                    (not (member
-                         (file-name-nondirectory dir)
-                         '("." ".." "tabulated-list-0"))))
+                         (file-name-nondirectory dir) '("." ".."))))
           (add-to-list 'load-path dir)))
       (message "load-path: %s" load-path))))
 
@@ -361,7 +361,7 @@
 ;;; load-path に追加
 ;; ディレクトリ配下全て load-path に追加
 (when (eq system-type 'gnu/linux)
-  (add-to-load-path2 "submodule" "elpa"))
+  (add-to-load-path2 "submodule"))
 
 (when (eq system-type 'gnu/linux)
   (setq load-path
@@ -374,8 +374,6 @@
 (setq load-path
       (append (list (expand-file-name "~/.emacs.d/conf")
                     (expand-file-name "~/.emacs.d/el-get/el-get")
-                    (expand-file-name "~/.emacs.d/howm")
-                    (expand-file-name "~/.emacs.d/emacs-w3m")
                     (expand-file-name "~/.emacs.d/evernote-mode")
                     (expand-file-name "~/.emacs.d/session/lisp")
                     (expand-file-name "~/.emacs.d/term-plus-el")
@@ -528,15 +526,21 @@
            (setq fixed-width-rescale nil))
          (setq-default line-spacing 1))
         (t
-         ;; それ以外はRictyにする
+         ;; それ以外は HackGen にする (半角と全角が 1:2 で, 桁がそろう)
+         ;; Console 版は, 罫線などの記号を半角にする (Emacs の文字の幅の数え方に合う)
+         ;; NF 版は, アイコンの文字 (Nerd Fonts) を含む
+         ;; Ricty は開発が終わったので, 乗り換えた
+         ;; 大きさは, 全角の幅がちょうど半角の 2 倍になるものにする (画面の点に丸めるため,
+         ;; 120 (16 ピクセル) では, 半角 8 と全角 17 になり, 桁がずれる). 110 なら半角 8 と全角 16
+         ;; (Ricty の 120 と同じ幅). 大きくするなら 130 (半角 9 と全角 18)
          (set-face-attribute 'default nil
-                             :family "Ricty"
-                             :height 120)
+                             :family "HackGen Console NF"
+                             :height 110)
          (if (fboundp 'font-spec)
              (set-fontset-font "fontset-default" 'japanese-jisx0208
-                               (font-spec :family "Ricty"))
+                               (font-spec :family "HackGen Console NF"))
            (set-fontset-font "fontset-default" 'japanese-jisx0208
-                             '("Ricty" . "jisx0208.*"))))))
+                             '("HackGen Console NF" . "jisx0208.*"))))))
 
 ;; モナーフォントに変更する
 ;; モナーフォントをインストールしておくこと
@@ -1079,15 +1083,11 @@
 ;;; 検索 (isearch)
 (when (locate-library "isearch")
   ;; リージョンで検索する
-  (defadvice isearch-mode
-      (before isearch-region-mode
-              (forward &optional regexp op-fun recursive-edit word-p)
-              activate compile)
-    (if mark-active
-        (progn
-          (isearch-update-ring
-           (buffer-substring-no-properties (mark) (point)))
-          (deactivate-mark))))
+  (define-advice isearch-mode (:before (&rest _) isearch-region-mode)
+    (when mark-active
+      (isearch-update-ring
+       (buffer-substring-no-properties (mark) (point)))
+      (deactivate-mark)))
 
   (eval-after-load "isearch"
     '(progn
@@ -1171,12 +1171,12 @@
        (when (boundp 'skk-isearch-start-mode)
          (setq skk-isearch-start-mode 'latin))
        ;; 変換でエラーを捕捉しない
-       (defadvice skk-isearch-wrapper
-           (around skk-isearch-wrapper-nil (&rest arg) activate compile)
-         (if (null (car arg))            ; (nil) の場合
+       (define-advice skk-isearch-wrapper
+           (:around (orig &rest arg) skk-isearch-wrapper-nil)
+         (if (null (car arg))           ; (nil) の場合
              (let ((skk-dcomp-multiple-activate nil))
-               (ignore-errors ad-do-it)) ; エラーを無視する
-           ad-do-it))))
+               (ignore-errors (apply orig arg))) ; エラーを無視する
+           (apply orig arg)))))
   (message "Loading %s (skk-isearch)...done" this-file-name))
 
 ;;; マークの設定
@@ -1196,8 +1196,7 @@
 (setq set-mark-command-repeat-pop t)
 
 ;; C-@ マークコマンド
-(defadvice set-mark-command
-    (after print-mark-ring (arg) activate compile)
+(define-advice set-mark-command (:after (&rest _) print-mark-ring)
   (message "%s - %s" (point) mark-ring))
 
 ;; 現在ポイントのマークを削除
@@ -1242,15 +1241,15 @@
   (interactive "F")
   (set-buffer (find-file (concat "/sudo::" file))))
 
-(defadvice find-file (around find-file-y-or-no activate compile)
+(define-advice find-file (:around (orig filename &rest args) find-file-y-or-no)
   "Open FILENAME using tramp's sudo method if it's read-only."
-  (if (and (file-root-p (ad-get-arg 0))
-           (not (file-writable-p (ad-get-arg 0)))
+  (if (and (file-root-p filename)
+           (not (file-writable-p filename))
            (y-or-n-p (concat "File `"
-                             (ad-get-arg 0)
+                             filename
                              "' is read-only.  Open it as root? ")))
-      (find-file-for-sudo (ad-get-arg 0))
-    ad-do-it))
+      (find-file-for-sudo filename)
+    (apply orig filename args)))
 
 ;;; キーバインド
 ;; f2 でバックトレースをトグルする
@@ -1482,7 +1481,7 @@
       (when (boundp 'linum-format)
         (setq linum-format "%5d ")))
     ;; 行番号表示する必要のないモードでは表示しない
-    (defadvice linum-on (around linum-off activate compile)
+    (define-advice linum-on (:around (orig) linum-off)
       (unless (or (minibufferp)
                   (member
                    major-mode
@@ -1495,7 +1494,8 @@
                      compilation-mode
                      navi2ch-list-mode
                      navi2ch-board-mode
-                     twittering-mode))) ad-do-it))))
+                     twittering-mode)))
+        (funcall orig)))))
 
 ;;; 釣り合いのとれる括弧をハイライトにする
 (when (eval-and-compile (require 'paren nil t))
@@ -1965,9 +1965,9 @@
   (set-face-attribute 'diff-removed nil
                       :foreground "white"
                       :background "dark red")
-  (set-face-attribute 'diff-refine-change nil
-                      :foreground nil
-                      :background nil
+  (set-face-attribute 'diff-refine-changed nil
+                      :foreground 'unspecified
+                      :background 'unspecified
                       :weight 'bold
                       :inverse-video t))
 
@@ -1994,11 +1994,9 @@
        ;; old ファイル名と new ファイル名を保持する
        (eval-when-compile (defvar diff-old-filname))
        (eval-when-compile (defvar diff-new-filname))
-       (defadvice diff (before diff-keep-arg
-                               (old new &optional switches no-async)
-                               activate compile)
-         (setq diff-old-filename (ad-get-arg 0))
-         (setq diff-new-filename (ad-get-arg 1)))
+       (define-advice diff (:before (old new &rest _) diff-keep-arg)
+         (setq diff-old-filename old)
+         (setq diff-new-filename new))
 
        ;; 空白無視をトグルする
        (defvar diff-old-filename nil)
@@ -2038,25 +2036,39 @@
        (message "Loading %s (ediff)...done" this-file-name))))
 
 ;;; バッファの切り替えをインクリメンタルにする
-(when (locate-library "iswitchb")
-  (autoload 'iswitchb-mode "iswitchb"
-    "Switch to buffers or file-cache entries with 1 command." t)
+;; iswitchb は Emacs 24.4 で非推奨になったので, 後継の ido を使う
+(if (require 'ido nil t)
+    (progn
+      ;; バッファの切り替えだけに使う
+      (ido-mode 'buffers)
+      ;; バッファ名の読み取り方を指定
+      (when (boundp 'read-buffer-function)
+        (setq read-buffer-function 'ido-read-buffer))
+      ;; 部分文字列の代わりに正規表現を使う場合は t に設定する
+      (when (boundp 'ido-enable-regexp)
+        (setq ido-enable-regexp nil))
+      ;; 新しいバッファを作成するときいちいち聞いてこない
+      (when (boundp 'ido-create-new-buffer)
+        (setq ido-create-new-buffer 'always)))
+  (when (locate-library "iswitchb")
+    (autoload 'iswitchb-mode "iswitchb"
+      "Switch to buffers or file-cache entries with 1 command." t)
 
-  ;; 有効にする
-  (iswitchb-mode 1)
+    ;; 有効にする
+    (iswitchb-mode 1)
 
-  (eval-after-load "iswitchb"
-    '(progn
-       ;; バッファ名の読み取り方を指定
-       (when (boundp 'read-buffer-function)
-         (setq read-buffer-function 'iswitchb-read-buffer))
-       ;; 部分文字列の代わりに正規表現を使う場合は t に設定する
-       (when (boundp 'iswitchb-regexp)
-         (setq iswitchb-regexp nil))
-       ;; 新しいバッファを作成するときいちいち聞いてこない
-       (when (boundp 'iswitchb-prompt-newbuffer)
-         (setq iswitchb-prompt-newbuffer nil))
-       (message "Loading %s (iswitch)...done" this-file-name))))
+    (eval-after-load "iswitchb"
+      '(progn
+         ;; バッファ名の読み取り方を指定
+         (when (boundp 'read-buffer-function)
+           (setq read-buffer-function 'iswitchb-read-buffer))
+         ;; 部分文字列の代わりに正規表現を使う場合は t に設定する
+         (when (boundp 'iswitchb-regexp)
+           (setq iswitchb-regexp nil))
+         ;; 新しいバッファを作成するときいちいち聞いてこない
+         (when (boundp 'iswitchb-prompt-newbuffer)
+           (setq iswitchb-prompt-newbuffer nil))
+         (message "Loading %s (iswitch)...done" this-file-name)))))
 
 ;;; 優先度の高いディレクトリから探索
 (defun find-directory (base)
@@ -2396,9 +2408,8 @@ Otherwise, return nil."
 ;; org-remember 設定
 (when (locate-library "org-remember")
   ;; ロケールを C にする
-  (defadvice org-remember-apply-template
-      (before org-remember-locale
-              (&optional use-char skip-interactive) activate compile)
+  (define-advice org-remember-apply-template
+      (:before (&rest _) org-remember-locale)
     (set (make-local-variable 'system-time-locale) "C"))
 
   ;; ソースコードを読みメモする
@@ -2490,7 +2501,7 @@ Otherwise, return nil."
        (when (locate-library "org-feed-alist")
          (load "org-feed-alist"))
        (eval-when-compile (defvar org-feed-default-template))
-       (when (boundp org-feed-default-template)
+       (when (boundp 'org-feed-default-template)
          (setq org-feed-default-template "\n* %u - %h %description\n %a"))
        (message "Loading %s (org-feed)...done" this-file-name))))
 
@@ -2527,7 +2538,7 @@ Otherwise, return nil."
        (?c "coding(c)"    org-remember-code-reading)
        (?f "feed(f)"      org-find-file-feed)
        (?s "storelink(s)" org-store-link)
-       (?i "iswitchb(i)"  org-iswitchb)
+       (?i "switchb(i)"   org-switchb)
        (?d "dired(d)"     org-dired)
        (?k "kill(k)"      kill-org-all-buffer))))
   (define-key global-map (kbd "C-c o") 'org-choice))
@@ -2584,39 +2595,35 @@ Otherwise, return nil."
               (message "Can not open `%s'" file)))))
 
   ;; recentf バッファを kill しない
-  (defadvice kill-buffer
-      (around kill-buffer-recentf-no-kill (&optional buffer)
-              disable compile)
-    (when (and (bufferp (ad-get-arg 0))
-               (not (string= (buffer-name (ad-get-arg 0))
+  (defun kill-buffer-recentf-no-kill (orig &optional buffer)
+    "Do not kill the recentf buffer."
+    (when (and (bufferp buffer)
+               (not (string= (buffer-name buffer)
                              (format "*%s*" recentf-menu-title))))
-      ad-do-it))
+      (funcall orig buffer)))
 
   ;; バッファキルしない
-  (defadvice recentf-open-files-action
-      (around recentf-open-files-action-no-kill (widget &rest _ignore)
-              activate compile)
-    (ad-enable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill)
-    (ad-activate 'kill-buffer)   ; 有効化
-    ad-do-it
-    (ad-deactivate 'kill-buffer) ; 無効化
-    (ad-disable-advice 'kill-buffer 'around 'kill-buffer-recentf-no-kill)
+  (define-advice recentf-open-files-action
+      (:around (orig &rest args) recentf-open-files-action-no-kill)
+    (advice-add 'kill-buffer :around #'kill-buffer-recentf-no-kill) ; 有効化
+    (unwind-protect
+        (apply orig args)
+      (advice-remove 'kill-buffer #'kill-buffer-recentf-no-kill)) ; 無効化
     ;; tabbar-mode を有効
     (when (fboundp 'tabbar-mode)
       (tabbar-mode 1)))
 
   ;; .recentf のバックアップファイルをつくらない
-  (defadvice write-file
-      (around recentf-save-nobackup (filename &optional confirm)
-              activate compile)
+  (define-advice write-file
+      (:around (orig filename &rest args) recentf-save-nobackup)
     (if (and (boundp 'recentf-save-file)
-             (string= (ad-get-arg 0) (expand-file-name recentf-save-file))
+             (string= filename (expand-file-name recentf-save-file))
              (not backup-inhibited))
         (progn
           (setq backup-inhibited t)
-          ad-do-it
+          (apply orig filename args)
           (setq backup-inhibited nil))
-      ad-do-it))
+      (apply orig filename args)))
 
   ;; ソート順をトグルする
   (defun recentf-sort-files ()
@@ -2866,6 +2873,43 @@ Otherwise, return nil."
 ;;; ここから拡張 lisp の設定
 ;; 使用する場合 lisp をロードパスの通ったところにインストールすること
 
+;;; パッケージ (package.el)
+;; ~/.emacs.d/elpa にインストールしたパッケージは, 起動時に有効になる
+;; 一括インストール
+;; (package-install-all)
+(when (require 'package nil t)
+  (setq package-archives
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+          ("melpa" . "https://melpa.org/packages/")))
+  ;; 起動時に有効にする (Emacs 27 以降は, 初期化ファイルの前に有効になる)
+  (when (< emacs-major-version 27)
+    (package-initialize)))
+
+;; lispxmp, php-eldoc, usage-memo は, 非推奨の cl を使う (それぞれの設定を参照)
+(defvar package-install-list
+  '(auto-async-byte-compile auto-complete auto-complete-clang bm
+    c-eldoc clojure-mode cp5022x css-eldoc csv-mode ddskk dired-k direx
+    gist goto-chg haskell-mode helm helm-descbinds helm-ls-git howm
+    japanese-holidays js2-mode json-mode lispxmp magit mew migemo
+    minibuf-isearch multi-term navi2ch open-junk-file paredit php-eldoc
+    php-mode popwin recentf-ext sdcv slime sr-speedbar
+    syslog-mode tea-time tomatinho undohist usage-memo w3m web-mode
+    xcscope yaml-mode yasnippet)
+  "Packages to install by `package-install-all'.")
+
+(defun package-install-all ()
+  "Install packages in `package-install-list'."
+  (interactive)
+  (package-refresh-contents)
+  (dolist (pkg package-install-list)
+    (unless (package-installed-p pkg)
+      (message "package: %s" pkg)
+      (condition-case err
+          (package-install pkg)
+        (error (message "package-install failed: %s %S" pkg err)))))
+  (message "package-install-all done."))
+
 ;;; インストーラ
 ;; (install-elisp-from-emacswiki "auto-install.el")
 (when (locate-library "auto-install")
@@ -3025,10 +3069,9 @@ Otherwise, return nil."
                 (define-key grep-mode-map (kbd "C-c C-c") 'grep-edit-finish-edit)
                 (message (substitute-command-keys "\\[grep-edit-finish-edit] to apply changes.")))
               (set (make-local-variable 'inhibit-read-only) t)))
-  (defadvice grep-edit-change-file
-      (around inhibit-read-only activate)
+  (define-advice grep-edit-change-file (:around (orig &rest args) inhibit-read-only)
     (let ((inhibit-read-only t))
-      ad-do-it)))
+      (apply orig args))))
 
 ;; Windows
 ;; Grep for Windows
@@ -3042,17 +3085,17 @@ Otherwise, return nil."
       (setq find-program (concat dir "\\find.exe")
             grep-program (concat dir "\\grep.exe")))
 
-    (defadvice shell-quote-argument
-        (after windows-nt-special-quote (argument) activate)
+    (define-advice shell-quote-argument
+        (:filter-return (quoted) windows-nt-special-quote)
       "Add special quotes to ARGUMENT in case the system type is 'windows-nt."
-      (when (and (eq system-type 'windows-nt)
-                 (w32-shell-dos-semantics))
-        (if (string-match "[\\.~]" ad-return-value)
-            (setq ad-return-value
-                  (replace-regexp-in-string
-                   "\\([\\.~]\\)"
-                   "\\\\\\1"
-                   ad-return-value)))))))
+      (if (and (eq system-type 'windows-nt)
+               (w32-shell-dos-semantics)
+               (string-match "[\\.~]" quoted))
+          (replace-regexp-in-string
+           "\\([\\.~]\\)"
+           "\\\\\\1"
+           quoted)
+        quoted))))
 
 
 ;; C-? でリドゥ C-/ でアンドゥ
@@ -3111,10 +3154,10 @@ Otherwise, return nil."
      . syslog-mode))
 
   ;; 上下分割のみ (デフォルト: 160)
-  (defadvice syslog-open-file-move-line
-      (around syslog-mode-width activate compile)
+  (define-advice syslog-open-file-move-line
+      (:around (orig &rest args) syslog-mode-width)
     (let ((split-width-threshold 100000))
-      ad-do-it))
+      (apply orig args)))
 
   (add-hook 'syslog-mode-hook
             (lambda ()
@@ -3375,7 +3418,8 @@ Otherwise, return nil."
        (when (boundp 'anything-grep-candidates-fast-directory-regexp)
          (setq anything-grep-candidates-anyfast-directory-regexp
                (expand-file-name "~/")))
-       (when (fboundp 'iswitchb-mode)
+       (when (and (fboundp 'iswitchb-mode)
+                  (not (bound-and-true-p ido-mode)))
          (iswitchb-mode))
        (when (fboundp 'anything-iswitchb-setup)
          (anything-iswitchb-setup))
@@ -3844,7 +3888,7 @@ Otherwise, return nil."
        (when (boundp 'skk-sticky-key)
          (setq skk-sticky-key ";"))
 
-       (defadvice skk-mode (after after-skk-mode activate compile)
+       (define-advice skk-mode (:after (&rest _) after-skk-mode)
          ;; paredit モードで sticky キーを使用する
          (when (and (boundp 'skk-sticky-key)
                     (string= skk-sticky-key ";")
@@ -3853,9 +3897,9 @@ Otherwise, return nil."
                     paredit-mode)
            (if skk-mode
                (define-key paredit-mode-map
-                 skk-sticky-key 'skk-sticky-set-henkan-point)
+                           skk-sticky-key 'skk-sticky-set-henkan-point)
              (define-key paredit-mode-map
-               skk-sticky-key 'paredit-semicolon))))
+                         skk-sticky-key 'paredit-semicolon))))
 
        ;; 動的補完の候補表示件数を変更
        (when (boundp 'skk-j-mode-map)
@@ -3932,6 +3976,9 @@ Otherwise, return nil."
 
 ;;; 式の評価結果を注釈するための設定
 ;; (install-elisp-from-emacswiki "lispxmp.el")
+;; 注意: パッケージが非推奨の cl を使うので, 初めて使うときに
+;; "Package cl is deprecated" と出る (パッケージ側の問題. cl が Emacs から
+;; 削除されると, パッケージ側が直るまで使えなくなる)
 (when (locate-library "lispxmp")
   (autoload 'lispxmp "lispxmp" "Automatic emacs lisp code annotation." t)
   ;; C-c C-d で注釈
@@ -3975,6 +4022,9 @@ Otherwise, return nil."
 
 ;;; *Help* にメモを書き込む
 ;; (install-elisp-from-emacswiki "usage-memo.el")
+;; 注意: パッケージが非推奨の cl を使うので, 初めて使うときに
+;; "Package cl is deprecated" と出る (パッケージ側の問題. cl が Emacs から
+;; 削除されると, パッケージ側が直るまで使えなくなる)
 (when (locate-library "usage-memo")
   (autoload 'umemo-initialize "usage-memo"
     "Integration of Emacs help system and memo." t)
@@ -3983,10 +4033,10 @@ Otherwise, return nil."
   (eval-after-load "usage-memo"
     '(progn
        ;; ヘッダを使用しない
-       (defadvice usage-memo-mode
-           (around usage-memo-no-header activate compile)
+       (define-advice usage-memo-mode
+           (:around (orig &rest args) usage-memo-no-header)
          (let (header-line-format)
-           ad-do-it))
+           (apply orig args)))
        ;; ディレクトリ
        (when (boundp 'umemo-base-directory)
          (setq umemo-base-directory (catch 'found (find-directory "umemo")))
@@ -4076,24 +4126,24 @@ Otherwise, return nil."
          (setq tomatinho-pomodoro-length 25))
        (defvar tomatinho-pomodoro-pause-length 5)       ; 休憩
        (defvar tomatinho-pomodoro-long-pause-length 20) ; 長い休憩
-       (defadvice tomatinho-update (after tomatinho-pause-update activate compile)
+       (define-advice tomatinho-update (:after (&rest _) tomatinho-pause-update)
          (let ((type (car tomatinho-current)) (val (cdr tomatinho-current))
-               (l (if (= 0 (mod (+ 1 (length tomatinho-events)) 8)
-                         tomatinho-pomodoro-long-pause-length
-                         tomatinho-pomodoro-pause-length))))
+               (l (if (= 0 (mod (+ 1 (length tomatinho-events)) 8))
+                      tomatinho-pomodoro-long-pause-length
+                    tomatinho-pomodoro-pause-length)))
            (when (and (equal type 'pause) (> val l))
              (setq tomatinho-events (append tomatinho-events `((pause . ,l))))
              (setq tomatinho-current '(ok . 0)))))
        (defun enable-tomatinho-pause ()
          "Enable tomatinho pause control."
          (interactive)
-         (ad-enable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
-         (ad-activate 'tomatinho-update))
+         (advice-add 'tomatinho-update :after
+                     #'tomatinho-update@tomatinho-pause-update))
        (defun disable-tomatinho-pause ()
          "Disable tomatinho pause control."
          (interactive)
-         (ad-disable-advice 'tomatinho-update 'after 'tomatinho-pause-update)
-         (ad-activate 'tomatinho-update))
+         (advice-remove 'tomatinho-update
+                        #'tomatinho-update@tomatinho-pause-update))
        (message "Loading %s (tomatinho)...done" this-file-name))))
 
 ;;; タイマー
@@ -4119,11 +4169,11 @@ Otherwise, return nil."
     (when (and (require 'ls-lisp nil t) (require 'w32-symlinks nil t))
       (custom-set-variables '(w32-symlinks-handle-shortcuts t))
       ;; NTEmacs で動かすための設定
-      (defadvice insert-file-contents-literally
-          (before insert-file-contents-literally-before activate compile)
+      (define-advice insert-file-contents-literally
+          (:before (&rest _) insert-file-contents-literally-before)
         (set-buffer-multibyte nil))
 
-      (defadvice minibuffer-complete (before expand-symlinks activate compile)
+      (define-advice minibuffer-complete (:before (&rest _) expand-symlinks)
         (let ((file (expand-file-name
                      (buffer-substring-no-properties
                       (line-beginning-position) (line-end-position)))))
@@ -4354,7 +4404,7 @@ Otherwise, return nil."
                         :timeout 5000)))
                    (setq mew-mode-line-biff-quantity n))))
          ;; 着信後呼ばれる関数
-         (defadvice mew-biff-clear (after mew-biff-clear-icon activate compile)
+         (define-advice mew-biff-clear (:after (&rest _) mew-biff-clear-icon)
            (setq mew-mode-line-biff-icon (mew-propertized-biff-icon ""))
            (setq mew-mode-line-biff-string (mew-propertized-biff-string ""))
            (setq mew-mode-line-biff-quantity 0))
@@ -4370,12 +4420,12 @@ Otherwise, return nil."
                            (cons mew-icon mode-line-format)))))
 
        ;; カーソルから最後までを refile するよう変更する
-       (defadvice mew-summary-auto-refile
-           (around mew-summary-auto-refile-from-cursor activate compile)
+       (define-advice mew-summary-auto-refile
+           (:around (orig &rest args) mew-summary-auto-refile-from-cursor)
          (save-excursion
            (save-window-excursion
              (narrow-to-region (point) (point-max))
-             ad-do-it
+             (apply orig args)
              (widen))))
 
        ;; IMAP の設定
@@ -4705,14 +4755,14 @@ Otherwise, return nil."
             (fname
              (find-file fname)))))
 
-       (defadvice eshell-ls-decorated-name (after ted-electrify-ls activate)
+       (define-advice eshell-ls-decorated-name (:filter-return (name) ted-electrify-ls)
          "Eshell's `ls' now lets you click or RET on file names to open them."
-         (add-text-properties 0 (length ad-return-value)
+         (add-text-properties 0 (length name)
                               (list 'help-echo "RET, mouse-2: visit this file"
                                     'mouse-face 'highlight
                                     'keymap ted-eshell-ls-keymap)
-                              ad-return-value)
-         ad-return-value)
+                              name)
+         name)
 
        (let ((map (make-sparse-keymap)))
          (define-key map (kbd "RET")      'ted-eshell-ls-find-file)
@@ -4827,7 +4877,9 @@ Otherwise, return nil."
        (when (boundp 'magit-diff-refine-hunk)
          (setq magit-diff-refine-hunk 'all))
        ;; diff の表示設定が上書きされてしまうのでハイライトを無効にする
-       (set-face-attribute 'magit-item-highlight nil :inherit nil)
+       ;; magit 2 以降は magit-item-highlight が無い
+       (when (facep 'magit-item-highlight)
+         (set-face-attribute 'magit-item-highlight nil :inherit nil))
        ;; 色の設定
        (when (and (eval-when-compile (require 'diff-mode nil t))
                   (fboundp 'diff-mode-setup-faces))
@@ -4843,7 +4895,8 @@ Otherwise, return nil."
                (add-to-list 'magit-diff-options option)))
            (when (fboundp 'magit-refresh)
              (magit-refresh))
-           (message "magit-diff-options %s" magit-diff-options)))
+           (when (boundp 'magit-diff-options)
+             (message "magit-diff-options %s" magit-diff-options))))
        (when (boundp 'magit-mode-map)
          (define-key magit-mode-map (kbd "M-r") 'magit-toggle-whitespace))
        (message "Loading %s (magit)...done" this-file-name))))
@@ -4953,11 +5006,10 @@ Otherwise, return nil."
              (message "Failed to set gtags-libpath"))))
 
        ;; 環境変数の設定
-       (defadvice gtags-goto-tag
-           (before setenv-gtags-libpath activate compile)
+       (define-advice gtags-goto-tag (:before (&rest _) setenv-gtags-libpath)
          (when gtags-libpath
            (setenv "GTAGSLIBPATH" gtags-libpath))
-         (setenv "GTAGSTHROUGH" "") ; 全てのパスを走査する
+         (setenv "GTAGSTHROUGH" "")     ; 全てのパスを走査する
          (message "GTAGSLIBPATH: %s" (getenv "GTAGSLIBPATH")))
 
        ;; パスの表示形式
@@ -5265,12 +5317,11 @@ Otherwise, return nil."
   (add-hook 'compilation-mode-hook (lambda () (require 'compile+ nil t)))
 
   ;; コンパイル
-  (defadvice compile
-      (around compile-directory (command &optional comint) activate compile)
+  (define-advice compile (:around (orig &rest args) compile-directory)
     (let ((split-width-threshold 100000) ; 上下分割のみ (デフォルト: 160)
           (default-directory (read-directory-name
                               "Directory: " default-directory nil nil nil)))
-      ad-do-it))
+      (apply orig args)))
   (define-key mode-specific-map "c" 'compile)
 
   (eval-after-load "compile"
@@ -5296,10 +5347,10 @@ Otherwise, return nil."
         '(gcc-ja "^\\([\x20-\x7E]+\\):\\([0-9]+\\): \\(エラー\\|警告\\)" 1 2 nil nil))
        (add-to-list 'compilation-error-regexp-alist 'gcc-ja)
 
-       (defadvice compilation-find-file
-           (before compilation-find-file-log activate compile)
+       (define-advice compilation-find-file
+           (:before (&rest args) compilation-find-file-log)
          (message "compilation-find-file: %s %s %s"
-                  (ad-get-arg 0) (ad-get-arg 1) (ad-get-arg 2)))
+                  (nth 0 args) (nth 1 args) (nth 2 args)))
 
        ;; 再コンパイル (make clean all)
        (defun recompile-make-clean-all ()
@@ -5646,11 +5697,12 @@ Otherwise, return nil."
   (eval-after-load "c-eldoc"
     '(progn
        ;; 関数が見つからないメッセージ抑制
-       (defadvice c-eldoc-print-current-symbol-info
-           (around c-eldoc-print-current-symbol-info-noerror activate compile)
-         (flet ((message (format-string &rest args)
-                         (eval `(format ,format-string ,@args))))
-           ad-do-it))
+       (define-advice c-eldoc-print-current-symbol-info
+           (:around (orig &rest args) c-eldoc-print-current-symbol-info-noerror)
+         (cl-letf (((symbol-function 'message)
+                    (lambda (format-string &rest args)
+                      (apply #'format format-string args))))
+           (apply orig args)))
        ;; 待ち時間
        (when (boundp 'eldoc-idle-delay)
          (setq eldoc-idle-delay 0.1))
@@ -5874,6 +5926,9 @@ Otherwise, return nil."
 ;; https://github.com/echosa/phpplus-mode.git
 ;; https://github.com/tetsujin/emacs-php-align.git
 ;; https://github.com/zenozeng/php-eldoc.git
+;; 注意: パッケージが非推奨の cl を使うので, 初めて使うときに
+;; "Package cl is deprecated" と出る (パッケージ側の問題. cl が Emacs から
+;; 削除されると, パッケージ側が直るまで使えなくなる)
 ;; (load-library "php-extras-gen-eldoc")
 ;; (php-extras-generate-eldoc)
 ;; (auto-install-batch "anything")
@@ -6465,10 +6520,8 @@ Otherwise, return nil."
     (define-key global-map (kbd "<C-right>") 'forward-word)
     (define-key global-map (kbd "<C-left>") 'backward-word)))
 
-(defadvice terminal-init-xterm
-    (around map-escape-sequence activate compile)
-  (set-keys-map)
-  ad-do-it)
+(define-advice terminal-init-xterm (:before (&rest _) map-escape-sequence)
+  (set-keys-map))
 (set-keys-map)
 
 ;;; バックトレースを無効にする

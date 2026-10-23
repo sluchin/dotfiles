@@ -471,7 +471,7 @@
 ;; inclusion list.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (defgroup color-moccur nil
   "Customize color-moccur"

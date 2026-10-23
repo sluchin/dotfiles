@@ -65,11 +65,11 @@
 (message se/version)(sit-for 0)
 
 (eval-and-compile
-  (require 'cl)
+  (require 'cl-lib)
   (or (fboundp 'cl-gethash) (load "cl-extra")))
 ;;; requires common lisp package
 ;;; This file uses: dotimes, push, pop, when, unless.
-(require 'cl)
+(require 'cl-lib)
 
 ;;; requires common lisp extra package
 ;;; they are used in se/only-once
@@ -304,8 +304,8 @@ and summary buffer. Thus Changing to buffer-local variable is not convenient.")
 (make-variable-buffer-local 'se/*memory-structure*)
 (defun se/make-se/memory ()
   (vector (list (cons 0 nil)) nil nil nil nil nil nil nil nil nil nil nil))
-(defmacro se/ref (name) (` (aref se/*memory-structure* (, name))))
-(defmacro se/set (name val) (` (aset se/*memory-structure* (, name) (, val))))
+(defmacro se/ref (name) `(aref se/*memory-structure* ,name))
+(defmacro se/set (name val) `(aset se/*memory-structure* ,name ,val))
 
 (defun se/ref-summary-vector (&optional category)
   (let ((alist (se/ref se/summary-vector)))
@@ -334,30 +334,30 @@ and summary buffer. Thus Changing to buffer-local variable is not convenient.")
 ;;;  position-on-summary(marker)	start position on summary buffer
 ;;;  marked (string)		operation flag (to delete)
 
-(defmacro se/cluster-position (cluster) (` (aref (, cluster) 0)))
+(defmacro se/cluster-position (cluster) `(aref ,cluster 0))
 (defmacro se/set-cluster-position (cluster position)
-  (` (aset (, cluster) 0 (, position))))
-(defmacro se/cluster-name (cluster) (` (aref (, cluster) 1)))
-(defmacro se/cluster-beg (cluster) (` (aref (, cluster) 2)))
+  `(aset ,cluster 0 ,position))
+(defmacro se/cluster-name (cluster) `(aref ,cluster 1))
+(defmacro se/cluster-beg (cluster) `(aref ,cluster 2))
 (defmacro se/cluster-buffer (cluster) 
-  (` (and (, cluster) (marker-buffer (aref (, cluster) 2)))))
-(defmacro se/cluster-end (cluster) (` (aref (, cluster) 3)))
-(defmacro se/set-cluster-end (cluster end) (` (aset (, cluster) 3 (, end))))
-(defmacro se/cluster-face-block (cluster) (` (aref (, cluster) 4)))
+  `(and ,cluster (marker-buffer (aref ,cluster 2))))
+(defmacro se/cluster-end (cluster) `(aref ,cluster 3))
+(defmacro se/set-cluster-end (cluster end) `(aset ,cluster 3 ,end))
+(defmacro se/cluster-face-block (cluster) `(aref ,cluster 4))
 (defmacro se/set-cluster-face-block (cluster list)
-  (` (aset (, cluster) 4 (, list))))
+  `(aset ,cluster 4 ,list))
 (defmacro se/cluster-display-string (cluster)
-  (` (aref (, cluster) 5)))
+  `(aref ,cluster 5))
 (defmacro se/set-cluster-display-string (cluster str)
-  (` (aset (, cluster) 5 (, str))))
+  `(aset ,cluster 5 ,str))
 (defmacro se/set-cluster-position-on-summary (cluster point)
-  (` (aset (, cluster) 6 (, point))))
+  `(aset ,cluster 6 ,point))
 (defmacro se/cluster-position-on-summary (cluster)
-  (` (aref (, cluster) 6)))
+  `(aref ,cluster 6))
 (defmacro se/cluster-marked (cluster)
-  (` (aref (, cluster) 7)))
+  `(aref ,cluster 7))
 (defmacro se/set-cluster-marked (cluster str)
-  (` (aset (, cluster) 7 (, str))))
+  `(aset ,cluster 7 ,str))
 (defun se/make-cluster (nth name beg &optional end)
   "NTH BEG END &optional NAME"
   (or (markerp beg) (error "a cluster is not bound to a buffer"))
@@ -699,7 +699,7 @@ interactively.
     (if (re-search-forward
 	 (concat "^" se/summary-item-flag-regexp "? +\\([0-9]+\\):")
 	 nil t)
-	(se/cluster-of (1- (string-to-int (se/matched-pattern 1))) category))))
+	(se/cluster-of (1- (string-to-number (se/matched-pattern 1))) category))))
 
 (defun se/current-cluster-number ()
   (save-excursion
@@ -707,7 +707,7 @@ interactively.
     (if (re-search-forward
 	 (concat "^" se/summary-item-flag-regexp "? +\\([0-9]+\\):")
 	 nil t)
-	(1- (string-to-int (se/matched-pattern 1))))))
+	(1- (string-to-number (se/matched-pattern 1))))))
 
 (defun se/current-item-number ()
   (save-excursion
@@ -715,7 +715,7 @@ interactively.
     (if (re-search-forward
 	 (concat "^" se/summary-item-flag-regexp "? +\\([0-9]+\\):")
 	 nil t)
-	(string-to-int (se/matched-pattern 1)))))
+	(string-to-number (se/matched-pattern 1)))))
 
 ;; * display commands
 (defun se/goto-current-item ()
@@ -750,7 +750,7 @@ interactively.
 (defun se/jump-to-item-of (nth)
   (interactive "P")
   (or nth
-      (setq nth (string-to-int (read-from-minibuffer "Item number to jump: "))))
+      (setq nth (string-to-number (read-from-minibuffer "Item number to jump: "))))
   (se/jump-to-cluster-of (1- nth)))
 
 (defun se/jump-to-cluster-of (nth)
@@ -758,7 +758,7 @@ interactively.
   (se/show-cluster (se/cluster-of nth) (current-buffer)))
 
 (defmacro se/walk-frame-for-buffer (buffer &rest body)
-  (` (let ((buffer (, buffer))
+  `(let ((buffer ,buffer)
 	   (cwindow (selected-window))
 	   (cframe (selected-frame)))
        (mapcar
@@ -770,11 +770,11 @@ interactively.
 	     (lambda (win)
 	       (when (eq (window-buffer win) buffer)
 		 (select-window win)
-		 (,@ body))))
+		 ,@body)))
 	    nil 'only)))
 	(frame-list))
        (select-frame cframe)
-       (select-window cwindow))))
+       (select-window cwindow)))
 
 ;(macroexpand '(se/walk-frame-for-buffer (current-buffer) (test)))
 ;(put 'se/walk-frame-for-buffer 'lisp-indent-function 1)
@@ -850,7 +850,7 @@ interactively.
     (set-buffer (se/ref se/parent-buffer))
     (se/make-summary-buffer category nil mem)
     (let ((length (length (se/cluster-vector))))
-      (when (and (numberp nth) (plusp length))
+      (when (and (numberp nth) (cl-plusp length))
 	(se/jump-to-cluster-of (min nth (1- length)))))
     (message "remaking...done")))
 
@@ -1161,7 +1161,7 @@ integer or marker. The type of ATTR is symbol. Its default value is bold."
       (when (stringp (se/ref se/item-documentation))
 	(princ "Documentation:\n")
 	(princ (se/ref se/item-documentation))))
-    (print-help-return-message)))
+    (help-print-return-message)))
 
 ;; * key bindings
 (eval-and-compile

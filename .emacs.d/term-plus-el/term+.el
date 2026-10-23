@@ -30,7 +30,7 @@
 (require 'term+logging)
 (require 'term+file-transfer)
 (require 'term+shell-history)
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 
 ;;; protocols
@@ -67,7 +67,7 @@
 It is the same as `yank' except that it sends the text to the
 terminal and ignores `yank-handler' property of the text."
   (interactive)
-  (letf (((symbol-function 'insert-for-yank)
+  (cl-letf (((symbol-function 'insert-for-yank)
           (symbol-function 'term-send-raw-string)))
     (setq this-command 'yank)
     (call-interactively 'yank)))
