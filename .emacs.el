@@ -536,6 +536,12 @@
          (set-face-attribute 'default nil
                              :family "HackGen Console NF"
                              :height 110)
+         ;; (set-face-attribute 'default nil
+         ;;                     :family "PlemolJP Console NF"
+         ;;                     :height 110)
+         ;; (set-face-attribute 'default nil
+         ;;                     :family "UDEV Gothic NF"
+         ;;                     :height 110)
          (if (fboundp 'font-spec)
              (set-fontset-font "fontset-default" 'japanese-jisx0208
                                (font-spec :family "HackGen Console NF"))
